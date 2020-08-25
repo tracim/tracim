@@ -14,10 +14,10 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 class TestLogoutEndpoint(object):
     def test_api__access_logout_get_enpoint__ok__nominal_case(self, web_testapp):
-        web_testapp.post_json("/api/auth/logout", status=204)
+        web_testapp.get("/api/auth/logout", status=204)
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self, web_testapp):
-        web_testapp.get("/api/auth/logout", status=204)
+        web_testapp.post_json("/api/auth/logout", status=204)
 
 
 @pytest.mark.usefixtures("base_fixture")

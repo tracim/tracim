@@ -140,7 +140,7 @@ export class Agenda extends React.Component {
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
-    console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
       if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)

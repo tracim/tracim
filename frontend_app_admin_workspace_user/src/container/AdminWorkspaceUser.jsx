@@ -130,7 +130,7 @@ export class AdminWorkspaceUser extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`)
+    // console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`)
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }

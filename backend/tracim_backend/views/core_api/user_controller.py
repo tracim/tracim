@@ -1,3 +1,4 @@
+import json
 import typing
 
 from hapic import HapicData
@@ -19,6 +20,7 @@ from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -47,6 +49,7 @@ from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
+from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
@@ -607,7 +610,8 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_headers(TracimLiveEventHeaderSchema())
-    def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
+    @hapic.input_query(TracimLiveEventQuerySchema())
+    def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
         """
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
@@ -615,15 +619,31 @@ class UserController(Controller):
         stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
             str(request.candidate_user.user_id)
         )
-        escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
-        user_channel_name = "user_{}".format(request.candidate_user.user_id)
+
+        after_event_id = hapic_data.query["after_event_id"]  # type: int
+        if after_event_id:
+            app_config = request.registry.settings["CFG"]  # type: CFG
+            event_api = EventApi(request.current_user, request.dbsession, app_config)
+            messages = event_api.get_messages_for_user(
+                request.candidate_user.user_id, after_event_id=after_event_id
+            )  # type: typing.List[Message]
+
+            stream_opened_event += "".join(
+                [
+                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
+                    for message in messages
+                ]
+            )
+
+        escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
+        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
         headers = [
             # Here we ask push pin to keep the connection open
             ("Grip-Hold", "stream"),
             # and register this connection on the given channel
             # multiple channels subscription is possible
             ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keealive_event)),
+            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events

@@ -1426,6 +1426,12 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
 
 
+class TracimLiveEventQuerySchema(marshmallow.Schema):
+    after_event_id = marshmallow.fields.Int(
+        required=False, missing=0, example=42, validator=positive_int_validator
+    )
+
+
 # INFO - G.M - 2020-05-19 - This is only used for documentation
 class PathSuffixSchema(marshmallow.Schema):
     path_suffix = marshmallow.fields.Str(

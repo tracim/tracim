@@ -71,19 +71,26 @@ class EventApi:
         self._session = session
         self._config = config
 
-    def get_messages_for_user(self, user_id: int, read_status: ReadStatus) -> typing.List[Message]:
+    def get_messages_for_user(
+        self, user_id: int, read_status: ReadStatus = ReadStatus.ALL, after_event_id: int = 0
+    ) -> typing.List[Message]:
         query = (
             self._session.query(Message)
             .filter(Message.receiver_id == user_id)
             .options(joinedload(Message.event))
         )
+
         if read_status == ReadStatus.READ:
             query = query.filter(Message.read != null())
         elif read_status == ReadStatus.UNREAD:
             query = query.filter(Message.read == null())
         else:
-            # ALL doesn't need any filtering an is the only other handled case
+            # ALL doesn't need any filtering and is the only other handled case
             assert read_status == ReadStatus.ALL
+
+        if after_event_id:
+            query = query.filter(Message.event_id > after_event_id)
+
         return query.all()
 
 

@@ -34,6 +34,7 @@ export class LiveMessageManager {
     this.reconnectionTimerId = 0
     this.userId = null
     this.host = null
+    this.lastEventId = 0
   }
 
   openLiveMessageConnection (userId, host = null) {
@@ -74,9 +75,13 @@ export class LiveMessageManager {
 
     this.closeEventSourceConnection()
 
+    let afterEventFilter = ''
+    if (this.lastEventId) {
+      afterEventFilter = `?after_event_id=${this.lastEventId}`
+    }
+
     this.eventSource = new EventSource(
-      `${url}/users/${this.userId}/live_messages`,
-      { withCredentials: true }
+      `${url}/users/${this.userId}/live_messages${afterEventFilter}`
     )
 
     this.broadcastStatus(LIVE_MESSAGE_STATUS.PENDING)
@@ -117,7 +122,6 @@ export class LiveMessageManager {
   closeEventSourceConnection () {
     if (this.eventSource) {
       this.eventSource.close()
-      console.log('%c.:. TLM Closed')
       this.stopHeartbeatFailureTimer()
       if (this.reconnectionTimerId) {
         globalThis.clearTimeout(this.reconnectionTimerId)
@@ -135,6 +139,7 @@ export class LiveMessageManager {
       this.broadcastChannel = null
     }
 
+    console.log('%c.:. TLM Closed')
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
     return true
   }
@@ -142,8 +147,33 @@ export class LiveMessageManager {
   restartEventSourceConnection () {
     if (this.reconnectionTimerId) return
 
-    this.reconnectionTimerId = globalThis.setTimeout(() => {
-      this.openEventSourceConnection()
+    // NOTE - 2020-08-19 - RJ
+    // We must not let the browser auto-reconnect. We need to
+    // use an URL containing the last received event id when
+    // reconnecting. We therefore close the connection.
+    // NOTE - 2020-08-20 - RJ
+    // And we also need to check whether the disconnection was
+    // not caused because the user has been logged out
+    this.closeEventSourceConnection()
+
+    this.reconnectionTimerId = setTimeout(async () => {
+      // NOTE - 2020-08-19 - RJ
+      // The live message manager can be closed during the timeout.
+      if (this.status !== LIVE_MESSAGE_STATUS.CLOSED) {
+        // NOTE - 2020-08-20 - RJ
+        // Let's check that the user has not been logged out. We do this by
+        // pinging whoami. In a perfect world, we would have checked the status of
+        // the EventSource request. The world is not perfect and sadly, EventSource
+        // does not expose the HTTP status.
+        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`)
+        if (response.status === 401) {
+          GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, data: {} })
+          this.closeLiveMessageConnection()
+          return
+        }
+
+        this.openEventSourceConnection()
+      }
       this.reconnectionTimerId = 0
     }, this.reconnectionIntervalMs)
   }
@@ -151,7 +181,9 @@ export class LiveMessageManager {
   dispatchLiveMessage (tlm) {
     console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
 
-    const customEvent = new globalThis.CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
+    this.lastEventId = Math.max(this.lastEventId, tlm.event_id)
+
+    const customEvent = new CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
       detail: {
         type: tlm.event_type,
         data: tlm.fields
@@ -162,7 +194,7 @@ export class LiveMessageManager {
   }
 
   startHeartbeatFailureTimer () {
-    this.heartbeatFailureTimerId = globalThis.setTimeout(
+    this.heartbeatFailureTimerId = setTimeout(
       this.handleHeartbeatFailure.bind(this),
       1.5 * this.heartBeatIntervalMs
     )
@@ -189,7 +221,7 @@ export class LiveMessageManager {
     if (this.status === status) return
     console.log('TLM STATUS: ', status)
     this.status = status
-    globalThis.GLOBAL_dispatchEvent({
+    GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED,
       data: { status }
     })
