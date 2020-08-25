@@ -6,7 +6,8 @@ import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
 
 export class CommentTextArea extends React.Component {
@@ -22,7 +23,10 @@ export class CommentTextArea extends React.Component {
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    if (!prevProps.wysiwyg && this.props.wysiwyg) this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
+    if (!prevProps.wysiwyg && this.props.wysiwyg) {
+      this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+    }
+
     if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
       this.searchForMentionCandidate()
     }
@@ -131,6 +135,10 @@ export class CommentTextArea extends React.Component {
       state.isAutoCompleteActivated,
       this.props.searchForMentionInQuery
     )
+  }
+
+  handleTinyMceSelectionChange = selectionId => {
+    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
   }
 
   render () {

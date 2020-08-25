@@ -99,3 +99,12 @@ export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
 
   setState({ isAutoCompleteActivated: false })
 }
+
+export const tinymceAutoCompleteHandleSelectionChange = (selectionId, setState, isAutoCompleteActivated) => {
+  if (selectionId === 'autocomplete__searchtext' || selectionId === 'autocomplete__start') {
+    if (!isAutoCompleteActivated) setState({ isAutoCompleteActivated: true })
+    return
+  }
+
+  if (isAutoCompleteActivated) setState({ isAutoCompleteActivated: false })
+}

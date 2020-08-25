@@ -29,7 +29,7 @@ import i18n from './i18n.js'
     }
   }
 
-  globalThis.wysiwyg = function (selector, lang, handleOnChange, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp) {
+  globalThis.wysiwyg = function (selector, lang, handleOnChange, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
@@ -112,6 +112,10 @@ import i18n from './i18n.js'
 
         $editor.on('input', function (e) {
           return getPosition(e)
+        })
+
+        $editor.on('selectionchange', function (e) {
+          handleTinyMceSelectionChange($editor.selection.getNode().id)
         })
 
         // ////////////////////////////////////////////

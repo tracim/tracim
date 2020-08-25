@@ -34,7 +34,8 @@ import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -228,13 +229,28 @@ export class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
+      globalThis.wysiwyg('#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText, this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp)
+      globalThis.wysiwyg(
+        '#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
@@ -243,16 +259,36 @@ export class HtmlDocument extends React.Component {
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+      initWysiwyg(
+        state,
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
   }
 
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp) => {
-    globalThis.wysiwyg('#wysiwygTimelineComment', this.state.loggedUser.lang, this.handleChangeNewComment, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp)
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
   }
 
   handleTinyMceInput = (event, tinymcePosition) => {
     tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+  }
+
+  handleTinyMceSelectionChange = selectionId => {
+    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
   }
 
   handleTinyMceKeyUp = event => {
