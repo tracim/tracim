@@ -3,6 +3,7 @@
 
 ### Fixed Issues
 
+- Frontend: #3409
 - Backend: #3049, #3409
 
 
