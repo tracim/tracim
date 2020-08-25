@@ -4,7 +4,7 @@ import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
 import {
   TextAreaApp,
-  DisplayState,
+  PromptMessage,
   APP_FEATURE_MODE
 } from 'tracim_frontend_lib'
 
@@ -65,7 +65,7 @@ describe('<HtmlDocument />', () => {
 
       it('should display the archived warning', () =>
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-          .to.have.descendants(DisplayState)
+          .to.have.descendants(PromptMessage)
           .and
           .have.html().to.contains('fa-archive')
       )
@@ -81,7 +81,7 @@ describe('<HtmlDocument />', () => {
 
       it('should display the trash warning', () =>
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-          .to.have.descendants(DisplayState)
+          .to.have.descendants(PromptMessage)
           .and
           .have.html().to.contains('fa-trash')
       )
@@ -97,7 +97,7 @@ describe('<HtmlDocument />', () => {
 
       it(`should display the ${props.deprecatedStatus.faIcon} warning`, () =>
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-          .to.have.descendants(DisplayState)
+          .to.have.descendants(PromptMessage)
           .and
           .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
       )
@@ -113,7 +113,7 @@ describe('<HtmlDocument />', () => {
 
       it('should display the "resume writing" button', () =>
         expect(wrapper.find('.html-document__contentpage__textnote'))
-          .to.have.descendants(DisplayState)
+          .to.have.descendants(PromptMessage)
           .and
           .have.html().to.contains('fa-hand-o-right')
       )
