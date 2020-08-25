@@ -30,13 +30,13 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  getContentComment
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
-  getHtmlDocComment,
   getHtmlDocRevision,
   putHtmlDocContent,
   putHtmlDocRead
@@ -311,7 +311,7 @@ export class HtmlDocument extends React.Component {
     const { props, state } = this
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resHtmlDocument, resComment, resRevision] = await Promise.all([

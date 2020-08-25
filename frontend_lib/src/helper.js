@@ -459,3 +459,26 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     usernameInvalidMsg: ''
   }
 }
+
+export const addMentionClassesOfUser = (rawContent, username, userClassName = 'mention-me') => {
+  const parser = new DOMParser()
+  const document = parser.parseFromString(rawContent, 'text/html')
+  // TODO: error case
+
+  const elementHasMentionForUser = element => {
+    const toto = '@' + username
+    return element.id !== null && element.id.startsWith('mention-') && element.textContent.includes(toto)
+  }
+
+  const spans = document.getElementsByTagName('span')
+  for (let i = 0; i < spans.length; ++i) {
+    const element = spans[i]
+    if (!elementHasMentionForUser(element)) continue
+
+    let className = element.className
+    className += className === '' ? userClassName : ' ' + userClassName
+    element.className = className
+  }
+
+  return document.body.innerHTML
+}

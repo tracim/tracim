@@ -41,14 +41,14 @@ import {
   RefreshWarningMessage,
   setupCommonRequestHeaders,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  getContentComment
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getFileContent,
-  getFileComment,
   getFileRevision,
   getShareLinksList,
   postShareLinksList,
@@ -334,7 +334,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const [resComment, resRevision] = await Promise.all([
-      handleFetchResult(await getFileComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 

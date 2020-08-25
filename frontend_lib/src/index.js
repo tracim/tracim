@@ -104,6 +104,8 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
+import getContentComment from './action.async.js'
+
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
@@ -198,5 +200,6 @@ export {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  getContentComment
 }

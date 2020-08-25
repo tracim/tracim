@@ -14,7 +14,8 @@ import {
   addRevisionFromTLM,
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
-  MAXIMUM_CHARACTERS_USERNAME
+  MAXIMUM_CHARACTERS_USERNAME,
+  addMentionClassesOfUser
 } from '../src/helper.js'
 
 import {
@@ -292,6 +293,14 @@ describe('helper.js', () => {
       } catch (e) {
         expect(typeof e).to.equal('Error')
       }
+    })
+  })
+
+  describe('the addMentionClassesOfUser function', () => {
+    it('should work', () => {
+      const content = '<span id="mention-foobar">@foo</span>'
+      const modifiedContent = addMentionClassesOfUser(content, 'foo')
+      expect(modifiedContent).to.equal('<span id="mention-foobar" class="mention-me">@foo</span>')
     })
   })
 })

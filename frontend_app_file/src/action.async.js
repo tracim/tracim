@@ -9,15 +9,6 @@ export const getFileContent = (apiUrl, workspaceId, contentId) =>
     method: 'GET'
   })
 
-export const getFileComment = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
 export const getFileRevision = (apiUrl, workspaceId, contentId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`, {
     credentials: 'include',

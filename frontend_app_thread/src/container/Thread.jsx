@@ -26,11 +26,11 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  getContentComment
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
-  getThreadComment,
   getThreadRevision,
   putThreadRead
 } from '../action.async.js'
@@ -239,7 +239,7 @@ export class Thread extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
-    const fetchResultThreadComment = getThreadComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resComment, resRevision] = await Promise.all([
