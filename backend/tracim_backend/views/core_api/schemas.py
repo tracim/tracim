@@ -22,6 +22,7 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.app_models.validator import user_config_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
@@ -266,7 +267,19 @@ class LoggedInUserPasswordSchema(marshmallow.Schema):
 
 
 class SetConfigSchema(marshmallow.Schema):
-    parameters = marshmallow.fields.Dict(required=True, example='{"param1":"value1"}')
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True,
+        example='{"param1":"value1"}',
+        validate=user_config_validator,
+        description="A simple json Dictionnary."
+        'Valid key are limited to not empty string with "0-9a-zA-Z-_." characters. '
+        "Valid value allow only standard type: int, bool, null, float and do not accept"
+        "complex type such dict or list.",
+    )
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):

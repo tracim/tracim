@@ -7,9 +7,11 @@ import os
 from os.path import normpath as base_normpath
 import pkgutil
 import random
+import re
 import string
 import sys
 import types
+import typing
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -23,6 +25,7 @@ import uuid
 from colour import Color
 from git import InvalidGitRepositoryError
 from marshmallow import ValidationError
+from marshmallow.validate import Regexp
 import pytz
 from sqlakeyset import unserialize_bookmark
 
@@ -499,7 +502,7 @@ def get_build_version(path: str) -> str:
         return repo.head.object.hexsha[:10]
 
 
-def validate_page_token(page_token: str):
+def validate_page_token(page_token: str) -> None:
     # INFO - G.M - 2020-07-23 - Because they lack an explicit message, we catch exceptions from
     # the unserialize_bookmark method of sqlakeyset and re-raise them with an explicit message.
     # See https://github.com/djrobstep/sqlakeyset/issues/34
@@ -507,3 +510,34 @@ def validate_page_token(page_token: str):
         unserialize_bookmark(page_token)
     except Exception as e:
         raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e
+
+
+def validate_simple_dict(dict_: typing.Dict) -> None:
+    """
+    A simple dict validator with:
+    key as 0-9a-zA-Z-_. based string
+    value as either: string, int, bool, float types
+    """
+    for key in dict_.keys():
+        if not isinstance(key, str):
+            raise ValidationError('Dictionnary key "{}" is not a string'.format(key))
+        regex_validator = Regexp(regex=(re.compile("^[0-9a-zA-Z-_.]+$")))
+        try:
+            regex_validator(key)
+        except ValidationError as exc:
+            raise ValidationError(
+                'Dictionnary key "{}" incorrect : {}'.format(key, str(exc))
+            ) from exc
+
+    # INFO - G.M - We do consider float is the type used for float conversion,
+    # this may change depending
+    # on how the json parser is configured.
+    float_type = float
+    valid_types = [str, int, bool, float_type]
+    for value in dict_.values():
+        if value and type(value) not in valid_types:
+            raise ValidationError(
+                'Dictionnary value "{}" type: "{}" is not a valid type for simple value'.format(
+                    value, type(value)
+                )
+            )
