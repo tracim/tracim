@@ -10,6 +10,25 @@ import { translate } from 'react-i18next'
 export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
+      {props.isLastModifier && (
+        <PromptMessage
+          msg={
+            <span>{props.t('To notify all members of the shared space of your modification')},
+              <button
+                className='buttonLink'
+                onClick={() => { console.log('clicou aqui tb') }}
+              >
+                {props.t('click here!')}
+              </button>
+            </span>
+          }
+          btnType='link'
+          icon='hand-o-right'
+          btnLabel={<i className='fa fa-times' />}
+          onClickBtn={() => { console.log('clicou') }}
+        />
+      )}
+
       {props.isArchived && (
         <PromptMessage
           msg={props.t('This content is archived')}

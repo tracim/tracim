@@ -657,6 +657,7 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
+            isLastModifier={true}
           />
 
           <PopinFixedRightPart
