@@ -185,9 +185,21 @@ const mockGetFolderContentList200 = (apiUrl, workspaceId, folderIdList, resultCo
 
 const mockGetWhoami = (apiUrl, status) => {
   return nock(apiUrl)
-    .log(console.error)
     .get('/auth/whoami')
     .reply(status, '')
+}
+
+const mockGetWhoamiWithDelay = (apiUrl, status, delay) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .delayConnection(delay)
+    .reply(status, '')
+}
+
+const mockGetWhoamiFailure = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .replyWithError('Error foobar')
 }
 
 export {
@@ -215,5 +227,7 @@ export {
   mockGetUserCalendar200,
   mockGetUser200,
   mockGetFolderContentList200,
-  mockGetWhoami
+  mockGetWhoami,
+  mockGetWhoamiFailure,
+  mockGetWhoamiWithDelay
 }

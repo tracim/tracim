@@ -5,6 +5,7 @@ import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import sinon from 'sinon'
 import EventSource from 'eventsourcemock'
+import AbortController from 'abort-controller'
 
 process.env.NODE_ENV = 'test'
 
@@ -36,6 +37,8 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
   global.EventSource = EventSource
   global.CustomEvent = () => {}
+  global.fetch = require('node-fetch')
+  global.AbortController = AbortController
 }
 
 Enzyme.configure({ adapter: new Adapter() })
