@@ -746,9 +746,9 @@ class UserController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
-        set or update the given configuration parameters for the given user
+        Set or update the given configuration parameters for the given user
         The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
-        whole config, so it's not possible to remove key through this endpoint
+        whole config, so it's not possible to remove key through this endpoint.
         """
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
