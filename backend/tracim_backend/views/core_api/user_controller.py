@@ -748,7 +748,7 @@ class UserController(Controller):
         """
         Set or update the given configuration parameters for the given user
         The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
-        whole config, so it's not possible to remove key through this endpoint.
+        whole configuration, so it's not possible to remove keys through this endpoint.
         """
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])

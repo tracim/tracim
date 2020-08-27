@@ -529,7 +529,7 @@ def validate_simple_dict(dict_: typing.Dict) -> None:
                 'Dictionary key "{}" incorrect : {}'.format(key, str(exc))
             ) from exc
 
-    # INFO - G.M - We do consider float is the type used for float conversion,
+    # INFO - G.M - We assume float is the type used for float conversion,
     # this may change depending
     # on how the json parser is configured.
     float_type = float
