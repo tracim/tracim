@@ -520,13 +520,13 @@ def validate_simple_dict(dict_: typing.Dict) -> None:
     """
     for key in dict_.keys():
         if not isinstance(key, str):
-            raise ValidationError('Dictionnary key "{}" is not a string'.format(key))
+            raise ValidationError('Dictionary key "{}" is not a string'.format(key))
         regex_validator = Regexp(regex=(re.compile("^[0-9a-zA-Z-_.]+$")))
         try:
             regex_validator(key)
         except ValidationError as exc:
             raise ValidationError(
-                'Dictionnary key "{}" incorrect : {}'.format(key, str(exc))
+                'Dictionary key "{}" incorrect : {}'.format(key, str(exc))
             ) from exc
 
     # INFO - G.M - We do consider float is the type used for float conversion,
@@ -537,7 +537,7 @@ def validate_simple_dict(dict_: typing.Dict) -> None:
     for value in dict_.values():
         if value and type(value) not in valid_types:
             raise ValidationError(
-                'Dictionnary value "{}" type: "{}" is not a valid type for simple value'.format(
+                'Dictionary value "{}" type: "{}" is not a valid type for simple value'.format(
                     value, type(value)
                 )
             )
