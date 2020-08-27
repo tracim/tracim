@@ -548,6 +548,19 @@ export class HtmlDocument extends React.Component {
     this.buildBreadcrumbs(newObjectContent)
   }
 
+  handleCloseNotifyAllMessage = () => {
+    // TODO Set notify all members at generic endpoint
+    // The stored key will be content.<content_id>.notify_all_members_message, its value is a bool.
+    console.log('closed')
+  }
+
+  handleClickNotifyAll = async () => {
+    const { state, props } = this
+
+    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    this.handleCloseNotifyAllMessage()
+  }
+
   render () {
     const { props, state } = this
 
@@ -657,7 +670,9 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            isLastModifier={true}
+            showNotifyAllMessage={true}
+            onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
+            onClickNotifyAll={this.handleClickNotifyAll}
           />
 
           <PopinFixedRightPart

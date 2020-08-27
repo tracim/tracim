@@ -1,4 +1,5 @@
 {
+  "click here!": "clique aqui!",
   "Last version": "Última versão",
   "Restore": "Restaurar",
   "Error while creating file": "Erro ao criar o ficheiro",
@@ -57,6 +58,7 @@
   "Play video": "Reproduzir vídeo",
   "In that case, you can download the video and try opening it manually.": "Nesse caso, você pode descarregar o vídeo e tentar abri-lo manualmente.",
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descarregar o vídeo, saia do modo ecrã inteiro e clique no botão de download {{icon}}.",
+  "To notify all members of the shared space of your modification": "Para notificar a todos os membros do espaço partilhado da sua modificação",
   "Note: Your browser might not be able to read this file.": "Nota: O seu browser pode não conseguir ler este ficheiro.",
   "File has been updated": "O ficheiro foi actualizado",
   "File has been deleted": "O ficheiro foi eliminado",

@@ -289,6 +289,12 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentNotifyAll = (content, setState, appSlug) => {
+      const notifyAllComment = i18n.t('@all please notice that I did an important update on this content.')
+
+      this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
+    }
+
     buildTimelineFromCommentAndRevision = (commentList, revisionList, userLang) => {
       const resCommentWithProperDate = commentList.map(c => ({
         ...c,
@@ -328,6 +334,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
           appContentDelete={this.appContentDelete}
+          appContentNotifyAll={this.appContentNotifyAll}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}

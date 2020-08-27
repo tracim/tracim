@@ -1,4 +1,5 @@
 {
+  "click here!": "clique aqui!",
   "Last version": "Última versão",
   "Validate and create": "Validar e criar",
   "Document's title": "Título do documento",
@@ -22,6 +23,7 @@
   "text documents": "documentos de texto",
   "This content is deprecated": "Este conteúdo está obsoleto",
   "Timeline": "Linha cronológica",
+  "To notify all members of the shared space of your modification": "Para notificar a todos os membros do espaço partilhado da sua modificação",
   "New text document": "Novo documento de texto",
   "You must change the status or restore this document before any change": "É necessário alterar o status ou restaurar este documento antes de qualquer alteração",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}"

@@ -75,6 +75,25 @@ export class FileComponent extends React.Component {
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
+        {props.showNotifyAllMessage && (
+          <PromptMessage
+            msg={
+              <span>{props.t('To notify all members of the shared space of your modification')},
+                <button
+                  className='buttonLink'
+                  onClick={props.onClickNotifyAll}
+                >
+                  {props.t('click here!')}
+                </button>
+              </span>
+            }
+            btnType='link'
+            icon='hand-o-right'
+            btnLabel={<i className='fa fa-times' />}
+            onClickBtn={props.onClickCloseNotifyAllMessage}
+          />
+        )}
+
         {props.isArchived && (
           <PromptMessage
             msg={props.t('This content is archived')}

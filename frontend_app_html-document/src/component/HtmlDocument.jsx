@@ -10,13 +10,13 @@ import { translate } from 'react-i18next'
 export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
-      {props.isLastModifier && (
+      {props.showNotifyAllMessage && (
         <PromptMessage
           msg={
             <span>{props.t('To notify all members of the shared space of your modification')},
               <button
                 className='buttonLink'
-                onClick={() => { console.log('clicou aqui tb') }}
+                onClick={props.onClickNotifyAll}
               >
                 {props.t('click here!')}
               </button>
@@ -25,7 +25,7 @@ export const HtmlDocument = props => {
           btnType='link'
           icon='hand-o-right'
           btnLabel={<i className='fa fa-times' />}
-          onClickBtn={() => { console.log('clicou') }}
+          onClickBtn={props.onClickCloseNotifyAllMessage}
         />
       )}
 
@@ -125,6 +125,8 @@ HtmlDocument.propTypes = {
   onClickValidateBtn: PropTypes.func,
   onChangeText: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
+  onClickCloseNotifyAllMessage: PropTypes.func,
+  onClickNotifyAll: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,

@@ -846,6 +846,19 @@ export class File extends React.Component {
     }
   }
 
+  handleCloseNotifyAllMessage = () => {
+    // TODO Set notify all members at generic endpoint
+    // The stored key will be content.<content_id>.notify_all_members_message, its value is a bool.
+    console.log('closed')
+  }
+
+  handleClickNotifyAll = async () => {
+    const { state, props } = this
+
+    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    this.handleCloseNotifyAllMessage()
+  }
+
   render () {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
@@ -993,6 +1006,9 @@ export class File extends React.Component {
             previewVideo={state.previewVideo}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
+            showNotifyAllMessage
+            onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
+            onClickNotifyAll={this.handleClickNotifyAll}
           />
 
           <PopinFixedRightPart
