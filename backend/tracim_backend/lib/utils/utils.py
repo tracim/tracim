@@ -533,11 +533,14 @@ def validate_simple_dict(dict_: typing.Dict) -> None:
     # this may change depending
     # on how the json parser is configured.
     float_type = float
-    valid_types = [str, int, bool, float_type]
-    for value in dict_.values():
-        if value and type(value) not in valid_types:
-            raise ValidationError(
-                'Dictionary value "{}" type: "{}" is not a valid type for simple value'.format(
-                    value, type(value)
-                )
+    invalid_key_value_pairs = [
+        (key, value)
+        for key, value in dict_.items()
+        if not isinstance(value, (str, int, bool, float_type, type(None)))
+    ]
+    if invalid_key_value_pairs:
+        raise ValidationError(
+            "Only string/number/null values are allowed as dictionary value. Invalid values: {}".format(
+                invalid_key_value_pairs
             )
+        )
