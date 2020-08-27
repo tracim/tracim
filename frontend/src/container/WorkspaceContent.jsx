@@ -159,7 +159,7 @@ export class WorkspaceContent extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
-    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
+    // console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
     if (state.workspaceIdInUrl === null) return
 
