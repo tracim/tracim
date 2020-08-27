@@ -80,7 +80,9 @@ export const HtmlDocument = props => {
                 style={{
                   top: props.tinymcePosition.top +
                     (props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.selectionHeight : 0),
-                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none'
+                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
+                  position: props.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
+                  zIndex: props.tinymcePosition.isFullscreen ? 1061 : 20
                 }}
                 delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
               />

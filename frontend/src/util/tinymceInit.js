@@ -90,10 +90,12 @@ import i18n from './i18n.js'
           const nodePosition = selectionNode.position()
           const nodeOffset = selectionNode.offset()
           const nodeHeight = selectionNode.height()
+          const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
           const position = {
-            top: nodePosition.top + toolbarPosition.height(),
+            top: (isFullscreen ? $editor.getContainer().offsetTop + nodePosition.top : nodePosition.top) + toolbarPosition.height(),
             isSelectionToTheTop: nodePosition.top === 0,
-            selectionHeight: (nodeOffset.top * 2) + nodeHeight
+            selectionHeight: (nodeOffset.top * 2) + nodeHeight,
+            isFullscreen
           }
           handleTinyMceInput(e, position)
         }
@@ -111,7 +113,7 @@ import i18n from './i18n.js'
         })
 
         $editor.on('input', function (e) {
-          return getPosition(e)
+          getPosition(e)
         })
 
         $editor.on('selectionchange', function (e) {
