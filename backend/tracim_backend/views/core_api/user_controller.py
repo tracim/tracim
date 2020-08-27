@@ -747,6 +747,8 @@ class UserController(Controller):
     def set_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         set or update the given configuration parameters for the given user
+        The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
+        whole config, so it's not possible to remove key through this endpoint
         """
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
@@ -961,6 +963,6 @@ class UserController(Controller):
         configurator.add_view(self.get_user_config, route_name="config_get")
 
         configurator.add_route(
-            "config_post", "/users/{user_id:\d+}/config", request_method="POST",  # noqa: W605
+            "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
