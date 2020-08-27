@@ -189,6 +189,7 @@
   "Error while moving content": "Error while moving content",
   "Error while uploading file": "Error while uploading file",
   "Error while loading the notification list": "Error while loading the notification list",
+  "Error while loading the user configuration": "Error while loading the user configuration",
   "Error while marking the notification as read": "Error while marking the notification as read",
   "Move this content": "Move this content",
   "Move this folder": "Move this folder",

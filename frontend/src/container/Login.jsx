@@ -24,6 +24,7 @@ import {
   setAppList,
   setConfig,
   resetBreadcrumbs,
+  setUserConfiguration,
   setUserLang,
   setWorkspaceListMemberList,
   setNotificationNotReadCounter,
@@ -37,6 +38,7 @@ import {
   getContentTypeList,
   getMyselfWorkspaceList,
   getNotificationList,
+  getUserConfiguration,
   getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
@@ -151,6 +153,7 @@ class Login extends React.Component {
         this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
+        this.loadUserConfiguration(loggedUser.user_id)
         props.tlm.manager.openLiveMessageConnection(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
@@ -220,6 +223,16 @@ class Login extends React.Component {
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+  }
+
+  loadUserConfiguration = async userId => {
+    const { props } = this
+
+    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
+    switch (fetchGetUserConfig.status) {
+      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
+    }
   }
 
   loadNotificationNotRead = async (userId) => {

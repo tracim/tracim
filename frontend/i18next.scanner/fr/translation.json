@@ -190,6 +190,7 @@
   "Error while moving content": "Erreur lors du déplacement du contenu",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
   "Error while loading the notification list": "Erreur lors du chargement de la liste des notifications",
+  "Error while loading the user configuration": "Erreur lors du chargement de la configuration utilisateur",
   "Error while marking the notification as read": "Erreur au moment de marquer la notification comme lue",
   "Move this content": "Déplacer ce contenu",
   "Move this folder": "Déplacer ce dossier",
