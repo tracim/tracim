@@ -277,6 +277,7 @@ class SetConfigSchema(marshmallow.Schema):
         validate=user_config_validator,
         description="A simple json Dictionnary."
         'Valid key are limited to not empty string with "0-9a-zA-Z-_." characters. '
+        'You can use "." to create hierarchy in the configuration parameters.'
         "Valid value allow only standard type: int, bool, null, float and do not accept"
         "complex type such dict or list.",
     )
