@@ -1,5 +1,6 @@
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import JSON
 from sqlalchemy.types import Integer
@@ -18,16 +19,14 @@ class UserConfig(DeclarativeBase):
 
     user_id = Column(
         Integer,
-        ForeignKey(
-            "users.user_id",
-            onupdate="CASCADE",
-            ondelete="CASCADE",
-        ),
+        ForeignKey("users.user_id", onupdate="CASCADE", ondelete="CASCADE",),
         nullable=False,
         primary_key=True,
     )
 
-    user = relationship("User", remote_side=[User.user_id])
+    user = relationship(
+        "User", remote_side=[User.user_id], backref=backref("config", uselist=False)
+    )
 
     fields = Column(JSON, nullable=False, default={})
 
