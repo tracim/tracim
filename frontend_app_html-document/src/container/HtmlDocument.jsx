@@ -31,8 +31,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  wrapMentionsInSpanTags
-  getCurrentContentVersionNumber,
+  wrapMentionsInSpanTags,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
@@ -516,7 +515,7 @@ export class HtmlDocument extends React.Component {
           mode: APP_FEATURE_MODE.VIEW,
           content: {
             ...prev.content,
-            raw_content: contentWithoutAnyAutoCompleteSpan
+            raw_content: newDocumentForApiWithMention
           }
         }))
         break
