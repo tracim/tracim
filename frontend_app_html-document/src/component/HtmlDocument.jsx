@@ -10,7 +10,7 @@ import { translate } from 'react-i18next'
 export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
-      {props.showNotifyAllMessage && (
+      {props.displayNotifyAllMessage && (
         <PromptMessage
           msg={
             <span>{props.t('To notify all members of the shared space of your modification')},

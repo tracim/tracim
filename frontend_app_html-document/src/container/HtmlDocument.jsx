@@ -561,6 +561,26 @@ export class HtmlDocument extends React.Component {
     this.handleCloseNotifyAllMessage()
   }
 
+  shouldDisplayNotifyAllMessage = () => {
+    const { state } = this
+    if (
+      !state.newContent.last_modifier ||
+      state.content.current_revision_type === 'creation' ||
+      (
+        state.loggedUser.config.notify_all_members_message &&
+        state.loggedUser.config.notify_all_members_message === false
+      )
+    ) return false
+    if (
+      state.newContent.last_modifier.user_id === state.loggedUser.userId ||
+      (
+        state.loggedUser.config.notify_all_members_message &&
+        state.loggedUser.config.notify_all_members_message === true
+      )
+    ) return true
+    return false
+  }
+
   render () {
     const { props, state } = this
 
@@ -670,7 +690,7 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            showNotifyAllMessage={true}
+            displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
           />
