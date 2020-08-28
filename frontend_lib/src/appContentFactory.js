@@ -1,11 +1,13 @@
 import React from 'react'
 import i18n from './i18n.js'
+import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
+  wrapMentionsInSpanTags,
   getMatchingCommonMentionFromQuery
 } from './helper.js'
 import {
@@ -148,8 +150,15 @@ export function appContentFactory (WrappedComponent) {
         ? tinymceRemoveAllAutocompleteSpan()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
       )
 
       switch (response.apiResponse.status) {
@@ -163,17 +172,19 @@ export function appContentFactory (WrappedComponent) {
           break
         case 400:
           switch (response.body.code) {
+            case 1001:
+              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
+              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new comment')); break
+        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response

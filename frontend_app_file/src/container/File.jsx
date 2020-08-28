@@ -252,7 +252,7 @@ export class File extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
@@ -285,10 +285,10 @@ export class File extends React.Component {
   setHeadTitle = (contentName) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label]) }
       })
     }
   }
@@ -435,7 +435,11 @@ export class File extends React.Component {
 
   handleClickValidateNewCommentBtn = () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+        this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))

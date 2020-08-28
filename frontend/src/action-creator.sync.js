@@ -147,6 +147,9 @@ export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
+export const HEAD_TITLE = 'HeadTitle'
+export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
 export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
@@ -175,8 +178,3 @@ export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATI
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
-
-export const TLM_MANAGER = 'TracimLiveMessageManager'
-export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
-export const TLM_MANAGER_STATUS = 'TracimLiveMessageManagerStatus'
-export const setLiveMessageManagerStatus = status => ({ type: `${SET}/${TLM_MANAGER_STATUS}`, status })

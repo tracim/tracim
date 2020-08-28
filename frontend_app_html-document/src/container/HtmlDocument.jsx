@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
@@ -30,6 +31,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
+  wrapMentionsInSpanTags
   getCurrentContentVersionNumber,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
@@ -223,7 +225,7 @@ export class HtmlDocument extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
@@ -334,10 +336,10 @@ export class HtmlDocument extends React.Component {
   setHeadTitle = (contentName) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label]) }
       })
     }
   }
@@ -489,6 +491,14 @@ export class HtmlDocument extends React.Component {
 
     const contentWithoutAnyAutoCompleteSpan = tinymceRemoveAllAutocompleteSpan()
 
+    let newDocumentForApiWithMention
+    try {
+      newDocumentForApiWithMention = wrapMentionsInSpanTags(contentWithoutAnyAutoCompleteSpan)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
+      return
+    }
+
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
@@ -496,7 +506,7 @@ export class HtmlDocument extends React.Component {
     )
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, contentWithoutAnyAutoCompleteSpan)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -513,17 +523,20 @@ export class HtmlDocument extends React.Component {
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
+          case 1001:
+            this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
+            break
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+            this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
             break
         }
         break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
   }
@@ -546,7 +559,11 @@ export class HtmlDocument extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))

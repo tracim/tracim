@@ -69,14 +69,10 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   setHeadTitle = async (contentName, workspaceLabel) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([contentName, workspaceLabel, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: buildHeadTitle([contentName, workspaceLabel]) }
+    })
   }
 
   handleIframeIsClosing (event) {

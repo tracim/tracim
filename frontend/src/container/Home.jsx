@@ -5,13 +5,13 @@ import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+
 import {
   COOKIE_FRONTEND,
   workspaceConfig,
   FETCH_CONFIG
 } from '../util/helper.js'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
   TracimComponent,
@@ -24,7 +24,7 @@ import {
 import {
   putUserUsername
 } from '../action-creator.async.js'
-import { newFlashMessage } from '../action-creator.sync.js'
+import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -66,7 +66,7 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.checkUsername()
+    this.setUsernamePopupVisibility()
     this.setHeadTitle()
   }
 
@@ -77,16 +77,11 @@ export class Home extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Home'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Home')))
   }
 
-  checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
+  setUsernamePopupVisibility () {
+    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -141,7 +136,7 @@ export class Home extends React.Component {
     this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
   }
 
-  handleChangeNewUsername = async (e) => {
+  handleChangeNewUsername = async e => {
     const username = e.target.value
     this.setState({ newUsername: username })
     this.debouncedCheckUsernameValidity(username)

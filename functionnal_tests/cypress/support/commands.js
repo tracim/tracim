@@ -176,7 +176,7 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/api/doc/')
+  cy.visit('/assets/cypress-blank.html')
 })
 
 Cypress.Commands.add('changeLanguage', (langCode) => {

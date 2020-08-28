@@ -12,7 +12,6 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   checkEmailValidity,
   serialize
@@ -29,7 +28,8 @@ import {
   setWorkspaceListMemberList,
   setNotificationNotReadCounter,
   setNotificationList,
-  setNextPage
+  setNextPage,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getAppList,
@@ -102,13 +102,7 @@ class Login extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Login'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Login')))
   }
 
   handleChangeRememberMe = e => {
@@ -157,7 +151,6 @@ class Login extends React.Component {
         this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
-        props.tlm.manager.openLiveMessageConnection(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)

@@ -1,4 +1,5 @@
-from typing import Dict
+import json
+import typing
 
 from hapic import HapicData
 from pyramid.config import Configurator
@@ -22,6 +23,7 @@ from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -35,6 +37,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
@@ -54,6 +57,7 @@ from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
+from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
 from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
@@ -702,7 +706,8 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_headers(TracimLiveEventHeaderSchema())
-    def open_message_stream(self, context, request: TracimRequest, hapic_data=None) -> Response:
+    @hapic.input_query(TracimLiveEventQuerySchema())
+    def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
         """
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
@@ -710,15 +715,31 @@ class UserController(Controller):
         stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
             str(request.candidate_user.user_id)
         )
-        escaped_keealive_event = "event: keep-alive\\ndata:\\n\\n"
-        user_channel_name = "user_{}".format(request.candidate_user.user_id)
+
+        after_event_id = hapic_data.query["after_event_id"]  # type: int
+        if after_event_id:
+            app_config = request.registry.settings["CFG"]  # type: CFG
+            event_api = EventApi(request.current_user, request.dbsession, app_config)
+            messages = event_api.get_messages_for_user(
+                request.candidate_user.user_id, after_event_id=after_event_id
+            )  # type: typing.List[Message]
+
+            stream_opened_event += "".join(
+                [
+                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
+                    for message in messages
+                ]
+            )
+
+        escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
+        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
         headers = [
             # Here we ask push pin to keep the connection open
             ("Grip-Hold", "stream"),
             # and register this connection on the given channel
             # multiple channels subscription is possible
             ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keealive_event)),
+            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events
@@ -732,7 +753,9 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserConfigSchema())
-    def get_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> Dict:
+    def get_user_config(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.Dict:
         """
         get all the configuration parameters for the given user
         """
@@ -746,7 +769,9 @@ class UserController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
-        set or update the given configuration parameters for the given user
+        Set or update the given configuration parameters for the given user
+        The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
+        whole configuration, so it's not possible to remove keys through this endpoint.
         """
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
@@ -961,6 +986,6 @@ class UserController(Controller):
         configurator.add_view(self.get_user_config, route_name="config_get")
 
         configurator.add_route(
-            "config_post", "/users/{user_id:\d+}/config", request_method="POST",  # noqa: W605
+            "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
