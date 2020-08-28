@@ -13,6 +13,7 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
@@ -30,7 +31,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  getCurrentContentVersionNumber
+  wrapMentionsInSpanTags
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -409,6 +410,14 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    let newDocumentForApiWithMention
+    try {
+      newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
+      return
+    }
+
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
@@ -416,7 +425,7 @@ export class HtmlDocument extends React.Component {
     )
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -427,17 +436,20 @@ export class HtmlDocument extends React.Component {
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
+          case 1001:
+            this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
+            break
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+            this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
             break
         }
         break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
   }
@@ -456,7 +468,11 @@ export class HtmlDocument extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))

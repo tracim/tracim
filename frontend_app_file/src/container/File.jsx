@@ -436,7 +436,11 @@ export class File extends React.Component {
 
   handleClickValidateNewCommentBtn = () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+        this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
