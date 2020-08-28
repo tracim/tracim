@@ -75,7 +75,7 @@ export class FileComponent extends React.Component {
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
-        {props.showNotifyAllMessage && (
+        {props.displayNotifyAllMessage && (
           <PromptMessage
             msg={
               <span>{props.t('To notify all members of the shared space of your modification')},
