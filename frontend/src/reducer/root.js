@@ -13,7 +13,6 @@ import timezone from './timezone.js'
 import system from './system.js'
 import searchResult from './searchResult.js'
 import notificationPage from './notificationPage.js'
-import tlm from './tlm.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -29,8 +28,7 @@ const rootReducer = combineReducers({
   timezone,
   system,
   searchResult,
-  notificationPage,
-  tlm
+  notificationPage
 })
 
 export default rootReducer

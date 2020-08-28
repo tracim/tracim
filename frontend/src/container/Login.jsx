@@ -151,7 +151,6 @@ class Login extends React.Component {
         this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
-        props.tlm.manager.openLiveMessageConnection(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)

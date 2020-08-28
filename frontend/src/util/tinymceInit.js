@@ -1,4 +1,5 @@
 import i18n from './i18n.js'
+import { uniqueId } from 'lodash'
 
 (function () {
   function base64EncodeAndTinyMceInsert (files) {
@@ -76,10 +77,20 @@ import i18n from './i18n.js'
       height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
-          // INFO - GM - 2020/03/17 - theses 3 lines enable autofocus at the end of the document
+          // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
+          const id = uniqueId()
+          if ($editor.getBody().textContent) {
+            $editor.dom.add($editor.getBody(), 'p', { id: id }, '&nbsp;')
+            $editor.selection.select($editor.dom.select(`p#${id}`)[0])
+          }
+          else {
+            $editor.selection.select($editor.getBody(), true)
+          }
+
+          // INFO - GM - 2020/03/17 - theses 2 lines enable autofocus at the end of the document
           $editor.focus()
-          $editor.selection.select($editor.getBody(), true)
           $editor.selection.collapse(false)
+
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
         })
