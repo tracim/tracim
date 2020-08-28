@@ -110,7 +110,8 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan
 } from './tinymceAutoCompleteHelper.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -213,5 +214,6 @@ export {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan
 }

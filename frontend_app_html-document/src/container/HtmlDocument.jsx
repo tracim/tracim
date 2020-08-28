@@ -35,7 +35,8 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -486,6 +487,8 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    const contentWithoutAnyAutoCompleteSpan = tinymceRemoveAllAutocompleteSpan()
+
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
@@ -493,13 +496,19 @@ export class HtmlDocument extends React.Component {
     )
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, contentWithoutAnyAutoCompleteSpan)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200:
         globalThis.tinymce.remove('#wysiwygNewVersion')
-        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        this.setState(prev => ({
+          mode: APP_FEATURE_MODE.VIEW,
+          content: {
+            ...prev.content,
+            raw_content: contentWithoutAnyAutoCompleteSpan
+          }
+        }))
         break
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)

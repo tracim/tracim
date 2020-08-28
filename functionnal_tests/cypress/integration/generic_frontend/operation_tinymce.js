@@ -69,6 +69,30 @@ describe('TinyMce text editor', function () {
           cy.get('.autocomplete').should('be.not.visible')
         })
       })
+
+      it('the autocompletion should handle 2 mentions inserted with the autocomplete popup', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.inputInTinyMCE('jo')
+          cy.get('.autocomplete').should('be.visible')
+          cy.inputInTinyMCE(' ')
+          cy.get('.autocomplete').should('be.not.visible')
+          cy.inputInTinyMCE('@')
+          cy.inputInTinyMCE('john')
+          cy.get('.autocomplete').contains('@johndoe').click()
+          cy.assertTinyMCEContent('<p>@jo&nbsp;@johndoe&nbsp;</p>')
+        })
+      })
+
+      it('it should not leave any span after saving the content', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE('@')
+          cy.inputInTinyMCE('jo')
+          cy.get('.html-document__editionmode__submit').click()
+          cy.get('.html-document__contentpage__textnote__version').should('be.visible')
+          cy.get('#autocomplete').should('be.not.visible')
+        })
+      })
     })
   })
 })

@@ -5,6 +5,8 @@ export const tinymceAutoCompleteHandleInput = (event, tinymcePosition, setState,
 
   switch (event.data) {
     case '@': {
+      tinymceRemoveAllAutocompleteSpan()
+
       const rawHtml = `<span id="autocomplete"><span id="autocomplete__searchtext"><span id="autocomplete__start">${atSymbolCode}</span></span></span>`
       const currentTextContent = tinymce.activeEditor.selection.getSel().anchorNode.textContent.slice(0, tinymce.activeEditor.selection.getSel().anchorOffset)
       const isAtTheBeginningOrHasSpaceBefore = currentTextContent.length === 1 || currentTextContent[currentTextContent.length - 2] === ' '
@@ -107,4 +109,20 @@ export const tinymceAutoCompleteHandleSelectionChange = (selectionId, setState, 
   }
 
   if (isAutoCompleteActivated) setState({ isAutoCompleteActivated: false })
+}
+
+export const tinymceRemoveAllAutocompleteSpan = () => {
+  let autocomplete = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+  while (autocomplete) {
+    tinymce.activeEditor.focus()
+    const query = tinymce.activeEditor.getDoc().getElementById('autocomplete__searchtext').textContent.replace('@', '')
+    const selection = autocomplete
+    tinymce.activeEditor.dom.remove(selection)
+    tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('span#autocomplete')[0])
+    tinymce.activeEditor.execCommand('mceInsertContent', false, query)
+
+    autocomplete = tinymce.activeEditor.dom.select('span#autocomplete')[0]
+  }
+
+  return tinymce.activeEditor.getContent()
 }

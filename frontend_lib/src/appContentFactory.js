@@ -20,6 +20,7 @@ import {
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
+import { tinymceRemoveAllAutocompleteSpan } from './tinymceAutoCompleteHelper.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -143,7 +144,9 @@ export function appContentFactory (WrappedComponent) {
 
       // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      const newCommentForApi = isCommentWysiwyg
+        ? tinymceRemoveAllAutocompleteSpan()
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
       const response = await handleFetchResult(
         await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)

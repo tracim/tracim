@@ -146,6 +146,7 @@ export class CommentTextArea extends React.Component {
 
     const style = {
       transform: 'translateY(-100%)',
+      position: 'absolute',
       ...(props.wysiwyg && {
         top: state.tinymcePosition.top,
         position: state.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',

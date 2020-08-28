@@ -66,7 +66,11 @@ Cypress.Commands.add('inputInTinyMCE', (content) => {
     .then(activeEditor => {
       activeEditor.focus()
       activeEditor.execCommand('mceInsertContent', false, content)
-      activeEditor.fire('input', { data: content })
+      content.split('').forEach(contentChar => {
+        activeEditor.fire('input', { data: contentChar })
+        activeEditor.fire('keyup', { key: contentChar })
+        activeEditor.fire('keydown', { key: contentChar })
+      })
     })
 })
 
