@@ -252,7 +252,7 @@ export class File extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {

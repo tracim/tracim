@@ -71,7 +71,7 @@ const mockGetReservedUsernames200 = (apiUrl) => {
 const mockGetReservedUsernames500 = (apiUrl) => {
   return nock(apiUrl)
     .get('/system/reserved-usernames')
-    .reply(500)
+    .reply(500, {})
 }
 
 const mockGetUsernameAvailability200 = (apiUrl, username, available) => {
@@ -83,7 +83,7 @@ const mockGetUsernameAvailability200 = (apiUrl, username, available) => {
 const mockGetUsernameAvailability500 = (apiUrl, username) => {
   return nock(apiUrl)
     .get(`/system/username-availability?username=${username}`)
-    .reply(500)
+    .reply(500, {})
 }
 
 export {

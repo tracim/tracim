@@ -5,6 +5,7 @@ import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+
 import {
   COOKIE_FRONTEND,
   workspaceConfig,
@@ -65,7 +66,7 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.checkUsername()
+    this.setUsernamePopupVisibility()
     this.setHeadTitle()
   }
 
@@ -79,8 +80,8 @@ export class Home extends React.Component {
     props.dispatch(setHeadTitle(props.t('Home')))
   }
 
-  checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
+  setUsernamePopupVisibility () {
+    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -135,7 +136,7 @@ export class Home extends React.Component {
     this.setState(prevState => ({ hidePopupCheckbox: !prevState.hidePopupCheckbox }))
   }
 
-  handleChangeNewUsername = async (e) => {
+  handleChangeNewUsername = async e => {
     const username = e.target.value
     this.setState({ newUsername: username })
     this.debouncedCheckUsernameValidity(username)

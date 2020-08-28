@@ -279,18 +279,18 @@ describe('helper.js', () => {
       try {
         await checkUsernameValidity(apiUrl, username, mockProps)
       } catch (e) {
-        expect(typeof e).to.equal('Error')
+        expect(e).to.be.a('Error')
       }
     })
 
     it('should throw Error if username availability API code is not 200', async () => {
       const username = 'hello'
-      mockGetReservedUsernames500(apiUrl)
-      mockGetUsernameAvailability200(apiUrl, username, true)
+      mockGetReservedUsernames200(apiUrl)
+      mockGetUsernameAvailability500(apiUrl, username, true)
       try {
         await checkUsernameValidity(apiUrl, username, mockProps)
       } catch (e) {
-        expect(typeof e).to.equal('Error')
+        expect(e).to.be.a('Error')
       }
     })
   })

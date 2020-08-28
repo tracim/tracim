@@ -90,6 +90,7 @@ class EventApi:
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
+        after_event_id: int = 0,
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if event_id:
@@ -101,7 +102,7 @@ class EventApi:
         elif read_status == ReadStatus.UNREAD:
             query = query.filter(Message.read == null())
         else:
-            # ALL doesn't need any filtering an is the only other handled case
+            # ALL doesn't need any filtering and is the only other handled case
             assert read_status == ReadStatus.ALL
 
         if event_types:
@@ -118,6 +119,9 @@ class EventApi:
                 query = query.filter(or_(*event_type_filters))
             else:
                 query = query.filter(event_type_filters[0])
+
+        if after_event_id:
+            query = query.filter(Message.event_id > after_event_id)
         return query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
@@ -151,6 +155,10 @@ class EventApi:
             self._session.add(message)
         self._session.flush()
         return unread_messages
+
+    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> typing.List[Message]:
+        query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
+        return query.all()
 
     def get_paginated_messages_for_user(
         self,
