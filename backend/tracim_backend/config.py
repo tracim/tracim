@@ -227,25 +227,6 @@ class CFG(object):
             "gallery"
         )
         extend_apps = ""
-        # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
-        #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
-        # should be deprecated.
-        self.CALDAV__ENABLED = asbool(
-            self.get_raw_config(
-                "caldav.enabled",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config(
-                "collaborative_document_edition.activated",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
             self.get_raw_config("app.enabled", default_enabled_app),
@@ -403,19 +384,12 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
-        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config(
-            "user.reset_password.validity",
-            deprecated=True,
-            deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
-        )
-        if self.USER__RESET_PASSWORD__VALIDITY:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
-        else:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
-                self.get_raw_config(
-                    "user.reset_password.token_lifetime", defaut_reset_password_validity
-                )
+
+        self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
+            self.get_raw_config(
+                "user.reset_password.token_lifetime", defaut_reset_password_validity
             )
+        )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
@@ -516,11 +490,6 @@ class CFG(object):
         ]
 
         self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
-        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
-            "email.notification.from",
-            deprecated=True,
-            deprecated_extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
-        )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"
