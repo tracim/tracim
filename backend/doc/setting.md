@@ -14,10 +14,10 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}|{config_name: <68}|"  with all app enabled to update this list properly --->
+
 | <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
-| TRACIM_CALDAV__ENABLED                                                    | caldav.enabled                                                 | CALDAV__ENABLED                                                    |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED                          | collaborative_document_edition.activated                       | COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED                          |
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
@@ -38,7 +38,6 @@ The priority order is (from less to more priority):
 | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |
 | TRACIM_DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               | default_anonymized_user_display_name                           | DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               |
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
-| TRACIM_USER__RESET_PASSWORD__VALIDITY                                     | user.reset_password.validity                                   | USER__RESET_PASSWORD__VALIDITY                                     |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
@@ -52,8 +51,6 @@ The priority order is (from less to more priority):
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
-| TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
-| TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
 | TRACIM_LIMITATION__SHAREDSPACE_PER_USER                                   | limitation.sharedspace_per_user                                | LIMITATION__SHAREDSPACE_PER_USER                                   |
 | TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE                               | limitation.content_length_file_size                            | LIMITATION__CONTENT_LENGTH_FILE_SIZE                               |
 | TRACIM_LIMITATION__WORKSPACE_SIZE                                         | limitation.workspace_size                                      | LIMITATION__WORKSPACE_SIZE                                         |
@@ -62,9 +59,10 @@ The priority order is (from less to more priority):
 | TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
 | TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
+| TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
+| TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
 | TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
 | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
-| TRACIM_EMAIL__NOTIFICATION__FROM                                          | email.notification.from                                        | EMAIL__NOTIFICATION__FROM                                          |
 | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
 | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
 | TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL                             | email.notification.references.email                            | EMAIL__NOTIFICATION__REFERENCES__EMAIL                             |
@@ -122,6 +120,9 @@ The priority order is (from less to more priority):
 | TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             | search.elasticsearch.request_timeout                           | SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |
