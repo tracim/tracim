@@ -389,7 +389,12 @@ export const serialize = (objectToSerialize, propertyMap) => {
 }
 
 export const commonMentionList = [
-  { mention: 'all', detail: i18n.t('Sends a notification to all members of the shared space'), isCommon: true }
+  {
+    mention: 'all',
+    detail: 'Sends a notification to all members of the shared space',
+    tradKey: [i18n.t('Sends a notification to all members of the shared space')],
+    isCommon: true
+  }
 ]
 
 export const getMatchingCommonMentionFromQuery = (query) => {
