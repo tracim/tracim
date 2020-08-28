@@ -194,10 +194,18 @@ const mockPutNotificationAsRead204 = (apiUrl, userId, notificationId) => {
     .put(`/users/${userId}/messages/${notificationId}/read`)
     .reply(204, true)
 }
+
 const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
   return nock(apiUrl)
     .put(`/users/${userId}/messages/read`)
     .reply(204, true)
+}
+
+const mockGetWhoami = (apiUrl, status) => {
+  return nock(apiUrl)
+    .log(console.error)
+    .get('/auth/whoami')
+    .reply(status, '')
 }
 
 export {
@@ -227,5 +235,6 @@ export {
   mockGetLoggedUserCalendar200,
   mockGetUserCalendar200,
   mockGetUser200,
-  mockGetFolderContentList200
+  mockGetFolderContentList200,
+  mockGetWhoami
 }

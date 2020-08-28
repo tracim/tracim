@@ -38,8 +38,9 @@
   "Error while archiving content": "Erreur lors de l'archivage d'un contenu",
   "Error while changing status": "Erreur lors d'un changement de statut",
   "Error while deleting content": "Erreur lors de la suppression d'un contenu",
+  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
   "Error while restoring content": "Erreur lors de la restauration du contenu",
-  "Error while saving new comment": "Erreur lors de l'enregistrement d'un nouveau commentaire",
+  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
   "Error while saving the title": "Erreur lors de l'enregistrement du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
@@ -92,6 +93,7 @@
   "Shared space manager": "Responsable",
   "Refresh?": "Rafraîchir ?",
   "If you refresh, you will lose the current changes": "Si vous rafraîchissez, vous perdrez les modifications actuelles",
+  "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
   "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
   "You must change the status or restore this content before any change": "Vous devez changer le statut ou restaurer ce contenu avant de le modifier"
 }

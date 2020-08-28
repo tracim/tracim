@@ -180,8 +180,3 @@ export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATI
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
-
-export const TLM_MANAGER = 'TracimLiveMessageManager'
-export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
-export const TLM_MANAGER_STATUS = 'TracimLiveMessageManagerStatus'
-export const setLiveMessageManagerStatus = status => ({ type: `${SET}/${TLM_MANAGER_STATUS}`, status })
