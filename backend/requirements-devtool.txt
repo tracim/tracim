@@ -1,5 +1,3 @@
-# base
--r requirements.txt
 # Devtools
 flake8==3.7.9
 isort==4.3.21

@@ -1,5 +1,3 @@
-# base
--r requirements.txt
 # Test requirements
 WebTest==2.0.34
 pytest==5.3.5

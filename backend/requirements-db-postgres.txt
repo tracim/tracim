@@ -1,4 +1,2 @@
-# base
--r requirements.txt
 # postgres specific dependencies
 psycopg2==2.8.4
