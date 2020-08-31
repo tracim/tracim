@@ -74,7 +74,7 @@ Install packaging tools:
 
 Install the project in editable mode with its develop requirements:
 
-    pip install -r requirements-dev.txt
+    pip install -r requirements-test.txt
     pip install -e "."
 
 If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
@@ -362,7 +362,7 @@ Run your project's tests:
 
 Install the required versions:
 
-    pip install -r requirements-static-tests.txt
+    pip install -r requirements-devtool.txt
 
 Run mypy checks:
 

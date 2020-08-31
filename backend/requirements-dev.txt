@@ -1,17 +1,6 @@
+# base
+-r requirements.txt
 # Test requirements
-WebTest==2.0.34
-pytest==5.3.5
-pytest-dotenv==0.4.0
-pytest-pyramid-server==1.7.0
-pytest-services==2.0.1
-responses==0.10.11
-mock==4.0.1
-Pillow==5.3.0
-freezegun==0.3.12
-sseclient-py==1.7
+-r requirements-test.txt
 # Devtools
-flake8==3.7.9
-isort==4.3.21
-mypy==0.770
-pre-commit==2.2.0
-black==19.10b0
+-r requirements-devtools.txt
