@@ -151,8 +151,8 @@ setup_yarn() {
         # would work since the installed version of Node if usually 10.17 or later.
 
         case "$yarn_version" in
-            2.*) yarn set version 2.1.1 ;;
-            *) yarn policies set-version berry; yarn set version 2.1.1 ;;
+            2.*) YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
+            *) yarn policies set-version berry; YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
         esac
 
         yarn_version="$(yarn -v)"
