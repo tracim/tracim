@@ -14,7 +14,7 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}|{config_name: <68}|"  with all app enabled to update this list properly --->
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}|{config_name: <68}|"  with all apps enabled to update this list properly --->
 
 | <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
