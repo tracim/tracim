@@ -19,6 +19,7 @@ const props = {
   isArchived: false,
   isDeleted: false,
   isDeprecated: false,
+  displayNotifyAllMessage: false,
   deprecatedStatus: {
     label: 'Deprecated',
     slug: 'closed-deprecated',
@@ -33,6 +34,8 @@ const props = {
   onClickRestoreArchived: () => {},
   onClickRestoreDeleted: () => {},
   onClickShowDraft: () => {},
+  onClickNotifyAll: () => {},
+  onClickCloseNotifyAllMessage: () => {},
   t: (s, opts) => {
     for (const p in opts) {
       s = s.replace('{{' + p + '}}', opts[p])
@@ -54,6 +57,22 @@ describe('<HtmlDocument />', () => {
     it('should display the content of the document', () =>
       expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
     )
+
+    describe('with the displayNotifyAllMessage is set a true', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          displayNotifyAllMessage
+        />
+      )
+
+      it('should display the prompt message', () =>
+        expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+          .to.have.descendants(PromptMessage)
+          .and
+          .have.html().to.contains('fa-hand-o-right')
+      )
+    })
 
     describe('with an archived content', () => {
       const wrapper = mount(

@@ -159,7 +159,7 @@ describe('<Tracim />', () => {
     describe('loadUserConfiguration', () => {
       it('should call setUserConfiguration', (done) => {
         mockGetUserConfig200(FETCH_CONFIG.apiUrl, user.userId)
-        wrapperInstance.loadUserConfiguration().then(() => {
+        wrapperInstance.loadUserConfiguration(user.userId).then(() => {
           expect(setUserConfigurationCallBack.called).to.equal(true)
         }).then(done, done)
       })

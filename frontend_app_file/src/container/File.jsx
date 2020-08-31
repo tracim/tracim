@@ -895,7 +895,7 @@ export class File extends React.Component {
       )
     ) return false
 
-    return state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
+    return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
   render () {

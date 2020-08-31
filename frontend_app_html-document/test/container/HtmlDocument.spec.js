@@ -281,5 +281,98 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
       })
     })
+
+    describe('handleCloseNotifyAllMessage', () => {
+      it('should update content state', () => {
+        wrapper.setState(prev => ({ newContent: { ...prev.content, label: 'New Name' } }))
+        wrapper.instance().handleClickRefresh()
+        expect(wrapper.state('content').label).to.deep.equal(wrapper.state('newContent').label)
+      })
+    })
+
+    describe('shouldDisplayNotifyAllMessage', () => {
+      it("should return false if loggedUser don't have config", () => {
+        wrapper.setState(prev => ({ loggedUser: { ...prev.loggedUser, config: null } }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content.current_revision_type is creation', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'creation'
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user and there in no newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          },
+          newContent: {}
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+    })
+
+    it('should return false if content last modifier is not the logged user at the newContent', () => {
+      wrapper.setState(prev => ({
+        loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+        newContent: {
+          ...prev.newContent,
+          last_modifier: {
+            user_id: prev.loggedUser.userId + 1
+          }
+        }
+      }))
+      expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+    })
+
+    it('should return false if user configuration content_id.notify_all_members_message is false', () => {
+      wrapper.setState(prev => ({
+        ...prev,
+        loggedUser: {
+          config: {
+            0: {
+              notify_all_members_message: false
+            }
+          }
+        }
+      }))
+      expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+    })
+
+    it('should return true if user configuration content_id.notify_all_members_message is true', () => {
+      wrapper.setState(prev => ({
+        ...prev,
+        loggedUser: {
+          config: {
+            0: {
+              notify_all_members_message: true
+            }
+          }
+        },
+        newContent: {
+          last_modifier: {
+            user_id: prev.loggedUser.userId
+          }
+        },
+        content: {
+          current_revision_type: 'edition',
+          last_modifier: {
+            user_id: prev.loggedUser.userId
+          }
+        }
+      }))
+      expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(true)
+    })
   })
 })
