@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
@@ -393,70 +393,6 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-export const wrapMentionsInSpanTags = (text) => {
-  try {
-    const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
-
-    const parser = new DOMParser()
-    const parsedText = parser.parseFromString(text, 'text/html')
-
-    const depthFirstSearchAndMentionAnalysis = childNodesList => {
-      let childNodesListCopy = [...childNodesList]
-      let i = 0
-
-      childNodesListCopy.forEach((node) => {
-        let value = node.nodeValue
-
-        if (node.nodeName === '#text' && value.includes('@')) {
-          const mentionsInThisNode = value.split(/\s/).filter(token => mentionRegex.test(token))
-
-          if (mentionsInThisNode.length > 0) {
-            let mentionIndex = 0
-            let lastMentionIndex = 0
-            let fragment = document.createDocumentFragment()
-            let htmlTagCounter = 0
-
-            mentionsInThisNode.forEach((mention, i) => {
-              mentionIndex = value.indexOf(mention, lastMentionIndex)
-
-              let mentionWithSpan = document.createElement('span')
-              mentionWithSpan.className = 'mention'
-              mentionWithSpan.id = `mention-${uuidv4()}`
-              mentionWithSpan.textContent = mention
-
-              if (mentionIndex !== 0) {
-                htmlTagCounter++
-                fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
-              }
-
-              fragment.appendChild(mentionWithSpan)
-              htmlTagCounter++
-
-              if (mentionsInThisNode.length - 1 === i) {
-                htmlTagCounter++
-                fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
-              }
-
-              lastMentionIndex = mentionIndex + mention.length - 1
-            })
-            childNodesList[i].replaceWith(fragment)
-            i = i + htmlTagCounter
-          } else i++
-        } else {
-          if (!(node.nodeName.toLowerCase() === 'span' && node.className === 'mention')) depthFirstSearchAndMentionAnalysis(node.childNodes)
-          i++
-        }
-      })
-    }
-
-    depthFirstSearchAndMentionAnalysis(parsedText.body.childNodes)
-    return parsedText.body.innerHTML
-  } catch (e) {
-    console.error('Error while parsing mention', e)
-    throw new Error(i18n.t('Error while detecting the mentions'))
-  }
-}
-
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
@@ -522,27 +458,4 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     isUsernameValid: true,
     usernameInvalidMsg: ''
   }
-}
-
-export const addMentionClassesOfUser = (rawContent, username, userClassName = 'mention-me') => {
-  const parser = new DOMParser()
-  const document = parser.parseFromString(rawContent, 'text/html')
-  // TODO: error case
-
-  const elementHasMentionForUser = element => {
-    const toto = '@' + username
-    return element.id !== null && element.id.startsWith('mention-') && element.textContent.includes(toto)
-  }
-
-  const spans = document.getElementsByTagName('span')
-  for (let i = 0; i < spans.length; ++i) {
-    const element = spans[i]
-    if (!elementHasMentionForUser(element)) continue
-
-    let className = element.className
-    className += className === '' ? userClassName : ' ' + userClassName
-    element.className = className
-  }
-
-  return document.body.innerHTML
 }

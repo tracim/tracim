@@ -17,6 +17,7 @@ import { debug } from '../../src/debug.js'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: (comment, timeline, hasBeenRead) => timeline,
     content: contentHtmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
@@ -43,7 +44,7 @@ describe('<HtmlDocument />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType content', () => {
-      describe('handleContentCreated', () => {
+      describe('handleContentCommentCreated', () => {
         describe('create a new comment', () => {
           it('should update the timeline if is related to the current html-document', () => {
             const tlmData = {
@@ -55,7 +56,7 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            wrapper.instance().handleContentCreated(tlmData)
+            wrapper.instance().handleContentCommentCreated(tlmData)
             const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
             expect(hasComment).to.equal(true)
           })
@@ -71,7 +72,7 @@ describe('<HtmlDocument />', () => {
               }
             }
             const oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCreated(tlmDataOtherContent)
+            wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
 
             expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
           })

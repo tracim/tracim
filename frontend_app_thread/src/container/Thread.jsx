@@ -20,7 +20,6 @@ import {
   buildHeadTitle,
   addRevisionFromTLM,
   RefreshWarningMessage,
-  sortTimelineByDate,
   displayDistanceDate,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -136,24 +135,16 @@ export class Thread extends React.Component {
     }
   }
 
-  handleCommentCreated = data => {
-    const { state } = this
+  handleCommentCreated = (tlm) => {
+    const { props, state } = this
+    // Not a comment for our content
+    if (tlm.fields.content.parent_id !== state.content.content_id) return
 
-    if (data.fields.content.parent_id !== state.content.content_id) return
-
-    const newTimelineSorted = sortTimelineByDate([
-      ...state.timeline,
-      {
-        ...data.fields.content,
-        created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
-        created_raw: data.fields.content.created,
-        timelineType: 'comment'
-      }
-    ])
-
+    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, createdByLoggedUser)
     this.setState({
-      timeline: newTimelineSorted,
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      timeline: newTimeline,
+      isLastTimelineItemCurrentToken: createdByLoggedUser
     })
   }
 
@@ -247,7 +238,7 @@ export class Thread extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -286,7 +277,14 @@ export class Thread extends React.Component {
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
     try {
-      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+      props.appContentSaveNewComment(
+        state.content,
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        state.config.slug,
+        state.loggedUser.username
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }

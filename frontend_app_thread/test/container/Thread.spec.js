@@ -17,6 +17,7 @@ describe('<Thread />', () => {
   const props = {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: (comment, timeline, hasBeenRead) => timeline,
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     i18n: {},

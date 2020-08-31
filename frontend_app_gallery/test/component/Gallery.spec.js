@@ -19,7 +19,7 @@ describe('<Gallery />', () => {
     registerLiveMessageHandlerList: () => { },
     data: {
       config: {
-        apiUrl: 'http://localhost:1337/api',
+        apiUrl: 'http://localhost:7999/api',
         slug: 'gallery',
         faIcon: 'paperclip',
         hexcolor: '#ffa500',

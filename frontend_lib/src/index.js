@@ -9,7 +9,6 @@ import {
   generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
-  hasNotAllowedCharacters,
   hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
@@ -34,13 +33,16 @@ import {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   checkUsernameValidity
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
+} from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -106,7 +108,7 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
-import getContentComment from './action.async.js'
+import { getContentComment } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -134,7 +136,6 @@ export {
   generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
-  hasNotAllowedCharacters,
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -199,11 +200,12 @@ export {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  getContentComment
+  getContentComment,
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
 }

@@ -25,14 +25,14 @@ import {
   RefreshWarningMessage,
   ROLE,
   SelectStatus,
-  sortTimelineByDate,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   getContentComment,
-  wrapMentionsInSpanTags
+  handleMentionsBeforeSave,
+  addClassToMentionsOfUser
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -90,7 +90,7 @@ export class HtmlDocument extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -122,26 +122,16 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleContentCreated = data => {
-    const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id || data.fields.content.content_type !== 'comment') return
+  handleContentCommentCreated = (tlm) => {
+    const { props, state } = this
+    // Not a comment for our content
+    if (tlm.fields.content.parent_id !== state.content.content_id) return
 
-    const sortedNewTimeline = sortTimelineByDate(
-      [
-        ...state.timeline,
-        {
-          ...data.fields.content,
-          created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
-          created_raw: data.fields.content.created,
-          timelineType: 'comment',
-          hasBeenRead: data.fields.client_token === this.sessionClientToken
-        }
-      ]
-    )
-
+    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, createdByLoggedUser)
     this.setState({
-      timeline: sortedNewTimeline,
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      timeline: newTimeline,
+      isLastTimelineItemCurrentToken: createdByLoggedUser
     })
   }
 
@@ -321,7 +311,7 @@ export class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     const localStorageComment = localStorage.getItem(
       generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
@@ -350,7 +340,7 @@ export class HtmlDocument extends React.Component {
         ...resHtmlDocument.body,
         raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
-          : resHtmlDocument.body.raw_content
+          : addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
@@ -412,7 +402,7 @@ export class HtmlDocument extends React.Component {
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(state.content.raw_content, state.loggedUser)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
@@ -469,7 +459,14 @@ export class HtmlDocument extends React.Component {
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
     try {
-      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+      props.appContentSaveNewComment(
+        state.content,
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        state.config.slug,
+        state.loggedUser.username
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
