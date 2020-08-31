@@ -53,7 +53,8 @@ import {
   getShareLinksList,
   postShareLinksList,
   putFileContent,
-  putMyselfFileRead
+  putMyselfFileRead,
+  putUserConfiguration
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
@@ -439,7 +440,7 @@ export class File extends React.Component {
     try {
       props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
     } catch (e) {
-        this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
@@ -850,10 +851,25 @@ export class File extends React.Component {
     }
   }
 
-  handleCloseNotifyAllMessage = () => {
-    // TODO Set notify all members at generic endpoint
-    // The stored key will be content.<content_id>.notify_all_members_message, its value is a bool.
-    console.log('closed')
+  handleCloseNotifyAllMessage = async () => {
+    const { state, props } = this
+    const newConfiguration = state.loggedUser.config
+
+    newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = false
+    this.setState(prev => ({
+      ...prev,
+      loggedUser: {
+        ...prev.loggedUser,
+        config: newConfiguration
+      }
+    }))
+
+    const fetchPutUserConfiguration = await handleFetchResult(
+      await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
+    )
+    if (fetchPutUserConfiguration.status !== 204) {
+      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+    }
   }
 
   handleClickNotifyAll = async () => {
@@ -866,21 +882,20 @@ export class File extends React.Component {
   shouldDisplayNotifyAllMessage = () => {
     const { state } = this
     if (
-      !state.newContent.last_modifier ||
+      !state.loggedUser.config ||
       state.content.current_revision_type === 'creation' ||
       (
-        state.loggedUser.config.notify_all_members_message &&
-        state.loggedUser.config.notify_all_members_message === false
+        state.newContent.last_modifier &&
+        state.newContent.last_modifier.user_id !== state.loggedUser.userId
+      ) ||
+      (
+        !state.newContent.last_modifier &&
+        state.content.last_modifier &&
+        state.content.last_modifier.user_id !== state.loggedUser.userId
       )
     ) return false
-    if (
-      state.newContent.last_modifier.user_id === state.loggedUser.userId ||
-      (
-        state.loggedUser.config.notify_all_members_message &&
-        state.loggedUser.config.notify_all_members_message === true
-      )
-    ) return true
-    return false
+
+    return state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
   render () {
