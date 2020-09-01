@@ -22,6 +22,7 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.app_models.validator import user_config_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
@@ -266,7 +267,20 @@ class LoggedInUserPasswordSchema(marshmallow.Schema):
 
 
 class SetConfigSchema(marshmallow.Schema):
-    parameters = marshmallow.fields.Dict(required=True, example='{"param1":"value1"}')
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True,
+        example={"param1": "value1"},
+        validate=user_config_validator,
+        description="A simple json dictionary. "
+        'Valid keys only contain characters in "0-9a-zA-Z-_." and are not empty. '
+        'You can use "." to create a hierarchy in the configuration parameters. '
+        "Valid values only allow primitive types: numbers, bool, null, and do not accept "
+        "complex types such dictionaries or lists.",
+    )
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
@@ -1506,6 +1520,12 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+
+
+class TracimLiveEventQuerySchema(marshmallow.Schema):
+    after_event_id = marshmallow.fields.Int(
+        required=False, missing=0, example=42, validator=positive_int_validator
+    )
 
 
 # INFO - G.M - 2020-05-19 - This is only used for documentation
