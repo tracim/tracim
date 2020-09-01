@@ -20,7 +20,6 @@ import {
   buildHeadTitle,
   addRevisionFromTLM,
   RefreshWarningMessage,
-  displayDistanceDate,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,

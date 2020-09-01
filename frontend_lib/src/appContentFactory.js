@@ -7,6 +7,7 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
+  sortTimelineByDate
 } from './helper.js'
 import {
   addClassToMentionsOfUser,

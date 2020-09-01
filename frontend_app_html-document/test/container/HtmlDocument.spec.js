@@ -17,7 +17,7 @@ import { debug } from '../../src/debug.js'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: (comment, timeline, loggedUser, hasBeenRead) => timeline,
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     content: contentHtmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
@@ -46,7 +46,7 @@ describe('<HtmlDocument />', () => {
     describe('eventType content', () => {
       describe('handleContentCommentCreated', () => {
         describe('create a new comment', () => {
-          it('should update the timeline if is related to the current html-document', () => {
+          it('should call addCommentToTimeline if is related to the current html-document', () => {
             const tlmData = {
               fields: {
                 content: {
@@ -56,9 +56,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
+            props.addCommentToTimeline.resetHistory()
             wrapper.instance().handleContentCommentCreated(tlmData)
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
-            expect(hasComment).to.equal(true)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
 
           it('should not update the timeline if is not related to the current html-document', () => {
@@ -71,10 +71,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            const oldTimelineLength = wrapper.state('timeline').length
+            props.addCommentToTimeline.resetHistory()
             wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
-
-            expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
           })
         })
       })
