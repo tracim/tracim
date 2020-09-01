@@ -261,7 +261,7 @@
   "Unknown email or username": "Unknown email or username",
   "This username is not linked to any email, please contact an administrator to reset your password": "This username is not linked to any email, please contact an administrator to reset your password",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?",
-  "Tracim has a connection problem, please wait or reload the page if the problem persists": "Tracim has a connection problem, please wait or reload the page if the problem persists",
+  "Tracim has a connection problem, please wait or restart your browser if the problem persists": "Tracim has a connection problem, please wait or restart your browser if the problem persists",
   "Your username": "Your username",
   "Your username has been set": "Your username has been set",
   "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}",
