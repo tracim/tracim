@@ -28,9 +28,7 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) => {
 export const getContentComment = (apiUrl, workspaceId, contentId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
     credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
+    headers: FETCH_CONFIG.headers,
     method: 'GET'
   })
 
