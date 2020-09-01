@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
 
-const MENTION_ID_PREFIX = 'mention-'
-const MENTION_CLASS = 'mention'
-const MENTION_ME_CLASS = 'mention-me'
-const MENTION_TAG_NAME = 'span'
-const MENTION_REGEX = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
+export const MENTION_ID_PREFIX = 'mention-'
+export const MENTION_CLASS = 'mention'
+export const MENTION_ME_CLASS = 'mention-me'
+export const MENTION_TAG_NAME = 'span'
+export const MENTION_REGEX = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
 
 const depthFirstSearchAndMentionAnalysis = childNodesList => {
   const childNodesListCopy = [...childNodesList]
@@ -67,35 +67,27 @@ const forEachMentionOfUser = (callback, document, username) => {
   }
 
   const spans = document.getElementsByTagName(MENTION_TAG_NAME)
-  for (let i = 0; i < spans.length; ++i) {
-    const element = spans[i]
-    if (!elementHasMentionForUser(element)) continue
-    callback(element)
+  for (const element of spans) {
+    if (elementHasMentionForUser(element)) callback(element)
   }
 }
 
 export const addClassToMentionsOfUser = (rawContent, username, userClassName = MENTION_ME_CLASS) => {
-  const addUserClass = (element) => {
-    const classNames = element.className.split(' ')
-    classNames.push(userClassName)
-    element.className = classNames.join(' ').trim()
-  }
+  const addUserClass = element => element.classList.add(userClassName)
 
   const parser = new DOMParser()
-  // TODO: error case
   const document = parser.parseFromString(rawContent, 'text/html')
+  if (document.documentElement.tagName === 'parsererror') {
+    throw new Error('Cannot parse string: ' + document.documentElement)
+  }
   forEachMentionOfUser(addUserClass, document, username)
   return document.body.innerHTML
 }
 
 export const removeClassFromMentionsOfUser = (document, username, userClassName = MENTION_ME_CLASS) => {
-  const removeUserClass = (element) => {
-    const classNames = element.className.split(' ').filter(name => name !== userClassName)
-    if (!classNames.length) {
-      element.removeAttribute('class')
-    } else {
-      element.className = classNames.join(' ').trim()
-    }
+  const removeUserClass = element => {
+    element.classList.remove(userClassName)
+    if (!element.classList.length) element.removeAttribute('class')
   }
   forEachMentionOfUser(removeUserClass, document, username)
 }

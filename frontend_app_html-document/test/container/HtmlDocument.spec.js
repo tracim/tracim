@@ -17,7 +17,7 @@ import { debug } from '../../src/debug.js'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: (comment, timeline, hasBeenRead) => timeline,
+    addCommentToTimeline: (comment, timeline, loggedUser, hasBeenRead) => timeline,
     content: contentHtmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },

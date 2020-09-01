@@ -459,3 +459,10 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     usernameInvalidMsg: ''
   }
 }
+
+// Equality test done as numbers with the following rules:
+// - strings are converted to numbers before comparing
+// - undefined and null are converted to 0 before comparing
+export const permissiveNumberEqual = (var1, var2) => {
+  return Number(var1 || 0) === Number(var2 || 0)
+}

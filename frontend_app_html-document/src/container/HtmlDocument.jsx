@@ -11,7 +11,6 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
-  displayDistanceDate,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
@@ -32,7 +31,8 @@ import {
   TracimComponent,
   getContentComment,
   handleMentionsBeforeSave,
-  addClassToMentionsOfUser
+  addClassToMentionsOfUser,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -103,7 +103,11 @@ export class HtmlDocument extends React.Component {
     if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = { ...state.content, ...data.fields.content }
+    const newContentObject = {
+      ...state.content,
+      ...data.fields.content,
+      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, state.loggedUser.username)
+    }
     this.setState(prev => ({
       ...prev,
       content: clientToken === data.fields.client_token
@@ -112,7 +116,7 @@ export class HtmlDocument extends React.Component {
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
-      rawContentBeforeEdit: data.fields.content.raw_content,
+      rawContentBeforeEdit: newContentObject.raw_content,
       timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
@@ -125,10 +129,10 @@ export class HtmlDocument extends React.Component {
   handleContentCommentCreated = (tlm) => {
     const { props, state } = this
     // Not a comment for our content
-    if (tlm.fields.content.parent_id !== state.content.content_id) return
+    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -334,16 +338,17 @@ export class HtmlDocument extends React.Component {
     )
     const hasLocalStorageRawContent = !!localStorageRawContent
 
+    const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
     this.setState({
       mode: modeToRender,
       content: {
         ...resHtmlDocument.body,
         raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
-          : addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
+          : rawContentBeforeEdit
       },
       newComment: localStorageComment || '',
-      rawContentBeforeEdit: resHtmlDocument.body.raw_content,
+      rawContentBeforeEdit: rawContentBeforeEdit,
       timeline: revisionWithComment,
       isLastTimelineItemCurrentToken: false
     })
@@ -402,7 +407,7 @@ export class HtmlDocument extends React.Component {
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(state.content.raw_content, state.loggedUser)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(state.content.raw_content, state.loggedUser.username)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return

@@ -3,7 +3,9 @@ import {
   wrapMentionsInSpanTags,
   addClassToMentionsOfUser,
   removeClassFromMentionsOfUser,
-  handleMentionsBeforeSave
+  handleMentionsBeforeSave,
+  MENTION_ID_PREFIX,
+  MENTION_ME_CLASS
 } from '../src/mention.js'
 
 describe('mention.js', () => {
@@ -28,7 +30,7 @@ describe('mention.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
           )
@@ -43,7 +45,7 @@ describe('mention.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
           )
@@ -60,7 +62,7 @@ describe('mention.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
           )
@@ -75,7 +77,7 @@ describe('mention.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
           )
@@ -96,10 +98,10 @@ describe('mention.js', () => {
           expect(addedSpanList[1].textContent).to.equal('@admin')
           expect(addedSpanList[2].textContent).to.equal('@user2')
         })
-        it('should have each span id starting with "mention-"', () => {
-          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
+        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
+          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
         })
       })
 
@@ -115,10 +117,10 @@ describe('mention.js', () => {
           expect(addedSpanList[1].textContent).to.equal('@admin')
           expect(addedSpanList[2].textContent).to.equal('@user2')
         })
-        it('should have each span id starting with "mention-"', () => {
-          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
+        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
+          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
         })
       })
     })
@@ -137,22 +139,22 @@ describe('mention.js', () => {
 
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
     const parser = new globalThis.DOMParser()
-    const mentionForFoo = '<span id="mention-foobar">@foo</span>'
+    const mentionForFoo = `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`
     const htmlCommentWithoutMention = '<p>Hello <strong>world.</strong></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
-    const htmlCommentWithMention = '<p>Hello <strong>world.</strong><span id="mention-foo">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
-    const expectedHtmlCommentWithMention = '<p>Hello <strong>world.</strong><span id="mention-foo" class="mention-me">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
+    const htmlCommentWithMention = `<p>Hello <strong>world.</strong><span id="${MENTION_ID_PREFIX}foo">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>`
+    const expectedHtmlCommentWithMention = `<p>Hello <strong>world.</strong><span id="${MENTION_ID_PREFIX}foo" class="${MENTION_ME_CLASS}">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>`
     const testCases = [
       {
         content: mentionForFoo,
-        expectedContent: '<span id="mention-foobar" class="mention-me">@foo</span>',
+        expectedContent: `<span id="${MENTION_ID_PREFIX}foobar" class="${MENTION_ME_CLASS}">@foo</span>`,
         username: 'foo',
         description: 'single mention for user'
       },
       {
         content: mentionForFoo,
-        expectedContent: '<span id="mention-foobar">@foo</span>',
+        expectedContent: `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`,
         username: 'bar',
-        description: 'user which is not mentioned'
+        description: 'user who is not mentioned'
       },
       {
         content: '<span>plop</span>',

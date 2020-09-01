@@ -14,7 +14,8 @@ import {
   addRevisionFromTLM,
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
-  MAXIMUM_CHARACTERS_USERNAME
+  MAXIMUM_CHARACTERS_USERNAME,
+  permissiveNumberEqual
 } from '../src/helper.js'
 
 import {
@@ -293,5 +294,53 @@ describe('helper.js', () => {
         expect(e).to.be.a('Error')
       }
     })
+  })
+
+  describe('the permissiveNumberEqual function', () => {
+    const testCases = [
+      {
+        var1: 0,
+        var2: 1,
+        expectedResult: false
+      },
+      {
+        var1: 0,
+        var2: 0,
+        expectedResult: true
+      },
+      {
+        var1: 12,
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 1,
+        var2: '12',
+        expectedResult: false
+      },
+      {
+        var1: '12',
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: null,
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: undefined,
+        expectedResult: true
+      }
+    ]
+    for (const { var1, var2, expectedResult } of testCases) {
+      const typeOfVar1 = typeof var1
+      const typeOfVar2 = typeof var2
+      const result = permissiveNumberEqual(var1, var2)
+      it(`should compare "${var1}" (${typeOfVar1}) and "${var2}" (${typeOfVar2}) to "${expectedResult}"`, () => {
+        expect(result).to.be.equal(expectedResult)
+      })
+    }
   })
 })

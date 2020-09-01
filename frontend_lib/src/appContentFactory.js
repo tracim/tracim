@@ -327,14 +327,14 @@ export function appContentFactory (WrappedComponent) {
         .flatMap(revision => [revision, ...revision.commentList])
     }
 
-    addCommentToTimeline = (comment, timeline, hasBeenRead) => {
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
       return sortTimelineByDate([
         ...timeline,
         {
           ...comment,
-          raw_content: addClassToMentionsOfUser(comment.raw_content, state.loggedUser.username),
+          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
           created_raw: comment.created,
-          created: displayDistanceDate(comment.created, this.state.loggedUser.lang),
+          created: displayDistanceDate(comment.created, loggedUser.lang),
           timelineType: comment.content_type,
           hasBeenRead: hasBeenRead
         }

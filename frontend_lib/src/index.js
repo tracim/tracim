@@ -37,7 +37,8 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  checkUsernameValidity
+  checkUsernameValidity,
+  permissiveNumberEqual
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -207,5 +208,6 @@ export {
   CHECK_USERNAME_DEBOUNCE_WAIT,
   getContentComment,
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave
+  handleMentionsBeforeSave,
+  permissiveNumberEqual
 }

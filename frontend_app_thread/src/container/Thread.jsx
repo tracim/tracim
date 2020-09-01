@@ -26,7 +26,8 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   getOrCreateSessionClientToken,
-  getContentComment
+  getContentComment,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -138,10 +139,10 @@ export class Thread extends React.Component {
   handleCommentCreated = (tlm) => {
     const { props, state } = this
     // Not a comment for our content
-    if (tlm.fields.content.parent_id !== state.content.content_id) return
+    if (!permissiveNumberEqual(tlm.fields.content.parent_id !== state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
