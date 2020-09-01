@@ -141,10 +141,18 @@ setup_yarn() {
     yarn_version="$(yarn -v)"
 
     if ! yarn_expected_version "$yarn_version" ; then
-        log "You have Yarn $yarn_version. Setting up Yarn 2 to the last version."
+        log "You have Yarn $yarn_version. Setting up Yarn 2 to version 2.1.1."
+
+        # RJ - 2020-08-31 - FIXME (#2953)
+        # We cap the version of Yarn to 2.1.1 because later versions require node
+        # version 10.17 or more. Unfortunately, Travis installs node 10.16.
+        # We need to upgrade Node version to 12 or 14 to use later versions of Yarn.
+        # Locally, the version of Node is not enforced, later versions of Yarn
+        # would work since the installed version of Node if usually 10.17 or later.
+
         case "$yarn_version" in
-            2.*) yarn set version latest ;;
-            *) yarn policies set-version berry ;;
+            2.*) YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
+            *) yarn policies set-version berry; YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
         esac
 
         yarn_version="$(yarn -v)"

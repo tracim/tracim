@@ -261,7 +261,7 @@ export class Gallery extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
       this.setState({ imagePreviewListLoaded: false, imagePreviewList: [] })

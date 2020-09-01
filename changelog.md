@@ -1,4 +1,20 @@
 
+## 3.0.4 / 2020-08-27
+
+### Fixed Issues
+
+- Frontend: #3461
+- Backend: #3401
+
+
+## 3.0.3 / 2020-08-25
+
+### Fixed Issues
+
+- Frontend: #3409
+- Backend: #3049, #3409
+
+
 ## 3.0.2 / 2020-08-17
 
 ### Fixed Issues
