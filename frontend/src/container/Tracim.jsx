@@ -368,7 +368,7 @@ export class Tracim extends React.Component {
             className='connection_error'
             flashMessage={
               [{
-                message: props.t('Tracim has a connection problem, please wait or reload the page if the problem persists'),
+                message: props.t('Tracim has a connection problem, please wait or restart your browser if the problem persists'),
                 type: 'danger'
               }]
             }

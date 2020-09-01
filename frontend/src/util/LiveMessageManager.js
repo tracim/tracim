@@ -159,21 +159,38 @@ export class LiveMessageManager {
     this.reconnectionTimerId = setTimeout(async () => {
       // NOTE - 2020-08-19 - RJ
       // The live message manager can be closed during the timeout.
-      if (this.status !== LIVE_MESSAGE_STATUS.CLOSED) {
-        // NOTE - 2020-08-20 - RJ
-        // Let's check that the user has not been logged out. We do this by
-        // pinging whoami. In a perfect world, we would have checked the status of
-        // the EventSource request. The world is not perfect and sadly, EventSource
-        // does not expose the HTTP status.
-        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`)
+      if (this.status === LIVE_MESSAGE_STATUS.CLOSED) return
+
+      // NOTE - 2020-08-20 - RJ
+      // Let's check that the user has not been logged out. We do this by
+      // pinging whoami. In a perfect world, we would have checked the status of
+      // the EventSource request. The world is not perfect and sadly, EventSource
+      // does not expose the HTTP status.
+      try {
+        // NOTE - 2020-08-26 - SG
+        // setup a timeout for this fetch: in some cases when resuming a computer
+        // the request isn't transmitted at all (so the response is never received)
+        const controller = new globalThis.AbortController()
+        const fetchTimeoutId = setTimeout(() => {
+          controller.abort()
+        }, this.reconnectionIntervalMs)
+        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`, { signal: controller.signal })
+        clearTimeout(fetchTimeoutId)
         if (response.status === 401) {
           GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, data: {} })
           this.closeLiveMessageConnection()
           return
         }
-
-        this.openEventSourceConnection()
+      } catch (e) {
+        // NOTE - 2020-08-26 - SG
+        // An error while fetching whoami, do not retry directly
+        // but instead re-open the connection
+        // if the re-opening fails, the reconnection will
+        // happen once more (and thus retry the whoami)
+        console.log('%c.:. Got Error while checking user connection state: ', 'color: #ccc0e2', e)
       }
+
+      this.openEventSourceConnection()
       this.reconnectionTimerId = 0
     }, this.reconnectionIntervalMs)
   }
