@@ -101,7 +101,7 @@ export const handleMentionsBeforeSave = (text, loggedUsername) => {
   try {
     const document = parser.parseFromString(text, 'text/html')
     if (document.documentElement.tagName === 'parsererror') {
-      throw new Error('Cannot parse string: ' + document.documentElement)
+      throw new Error('Cannot parse string: ' + document.documentElement.textContent)
     }
     wrapMentionsInSpanTags(document)
     removeClassFromMentionsOfUser(document, loggedUsername)
