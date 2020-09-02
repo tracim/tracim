@@ -8,12 +8,13 @@ assignees: ""
 
 ## Feature description and goals
 
-Explain why we want this feature and describe it.
+<!-- Explain why we want this feature and describe it. -->
 
 ## Prerequisites
 
-Optional - list the issues that must be solved or what needs to be done before handling this issue.
+<!-- Optional - list the issues that must be solved or what needs to be done before handling this issue. -->
 
+<!--
 ## Required sections, if relevant
 
  - To be discussed before development
@@ -21,3 +22,4 @@ Optional - list the issues that must be solved or what needs to be done before h
  - Translations
  - Workaround
  - Extra information
+-->
