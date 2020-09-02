@@ -603,6 +603,11 @@ export class HtmlDocument extends React.Component {
 
   shouldDisplayNotifyAllMessage = () => {
     const { state } = this
+    if (!state.loggedUser.config) console.log('AAAAAAAAAAAAAAAA')
+    else if (state.content.current_revision_type === 'creation') console.log('BBBBBBBBBBBBBBBBBBB')
+    else if (state.newContent.last_modifier && state.newContent.last_modifier.user_id !== state.loggedUser.userId) console.log('CCCCCCCCCCCCC')
+    else if (!state.newContent.last_modifier && state.content.last_modifier && state.content.last_modifier.user_id !== state.loggedUser.userId) console.log('DDDDDDDDDDDDDDDDDDDDDDDD')
+    else console.log('EEEEEEEEEEEEEEEEEEEEEEEEEEEEE', !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`])
     if (
       !state.loggedUser.config ||
       state.content.current_revision_type === 'creation' ||
