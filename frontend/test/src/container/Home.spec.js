@@ -18,6 +18,7 @@ describe('<Home />', () => {
         instance_name: 'instanceTest'
       }
     },
+    dispatch: () => { },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
     registerCustomEventHandlerList: () => { }

@@ -79,7 +79,6 @@ describe('LiveMessageManager class', () => {
   })
 
   describe('the openEventSourceConnection() method', () => {
-
     it('should create an EventSource', () => {
       const manager = createManager(30000, 0)
       manager.openLiveMessageConnection(userId, apiUrl)
