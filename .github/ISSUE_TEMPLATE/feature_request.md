@@ -14,12 +14,10 @@ assignees: ""
 
 <!-- Optional - list the issues that must be solved or what needs to be done before handling this issue. -->
 
-<!--
-## Required sections, if relevant
+<!-- ## Required sections, if relevant ## -->
 
- - To be discussed before development
- - Interface
- - Translations
- - Workaround
- - Extra information
--->
+<!-- - To be discussed before development -->
+<!-- - Interface -->
+<!-- - Translations -->
+<!-- - Workaround -->
+<!-- - Extra information -->
