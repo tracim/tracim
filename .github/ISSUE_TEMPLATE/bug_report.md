@@ -7,12 +7,11 @@ assignees: ""
 ---
 ## Description and expectations
 
-<!-- Explain:
+<!-- Explain: -->
+<!-- - the bug and what is going wrong. -->
+<!-- - what needs to be done to consider the bug solved. -->
 
-- the bug and what is going wrong.
-- what needs to be done to consider the bug solved.
-
-If you know which component may be affected, feel free to mention it. -->
+<!-- If you know which component may be affected, feel free to mention it. -->
 
 ### How to reproduce
 
@@ -47,13 +46,11 @@ ________________________________________________
 
 <!-- Optional - list the issues that must be solved or what needs to be done before handling this issue. -->
 
-<!--
-## Required sections, if relevant
+<!-- ## Required sections, if relevant ## -->
 
- - To be discussed before development
- - Interface
- - Translations
- - Workaround
- - Extra information
- - Implemented solution
--->
+<!-- - To be discussed before development -->
+<!-- - Interface -->
+<!-- - Translations -->
+<!-- - Workaround -->
+<!-- - Extra information -->
+<!-- - Implemented solution -->
