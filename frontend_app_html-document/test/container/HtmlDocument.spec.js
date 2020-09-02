@@ -329,41 +329,58 @@ describe('<HtmlDocument />', () => {
       })
 
       it('should return false if user configuration content_id.notify_all_members_message is false', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.content_id}.notify_all_members_message`] = false
         wrapper.setState(prev => ({
           ...prev,
           newContent: {
+            ...prev.newContent,
             last_modifier: {
+              ...prev.newContent.last_modifier,
               user_id: prev.loggedUser.userId
             }
           },
           content: {
+            ...prev.content,
             current_revision_type: 'edition',
             last_modifier: {
+              ...prev.content.last_modifier,
               user_id: prev.loggedUser.userId
             }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
           }
         }))
-        wrapper.state('loggedUser').config[`content.${props.content.content_id}.notify_all_members_message`] = false
         expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
       })
 
       it('should return true if user configuration content_id.notify_all_members_message is true', () => {
-        wrapper.state('loggedUser').config[content[props.content.content_id].notify_all_members_message] = true
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.content_id}.notify_all_members_message`] = true
         wrapper.setState(prev => ({
           ...prev,
           newContent: {
+            ...prev.newContent,
             last_modifier: {
+              ...prev.newContent.last_modifier,
               user_id: prev.loggedUser.userId
             }
           },
           content: {
+            ...prev.content,
             current_revision_type: 'edition',
             last_modifier: {
+              ...prev.content.last_modifier,
               user_id: prev.loggedUser.userId
             }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
           }
         }))
-        console.log('GGGGGGGGGGGGGGGG', wrapper.state('loggedUser').config[content[props.content.content_id].notify_all_members_message] = true)
         expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(true)
       })
     })
@@ -372,9 +389,8 @@ describe('<HtmlDocument />', () => {
       it('should set content_id.notify_all_members_message as false', () => {
         mockPutUserConfiguration204(debug.config.apiUrl, debug.loggedUser.userId)
         wrapper.instance().handleCloseNotifyAllMessage()
-        expect(wrapper.state('loggedUser').config[`content.${contentHtmlDocument.htmlDocument.content_id}.notify_all_members_message`]).to.equal(false)
+        expect(wrapper.state('loggedUser').config[`content.${props.content.content_id}.notify_all_members_message`]).to.equal(false)
       })
     })
-
   })
 })

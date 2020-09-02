@@ -410,7 +410,16 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: break
+      case 200: {
+        const newConfiguration = state.loggedUser.config
+        newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
+
+        this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, config: newConfiguration } }))
+
+        const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
+        if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
+        break
+      }
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -559,17 +568,26 @@ export class File extends React.Component {
     setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
-    xhr.onreadystatechange = () => {
+    xhr.onreadystatechange = async () => {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
-          case 204:
-            this.setState({
+          case 204: {
+            const newConfiguration = state.loggedUser.config
+            newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
+
+            this.setState(prev => ({
+              ...prev,
               newFile: '',
               newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
               fileCurrentPage: 1,
-              mode: APP_FEATURE_MODE.VIEW
-            })
+              mode: APP_FEATURE_MODE.VIEW,
+              loggedUser: { ...prev.loggedUser, config: newConfiguration }
+            }))
+
+            const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
+            if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
             break
+          }
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
