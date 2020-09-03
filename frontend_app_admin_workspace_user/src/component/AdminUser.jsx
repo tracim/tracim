@@ -158,13 +158,13 @@ export class AdminUser extends React.Component {
             <table className='table'>
               <thead>
                 <tr>
-                  <th scope='col'>{props.t('Active')}</th>
-                  <th />
-                  <th scope='col'>{props.t('User')}</th>
-                  <th scope='col'>{props.t('Username')}</th>
-                  <th scope='col'>{props.t('Email')}</th>
-                  <th scope='col'>{props.t('Can create shared space')}</th>
-                  <th scope='col'>{props.t('Administrator')}</th>
+                  <th className='adminUser__table__active' scope='col'>{props.t('Active')}</th>
+                  <th className='adminUser__table__profile' />
+                  <th className='adminUser__table__fullName' scope='col'>{props.t('User')}</th>
+                  <th className='adminUser__table__username' scope='col'>{props.t('Username')}</th>
+                  <th className='adminUser__table__email' scope='col'>{props.t('Email')}</th>
+                  <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create shared space')}</th>
+                  <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>
 
@@ -196,17 +196,20 @@ export class AdminUser extends React.Component {
 
                       <td
                         className='adminUser__table__tr__td-link primaryColorFont'
+                        title={u.public_name}
                       >
                         <Link to={`/ui/admin/user/${u.user_id}`}>
                           {u.public_name}
                         </Link>
                       </td>
 
-                      <td>
-                        {u.username}
+                      <td title={u.username}>
+                        {u.username && `@${u.username}`}
                       </td>
 
-                      <td>{u.email}</td>
+                      <td title={u.email}>
+                        {u.email}
+                      </td>
 
                       <td>
                         <BtnSwitch

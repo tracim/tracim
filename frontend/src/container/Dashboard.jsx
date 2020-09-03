@@ -6,7 +6,6 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -38,16 +37,10 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
-  updateWorkspaceMember,
-  removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
   setBreadcrumbs,
-  addWorkspaceMember,
-  addWorkspaceContentList,
-  updateWorkspaceContentList,
-  removeWorkspaceReadStatus
-  // deleteWorkspaceContentList // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
+  setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
@@ -73,6 +66,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       },
@@ -90,23 +84,10 @@ export class Dashboard extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreatedComment },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified }
-      // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
-      // { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentDeleted }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
     ])
   }
 
-  // CustomEvent handlers
   handleRefreshDashboardMemberList = () => this.loadMemberList()
 
   handleAllAppChangeLanguage = () => {
@@ -114,48 +95,11 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
   }
 
-  // LiveMessage handlers
   handleWorkspaceModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(setWorkspaceDetail(data.workspace))
+    if (this.props.curWs.id !== data.fields.workspace.workspace_id) return
     this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
-
-  handleMemberCreated = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(addWorkspaceMember(data.user, data.workspace, data.member))
-  }
-
-  handleMemberModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(updateWorkspaceMember(data.user, data.workspace, data.member))
-  }
-
-  handleMemberDeleted = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceMember(data.user.user_id, data.workspace))
-  }
-
-  handleContentCreated = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(addWorkspaceContentList([data.content]))
-  }
-
-  handleContentCreatedComment = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(removeWorkspaceReadStatus(data.content.parent_id))
-  }
-
-  handleContentModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
-    this.props.dispatch(updateWorkspaceContentList([data.content]))
-  }
-
-  // FIXME - CH - 2020-05-18 - need core event type undelete to handle this
-  // handleContentDeleted = data => {
-  //   if (this.props.curWs.id !== data.workspace.workspace_id) return
-  //   this.props.dispatch(deleteWorkspaceContentList([data.content]))
-  // }
 
   async componentDidMount () {
     this.setHeadTitle()
@@ -181,6 +125,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       }
@@ -264,12 +209,10 @@ export class Dashboard extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Dashboard'), props.system.config.instance_name]) }
-      })
-    }
+    const headTitle = buildHeadTitle(
+      [props.t('Dashboard'), props.curWs.label]
+    )
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   buildBreadcrumbs = () => {
@@ -326,9 +269,9 @@ export class Dashboard extends React.Component {
     }
   }
 
-  handleSearchUser = async userNameToSearch => {
+  handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
@@ -342,13 +285,16 @@ export class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         personalData: newPersonalData,
+        publicName: newPersonalData,
         isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
     }))
 
-    if (removeAtInUsername(newPersonalData).length >= 2) {
-      await this.handleSearchUser(removeAtInUsername(newPersonalData))
+    const personalData = removeAtInUsername(newPersonalData)
+
+    if (personalData.length >= 2) {
+      await this.handleSearchUser(personalData)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -358,6 +304,7 @@ export class Dashboard extends React.Component {
       newMember: {
         ...prev.newMember,
         id: knownMember.user_id,
+        publicName: knownMember.public_name,
         personalData: knownMember.username,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
@@ -405,6 +352,7 @@ export class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         personalData: '',
+        publicName: '',
         role: '',
         isEmail: false
       },
@@ -640,7 +588,7 @@ export class Dashboard extends React.Component {
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
-                  onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
+                  onClickMarkAllAsRead={this.handleClickMarkRecentActivityAsRead}
                   onClickSeeMore={this.handleClickSeeMore}
                   t={props.t}
                 />
@@ -652,7 +600,7 @@ export class Dashboard extends React.Component {
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  personalData={state.newMember.personalData}
+                  publicName={state.newMember.publicName}
                   isEmail={state.newMember.isEmail}
                   onChangePersonalData={this.handleChangePersonalData}
                   onClickKnownMember={this.handleClickKnownMember}

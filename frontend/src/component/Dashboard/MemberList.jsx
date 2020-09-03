@@ -31,7 +31,7 @@ export class MemberList extends React.Component {
             ? (
               <NewMemberForm
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
-                personalData={props.personalData}
+                publicName={props.publicName}
                 isEmail={props.isEmail}
                 onChangePersonalData={props.onChangePersonalData}
                 searchedKnownMemberList={props.searchedKnownMemberList}
@@ -80,21 +80,27 @@ export class MemberList extends React.Component {
                       </div>
 
                       <div className='memberlist__list__item__info'>
-                        <div className='memberlist__list__item__info__firstLine'>
-                          <div className='memberlist__list__item__info__firstLine__name'>
+                        <div className='memberlist__list__item__info__firstColumn'>
+                          <div
+                            className='memberlist__list__item__info__firstColumn__name'
+                            title={m.publicName}
+                          >
                             {m.publicName}
                           </div>
 
-                          <div className='memberlist__list__item__info__firstLine__role'>
-                            - {props.t(props.roleList.find(r => r.slug === m.role).label)}
-                          </div>
+                          {m.username && (
+                            <div
+                              className='memberlist__list__item__info__firstColumn__username'
+                              title={`@${m.username}`}
+                            >
+                              @{m.username}
+                            </div>
+                          )}
                         </div>
 
-                        {m.username && (
-                          <div className='memberlist__list__item__info__username'>
-                            @{m.username}
-                          </div>
-                        )}
+                        <div className='memberlist__list__item__info__role'>
+                          - {props.t(props.roleList.find(r => r.slug === m.role).label)}
+                        </div>
                       </div>
 
                       {props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (

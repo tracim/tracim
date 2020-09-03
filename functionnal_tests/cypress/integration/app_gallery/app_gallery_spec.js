@@ -3,6 +3,7 @@ import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('App Gallery', function () {
   let workspaceId
+  let otherWorkspaceId
   let folder1 = { label: 'first Folder' }
   const createdFiles = {
     file1: {
@@ -49,6 +50,9 @@ describe('App Gallery', function () {
           .then(newContent => createdFiles.file4.id = newContent.content_id)
       })
     })
+    cy.createRandomWorkspace().then(workspace => {
+      otherWorkspaceId = workspace.workspace_id
+    })
   })
 
   beforeEach(() => {
@@ -78,10 +82,29 @@ describe('App Gallery', function () {
       })
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId } }).click()
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId } })
-        .get('[data-cy=sidebar_subdropdown-gallery]')
+        .find('[data-cy=sidebar_subdropdown-gallery]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .should('be.visible')
+    })
+    it('click to another workspace gallery button in the sidebar should update the gallery app contents', function () {
+      // INFO - GM - 2020/07/16 - Skipping this test because it fails in TravisCI but pass locally
+      // https://github.com/tracim/tracim/issues/3341
+      this.skip()
+
+      cy.visitPage({
+        pageName: PAGES.HOME,
+        params: { workspaceId }
+      })
+      cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId } }).click()
+      cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId } })
+        .find('[data-cy=sidebar_subdropdown-gallery]')
+        .click()
+      cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: otherWorkspaceId } })
+        .click()
+        .find('[data-cy=sidebar_subdropdown-gallery]')
+        .click()
+      cy.contains('.gallery-scrollView', "There isn't any previewable content at that folder's root.")
     })
     it('open a folder gallery with button extended action', () => {
       cy.visitPage({

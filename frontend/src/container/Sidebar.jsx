@@ -7,6 +7,8 @@ import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
+  addWorkspaceList,
+  addWorkspaceMember,
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
 import {
@@ -20,7 +22,11 @@ import {
 import {
   CUSTOM_EVENT,
   ROLE_LIST,
-  PROFILE
+  PROFILE,
+  TracimComponent,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  getOrCreateSessionClientToken
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -30,14 +36,43 @@ export class Sidebar extends React.Component {
       sidebarClose: isMobile
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmMemberCreated }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP:
-        this.handleClickNewWorkspace()
-        break
+  // Custom Event Handler
+  handleShowCreateWorkspacePopup = () => {
+    this.handleClickNewWorkspace()
+  }
+
+  handleTlmMemberCreated = tlmFieldObject => {
+    const { props } = this
+
+    const tlmUser = tlmFieldObject.fields.user
+    const tlmAuthor = tlmFieldObject.fields.author
+    const tlmWorkspace = tlmFieldObject.fields.workspace
+    const loggedUserId = props.user.userId
+
+    if (loggedUserId === tlmUser.user_id) {
+      props.dispatch(addWorkspaceList([tlmWorkspace]))
+      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.fields.member))
+
+      // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
+      // user created a new workspace
+      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
+      const clientToken = getOrCreateSessionClientToken()
+      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.fields.client_token) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
+        if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
+          document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
+        }
+        props.history.push(PAGE.WORKSPACE.DASHBOARD(tlmWorkspace.workspace_id))
+      }
     }
   }
 
@@ -113,7 +148,7 @@ export class Sidebar extends React.Component {
                       workspaceId={ws.id}
                       userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
                       label={ws.label}
-                      allowedAppList={ws.sidebarEntry}
+                      allowedAppList={ws.sidebarEntryList}
                       activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
                       isOpenInSidebar={ws.isOpenInSidebar}
                       onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
@@ -156,4 +191,4 @@ export class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

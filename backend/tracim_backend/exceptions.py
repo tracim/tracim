@@ -206,7 +206,7 @@ class WrongSharePassword(TracimException):
     error_code = ErrorCode.WRONG_SHARE_PASSWORD
 
 
-class UnvalidResetPasswordToken(TracimException):
+class InvalidResetPasswordToken(TracimException):
     error_code = ErrorCode.INVALID_RESET_PASSWORD_TOKEN
     pass
 
@@ -241,6 +241,10 @@ class ContentTypeNotExist(TracimError):
 
 class UserDoesNotExist(TracimException):
     error_code = ErrorCode.USER_NOT_FOUND
+
+
+class MessageDoesNotExist(TracimException):
+    error_code = ErrorCode.MESSAGE_NOT_FOUND
 
 
 class UserNotFoundInTracimRequest(TracimException):
@@ -463,6 +467,10 @@ class TooShortAutocompleteString(TracimException):
     pass
 
 
+class CannotUseBothIncludeAndExcludeWorkspaceUsers(TracimException):
+    pass
+
+
 class PageNotFound(TracimException):
     pass
 
@@ -471,12 +479,12 @@ class AppDoesNotExist(TracimException):
     pass
 
 
-class EmailAlreadyExistInDb(TracimException):
-    error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+class EmailAlreadyExists(TracimException):
+    error_code = ErrorCode.EMAIL_ALREADY_EXISTS
 
 
-class UsernameAlreadyExistInDb(TracimException):
-    error_code = ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+class UsernameAlreadyExists(TracimException):
+    error_code = ErrorCode.USERNAME_ALREADY_EXISTS
 
 
 class UnavailablePreview(TracimException):
@@ -553,3 +561,7 @@ class ConflictingMoveInChild(TracimException):
 
 class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
     pass
+
+
+class ReservedUsernameError(TracimException):
+    error_code = ErrorCode.RESERVED_USERNAME

@@ -89,7 +89,11 @@ basic_setup.session_secret = change_this_value_please!
 ### Live Messages ###
 # control_uri for GRIP protocol reverse-proxy (PushPin)
 # this is the base url used for publishing new events to reverse-proxy.
-; live_messages.control_uri = http://localhost:5561
+; live_messages.control_zmq_uri = tcp://localhost:5563
+# do tracim block until publishing is complete or not
+# by default it will be False if jobs.processing_mode is sync and True if processing_mode is async
+# as sync publishing is done during the HTTP request
+; live_messages.blocking_publish = False
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow
@@ -187,9 +191,19 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 ### pyramid_beaker parameters ###
+
 session.type = file
+# needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+# needed for many session storage type, but not for file (leave as empty for file)
+session.url =
+
+## "Redis" storage config sample:
+# session.type = ext:redis
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
+# session.url = redis://localhost:6379/0
+
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
@@ -199,8 +213,6 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
-## custom Tracim pyramid_beaker parameter
-; session.reissue_time = 120
 
 ####
 # AUTH
@@ -345,6 +357,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## with async, please also configure redis below
 ; jobs.async.redis.host = localhost
 ; jobs.async.redis.port = 6379
+# note: redis db name are integer (by default 16 database are available from 0 to 15 db)
 ; jobs.async.redis.db = 0
 
 ####

@@ -26,7 +26,7 @@ class RoleApi(object):
         config: CFG,
         show_disabled_user: bool = True,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config

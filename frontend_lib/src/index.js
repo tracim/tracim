@@ -8,6 +8,7 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  getCurrentContentVersionNumber,
   hasNotAllowedCharacters,
   hasSpaces,
   BREADCRUMBS_TYPE,
@@ -30,7 +31,15 @@ import {
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername,
-  serialize
+  setupCommonRequestHeaders,
+  serialize,
+  getOrCreateSessionClientToken,
+  wrapMentionsInSpanTags,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  checkUsernameValidity
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -74,6 +83,7 @@ import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
+import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarningMessage.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
@@ -121,6 +131,7 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
+  getCurrentContentVersionNumber,
   hasNotAllowedCharacters,
   hasSpaces,
   buildFilePreviewUrl,
@@ -181,6 +192,15 @@ export {
   RadioBtnGroup,
   CONTENT_TYPE,
   buildTracimLiveMessageEventType,
+  RefreshWarningMessage,
   sortTimelineByDate,
-  serialize
+  setupCommonRequestHeaders,
+  serialize,
+  getOrCreateSessionClientToken,
+  wrapMentionsInSpanTags,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 }

@@ -71,8 +71,8 @@ debian_install() {
     install_yarn_package=""
 
     log "Checking whether Yarn is installed…"
-    if yarn -v > /dev/null 2>&1; then
-        loggood "Yarn $(yarn -v) is installed."
+    if which yarn > /dev/null 2>&1; then
+        loggood "Yarn is installed."
     else
         log "Yarn is not installed. Adding its repository."
 
@@ -120,17 +120,48 @@ debian_install() {
     fi
 }
 
+yarn_expected_version() {
+    min_yarn2_rc_version=34
+    # RJ - 2020-06-12 - NOTE: Yarn 2.0.0-rc.33 and earlier had issues related
+    # to rewritting the checksums of the whole yarn.lock by prefixing them
+    # with 2/ or 3/. We could not find anything about this issue on the web.
+    case "$1" in
+        2.0.*)
+            [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
+            return $?
+        ;;
+        2.*)
+            return 0
+        ;;
+    esac
+    return 1
+}
+
 setup_yarn() {
-    if ! yarn -v | grep '^2\.' > /dev/null; then
-        log "Setting up yarn (yarn policies set-version berry)"
-        yarn policies set-version berry && \
-            loggood "Yarn is correctly set up." || \
-            logerror "Failed to set up yarn."
+    yarn_version="$(yarn -v)"
+
+    if ! yarn_expected_version "$yarn_version" ; then
+        log "You have Yarn $yarn_version. Setting up Yarn 2 to version 2.1.1."
+
+        # RJ - 2020-08-31 - FIXME (#2953)
+        # We cap the version of Yarn to 2.1.1 because later versions require node
+        # version 10.17 or more. Unfortunately, Travis installs node 10.16.
+        # We need to upgrade Node version to 12 or 14 to use later versions of Yarn.
+        # Locally, the version of Node is not enforced, later versions of Yarn
+        # would work since the installed version of Node if usually 10.17 or later.
+
+        case "$yarn_version" in
+            2.*) YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
+            *) yarn policies set-version berry; YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
+        esac
+
+        yarn_version="$(yarn -v)"
+        if ! yarn_expected_version "$yarn_version" ; then
+            logerror "We expected Yarn 2 ≥ 2.0.0-rc.33, we got $yarn_version."
+        fi
     fi
 
-    if ! yarn -v | grep '^2\.' > /dev/null; then
-        logerror "We expected Yarn 2, we got $(yarn --version)."
-    fi
+    loggood "Yarn version: $yarn_version"
 
     if ! grep -F 'nodeLinker: node-modules' .yarnrc.yml > /dev/null; then
         log "Setting yarn nodeLinker to node-modules mode."
@@ -139,13 +170,13 @@ setup_yarn() {
 }
 
 setup_config() {
-    log "Checking if configEnv.json exist.."
+    log "Checking whether configEnv.json exists.."
 
     if [ ! -f frontend/configEnv.json ]; then
         log "cp frontend/configEnv.json.sample frontend/configEnv.json ..."
         cp frontend/configEnv.json.sample frontend/configEnv.json && \
             loggood "ok" || \
-            logerror "Failed copying the configuration."
+            logerror "Failed to copy the configuration."
     else
         log "configEnv.json already exists."
     fi

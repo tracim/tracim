@@ -53,7 +53,7 @@ describe('Login', function () {
   describe('if username is null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=email]')
+        .find('input[type=text]')
         .type(userWithoutUsername.email)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -88,7 +88,6 @@ describe('Login', function () {
 
     it('should have the confirm button disabled if username is too short', function () {
       cy.get(usernameInput).type(shortUsername)
-      cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).should('not.be.enabled')
     })
 
@@ -103,7 +102,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
-      cy.get('.flashmessage').contains('Your username has been changed')
+      cy.get('.flashmessage').contains('Your username has been set')
     })
 
     describe('if user choose "Never ask me again"', function () {
@@ -115,7 +114,7 @@ describe('Login', function () {
         cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-          .find('input[type=email]')
+          .find('input[type=text]')
           .type(userWithoutUsername.email)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
@@ -134,7 +133,7 @@ describe('Login', function () {
   describe('if username is not null', function () {
     beforeEach(() => {
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=email]')
+        .find('input[type=text]')
         .type(userWithUsernameEmail)
 
       cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })

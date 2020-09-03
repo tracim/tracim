@@ -6,13 +6,13 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import DownloadForm from '../component/GuestPage/DownloadForm.jsx'
+import { setHeadTitle } from '../action-creator.sync.js'
 import {
   getFileInfos
 } from '../action-creator.async.js'
 import {
   displayFileSize,
   handleFetchResult,
-  buildHeadTitle,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { PAGE } from '../util/helper.js'
@@ -98,12 +98,7 @@ class GuestDownload extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Public download'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Public download')))
   }
 
   handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })

@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  TextAreaApp,
+  APP_FEATURE_MODE,
   DisplayState,
-  APP_FEATURE_MODE
+  TextAreaApp
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -37,17 +37,6 @@ export const HtmlDocument = props => {
         />
       )}
 
-      {props.keepEditingWarning && (
-        <DisplayState
-          msg={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
-          btnType='button'
-          icon='repeat'
-          btnLabel={props.t('Refresh')}
-          onClickBtn={props.onClickRefresh}
-          tooltip={props.t('If you refresh, you will lose the current changes')}
-        />
-      )}
-
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
@@ -64,13 +53,13 @@ export const HtmlDocument = props => {
             <div className='html-document__contentpage__textnote__version'>
               {props.t(
                 'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW
+                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
                     ? props.lastVersion
                     : props.version
                 }
               )}
-              {props.mode === APP_FEATURE_MODE.REVISION && (
-                <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
+              {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                <div className='html-document__contentpage__textnote__lastversion'>
                   ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
                 </div>
               )}
@@ -119,5 +108,6 @@ HtmlDocument.propTypes = {
   onClickCloseEditMode: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
-  onClickShowDraft: PropTypes.func
+  onClickShowDraft: PropTypes.func,
+  isRefreshNeeded: PropTypes.bool
 }

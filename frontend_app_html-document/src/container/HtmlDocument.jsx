@@ -13,6 +13,8 @@ import {
   CUSTOM_EVENT,
   displayDistanceDate,
   generateLocalStorageContentId,
+  getCurrentContentVersionNumber,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
   PopinFixed,
@@ -20,6 +22,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedRightPart,
+  RefreshWarningMessage,
   ROLE,
   SelectStatus,
   sortTimelineByDate,
@@ -27,7 +30,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  wrapMentionsInSpanTags
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -64,11 +68,14 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false,
-      editionAuthor: ''
+      showRefreshWarning: false,
+      editionAuthor: '',
+      isLastTimelineItemCurrentToken: false
     }
+    this.sessionClientToken = getOrCreateSessionClientToken()
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -84,76 +91,85 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUndeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
   // TLM Handlers
   handleContentModified = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content
-      },
-      editionAuthor: data.author.public_name,
-      keepEditingWarning: (prev.mode === APP_FEATURE_MODE.EDIT && prev.loggedUser.userId !== data.author.user_id),
-      rawContentBeforeEdit: data.content.raw_content,
-      timeline: addRevisionFromTLM(data, prev.timeline, prev.loggedUser.lang)
+      content: clientToken === data.fields.client_token
+        ? newContentObject
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+      newContent: newContentObject,
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      rawContentBeforeEdit: data.fields.content.raw_content,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
+    if (clientToken === data.fields.client_token) {
+      this.setHeadTitle(newContentObject.label)
+      this.buildBreadcrumbs(newContentObject)
+    }
   }
 
   handleContentCreated = data => {
     const { state } = this
-    if (data.content.parent_id !== state.content.content_id || data.content.content_type !== 'comment') return
+    if (data.fields.content.parent_id !== state.content.content_id || data.fields.content.content_type !== 'comment') return
 
     const sortedNewTimeline = sortTimelineByDate(
       [
         ...state.timeline,
         {
-          ...data.content,
-          created: displayDistanceDate(data.content.created, state.loggedUser.lang),
-          created_raw: data.content.created,
-          timelineType: 'comment'
+          ...data.fields.content,
+          created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
+          created_raw: data.fields.content.created,
+          timelineType: 'comment',
+          hasBeenRead: data.fields.client_token === this.sessionClientToken
         }
       ]
     )
 
-    this.setState({ timeline: sortedNewTimeline })
+    this.setState({
+      timeline: sortedNewTimeline,
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+    })
   }
 
-  handleContentDeleted = data => {
+  handleContentDeletedOrRestore = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: true
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
+      content: clientToken === data.fields.client_token
+        ? { ...prev.content, ...data.fields.content }
+        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+      newContent: { ...prev.content, ...data.fields.content },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
+      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
   }
 
-  handleContentUndeleted = data => {
-    const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+  handleUserModified = data => {
+    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
+      ? { ...timelineItem, author: data.fields.user }
+      : timelineItem
+    )
 
-    this.setState(prev => ({
-      ...prev,
-      content: {
-        ...prev.content,
-        ...data.content,
-        is_deleted: false
-      },
-      timeline: addRevisionFromTLM(data, prev.timeline, state.loggedUser.lang)
-    }))
+    this.setState({ timeline: newTimeline })
   }
 
   // Custom Event Handlers
@@ -194,19 +210,17 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
       globalThis.tinymce.remove('#wysiwygNewVersion')
       globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -243,10 +257,10 @@ export class HtmlDocument extends React.Component {
   setHeadTitle = (contentName) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([contentName, state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([contentName, state.config.workspace.label]) }
       })
     }
   }
@@ -278,15 +292,15 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -340,10 +354,12 @@ export class HtmlDocument extends React.Component {
       },
       newComment: localStorageComment || '',
       rawContentBeforeEdit: resHtmlDocument.body.raw_content,
-      timeline: revisionWithComment
+      timeline: revisionWithComment,
+      isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
+    this.buildBreadcrumbs(resHtmlDocument.body)
     await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
@@ -394,6 +410,14 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    let newDocumentForApiWithMention
+    try {
+      newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
+      return
+    }
+
     const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
     localStorage.removeItem(
@@ -401,7 +425,7 @@ export class HtmlDocument extends React.Component {
     )
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -412,17 +436,20 @@ export class HtmlDocument extends React.Component {
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
+          case 1001:
+            this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
+            break
           case 2044:
             this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+            this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
             break
         }
         break
       default:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
-        this.sendGlobalFlashMessage(props.t('Error while saving new version'))
+        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
   }
@@ -441,7 +468,11 @@ export class HtmlDocument extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
-    props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    try {
+      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -504,21 +535,33 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickLastVersion = () => {
+    if (this.state.showRefreshWarning) {
+      this.handleClickRefresh()
+      return
+    }
+
     this.loadContent()
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
   }
 
   handleClickRefresh = () => {
+    const { state } = this
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
+    const newObjectContent = {
+      ...state.content,
+      ...state.newContent,
+      raw_content: state.rawContentBeforeEdit
+    }
+
     this.setState(prev => ({
-      content: {
-        ...prev.content,
-        raw_content: prev.rawContentBeforeEdit
-      },
+      content: newObjectContent,
+      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
-      keepEditingWarning: false
+      showRefreshWarning: false
     }))
+    this.setHeadTitle(newObjectContent.label)
+    this.buildBreadcrumbs(newObjectContent)
   }
 
   render () {
@@ -570,6 +613,14 @@ export class HtmlDocument extends React.Component {
                   {props.t('Last version')}
                 </button>
               )}
+
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+
             </div>
 
             <div className='d-flex'>
@@ -621,9 +672,7 @@ export class HtmlDocument extends React.Component {
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
-            keepEditingWarning={state.keepEditingWarning}
-            onClickRefresh={this.handleClickRefresh}
-            editionAuthor={state.editionAuthor}
+            isRefreshNeeded={state.showRefreshWarning}
           />
 
           <PopinFixedRightPart
@@ -648,6 +697,7 @@ export class HtmlDocument extends React.Component {
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 />
               )
             }]}

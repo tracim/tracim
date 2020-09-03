@@ -6,6 +6,7 @@ from typing import List
 from typing import Optional
 
 from slugify import slugify
+from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
@@ -31,6 +32,8 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import EventTypeDatabaseParameters
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -390,17 +393,22 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
-class KnownMemberQuery(object):
+class KnownMembersQuery(object):
     """
     Autocomplete query model
     """
 
     def __init__(
-        self, acp: str, exclude_user_ids: str = None, exclude_workspace_ids: str = None
+        self,
+        acp: str,
+        exclude_user_ids: str = None,
+        exclude_workspace_ids: str = None,
+        include_workspace_ids: str = None,
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
+        self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
 
 
 class AgendaFilterQuery(object):
@@ -579,6 +587,33 @@ class TextBasedContentUpdate(object):
     def __init__(self, label: str, raw_content: str) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class LiveMessageQuery(object):
+    """
+    Live Message query model
+    """
+
+    def __init__(
+        self,
+        read_status: str,
+        count: int,
+        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        page_token: Optional[str] = None,
+    ) -> None:
+        self.read_status = ReadStatus(read_status)
+        self.count = count
+        self.page_token = page_token
+        self.event_types = event_types
+
+
+class UserMessagesSummaryQuery(object):
+    """
+    Message summary query model
+    """
+
+    def __init__(self, event_types: Optional[List[EventTypeDatabaseParameters]] = None,) -> None:
+        self.event_types = event_types
 
 
 class FolderContentUpdate(object):
@@ -945,6 +980,20 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_content_in_context(self.content.parent)
+        return None
+
+    @property
+    def parent_content_type(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.content_type
+        return None
+
+    @property
+    def parent_label(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.label
         return None
 
     @property
@@ -1526,3 +1575,25 @@ class RevisionInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.revision.file_name)
+
+
+class PaginatedObject(object):
+    def __init__(self, page: Page) -> None:
+        self.previous_page_token = page.paging.bookmark_previous
+        self.next_page_token = page.paging.bookmark_next
+        self.has_previous = page.paging.has_previous
+        self.has_next = page.paging.has_next
+        self.per_page = page.paging.per_page
+        self.items = page
+
+
+class UserMessagesSummary(object):
+    def __init__(self, user: UserInContext, read_messages_count: int, unread_messages_count: int):
+        self.read_messages_count = read_messages_count
+        self.unread_messages_count = unread_messages_count
+        self.messages_count = self.unread_messages_count + self.read_messages_count
+        self.user = user
+
+    @property
+    def user_id(self) -> int:
+        return self.user.user_id

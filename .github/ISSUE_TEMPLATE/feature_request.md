@@ -6,35 +6,18 @@ labels: to sort
 assignees: ""
 ---
 
-## Feature description
+## Feature description and goals
 
-*Explain the requested feature and the functional and technical expectations.*
-
-## Context
-
-*Explain the why and the how of the requested feature.*
+<!-- Explain why we want this feature and describe it. -->
 
 ## Prerequisites
 
-*Optional - if some other issues must be closed before the current, list them here.*
+<!-- Optional - list the issues that must be solved or what needs to be done before handling this issue. -->
 
-- *#xxx*
-- *...*
+<!-- ## Required sections, if relevant ## -->
 
-## Impacted components
-
-*Optional - list components which will be impacted.*
-
-*For example:*
-
-- *backend*
-- *frontend*
-- *htmldoc / file / thread app*
-- *webdav*
-- *...*
-
-*If unsure, write "unknown"*
-
-## Extra information
-
-*Optional - Add any useful information to understand and develop the feature*
+<!-- - To be discussed before development -->
+<!-- - Interface -->
+<!-- - Translations -->
+<!-- - Workaround -->
+<!-- - Extra information -->

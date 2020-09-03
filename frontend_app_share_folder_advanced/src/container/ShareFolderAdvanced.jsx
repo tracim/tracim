@@ -13,7 +13,8 @@ import {
   CUSTOM_EVENT,
   checkEmailValidity,
   parserStringToList,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -23,7 +24,7 @@ import {
   getContentTypeList
 } from '../action.async.js'
 
-class ShareFolderAdvanced extends React.Component {
+export class ShareFolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
 
@@ -55,29 +56,36 @@ class ShareFolderAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  // Custom Event Handlers
+  handleShowApp = data => {
     const { props, state } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
-        this.setHeadTitle()
-        break
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-        this.loadContentTypeList()
-        this.setHeadTitle()
-        break
-    }
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), () => {})
+    this.setHeadTitle()
+  }
+
+  handleHideApp = data => {
+    const { props, state } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(state.config.slug), data)
+
+    props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
+
+  handleAllAppChangeLanguage = data => {
+    const { props } = this
+    console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.loadContentTypeList()
+    this.setHeadTitle()
   }
 
   componentDidMount () {
@@ -88,7 +96,6 @@ class ShareFolderAdvanced extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<ShareFolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
@@ -103,10 +110,10 @@ class ShareFolderAdvanced extends React.Component {
   setHeadTitle = () => {
     const { state, props } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Received files'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('Received files'), state.config.workspace.label]) }
       })
     }
   }
@@ -291,4 +298,4 @@ class ShareFolderAdvanced extends React.Component {
   }
 }
 
-export default translate()(appContentFactory(ShareFolderAdvanced))
+export default translate()(appContentFactory(TracimComponent(ShareFolderAdvanced)))

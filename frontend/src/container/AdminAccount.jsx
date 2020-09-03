@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
+import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -15,14 +16,20 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  hasNotAllowedCharacters,
-  hasSpaces,
-  removeAtInUsername,
-  serialize
+  serialize,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getUser,
@@ -33,20 +40,19 @@ import {
   putUserUsername,
   putUserPassword,
   putUserWorkspaceDoNotify,
-  getUsernameAvailability,
   getUserCalendar
 } from '../action-creator.async.js'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME
+  FETCH_CONFIG
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
+import { serializeMember } from '../reducer/currentWorkspace.js'
 
-class Account extends React.Component {
+export class Account extends React.Component {
   constructor (props) {
     super(props)
 
@@ -86,16 +92,56 @@ class Account extends React.Component {
       subComponentMenu: builtSubComponentMenu
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        this.setHeadTitle()
-        break
+  // TLM Handler
+  handleUserModified = data => {
+    const { state } = this
+    if (Number(state.userToEditId) !== data.fields.user.user_id) return
+    if (state.userToEdit.publicName !== data.fields.user.public_name) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: data.fields.user.public_name } }))
+      return
     }
+    if (state.userToEdit.username !== data.fields.user.username) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: data.fields.user.username } }))
+      return
+    }
+    if (state.userToEdit.email !== data.fields.user.email) {
+      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.fields.user.email } }))
+      return
+    }
+    if (state.userToEdit.profile !== data.fields.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.fields.user.profile } }))
+  }
+
+  handleMemberModified = data => {
+    const { state } = this
+    if (Number(state.userToEditId) !== data.fields.user.user_id) return
+    this.setState(prev => ({
+      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.fields.workspace.workspace_id
+        ? {
+          ...ws,
+          memberList: ws.memberList.map(member => member.id === Number(state.userToEditId)
+            ? { ...member, doNotify: data.fields.member.do_notify }
+            : member
+          )
+        }
+        : ws
+      )
+    }))
+  }
+
+  // Custom Event Handler
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   async componentDidMount () {
@@ -106,11 +152,18 @@ class Account extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps) {
-    const { props } = this
+  componentWillUnmount () {
+    this.handleChangeUsername.cancel()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props, state } = this
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
       this.setHeadTitle()
+    }
+    if (state.userToEdit.publicName !== prevState.userToEdit.publicName) {
+      this.buildBreadcrumbs()
     }
   }
 
@@ -213,7 +266,9 @@ class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId)
+        memberList: workspaceListMemberList
+          .find(wsm => ws.workspace_id === wsm.workspaceId).memberList
+          .map(m => serializeMember(m))
       }))
     })
   }
@@ -238,7 +293,6 @@ class Account extends React.Component {
       const fetchPutUserPublicName = await props.dispatch(putUserPublicName(state.userToEdit, newPublicName))
       switch (fetchPutUserPublicName.status) {
         case 200:
-          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: newPublicName } }))
           if (newEmail === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
@@ -250,12 +304,9 @@ class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-
-      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, newUsername, checkPassword))
       switch (fetchPutUsername.status) {
         case 200:
-          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: username } }))
           if (newEmail === '') {
             if (newPublicName !== '') props.dispatch(newFlashMessage(props.t('Username and name has been changed'), 'info'))
             else props.dispatch(newFlashMessage(props.t('Username has been changed'), 'info'))
@@ -264,6 +315,11 @@ class Account extends React.Component {
           break
         case 400:
           switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
             case 2062:
               props.dispatch(newFlashMessage(
                 props.t(
@@ -287,7 +343,6 @@ class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putUserEmail(state.userToEdit, newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: newEmail } }))
           if (newUsername !== '' || newPublicName !== '') props.dispatch(newFlashMessage(props.t('Personal data has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
           return true
@@ -298,73 +353,39 @@ class Account extends React.Component {
     return false
   }
 
-  handleChangeUsername = async (newUsername) => {
+  changeUsername = async (newUsername) => {
+    if (!newUsername) {
+      this.setState(prev => ({
+        userToEdit: {
+          ...prev.userToEdit,
+          isUsernameValid: true,
+          usernameInvalidMsg: ''
+        }
+      }))
+      return
+    }
     const { props } = this
-
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
+    try {
+      const usernameValidity = await checkUsernameValidity(FETCH_CONFIG.apiUrl, newUsername, props)
       this.setState(prev => ({
         userToEdit: {
           ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+          ...usernameValidity
         }
       }))
-      return
-    }
-
-    if (hasSpaces(username)) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t("Username can't contain any whitespace")
-        }
-      }))
-      return
-    }
-
-    if (hasNotAllowedCharacters(username)) {
-      this.setState(prev => ({
-        userToEdit: {
-          ...prev.userToEdit,
-          isUsernameValid: false,
-          usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-        }
-      }))
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState(prev => ({
-          userToEdit: {
-            ...prev.userToEdit,
-            isUsernameValid: fetchUsernameAvailability.json.available,
-            usernameInvalidMsg: props.t('This username is not available')
-          }
-        }))
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props, state } = this
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, workspaceId, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204:
-        this.setState(prev => ({
-          userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
-            ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.userId ? { ...u, doNotify: doNotify } : u) }
-            : ws
-          )
-        }))
-        break
+      case 204: break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -372,7 +393,7 @@ class Account extends React.Component {
   handleSubmitPassword = async (oldPassword, newPassword, newPassword2) => {
     const { props, state } = this
 
-    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEdit, oldPassword, newPassword, newPassword2))
+    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEditId, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); return true
       case 403: props.dispatch(newFlashMessage(props.t("Wrong administrator's password"), 'warning')); return false
@@ -398,11 +419,12 @@ class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props, state } = this
-    if (props.system.config.instance_name && state.userToEdit.publicName) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([this.props.t('User administration'), state.userToEdit.publicName, props.system.config.instance_name]) }
-      })
+    if (state.userToEdit.publicName) {
+      const headTitle = buildHeadTitle(
+        [this.props.t('User administration'), state.userToEdit.publicName]
+      )
+
+      props.dispatch(setHeadTitle(headTitle))
     }
   }
 
@@ -483,4 +505,4 @@ class Account extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
   breadcrumbs, user, workspaceList, timezone, system, appList
 })
-export default withRouter(connect(mapStateToProps)(translate()(Account)))
+export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Account))))

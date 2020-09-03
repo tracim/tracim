@@ -1,11 +1,13 @@
 import React from 'react'
 import i18n from './i18n.js'
+import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
-  displayDistanceDate
+  displayDistanceDate,
+  wrapMentionsInSpanTags
 } from './helper.js'
 import {
   putEditContent,
@@ -49,7 +51,7 @@ export function appContentFactory (WrappedComponent) {
         return
       }
       setState({ isVisible: true })
-      buildBreadcrumbs()
+      buildBreadcrumbs(content)
     }
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
@@ -80,10 +82,9 @@ export function appContentFactory (WrappedComponent) {
     }
 
     // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
-    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline, buildBreadcrumbs) => {
+    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline) => {
       await loadContent()
       loadTimeline()
-      buildBreadcrumbs()
     }
 
     // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
@@ -118,10 +119,10 @@ export function appContentFactory (WrappedComponent) {
             switch (response.body.code) {
               case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
               case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-              default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+              default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
             }
             break
-          default: this.sendGlobalFlashMessage(i18n.t('Error while saving new title')); break
+          default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
       return response
@@ -144,8 +145,15 @@ export function appContentFactory (WrappedComponent) {
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
       )
 
       switch (response.apiResponse.status) {
@@ -159,15 +167,19 @@ export function appContentFactory (WrappedComponent) {
           break
         case 400:
           switch (response.body.code) {
+            case 1001:
+              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
+            case 2044:
+              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
+              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new comment')); break
+        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response
@@ -205,7 +217,7 @@ export function appContentFactory (WrappedComponent) {
           GLOBAL_dispatchEvent({
             type: CUSTOM_EVENT.ADD_FLASH_MSG,
             data: {
-              msg: i18n.t('Error while archiving document'),
+              msg: i18n.t('Error while archiving content'),
               type: 'warning',
               delay: undefined
             }
@@ -231,7 +243,7 @@ export function appContentFactory (WrappedComponent) {
           GLOBAL_dispatchEvent({
             type: CUSTOM_EVENT.ADD_FLASH_MSG,
             data: {
-              msg: i18n.t('Error while deleting document'),
+              msg: i18n.t('Error while deleting content'),
               type: 'warning',
               delay: undefined
             }
@@ -257,7 +269,7 @@ export function appContentFactory (WrappedComponent) {
         default: GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
-            msg: i18n.t('Error while restoring document'),
+            msg: i18n.t('Error while restoring content'),
             type: 'warning',
             delay: undefined
           }
@@ -278,7 +290,7 @@ export function appContentFactory (WrappedComponent) {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.ADD_FLASH_MSG,
           data: {
-            msg: i18n.t('Error while restoring document'),
+            msg: i18n.t('Error while restoring content'),
             type: 'warning',
             delay: undefined
           }
@@ -305,7 +317,8 @@ export function appContentFactory (WrappedComponent) {
             timelineType: 'comment',
             ...resCommentWithProperDate.find(c => c.content_id === ci)
           })),
-          number: i + 1
+          number: i + 1,
+          hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
     }

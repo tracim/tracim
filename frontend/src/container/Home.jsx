@@ -1,31 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import debounce from 'lodash/debounce'
 import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
-  MINIMUM_CHARACTERS_USERNAME,
-  workspaceConfig
+  workspaceConfig,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
-  hasNotAllowedCharacters,
-  hasSpaces,
-  removeAtInUsername
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
-  getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import {
-  newFlashMessage,
-  updateUserUsername
-} from '../action-creator.sync.js'
+import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -36,7 +35,6 @@ export class Home extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.state = {
       hidePopupCheckbox: false,
       newUsername: '',
@@ -45,15 +43,13 @@ export class Home extends React.Component {
       usernamePopup: false,
       usernameInvalidMsg: ''
     }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.setHeadTitle()
-        break
-    }
-  }
+  handleAllAppChangeLanguage = () => this.setHeadTitle()
 
   handleClickCreateWorkspace = e => {
     e.preventDefault()
@@ -70,23 +66,22 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.checkUsername()
+    this.setUsernamePopupVisibility()
     this.setHeadTitle()
+  }
+
+  componentWillUnmount () {
+    this.debouncedCheckUsernameValidity.cancel()
   }
 
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Home'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Home')))
   }
 
-  checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
+  setUsernamePopupVisibility () {
+    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -101,18 +96,19 @@ export class Home extends React.Component {
     if (state.newUsername === '') {
       Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, this.state.hidePopupCheckbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     } else {
-      const username = removeAtInUsername(state.newUsername)
-
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, state.password))
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, state.newUsername, state.password))
       switch (fetchPutUsername.status) {
         case 200:
-          props.dispatch(updateUserUsername(username))
-          props.dispatch(newFlashMessage(props.t('Your username has been changed'), 'info'))
+          props.dispatch(newFlashMessage(props.t('Your username has been set'), 'info'))
           break
         case 400:
           switch (fetchPutUsername.json.code) {
             case 2001:
-              props.dispatch(newFlashMessage(props.t('Password must be at least 6 characters'), 'warning'))
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long',
+                  { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }
+                ), 'warning'
+              ))
               return false
             case 2062:
               props.dispatch(
@@ -141,49 +137,25 @@ export class Home extends React.Component {
   }
 
   handleChangeNewUsername = async e => {
+    const username = e.target.value
+    this.setState({ newUsername: username })
+    this.debouncedCheckUsernameValidity(username)
+  }
+
+  checkUsernameValidity = async (username) => {
+    if (!username) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
     const { props } = this
-
-    this.setState({ newUsername: e.target.value })
-    const username = removeAtInUsername(e.target.value)
-
-    if (username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.json.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning'))
-        break
+    try {
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, this.state.newUsername, props))
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  debouncedCheckUsernameValidity = debounce(checkUsernameValidity, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 
@@ -244,7 +216,7 @@ export class Home extends React.Component {
                   <input
                     className='homepage__usernamePopup__body__input form-control'
                     type='text'
-                    placeholder={props.t('@username')}
+                    placeholder={props.t('Your username')}
                     value={this.state.newUsername}
                     onChange={this.handleChangeNewUsername}
                     data-cy='usernamePopup_username'
@@ -280,17 +252,21 @@ export class Home extends React.Component {
                     </>
                   )}
 
-                  <div className='homepage__usernamePopup__body__checkbox'>
-                    <input
-                      className='homepage__usernamePopup__body__checkbox__input'
-                      type='checkbox'
-                      onChange={this.handleClickCheckbox}
-                    />
-                    {props.t('Never ask me again')}
-                  </div>
-                  <div className='homepage__usernamePopup__body__smallmsg'>
-                    ({props.t('you can always set your username in your account preferences')})
-                  </div>
+                  {this.state.newUsername === '' && (
+                    <div>
+                      <div className='homepage__usernamePopup__body__checkbox'>
+                        <input
+                          className='homepage__usernamePopup__body__checkbox__input'
+                          type='checkbox'
+                          onChange={this.handleClickCheckbox}
+                        />
+                        {props.t('Do not show this popup again')}
+                      </div>
+                      <div className='homepage__usernamePopup__body__smallmsg'>
+                        ({props.t('you can set your username on page My Account')})
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type='button'
@@ -311,4 +287,4 @@ export class Home extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Home)))))

@@ -35,6 +35,14 @@
         text-overflow ellipsis
 
 .adminUser
+  & .table
+    table-layout fixed
+    & td
+      text-overflow ellipsis
+      overflow hidden
+    & th
+      height 75px
+      vertical-align middle
   &__description
     margin-bottom 40px
   &__adduser
@@ -52,17 +60,22 @@
         .userData
           &__text
             font-weight bold
+            margin-top 10px
+            margin-bottom 0px
           &__input
-            margin-bottom 10px
+            width 300px
             &__username
               &__errorMsg
-                margin-bottom 10px
+                width 300px
+                font-size small
+                text-align right
                 color errorRed
               &__errorIcon
                 margin-right 5px
               &__errorInfo
-                margin-bottom 10px
-                color grey
+                width 300px
+                font-size small
+                text-align right
           &__info
             color grey
             &__icon
@@ -113,6 +126,21 @@
           color inherit
         & > i
           margin-right 5px
+    &__active
+      width 17%
+    &__profile
+      width 70px // 70px it's the size of avatar's profile
+    &__fullName
+      width 18%
+    &__useername
+      width 17%
+    &__email
+      width 18%
+    &__canCreate
+      width 15%
+    &__administrator
+      width 15%
+
 
 .adminworkspaceuser__popup
   .cardPopup__container

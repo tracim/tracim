@@ -103,7 +103,7 @@ describe('<CollaborativeEditionFrame />', function () {
         .get(`/workspaces/${props.data.content.workspace_id}`)
         .reply(200, {})
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http://localhost/api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en'
       await wrapper.instance().loadContent()
       const urlResult = wrapper.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)
@@ -119,7 +119,7 @@ describe('<CollaborativeEditionFrame />', function () {
         .get(`/workspaces/${props.data.content.workspace_id}`)
         .reply(200, {})
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http://localhost/api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
       await wrapper.instance().loadContent()
       const urlResult = wrapper.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)
@@ -143,7 +143,7 @@ describe('<CollaborativeEditionFrame />', function () {
         <CollaborativeEditionFrameWithoutHOC { ...updatedProps } />
       )
 
-      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=about:///api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
+      const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http://localhost/api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'
       await wrapperWithUserAsReader.instance().loadContent()
       const urlResult = wrapperWithUserAsReader.instance().buildCompleteIframeUrl(urlSource, accessToken)
       expect(urlResult).to.equal(expectedResult)

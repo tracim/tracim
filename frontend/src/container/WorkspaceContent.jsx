@@ -8,7 +8,8 @@ import {
   PAGE,
   findUserRoleIdInWorkspace,
   sortWorkspaceContents,
-  SHARE_FOLDER_ID
+  SHARE_FOLDER_ID,
+  ANCHOR_NAMESPACE
 } from '../util/helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ShareFolder from '../component/Workspace/ShareFolder.jsx'
@@ -27,7 +28,8 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -45,17 +47,16 @@ import {
 import {
   newFlashMessage,
   setWorkspaceContentList,
-  addWorkspaceContentList,
+  setWorkspaceFolderContentList,
   setWorkspaceShareFolderContentList,
-  addWorkspaceShareFolderContentList,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  moveWorkspaceContent,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -71,7 +72,7 @@ export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   availableStatuses: contentType[0].availableStatuses
 })
 
-class WorkspaceContent extends React.Component {
+export class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -83,46 +84,58 @@ class WorkspaceContent extends React.Component {
       }
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.REFRESH_CONTENT_LIST, handler: this.handleRefreshContentList },
+      { name: CUSTOM_EVENT.OPEN_CONTENT_URL, handler: this.handleOpenContentUrl },
+      { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseApp },
+      { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.loadAllWorkspaceContent(state.workspaceIdInUrl)
-        break
+  // CustomEvent handlers
+  handleRefreshContentList = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_CONTENT_LIST, data)
+    this.loadAllWorkspaceContent(this.state.workspaceIdInUrl)
+  }
 
-      case CUSTOM_EVENT.OPEN_CONTENT_URL:
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
-        break
+  handleOpenContentUrl = data => {
+    const { props } = this
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.OPEN_CONTENT_URL, data)
+    props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
+  }
 
-      case CUSTOM_EVENT.APP_CLOSED:
-      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT: {
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
+  handleCloseApp = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CLOSED, data, this.state.workspaceIdInUrl)
+    this.updateUrlTitleBreadcrumbs()
+  }
 
-        const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
-        const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
+  handleHidePopupCreateContent = data => {
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, data, this.state.workspaceIdInUrl)
+    this.updateUrlTitleBreadcrumbs()
+  }
 
-        const newUrlSearch = {
-          ...qs.parse(props.location.search),
-          folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
-        }
+  updateUrlTitleBreadcrumbs = () => {
+    const { state, props } = this
 
-        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
-        this.setState({ appOpenedType: false })
+    const contentFolderPath = props.workspaceContentList.contentList.filter(c => c.isOpen).map(c => c.id)
+    const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
 
-        this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
-        this.props.dispatch(resetBreadcrumbsAppFeature())
-        break
-      }
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        this.buildBreadcrumbs()
-        if (!state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
-        break
+    const newUrlSearch = {
+      ...qs.parse(props.location.search),
+      folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
     }
+
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
+    this.setState({ appOpenedType: false })
+
+    this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
+    this.props.dispatch(resetBreadcrumbsAppFeature())
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
   }
 
   async componentDidMount () {
@@ -148,7 +161,7 @@ class WorkspaceContent extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
-    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
+    // console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
     if (state.workspaceIdInUrl === null) return
 
@@ -162,6 +175,7 @@ class WorkspaceContent extends React.Component {
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevProps.currentWorkspace.label !== props.currentWorkspace.label || prevFilter !== currentFilter) {
       this.setHeadTitle(this.getFilterName(currentFilter))
+      this.buildBreadcrumbs()
     }
 
     // INFO - GM - 2020/03/03 - hide opened app if the current url is /contents
@@ -181,7 +195,6 @@ class WorkspaceContent extends React.Component {
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
@@ -210,11 +223,8 @@ class WorkspaceContent extends React.Component {
   setHeadTitle = (filterName) => {
     const { props } = this
 
-    if (props.system.config.instance_name && props.currentWorkspace.label) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name]) }
-      })
+    if (props.currentWorkspace.label) {
+      props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label])))
     }
   }
 
@@ -304,7 +314,7 @@ class WorkspaceContent extends React.Component {
           ...folderIdInUrl,
           ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
         ]
-        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen))
+        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen, parseInt(workspaceId)))
         break
       }
       case 400:
@@ -396,30 +406,26 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickDeleteContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
-    switch (fetchPutContentDeleted.status) {
-      case 204:
-        this.loadContentList(state.workspaceIdInUrl)
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
+
+    if (fetchPutContentDeleted.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
   handleClickDeleteShareFolderContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.workspaceId, content.id))
-    switch (fetchPutContentDeleted.status) {
-      case 204:
-        this.loadShareFolderContent(state.workspaceIdInUrl)
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
+
+    if (fetchPutContentDeleted.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
@@ -450,7 +456,7 @@ class WorkspaceContent extends React.Component {
     const { props, state } = this
 
     const folderOpen = folderId
-      ? (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
+      ? (props.workspaceContentList.contentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
       : false
 
     const urlSearch = qs.parse(props.location.search)
@@ -468,23 +474,27 @@ class WorkspaceContent extends React.Component {
 
     if (folderId && !folderOpen) this.handleToggleFolderOpen(folderId)
 
-    props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
+    props.history.push(
+      `${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`
+    )
   }
 
   handleToggleFolderOpen = async folderId => {
     const { props, state } = this
-    const folder = props.workspaceContentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.find(c => c.id === folderId)
+    const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
 
-    props.dispatch(toggleFolderOpen(folderId))
+    const isFolderPreviousStateOpen = folder.isOpen
 
-    if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
-    }
+    props.dispatch(toggleFolderOpen(folderId, state.workspaceIdInUrl))
 
-    if (folder.parentId === SHARE_FOLDER_ID && !props.workspaceShareFolderContentList.some(c => c.parentId === folderId)) {
-      const fetchContentList = await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      if (fetchContentList.status === 200) props.dispatch(addWorkspaceShareFolderContentList(fetchContentList.json))
+    if (isFolderPreviousStateOpen) return
+
+    const fetchContentList = folder.parentId === SHARE_FOLDER_ID
+      ? await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
+      : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
+
+    if (fetchContentList.status === 200) {
+      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json))
     }
   }
 
@@ -496,7 +506,7 @@ class WorkspaceContent extends React.Component {
   }
 
   handleDropMoveContent = async (source, destination) => {
-    const { props, state } = this
+    const { props } = this
 
     if (source.contentId === destination.contentId) return
 
@@ -504,8 +514,8 @@ class WorkspaceContent extends React.Component {
 
     // INFO - CH - 2019-06-14 - Check that not moving a folder into one of its sub folder
     if (source.workspaceId === destination.workspaceId && destination.parentId !== 0) {
-      const destinationContent = props.workspaceContentList.find(c => c.id === destination.contentId)
-      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList)
+      const destinationContent = props.workspaceContentList.contentList.find(c => c.id === destination.contentId)
+      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList.contentList)
 
       if (parentIdList.includes(source.contentId)) return
     }
@@ -522,28 +532,18 @@ class WorkspaceContent extends React.Component {
     }
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
-    switch (fetchMoveContent.status) {
-      case 200: {
-        const { dropEffect, ...actionDestination } = destination
-        props.dispatch(moveWorkspaceContent(source, actionDestination))
-        this.loadContentList(state.workspaceIdInUrl)
-        this.loadShareFolderContent(state.workspaceIdInUrl)
-        break
+    if (fetchMoveContent.status !== 200) {
+      switch (fetchMoveContent.json.code) {
+        case 3002:
+          props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
+          break
+        case 2038:
+          props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
+          break
       }
-      case 400:
-        switch (fetchMoveContent.json.code) {
-          case 3002:
-            props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
-            break
-          case 2038:
-            props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
-            break
-        }
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
     }
   }
 
@@ -604,7 +604,7 @@ class WorkspaceContent extends React.Component {
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )
-        props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen))
+        props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen, parseInt(workspaceId)))
         return true
       }
       default:
@@ -659,12 +659,17 @@ class WorkspaceContent extends React.Component {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
       if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
     }
-    if (document.getElementById(contentToScrollTo)) document.getElementById(contentToScrollTo).scrollIntoView()
+    const idContentToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentToScrollTo}`
+    if (document.getElementById(idContentToScrollTo)) document.getElementById(idContentToScrollTo).scrollIntoView()
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceShareFolderContentList, contentType, location, t, appList } = this.props
     const { state, props } = this
+
+    const workspaceContentList = props.workspaceContentList && props.workspaceContentList.contentList
+      ? props.workspaceContentList.contentList
+      : []
 
     const urlFilter = qs.parse(location.search).type
 
@@ -765,7 +770,7 @@ class WorkspaceContent extends React.Component {
                     onClickCreateContent={this.handleClickCreateContent}
                     onSetFolderRead={this.handleSetFolderRead}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
-                    shareFolderContentList={workspaceShareFolderContentList}
+                    shareFolderContentList={workspaceShareFolderContentList.contentList}
                     onClickExtendedAction={{
                       edit: this.handleClickEditContentItem,
                       download: this.handleClickDownloadContentItem,
@@ -869,4 +874,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
   breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
 })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(WorkspaceContent)))))

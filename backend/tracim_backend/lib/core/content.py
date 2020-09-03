@@ -158,7 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -854,7 +854,7 @@ class ContentApi(object):
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
         self, path_labels: typing.List[str], workspace: Workspace
-    ) -> Content:
+    ) -> typing.Optional[Content]:
         """
         Return a Content folder for given relative path.
         TODO BS 20161124: Not safe if web interface allow folder duplicate names

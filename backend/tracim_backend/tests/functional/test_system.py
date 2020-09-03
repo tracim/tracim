@@ -169,14 +169,24 @@ class TestAboutEndpoint(object):
 
 
 @pytest.mark.usefixtures("test_fixture")
-class TestUsernameAvailabilitiesEndpoint(object):
+class TestUsernameEndpoints(object):
     """
-    Tests for /api/system/username-availability
+    Tests for:
+     - /api/system/username-availability
+     - /api/system/reserved-usernames
     """
 
     @pytest.mark.parametrize(
         "username,is_available",
-        [("TheAdmin", False), ("TheBobi", False), ("Cloclo", True), ("anotherOne", True)],
+        [
+            ("TheAdmin", False),
+            ("TheBobi", False),
+            ("Cloclo", True),
+            ("anotherOne", True),
+            ("all", False),
+            ("tous", False),
+            ("todos", False),
+        ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
         self, web_testapp, username: str, is_available: bool
@@ -186,6 +196,11 @@ class TestUsernameAvailabilitiesEndpoint(object):
             "/api/system/username-availability?username={}".format(username), status=200
         )
         assert res.json["available"] == is_available
+
+    def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/reserved-usernames", status=200)
+        assert set(res.json["items"]) == set(("all", "tous", "todos"))
 
 
 @pytest.mark.usefixtures("base_fixture")

@@ -6,11 +6,11 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   ProgressBar,
   computeProgressionPercentage,
-  FILE_PREVIEW_STATE
+  FILE_PREVIEW_STATE,
+  setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -18,6 +18,7 @@ import {
   FETCH_CONFIG,
   PAGE
 } from '../util/helper.js'
+import { setHeadTitle } from '../action-creator.sync.js'
 import { getGuestUploadInfo } from '../action-creator.async'
 
 class GuestUpload extends React.Component {
@@ -103,12 +104,7 @@ class GuestUpload extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Public upload'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Public upload')))
   }
 
   handleChangeFullName = e => this.setState({ guestFullname: { value: e.target.value, isInvalid: false } })
@@ -202,7 +198,7 @@ class GuestUpload extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
     xhr.open('POST', `${FETCH_CONFIG.apiUrl}/public/guest-upload/${this.props.match.params.token}`, true)
-    xhr.setRequestHeader('Accept', 'application/json')
+    setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {

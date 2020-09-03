@@ -1,14 +1,13 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE_LIST, ROLE } from 'tracim_frontend_lib'
+import { PROFILE_LIST, ROLE, FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
 const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const MINIMUM_CHARACTERS_USERNAME = 3
+export const NUMBER_RESULTS_BY_PAGE = 15
 
 export const history = require('history').createBrowserHistory()
 
@@ -16,11 +15,13 @@ export const history = require('history').createBrowserHistory()
 export { getBrowserLang }
 
 export const FETCH_CONFIG = {
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  },
+  headers: LIB_FETCH_CONFIG.headers,
   apiUrl: configEnv.apiUrl
+}
+
+export const ANCHOR_NAMESPACE = {
+  workspaceItem: 'workspaceItem',
+  notificationItem: 'notificationItem'
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?
@@ -115,4 +116,60 @@ export const sortWorkspaceContents = (a, b) => {
   if (a.label > b.label) return 1
   if (b.label > a.label) return -1
   return 0
+}
+
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload'
+}
+
+export const sortWorkspaceList = (a, b) => {
+  if (a.label > b.label) return 1
+  if (b.label > a.label) return -1
+  return 0
+}
+
+export const toggleFavicon = (hasNewNotification) => {
+  const originalHrefAttribute = 'originalHrefAttribute'
+
+  document.getElementsByClassName('tracim__favicon').forEach(favicon => {
+    if (!hasNewNotification) {
+      favicon.href = favicon.getAttribute(originalHrefAttribute)
+      favicon.removeAttribute(originalHrefAttribute)
+      return
+    }
+    const faviconSize = favicon.sizes[0].split('x')[0]
+
+    const canvas = document.createElement('canvas')
+    canvas.width = faviconSize
+    canvas.height = faviconSize
+
+    const context = canvas.getContext('2d')
+    const img = document.createElement('img')
+    img.src = favicon.href
+
+    img.onload = () => {
+      // INFO - GM - 2020/08/18 - Draw Original Favicon as Background
+      context.drawImage(img, 0, 0, faviconSize, faviconSize)
+
+      // INFO - GM - 2020/08/18 - Draw Notification Circle
+      const circleSize = faviconSize / 6
+      context.beginPath()
+      context.arc(
+        canvas.width - circleSize,
+        canvas.height - circleSize,
+        circleSize,
+        0,
+        2 * Math.PI
+      )
+      // FIXME - GM - 2020/08/18 - Replace this hardcoded values to webpack variables
+      // https://github.com/tracim/tracim/issues/2098
+      context.fillStyle = '#3F9FF7'
+      context.fill()
+
+      // INFO - GM - 2020/08/18 - Replace the favicon
+      if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
+      favicon.href = canvas.toDataURL('image/png')
+    }
+  })
 }

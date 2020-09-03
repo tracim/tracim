@@ -14,7 +14,12 @@ import {
   CUSTOM_EVENT,
   ROLE,
   buildHeadTitle,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  RefreshWarningMessage,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -23,7 +28,15 @@ import {
   putFolder
 } from '../action.async.js'
 
-class FolderAdvanced extends React.Component {
+const filterSubContentTypes = (list) => {
+  /* INFO - SG - 2020-06-18
+   * Comments cannot be made on a folder, so remove them
+   * from the possible content types
+   */
+  return list.filter(ct => ct.slug !== 'comment')
+}
+
+export class FolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
 
@@ -32,6 +45,8 @@ class FolderAdvanced extends React.Component {
 
     this.state = {
       appName: 'folder',
+      editionAuthor: '',
+      showRefreshWarning: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -47,44 +62,72 @@ class FolderAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
+      { name: CUSTOM_EVENT.SHOW_APP(param.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(param.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.RELOAD_CONTENT(param.config.slug), handler: this.handleReloadContent },
+      { name: CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(param.config.slug), handler: this.handleReloadAppFeatureData }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleFolderChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleFolderChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleFolderChanged }
+    ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  handleAllAppChangeLanguage = async data => {
+    const { props } = this
+    console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    await this.loadContent()
+  }
+
+  handleShowApp = data => {
     const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
-        break
+    console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
+    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+  }
 
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
+  handleHideApp = data => {
+    const { props, state } = this
+    console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(state.config.slug), data)
+    props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
 
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
-        break
+  handleReloadContent = data => {
+    const { state } = this
+    console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
+    this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
+  }
 
-      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
-        break
+  handleReloadAppFeatureData = data => {
+    const { props, state } = this
+    console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data)
+    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
+  }
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-        this.loadContent()
-        break
+  handleFolderChanged = data => {
+    const { state } = this
+    if (data.fields.content.content_id !== state.content.content_id) return
+
+    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    this.setState(prev => ({
+      content: clientToken === data.fields.client_token ? { ...prev.content, ...data.fields.content } : prev.content,
+      newContent: { ...prev.content, ...data.fields.content },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token
+    }))
+    if (clientToken === data.fields.client_token) {
+      this.setHeadTitle(data.fields.content.label)
+      this.buildBreadcrumbs(data.fields.content)
     }
   }
 
   async componentDidMount () {
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -92,13 +135,7 @@ class FolderAdvanced extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
     }
-  }
-
-  componentWillUnmount () {
-    console.log('%c<FolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
@@ -113,17 +150,16 @@ class FolderAdvanced extends React.Component {
   setHeadTitle = (folderName) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([folderName, state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([folderName, state.config.workspace.label]) }
       })
     }
   }
 
   loadContent = async () => {
     const { props, state } = this
-
     const fetchFolder = await handleFetchResult(await getFolder(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
@@ -131,27 +167,28 @@ class FolderAdvanced extends React.Component {
       case 200:
         this.setState({ content: fetchFolder.body })
         this.setHeadTitle(fetchFolder.body.label)
+        this.buildBreadcrumbs(fetchFolder.body)
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
     switch (fetchContentTypeList.apiResponse.status) {
-      case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
+      case 200: this.setState({ tracimContentTypeList: filterSubContentTypes(fetchContentTypeList.body) }); break
       default: this.sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"), 'warning')
     }
   }
 
   loadTimeline = () => {}
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
@@ -229,8 +266,19 @@ class FolderAdvanced extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickRefresh = () => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...prev.newContent
+      },
+      showRefreshWarning: false
+    }))
+    this.setHeadTitle(this.state.newContent.label)
+  }
+
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -248,8 +296,15 @@ class FolderAdvanced extends React.Component {
         />
 
         <PopinFixedOption>
-          <div className='justify-content-end'>
-            <div className='d-flex'>
+          <div className='folder_advanced__header'>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
+
+            <div className='folder_advanced__header__deleteButton'>
               {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -287,4 +342,4 @@ class FolderAdvanced extends React.Component {
   }
 }
 
-export default translate()(appContentFactory(FolderAdvanced))
+export default translate()(appContentFactory(TracimComponent(FolderAdvanced)))

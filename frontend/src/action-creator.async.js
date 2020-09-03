@@ -16,6 +16,9 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION,
+  NOTIFICATION_LIST,
+  NOTIFICATION_NOT_READ_COUNT,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
@@ -32,7 +35,6 @@ import {
   USER_USERNAME,
   USER_WORKSPACE_DO_NOTIFY,
   USER_WORKSPACE_LIST,
-  USERNAME_AVAILABILITY,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -302,21 +304,6 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
   })
 }
 
-export const getUsernameAvailability = (username) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: USERNAME_AVAILABILITY,
-    dispatch
-  })
-}
-
 export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/email`,
@@ -375,9 +362,9 @@ export const putMyselfPassword = (oldPassword, newPassword, newPassword2) => dis
   })
 }
 
-export const putUserPassword = (user, oldPassword, newPassword, newPassword2) => dispatch => {
+export const putUserPassword = (userId, oldPassword, newPassword, newPassword2) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/password`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/password`,
     param: {
       credentials: 'include',
       headers: {
@@ -505,10 +492,9 @@ export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) =>
   })
 }
 
-export const getContent = (workspaceId, contentId, contentType) => dispatch => {
+export const getContent = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    // @FIXME - Côme - 2018/11/06 - find better solution for the -s in string bellow
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -531,7 +517,7 @@ export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE,
+    actionName: FOLDER,
     dispatch
   })
 }
@@ -844,6 +830,60 @@ export const getGuestUploadInfo = token => dispatch => {
       method: 'GET'
     },
     actionName: 'GuestUpload',
+    dispatch
+  })
+}
+
+export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const putNotificationAsRead = (userId, eventId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION,
+    dispatch
+  })
+}
+
+export const putAllNotificationAsRead = (userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const getUserMessagesSummary = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
 }

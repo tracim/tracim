@@ -6,7 +6,8 @@ import {
   addAllResourceI18n,
   RadioBtnGroup,
   buildHeadTitle,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   postCollaborativeDocumentFromTemplate,
@@ -20,16 +21,20 @@ import {
   getTranslationFromFileType,
   getExtensionFromFileType
 } from '../helper.js'
+import { debug } from '../debug.js'
 
-class PopupCreateCollaborativeDocument extends React.Component {
+export class PopupCreateCollaborativeDocument extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+
     this.state = {
       appName: 'collaborative_document_edition',
-      config: props.data.config,
-      loggedUser: props.data.loggedUser,
-      workspaceId: props.data.workspaceId,
-      folderId: props.data.folderId,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      workspaceId: param.workspaceId,
+      folderId: param.folderId,
       newContentName: '',
       availableFileTypes: [],
       availableTemplates: [],
@@ -41,41 +46,40 @@ class PopupCreateCollaborativeDocument extends React.Component {
     }
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
     this.setHeadTitle()
     this.setDocumentOptions()
   }
 
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateOfficeDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.setHeadTitle()
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<PopupCreateCollaborativeDocument> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({
-          loggedUser: {
-            ...prev.loggedUser,
-            lang: data
-          }
-        }))
-        i18n.changeLanguage(data)
-        this.setHeadTitle()
-        break
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
     }
-  }
+  })
 
   setHeadTitle = () => {
     const { state, props } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+    if (state.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New Office document'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('New Office document'), state.config.workspace.label]) }
       })
     }
   }
@@ -103,51 +107,37 @@ class PopupCreateCollaborativeDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleValidate = async () => {
-    const { config, workspaceId, folderId, newContentName, availableTemplates, selectedOption, software } = this.state
+    const { state, props } = this
     const { PAGE } = this.props.data.config
-    const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
-    const filename = newContentName + getExtensionFromFileType(software, selectedOption.value)
-    const request = postCollaborativeDocumentFromTemplate(config.apiUrl, workspaceId, folderId, config.slug, filename, templateName)
+
+    const templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
+    const filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
+    const request = postCollaborativeDocumentFromTemplate(
+      state.config.apiUrl, state.workspaceId, state.folderId, state.config.slug, filename, templateName
+    )
 
     const response = await handleFetchResult(await request)
 
     switch (response.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.REDIRECT,
-          data: {
-            url: PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, response.body.content_id)
-          }
+          data: { url: PAGE.WORKSPACE.CONTENT_EDITION(response.body.workspace_id, response.body.content_id) }
         })
         break
       case 400:
         switch (response.body.code) {
           case 3002:
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.ADD_FLASH_MSG,
-              data: {
-                msg: this.props.t('A content with the same name already exists'),
-                type: 'warning',
-                delay: undefined
-              }
-            })
+            this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
             break
         }
         break
-      default: GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: this.props.t('Error while creating document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(props.t('Error while creating document'))
     }
   }
 
-  getAvaibleTemplates = async () => {
+  getAvailableTemplates = async () => {
     const { state } = this
     const request = getCollaborativeDocumentTemplates(state.config.apiUrl, state.workspaceId)
     const response = await handleFetchResult(await request)
@@ -158,7 +148,7 @@ class PopupCreateCollaborativeDocument extends React.Component {
   }
 
   setDocumentOptions = async () => {
-    const availableTemplates = await this.getAvaibleTemplates()
+    const availableTemplates = await this.getAvailableTemplates()
     const software = this.state.config.system.config.collaborative_document_edition.software
     const availableFileTypes = getAvaibleFileTypes(software, availableTemplates)
     this.setState({
@@ -173,18 +163,16 @@ class PopupCreateCollaborativeDocument extends React.Component {
   buildOptions () {
     const { props, state } = this
 
-    return state.availableFileTypes.map(
-      (fileType) => ({
-        text: props.t(getTranslationFromFileType(state.software, fileType)),
-        value: fileType,
-        img: {
-          alt: fileType,
-          src: getIconUrlFromFileType(state.software, fileType),
-          height: 52,
-          width: 52
-        }
-      })
-    )
+    return state.availableFileTypes.map((fileType) => ({
+      text: props.t(getTranslationFromFileType(state.software, fileType)),
+      value: fileType,
+      img: {
+        alt: fileType,
+        src: getIconUrlFromFileType(state.software, fileType),
+        height: 52,
+        width: 52
+      }
+    }))
   }
 
   render () {
@@ -220,4 +208,4 @@ class PopupCreateCollaborativeDocument extends React.Component {
   }
 }
 
-export default translate()(PopupCreateCollaborativeDocument)
+export default translate()(TracimComponent(PopupCreateCollaborativeDocument))

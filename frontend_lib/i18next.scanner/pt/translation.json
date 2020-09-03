@@ -1,4 +1,5 @@
 {
+  "A content with same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
   "Send": "Enviar",
@@ -31,6 +32,13 @@
   "Search user...": "Procurar usuário...",
   "Unknown error, please inform an administrator": "Erro desconhecido, informe um administrador",
   "Error detail": "Detalhes do erro",
+  "Error while archiving content": "Erro ao arquivar conteúdo",
+  "Error while changing status": "Erro ao mudar de status",
+  "Error while deleting document": "Erro ao deletar conteúdo",
+  "Error while detecting the mentions": "Erro na detecção de menções",
+  "Error while restoring content": "Erro ao restaurar conteúdo",
+  "Error while saving the comment": "Erro ao salvar o comentário",
+  "Error while saving the title": "Erro ao salvar o título",
   "This content is archived": "Este conteúdo está arquivado",
   "This content is deleted": "Este conteúdo está eliminado",
   "Status changed to {{status}}": "Status mudado para {{status}}",
@@ -81,5 +89,10 @@
   "User": "Utilizador",
   "Access to shared spaces where user is member": "Acesso a espaços partilhados onde o utilizador é membro",
   "Simple edition": "Edição simples",
-  "Advanced edition": "Edição avançada"
+  "Advanced edition": "Edição avançada",
+  "Refresh?": "Actualizar?",
+  "If you refresh, you will lose the current changes": "Se você atualizar, você perderá as mudanças atuais",
+  "You are trying to mention an invalid user": "Está a tentar mencionar um utilizador inválido",
+  "You can't send an empty comment": "Você não pode enviar um comentário vazio",
+  "You must change the status or restore this content before any change": "É necessário alterar o status ou restaurar este conteúdo antes de qualquer alteração"
 }

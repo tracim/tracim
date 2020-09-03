@@ -4,6 +4,8 @@ import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import sinon from 'sinon'
+import EventSource from 'eventsourcemock'
+import AbortController from 'abort-controller'
 
 process.env.NODE_ENV = 'test'
 
@@ -19,16 +21,27 @@ if (!global.window && !global.document) {
       win.scrollTo = () => {}
     },
     pretendToBeVisual: false,
-    userAgent: 'mocha'
+    userAgent: 'mocha',
+    url: 'http://localhost'
   })
 
+  const nodeCrypto = require('crypto')
+  global.crypto = {
+    getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
+  }
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
+  global.lastCustomEventTypes = new Set()
   global.GLOBAL_primaryColor = globalPrimaryColor.hex
-  global.GLOBAL_dispatchEvent = () => {}
+  global.GLOBAL_dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
+  global.EventSource = EventSource
+  global.CustomEvent = () => {}
+  global.fetch = require('node-fetch')
+  global.AbortController = AbortController
 }
 
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
+sinon.stub(document, 'dispatchEvent')
 sinon.stub(console, 'log')

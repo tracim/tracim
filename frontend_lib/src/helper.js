@@ -1,9 +1,10 @@
-/* global GLOBAL_dispatchEvent */
+import { v4 as uuidv4 } from 'uuid';
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -220,7 +221,7 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
-// INFO - GB - 2019-07-05 - This password generetor function was based on
+// INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
   const password = []
@@ -237,10 +238,31 @@ export const generateRandomPassword = () => {
   return randomPassword
 }
 
+export const getOrCreateSessionClientToken = () => {
+  const clientTokenKey = 'tracimClientToken'
+  let token = window.sessionStorage.getItem(clientTokenKey)
+  if (token === null) {
+    token = uuidv4()
+    window.sessionStorage.setItem(clientTokenKey, token)
+  }
+  return token
+}
+
+export const COMMON_REQUEST_HEADERS = {
+  'Accept': 'application/json',
+  'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+}
+
 export const FETCH_CONFIG = {
   headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
+    ...COMMON_REQUEST_HEADERS,
+    'Content-Type': 'application/json',
+  }
+}
+
+export const setupCommonRequestHeaders = (xhr) => {
+  for (const [key, value] of Object.entries(COMMON_REQUEST_HEADERS)) {
+    xhr.setRequestHeader(key, value)
   }
 }
 
@@ -301,11 +323,16 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+export const TIMELINE_TYPE = {
+  COMMENT: CONTENT_TYPE.COMMENT,
+  REVISION: 'revision'
+}
+
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
 
-export const addRevisionFromTLM = (data, timeline, lang) => {
+export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
   // INFO - GB - 2020-05-29 In the filter below we use the names from the TLM message so they are not in camelCase and it is necessary to ignore the eslint rule.
   const {
     actives_shares, // eslint-disable-line camelcase
@@ -316,6 +343,8 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     last_modifier, // eslint-disable-line camelcase
     ...revisionObject
   } = data.content
+
+  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
 
   return [
     ...timeline,
@@ -330,10 +359,11 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: timeline.length + 1,
+      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision'
+      timelineType: 'revision',
+      hasBeenRead: isTokenClient
     }
   ]
 }
@@ -346,15 +376,150 @@ export const removeAtInUsername = (username) => {
   return trimmedUsername
 }
 
-// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
-
 export const hasSpaces = name => /\s/.test(name)
 
+// FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
+// https://github.com/tracim/tracim/issues/3229
 export const serialize = (objectToSerialize, propertyMap) => {
   return Object.fromEntries(
     Object.entries(objectToSerialize)
       .map(([key, value]) => [propertyMap[key], value])
       .filter(([key, value]) => key !== undefined)
   )
+}
+
+export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
+  if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
+  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+}
+
+export const wrapMentionsInSpanTags = (text) => {
+  try {
+    const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
+
+    const parser = new DOMParser()
+    const parsedText = parser.parseFromString(text, 'text/html')
+
+    const depthFirstSearchAndMentionAnalysis = childNodesList => {
+      let childNodesListCopy = [...childNodesList]
+      let i = 0
+
+      childNodesListCopy.forEach((node) => {
+        let value = node.nodeValue
+
+        if (node.nodeName === '#text' && value.includes('@')) {
+          const mentionsInThisNode = value.split(/\s/).filter(token => mentionRegex.test(token))
+
+          if (mentionsInThisNode.length > 0) {
+            let mentionIndex = 0
+            let lastMentionIndex = 0
+            let fragment = document.createDocumentFragment()
+            let htmlTagCounter = 0
+
+            mentionsInThisNode.forEach((mention, i) => {
+              mentionIndex = value.indexOf(mention, lastMentionIndex)
+
+              let mentionWithSpan = document.createElement('span')
+              mentionWithSpan.className = 'mention'
+              mentionWithSpan.id = `mention-${uuidv4()}`
+              mentionWithSpan.textContent = mention
+
+              if (mentionIndex !== 0) {
+                htmlTagCounter++
+                fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
+              }
+
+              fragment.appendChild(mentionWithSpan)
+              htmlTagCounter++
+
+              if (mentionsInThisNode.length - 1 === i) {
+                htmlTagCounter++
+                fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
+              }
+
+              lastMentionIndex = mentionIndex + mention.length - 1
+            })
+            childNodesList[i].replaceWith(fragment)
+            i = i + htmlTagCounter
+          } else i++
+        } else {
+          if (!(node.nodeName.toLowerCase() === 'span' && node.className === 'mention')) depthFirstSearchAndMentionAnalysis(node.childNodes)
+          i++
+        }
+      })
+    }
+
+    depthFirstSearchAndMentionAnalysis(parsedText.body.childNodes)
+    return parsedText.body.innerHTML
+  } catch (e) {
+    console.error('Error while parsing mention', e)
+    throw new Error(i18n.t('Error while detecting the mentions'))
+  }
+}
+
+export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
+
+// Check that the given username is valid.
+// Return an object:
+// {isUsernameValid: false, usernameInvalidMsg: 'Username invalid'}
+// The message is translated using the given props.t.
+export const checkUsernameValidity = async (apiUrl, username, props) => {
+  if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (hasSpaces(username)) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t("Username can't contain any whitespace")
+    }
+  }
+
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+    }
+  }
+
+  const fetchReservedUsernames = await getReservedUsernames(apiUrl)
+  if (fetchReservedUsernames.status !== 200 || !fetchReservedUsernames.json.items) {
+    throw new Error(props.t('Error while checking reserved usernames'))
+  }
+  if (fetchReservedUsernames.json.items.indexOf(username) >= 0) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This word is reserved for group mentions')
+    }
+  }
+
+  const fetchUsernameAvailability = await getUsernameAvailability(apiUrl, username)
+  if (fetchUsernameAvailability.status !== 200) {
+    throw new Error(props.t('Error while checking username availability'))
+  }
+  if (!fetchUsernameAvailability.json.available) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This username is not available')
+    }
+  }
+
+  return {
+    isUsernameValid: true,
+    usernameInvalidMsg: ''
+  }
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
+import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -14,21 +15,19 @@ import {
   PageContent,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
-  buildHeadTitle,
-  hasNotAllowedCharacters,
-  hasSpaces,
-  removeAtInUsername,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
-  updateUser,
   updateUserAgendaUrl,
-  updateUserWorkspaceSubscriptionNotif,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
@@ -37,15 +36,13 @@ import {
   putUserUsername,
   putMyselfPassword,
   putMyselfWorkspaceDoNotify,
-  getLoggedUserCalendar,
-  getUsernameAvailability
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList,
   PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
-  MINIMUM_CHARACTERS_USERNAME
+  FETCH_CONFIG
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
@@ -88,30 +85,12 @@ export class Account extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
-    ])
   }
 
   // Custom Event Handler
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     this.setHeadTitle()
-  }
-
-  // TLM Handlers
-  handleUserModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    props.dispatch(updateUser(data.user))
-  }
-
-  handleMemberModified = data => {
-    const { props } = this
-    if (props.user.userId !== data.user.user_id) return
-    props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, data.workspace.workspace_id, data.member.do_notify))
   }
 
   componentDidMount () {
@@ -128,6 +107,10 @@ export class Account extends React.Component {
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
       this.setHeadTitle()
     }
+  }
+
+  componentWillUnmount () {
+    this.handleChangeUsername.cancel()
   }
 
   loadAgendaUrl = async () => {
@@ -214,8 +197,7 @@ export class Account extends React.Component {
     }
 
     if (newUsername !== '') {
-      const username = removeAtInUsername(newUsername)
-      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, username, checkPassword))
+      const fetchPutUsername = await props.dispatch(putUserUsername(props.user, newUsername, checkPassword))
 
       switch (fetchPutUsername.status) {
         case 200:
@@ -227,6 +209,11 @@ export class Account extends React.Component {
           break
         case 400:
           switch (fetchPutUsername.json.code) {
+            case 2001:
+              props.dispatch(newFlashMessage(
+                props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }), 'warning'
+              ))
+              break
             case 2062:
               props.dispatch(newFlashMessage(
                 props.t(
@@ -258,47 +245,21 @@ export class Account extends React.Component {
     }
   }
 
-  handleChangeUsername = async (newUsername) => {
+  changeUsername = async (newUsername) => {
+    if (!newUsername) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
+
     const { props } = this
-
-    const username = removeAtInUsername(newUsername)
-
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.json.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning')); break
+    try {
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, newUsername, props))
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props } = this
@@ -324,12 +285,7 @@ export class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('My Account'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('My Account')))
   }
 
   render () {

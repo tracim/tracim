@@ -1,12 +1,14 @@
 # coding=utf-8
 from hapic.data import HapicData
 from pyramid.config import Configurator
+from pyramid.security import forget
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
 from tracim_backend import AuthenticationFailed
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
@@ -67,9 +69,15 @@ class SessionController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
-        Logs out current logged in user. This also trashes the associated session
+        Logs out current logged in user. This also trashes the associated session and the
+        live message connections of the current user.
         """
-        request.session.delete()
+        if request.authenticated_userid:
+            app_config = request.registry.settings["CFG"]  # type: CFG
+            LiveMessagesLib(app_config).close_channel_connections(
+                LiveMessagesLib.user_grip_channel(request.current_user.user_id)
+            )
+        forget(request)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_ENDPOINTS])

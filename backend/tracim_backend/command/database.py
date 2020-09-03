@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import argparse
+import re
 import traceback
 
 from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
+from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
 import transaction
 
@@ -137,3 +139,108 @@ class DeleteDBCommand(AppContextCommand):
             print(force_arg_required)
             print("Database not deleted")
             raise ForceArgumentNeeded(force_arg_required)
+
+
+class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
+    auto_setup_context = False
+
+    def get_description(self) -> str:
+        return "Update database naming conventions from V1 database to V2"
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(UpdateNamingConventionsV1ToV2Command, self).take_action(parsed_args)
+        config_uri = parsed_args.config_file
+        settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
+        app_config = CFG(settings)
+        app_config.configure_filedepot()
+        engine = get_engine(app_config)
+        inspector = reflection.Inspector.from_engine(engine)
+        v1_unique_convention = re.compile(r"uk__(\w+)__(\w+)")
+        v1_foreign_key_convention = re.compile(r"fk__(\w+)__(\w+)__(\w+)")
+        v1_primary_key_convention = re.compile(r"pk__(\w+)")
+
+        if not engine.dialect.name.startswith("postgresql"):
+            raise ValueError("This command is only supported on PostgreSQL databases")
+
+        with engine.begin():
+            for table_name in inspector.get_table_names():
+                if table_name == "migrate_version":
+                    continue
+
+                for unique_constraint in inspector.get_unique_constraints(table_name):
+                    match = v1_unique_convention.search(unique_constraint["name"])
+                    if match:
+                        new_name = "uq__{}__{}".format(match.group(1), match.group(2))
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, unique_constraint["name"], new_name
+                            )
+                        )
+
+                for foreign_key in inspector.get_foreign_keys(table_name):
+                    match = v1_foreign_key_convention.search(foreign_key["name"])
+                    # special cases for content_revisions and revision_read_status
+                    if foreign_key["name"] == "fk__content_revisions__owner_id":
+                        new_name = "fk_content_revisions_owner_id_users"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    elif foreign_key["name"] == "revision_read_status_revision_id_fkey":
+                        new_name = "fk_revision_read_status_revision_id_content_revisions"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    elif foreign_key["name"] == "revision_read_status_user_id_fkey":
+                        new_name = "fk_revision_read_status_user_id_users"
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+                    elif match:
+                        new_name = "fk_{}_{}_{}".format(
+                            match.group(1), match.group(2), match.group(3)
+                        )
+                        engine.execute(
+                            "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
+                                table_name, foreign_key["name"], new_name
+                            )
+                        )
+
+                primary_key = inspector.get_pk_constraint(table_name)
+                if primary_key:
+                    match = v1_primary_key_convention.search(primary_key["name"])
+                    if primary_key["name"] == "pk__users__user_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_users".format(primary_key["name"])
+                        )
+                    elif primary_key["name"] == "pk__content_revisions__revision_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_content_revisions".format(
+                                primary_key["name"]
+                            )
+                        )
+                    elif primary_key["name"] == "pk__user_workspace__user_id__workspace_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_user_workspace".format(primary_key["name"])
+                        )
+                    elif primary_key["name"] == "pk__workspace__workspace_id":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_workspaces".format(primary_key["name"])
+                        )
+                    elif primary_key["name"] == "revision_read_status_pkey":
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO pk_revision_read_status".format(
+                                primary_key["name"]
+                            )
+                        )
+                    elif match:
+                        new_name = "pk_{}".format(match.group(1))
+                        engine.execute(
+                            "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
+                        )

@@ -14,7 +14,8 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  removeAtInUsername
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -36,7 +37,7 @@ import Radium from 'radium'
 import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
 import OptionalFeatures from '../component/OptionalFeatures.jsx'
 
-class WorkspaceAdvanced extends React.Component {
+export class WorkspaceAdvanced extends React.Component {
   constructor (props) {
     super(props)
 
@@ -53,6 +54,7 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         id: '',
         personalData: '',
+        publicName: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -69,92 +71,86 @@ class WorkspaceAdvanced extends React.Component {
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
 
-    // props.registerCustomEventHandlerList([
-    //   { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
-    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
-    // ])
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.SHOW_APP(this.state.config.slug), handler: this.handleShowApp },
+      { name: CUSTOM_EVENT.HIDE_APP(this.state.config.slug), handler: this.handleHideApp },
+      { name: CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), handler: this.handleReloadContent },
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted }
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    const { props, state } = this
-    switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
-        break
-
-      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-        break
-
-      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
-        break
-
-      case CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug):
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => {}, () => {})
-        break
-
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
-        props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-        this.loadContent()
-        break
-    }
+  // Custom Event Handlers
+  handleShowApp = data => {
+    console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
+    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => {})
   }
 
+  handleHideApp = data => {
+    console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP(this.state.config.slug), data)
+    this.props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
+  }
+
+  handleReloadContent = data => {
+    console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
+    this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+  }
+
+  // TLM Handlers
   handleWorkspaceModified = (data) => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
-      content: { ...prev.content, ...data.workspace }
+      content: { ...prev.content, ...data.fields.workspace }
     }))
   }
 
   handleMemberCreated = data => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
       content: {
         ...prev.content,
         memberList: [...prev.content.memberList, {
-          user_id: data.user.user_id,
-          user: data.user,
-          workspace_id: data.workspace.workspace_id,
-          workspace: data.workspace,
-          do_notify: data.member.do_notify,
-          is_active: data.user.is_active,
-          role: data.member.role
+          user_id: data.fields.user.user_id,
+          user: data.fields.user,
+          workspace_id: data.fields.workspace.workspace_id,
+          workspace: data.fields.workspace,
+          do_notify: data.fields.member.do_notify,
+          is_active: data.fields.user.is_active,
+          role: data.fields.member.role
         }]
       }
     }))
   }
 
   handleMemberModified = data => {
-    if (data.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        memberList: prev.content.memberList.map(m => m.user_id === data.user.user_id
+        memberList: prev.content.memberList.map(m => m.user_id === data.fields.user.user_id
           ? {
-            user_id: data.user.user_id,
-            user: data.user,
-            workspace_id: data.workspace.workspace_id,
-            workspace: data.workspace,
-            do_notify: data.member.do_notify,
-            is_active: data.user.is_active,
-            role: data.member.role
+            user_id: data.fields.user.user_id,
+            user: data.fields.user,
+            workspace_id: data.fields.workspace.workspace_id,
+            workspace: data.fields.workspace,
+            do_notify: data.fields.member.do_notify,
+            is_active: data.fields.user.is_active,
+            role: data.fields.member.role
           }
           : m
         )
@@ -166,7 +162,23 @@ class WorkspaceAdvanced extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        memberList: prev.content.memberList.filter(m => m.user_id !== data.user.user_id)
+        memberList: prev.content.memberList.filter(m => m.user_id !== data.fields.user.user_id)
+      }
+    }))
+  }
+
+  handleUserModified = data => {
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        memberList: prev.content.memberList.map(m => m.user_id === data.fields.user.user_id
+          ? {
+            ...m,
+            user: data.fields.user,
+            is_active: data.fields.user.is_active
+          }
+          : m
+        )
       }
     }))
   }
@@ -180,7 +192,6 @@ class WorkspaceAdvanced extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
     // console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState, state)
-
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
     }
@@ -353,13 +364,16 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         ...prev.newMember,
         personalData: newPersonalData,
+        publicName: newPersonalData,
         isEmail: this.isEmail(newPersonalData)
       },
       autoCompleteClicked: false
     }))
 
-    if (newPersonalData.length >= 2) {
-      await this.handleSearchUser(newPersonalData)
+    const username = removeAtInUsername(newPersonalData)
+
+    if (username.length >= 2) {
+      await this.handleSearchUser(username)
       this.setState({ autoCompleteFormNewMemberActive: true })
     }
   }
@@ -370,6 +384,7 @@ class WorkspaceAdvanced extends React.Component {
         ...prev.newMember,
         id: knownMember.user_id,
         personalData: knownMember.username,
+        publicName: knownMember.public_name,
         avatarUrl: knownMember.avatar_url,
         isEmail: false
       },
@@ -433,6 +448,7 @@ class WorkspaceAdvanced extends React.Component {
       newMember: {
         id: '',
         personalData: '',
+        publicName: '',
         role: '',
         avatarUrl: '',
         isEmail: false
@@ -476,8 +492,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, data: { url: '/ui' } })
-        // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: '/ui' } })
         this.handleClickBtnCloseApp()
         break
       default: this.sendGlobalFlashMessage(props.t('Error while deleting shared space', 'warning'))
@@ -544,7 +559,7 @@ class WorkspaceAdvanced extends React.Component {
                     loggedUser={state.loggedUser}
                     onClickDeleteMember={this.handleClickDeleteMember}
                     onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                    newMemberName={state.newMember.personalData}
+                    newMemberName={state.newMember.publicName}
                     isEmail={state.newMember.isEmail}
                     onChangeNewMemberName={this.handleChangeNewMemberName}
                     searchedKnownMemberList={state.searchedKnownMemberList}

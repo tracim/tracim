@@ -30,17 +30,25 @@
           height 50px
       &__info
         margin-right auto
-        &__firstLine
-          display flex
+        width calc(100% - 81px) // 81px is the avatar's size
+        display flex
+        flex-direction row
+        &__firstColumn
+          overflow hidden
+          white-space nowrap
           &__name
             font-size 20px
-          &__role
+            text-overflow ellipsis
+            overflow hidden
+          &__username
             font-size 14px
             color mediumDarkGrey
-            margin auto 5px
-        &__username
+            text-overflow ellipsis
+            overflow hidden
+        &__role
           font-size 14px
           color mediumDarkGrey
+          margin auto 5px
       &__delete
         font-size 20px
         color darkGrey
