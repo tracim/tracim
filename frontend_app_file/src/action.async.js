@@ -50,6 +50,16 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) => {
   })
 }
 
+export const putUserConfiguration = (apiUrl, userId, config) =>
+  fetch(`${apiUrl}/users/${userId}/config`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'PUT',
+    body: JSON.stringify({
+      parameters: config
+    })
+  })
+
 export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
     credentials: 'include',

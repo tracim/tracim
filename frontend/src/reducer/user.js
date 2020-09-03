@@ -2,6 +2,7 @@ import {
   SET,
   UPDATE,
   USER,
+  USER_CONFIGURATION,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
@@ -11,6 +12,7 @@ import { getBrowserLang } from '../util/helper.js'
 import { PROFILE, serialize } from 'tracim_frontend_lib'
 
 export const serializeUserProps = {
+  config: 'config',
   user_id: 'userId',
   logged: 'logged',
   auth_type: 'authType',
@@ -28,6 +30,7 @@ export const serializeUserProps = {
 }
 
 export const defaultUser = {
+  config: {},
   userId: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
   authType: '',
@@ -64,6 +67,9 @@ export default function user (state = defaultUser, action) {
 
     case `${SET}/${USER_AGENDA_URL}`:
       return { ...state, agendaUrl: action.newAgendaUrl }
+
+    case `${SET}/${USER_CONFIGURATION}`:
+      return { ...state, config: action.userConfig }
 
     default:
       return state

@@ -82,8 +82,7 @@ import { uniqueId } from 'lodash'
           if ($editor.getBody().textContent) {
             $editor.dom.add($editor.getBody(), 'p', { id: id }, '&nbsp;')
             $editor.selection.select($editor.dom.select(`p#${id}`)[0])
-          }
-          else {
+          } else {
             $editor.selection.select($editor.getBody(), true)
           }
 

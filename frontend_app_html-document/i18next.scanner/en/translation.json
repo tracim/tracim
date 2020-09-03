@@ -1,4 +1,5 @@
 {
+  "click here!": "click here!",
   "Last version": "Last version",
   "Validate and create": "Validate and create",
   "Document's title": "Document's title",
@@ -23,8 +24,10 @@
   "text documents": "text documents",
   "This content is deprecated": "This content is deprecated",
   "Timeline": "Timeline",
+  "To notify all members of the shared space of your modification": "To notify all members of the shared space of your modification",
   "New text document": "New text document",
   "You are trying to mention an invalid user": "You are trying to mention an invalid user",
   "You must change the status or restore this document before any change": "You must change the status or restore this document before any change",
-  "The content has been modified by {{author}}": "The content has been modified by {{author}}"
+  "The content has been modified by {{author}}": "The content has been modified by {{author}}",
+  "Error while saving the user configuration": "Error while saving the user configuration"
 }
