@@ -27,7 +27,7 @@ export const serializeWorkspaceListProps = {
   memberList: 'memberList'
 }
 
-export function workspaceList (state = [], action) {
+export function workspaceList (state = [], action, lang) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_LIST}`:
       return action.workspaceList.map(ws => ({
@@ -37,7 +37,7 @@ export function workspaceList (state = [], action) {
       }))
 
     case `${ADD}/${WORKSPACE_LIST}`:
-      return [
+      return sortWorkspaceList([
         ...state,
         ...action.workspaceList
           .filter(w => !state.some(s => s.id === w.workspace_id))
@@ -46,7 +46,7 @@ export function workspaceList (state = [], action) {
             sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
             memberList: []
           }))
-      ].sort(sortWorkspaceList)
+      ], lang)
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
       return state.filter(ws => ws.id !== action.workspace.workspace_id)
@@ -110,14 +110,18 @@ export function workspaceList (state = [], action) {
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
-      return state.map(ws => ws.id === action.workspaceDetail.workspace_id
-        ? {
-          ...ws,
-          ...serialize(action.workspaceDetail, serializeWorkspaceListProps),
-          sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
-        }
-        : ws
-      ).sort(sortWorkspaceList)
+      return sortWorkspaceList(
+        state.map(
+          ws => ws.id === action.workspaceDetail.workspace_id
+            ? {
+              ...ws,
+              ...serialize(action.workspaceDetail, serializeWorkspaceListProps),
+              sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+            }
+            : ws
+        ),
+        lang
+      )
 
     default:
       return state

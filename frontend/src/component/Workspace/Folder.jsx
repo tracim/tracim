@@ -180,7 +180,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
+          {sortWorkspaceContents(folderContentList, props.lang).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
