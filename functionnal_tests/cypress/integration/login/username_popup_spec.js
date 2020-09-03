@@ -71,6 +71,7 @@ describe('Login', function () {
     })
 
     it('should enable the confirm button when check "Never ask me again"', function () {
+      this.skip() // FIXME - GB - 2020-09-03 - this tests is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
       cy.get(checkbox).click()
       cy.get(confirmButton).should('be.enabled')
     })
