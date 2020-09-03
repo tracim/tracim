@@ -16,7 +16,7 @@ describe('First login with a new user', function () {
   })
 
   it('should redirect to the homepage', function () {
-    cy.skip() // RJ - 2020-09-02 FIXME (#3483) - unstable test
+    this.skip() // RJ - 2020-09-02 FIXME (#3483) - unstable test
     cy.visitPage({ pageName: p.ADMIN_USER })
     cy.get('.adminUser__adduser__button').click()
     cy.get('[data-cy=adduser_name]').type('name')
