@@ -523,3 +523,5 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     usernameInvalidMsg: ''
   }
 }
+
+export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)

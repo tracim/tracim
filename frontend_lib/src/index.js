@@ -39,7 +39,8 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  checkUsernameValidity
+  checkUsernameValidity,
+  formatAbsoluteDate
 } from './helper.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -202,5 +203,6 @@ export {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  formatAbsoluteDate
 }

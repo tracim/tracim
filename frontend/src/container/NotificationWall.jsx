@@ -26,7 +26,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  Avatar
+  Avatar,
+  formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import {
   ANCHOR_NAMESPACE,
@@ -206,7 +207,12 @@ export class NotificationWall extends React.Component {
                     <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${notificationDetails.text} ${displayDistanceDate(notification.created, props.user.lang)}`
+                        __html: (
+                          notificationDetails.text +
+                          `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
+                            escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
+                          '</span>'
+                        )
                       }}
                     />
                   </div>
