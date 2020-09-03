@@ -41,7 +41,7 @@ describe('In Html Document', () => {
             cy.get('[data-cy=wsContentGeneric__option__menu__addversion]').should('not.be.disabled').click()
             cy.assertTinyMCEContent(HtmlDocContent)
             cy.get('.promptMessage').should('be.visible')
-            cy.get('.buttonLink').click()
+            cy.get('.actionLink').click()
             cy.contains('.mention', '@all').should('be.visible')
           })
       })

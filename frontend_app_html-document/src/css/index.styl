@@ -95,13 +95,9 @@
   .timeline__messagelist__item__content
     background-color htmlColor
 
-.buttonLink
-  border none
-  background-color transparent
-  text-decoration underline
-  &:focus
-    outline none
-    font-weight bold
+.actionLink
+  text-decoration underline !important // INFO - GB - 2020-09-03 - !important it's not a good practice but it was the way finded to overwrite the rule a:not([href]):not([tabindex])
+  cursor pointer
 
 // MEDIAQUERIES
 

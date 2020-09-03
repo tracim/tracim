@@ -88,6 +88,10 @@
     &__btndesc
       display none
 
+.actionLink
+  text-decoration underline !important // INFO - GB - 2020-09-03 - !important it's not a good practice but it was the way finded to overwrite the rule a:not([href]):not([tabindex])
+  cursor pointer
+
 // MEDIAQUERIES
 
 @media (min-width: max-xs) and (max-width: max-lg)
