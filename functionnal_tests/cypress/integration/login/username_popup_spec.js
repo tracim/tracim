@@ -108,6 +108,7 @@ describe('Login', function () {
 
     describe('if user choose "Never ask me again"', function () {
       it('should not open the set username popup if they login again', function () {
+        this.skip() // FIXME - GB - 2020-09-03 - this tests is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
         cy.get(checkbox).click()
         cy.get(confirmButton).click()
 
