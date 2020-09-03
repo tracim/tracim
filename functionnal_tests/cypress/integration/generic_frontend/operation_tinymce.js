@@ -86,8 +86,7 @@ describe('TinyMce text editor', function () {
 
       it('it should not leave any span after saving the content', function () {
         cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@')
-          cy.inputInTinyMCE('jo')
+          cy.inputInTinyMCE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
           cy.get('.html-document__contentpage__textnote__version').should('be.visible')
           cy.get('#autocomplete').should('be.not.visible')

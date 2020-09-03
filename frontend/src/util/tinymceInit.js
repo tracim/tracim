@@ -30,7 +30,15 @@ import { uniqueId } from 'lodash'
     }
   }
 
-  globalThis.wysiwyg = function (selector, lang, handleOnChange, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) {
+  globalThis.wysiwyg = function (
+    selector,
+    lang,
+    handleOnChange,
+    handleTinyMceInput,
+    handleTinyMceKeyDown,
+    handleTinyMceKeyUp,
+    handleTinyMceSelectionChange
+  ) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
@@ -111,25 +119,21 @@ import { uniqueId } from 'lodash'
           handleTinyMceInput(e, position)
         }
 
-        $editor.on('change keyup', function (e) {
-          handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
-        })
+        if (handleOnChange) {
+          $editor.on('change keyup', function (e) {
+            handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
+          })
+        }
 
-        $editor.on('keydown', function (e) {
-          handleTinyMceKeyDown(e)
-        })
+        if (handleTinyMceKeyDown) $editor.on('keydown', handleTinyMceKeyDown)
+        if (handleTinyMceKeyUp) $editor.on('keyup', handleTinyMceKeyUp)
+        if (handleTinyMceInput) $editor.on('input', getPosition)
 
-        $editor.on('keyup', function (e) {
-          handleTinyMceKeyUp(e)
-        })
-
-        $editor.on('input', function (e) {
-          getPosition(e)
-        })
-
-        $editor.on('selectionchange', function (e) {
-          handleTinyMceSelectionChange($editor.selection.getNode().id)
-        })
+        if (handleTinyMceSelectionChange) {
+          $editor.on('selectionchange', function (e) {
+            handleTinyMceSelectionChange($editor.selection.getNode().id)
+          })
+        }
 
         // ////////////////////////////////////////////
         // add custom btn to handle image by selecting them with system explorer
