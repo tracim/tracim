@@ -41,7 +41,7 @@ import { uniqueId } from 'lodash'
   ) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
-    // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
+    // solves the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
     $(document).on('focusin', function (e) {
       if ($(e.target).closest('.mce-window').length) {
         e.stopImmediatePropagation()
