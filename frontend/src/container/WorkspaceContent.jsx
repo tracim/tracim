@@ -7,7 +7,7 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   findUserRoleIdInWorkspace,
-  sortWorkspaceContents,
+  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../util/helper.js'
@@ -677,9 +677,10 @@ export class WorkspaceContent extends React.Component {
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
-    const rootContentList = filteredWorkspaceContentList
-      .filter(c => c.parentId === null)
-      .sort(sortWorkspaceContents)
+    const rootContentList = sortContentList(
+      filteredWorkspaceContentList.filter(c => c.parentId === null),
+      props.user.lang
+    )
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
 
@@ -764,6 +765,7 @@ export class WorkspaceContent extends React.Component {
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
                     isOpen={state.shareFolder.isOpen}
+                    lang={props.user.lang}
                     getContentParentList={this.getContentParentList}
                     onDropMoveContentItem={this.handleDropMoveContent}
                     onClickFolder={this.handleClickFolder}
@@ -793,6 +795,7 @@ export class WorkspaceContent extends React.Component {
                       <Folder
                         availableApp={createContentAvailableApp}
                         folderData={content}
+                        lang={props.user.lang}
                         workspaceContentList={filteredWorkspaceContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}

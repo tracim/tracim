@@ -208,7 +208,7 @@ export function appContentFactory (WrappedComponent) {
     appContentArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentArchived(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -235,7 +235,7 @@ export function appContentFactory (WrappedComponent) {
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -261,7 +261,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreArchive(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -286,7 +286,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
