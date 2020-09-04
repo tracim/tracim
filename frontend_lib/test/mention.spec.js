@@ -140,6 +140,7 @@ describe('mention.js', () => {
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
     const parser = new globalThis.DOMParser()
     const mentionForFoo = `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`
+    const mentionForAll = `<span id="${MENTION_ID_PREFIX}foobar">@all</span>`
     const htmlCommentWithoutMention = '<p>Hello <strong>world.</strong></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
     const htmlCommentWithMention = `<p>Hello <strong>world.</strong><span id="${MENTION_ID_PREFIX}foo">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>`
     const expectedHtmlCommentWithMention = `<p>Hello <strong>world.</strong><span id="${MENTION_ID_PREFIX}foo" class="${MENTION_ME_CLASS}">@foo</span></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>`
@@ -149,6 +150,12 @@ describe('mention.js', () => {
         expectedContent: `<span id="${MENTION_ID_PREFIX}foobar" class="${MENTION_ME_CLASS}">@foo</span>`,
         username: 'foo',
         description: 'single mention for user'
+      },
+      {
+        content: mentionForAll,
+        expectedContent: `<span id="${MENTION_ID_PREFIX}foobar" class="${MENTION_ME_CLASS}">@all</span>`,
+        username: 'foo',
+        description: 'single mention for all'
       },
       {
         content: mentionForFoo,

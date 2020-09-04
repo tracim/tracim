@@ -6,6 +6,7 @@ export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
 export const MENTION_REGEX = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
+export const ALL_MENTIONS = ['all', 'todos', 'tous']
 
 const depthFirstSearchAndMentionAnalysis = childNodesList => {
   const childNodesListCopy = [...childNodesList]
@@ -56,14 +57,18 @@ const depthFirstSearchAndMentionAnalysis = childNodesList => {
   })
 }
 
-// Call the given callback for each username mention found in the given content.
+// Call the given callback for each mention found in the given content.
 // Mention detection assumes that the mentions have been wrapped using wrapMentionsInSpanTags().
+// callback with get the matching DOM Element as parameter.
 // document is a DOM Document
-
-const forEachMentionOfUser = (callback, document, username) => {
+const forEachMentionIn = (callback, document, mentions) => {
   const elementHasMentionForUser = element => {
-    const userMention = '@' + username
-    return element.id !== null && element.id.startsWith(MENTION_ID_PREFIX) && element.textContent.includes(userMention)
+    if (element.id === null || !element.id.startsWith(MENTION_ID_PREFIX)) return false
+    for (const mention of mentions) {
+      if (element.textContent.includes('@' + mention)) return true
+
+    }
+    return false
   }
 
   const spans = document.getElementsByTagName(MENTION_TAG_NAME)
@@ -80,7 +85,7 @@ export const addClassToMentionsOfUser = (rawContent, username, userClassName = M
   if (document.documentElement.tagName === 'parsererror') {
     throw new Error('Cannot parse string: ' + document.documentElement)
   }
-  forEachMentionOfUser(addUserClass, document, username)
+  forEachMentionIn(addUserClass, document, username + ALL_MENTIONS)
   return document.body.innerHTML
 }
 
@@ -89,7 +94,7 @@ export const removeClassFromMentionsOfUser = (document, username, userClassName 
     element.classList.remove(userClassName)
     if (!element.classList.length) element.removeAttribute('class')
   }
-  forEachMentionOfUser(removeUserClass, document, username)
+  forEachMentionIn(removeUserClass, document, username + ALL_MENTIONS)
 }
 
 export const wrapMentionsInSpanTags = (document) => {
