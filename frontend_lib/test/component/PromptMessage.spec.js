@@ -40,9 +40,9 @@ describe('<PromptMessage />', function () {
       expect(wrapper.find(`i.fa-${props.icon}`)).to.have.lengthOf(2)
     })
 
-    it('should not display the button when the btnType is set to link"', () => {
+    it('should only display the buttonLink when the btnType is set to link"', () => {
       wrapper.setProps({ btnType: 'link' })
-      expect(wrapper.find('button.promptMessage__btn')).to.have.lengthOf(0)
+      expect(wrapper.find('button.promptMessage__btn')).to.have.lengthOf(1)
     })
 
     it(`should display 1 icon when the btnType is set to link"${props.icon}"`, () => {
