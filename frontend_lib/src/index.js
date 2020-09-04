@@ -9,7 +9,6 @@ import {
   generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
-  hasNotAllowedCharacters,
   hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
@@ -95,7 +94,7 @@ import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
 import GenericButton from './component/Button/GenericButton.jsx'
 
-import DisplayState from './component/DisplayState/DisplayState.jsx'
+import PromptMessage from './component/PromptMessage/PromptMessage.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
@@ -142,7 +141,6 @@ export {
   generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
-  hasNotAllowedCharacters,
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -193,7 +191,7 @@ export {
   ListItemWrapper,
   IconButton,
   ComposedIcon,
-  DisplayState,
+  PromptMessage,
   FileDropzone,
   FileUploadList,
   ShareLink,

@@ -47,7 +47,7 @@ describe('delete a thread content', function () {
           cy.get('.thread.visible').should('be.visible')
           cy.get('.thread.visible .wsContentGeneric__header__title').contains(createdThreadTitle)
           cy.get('.wsContentGeneric__option__menu__action[data-cy="delete__button"]').click()
-          cy.get('.timeline__warning > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
+          cy.get('.timeline__warning > [data-cy="promptMessage"] .promptMessage__btn').should('be.visible')
           cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
           cy.contains('.content__name', firstThreadTitle).should('be.visible')
           cy.contains('.content__name', createdThreadTitle).should('not.exist')

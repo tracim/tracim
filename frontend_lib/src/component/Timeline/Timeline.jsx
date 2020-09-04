@@ -6,7 +6,7 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import DisplayState from '../DisplayState/DisplayState.jsx'
+import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
@@ -93,14 +93,14 @@ export class Timeline extends React.Component {
         }
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deprecated')}
               icon={props.deprecatedStatus.faIcon}
             />
           )}
 
           {props.isArchived && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is archived')}
               btnType='button'
               icon='archive'
@@ -110,7 +110,7 @@ export class Timeline extends React.Component {
           )}
 
           {props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
               icon='trash'

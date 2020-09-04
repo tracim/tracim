@@ -1,4 +1,5 @@
 {
+  "click here!": "cliquez ici !",
   "Last version": "Dernière version",
   "Validate and create": "Valider et créer",
   "Document's title": "Titre du document",
@@ -23,8 +24,10 @@
   "text documents": "documents texte",
   "This content is deprecated": "Ce contenu est obsolète",
   "Timeline": "Historique",
+  "To notify all members of the shared space of your modification": "Pour notifier tous les membres de l'espace partagé de votre modification",
   "New text document": "Nouveau document texte",
   "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
   "You must change the status or restore this document before any change": "Vous devez changer le statut ou restaurer ce document avant de le modifier",
-  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
+  "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur"
 }
