@@ -94,5 +94,6 @@
   "Error while checking reserved usernames": "Error while checking reserved usernames",
   "This word is reserved for group mentions": "This word is reserved for group mentions",
   "Error while checking username availability": "Error while checking username availability",
-  "This username is not available": "This username is not available"
+  "This username is not available": "This username is not available",
+  "all": "all"
 }

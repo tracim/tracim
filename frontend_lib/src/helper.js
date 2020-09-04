@@ -390,7 +390,7 @@ export const serialize = (objectToSerialize, propertyMap) => {
 
 export const commonMentionList = [
   {
-    mention: 'all',
+    mention: i18n.t('all'),
     detail: 'Sends a notification to all members of the shared space',
     tradKey: [i18n.t('Sends a notification to all members of the shared space')],
     isCommon: true
