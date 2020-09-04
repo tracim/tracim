@@ -110,14 +110,14 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 
-const naturalCompareLabels = (lang, itemA, itemB) => {
+const naturalCompareLabels = (itemA, itemB, lang) => {
   return itemA.label.localeCompare(itemB.label, lang, { numeric: true, ignorePunctuation: true })
 }
 
-export const compareContents = (lang, a, b) => {
+export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1
   if (b.type === 'folder' && a.type !== 'folder') return 1
-  return naturalCompareLabels(lang, a, b)
+  return naturalCompareLabels(a, b, lang)
 }
 
 export const CONTENT_NAMESPACE = {
@@ -126,11 +126,11 @@ export const CONTENT_NAMESPACE = {
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort(naturalCompareLabels.bind(workspaceList, lang))
+  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
 }
 
 export const sortContentList = (workspaceContents, lang) => {
-  return workspaceContents.sort(compareContents.bind(workspaceContents, lang))
+  return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }
 
 export const toggleFavicon = (hasNewNotification) => {
