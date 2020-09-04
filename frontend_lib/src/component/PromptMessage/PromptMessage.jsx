@@ -13,7 +13,7 @@ const PromptMessage = props => (
 
     {props.btnType === 'button' && (
       <button
-        className='promptMessage__btn'
+        className='btn promptMessage__btn'
         onClick={props.onClickBtn}
         title={props.tooltip}
       >
@@ -23,12 +23,12 @@ const PromptMessage = props => (
     )}
 
     {props.btnType === 'link' && (
-      <span
-        className='promptMessage__btn link'
+      <button
+        className='btn promptMessage__btn link'
         onClick={props.onClickBtn}
       >
         {props.btnLabel}
-      </span>
+      </button>
     )}
   </div>
 )

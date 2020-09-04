@@ -15,7 +15,7 @@ export const HtmlDocument = props => {
           msg={
             <span>{props.t('To notify all members of the shared space of your modification')},
               <button
-                className='buttonLink'
+                className='btn buttonLink'
                 onClick={props.onClickNotifyAll}
               >
                 {props.t('click here!')}
