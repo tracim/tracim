@@ -79,12 +79,12 @@ export class FileComponent extends React.Component {
           <PromptMessage
             msg={
               <span>{props.t('To notify all members of the shared space of your modification')},
-                <a
-                  className='actionLink'
+                <button
+                  className='btn buttonLink'
                   onClick={props.onClickNotifyAll}
                 >
                   {props.t('click here!')}
-                </a>
+                </button>
               </span>
             }
             btnType='link'

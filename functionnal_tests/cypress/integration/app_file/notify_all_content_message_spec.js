@@ -42,7 +42,7 @@ describe('In Html Document', () => {
         cy.get('.fileProperties__content__detail__description__editiondesc__btn__validate').should('not.be.disabled').click()
         cy.get('[data-cy=popin_right_part_timeline]').should('not.be.disabled').click()
         cy.get('.promptMessage').should('be.visible')
-        cy.get('.actionLink').click()
+        cy.get('.buttonLink').click()
         cy.contains('.mention', '@all').should('be.visible')
       })
     })
