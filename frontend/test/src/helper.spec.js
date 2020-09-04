@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import {
-  sortWorkspaceContents,
+  sortContentList,
   sortWorkspaceList,
   findUserRoleIdInWorkspace,
   getUserProfile
@@ -12,11 +12,10 @@ import {
 } from 'tracim_frontend_lib'
 
 describe('In file helper.js', () => {
-  describe('Function sortWorkspaceContents()', () => {
+  describe('Function sortContentList()', () => {
     it('should sort the array of content by folder and file, and then naturally', () => {
       // INFO - CH - 2019-08-08 - on the list bellow, contents only have the properties that matter for the sort
-      // Note that Array.sort() differs between chrome and node.js.
-      // the implementation of sortWorkspaceContents should handle these differences
+
       const contentList = [
         { id: 1, label: 'content 0', type: 'html-document' },
         { id: 2, label: 'content 0', type: 'folder' },
@@ -111,7 +110,7 @@ describe('In file helper.js', () => {
         { id: 41, label: 'content 20', type: 'html-document' }
       ]
 
-      sortWorkspaceContents(contentList, 'en')
+      sortContentList(contentList, 'en')
       expect(contentList).to.deep.equal(contentListSortedByFolderAndNaturally)
     })
   })

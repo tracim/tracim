@@ -12,7 +12,7 @@ import { ROLE } from 'tracim_frontend_lib'
 import {
   PAGE,
   DRAG_AND_DROP,
-  sortWorkspaceContents,
+  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../../util/helper.js'
@@ -180,7 +180,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {sortWorkspaceContents(folderContentList, props.lang).map((content, i) => content.type === 'folder'
+          {sortContentList(folderContentList, props.lang).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}

@@ -7,7 +7,7 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   findUserRoleIdInWorkspace,
-  sortWorkspaceContents,
+  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../util/helper.js'
@@ -677,7 +677,7 @@ export class WorkspaceContent extends React.Component {
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
-    const rootContentList = sortWorkspaceContents(
+    const rootContentList = sortContentList(
       filteredWorkspaceContentList.filter(c => c.parentId === null),
       props.user.lang
     )
