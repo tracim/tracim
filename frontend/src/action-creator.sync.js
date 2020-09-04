@@ -27,6 +27,8 @@ export const USER_LOGOUT = `${USER}/Logout`
 export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
+export const USER_CONFIGURATION = `${USER}/Configuration`
+export const setUserConfiguration = userConfig => ({ type: `${SET}/${USER_CONFIGURATION}`, userConfig })
 export const setUserConnected = user => ({ type: `${SET}/${USER_CONNECTED}`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER_DISCONNECTED}` })
 export const setRedirectLogin = url => ({ type: `${SET}/${LOGIN}/Redirect`, url })

@@ -23,6 +23,7 @@ import {
   setRedirectLogin,
   setUserDisconnected,
   USER,
+  USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
   USER_KNOWN_MEMBER_LIST,
@@ -196,6 +197,19 @@ export const getUser = userId => async dispatch => {
       method: 'GET'
     },
     actionName: USER,
+    dispatch
+  })
+}
+
+export const getUserConfiguration = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/config`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: USER_CONFIGURATION,
     dispatch
   })
 }

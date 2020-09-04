@@ -40,7 +40,8 @@ import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead
+  putHtmlDocRead,
+  putUserConfiguration
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -424,10 +425,18 @@ export class HtmlDocument extends React.Component {
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
-      case 200:
+      case 200: {
+        state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
         this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        const fetchPutUserConfiguration = await handleFetchResult(
+          await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
+        )
+        if (fetchPutUserConfiguration.status !== 204) {
+          this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+        }
         break
+      }
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
@@ -566,6 +575,54 @@ export class HtmlDocument extends React.Component {
     this.buildBreadcrumbs(newObjectContent)
   }
 
+  handleCloseNotifyAllMessage = async () => {
+    const { state, props } = this
+    const newConfiguration = state.loggedUser.config
+    newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = false
+
+    this.setState(prev => ({
+      ...prev,
+      loggedUser: {
+        ...prev.loggedUser,
+        config: newConfiguration
+      }
+    }))
+
+    const fetchPutUserConfiguration = await handleFetchResult(
+      await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
+    )
+    if (fetchPutUserConfiguration.status !== 204) {
+      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+    }
+  }
+
+  handleClickNotifyAll = async () => {
+    const { state, props } = this
+
+    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    this.handleCloseNotifyAllMessage()
+  }
+
+  shouldDisplayNotifyAllMessage = () => {
+    const { state } = this
+
+    if (
+      !state.loggedUser.config ||
+      state.content.current_revision_type === 'creation' ||
+      (
+        state.newContent.last_modifier &&
+        state.newContent.last_modifier.user_id !== state.loggedUser.userId
+      ) ||
+      (
+        !state.newContent.last_modifier &&
+        state.content.last_modifier &&
+        state.content.last_modifier.user_id !== state.loggedUser.userId
+      )
+    ) return false
+
+    return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
+  }
+
   render () {
     const { props, state } = this
 
@@ -675,6 +732,9 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
+            displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
+            onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
+            onClickNotifyAll={this.handleClickNotifyAll}
           />
 
           <PopinFixedRightPart

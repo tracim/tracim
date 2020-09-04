@@ -58,6 +58,7 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentNotifyAll',
         'appContentSaveNewComment',
         'appContentChangeStatus',
         'addCommentToTimeline',

@@ -1,19 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const DisplayState = props => (
+const PromptMessage = props => (
   <div
-    className='displaystate'
-    data-cy='displaystate'
+    className='promptMessage'
+    data-cy='promptMessage'
   >
-    <div className='displaystate__msg'>
+    <div className='promptMessage__msg'>
       <i className={`fa fa-fw fa-${props.icon}`} />
       {props.msg}
     </div>
 
     {props.btnType === 'button' && (
       <button
-        className='displaystate__btn'
+        className='promptMessage__btn'
         onClick={props.onClickBtn}
         title={props.tooltip}
       >
@@ -24,7 +24,7 @@ const DisplayState = props => (
 
     {props.btnType === 'link' && (
       <span
-        className='displaystate__btn link'
+        className='promptMessage__btn link'
         onClick={props.onClickBtn}
       >
         {props.btnLabel}
@@ -33,9 +33,9 @@ const DisplayState = props => (
   </div>
 )
 
-export default DisplayState
+export default PromptMessage
 
-DisplayState.propTypes = {
+PromptMessage.propTypes = {
   msg: PropTypes.string,
   btnType: PropTypes.oneOf([
     'button', 'link'
@@ -46,7 +46,7 @@ DisplayState.propTypes = {
   tooltip: PropTypes.string
 }
 
-DisplayState.defaultProps = {
+PromptMessage.defaultProps = {
   msg: '',
   icon: '',
   btnLabel: '',

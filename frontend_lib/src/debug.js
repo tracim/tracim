@@ -80,6 +80,7 @@ export const defaultDebug = {
   loggedUser: {
     agendaUrl: '',
     authType: 'internal',
+    config: {},
     userId: 1,
     publicName: 'Global manager',
     username: 'global_manager',
