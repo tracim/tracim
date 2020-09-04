@@ -388,22 +388,6 @@ export const serialize = (objectToSerialize, propertyMap) => {
   )
 }
 
-export const commonMentionList = [
-  {
-    mention: i18n.t('all'),
-    detail: 'Sends a notification to all members of the shared space',
-    tradKey: [i18n.t('Sends a notification to all members of the shared space')],
-    isCommon: true
-  }
-]
-
-export const getMatchingCommonMentionFromQuery = (query) => {
-  return commonMentionList.filter(item => {
-    const isMatching = item.mention.toLowerCase().indexOf(query.toLowerCase())
-    return (isMatching >= 0)
-  })
-}
-
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length

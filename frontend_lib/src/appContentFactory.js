@@ -7,12 +7,12 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
-  getMatchingCommonMentionFromQuery,
   sortTimelineByDate
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave
+  handleMentionsBeforeSave,
+  getMatchingGroupMentionList
 } from './mention.js'
 import {
   putEditContent,
@@ -340,7 +340,7 @@ export function appContentFactory (WrappedComponent) {
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
-      const mentionList = getMatchingCommonMentionFromQuery(query)
+      const mentionList = getMatchingGroupMentionList(query)
 
       if (query.length < 2) return mentionList
 
