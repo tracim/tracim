@@ -111,7 +111,8 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 
 const naturalCompareLabels = (itemA, itemB, lang) => {
-  return itemA.label.localeCompare(itemB.label, lang, { numeric: true, ignorePunctuation: true })
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
 }
 
 export const compareContents = (a, b, lang) => {
