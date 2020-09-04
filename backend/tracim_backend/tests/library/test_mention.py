@@ -13,11 +13,12 @@ from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.revision_protection import new_revision
-
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import TracimTestContext
 
-html_with_one_mention = '<p>Foo bar</p><span id="foo">@foo</span><span id="mention-foo">@bar</span>'
+html_with_one_mention_bar = (
+    '<p>Foo bar</p><span id="foo">@foo</span><span id="mention-foo">@bar</span>'
+)
 
 comment_without_mention = (
     "<p>Bonjour,</p>"
@@ -48,7 +49,7 @@ def create_content(
             user = uapi.get_one_by_email(email="this.is@user")
         except Exception:
             user = uapi.create_minimal_user(
-                email="this.is@user", profile=Profile.ADMIN, save_now=True
+                email="this.is@user", profile=Profile.ADMIN, save_now=True, username="bar"
             )
         if parent_content:
             workspace = parent_content.workspace
@@ -77,7 +78,7 @@ def one_content_with_a_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        html_with_one_mention, user_api_factory, workspace_api_factory, session, app_config,
+        html_with_one_mention_bar, user_api_factory, workspace_api_factory, session, app_config,
     )
 
 
@@ -138,7 +139,7 @@ def one_comment_with_a_mention(
     one_content_with_a_mention: Content,
 ) -> Content:
     return create_content(
-        html_with_one_mention,
+        html_with_one_mention_bar,
         user_api_factory,
         workspace_api_factory,
         session,
@@ -152,7 +153,7 @@ class TestMentionBuilder:
     @pytest.mark.parametrize(
         "html,mentions",
         [
-            (html_with_one_mention, [Mention("bar", "foo")]),
+            (html_with_one_mention_bar, [Mention("bar", "foo")]),
             (comment_without_mention, []),
             (html_with_several_mentions, [Mention("bar", "foo"), Mention("foo", "bar")]),
         ],

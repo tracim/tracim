@@ -129,7 +129,7 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool = True,
     ) -> UserRoleInWorkspace:
-        # INFO - G.M - 2018-10-29 - Check if role already exist
+        # INFO - G.M - 2018-10-29 - Check if role already exists
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
             raise RoleAlreadyExistError(
@@ -166,11 +166,11 @@ class RoleApi(object):
 
     def get_workspace_members(self, workspace_id: int) -> typing.List[User]:
         query = self._apply_base_filters(
-            self._session.query(UserRoleInWorkspace.user).filter(
-                UserRoleInWorkspace.workspace_id == workspace_id
-            )
+            self._session.query(User)
+            .join(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
         )
-        return [res[0] for res in query]
+        return query.all()
 
     def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
         return [user.user_id for user in self.get_workspace_members(workspace_id)]
