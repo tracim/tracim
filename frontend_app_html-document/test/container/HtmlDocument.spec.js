@@ -18,6 +18,7 @@ import { debug } from '../../src/debug.js'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     content: contentHtmlDocument.htmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
@@ -44,9 +45,9 @@ describe('<HtmlDocument />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType content', () => {
-      describe('handleContentCreated', () => {
+      describe('handleContentCommentCreated', () => {
         describe('create a new comment', () => {
-          it('should update the timeline if is related to the current html-document', () => {
+          it('should call addCommentToTimeline if is related to the current html-document', () => {
             const tlmData = {
               fields: {
                 content: {
@@ -56,9 +57,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            wrapper.instance().handleContentCreated(tlmData)
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
-            expect(hasComment).to.equal(true)
+            props.addCommentToTimeline.resetHistory()
+            wrapper.instance().handleContentCommentCreated(tlmData)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
 
           it('should not update the timeline if is not related to the current html-document', () => {
@@ -71,10 +72,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            const oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCreated(tlmDataOtherContent)
-
-            expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
+            props.addCommentToTimeline.resetHistory()
+            wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
           })
         })
       })

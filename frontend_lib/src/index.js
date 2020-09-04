@@ -33,13 +33,17 @@ import {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  checkUsernameValidity
+  checkUsernameValidity,
+  permissiveNumberEqual
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
+} from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -114,6 +118,8 @@ import {
   tinymceAutoCompleteHandleSelectionChange,
   tinymceRemoveAllAutocompleteSpan
 } from './tinymceAutoCompleteHelper.js'
+
+import { getContentComment } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -205,7 +211,6 @@ export {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
@@ -217,5 +222,9 @@ export {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan
+  tinymceRemoveAllAutocompleteSpan,
+  getContentComment,
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave,
+  permissiveNumberEqual
 }
