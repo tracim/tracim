@@ -17,6 +17,7 @@ describe('<Thread />', () => {
   const props = {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     i18n: {},
@@ -68,11 +69,12 @@ describe('<Thread />', () => {
         }
 
         before(() => {
+          props.addCommentToTimeline.resetHistory()
           wrapper.instance().handleCommentCreated(tlmData)
         })
 
-        it('should have the new comment in the Timeline', () => {
-          expect(wrapper.state('timeline').find(t => t.content_id === 9)).to.not.equal(undefined)
+        it('should have called addCommentToTimeline', () => {
+          expect(props.addCommentToTimeline.calledOnce).to.equal(true)
         })
 
         // TODO - CH - 2020-06-05 - need to use the real buildTimelineFromCommentAndRevision function (not mocked)
@@ -124,12 +126,13 @@ describe('<Thread />', () => {
           let oldTimelineLength = 0
 
           before(() => {
+            props.addCommentToTimeline.resetHistory()
             oldTimelineLength = wrapper.state('timeline').length
             wrapper.instance().handleCommentCreated(tlmData)
           })
 
-          it('should not modify the timeline', () => {
-            expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
+          it('should not call addCommentToTimeline', () => {
+            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
           })
         })
       })

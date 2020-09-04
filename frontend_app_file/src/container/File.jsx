@@ -36,19 +36,19 @@ import {
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
-  sortTimelineByDate,
   addRevisionFromTLM,
   RefreshWarningMessage,
   setupCommonRequestHeaders,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  getContentComment,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getFileContent,
-  getFileComment,
   getFileRevision,
   getShareLinksList,
   postShareLinksList,
@@ -185,23 +185,17 @@ export class File extends React.Component {
     }
   }
 
-  handleContentCommentCreated = (data) => {
-    if (data.fields.content.parent_id === this.state.content.content_id) {
-      const sortedNewTimeLine = sortTimelineByDate([
-        ...this.state.timeline,
-        {
-          ...data.fields.content,
-          created_raw: data.fields.content.created,
-          created: displayDistanceDate(data.fields.content.created, this.state.loggedUser.lang),
-          timelineType: data.fields.content.content_type,
-          hasBeenRead: data.fields.client_token === this.sessionClientToken
-        }
-      ])
-      this.setState({
-        timeline: sortedNewTimeLine,
-        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-      })
-    }
+  handleContentCommentCreated = (tlm) => {
+    const { props, state } = this
+    // Not a comment for our content
+    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    this.setState({
+      timeline: newTimeline,
+      isLastTimelineItemCurrentToken: createdByLoggedUser
+    })
   }
 
   handleContentDeletedOrRestored = data => {
@@ -335,7 +329,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const [resComment, resRevision] = await Promise.all([
-      handleFetchResult(await getFileComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 
@@ -345,7 +339,7 @@ export class File extends React.Component {
       return
     }
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -447,7 +441,14 @@ export class File extends React.Component {
   handleClickValidateNewCommentBtn = () => {
     const { props, state } = this
     try {
-      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+      props.appContentSaveNewComment(
+        state.content,
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        state.config.slug,
+        state.loggedUser.username
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }

@@ -61,6 +61,7 @@ describe('appContentFactory.js', () => {
         'appContentNotifyAll',
         'appContentSaveNewComment',
         'appContentChangeStatus',
+        'addCommentToTimeline',
         'appContentArchive',
         'appContentDelete',
         'appContentRestoreArchive',
@@ -322,7 +323,7 @@ describe('appContentFactory.js', () => {
         const newComment = 'Edited comment'
         const isCommentWysiwyg = true
         mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
-        response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug)
+        response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, 'foo')
       })
 
       after(() => {
@@ -476,6 +477,10 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function buildTimelineFromCommentAndRevision', () => {
+    const loggedUser = {
+      username: 'foo',
+      lang: 'en'
+    }
     const commentList = fixtureCommentList
     const revisionList = fixtureRevisionList.map((revision, i) => ({
       ...revision,
@@ -485,7 +490,7 @@ describe('appContentFactory.js', () => {
     let commentAndRevisionMergedList = []
 
     before(() => {
-      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, 'en')
+      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, loggedUser)
     })
 
     it('should have merged all the comments and revision at depth 0', () => {

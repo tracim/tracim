@@ -20,6 +20,7 @@ describe('<File />', () => {
   const props = {
     setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     registerLiveMessageHandlerList: () => { },
     registerCustomEventHandlerList: () => { },
     i18n: {},
@@ -48,7 +49,7 @@ describe('<File />', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('Create a new comment', () => {
-          it('should have the new comment in the Timeline', () => {
+          it('should call addCommentToTimeline', () => {
             const tlmData = {
               fields: {
                 author: {
@@ -64,9 +65,7 @@ describe('<File />', () => {
               }
             }
             wrapper.instance().handleContentCommentCreated(tlmData)
-
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
-            expect(hasComment).to.equal(true)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
         })
 

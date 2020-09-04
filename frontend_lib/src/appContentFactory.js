@@ -7,8 +7,12 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
-  wrapMentionsInSpanTags
+  sortTimelineByDate
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
+} from './mention.js'
 import {
   putEditContent,
   postNewComment,
@@ -138,16 +142,16 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug) => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
       this.checkApiUrl()
 
-      // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
       let newCommentForApiWithMention
       try {
-        newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername)
       } catch (e) {
         return Promise.reject(e)
       }
@@ -306,18 +310,19 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, userLang) => {
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
       const resCommentWithProperDate = commentList.map(c => ({
         ...c,
         created_raw: c.created,
-        created: displayDistanceDate(c.created, userLang)
+        created: displayDistanceDate(c.created, loggedUser.lang),
+        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
       }))
 
       return revisionList
         .map((revision, i) => ({
           ...revision,
           created_raw: revision.created,
-          created: displayDistanceDate(revision.created, userLang),
+          created: displayDistanceDate(revision.created, loggedUser.lang),
           timelineType: 'revision',
           commentList: revision.comment_ids.map(ci => ({
             timelineType: 'comment',
@@ -327,6 +332,20 @@ export function appContentFactory (WrappedComponent) {
           hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
+    }
+
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
+      return sortTimelineByDate([
+        ...timeline,
+        {
+          ...comment,
+          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
+          created_raw: comment.created,
+          created: displayDistanceDate(comment.created, loggedUser.lang),
+          timelineType: comment.content_type,
+          hasBeenRead: hasBeenRead
+        }
+      ])
     }
 
     render () {
@@ -349,6 +368,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          addCommentToTimeline={this.addCommentToTimeline}
         />
       )
     }

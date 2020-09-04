@@ -33,13 +33,17 @@ import {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  checkUsernameValidity
+  checkUsernameValidity,
+  permissiveNumberEqual
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
+} from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -104,6 +108,8 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
+import { getContentComment } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -195,10 +201,13 @@ export {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  wrapMentionsInSpanTags,
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  getContentComment,
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave,
+  permissiveNumberEqual
 }

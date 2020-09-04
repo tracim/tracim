@@ -35,6 +35,7 @@ if (!global.window && !global.document) {
   global.crypto = {
     getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
   }
+  global.DOMParser = window.DOMParser
 }
 
 Enzyme.configure({ adapter: new Adapter() })

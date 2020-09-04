@@ -25,6 +25,13 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) => {
   })
 }
 
+export const getContentComment = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'GET'
+  })
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) => {
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   return fetch(`${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {
