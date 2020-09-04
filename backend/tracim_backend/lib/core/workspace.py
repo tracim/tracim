@@ -231,7 +231,7 @@ class WorkspaceApi(object):
         self, user: User, include_owned: bool = True, include_with_role: bool = True
     ) -> typing.List[Workspace]:
         """
-        Get al workspace of user
+        Get all workspaces of user
         :param user:  just an user
         :param include_owned: include workspace where user is owner
         :param include_with_role: include workspace where user has a role

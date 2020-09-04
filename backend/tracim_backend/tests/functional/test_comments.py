@@ -408,6 +408,16 @@ class TestCommentsEndpoint(object):
         params = {"raw_content": "<p></p>Hello"}
         web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
 
+    def test_api__post_content_comment__err_400__user_not_member(
+        self, web_testapp, html_with_nasty_mention
+    ) -> None:
+        """
+        This test should raise an error as the html contains a mention to a user not member of the workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": html_with_nasty_mention}
+        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
+
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp
     ) -> None:

@@ -383,6 +383,10 @@ class UserCantDeleteHimself(TracimException):
     error_code = ErrorCode.USER_CANT_DELETE_HIMSELF
 
 
+class UserNotMember(TracimException):
+    error_code = ErrorCode.USER_NOT_MEMBER
+
+
 class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
     error_code = ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
 

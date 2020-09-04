@@ -594,7 +594,7 @@ class ContentApi(object):
 
     def execute_created_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -613,7 +613,7 @@ class ContentApi(object):
 
     def execute_update_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 

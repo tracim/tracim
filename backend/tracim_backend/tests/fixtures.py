@@ -253,7 +253,7 @@ def base_fixture(session, app_config) -> Session:
 @pytest.fixture
 def test_fixture(session, app_config) -> Session:
     """
-    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    Warning! This fixture is now deprecated. Don't use it for new tests.
     """
     with transaction.manager:
         try:
@@ -269,7 +269,7 @@ def test_fixture(session, app_config) -> Session:
 @pytest.fixture
 def default_content_fixture(base_fixture, app_config) -> Session:
     """
-    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    Warning! This fixture is now deprecated. Don't use it for new tests.
     """
     with transaction.manager:
         try:
@@ -401,3 +401,8 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
 @pytest.fixture
 def event_helper(session) -> EventHelper:
     return EventHelper(session)
+
+
+@pytest.fixture
+def html_with_nasty_mention() -> str:
+    return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace @victimnotmemberofthisworkspace, are you? </p>"
