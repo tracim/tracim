@@ -208,7 +208,7 @@ export class NotificationWall extends React.Component {
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (
-                          notificationDetails.text +
+                          notificationDetails.text + ' ' +
                           `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
                             escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
                           '</span>'
