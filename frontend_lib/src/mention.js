@@ -85,7 +85,7 @@ export const addClassToMentionsOfUser = (rawContent, username, userClassName = M
   if (document.documentElement.tagName === 'parsererror') {
     throw new Error('Cannot parse string: ' + document.documentElement)
   }
-  forEachMentionIn(addUserClass, document, username + ALL_MENTIONS)
+  forEachMentionIn(addUserClass, document, [username, ...ALL_MENTIONS])
   return document.body.innerHTML
 }
 
@@ -94,7 +94,7 @@ export const removeClassFromMentionsOfUser = (document, username, userClassName 
     element.classList.remove(userClassName)
     if (!element.classList.length) element.removeAttribute('class')
   }
-  forEachMentionIn(removeUserClass, document, username + ALL_MENTIONS)
+  forEachMentionIn(removeUserClass, document, [username, ...ALL_MENTIONS])
 }
 
 export const wrapMentionsInSpanTags = (document) => {
