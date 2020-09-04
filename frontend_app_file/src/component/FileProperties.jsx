@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { DisplayState } from 'tracim_frontend_lib'
+import { PromptMessage } from 'tracim_frontend_lib'
 
 const color = require('color')
 
@@ -74,7 +74,7 @@ export class FileProperties extends React.Component {
                   />
 
                   {props.disableChangeDescription && (
-                    <DisplayState
+                    <PromptMessage
                       msg={props.t("The file has been updated, it can't be edited anymore")}
                       icon='warning'
                     />

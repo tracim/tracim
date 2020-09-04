@@ -1,9 +1,15 @@
 const nock = require('nock')
 
-const mockPutHtmlDocumentRead200 = (user, apiUrl, workspaceId, contentId) => {
+const mockPutHtmlDocumentRead200 = (userId, apiUrl, workspaceId, contentId) => {
   return nock(apiUrl)
-    .put(`/users/${user.user_id}/workspaces/${workspaceId}/contents/${contentId}/read`)
+    .put(`/users/${userId}/workspaces/${workspaceId}/contents/${contentId}/read`)
     .reply(200)
+}
+
+const mockPutUserConfiguration204 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/config`)
+    .reply(204)
 }
 
 const mockGetHtmlDocumentRevision200 = (apiUrl, workspaceId, contentId, revisionList) => {
@@ -28,5 +34,6 @@ export {
   mockGetHtmlDocumentContent200,
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentRevision200,
-  mockPutHtmlDocumentRead200
+  mockPutHtmlDocumentRead200,
+  mockPutUserConfiguration204
 }
