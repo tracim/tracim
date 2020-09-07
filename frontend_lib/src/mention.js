@@ -6,7 +6,16 @@ export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
 export const MENTION_REGEX = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
-export const ALL_MENTIONS = ['all', 'todos', 'tous']
+export const GROUP_MENTION_LIST = [
+  {
+    mention: 'all',
+    detail: 'Sends a notification to all members of the shared space',
+    tradKey: [i18n.t('Sends a notification to all members of the shared space')],
+    isCommon: true
+  }
+]
+
+export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos']
 
 const depthFirstSearchAndMentionAnalysis = childNodesList => {
   const childNodesListCopy = [...childNodesList]
@@ -85,7 +94,7 @@ export const addClassToMentionsOfUser = (rawContent, username, userClassName = M
   if (document.documentElement.tagName === 'parsererror') {
     throw new Error('Cannot parse string: ' + document.documentElement)
   }
-  forEachMentionIn(addUserClass, document, [username, ...ALL_MENTIONS])
+  forEachMentionIn(addUserClass, document, [username, ...GROUP_MENTION_TRANSLATION_LIST])
   return document.body.innerHTML
 }
 
@@ -94,7 +103,7 @@ export const removeClassFromMentionsOfUser = (document, username, userClassName 
     element.classList.remove(userClassName)
     if (!element.classList.length) element.removeAttribute('class')
   }
-  forEachMentionIn(removeUserClass, document, [username, ...ALL_MENTIONS])
+  forEachMentionIn(removeUserClass, document, [username, ...GROUP_MENTION_TRANSLATION_LIST])
 }
 
 export const wrapMentionsInSpanTags = (document) => {
@@ -115,4 +124,13 @@ export const handleMentionsBeforeSave = (text, loggedUsername) => {
     console.error('Error while parsing mention', e)
     throw new Error(i18n.t('Error while detecting the mentions'))
   }
+}
+
+export const getMatchingGroupMentionList = (query) => {
+  const matching = []
+  for (const mention of GROUP_MENTION_LIST) {
+    const translatedMention = { ...mention, mention: i18n.t(mention.mention) }
+    if (translatedMention.mention.indexOf(query.toLowerCase()) >= 0) matching.push(translatedMention)
+  }
+  return matching
 }

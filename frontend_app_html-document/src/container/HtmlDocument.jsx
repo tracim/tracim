@@ -29,6 +29,12 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan,
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
@@ -74,7 +80,10 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      isLastTimelineItemCurrentToken: false,
+      isAutoCompleteActivated: false,
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -217,21 +226,90 @@ export class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg('#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg(
+        '#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygNewVersion')
+    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+      initWysiwyg(
+        state,
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
+  }
+
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
+  }
+
+  handleTinyMceInput = (event, tinymcePosition) => {
+    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+  }
+
+  handleTinyMceSelectionChange = selectionId => {
+    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchForMentionInQuery
+    )
+  }
+
+  handleTinyMceKeyDown = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchForMentionInQuery
+    )
   }
 
   componentWillUnmount () {
@@ -406,9 +484,11 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    const contentWithoutAnyAutoCompleteSpan = tinymceRemoveAllAutocompleteSpan()
+
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(state.content.raw_content, state.loggedUser.username)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(contentWithoutAnyAutoCompleteSpan, state.loggedUser.username)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
@@ -428,7 +508,13 @@ export class HtmlDocument extends React.Component {
       case 200: {
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
-        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        this.setState(prev => ({
+          mode: APP_FEATURE_MODE.VIEW,
+          content: {
+            ...prev.content,
+            raw_content: newDocumentForApiWithMention
+          }
+        }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
         )
@@ -468,6 +554,10 @@ export class HtmlDocument extends React.Component {
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
+  }
+
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -732,6 +822,11 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            tinymcePosition={state.tinymcePosition}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
+            onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
@@ -760,6 +855,8 @@ export class HtmlDocument extends React.Component {
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                  searchForMentionInQuery={this.searchForMentionInQuery}
+                  onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
                 />
               )
             }]}

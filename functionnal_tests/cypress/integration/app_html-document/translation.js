@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands.js'
 
-describe('App Folder Advanced', function () {
+describe('App HTML Document', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()

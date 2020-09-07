@@ -11,7 +11,8 @@ import {
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave
+  handleMentionsBeforeSave,
+  getMatchingGroupMentionList
 } from './mention.js'
 import {
   putEditContent,
@@ -20,10 +21,12 @@ import {
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
-  putContentRestoreDelete
+  putContentRestoreDelete,
+  getMyselfKnownMember
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
+import { tinymceRemoveAllAutocompleteSpan } from './tinymceAutoCompleteHelper.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -147,7 +150,9 @@ export function appContentFactory (WrappedComponent) {
 
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      const newCommentForApi = isCommentWysiwyg
+        ? tinymceRemoveAllAutocompleteSpan()
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
       let newCommentForApiWithMention
       try {
@@ -334,6 +339,20 @@ export function appContentFactory (WrappedComponent) {
         .flatMap(revision => [revision, ...revision.commentList])
     }
 
+    searchForMentionInQuery = async (query, workspaceId) => {
+      const mentionList = getMatchingGroupMentionList(query)
+
+      if (query.length < 2) return mentionList
+
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+
+      switch (fetchUserKnownMemberList.apiResponse.status) {
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+      }
+      return mentionList
+    }
+
     addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
       return sortTimelineByDate([
         ...timeline,
@@ -368,6 +387,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          searchForMentionInQuery={this.searchForMentionInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
         />
       )

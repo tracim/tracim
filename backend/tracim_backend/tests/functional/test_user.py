@@ -3673,6 +3673,69 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
+    def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
+        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+    ):
+
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "acp": "bob",
+            "include_workspace_ids": str(workspace.workspace_id),
+            "exclude_user_ids": str(test_user3.user_id),
+        }
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]["user_id"] == test_user.user_id
+        assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["avatar_url"] is None
+
     def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
         self, admin_user, web_testapp
     ):

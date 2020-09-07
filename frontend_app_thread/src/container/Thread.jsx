@@ -181,13 +181,24 @@ export class Thread extends React.Component {
       this.loadTimeline()
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
+  }
+
+  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -416,6 +427,8 @@ export class Thread extends React.Component {
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
             isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+            onInitWysiwyg={this.handleInitWysiwyg}
+            searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
           />
         </PopinFixedContent>
       </PopinFixed>

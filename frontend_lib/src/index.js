@@ -72,6 +72,7 @@ import Timeline from './component/Timeline/Timeline.jsx'
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
+import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -108,6 +109,15 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
+import {
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan
+} from './tinymceAutoCompleteHelper.js'
 
 import { getContentComment } from './action.async.js'
 
@@ -206,6 +216,13 @@ export {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
+  MentionAutoComplete,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan,
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,

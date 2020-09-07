@@ -260,8 +260,7 @@ export class File extends React.Component {
       }
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
@@ -811,6 +810,8 @@ export class File extends React.Component {
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
+          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
         />
       )
     }
@@ -868,6 +869,18 @@ export class File extends React.Component {
     } else {
       return [timelineObject, propertiesObject]
     }
+  }
+
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
   }
 
   handleCloseNotifyAllMessage = async () => {

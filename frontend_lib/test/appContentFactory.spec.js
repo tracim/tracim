@@ -66,7 +66,8 @@ describe('appContentFactory.js', () => {
         'appContentDelete',
         'appContentRestoreArchive',
         'appContentRestoreDelete',
-        'buildTimelineFromCommentAndRevision'
+        'buildTimelineFromCommentAndRevision',
+        'searchForMentionInQuery'
       )
     })
   })
@@ -308,19 +309,25 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentSaveNewComment', () => {
     describe('on comment save success', async () => {
-      let response = {}
+      let response
+      const newComment = 'Edited comment'
       const fakeTinymceSetContent = sinon.spy()
       global.tinymce = {
         ...global.tinymce,
         get: () => ({
           setContent: fakeTinymceSetContent
-        })
+        }),
+        activeEditor: {
+          dom: {
+            select: () => []
+          },
+          getContent: () => newComment
+        }
       }
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
-        const newComment = 'Edited comment'
         const isCommentWysiwyg = true
         mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
         response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, 'foo')
