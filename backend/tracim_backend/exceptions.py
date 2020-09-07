@@ -383,7 +383,7 @@ class UserCantDeleteHimself(TracimException):
     error_code = ErrorCode.USER_CANT_DELETE_HIMSELF
 
 
-class UserNotMember(TracimException):
+class UserNotMemberOfWorkspace(TracimException):
     error_code = ErrorCode.USER_NOT_MEMBER
 
 

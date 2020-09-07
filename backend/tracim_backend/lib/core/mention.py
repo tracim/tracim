@@ -7,7 +7,7 @@ from pluggy import PluginManager
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import UserNotMember
+from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
@@ -169,12 +169,18 @@ class MentionBuilder:
         cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
     ) -> None:
         role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+
         workspace_members_usernames = [
             user.username for user in role_api.get_workspace_members(content.workspace_id)
         ]
+
         for mention in mentions:
-            if mention.recipient not in workspace_members_usernames:
-                raise UserNotMember(
+            recipient = mention.recipient
+            if (
+                recipient not in workspace_members_usernames
+                and recipient not in ALL__GROUP_MENTIONS
+            ):
+                raise UserNotMemberOfWorkspace(
                     "This user is not a member of this workspace: {}".format(mention.recipient)
                 )
 
