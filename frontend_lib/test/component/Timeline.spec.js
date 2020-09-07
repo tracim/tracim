@@ -57,9 +57,6 @@ describe('<Timeline />', () => {
   )
 
   describe('Static design', () => {
-    it(`The textarea should have the value:"${props.newComment}"`, () => {
-      expect(wrapper.find('#wysiwygTimelineComment').prop('value')).to.equal(props.newComment)
-    })
     it('The advanced mode button should be disabled when disableComment is true', () => {
       expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(false)
       wrapper.setProps({ disableComment: true })
@@ -270,11 +267,6 @@ describe('<Timeline />', () => {
     it('onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked', () => {
       wrapper.find(`.${props.customClass}__texteditor__submit__btn`).simulate('click')
       expect(onClickValidateNewCommentBtnCallBack.called).to.equal(true)
-    })
-
-    it('onChangeNewCommentCallBack should be called when comment is changing', () => {
-      wrapper.find('#wysiwygTimelineComment').simulate('change')
-      expect(onChangeNewCommentCallBack.called).to.equal(true)
     })
   })
 })

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { mockGetWhoami } from '../apiMock'
+import { mockGetWhoami, mockGetWhoamiWithDelay, mockGetWhoamiFailure } from '../apiMock'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { FETCH_CONFIG } from '../../src/util/helper.js'
 
@@ -18,7 +18,7 @@ const apiUrl = FETCH_CONFIG.apiUrl
 const userId = 1
 
 // RJ - 2020-09-13 - NOTE: The next two methods are used to track status changes
-// in this test suit.
+// in this test suite.
 
 const setStatusOrig = LiveMessageManager.prototype.setStatus
 LiveMessageManager.prototype.setStatus = function (status) {
@@ -41,42 +41,55 @@ LiveMessageManager.prototype.onStatusChange = async function () {
 // We directly open an EventSource connection. We are alone.
 LiveMessageManager.prototype.electLeader = LiveMessageManager.prototype.openEventSourceConnection
 
-const openedManager = (heartbeatTimeOut, reconnectionInterval) => {
+const managers = []
+
+const createManager = (heartbeatTimeOut, reconnectionInterval) => {
+  closeManagers()
   const manager = new LiveMessageManager(heartbeatTimeOut, reconnectionInterval)
+  managers.push(manager)
+  return manager
+}
+
+const openedManager = (heartbeatTimeOut, reconnectionInterval) => {
+  const manager = createManager(heartbeatTimeOut, reconnectionInterval)
   manager.openLiveMessageConnection(userId, apiUrl)
   manager.eventSource.emitOpen()
   return manager
 }
 
+const closeManagers = () => {
+  for (const manager of managers) {
+    manager.closeLiveMessageConnection()
+  }
+}
+
 describe('LiveMessageManager class', () => {
-  const managers = []
-
   describe('the openLiveMessageConnection() method', () => {
-    const manager = new LiveMessageManager(30000, 0)
-    managers.push(manager)
-    manager.openLiveMessageConnection(userId, apiUrl)
-
     it('should set manager status to PENDING when called', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
     })
 
     it('should create a BroadcastChannel', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
       expect(manager.broadcastChannel.constructor.name).to.not.be.equal('BroadcastChannel')
-      manager.closeLiveMessageConnection()
     })
   })
 
   describe('the openEventSourceConnection() method', () => {
-    const manager = new LiveMessageManager(30000, 0)
-    managers.push(manager)
-    manager.openLiveMessageConnection(userId, apiUrl)
-
     it('should create an EventSource', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
       expect(manager.eventSource).to.not.be.equal(null)
       expect(manager.eventSource.readyState).to.be.equal(0)
     })
 
     it('should set manager status to OPENED when initial event is received', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+
       manager.eventSource.emitOpen()
       manager.eventSource.emit('stream-open')
       expect(manager.eventSource.readyState).to.be.equal(1)
@@ -84,6 +97,9 @@ describe('LiveMessageManager class', () => {
     })
 
     it('should restart connection when an error is raised by EventSource', async () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+
       mockGetWhoami(apiUrl, 200)
       const promiseStatus1 = manager.onStatusChange()
       const promiseStatus2 = manager.onStatusChange()
@@ -97,14 +113,12 @@ describe('LiveMessageManager class', () => {
   describe('the closeLiveMessageConnection() method', () => {
     it('should close the EventSource', () => {
       const manager = openedManager()
-      managers.push(manager)
       manager.closeLiveMessageConnection()
       expect(manager.eventSource).to.be.equal(null)
     })
 
     it('should set manager status to CLOSED', () => {
       const manager = openedManager()
-      managers.push(manager)
       manager.closeLiveMessageConnection()
       expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.CLOSED)
       manager.closeLiveMessageConnection()
@@ -115,7 +129,6 @@ describe('LiveMessageManager class', () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
       mockGetWhoami(apiUrl, 200)
       const manager = openedManager(2, 10)
-      managers.push(manager)
       expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.HEARTBEAT_FAILED)
       expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
       manager.closeLiveMessageConnection()
@@ -123,49 +136,59 @@ describe('LiveMessageManager class', () => {
   })
 
   describe('after losing the connection', async function () {
-    it('should restart connection with the after_event_id parameter', async () => {
-      mockGetWhoami(apiUrl, 200)
-      const manager = new LiveMessageManager(30000, 0)
-      managers.push(manager)
+    const testCases = [
+      {
+        description: 'nominal case',
+        mockWhoami: () => { return mockGetWhoami(apiUrl, 200) },
+        reconnectionInterval: 10
+      },
+      {
+        description: 'whoami fetch fails',
+        mockWhoami: () => { return mockGetWhoami(apiUrl, 500) },
+        reconnectionInterval: 10
+      },
+      {
+        description: 'whoami fetch timeouts',
+        mockWhoami: () => { return mockGetWhoamiWithDelay(apiUrl, 200) },
+        reconnectionInterval: 10
+      },
+      {
+        description: 'whoami fetch errors',
+        mockWhoami: () => { return mockGetWhoamiFailure(apiUrl) },
+        reconnectionInterval: 10
+      }
+    ]
+    for (const testCase of testCases) {
+      it(`should restart connection with the after_event_id parameter (${testCase.description})`, async () => {
+        const mock = testCase.mockWhoami()
+        const manager = openedManager(30000, testCase.reconnectionInterval)
 
-      manager.openLiveMessageConnection(userId, apiUrl)
-      manager.eventSource.emitOpen()
-      manager.eventSource.emit('stream-open')
-      expect(manager.eventSource.readyState).to.be.equal(1)
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
+        manager.eventSource.emitMessage({ data: '{ "event_id": 42 }' })
+        expect(manager.lastEventId).to.be.equal(42)
 
-      manager.eventSource.emitMessage({ data: '{ "event_id": 42 }' })
-      expect(manager.lastEventId).to.be.equal(42)
+        const promiseStatus = manager.onStatusChange()
+        manager.eventSource.emitError()
+        expect(await promiseStatus).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
+        expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
+        expect(mock.isDone()).to.be.equal(true)
 
-      const promiseStatus = manager.onStatusChange()
-      manager.eventSource.emitError()
-      expect(await promiseStatus).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
-      expect(await manager.onStatusChange()).to.be.equal(LIVE_MESSAGE_STATUS.PENDING)
+        manager.eventSource.emitOpen()
+        manager.eventSource.emit('stream-open')
+        expect(manager.eventSource.readyState).to.be.equal(1)
+        expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
 
-      manager.eventSource.emitOpen()
-      manager.eventSource.emit('stream-open')
-      expect(manager.eventSource.readyState).to.be.equal(1)
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
+        expect(manager.eventSource.url).to.be.equal(
+          `${apiUrl}/users/${userId}/live_messages?after_event_id=42`
+        )
 
-      expect(manager.eventSource.url).to.be.equal(
-         `${apiUrl}/users/${userId}/live_messages?after_event_id=42`
-      )
-
-      manager.closeLiveMessageConnection()
-    })
+        manager.closeLiveMessageConnection()
+      })
+    }
   })
 
   describe('after closing and re-opening the connection', async () => {
     it('should restart connection with the after_event_id parameter', async () => {
-      const manager = new LiveMessageManager(30000, 0)
-      managers.push(manager)
-
-      manager.openLiveMessageConnection(userId, apiUrl)
-      manager.eventSource.emitOpen()
-      manager.eventSource.emit('stream-open')
-      expect(manager.eventSource.readyState).to.be.equal(1)
-      expect(manager.status).to.be.equal(LIVE_MESSAGE_STATUS.OPENED)
-
+      const manager = openedManager(30000, 0)
       manager.eventSource.emitMessage({ data: '{ "event_id": 1337 }' })
       expect(manager.lastEventId).to.be.equal(1337)
 
@@ -188,11 +211,7 @@ describe('LiveMessageManager class', () => {
   describe('after losing the connection due to a logout', async () => {
     it('should redirect to the login page (by sending a custom event)', async () => {
       mockGetWhoami(apiUrl, 401)
-      const manager = new LiveMessageManager(30000, 0)
-      managers.push(manager)
-      manager.openLiveMessageConnection(userId, apiUrl)
-      manager.eventSource.emitOpen()
-      manager.eventSource.emit('stream-open')
+      const manager = openedManager(30000, 10)
       global.lastCustomEventTypes = new Set()
       const promiseStatus1 = manager.onStatusChange()
       const promiseStatus2 = manager.onStatusChange()
@@ -208,8 +227,6 @@ describe('LiveMessageManager class', () => {
   after(() => {
     // NOTE SG 2020-07-03 - close all connections to clear timeouts so that mocha exits properly
     // NOTE RJ 2020-08-19 - and between tests, so that managers from different tests do not interact with each other
-    for (const manager of managers) {
-      manager.closeLiveMessageConnection()
-    }
+    closeManagers()
   })
 })

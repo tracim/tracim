@@ -27,6 +27,16 @@ export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
     method: 'GET'
   })
 
+export const putUserConfiguration = (apiUrl, userId, config) =>
+  fetch(`${apiUrl}/users/${userId}/config`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'PUT',
+    body: JSON.stringify({
+      parameters: config
+    })
+  })
+
 export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newContent) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
     credentials: 'include',

@@ -6,10 +6,11 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import DisplayState from '../DisplayState/DisplayState.jsx'
+import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
+import CommentTextArea from './CommentTextArea.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -92,14 +93,14 @@ export class Timeline extends React.Component {
         }
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deprecated')}
               icon={props.deprecatedStatus.faIcon}
             />
           )}
 
           {props.isArchived && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is archived')}
               btnType='button'
               icon='archive'
@@ -109,7 +110,7 @@ export class Timeline extends React.Component {
           )}
 
           {props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
               icon='trash'
@@ -164,12 +165,14 @@ export class Timeline extends React.Component {
                 'timeline__texteditor__textinput'
               )}
             >
-              <textarea
+              <CommentTextArea
                 id='wysiwygTimelineComment'
-                placeholder={props.t('Your message...')}
-                value={props.newComment}
-                onChange={props.onChangeNewComment}
-                disabled={props.disableComment}
+                onChangeNewComment={props.onChangeNewComment}
+                newComment={props.newComment}
+                disableComment={props.disableComment}
+                wysiwyg={props.wysiwyg}
+                searchForMentionInQuery={props.searchForMentionInQuery}
+                onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
 
@@ -240,7 +243,8 @@ Timeline.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func,
-  showTitle: PropTypes.bool
+  showTitle: PropTypes.bool,
+  searchForMentionInQuery: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -262,5 +266,6 @@ Timeline.defaultProps = {
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
-  showTitle: true
+  showTitle: true,
+  searchForMentionInQuery: () => {}
 }

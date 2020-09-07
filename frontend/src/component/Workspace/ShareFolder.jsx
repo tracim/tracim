@@ -29,10 +29,7 @@ class ShareFolder extends React.Component {
 
     const folderContentList = (props.shareFolderContentList ? props.shareFolderContentList : [])
       .filter(content => content.parentId === SHARE_FOLDER_ID)
-      .sort((a, b) => {
-        if (a.created > b.created) return -1
-        return 1
-      })
+      .sort((a, b) => a.created - b.created)
 
     return (
       <div
@@ -119,6 +116,7 @@ class ShareFolder extends React.Component {
                 workspaceContentList={props.shareFolderContentList}
                 getContentParentList={props.getContentParentList}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                lang={props.lang}
                 onClickExtendedAction={props.onClickExtendedAction}
                 onDropMoveContentItem={props.onDropMoveContentItem}
                 onClickFolder={props.onClickFolder}
@@ -170,6 +168,7 @@ export default translate()(withRouter(ShareFolder))
 ShareFolder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
+  lang: PropTypes.string,
   onClickShareFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }

@@ -147,6 +147,12 @@ const mockGetConfig200 = (apiUrl) => {
     .reply(200, {})
 }
 
+const mockGetUserConfig200 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .get(`/users/${userId}/config`)
+    .reply(200, { parameters: {} })
+}
+
 const mockGetAppList200 = (apiUrl, appList) => {
   return nock(apiUrl)
     .get('/system/applications')
@@ -197,9 +203,21 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
 
 const mockGetWhoami = (apiUrl, status) => {
   return nock(apiUrl)
-    .log(console.error)
     .get('/auth/whoami')
     .reply(status, '')
+}
+
+const mockGetWhoamiWithDelay = (apiUrl, status, delay) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .delayConnection(delay)
+    .reply(status, '')
+}
+
+const mockGetWhoamiFailure = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .replyWithError('Error foobar')
 }
 
 export {
@@ -209,6 +227,7 @@ export {
   mockGetContentType200,
   mockGetAppList200,
   mockGetConfig200,
+  mockGetUserConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
   mockPutAllNotificationAsRead204,
@@ -229,5 +248,7 @@ export {
   mockGetUserCalendar200,
   mockGetUser200,
   mockGetFolderContentList200,
-  mockGetWhoami
+  mockGetWhoami,
+  mockGetWhoamiFailure,
+  mockGetWhoamiWithDelay
 }

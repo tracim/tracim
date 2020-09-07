@@ -1,8 +1,8 @@
-*Please indicate here a summary of the pull request content. If a related issue exists, please indicate issue reference here*
+<!-- Here, you can write a short summary of what the pull request brings. If a related issue exists, please reference it here -->
 
 ## Checkpoints
 
-These points must be checked before merging. Please don't edit them out.
+<!-- These points must be checked before merging. Please don't edit them out. -->
 
 **For developers**
 
