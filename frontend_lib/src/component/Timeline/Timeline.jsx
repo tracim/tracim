@@ -10,6 +10,7 @@ import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../hel
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
+import CommentTextArea from './CommentTextArea.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -164,12 +165,14 @@ export class Timeline extends React.Component {
                 'timeline__texteditor__textinput'
               )}
             >
-              <textarea
+              <CommentTextArea
                 id='wysiwygTimelineComment'
-                placeholder={props.t('Your message...')}
-                value={props.newComment}
-                onChange={props.onChangeNewComment}
-                disabled={props.disableComment}
+                onChangeNewComment={props.onChangeNewComment}
+                newComment={props.newComment}
+                disableComment={props.disableComment}
+                wysiwyg={props.wysiwyg}
+                searchForMentionInQuery={props.searchForMentionInQuery}
+                onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
 
@@ -240,7 +243,8 @@ Timeline.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func,
-  showTitle: PropTypes.bool
+  showTitle: PropTypes.bool,
+  searchForMentionInQuery: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -262,5 +266,6 @@ Timeline.defaultProps = {
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
-  showTitle: true
+  showTitle: true,
+  searchForMentionInQuery: () => {}
 }

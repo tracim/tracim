@@ -7,8 +7,13 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
-  wrapMentionsInSpanTags
+  sortTimelineByDate
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave,
+  getMatchingGroupMentionList
+} from './mention.js'
 import {
   putEditContent,
   postNewComment,
@@ -16,10 +21,12 @@ import {
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
-  putContentRestoreDelete
+  putContentRestoreDelete,
+  getMyselfKnownMember
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
+import { tinymceRemoveAllAutocompleteSpan } from './tinymceAutoCompleteHelper.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -138,16 +145,18 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug) => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
       this.checkApiUrl()
 
-      // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      const newCommentForApi = isCommentWysiwyg
+        ? tinymceRemoveAllAutocompleteSpan()
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
       let newCommentForApiWithMention
       try {
-        newCommentForApiWithMention = wrapMentionsInSpanTags(newCommentForApi)
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername)
       } catch (e) {
         return Promise.reject(e)
       }
@@ -204,7 +213,7 @@ export function appContentFactory (WrappedComponent) {
     appContentArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentArchived(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -231,7 +240,7 @@ export function appContentFactory (WrappedComponent) {
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -257,7 +266,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreArchive(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -282,7 +291,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -306,18 +315,19 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, userLang) => {
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
       const resCommentWithProperDate = commentList.map(c => ({
         ...c,
         created_raw: c.created,
-        created: displayDistanceDate(c.created, userLang)
+        created: displayDistanceDate(c.created, loggedUser.lang),
+        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
       }))
 
       return revisionList
         .map((revision, i) => ({
           ...revision,
           created_raw: revision.created,
-          created: displayDistanceDate(revision.created, userLang),
+          created: displayDistanceDate(revision.created, loggedUser.lang),
           timelineType: 'revision',
           commentList: revision.comment_ids.map(ci => ({
             timelineType: 'comment',
@@ -327,6 +337,34 @@ export function appContentFactory (WrappedComponent) {
           hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
+    }
+
+    searchForMentionInQuery = async (query, workspaceId) => {
+      const mentionList = getMatchingGroupMentionList(query)
+
+      if (query.length < 2) return mentionList
+
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+
+      switch (fetchUserKnownMemberList.apiResponse.status) {
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+      }
+      return mentionList
+    }
+
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
+      return sortTimelineByDate([
+        ...timeline,
+        {
+          ...comment,
+          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
+          created_raw: comment.created,
+          created: displayDistanceDate(comment.created, loggedUser.lang),
+          timelineType: comment.content_type,
+          hasBeenRead: hasBeenRead
+        }
+      ])
     }
 
     render () {
@@ -349,6 +387,8 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          searchForMentionInQuery={this.searchForMentionInQuery}
+          addCommentToTimeline={this.addCommentToTimeline}
         />
       )
     }

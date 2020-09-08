@@ -76,13 +76,15 @@ describe('Login', function () {
       cy.get(confirmButton).should('be.enabled')
     })
 
-    it('should have the confirm button disabled if the user not put the password', function () {
+    it('should have the confirm button disabled if the user does not put the password', function () {
+      this.skip() // FIXME - RJ - 2020-09-03 - this test is unstable and it will be fixed in https://github.com/tracim/tracim/issues/3483
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).should('be.empty')
       cy.get(confirmButton).should('not.be.enabled')
     })
 
     it('should have the confirm button disabled if username is not available', function () {
+      this.skip() // FIXME - RJ - 2020-09-03 - this test is unstable and it will be fixed in https://github.com/tracim/tracim/issues/3483
       cy.get(usernameInput).type(userWithUsernameUsername)
       cy.get(confirmButton).should('not.be.enabled')
     })

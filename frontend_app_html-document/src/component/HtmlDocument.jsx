@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   APP_FEATURE_MODE,
+  MentionAutoComplete,
   PromptMessage,
   TextAreaApp
 } from 'tracim_frontend_lib'
@@ -15,7 +16,7 @@ export const HtmlDocument = props => {
           msg={
             <span>{props.t('To notify all members of the shared space of your modification')},
               <button
-                className='buttonLink'
+                className='btn buttonLink'
                 onClick={props.onClickNotifyAll}
               >
                 {props.t('click here!')}
@@ -90,6 +91,21 @@ export const HtmlDocument = props => {
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+              <MentionAutoComplete
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                style={{
+                  top: props.tinymcePosition.top +
+                    (props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.selectionHeight : 0),
+                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
+                  position: props.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
+                  zIndex: props.tinymcePosition.isFullscreen ? 1061 : 20
+                }}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+              />
+            )}
             <TextAreaApp
               id={props.wysiwygNewVersion}
               customClass='html-document__editionmode'
