@@ -238,7 +238,7 @@ export class WorkspaceContent extends React.Component {
         break
       case 400:
         props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage('Unknown shared space'))
+        props.dispatch(newFlashMessage(props.t('Unknown shared space')))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
     }
