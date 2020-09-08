@@ -6,8 +6,8 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
+import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../helper.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
-import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
@@ -129,7 +129,7 @@ export class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     author={content.author.public_name}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
@@ -142,7 +142,7 @@ export class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     revisionType={content.revision_type}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     number={content.number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}

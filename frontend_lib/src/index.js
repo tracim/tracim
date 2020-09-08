@@ -38,6 +38,7 @@ import {
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   checkUsernameValidity,
+  formatAbsoluteDate,
   permissiveNumberEqual
 } from './helper.js'
 import {
@@ -216,6 +217,7 @@ export {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
+  formatAbsoluteDate,
   MentionAutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,

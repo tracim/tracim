@@ -66,7 +66,8 @@ describe('<NotificationWall />', () => {
       const baseNotification = {
         content: serialize(contentFromApi, serializeContentProps),
         workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-        user: serialize(globalManagerFromApi, serializeUserProps)
+        user: serialize(globalManagerFromApi, serializeUserProps),
+        author: 'Leslie'
       }
       it(`should return type comment object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)}`, () => {
         expect(NotificationWallInstance.getNotificationDetails({
@@ -75,7 +76,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-comments-o',
-            text: '{{author}} commented on {{content}} at {{workspace}}',
+            text: '{{author}} commented on {{content}} in {{workspace}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.id}`
           })
       })
@@ -87,7 +88,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-magic',
-            text: '{{author}} created {{content}} at {{workspace}}',
+            text: '{{author}} created {{content}} in {{workspace}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -99,7 +100,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-history',
-            text: '{{author}} updated a new version of {{content}} at {{workspace}}',
+            text: '{{author}} updated a new version of {{content}} in {{workspace}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -115,6 +116,36 @@ describe('<NotificationWall />', () => {
             text: '{{author}} added you to {{workspace}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })
+      })
+
+      it('should produce span tags, and have title attributes on them', () => {
+        function mocki18nextT (text, opts) {
+          if (!opts) return text
+
+          if (opts.interpolation.escapeValue !== false) {
+            throw new Error('Expected interpolation.escapeValue to be false')
+          }
+
+          for (const p of Object.keys(opts)) {
+            text = text.replace(new RegExp('\\{\\{' + p + '\\}\\}', 'g'), opts[p])
+          }
+
+          return text
+        }
+
+        const translatedNotificationWallInstance = shallow(<NotificationWall {...{ ...props, t: mocki18nextT }} />).instance()
+
+        const htmlText = translatedNotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
+        }).text
+
+        const div = document.createElement('div')
+        div.innerHTML = htmlText
+        const spanList = [...div.querySelectorAll('span')]
+
+        expect(spanList.length).to.be.greaterThan(0)
+        expect(spanList.every(span => span.title && span.title === span.textContent)).to.equal(true)
       })
     })
 
