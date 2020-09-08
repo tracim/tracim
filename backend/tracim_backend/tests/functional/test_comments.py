@@ -399,7 +399,12 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": html_with_nasty_mention}
-        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=400)
+        res = web_testapp.post_json(
+            "/api/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
 
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp
