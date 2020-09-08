@@ -78,7 +78,7 @@ class TestCommentsEndpoint(object):
         event_helper,
     ) -> None:
         """
-        Get alls comments of a content
+        Create a comment
         """
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
@@ -391,24 +391,7 @@ class TestCommentsEndpoint(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
-    def test_api__post_content_comment__err_400__unclosed_tag_not_empty(self, web_testapp) -> None:
-        """
-        This test should raise an error if we validate the html
-        The browser will close the p tag and removes the i tag so the html is valid
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": "<p>Hello</i>"}
-        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
-
-    def test_api__post_content_comment__err_400__invalid_html(self, web_testapp) -> None:
-        """
-        This test should raise an error as the html isn't valid
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": "<p></p>Hello"}
-        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
-
-    def test_api__post_content_comment__err_400__user_not_member(
+    def test_api__post_content_comment__err_400__user_not_member_of_workspace(
         self, web_testapp, html_with_nasty_mention
     ) -> None:
         """
@@ -416,7 +399,7 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": html_with_nasty_mention}
-        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
+        web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=400)
 
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp

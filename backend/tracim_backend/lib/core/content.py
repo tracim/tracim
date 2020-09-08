@@ -507,7 +507,7 @@ class ContentApi(object):
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
-        # can call here with None. Must update create_comment tu require the
+        # can call here with None. Must update create_comment to require the
         # workspace.
         if not workspace and parent:
             workspace = parent.workspace
@@ -567,7 +567,7 @@ class ContentApi(object):
         assert parent and parent.type != FOLDER_TYPE
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
-                "Can't create comment on content, you need to change his"
+                "Can't create comment on content, you need to change its"
                 "status or state (deleted/archived) before any change."
             )
 

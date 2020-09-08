@@ -405,4 +405,4 @@ def event_helper(session) -> EventHelper:
 
 @pytest.fixture
 def html_with_nasty_mention() -> str:
-    return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace @victimnotmemberofthisworkspace, are you? </p>"
+    return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace <span id='mention-victim'>@victimnotmemberofthisworkspace</span>, are you? </p>"

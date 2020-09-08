@@ -4158,7 +4158,7 @@ class TestThreads(object):
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
 
     def test_api__get_thread_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """
