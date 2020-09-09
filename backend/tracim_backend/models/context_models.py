@@ -600,11 +600,13 @@ class LiveMessageQuery(object):
         count: int,
         event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         page_token: Optional[str] = None,
+        exclude_author_id: Optional[int] = 0,
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
         self.page_token = page_token
         self.event_types = event_types
+        self.exclude_author_id = exclude_author_id
 
 
 class UserMessagesSummaryQuery(object):
@@ -612,8 +614,13 @@ class UserMessagesSummaryQuery(object):
     Message summary query model
     """
 
-    def __init__(self, event_types: Optional[List[EventTypeDatabaseParameters]] = None,) -> None:
+    def __init__(
+        self,
+        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_author_id: int = 0,
+    ) -> None:
         self.event_types = event_types
+        self.exclude_author_id = exclude_author_id
 
 
 class FolderContentUpdate(object):

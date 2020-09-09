@@ -623,6 +623,7 @@ class UserController(Controller):
                 read_status=hapic_data.query.read_status,
                 page_token=hapic_data.query.page_token,
                 count=hapic_data.query.count,
+                exclude_author_id=hapic_data.query.exclude_author_id,
                 event_types=hapic_data.query.event_types,
             )
         )
@@ -647,11 +648,13 @@ class UserController(Controller):
             user_id=candidate_user.user_id,
             read_status=ReadStatus.UNREAD,
             event_types=hapic_data.query.event_types,
+            exclude_author_id=hapic_data.query.exclude_author_id,
         )
         read_messages_count = event_api.get_messages_count(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.READ,
             event_types=hapic_data.query.event_types,
+            exclude_author_id=hapic_data.query.exclude_author_id,
         )
         return UserMessagesSummary(
             user=candidate_user,

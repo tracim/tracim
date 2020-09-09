@@ -71,45 +71,51 @@ export class ReduxTlmDispatcher extends React.Component {
     ])
   }
 
+  handleNotification (data) {
+    if (this.props.user.userId !== data.fields.author.user_id) {
+      this.props.dispatch(addNotification(data))
+    }
+  }
+
   handleWorkspaceDeleted = data => {
     const { props } = this
     props.dispatch(removeWorkspace(data.fields.workspace))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleWorkspaceModified = data => {
     const { props } = this
     props.dispatch(updateWorkspaceDetail(data.fields.workspace))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleMemberCreated = data => {
     const { props } = this
     props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleMemberModified = data => {
     const { props } = this
     props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleMemberDeleted = data => {
     const { props } = this
     props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
     if (props.user.userId === data.fields.user.user_id) props.dispatch(removeWorkspace(data.fields.workspace))
-    else props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleMentionCreated = data => {
-    this.props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleContentCreated = data => {
     const { props } = this
     props.dispatch(addWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleContentCommentCreated = async data => {
@@ -130,7 +136,7 @@ export class ReduxTlmDispatcher extends React.Component {
         }
       }
     }
-    props.dispatch(addNotification(notificationData))
+    this.handleNotification(notificationData)
     props.dispatch(removeWorkspaceReadStatus(response.json, data.fields.workspace.workspace_id))
   }
 
@@ -139,25 +145,26 @@ export class ReduxTlmDispatcher extends React.Component {
     props.dispatch(updateWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
     if (data.fields.author.user_id === props.user.userId) {
       props.dispatch(addWorkspaceReadStatus(data.fields.content, data.fields.workspace.workspace_id))
-    } else props.dispatch(addNotification(data))
+    }
+    this.handleNotification(data)
   }
 
   handleContentDeleted = data => {
     const { props } = this
     props.dispatch(deleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleContentUnDeleted = data => {
     const { props } = this
     props.dispatch(unDeleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   handleUserModified = data => {
     const { props } = this
     props.dispatch(updateUser(data.fields.user))
-    if (props.user.userId !== data.fields.user.user_id) props.dispatch(addNotification(data))
+    this.handleNotification(data)
   }
 
   render () {

@@ -47,7 +47,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
-        .map(no => (serializeNotification(no)))
+        .map(notification => (serializeNotification(notification)))
       return {
         ...state,
         list: uniqBy([...state.list, ...notificationList], 'id')
