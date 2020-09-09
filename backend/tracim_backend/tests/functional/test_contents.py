@@ -4153,7 +4153,7 @@ class TestThreads(object):
         Update(put) thread
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "", "raw_content": html_with_nasty_mention}
+        params = {"label": "Hello", "raw_content": html_with_nasty_mention}
         res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=400)
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
