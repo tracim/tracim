@@ -83,6 +83,11 @@ class TracimPyramidContext(PyramidContext):
 
     def doom_request_transaction(self, exc: Exception, *args, **kwargs) -> None:
         try:
+            # NOTE 2020-09-09 - S.G.
+            # we have to search for the request object in all arguments
+            # as we cannot be sure of its place in it.
+            # For example if a handler is an object method the first argument
+            # will be the controller object, not the request object.
             request = next(arg for arg in args if isinstance(arg, Request))
             request.tm.doom()
         except StopIteration:
