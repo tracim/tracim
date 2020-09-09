@@ -265,5 +265,6 @@
   "Your username": "Your username",
   "Your username has been set": "Your username has been set",
   "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}",
+  "Unknown shared space": "Unknown shared space",
   "Error loading unread notification number": "Error loading unread notification number"
 }
