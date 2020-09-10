@@ -15,7 +15,8 @@ import {
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  updateTLMAuthor
 } from '../src/helper.js'
 
 import {
@@ -52,6 +53,35 @@ describe('helper.js', () => {
       const expectedMsg = 'random<br />Message'
       const returnedMsg = convertBackslashNToBr(msg)
       expect(returnedMsg).to.equal(expectedMsg)
+    })
+  })
+
+  describe('updateTLMAuthor()', () => {
+    it('should return the author object added with is_from_system_admin if author is not null', () => {
+      const author = { username: 'Author' }
+      const returnedObject = updateTLMAuthor(author)
+      expect(returnedObject).to.deep.equal({ ...author, is_from_system_admin: false })
+    })
+
+    it('should return the System Administrator author object if author is null', () => {
+      const systemAdministratorAuthor = {
+        allowed_space: 0,
+        auth_type: 'internal',
+        avatar_url: null,
+        created: '',
+        email: '',
+        is_active: true,
+        is_deleted: false,
+        is_from_system_admin: true,
+        lang: 'en',
+        profile: 'administrators',
+        public_name: 'System Administrator',
+        timezone: '',
+        user_id: 0,
+        username: ''
+      }
+      const returnedObject = updateTLMAuthor(null)
+      expect(returnedObject).to.deep.equal(systemAdministratorAuthor)
     })
   })
 
