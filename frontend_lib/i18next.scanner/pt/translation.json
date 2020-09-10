@@ -86,6 +86,7 @@
   "Advanced edition": "Edição avançada",
   "Refresh?": "Actualizar?",
   "Sends a notification to all members of the shared space": "Envia uma notificação a todos os membros do espaço partilhado",
+  "System Administrator": "Administrador do sistema",
   "Error while detecting the mentions": "Erro ao detectar as menções",
   "Username must be at least {{minimumCharactersUsername}} characters long": "O identificador deve ter pelo menos {{minimumCharactersUsername}} carateres",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "O identificador deve ter no máximo {{maximumCharactersUsername}} carateres",

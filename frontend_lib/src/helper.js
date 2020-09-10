@@ -222,7 +222,7 @@ export const APP_FEATURE_MODE = {
 }
 
 export const updateTLMAuthor = author => {
-  return author.lang
+  return author
     ? { ...author, is_from_system_admin: false }
     : {
       allowed_space: 0,

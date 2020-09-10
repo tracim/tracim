@@ -859,7 +859,7 @@ export const getNotificationList = (userId, notificationsByPage, nextPageToken =
     actionName: NOTIFICATION_LIST,
     dispatch
   })
-  console.log(fetchGetNotificationWall)
+
   if (fetchGetNotificationWall.status === 200) {
     fetchGetNotificationWall.json.items = fetchGetNotificationWall.json.items.map(notification => ({
       ...notification,
@@ -869,7 +869,6 @@ export const getNotificationList = (userId, notificationsByPage, nextPageToken =
       }
     }))
   }
-  console.log(fetchGetNotificationWall)
   return fetchGetNotificationWall
 }
 
