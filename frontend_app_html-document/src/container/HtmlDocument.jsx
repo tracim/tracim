@@ -696,18 +696,16 @@ export class HtmlDocument extends React.Component {
   shouldDisplayNotifyAllMessage = () => {
     const { state } = this
 
+    const lastModifierIsLoggedUser = (content) => {
+      return content.last_modifier && content.last_modifier.user_id === state.loggedUser.userId
+    }
+
     if (
       !state.loggedUser.config ||
       state.content.current_revision_type === 'creation' ||
-      (
-        state.newContent.last_modifier &&
-        state.newContent.last_modifier.user_id !== state.loggedUser.userId
-      ) ||
-      (
-        !state.newContent.last_modifier &&
-        state.content.last_modifier &&
-        state.content.last_modifier.user_id !== state.loggedUser.userId
-      )
+      !lastModifierIsLoggedUser(state.newContent) ||
+      (!state.newContent.last_modifier && !lastModifierIsLoggedUser(state.content)) ||
+      state.mode !== APP_FEATURE_MODE.VIEW
     ) return false
 
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]

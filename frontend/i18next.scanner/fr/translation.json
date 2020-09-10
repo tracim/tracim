@@ -265,5 +265,6 @@
   "Your username": "Votre identifiant",
   "Your username has been set": "Votre identifiant a été défini",
   "{{author}} added {{user}} to {{workspace}}": "{{author}} a ajouté {{user}} dans {{workspace}}",
+  "Unknown shared space": "Espace partagé inconnu",
   "Error loading unread notification number": "Erreur lors du chargement du nombre de notification non lu"
 }

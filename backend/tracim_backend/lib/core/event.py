@@ -212,10 +212,12 @@ class EventApi:
             config=self._config,
             show_deleted=True,
         )
+        if current_user:
+            author = self.user_schema.dump(user_api.get_user_with_context(current_user)).data
+        else:
+            author = None
         fields = {
-            Event.AUTHOR_FIELD: self.user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
+            Event.AUTHOR_FIELD: author,
             Event.CLIENT_TOKEN_FIELD: context.client_token,
         }
         fields.update(additional_fields)

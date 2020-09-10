@@ -6,7 +6,7 @@ const HtmlDocContent = 'HtmlDocContent'
 let workspaceId, contentId
 
 describe('In Html Document', () => {
-  describe('if the user make a chaage', () => {
+  describe('if the user makes a change', () => {
     before(function () {
       cy.resetDB()
       cy.setupBaseDB()
@@ -32,13 +32,12 @@ describe('In Html Document', () => {
       cy.cancelXHR()
     })
 
-    describe('if click at "notify all" message', () => {
+    describe('clicking at "notify all" message', () => {
       it('should send a comment with a @all mention', () => {
         cy.waitForTinyMCELoaded()
           .then(() => cy.typeInTinyMCE(HtmlDocContent))
           .then(() => {
             cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-            cy.get('[data-cy=wsContentGeneric__option__menu__addversion]').should('not.be.disabled').click()
             cy.assertTinyMCEContent(HtmlDocContent)
             cy.get('.promptMessage').should('be.visible')
             cy.get('.buttonLink').click()

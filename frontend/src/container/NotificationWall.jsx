@@ -96,7 +96,7 @@ export class NotificationWall extends React.Component {
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT):
         icon = 'fa-comments-o'
         text = props.t('{{author}} commented on {{content}} in {{workspace}}', i18nOpts)
-        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
+        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.parentId}`
         break
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
       case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
@@ -130,7 +130,7 @@ export class NotificationWall extends React.Component {
         if (notification.content.type === CONTENT_TYPE.COMMENT) {
           icon = 'fa-comment-o'
           text = props.t('{{author}} mentioned you in a comment in {{content}} in {{workspace}}', i18nOpts)
-          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
+          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.parentId}`
         } else {
           icon = 'fa-at'
           text = props.t('{{author}} mentioned you in {{content}} in {{workspace}}', i18nOpts)

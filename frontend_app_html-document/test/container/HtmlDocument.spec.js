@@ -356,11 +356,20 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
       })
 
+      it('should return false if the app mode is not VIEW', () => {
+        wrapper.setState(prev => ({
+          ...prev,
+          mode: APP_FEATURE_MODE.EDIT
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
       it('should return true if user configuration content_id.notify_all_members_message is true', () => {
         const newConfig = { ...wrapper.state('loggedUser').config }
         newConfig[`content.${props.content.content_id}.notify_all_members_message`] = true
         wrapper.setState(prev => ({
           ...prev,
+          mode: APP_FEATURE_MODE.VIEW,
           newContent: {
             ...prev.newContent,
             last_modifier: {
