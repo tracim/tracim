@@ -39,7 +39,8 @@ import {
   CHECK_USERNAME_DEBOUNCE_WAIT,
   checkUsernameValidity,
   formatAbsoluteDate,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  updateTLMAuthor
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -225,6 +226,7 @@ export {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
   tinymceRemoveAllAutocompleteSpan,
+  updateTLMAuthor,
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,

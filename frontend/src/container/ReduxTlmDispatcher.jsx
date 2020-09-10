@@ -32,10 +32,16 @@ export class ReduxTlmDispatcher extends React.Component {
     props.registerLiveMessageHandlerList([
       // User
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserChanged },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.UNDELETED, handler: this.handleUserChanged },
+      { entityType: TLM_ET.USER_INVITATION, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
 
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceChanged },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.UNDELETED, handler: this.handleWorkspaceChanged },
 
       // Role
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
@@ -64,7 +70,8 @@ export class ReduxTlmDispatcher extends React.Component {
       // Content restored
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted }
     ])
   }
 
@@ -75,6 +82,10 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceModified = data => {
     this.props.dispatch(updateWorkspaceDetail(data.fields.workspace))
+    this.props.dispatch(addNotification(data))
+  }
+
+  handleWorkspaceChanged = data => {
     this.props.dispatch(addNotification(data))
   }
 
@@ -140,6 +151,10 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleUserModified = data => {
     this.props.dispatch(updateUser(data.fields.user))
+    this.props.dispatch(addNotification(data))
+  }
+
+  handleUserChanged = data => {
     this.props.dispatch(addNotification(data))
   }
 

@@ -86,6 +86,7 @@
   "Access to shared spaces where user is member": "Access to shared spaces where user is member",
   "Refresh?": "Refresh?",
   "Sends a notification to all members of the shared space": "Sends a notification to all members of the shared space",
+  "System Administrator": "System Administrator",
   "Error while detecting the mentions": "Error while detecting the mentions",
   "Username must be at least {{minimumCharactersUsername}} characters long": "Username must be at least {{minimumCharactersUsername}} characters long",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "Username must be at maximum {{maximumCharactersUsername}} characters long",
