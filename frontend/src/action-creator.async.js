@@ -51,7 +51,7 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
+import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -848,8 +848,8 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
-  return fetchWrapper({
+export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => async dispatch => {
+  const fetchGetNotificationWall = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
     param: {
       credentials: 'include',
@@ -859,6 +859,18 @@ export const getNotificationList = (userId, notificationsByPage, nextPageToken =
     actionName: NOTIFICATION_LIST,
     dispatch
   })
+  console.log(fetchGetNotificationWall)
+  if (fetchGetNotificationWall.status === 200) {
+    fetchGetNotificationWall.json.items = fetchGetNotificationWall.json.items.map(notification => ({
+      ...notification,
+      fields: {
+        ...notification.fields,
+        author: updateTLMAuthor(notification.fields.author)
+      }
+    }))
+  }
+  console.log(fetchGetNotificationWall)
+  return fetchGetNotificationWall
 }
 
 export const putNotificationAsRead = (userId, eventId) => dispatch => {

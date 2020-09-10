@@ -221,6 +221,27 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
+export const updateTLMAuthor = author => {
+  return author.lang
+    ? { ...author, is_from_system_admin: false }
+    : {
+      allowed_space: 0,
+      auth_type: 'internal',
+      avatar_url: null,
+      created: '',
+      email: '',
+      is_active: true,
+      is_deleted: false,
+      is_from_system_admin: true,
+      lang: 'en',
+      profile: 'administrators',
+      public_name: i18n.t('System Administrator'),
+      timezone: '',
+      user_id: 0,
+      username: ''
+    }
+}
+
 // INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
