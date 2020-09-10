@@ -71,11 +71,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted },
-
-      // Content share
-      { entityType: TLM_ET.CONTENT_SHARE, coreEntityType: TLM_CET.CREATED, handler: this.handleContentShareChanged },
-      { entityType: TLM_ET.CONTENT_SHARE, coreEntityType: TLM_CET.DELETED, handler: this.handleContentShareChanged }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted }
     ])
   }
 
@@ -150,10 +146,6 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleContentUnDeleted = data => {
     this.props.dispatch(unDeleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    this.props.dispatch(addNotification(data))
-  }
-
-  handleContentShareChanged = data => {
     this.props.dispatch(addNotification(data))
   }
 
