@@ -889,7 +889,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 
 export const getUserMessagesSummary = userId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_id=${userId}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}`,
     param: {
       credentials: 'include',
       headers: {

@@ -118,8 +118,9 @@ class PositiveIntegerListField(StrippedString):
 
 
 ExcludeAuthorIdsField = PositiveIntegerListField(
-    validate=regex_string_as_list_of_int,
-    example="3,4",
+    required=False,
+    default=None,
+    allow_none=True,
     description="comma separated list of authors excluded from the result",
 )
 

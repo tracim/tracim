@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import typing
 
 import pytest
 import transaction
@@ -9,7 +10,7 @@ import tracim_backend.models.event as tracim_event
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-def create_events_and_messages(session, unread: bool = False) -> tracim_event.Event:
+def create_events_and_messages(session, unread: bool = False) -> typing.List[tracim_event.Message]:
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
@@ -17,7 +18,7 @@ def create_events_and_messages(session, unread: bool = False) -> tracim_event.Ev
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
-            fields={"example": "hello"},
+            fields={"example": "hello", "author": {"user_id": 1}},
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -28,7 +29,7 @@ def create_events_and_messages(session, unread: bool = False) -> tracim_event.Ev
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.MODIFIED,
-            fields={"example": "bar"},
+            fields={"example": "bar", "author": {"user_id": 2}},
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1))
@@ -74,6 +75,37 @@ class TestMessages(object):
                 "created": message.created.strftime(DATETIME_FORMAT),
                 "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
             } == message_dict
+
+    def test_api__get_messages__ok_200__exclude_author_ids_filter(
+        self, session, web_testapp
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint. Filter by event_type
+        """
+        messages = create_events_and_messages(session)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        result = web_testapp.get("/api/users/1/messages?exclude_author_ids=", status=200,).json_body
+        message_dicts = result.get("items")
+        assert len(message_dicts) == len(messages)
+
+        result = web_testapp.get(
+            "/api/users/1/messages?exclude_author_ids=1", status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(message_dicts) == len(
+            [m for m in messages if m.fields["author"]["user_id"] != 1]
+        )
+
+        result = web_testapp.get(
+            "/api/users/1/messages?exclude_author_ids=1,2", status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(message_dicts) == 0
+        assert len(message_dicts) == len(
+            [m for m in messages if m.fields["author"]["user_id"] not in (1, 2)]
+        )
 
     @pytest.mark.parametrize("event_type", ["user.created", "user.modified", ""])
     def test_api__get_messages__ok_200__event_type_filter(
