@@ -109,8 +109,18 @@ class EventTypeListField(StrippedString):
         return None
 
 
-ExcludeAuthorIdField = marshmallow.fields.Int(
-    example=10, validate=positive_int_validator, missing=0, allow_none=False,
+class PositiveIntegerListField(StrippedString):
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            return [int(item) for item in value.split(",")]
+        return None
+
+
+ExcludeAuthorIdsField = PositiveIntegerListField(
+    validate=regex_string_as_list_of_int,
+    example="3,4",
+    description="comma separated list of authors excluded from the result",
 )
 
 
@@ -1515,7 +1525,7 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
     )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     event_types = EventTypeListField()
-    exclude_author_id = ExcludeAuthorIdField
+    exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
     def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
@@ -1548,7 +1558,7 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
     event_types = EventTypeListField()
-    exclude_author_id = ExcludeAuthorIdField
+    exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
     def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:

@@ -90,7 +90,7 @@ class EventApi:
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
-        exclude_author_id: typing.Optional[int] = None,
+        exclude_author_ids: typing.List[int] = None,
         after_event_id: int = 0,
     ) -> Query:
         query = self._session.query(Message).join(Event)
@@ -121,11 +121,9 @@ class EventApi:
             else:
                 query = query.filter(event_type_filters[0])
 
-        if exclude_author_id:
-            print("OK")
-            query = query.filter(
-                Event.fields["author"]["user_id"].as_integer() != exclude_author_id
-            )
+        if exclude_author_ids:
+            for author_id in exclude_author_ids:
+                query = query.filter(Event.fields["author"]["user_id"].as_integer() != author_id)
 
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
@@ -171,8 +169,8 @@ class EventApi:
     def get_paginated_messages_for_user(
         self,
         user_id: int,
-        exclude_author_id: int,
         read_status: ReadStatus,
+        exclude_author_ids: typing.List[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: typing.Optional[int] = None,
@@ -181,7 +179,7 @@ class EventApi:
             user_id=user_id,
             read_status=read_status,
             event_types=event_types,
-            exclude_author_id=exclude_author_id,
+            exclude_author_ids=exclude_author_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
 
@@ -190,13 +188,13 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
-        exclude_author_id: int = 0,
+        exclude_author_ids: typing.List[int] = None,
     ) -> int:
         return self._base_query(
             user_id=user_id,
             event_types=event_types,
             read_status=read_status,
-            exclude_author_id=exclude_author_id,
+            exclude_author_ids=exclude_author_ids,
         ).count()
 
     def create_event(
@@ -206,7 +204,7 @@ class EventApi:
         additional_fields: typing.Dict[str, JsonDict],
         context: TracimContext,
         entity_subtype: typing.Optional[str] = None,
-    ) -> None:
+    ) -> Event:
         current_user = context.safe_current_user()
         user_api = UserApi(
             current_user=current_user,
@@ -229,6 +227,7 @@ class EventApi:
         )
         context.dbsession.add(event)
         context.pending_events.append(event)
+        return event
 
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:

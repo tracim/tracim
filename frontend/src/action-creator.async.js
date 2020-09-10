@@ -850,7 +850,7 @@ export const getGuestUploadInfo = token => dispatch => {
 
 export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_id=${userId}&count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_ids=${userId}&count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
