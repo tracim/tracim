@@ -90,7 +90,7 @@ class EventApi:
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
-        exclude_author_ids: typing.List[int] = None,
+        exclude_author_ids: typing.Optional[typing.List[int]] = None,
         after_event_id: int = 0,
     ) -> Query:
         query = self._session.query(Message).join(Event)
