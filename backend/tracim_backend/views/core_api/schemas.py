@@ -109,19 +109,13 @@ class EventTypeListField(StrippedString):
         return None
 
 
-class PositiveIntegerListField(StrippedString):
-    def _deserialize(self, value, attr, data, **kwargs):
-        value = super()._deserialize(value, attr, data, **kwargs)
-        if value:
-            return [int(item) for item in value.split(",")]
-        return None
-
-
-ExcludeAuthorIdsField = PositiveIntegerListField(
+ExcludeAuthorIdsField = StrippedString(
     required=False,
     default=None,
     allow_none=True,
-    description="comma separated list of authors excluded from the result",
+    validate=regex_string_as_list_of_int,
+    example="1,5",
+    description="comma separated list of excluded authors",
 )
 
 
