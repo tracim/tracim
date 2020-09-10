@@ -168,11 +168,9 @@ def generate_autogen_password_char() -> str:
     confusing_characters = "0Oo" + "1lI"
     return str(
         "".join(
-            [
-                char
-                for char in alphanumeric_chars + allowed_special_characters
-                if char not in confusing_characters
-            ]
+            char
+            for char in alphanumeric_chars + allowed_special_characters
+            if char not in confusing_characters
         )
     )
 
