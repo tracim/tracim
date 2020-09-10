@@ -149,7 +149,7 @@ describe('Login', function () {
         .click()
     })
     it('should not open the set username popup', function () {
-      this.skip() // FIXME - GB - 2020-09-09 - this tests is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
+      this.skip() // FIXME - GB - 2020-09-09 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
       cy.get(usernamePopup).should('not.be.visible')
     })
   })
