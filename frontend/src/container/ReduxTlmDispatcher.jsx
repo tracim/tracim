@@ -96,9 +96,7 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleWorkspaceChanged = data => {
-    this.props.dispatch(addNotification(data))
-  }
+  handleWorkspaceChanged = this.handleNotification
 
   handleMemberCreated = data => {
     const { props } = this
