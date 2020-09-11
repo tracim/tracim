@@ -6,6 +6,7 @@ import typing
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
+from sqlalchemy import cast
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
@@ -13,6 +14,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import text
+from sqlalchemy.types import String
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -123,7 +126,12 @@ class EventApi:
 
         if exclude_author_ids:
             for author_id in exclude_author_ids:
-                query = query.filter(Event.fields["author"]["user_id"].as_integer() != author_id)
+                query = query.filter(
+                    or_(
+                        cast(Event.fields["author"], String) == text("'null'"),
+                        Event.fields["author"]["user_id"].as_integer() != author_id,
+                    )
+                )
 
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)

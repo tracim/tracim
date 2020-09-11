@@ -33,6 +33,15 @@ def create_events_and_messages(session, unread: bool = False) -> typing.List[tra
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.USER,
+            operation=tracim_event.OperationType.MODIFIED,
+            fields={"example": "event without author", "author": None},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1))
+
         session.add_all(messages)
         session.flush()
     transaction.commit()
@@ -95,16 +104,24 @@ class TestMessages(object):
         ).json_body
         message_dicts = result.get("items")
         assert len(message_dicts) == len(
-            [m for m in messages if m.fields["author"]["user_id"] != 1]
+            [
+                m
+                for m in messages
+                if (not m.fields["author"]) or (m.fields["author"]["user_id"] != 1)
+            ]
         )
 
         result = web_testapp.get(
             "/api/users/1/messages?exclude_author_ids=1,2", status=200,
         ).json_body
         message_dicts = result.get("items")
-        assert len(message_dicts) == 0
+
         assert len(message_dicts) == len(
-            [m for m in messages if m.fields["author"]["user_id"] not in (1, 2)]
+            [
+                m
+                for m in messages
+                if (not m.fields["author"]) or (m.fields["author"]["user_id"] not in (1, 2))
+            ]
         )
 
     @pytest.mark.parametrize("event_type", ["user.created", "user.modified", ""])
