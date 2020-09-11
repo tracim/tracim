@@ -40,7 +40,7 @@ For better preview support:
 #### Supported database engines
 
 - SQLite 3.9+
-- PostgreSQL 9.3+
+- PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
 
