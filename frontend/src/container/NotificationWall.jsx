@@ -76,7 +76,7 @@ export class NotificationWall extends React.Component {
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
-          notification.type === buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
+          (notification.type === buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT) || (notification.type === buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED) && notification.content.type === CONTENT_TYPE.COMMENT))
             ? notification.content.parentLabel
             : notification.content.label
         )
