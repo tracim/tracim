@@ -126,6 +126,12 @@ class EventApi:
 
         if exclude_author_ids:
             for author_id in exclude_author_ids:
+                # RJ & SG - 2020-09-11 - HACK
+                # We wanted to use Event.fields["author"] == JSON.NULL instead of this
+                # soup involving a cast and a get out of my way text("'null'") to
+                # know whether a JSON field is null. However, this does not work on
+                # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
+
                 query = query.filter(
                     or_(
                         cast(Event.fields["author"], String) == text("'null'"),
