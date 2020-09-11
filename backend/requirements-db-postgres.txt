@@ -1,0 +1,2 @@
+# postgres specific dependencies
+psycopg2==2.8.4
