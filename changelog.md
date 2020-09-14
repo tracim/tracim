@@ -3,8 +3,8 @@
 
 ### New Features
 
-- A notification wall is now available in header bar. You can now seen all new activities done in Tracim.
-- It is now possible to mention user directly with his Tracim username like this `@username`. All mention are visible in notification wall.
+- A notification wall now displays the users' notifications, who can see what's happening in Tracim at a glance. It can be opened using a button in the header bar.
+- It is now possible to mention users directly using their Tracim username like this: `@username`. This matches the behavior of many widespread application chats. Mentions are visible in the notification wall.
 
 ### Fixed Issues
 
