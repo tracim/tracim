@@ -35,7 +35,6 @@ export class LiveMessageManager {
     this.userId = null
     this.host = null
     this.lastEventId = 0
-    this.tabId = Date.now() + Math.random()
   }
 
   openLiveMessageConnection (userId, host = null) {
@@ -43,13 +42,7 @@ export class LiveMessageManager {
     this.host = host
 
     this.setStatus(LIVE_MESSAGE_STATUS.PENDING)
-
-    if (!this.broadcastChannel) {
-      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-      this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
-      this.broadcastChannel.postMessage({ canIHaveStatus: true })
-      this.electLeader()
-    }
+    this.openBroadcastChannel()
   }
 
   electLeader () {
@@ -64,13 +57,9 @@ export class LiveMessageManager {
 
     if (this.eventSource && (message.status || message.tlm)) {
       // NOTE - 2020-09-14 - RJ
-      // There are two leaders. We close the connection of the
-      // tab that has the smaller id.
-      // This ensures that the tab with the greatest id always
-      // keeps its connection, while the other tabs close theirs.
-      if (message.fromTabId > this.tabId) {
-        this.closeEventSourceConnection()
-      }
+      // There are two leaders. We reset the connection and
+      // hope that a proper leader election will fix the situation.
+      this.restartLiveMessageConnection()
     }
 
     if (message.status) {
@@ -143,13 +132,31 @@ export class LiveMessageManager {
     }
   }
 
-  closeLiveMessageConnection () {
-    this.closeEventSourceConnection()
-
+  closeBroadcastChannel () {
     if (this.broadcastChannel) {
       this.broadcastChannel.close()
       this.broadcastChannel = null
     }
+  }
+
+  openBroadcastChannel () {
+    if (!this.broadcastChannel) {
+      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+      this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
+      this.broadcastChannel.postMessage({ canIHaveStatus: true })
+      this.electLeader()
+    }
+  }
+
+  restartLiveMessageConnection () {
+    this.closeEventSourceConnection()
+    this.closeBroadcastChannel()
+    this.openBroadcastChannel()
+  }
+
+  closeLiveMessageConnection () {
+    this.closeEventSourceConnection()
+    this.closeBroadcastChannel()
 
     console.log('%c.:. TLM Closed')
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
