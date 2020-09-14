@@ -64,8 +64,8 @@ _install_backend: &_install_backend
     # postgresql
     - |
       if [ "${DB}" == "postgres" ]; then
-        docker pull postgres:9.3
-        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.3
+        docker pull postgres:9.6
+        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.6
         pip install -r "requirements-db-postgres.txt"
       fi
     # mysql 8+

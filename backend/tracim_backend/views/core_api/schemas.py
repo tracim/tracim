@@ -109,6 +109,16 @@ class EventTypeListField(StrippedString):
         return None
 
 
+ExcludeAuthorIdsField = StrippedString(
+    required=False,
+    default=None,
+    allow_none=True,
+    validate=regex_string_as_list_of_int,
+    example="1,5",
+    description="comma separated list of excluded authors",
+)
+
+
 class RFCEmail(ValidatedField, String):
     """A validated email rfc style "john <john@john.ndd>" field.
     Validation occurs during both serialization and
@@ -1510,6 +1520,7 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
     )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     event_types = EventTypeListField()
+    exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
     def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
@@ -1542,6 +1553,7 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
     event_types = EventTypeListField()
+    exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
     def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:

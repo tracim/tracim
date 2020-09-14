@@ -6,6 +6,7 @@ import typing
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
+from sqlalchemy import cast
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import null
@@ -13,6 +14,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import text
+from sqlalchemy.types import String
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -90,6 +93,7 @@ class EventApi:
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
+        exclude_author_ids: typing.Optional[typing.List[int]] = None,
         after_event_id: int = 0,
     ) -> Query:
         query = self._session.query(Message).join(Event)
@@ -120,8 +124,24 @@ class EventApi:
             else:
                 query = query.filter(event_type_filters[0])
 
+        if exclude_author_ids:
+            for author_id in exclude_author_ids:
+                # RJ & SG - 2020-09-11 - HACK
+                # We wanted to use Event.fields["author"] == JSON.NULL instead of this
+                # soup involving a cast and a get out of my way text("'null'") to
+                # know whether a JSON field is null. However, this does not work on
+                # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
+
+                query = query.filter(
+                    or_(
+                        cast(Event.fields["author"], String) == text("'null'"),
+                        Event.fields["author"]["user_id"].as_integer() != author_id,
+                    )
+                )
+
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
+
         return query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
@@ -164,12 +184,16 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
+        exclude_author_ids: typing.List[int] = None,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: typing.Optional[int] = None,
     ) -> Page:
         query = self._base_query(
-            user_id=user_id, read_status=read_status, event_types=event_types,
+            user_id=user_id,
+            read_status=read_status,
+            event_types=event_types,
+            exclude_author_ids=exclude_author_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
 
@@ -178,9 +202,13 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         event_types: typing.List[EventTypeDatabaseParameters] = None,
+        exclude_author_ids: typing.List[int] = None,
     ) -> int:
         return self._base_query(
-            user_id=user_id, event_types=event_types, read_status=read_status
+            user_id=user_id,
+            event_types=event_types,
+            read_status=read_status,
+            exclude_author_ids=exclude_author_ids,
         ).count()
 
     def create_event(
@@ -215,6 +243,7 @@ class EventApi:
         )
         context.dbsession.add(event)
         context.pending_events.append(event)
+        return event
 
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
