@@ -147,7 +147,6 @@ class Workspace(DeclarativeBase):
 
 
 class UserRoleInWorkspace(DeclarativeBase):
-
     __tablename__ = "user_workspace"
 
     user_id = Column(
