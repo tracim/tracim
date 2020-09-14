@@ -63,7 +63,11 @@ export class LiveMessageManager {
     }
 
     if (this.eventSource && (message.status || message.tlm)) {
-      // There are two leaders.
+      // NOTE - 2020-09-14 - RJ
+      // There are two leaders. We close the connection of the
+      // tab that has the smaller id.
+      // This ensures that the tab with the greatest id always
+      // keeps its connection, while the other tabs close theirs.
       if (message.fromTabId > this.tabId) {
         this.closeEventSourceConnection()
       }
