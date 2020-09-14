@@ -70,7 +70,7 @@ export class FileComponent extends React.Component {
       <div
         className={classnames(
           'file__contentpage__statewrapper',
-          { promptMessage: props.isArchived || props.isDeleted || props.isDeprecated }
+          { promptMessageWrapper: props.isArchived || props.isDeleted || props.isDeprecated }
         )}
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
