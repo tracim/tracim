@@ -36,14 +36,30 @@ describe('<Agenda />', () => {
       describe('handleUserModified', () => {
         it('should update loggedUser state', () => {
           const tlmData = {
-            author: user,
-            user: {
-              ...user,
-              public_name: 'newPublicName'
+            fields: {
+              author: user,
+              user: {
+                ...user,
+                public_name: 'newPublicName'
+              }
             }
           }
           wrapper.instance().handleUserModified(tlmData)
-          expect(wrapper.state('loggedUser').publicName).to.equal(tlmData.user.public_name)
+          expect(wrapper.state('loggedUser').publicName).to.equal(tlmData.fields.user.public_name)
+        })
+
+        it('should have showRefreshWarning state as false if changes just the user language', () => {
+          const tlmData = {
+            fields: {
+              author: user,
+              user: {
+                ...user,
+                lang: 'otherLang'
+              }
+            }
+          }
+          wrapper.instance().handleUserModified(tlmData)
+          expect(wrapper.state('showRefreshWarning')).to.equal(false)
         })
       })
     })
@@ -52,15 +68,17 @@ describe('<Agenda />', () => {
       describe('handleSharedspaceModified', () => {
         it('should update workspaceLabel state', () => {
           const tlmData = {
-            author: user,
-            workspace: {
-              ...workspace,
-              label: 'newWorkspaceLabel'
+            fields: {
+              author: user,
+              workspace: {
+                ...workspace,
+                label: 'newWorkspaceLabel'
+              }
             }
           }
           wrapper.setState({ userWorkspaceList: userWorkspaceList })
           wrapper.instance().handleSharedspaceModified(tlmData)
-          expect(wrapper.state('content').workspaceLabel).to.equal(tlmData.workspace.label)
+          expect(wrapper.state('content').workspaceLabel).to.equal(tlmData.fields.workspace.label)
         })
       })
     })

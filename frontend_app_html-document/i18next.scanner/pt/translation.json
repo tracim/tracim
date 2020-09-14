@@ -1,4 +1,5 @@
 {
+  "click here!": "clique aqui!",
   "Last version": "Última versão",
   "Validate and create": "Validar e criar",
   "Document's title": "Título do documento",
@@ -10,19 +11,23 @@
   "Edit": "Editar",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating document": "Erro ao criar o documento",
+  "Error while saving the comment": "Erro ao salvar o comentário",
   "This content is archived": "Este conteúdo está arquivado",
   "Restore": "Restaurar",
   "This content is deleted": "Este conteúdo está eliminado",
   "You have a pending draft": "Você tem um rascunho pendente",
   "Resume writing": "Continuar a escrever",
-  "Error while saving new version": "Erro ao salvar a nova versão",
+  "Error while saving the new version": "Erro ao salvar a nova versão",
   "Text Document": "Documento de Texto",
   "Text document": "Documento de texto",
   "text document": "documento de texto",
   "text documents": "documentos de texto",
   "This content is deprecated": "Este conteúdo está obsoleto",
   "Timeline": "Linha cronológica",
+  "To notify all members of the shared space of your modification": "Para notificar a todos os membros do espaço partilhado da sua modificação",
   "New text document": "Novo documento de texto",
+  "You are trying to mention an invalid user": "Está a tentar mencionar um utilizador inválido",
   "You must change the status or restore this document before any change": "É necessário alterar o status ou restaurar este documento antes de qualquer alteração",
-  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}"
+  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
+  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador"
 }

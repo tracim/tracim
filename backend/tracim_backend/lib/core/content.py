@@ -158,7 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -507,7 +507,7 @@ class ContentApi(object):
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
-        # can call here with None. Must update create_comment tu require the
+        # can call here with None. Must update create_comment to require the
         # workspace.
         if not workspace and parent:
             workspace = parent.workspace
@@ -567,7 +567,7 @@ class ContentApi(object):
         assert parent and parent.type != FOLDER_TYPE
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
-                "Can't create comment on content, you need to change his"
+                "Can't create comment on content, you need to change its"
                 "status or state (deleted/archived) before any change."
             )
 
@@ -594,7 +594,7 @@ class ContentApi(object):
 
     def execute_created_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -613,7 +613,7 @@ class ContentApi(object):
 
     def execute_update_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -854,7 +854,7 @@ class ContentApi(object):
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
         self, path_labels: typing.List[str], workspace: Workspace
-    ) -> Content:
+    ) -> typing.Optional[Content]:
         """
         Return a Content folder for given relative path.
         TODO BS 20161124: Not safe if web interface allow folder duplicate names

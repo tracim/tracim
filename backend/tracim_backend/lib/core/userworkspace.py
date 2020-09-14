@@ -26,51 +26,11 @@ class RoleApi(object):
         config: CFG,
         show_disabled_user: bool = True,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
         self._show_disabled_user = show_disabled_user
-
-    # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
-    # ALL_ROLE_VALUES = UserRoleInWorkspace.get_all_role_values()
-    # Dict containing readable members roles for given role
-    # members_read_rights = {
-    #     UserRoleInWorkspace.NOT_APPLICABLE: [],
-    #     UserRoleInWorkspace.READER: [
-    #         UserRoleInWorkspace.WORKSPACE_MANAGER,
-    #     ],
-    #     UserRoleInWorkspace.CONTRIBUTOR: [
-    #         UserRoleInWorkspace.WORKSPACE_MANAGER,
-    #         UserRoleInWorkspace.CONTENT_MANAGER,
-    #         UserRoleInWorkspace.CONTRIBUTOR,
-    #     ],
-    #     UserRoleInWorkspace.CONTENT_MANAGER: [
-    #         UserRoleInWorkspace.WORKSPACE_MANAGER,
-    #         UserRoleInWorkspace.CONTENT_MANAGER,
-    #         UserRoleInWorkspace.CONTRIBUTOR,
-    #         UserRoleInWorkspace.READER,
-    #     ],
-    #     UserRoleInWorkspace.WORKSPACE_MANAGER: [
-    #         UserRoleInWorkspace.WORKSPACE_MANAGER,
-    #         UserRoleInWorkspace.CONTENT_MANAGER,
-    #         UserRoleInWorkspace.CONTRIBUTOR,
-    #         UserRoleInWorkspace.READER,
-    #     ],
-    # }
-
-    # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
-    # @classmethod
-    # def role_can_read_member_role(cls, reader_role: int, tested_role: int) \
-    #         -> bool:
-    #     """
-    #     :param reader_role: role as viewer
-    #     :param tested_role: role as viwed
-    #     :return: True if given role can view member role in workspace.
-    #     """
-    #     if reader_role in cls.members_read_rights:
-    #         return tested_role in cls.members_read_rights[reader_role]
-    #     return False
 
     # TODO - Gui.M - 26-03-2020 - For now it only filters enabled/disabled user, it does not filters deleted
     #  workspaces/users
@@ -169,7 +129,7 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool = True,
     ) -> UserRoleInWorkspace:
-        # INFO - G.M - 2018-10-29 - Check if role already exist
+        # INFO - G.M - 2018-10-29 - Check if role already exists
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
             raise RoleAlreadyExistError(
@@ -204,55 +164,16 @@ class RoleApi(object):
         )
         return query.all()
 
-    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
+    def get_workspace_members(self, workspace_id: int) -> typing.List[User]:
         query = self._apply_base_filters(
-            self._session.query(UserRoleInWorkspace.user_id).filter(
-                UserRoleInWorkspace.workspace_id == workspace_id
-            )
+            self._session.query(User)
+            .join(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
         )
-        return [res[0] for res in query]
+        return query.all()
+
+    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
+        return [user.user_id for user in self.get_workspace_members(workspace_id)]
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()
-
-    # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
-    # @classmethod
-    # def role_can_read_member_role(cls, reader_role: int, tested_role: int) \
-    #         -> bool:
-    #     """
-    #     :param reader_role: role as viewer
-    #     :param tested_role: role as viwed
-    #     :return: True if given role can view member role in workspace.
-    #     """
-    #     if reader_role in cls.members_read_rights:
-    #         return tested_role in cls.members_read_rights[reader_role]
-    #     return False
-    # def _get_all_for_user(self, user_id) -> typing.List[UserRoleInWorkspace]:
-    #     return self._session.query(UserRoleInWorkspace)\
-    #         .filter(UserRoleInWorkspace.user_id == user_id)
-    #
-    # def get_all_for_user(self, user: User) -> typing.List[UserRoleInWorkspace]:
-    #     return self._get_all_for_user(user.user_id).all()
-    #
-    # def get_all_for_user_order_by_workspace(
-    #     self,
-    #     user_id: int
-    # ) -> typing.List[UserRoleInWorkspace]:
-    #     return self._get_all_for_user(user_id)\
-    #         .join(UserRoleInWorkspace.workspace).order_by(Workspace.label).all()
-
-    # TODO - G.M - 07-06-2018 - [Cleanup] Check if this method is already needed
-    # @classmethod
-    # def get_roles_for_select_field(cls) -> typing.List[RoleType]:
-    #     """
-    #
-    #     :return: list of DictLikeClass instances representing available Roles
-    #     (to be used in select fields)
-    #     """
-    #     result = list()
-    #
-    #     for role_id in UserRoleInWorkspace.get_all_role_values():
-    #         role = RoleType(role_id)
-    #         result.append(role)
-    #
-    #     return result

@@ -1,4 +1,41 @@
 
+## 3.1.0 / 2020-09-14
+
+### New Features
+
+- A notification wall now displays the users' notifications, who can see what's happening in Tracim at a glance. It can be opened using a button in the header bar.
+- It is now possible to mention users directly using their Tracim username like this: `@username`. This matches the behavior of many widespread application chats. Mentions are visible in the notification wall.
+
+### Fixed Issues
+
+- UX: #2801, #3314, #3316, #3331, #3335, #3342, #3363, #3481, #3513
+- Gallery: #3337
+- Agenda: #3336
+- Frontend: #3185, #3374, #3473
+- Backend: #3380, #3451, #3528, #3529
+
+### Breaking/Important change
+
+- These deprecated configuration parameters (in development.ini) have been removed: user.reset_password.validity, caldav.enabled, collaborative_document_edition.activated, email.notification.from. They were already ignored in previous versions. (#1483)
+- The minimal PostgreSQL is now 9.6 (instead of 9.3 in previous versions of Tracim). A JSON-related bug in version 9.3 affected Tracim 3.1 and was likely fixed in version 9.4. Versions 9.4, 9.5, 9.6 also brought many related fixes, including a potential buffer overflow in its JSON parser. (#3523)
+
+
+## 3.0.4 / 2020-08-27
+
+### Fixed Issues
+
+- Frontend: #3461
+- Backend: #3401
+
+
+## 3.0.3 / 2020-08-25
+
+### Fixed Issues
+
+- Frontend: #3409
+- Backend: #3049, #3409
+
+
 ## 3.0.2 / 2020-08-17
 
 ### Fixed Issues

@@ -14,6 +14,8 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.lib.utils.utils import validate_page_token
+from tracim_backend.lib.utils.utils import validate_simple_dict
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -102,6 +104,8 @@ user_public_name_validator = Length(
 )
 user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
 user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
+page_token_validator = validate_page_token
+user_config_validator = validate_simple_dict
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])

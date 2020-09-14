@@ -9,15 +9,6 @@ export const getCustomFormContent = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getCustomFormComment = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
 export const getCustomFormRevision = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}/revisions`, {
     credentials: 'include',

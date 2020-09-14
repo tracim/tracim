@@ -8,7 +8,6 @@ export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
-export const USERNAME_AVAILABILITY = 'username_availability'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -28,6 +27,8 @@ export const USER_LOGOUT = `${USER}/Logout`
 export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
+export const USER_CONFIGURATION = `${USER}/Configuration`
+export const setUserConfiguration = userConfig => ({ type: `${SET}/${USER_CONFIGURATION}`, userConfig })
 export const setUserConnected = user => ({ type: `${SET}/${USER_CONNECTED}`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER_DISCONNECTED}` })
 export const setRedirectLogin = url => ({ type: `${SET}/${LOGIN}/Redirect`, url })
@@ -148,6 +149,9 @@ export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
+export const HEAD_TITLE = 'HeadTitle'
+export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
 export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
@@ -165,7 +169,14 @@ export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${
 export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
 
-export const TLM_MANAGER = 'TracimLiveMessageManager'
-export const setLiveMessageManager = TLMManager => ({ type: `${SET}/${TLM_MANAGER}`, TLMManager })
-export const TLM_MANAGER_STATUS = 'TracimLiveMessageManagerStatus'
-export const setLiveMessageManagerStatus = status => ({ type: `${SET}/${TLM_MANAGER_STATUS}`, status })
+export const NEXT_PAGE = 'NextPage'
+export const NOTIFICATION_LIST = 'NotificationList'
+export const NOTIFICATION = 'Notification'
+export const NOTIFICATION_NOT_READ_COUNT = 'NotificationNotReadCounter'
+export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
+export const appendNotificationList = notificationList => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList })
+export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
+export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
+export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
+export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
+export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })

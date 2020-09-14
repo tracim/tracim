@@ -11,7 +11,6 @@ import {
   PageContent,
   CardPopup,
   handleFetchResult,
-  buildHeadTitle,
   appContentFactory,
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -94,13 +93,13 @@ export class Gallery extends React.Component {
   // https://github.com/tracim/tracim/issues/3107#issuecomment-643994410
 
   liveMessageNotRelevant (data, state) {
-    if (Number(data.content.workspace_id) !== Number(state.config.appConfig.workspaceId)) {
+    if (Number(data.fields.content.workspace_id) !== Number(state.config.appConfig.workspaceId)) {
       return true
     }
 
-    if (state.folderId || data.content.parent_id) {
+    if (state.folderId || data.fields.content.parent_id) {
       const currentFolderId = Number(state.folderId) || 0
-      const liveMessageFolderId = Number(data.content.parent_id) || 0
+      const liveMessageFolderId = Number(data.fields.content.parent_id) || 0
       return currentFolderId !== liveMessageFolderId
     }
 
@@ -121,9 +120,9 @@ export class Gallery extends React.Component {
 
   handleWorkspaceModified = data => {
     const { state } = this
-    if (Number(data.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
-    this.setState({ workspaceLabel: data.workspace.label })
-    this.updateBreadcrumbsAndTitle(data.workspace.label, state.folderDetail)
+    if (Number(data.fields.workspace.workspace_id) !== Number(state.config.appConfig.workspaceId)) return
+    this.setState({ workspaceLabel: data.fields.workspace.label })
+    this.updateBreadcrumbsAndTitle(data.fields.workspace.label, state.folderDetail)
   }
 
   handleContentCreatedOrUndeleted = data => {
@@ -137,7 +136,13 @@ export class Gallery extends React.Component {
 
   handleContentModified = data => {
     const { state } = this
-    if (this.liveMessageNotRelevant(data, state)) return
+    if (this.liveMessageNotRelevant(data, state)) {
+      // INFO - GM - 2020-07-20 - The if below covers the move functionality.
+      if (state.imagePreviewList.find(p => data.fields.content.content_id === p.contentId)) {
+        this.removeContent(data.fields.content.content_id)
+      }
+      return
+    }
 
     // RJ - 2020-06-15 - NOTE
     // We need to reorder the list because the label of the file could have changed.
@@ -145,10 +150,10 @@ export class Gallery extends React.Component {
     // probably better.
 
     const imagePreviewList = state.imagePreviewList.filter(
-      image => image.contentId !== data.content.content_id
+      image => image.contentId !== data.fields.content.content_id
     )
 
-    const preview = this.buildPreview(data.content)
+    const preview = this.buildPreview(data.fields.content)
     if (preview) {
       // RJ - 2020-06-15 - NOTE
       // Unlikely, but a picture could be replaced by a file of another type
@@ -163,13 +168,19 @@ export class Gallery extends React.Component {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) return
 
+    this.removeContent(data.fields.content.content_id)
+  }
+
+  removeContent = (contentId) => {
+    const { state } = this
+
     let displayedPictureIndex = state.displayedPictureIndex
     let imagePreviewList = state.imagePreviewList
 
     let deletedIndex = -1
 
     imagePreviewList = state.imagePreviewList.filter((image, i) => {
-      const isDeletedImage = Number(image.contentId) === Number(data.content.content_id)
+      const isDeletedImage = Number(image.contentId) === Number(contentId)
       if (isDeletedImage) deletedIndex = i
       return !isDeletedImage
     })
@@ -250,7 +261,7 @@ export class Gallery extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<Gallery> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId || prevState.folderId !== state.folderId) {
       this.setState({ imagePreviewListLoaded: false, imagePreviewList: [] })
@@ -509,14 +520,10 @@ export class Gallery extends React.Component {
   })
 
   setHeadTitle = (title) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: title }
+    })
   }
 
   handleClickHideImageRaw = () => {

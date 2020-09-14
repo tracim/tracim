@@ -35,6 +35,14 @@
         text-overflow ellipsis
 
 .adminUser
+  & .table
+    table-layout fixed
+    & td
+      text-overflow ellipsis
+      overflow hidden
+    & th
+      height 75px
+      vertical-align middle
   &__description
     margin-bottom 40px
   &__adduser
@@ -118,11 +126,20 @@
           color inherit
         & > i
           margin-right 5px
-      &__td-text
-        max-width 0
-        white-space nowrap
-        overflow hidden
-        text-overflow ellipsis
+    &__active
+      width 17%
+    &__profile
+      width 70px // 70px it's the size of avatar's profile
+    &__fullName
+      width 18%
+    &__useername
+      width 17%
+    &__email
+      width 18%
+    &__canCreate
+      width 15%
+    &__administrator
+      width 15%
 
 
 .adminworkspaceuser__popup

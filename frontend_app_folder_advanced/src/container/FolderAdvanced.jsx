@@ -106,26 +106,28 @@ export class FolderAdvanced extends React.Component {
   handleReloadAppFeatureData = data => {
     const { props, state } = this
     console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(state.config.slug), data)
-    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline, this.buildBreadcrumbs)
+    props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
   }
 
   handleFolderChanged = data => {
     const { state } = this
-    if (data.content.content_id !== state.content.content_id) return
+    if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
-      content: clientToken === data.client_token ? { ...prev.content, ...data.content } : prev.content,
-      newContent: { ...prev.content, ...data.content },
-      editionAuthor: data.author.public_name,
-      showRefreshWarning: clientToken !== data.client_token
+      content: clientToken === data.fields.client_token ? { ...prev.content, ...data.fields.content } : prev.content,
+      newContent: { ...prev.content, ...data.fields.content },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token
     }))
-    if (clientToken === data.client_token) this.setHeadTitle(data.content.label)
+    if (clientToken === data.fields.client_token) {
+      this.setHeadTitle(data.fields.content.label)
+      this.buildBreadcrumbs(data.fields.content)
+    }
   }
 
   async componentDidMount () {
     await this.loadContent()
-    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -133,7 +135,6 @@ export class FolderAdvanced extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
     }
   }
 
@@ -149,10 +150,10 @@ export class FolderAdvanced extends React.Component {
   setHeadTitle = (folderName) => {
     const { state } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace && state.isVisible) {
+    if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([folderName, state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([folderName, state.config.workspace.label]) }
       })
     }
   }
@@ -166,6 +167,7 @@ export class FolderAdvanced extends React.Component {
       case 200:
         this.setState({ content: fetchFolder.body })
         this.setHeadTitle(fetchFolder.body.label)
+        this.buildBreadcrumbs(fetchFolder.body)
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
@@ -178,15 +180,15 @@ export class FolderAdvanced extends React.Component {
 
   loadTimeline = () => {}
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (content) => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: state.content.label,
+          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]

@@ -3,7 +3,6 @@ import {
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
-  hasNotAllowedCharacters,
   hasSpaces,
   generateFetchResponse,
   parserStringToList,
@@ -12,8 +11,20 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  checkUsernameValidity,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  permissiveNumberEqual,
+  updateTLMAuthor
 } from '../src/helper.js'
+
+import {
+  mockGetReservedUsernames200,
+  mockGetUsernameAvailability200,
+  mockGetReservedUsernames500,
+  mockGetUsernameAvailability500
+} from './apiMock.js'
 
 import sinon from 'sinon'
 
@@ -42,6 +53,35 @@ describe('helper.js', () => {
       const expectedMsg = 'random<br />Message'
       const returnedMsg = convertBackslashNToBr(msg)
       expect(returnedMsg).to.equal(expectedMsg)
+    })
+  })
+
+  describe('updateTLMAuthor()', () => {
+    it('should return the author object added with is_from_system_admin if author is not null', () => {
+      const author = { username: 'Author' }
+      const returnedObject = updateTLMAuthor(author)
+      expect(returnedObject).to.deep.equal({ ...author, is_from_system_admin: false })
+    })
+
+    it('should return the System Administrator author object if author is null', () => {
+      const systemAdministratorAuthor = {
+        allowed_space: 0,
+        auth_type: 'internal',
+        avatar_url: null,
+        created: '',
+        email: '',
+        is_active: true,
+        is_deleted: false,
+        is_from_system_admin: true,
+        lang: 'en',
+        profile: 'administrators',
+        public_name: 'System Administrator',
+        timezone: '',
+        user_id: 0,
+        username: ''
+      }
+      const returnedObject = updateTLMAuthor(null)
+      expect(returnedObject).to.deep.equal(systemAdministratorAuthor)
     })
   })
 
@@ -126,15 +166,6 @@ describe('helper.js', () => {
     })
     it('should return the username empty when username is empty', () => {
       expect(removeAtInUsername('')).to.eq('')
-    })
-  })
-
-  describe('the hasNotAllowedCharacters() function', () => {
-    it('should return false if name has only allowed characters', () => {
-      expect(hasNotAllowedCharacters('g00dUsername')).to.eq(false)
-    })
-    it('should return true if name has not allowed characters', () => {
-      expect(hasNotAllowedCharacters('b@dU$ername')).to.eq(true)
     })
   })
 
@@ -243,5 +274,103 @@ describe('helper.js', () => {
     it('should set a revision number to revision count + 1', () => {
       expect(lastRevisionObject.number).to.be.equal(2)
     })
+  })
+
+  describe('the checkUsernameValidity function', () => {
+    const mockProps = {
+      t: m => m
+    }
+    const apiUrl = 'http://localhost/api'
+
+    const nominalCases = [
+      { username: 'foo', available: true, valid: true, message: '' },
+      { username: 'foo ', available: true, valid: false, message: "Username can't contain any whitespace" },
+      { username: 'foo(', available: true, valid: false, message: 'Allowed characters: {{allowedCharactersUsername}}' },
+      { username: 'f'.repeat(MINIMUM_CHARACTERS_USERNAME - 1), available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },
+      { username: '', available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },
+      { username: 'o'.repeat(MAXIMUM_CHARACTERS_USERNAME + 1), available: true, valid: false, message: 'Username must be at maximum {{maximumCharactersUsername}} characters long' },
+      { username: 'bar', available: false, valid: false, message: 'This username is not available' },
+      { username: 'all', available: false, valid: false, message: 'This word is reserved for group mentions' }
+    ]
+
+    nominalCases.forEach(item => {
+      const { username, available, valid, message } = item
+      it(`should return ${valid} for '${username}'`, async () => {
+        mockGetReservedUsernames200(apiUrl)
+        mockGetUsernameAvailability200(apiUrl, username, available)
+        const validity = await checkUsernameValidity(apiUrl, username, mockProps)
+        expect(validity).to.deep.equal({ isUsernameValid: valid, usernameInvalidMsg: message })
+      })
+    })
+
+    it('should throw Error if reserved usernames API code is not 200', async () => {
+      const username = 'hello'
+      mockGetReservedUsernames500(apiUrl)
+      mockGetUsernameAvailability200(apiUrl, username, true)
+      try {
+        await checkUsernameValidity(apiUrl, username, mockProps)
+      } catch (e) {
+        expect(e).to.be.a('Error')
+      }
+    })
+
+    it('should throw Error if username availability API code is not 200', async () => {
+      const username = 'hello'
+      mockGetReservedUsernames200(apiUrl)
+      mockGetUsernameAvailability500(apiUrl, username, true)
+      try {
+        await checkUsernameValidity(apiUrl, username, mockProps)
+      } catch (e) {
+        expect(e).to.be.a('Error')
+      }
+    })
+  })
+
+  describe('the permissiveNumberEqual function', () => {
+    const testCases = [
+      {
+        var1: 0,
+        var2: 1,
+        expectedResult: false
+      },
+      {
+        var1: 0,
+        var2: 0,
+        expectedResult: true
+      },
+      {
+        var1: 12,
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 1,
+        var2: '12',
+        expectedResult: false
+      },
+      {
+        var1: '12',
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: null,
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: undefined,
+        expectedResult: true
+      }
+    ]
+    for (const { var1, var2, expectedResult } of testCases) {
+      const typeOfVar1 = typeof var1
+      const typeOfVar2 = typeof var2
+      const result = permissiveNumberEqual(var1, var2)
+      it(`should compare "${var1}" (${typeOfVar1}) and "${var2}" (${typeOfVar2}) to "${expectedResult}"`, () => {
+        expect(result).to.be.equal(expectedResult)
+      })
+    }
   })
 })

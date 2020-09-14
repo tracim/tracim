@@ -1,7 +1,8 @@
+
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .custom-form
-  height calc(100% - 61px)
+  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none

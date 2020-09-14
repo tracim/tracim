@@ -9,11 +9,12 @@ requires = [
     "pyramid_retry",
     "waitress",
     # Database
-    "pyramid_tm",
-    "SQLAlchemy",
-    "transaction",
-    "zope.sqlalchemy",
-    "alembic",
+    'pyramid_tm',
+    'SQLAlchemy',
+    'transaction',
+    'zope.sqlalchemy',
+    'alembic',
+    'sqlakeyset',
     # API
     "hapic[marshmallow]>=0.83",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
@@ -30,7 +31,7 @@ requires = [
     "filedepot",
     "babel",
     "python-slugify",
-    "preview-generator>=0.14",
+    "preview-generator>=0.15.4",
     "colour",
     "python-dateutil",
     "gitpython",

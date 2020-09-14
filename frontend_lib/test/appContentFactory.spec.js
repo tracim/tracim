@@ -58,13 +58,16 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentNotifyAll',
         'appContentSaveNewComment',
         'appContentChangeStatus',
+        'addCommentToTimeline',
         'appContentArchive',
         'appContentDelete',
         'appContentRestoreArchive',
         'appContentRestoreDelete',
-        'buildTimelineFromCommentAndRevision'
+        'buildTimelineFromCommentAndRevision',
+        'searchForMentionInQuery'
       )
     })
   })
@@ -181,19 +184,17 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentCustomEventHandlerReloadAppFeatureData', () => {
     before(() => {
-      wrapper.instance().appContentCustomEventHandlerReloadAppFeatureData(fakeLoadContent, fakeLoadTimeline, fakeBuildBreadcrumbs)
+      wrapper.instance().appContentCustomEventHandlerReloadAppFeatureData(fakeLoadContent, fakeLoadTimeline)
     })
 
     after(() => {
       fakeLoadContent.resetHistory()
       fakeLoadTimeline.resetHistory()
-      fakeBuildBreadcrumbs.resetHistory()
     })
 
-    it('should call the 3 functions given in parameter', () => {
+    it('should call the 2 functions given in parameter', () => {
       expect(fakeLoadContent.called).to.equal(true)
       expect(fakeLoadTimeline.called).to.equal(true)
-      expect(fakeBuildBreadcrumbs.called).to.equal(true)
     })
   })
 
@@ -308,22 +309,28 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentSaveNewComment', () => {
     describe('on comment save success', async () => {
-      let response = {}
+      let response
+      const newComment = 'Edited comment'
       const fakeTinymceSetContent = sinon.spy()
       global.tinymce = {
         ...global.tinymce,
         get: () => ({
           setContent: fakeTinymceSetContent
-        })
+        }),
+        activeEditor: {
+          dom: {
+            select: () => []
+          },
+          getContent: () => newComment
+        }
       }
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
 
-        const newComment = 'Edited comment'
         const isCommentWysiwyg = true
         mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
-        response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug)
+        response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, 'foo')
       })
 
       after(() => {
@@ -477,6 +484,10 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function buildTimelineFromCommentAndRevision', () => {
+    const loggedUser = {
+      username: 'foo',
+      lang: 'en'
+    }
     const commentList = fixtureCommentList
     const revisionList = fixtureRevisionList.map((revision, i) => ({
       ...revision,
@@ -486,7 +497,7 @@ describe('appContentFactory.js', () => {
     let commentAndRevisionMergedList = []
 
     before(() => {
-      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, 'en')
+      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, loggedUser)
     })
 
     it('should have merged all the comments and revision at depth 0', () => {

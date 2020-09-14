@@ -9,15 +9,6 @@ export const getThreadContent = (apiUrl, workspaceId, contentId) =>
     method: 'GET'
   })
 
-export const getThreadComment = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
 export const getThreadRevision = (apiUrl, workspaceId, contentId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/revisions`, {
     credentials: 'include',

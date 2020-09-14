@@ -8,7 +8,7 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  hasNotAllowedCharacters,
+  getCurrentContentVersionNumber,
   hasSpaces,
   BREADCRUMBS_TYPE,
   ROLE,
@@ -33,8 +33,19 @@ import {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  checkUsernameValidity,
+  formatAbsoluteDate,
+  permissiveNumberEqual,
+  updateTLMAuthor
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave
+} from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -63,6 +74,7 @@ import Timeline from './component/Timeline/Timeline.jsx'
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
+import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -88,7 +100,7 @@ import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
 import GenericButton from './component/Button/GenericButton.jsx'
 
-import DisplayState from './component/DisplayState/DisplayState.jsx'
+import PromptMessage from './component/PromptMessage/PromptMessage.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 import FileUploadList from './component/FileDropzone/FileUploadList.jsx'
@@ -99,6 +111,17 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
+import {
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan
+} from './tinymceAutoCompleteHelper.js'
+
+import { getContentComment } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -125,7 +148,7 @@ export {
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
-  hasNotAllowedCharacters,
+  getCurrentContentVersionNumber,
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -176,7 +199,7 @@ export {
   ListItemWrapper,
   IconButton,
   ComposedIcon,
-  DisplayState,
+  PromptMessage,
   FileDropzone,
   FileUploadList,
   ShareLink,
@@ -190,5 +213,22 @@ export {
   setupCommonRequestHeaders,
   serialize,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  formatAbsoluteDate,
+  MentionAutoComplete,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  tinymceRemoveAllAutocompleteSpan,
+  updateTLMAuthor,
+  getContentComment,
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave,
+  permissiveNumberEqual
 }

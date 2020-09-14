@@ -25,6 +25,13 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) => {
   })
 }
 
+export const getContentComment = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'GET'
+  })
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) => {
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   return fetch(`${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {
@@ -67,4 +74,42 @@ export const putContentRestoreDelete = (apiUrl, workspaceId, contentId) => {
     headers: { ...FETCH_CONFIG.headers },
     method: 'PUT'
   })
+}
+
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude) => {
+  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&include_workspace_ids=${workspaceIdToInclude}`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'GET'
+  })
+}
+
+export const getUsernameAvailability = async (apiUrl, username) => {
+  const response = await fetch(`${apiUrl}/system/username-availability?username=${username}`,
+    {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    }
+  )
+  return {
+    status: response.status,
+    json: await response.json()
+  }
+}
+
+export const getReservedUsernames = async (apiUrl) => {
+  const response = await fetch(`${apiUrl}/system/reserved-usernames`,
+    {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    }
+  )
+  return {
+    status: response.status,
+    json: await response.json()
+  }
 }

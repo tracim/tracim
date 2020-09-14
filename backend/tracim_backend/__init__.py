@@ -6,6 +6,7 @@ import warnings
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
@@ -34,7 +35,6 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
@@ -47,6 +47,7 @@ from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticat
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -74,6 +75,28 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 
+class TracimPyramidContext(PyramidContext):
+    """
+    Customize the hapic context to avoid committing a transaction when an exception is caught
+    by hapic.
+    """
+
+    def doom_request_transaction(self, exc: Exception, *args, **kwargs) -> None:
+        try:
+            # NOTE 2020-09-09 - S.G.
+            # we have to search for the request object in all arguments
+            # as we cannot be sure of its place in it.
+            # For example if a handler is an object method the first argument
+            # will be the controller object, not the request object.
+            request = next(arg for arg in args if isinstance(arg, Request))
+            request.tm.doom()
+        except StopIteration:
+            logger.error(self, "Cannot find request object in arguments")
+
+    global_exception_caught = doom_request_transaction
+    local_exception_caught = doom_request_transaction
+
+
 def web(global_config: OrderedDict, **local_settings) -> Router:
     """ This function returns a Pyramid WSGI application.
     """
@@ -86,7 +109,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    plugin_manager.register(EventBuilder(app_config))
     settings["plugin_manager"] = plugin_manager
 
     configurator = Configurator(settings=settings, autocommit=True)
@@ -153,7 +175,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Add SqlAlchemy DB
     init_models(configurator, app_config)
     # set Hapic
-    context = PyramidContext(
+    context = TracimPyramidContext(
         configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
     )
     hapic.set_context(context)
@@ -202,10 +224,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config,
-            configurator=configurator,
-            route_prefix=BASE_API,
-            context=context,
+            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
         )
 
     configurator.scan("tracim_backend.lib.utils.authentification")

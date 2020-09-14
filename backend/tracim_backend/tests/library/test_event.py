@@ -1,12 +1,6 @@
 import pytest
 import transaction
 
-from tracim_backend.lib.core.event import _AUTHOR_FIELD
-from tracim_backend.lib.core.event import _CLIENT_TOKEN_FIELD
-from tracim_backend.lib.core.event import _CONTENT_FIELD
-from tracim_backend.lib.core.event import _MEMBER_FIELD
-from tracim_backend.lib.core.event import _USER_FIELD
-from tracim_backend.lib.core.event import _WORKSPACE_FIELD
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -126,13 +120,17 @@ class TestEventReceiver:
         )
         transaction.commit()
         fields = {
-            _AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
-            _CLIENT_TOKEN_FIELD: "test",
-            _USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.USER_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
         }
         event = Event(entity_type=EntityType.USER, operation=OperationType.MODIFIED, fields=fields)
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(session, event)
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -173,15 +171,17 @@ class TestEventReceiver:
         transaction.commit()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         fields = {
-            _AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
-            _CLIENT_TOKEN_FIELD: "test",
-            _WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(session, event)
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -223,17 +223,21 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         role_in_context = rapi.get_user_role_workspace_with_context(role)
         fields = {
-            _AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
-            _USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
-            _CLIENT_TOKEN_FIELD: "test",
-            _WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            _MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.USER_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(session, event)
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -290,16 +294,18 @@ class TestEventReceiver:
         transaction.commit()
         content_in_context = content_api.get_content_in_context(folder)
         fields = {
-            _AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)).data,
-            _CONTENT_FIELD: ContentSchema().dump(content_in_context).data,
-            _CLIENT_TOKEN_FIELD: "test",
-            _WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CONTENT_FIELD: ContentSchema().dump(content_in_context).data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
             entity_type=EntityType.CONTENT, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(session, event)
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids

@@ -1,4 +1,5 @@
 {
+  "@all please notice that I did an important update on this content.": "@all please notice that I did an important update on this content.",
   "A content with same name already exists": "A content with same name already exists",
   "Timeline": "Timeline",
   "Restore": "Restore",
@@ -34,12 +35,6 @@
   "Search user...": "Search user...",
   "Unknown error, please inform an administrator": "Unknown error, please inform an administrator",
   "Error detail": "Error detail",
-  "Error while archiving content": "Error while archiving content",
-  "Error while changing status": "Error while changing status",
-  "Error while deleting content": "Error while deleting content",
-  "Error while restoring content": "Error while restoring content",
-  "Error while saving new comment": "Error while saving new comment",
-  "Error while saving the title": "Error while saving the title",
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
   "Status changed to {{status}}": "Status changed to {{status}}",
@@ -90,7 +85,16 @@
   "User": "User",
   "Access to shared spaces where user is member": "Access to shared spaces where user is member",
   "Refresh?": "Refresh?",
-  "If you refresh, you will lose the current changes": "If you refresh, you will lose the current changes",
-  "You can't send an empty comment": "You can't send an empty comment",
-  "You must change the status or restore this content before any change": "You must change the status or restore this content before any change"
+  "Sends a notification to all members of the shared space": "Sends a notification to all members of the shared space",
+  "System Administrator": "System Administrator",
+  "Error while detecting the mentions": "Error while detecting the mentions",
+  "Username must be at least {{minimumCharactersUsername}} characters long": "Username must be at least {{minimumCharactersUsername}} characters long",
+  "Username must be at maximum {{maximumCharactersUsername}} characters long": "Username must be at maximum {{maximumCharactersUsername}} characters long",
+  "Username can't contain any whitespace": "Username can't contain any whitespace",
+  "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
+  "Error while checking reserved usernames": "Error while checking reserved usernames",
+  "This word is reserved for group mentions": "This word is reserved for group mentions",
+  "Error while checking username availability": "Error while checking username availability",
+  "This username is not available": "This username is not available",
+  "all": "all"
 }

@@ -1,9 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -220,6 +221,27 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
+export const updateTLMAuthor = author => {
+  return author
+    ? { ...author, is_from_system_admin: false }
+    : {
+      allowed_space: 0,
+      auth_type: 'internal',
+      avatar_url: null,
+      created: '',
+      email: '',
+      is_active: true,
+      is_deleted: false,
+      is_from_system_admin: true,
+      lang: 'en',
+      profile: 'administrators',
+      public_name: i18n.t('System Administrator'),
+      timezone: '',
+      user_id: 0,
+      username: ''
+    }
+}
+
 // INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
@@ -375,9 +397,6 @@ export const removeAtInUsername = (username) => {
   return trimmedUsername
 }
 
-// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
-
 export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
@@ -393,4 +412,80 @@ export const serialize = (objectToSerialize, propertyMap) => {
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+}
+
+export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
+
+// Check that the given username is valid.
+// Return an object:
+// {isUsernameValid: false, usernameInvalidMsg: 'Username invalid'}
+// The message is translated using the given props.t.
+export const checkUsernameValidity = async (apiUrl, username, props) => {
+  if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (hasSpaces(username)) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t("Username can't contain any whitespace")
+    }
+  }
+
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+    }
+  }
+
+  const fetchReservedUsernames = await getReservedUsernames(apiUrl)
+  if (fetchReservedUsernames.status !== 200 || !fetchReservedUsernames.json.items) {
+    throw new Error(props.t('Error while checking reserved usernames'))
+  }
+  if (fetchReservedUsernames.json.items.indexOf(username) >= 0) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This word is reserved for group mentions')
+    }
+  }
+
+  const fetchUsernameAvailability = await getUsernameAvailability(apiUrl, username)
+  if (fetchUsernameAvailability.status !== 200) {
+    throw new Error(props.t('Error while checking username availability'))
+  }
+  if (!fetchUsernameAvailability.json.available) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This username is not available')
+    }
+  }
+
+  return {
+    isUsernameValid: true,
+    usernameInvalidMsg: ''
+  }
+}
+
+export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+
+// Equality test done as numbers with the following rules:
+// - strings are converted to numbers before comparing
+// - undefined and null are converted to 0 before comparing
+export const permissiveNumberEqual = (var1, var2) => {
+  return Number(var1 || 0) === Number(var2 || 0)
 }

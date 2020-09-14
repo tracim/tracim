@@ -24,6 +24,7 @@ if (!global.window && !global.document) {
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
+  global.DOMParser = window.DOMParser
 }
 
 Enzyme.configure({ adapter: new Adapter() })

@@ -3156,7 +3156,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         params = {
             "email": "THISISANEMAILWITHUPPERCASECHARACTERS@TEST.TEST",
             "password": "mysuperpassword",
@@ -3168,7 +3168,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         params = {
             "email": "ThisIsAnEmailWithUppercaseCharacters@Test.Test",
             "password": "mysuperpassword",
@@ -3180,7 +3180,7 @@ class TestUserEndpoint(object):
         }
         res = web_testapp.post_json("/api/users", status=400, params=params)
         res = res.json_body
-        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__ok_200__limited_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3258,7 +3258,7 @@ class TestUserEndpoint(object):
         res = web_testapp.post_json("/api/users", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__err_403__other_user(self, user_api_factory, web_testapp):
 
@@ -3672,6 +3672,83 @@ class TestKnownMembersEndpoint(object):
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
+
+    def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
+        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+    ):
+
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "acp": "bob",
+            "include_workspace_ids": str(workspace.workspace_id),
+            "exclude_user_ids": str(test_user3.user_id),
+        }
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]["user_id"] == test_user.user_id
+        assert res[0]["public_name"] == test_user.display_name
+        assert res[0]["avatar_url"] is None
+
+    def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
+        self, admin_user, web_testapp
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=admin_user.user_id),
+            status=400,
+            params={
+                "acp": "bob",
+                "exclude_workspace_ids": str([1]),
+                "include_workspace_ids": str([1]),
+            },
+        )
 
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(
         self, user_api_factory, web_testapp, admin_user
@@ -4102,7 +4179,7 @@ class TestSetEmailEndpoint(object):
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4331,7 +4408,7 @@ class TestSetUsernameEndpoint(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.USERNAME_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
