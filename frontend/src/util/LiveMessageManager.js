@@ -35,6 +35,7 @@ export class LiveMessageManager {
     this.userId = null
     this.host = null
     this.lastEventId = 0
+    this.tabId = Date.now() + Math.random()
   }
 
   openLiveMessageConnection (userId, host = null) {
@@ -59,6 +60,13 @@ export class LiveMessageManager {
   broadcastChannelMessageReceived (message) {
     if (message.canIHaveStatus && this.eventSource) {
       this.broadcastChannel.postMessage({ status: this.status })
+    }
+
+    if (this.eventSource && (message.status || message.tlm)) {
+      // There are two leaders.
+      if (message.fromTabId > this.tabId) {
+        this.closeEventSourceConnection()
+      }
     }
 
     if (message.status) {
@@ -196,6 +204,11 @@ export class LiveMessageManager {
   }
 
   dispatchLiveMessage (tlm) {
+    if (this.lastEventId >= tlm.event_id) {
+      console.log('INFO: prevented a live message to be dispatched a second time:', tlm)
+      return
+    }
+
     console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
 
     this.lastEventId = Math.max(this.lastEventId, tlm.event_id)
