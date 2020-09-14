@@ -126,7 +126,12 @@ describe('mention.js', () => {
       })
     })
 
+    it('should handle a document containing only a mention correctly', () => {
+      expect(getWrappedDocument('@mention').querySelector('span')).to.be.an.instanceof(Element)
+    })
+
     it('should not add text between mentions', () => {
+      expect(getWrappedDocument('@mention').textContent).to.equal('@mention')
       expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
     })
   })

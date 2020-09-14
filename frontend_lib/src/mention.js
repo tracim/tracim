@@ -75,7 +75,7 @@ const getDocumentFromHTMLString = (htmlString) => {
 }
 
 const getMentions = function* (node) {
-  for (const candidate of node.querySelectorAll(MENTION_TAG_NAME )) {
+  for (const candidate of node.querySelectorAll(MENTION_TAG_NAME)) {
     if (candidate.id.startsWith(MENTION_ID_PREFIX)) {
       yield candidate
     }
