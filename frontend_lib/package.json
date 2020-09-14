@@ -83,7 +83,8 @@
   "standard": {
     "globals": [
       "tinymce",
-      "DOMParser"
+      "DOMParser",
+      "globalThis"
     ],
     "parser": "babel-eslint",
     "ignore": []

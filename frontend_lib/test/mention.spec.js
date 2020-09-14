@@ -125,6 +125,10 @@ describe('mention.js', () => {
         expect(addedSpanList).to.have.lengthOf(0)
       })
     })
+
+    it('should not add text between mentions', () => {
+      expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
+    })
   })
 
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
