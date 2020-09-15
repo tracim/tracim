@@ -11,8 +11,8 @@ export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
 
 export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newContent) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
-      label: label,
-      raw_content: newContent
+    label: label,
+    raw_content: newContent
   })
 
 export const postHtmlDocContent = (apiUrl, workspaceId, folderId, contentType, newContentName) =>
