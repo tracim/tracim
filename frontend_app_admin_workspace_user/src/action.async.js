@@ -7,7 +7,7 @@ export const getUserList = (apiUrl) =>
   baseFetch('GET', `${apiUrl}/users`)
 
 export const getUserDetail = (apiUrl, userId) =>
-  baseFetch('GET', `${apiUrl}/users/${userId}`, )
+  baseFetch('GET', `${apiUrl}/users/${userId}`)
 
 export const putUserDisable = (apiUrl, userId) =>
   baseFetch('GET', `${apiUrl}/users/${userId}/disabled`)
