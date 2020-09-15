@@ -1,6 +1,6 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const baseFetch = (method, url, body, opts) =>
+export const baseFetch = (method, url, body) =>
   fetch(url, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
