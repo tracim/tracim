@@ -533,14 +533,14 @@ class WorkspaceUpdate(object):
 
 class WorkspaceCreate(object):
     """
-    Update workspace
+    Create workspace
     """
 
     def __init__(
         self,
         label: str,
         description: str,
-        access_type: str = WorkspaceAccessType.CONFIDENTIAL.value,
+        access_type: str,
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,

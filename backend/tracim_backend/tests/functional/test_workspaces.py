@@ -29,9 +29,17 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         """
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace2",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
@@ -46,11 +54,23 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         """
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace2",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace3", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace3",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
 
 
@@ -452,6 +472,7 @@ class TestWorkspaceEndpoint(object):
             "label": "Documentation",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "access_type": "confidential",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace1_id = res.json_body["workspace_id"]
@@ -460,6 +481,7 @@ class TestWorkspaceEndpoint(object):
             "label": "Documentation2",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "access_type": "confidential",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace2_id = res.json_body["workspace_id"]
@@ -531,7 +553,11 @@ class TestWorkspaceEndpoint(object):
         Test create workspace : label already used
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         web_testapp.post_json("/api/workspaces", status=200, params=params)
 

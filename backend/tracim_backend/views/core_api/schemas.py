@@ -982,7 +982,7 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
-        default=WorkspaceAccessType.CONFIDENTIAL.value,
+        required=True,
     )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
@@ -1036,7 +1036,7 @@ class WorkspaceMinimalSchema(marshmallow.Schema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
-        default=WorkspaceAccessType.CONFIDENTIAL.value,
+        required=True,
     )
 
 
