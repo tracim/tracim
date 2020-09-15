@@ -54,7 +54,7 @@ import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getShareLinksList,
-  postShareLinksList,
+  postShareLinksList
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
