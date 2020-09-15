@@ -25,4 +25,4 @@ def upgrade():
 def downgrade():
     with op.batch_alter_table("workspaces") as batch_op:
         batch_op.drop_column("access_type")
-    sa.Enum(name="access_type").drop(op.get_bind(), checkfirst=False)
+    sa.Enum(name="workspaceaccesstype").drop(op.get_bind(), checkfirst=False)
