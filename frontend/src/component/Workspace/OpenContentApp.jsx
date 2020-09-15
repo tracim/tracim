@@ -28,7 +28,7 @@ export class OpenContentApp extends React.Component {
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
-        workspace_id: parseInt(workspaceId),
+        workspace_id: parseInt(match.params.idws),
         type: match.params.type
       }
 
