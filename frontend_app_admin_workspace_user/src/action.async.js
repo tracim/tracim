@@ -13,7 +13,7 @@ export const putUserDisable = (apiUrl, userId) =>
   baseFetch('PUT', `${apiUrl}/users/${userId}/disabled`)
 
 export const putUserEnable = (apiUrl, userId) =>
-  baseFetch('GET', `${apiUrl}/users/${userId}/enabled`)
+  baseFetch('PUT', `${apiUrl}/users/${userId}/enabled`)
 
 export const putMyselfProfile = (apiUrl, userId, newProfile) =>
   baseFetch('PUT', `${apiUrl}/users/${userId}/profile`, {
