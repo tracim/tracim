@@ -8,7 +8,7 @@ export const postCollaborativeDocumentFromTemplate = (apiUrl, workspaceId, folde
   })
 
 export const getCollaborativeDocumentTemplates = (apiUrl, workspaceId) =>
-  baseFetch('GET', `${apiUrl}/collaborative-document-edition/templates`, )
+  baseFetch('GET', `${apiUrl}/collaborative-document-edition/templates`)
 
 export const getWOPIToken = apiUrl =>
   baseFetch('GET', `${apiUrl}/collaborative-document-edition/token`)
