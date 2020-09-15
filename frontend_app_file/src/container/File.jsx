@@ -42,19 +42,19 @@ import {
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
   getContentComment,
+  getFileContent,
+  getFileRevision,
+  putFileContent,
+  putMyselfFileRead,
+  putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
-  getFileContent,
-  getFileRevision,
   getShareLinksList,
   postShareLinksList,
-  putFileContent,
-  putMyselfFileRead,
-  putUserConfiguration
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 

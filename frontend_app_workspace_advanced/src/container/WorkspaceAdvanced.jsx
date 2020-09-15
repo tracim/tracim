@@ -15,11 +15,13 @@ import {
   PopinFixedContent,
   PopinFixedRightPart,
   CUSTOM_EVENT,
-  removeAtInUsername
+  removeAtInUsername,
+  getWorkspaceDetail,
+  deleteWorkspace,
+  getMyselfKnownMember
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
-  getWorkspaceDetail,
   getWorkspaceMember,
   putLabel,
   putDescription,
@@ -28,9 +30,7 @@ import {
   putUploadEnabled,
   putMemberRole,
   deleteMember,
-  getMyselfKnownMember,
   postWorkspaceMember,
-  deleteWorkspace,
   getAppList
 } from '../action.async.js'
 import Radium from 'radium'

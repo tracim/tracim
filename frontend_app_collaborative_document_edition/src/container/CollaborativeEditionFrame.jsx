@@ -7,13 +7,11 @@ import {
   CUSTOM_EVENT,
   addAllResourceI18n,
   buildHeadTitle,
+  getFileContent,
+  getWorkspaceDetail,
   ROLE
 } from 'tracim_frontend_lib'
-import {
-  getWOPIToken,
-  getFileContent,
-  getWorkspaceDetail
-} from '../action.async.js'
+import { getWOPIToken } from '../action.async.js'
 
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'

@@ -5,6 +5,8 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
+  getWorkspaceDetail,
+  getWorkspaceMemberList,
   PageContent,
   PageTitle,
   PageWrapper,
@@ -16,11 +18,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
-import {
-  getAgendaList,
-  getWorkspaceDetail,
-  getWorkspaceMemberList
-} from '../action.async.js'
+import { getAgendaList } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {

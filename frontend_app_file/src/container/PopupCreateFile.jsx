@@ -11,13 +11,13 @@ import {
   FileUploadList,
   FILE_PREVIEW_STATE,
   TracimComponent,
-  setupCommonRequestHeaders
+  setupCommonRequestHeaders,
+  putMyselfFileRead
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
 import { debug } from '../debug.js'
-import { putMyselfFileRead } from '../action.async'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {
