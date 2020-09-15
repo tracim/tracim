@@ -980,9 +980,9 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         required=False, description="has workspace has an associated agenda ?", default=True
     )
     access_type = StrippedString(
-        example=WorkspaceAccessType.CONFIDENTIAL,
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
-        default=WorkspaceAccessType.CONFIDENTIAL,
+        default=WorkspaceAccessType.CONFIDENTIAL.value,
     )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
@@ -1034,9 +1034,9 @@ class WorkspaceMinimalSchema(marshmallow.Schema):
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
     access_type = StrippedString(
-        example=WorkspaceAccessType.CONFIDENTIAL,
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
-        default=WorkspaceAccessType.CONFIDENTIAL,
+        default=WorkspaceAccessType.CONFIDENTIAL.value,
     )
 
 
