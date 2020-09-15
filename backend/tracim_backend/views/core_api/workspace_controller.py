@@ -186,6 +186,7 @@ class WorkspaceController(Controller):
         workspace = wapi.create_workspace(
             label=hapic_data.body.label,
             description=hapic_data.body.description,
+            access_type=hapic_data.body.access_type,
             save_now=True,
             agenda_enabled=hapic_data.body.agenda_enabled,
             public_download_enabled=hapic_data.body.public_download_enabled,

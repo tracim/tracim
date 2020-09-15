@@ -9,6 +9,7 @@ import transaction
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -159,6 +160,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["label"] == workspace.label
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
+        assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
@@ -204,6 +206,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["label"] == workspace.label
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
+        assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
@@ -248,6 +251,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is True
         assert workspace["public_upload_enabled"] is True
         assert workspace["public_download_enabled"] is True
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         # modify workspace
         res = web_testapp.put_json("/api/workspaces/1", status=200, params=params)
@@ -262,6 +266,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
         assert last_event.workspace == workspace
@@ -279,6 +284,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
@@ -490,6 +496,7 @@ class TestWorkspaceEndpoint(object):
             "agenda_enabled": False,
             "public_upload_enabled": False,
             "public_download_enabled": False,
+            "access_type": "open",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -512,10 +519,12 @@ class TestWorkspaceEndpoint(object):
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
 
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
 
     def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """

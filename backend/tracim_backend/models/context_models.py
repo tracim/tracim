@@ -32,6 +32,7 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.roles import WorkspaceRoles
@@ -539,6 +540,7 @@ class WorkspaceCreate(object):
         self,
         label: str,
         description: str,
+        access_type: str = WorkspaceAccessType.CONFIDENTIAL.value,
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
@@ -548,6 +550,7 @@ class WorkspaceCreate(object):
         self.agenda_enabled = agenda_enabled
         self.public_upload_enabled = public_upload_enabled
         self.public_download_enabled = public_download_enabled
+        self.access_type = WorkspaceAccessType(access_type)
 
 
 class ContentCreation(object):
@@ -750,6 +753,11 @@ class WorkspaceInContext(object):
         numeric id of the workspace.
         """
         return self.workspace.workspace_id
+
+    @property
+    def access_type(self) -> str:
+        """access type of the workspace"""
+        return self.workspace.access_type.value
 
     @property
     def id(self) -> int:
