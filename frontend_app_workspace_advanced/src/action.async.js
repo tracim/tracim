@@ -3,7 +3,7 @@ import { baseFetch } from 'tracim_frontend_lib'
 export const getWorkspaceMember = (apiUrl, workspaceId, showDisabledUser = false) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
 
-export const getAppList = () =>
+export const getAppList = (apiUrl) =>
   baseFetch('GET', `${apiUrl}/system/applications`)
 
 export const putLabel = (apiUrl, workspace, newLabel) =>
