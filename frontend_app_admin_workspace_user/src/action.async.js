@@ -10,7 +10,7 @@ export const getUserDetail = (apiUrl, userId) =>
   baseFetch('GET', `${apiUrl}/users/${userId}`)
 
 export const putUserDisable = (apiUrl, userId) =>
-  baseFetch('GET', `${apiUrl}/users/${userId}/disabled`)
+  baseFetch('PUT', `${apiUrl}/users/${userId}/disabled`)
 
 export const putUserEnable = (apiUrl, userId) =>
   baseFetch('GET', `${apiUrl}/users/${userId}/enabled`)
