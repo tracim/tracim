@@ -1,5 +1,6 @@
 {
   "description": "A super description of my workspace.",
+  "access_type": "confidential",
   "label": "My Workspace",
   "workspace_id": 1
 }
