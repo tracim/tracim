@@ -82,7 +82,7 @@ const getDocumentFromHTMLString = (htmlString) => {
   return doc
 }
 
-const getMentions = function* (node) {
+const getMentions = function * (node) {
   for (const candidate of node.querySelectorAll(MENTION_TAG_NAME)) {
     if (isAWrappedMention(candidate)) {
       yield candidate
@@ -95,7 +95,7 @@ export const addClassToMentionsOfUser = (rawContent, username, userClassName = M
 
   const releventMentions = [username, ...GROUP_MENTION_TRANSLATION_LIST]
   for (const wrappedMention of getMentions(body)) {
-    if (releventMentions.some(mention => wrappedMention.textContent.includes('@' + mention))) {
+    if (releventMentions.some(mention => wrappedMention.textContent.trim() === '@' + mention)) {
       wrappedMention.classList.add(userClassName)
     }
   }
