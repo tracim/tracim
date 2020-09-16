@@ -14,7 +14,7 @@ describe('mention.js', () => {
 
     function getWrappedDocument (html) {
       const doc = parser.parseFromString(html, 'text/html')
-      return wrapMentionsInSpanTags(doc, doc.body)
+      return wrapMentionsInSpanTags(doc.body, doc)
     }
 
     describe('with a source without any mention', () => {

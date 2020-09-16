@@ -17,7 +17,9 @@ export const GROUP_MENTION_LIST = [
 
 export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos']
 
-const wrapMentionsInText = (doc, text) => {
+const wrapMentionsFromText = (text, doc) => {
+  // takes a text as string, and returns a document fragment
+  // containing this text, with tags added for the mentions
   const match = text.match(MENTION_REGEX)
 
   if (!match) {
@@ -35,21 +37,26 @@ const wrapMentionsInText = (doc, text) => {
   fragment.appendChild(wrappedMention)
 
   const mentionEndIndex = match.index + match[0].length
-  fragment.appendChild(wrapMentionsInText(doc, text.substring(mentionEndIndex)))
+  fragment.appendChild(wrapMentionsFromText(text.substring(mentionEndIndex), doc))
 
   return fragment
 }
 
 const isAWrappedMention = (node) => (
   node.nodeName.toLowerCase() === MENTION_TAG_NAME &&
-  node.classList.contains(MENTION_CLASS) &&
   node.id &&
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
-export const wrapMentionsInSpanTags = (doc, node) => {
+export const wrapMentionsInSpanTags = (node, doc) => {
+  // takes a DOM node, and returns a copy with mention
+  // wrapped in tags MENTION_TAG_NAME, with class MENTION_CLASS
+  // and mention-xxx IDs
+
   if (isAWrappedMention(node)) {
-    return node.cloneNode(true)
+    const mention = node.cloneNode(true)
+    mention.classList.add(MENTION_CLASS)
+    return mention
   }
 
   const resultingNode = node.cloneNode(false)
@@ -57,8 +64,8 @@ export const wrapMentionsInSpanTags = (doc, node) => {
   for (const child of node.childNodes) {
     resultingNode.appendChild(
       (child.nodeName === '#text')
-        ? wrapMentionsInText(doc, child.textContent)
-        : wrapMentionsInSpanTags(doc, child)
+        ? wrapMentionsFromText(child.textContent, doc)
+        : wrapMentionsInSpanTags(child, doc)
     )
   }
 
@@ -77,7 +84,7 @@ const getDocumentFromHTMLString = (htmlString) => {
 
 const getMentions = function* (node) {
   for (const candidate of node.querySelectorAll(MENTION_TAG_NAME)) {
-    if (candidate.id.startsWith(MENTION_ID_PREFIX)) {
+    if (isAWrappedMention(candidate)) {
       yield candidate
     }
   }
@@ -108,7 +115,7 @@ export const removeMentionMeClass = (body) => {
 export const handleMentionsBeforeSave = (htmlString, loggedUsername) => {
   try {
     const doc = getDocumentFromHTMLString(htmlString)
-    const bodyWithWrappedMentions = wrapMentionsInSpanTags(doc, doc.body)
+    const bodyWithWrappedMentions = wrapMentionsInSpanTags(doc.body, doc)
     removeMentionMeClass(bodyWithWrappedMentions, loggedUsername)
     return bodyWithWrappedMentions.innerHTML
   } catch (e) {
