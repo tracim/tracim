@@ -43,7 +43,8 @@ const wrapMentionsInText = (doc, text) => {
 const isAWrappedMention = (node) => (
   node.nodeName.toLowerCase() === MENTION_TAG_NAME &&
   node.classList.contains(MENTION_CLASS) &&
-  (node.id || '').startsWith(MENTION_ID_PREFIX)
+  node.id &&
+  node.id.startsWith(MENTION_ID_PREFIX)
 )
 
 export const wrapMentionsInSpanTags = (doc, node) => {
