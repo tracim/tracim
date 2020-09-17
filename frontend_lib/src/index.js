@@ -118,7 +118,6 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan
 } from './tinymceAutoCompleteHelper.js'
 
 import { getContentComment } from './action.async.js'
@@ -225,7 +224,6 @@ export {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan,
   updateTLMAuthor,
   getContentComment,
   addClassToMentionsOfUser,

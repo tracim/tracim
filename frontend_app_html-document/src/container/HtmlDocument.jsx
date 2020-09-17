@@ -34,7 +34,6 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan,
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
@@ -280,12 +279,20 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  handleTinyMceInput = (event, tinymcePosition) => {
-    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery, this.state.isAutoCompleteActivated
+    )
   }
 
-  handleTinyMceSelectionChange = selectionId => {
-    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
+  handleTinyMceSelectionChange = (e, position) => {
+    tinymceAutoCompleteHandleSelectionChange(
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   handleTinyMceKeyUp = event => {
@@ -484,11 +491,11 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
-    const contentWithoutAnyAutoCompleteSpan = tinymceRemoveAllAutocompleteSpan()
+    const content = tinymce.activeEditor.getContent()
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(contentWithoutAnyAutoCompleteSpan, state.loggedUser.username)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(content, state.loggedUser.username)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
