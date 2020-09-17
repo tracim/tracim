@@ -1,6 +1,4 @@
 {
-  "@all please notice that I did an important update on this content.": "@todos percebam que fiz uma actualização importante neste conteúdo.",
-  "A content with same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
   "Send": "Enviar",
@@ -85,9 +83,7 @@
   "Simple edition": "Edição simples",
   "Advanced edition": "Edição avançada",
   "Refresh?": "Actualizar?",
-  "Sends a notification to all members of the space": "Envia uma notificação a todos os membros do espaço",
   "System Administrator": "Administrador do sistema",
-  "Error while detecting the mentions": "Erro ao detectar as menções",
   "Username must be at least {{minimumCharactersUsername}} characters long": "O identificador deve ter pelo menos {{minimumCharactersUsername}} carateres",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "O identificador deve ter no máximo {{maximumCharactersUsername}} carateres",
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
@@ -95,6 +91,5 @@
   "Error while checking reserved usernames": "Erro ao verificar nomes de utilizador reservados",
   "This word is reserved for group mentions": "Esta palavra é reservada às menções de grupo",
   "Error while checking username availability": "Erro ao verificar a disponibilidade do identificador",
-  "This username is not available": "Este identificador não está disponível",
-  "all": "todos"
+  "This username is not available": "Este identificador não está disponível"
 }

@@ -1,6 +1,4 @@
 {
-  "@all please notice that I did an important update on this content.": "@tous veuillez noter que j'ai fait une mise à jour importante sur ce contenu.",
-  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -85,9 +83,7 @@
   "User + create spaces, add members in spaces": "Utilisateur + créer des espaces, ajouter des membres dans les espaces",
   "Space manager": "Responsable",
   "Refresh?": "Rafraîchir ?",
-  "Sends a notification to all members of the space": "Envoie une notification à tous les membres de l'espace",
   "System Administrator": "Administrateur du système",
-  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
   "Username must be at least {{minimumCharactersUsername}} characters long": "L'identifiant doit être composé d'au moins {{minimumCharactersUsername}} caractères",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "L'identifiant doit être composé d'au maximum {{maximumCharactersUsername}} caractères",
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
@@ -95,6 +91,5 @@
   "Error while checking reserved usernames": "Erreur lors de la vérification des noms d'utilisateur réservés",
   "This word is reserved for group mentions": "Ce mot est réservé aux mentions de groupe",
   "Error while checking username availability": "Erreur lors de la vérification de la disponibilité de l'identifiant",
-  "This username is not available": "Cet identifiant n'est pas disponible",
-  "all": "tous"
+  "This username is not available": "Cet identifiant n'est pas disponible"
 }

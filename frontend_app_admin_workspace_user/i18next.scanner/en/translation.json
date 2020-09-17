@@ -42,18 +42,14 @@
   "Please set a password": "Please set a password",
   "Full name": "Full name",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Full name must be at least {{minimumCharactersPublicName}} characters",
-  "Username must be at least {{minimumCharactersUsername}} characters long": "Username must be at least {{minimumCharactersUsername}} characters long",
-  "Username must be at maximum {{maximumCharactersUsername}} characters long": "Username must be at maximum {{maximumCharactersUsername}} characters long",
   "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long",
-  "Username can't contain any whitespace": "Username can't contain any whitespace",
   "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change",
   "Error, invalid email address": "Error, invalid email address",
-  "Error while checking username availability": "Error while checking username availability",
   "Create a space": "Create a space",
   "Home": "Home",
   "If you do not link an email to this new user, please notify manually the username and password.": "If you do not link an email to this new user, please notify manually the username and password.",
   "Users": "Users",
   "Administration": "Administration",
   "Username": "Username",
-  "This username is not available": "This username is not available"
+  "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}"
 }

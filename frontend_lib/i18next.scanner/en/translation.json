@@ -1,6 +1,4 @@
 {
-  "@all please notice that I did an important update on this content.": "@all please notice that I did an important update on this content.",
-  "A content with same name already exists": "A content with same name already exists",
   "Timeline": "Timeline",
   "Restore": "Restore",
   "Simple edition": "Simple edition",
@@ -85,9 +83,7 @@
   "User": "User",
   "Access to spaces where user is member": "Access to spaces where user is member",
   "Refresh?": "Refresh?",
-  "Sends a notification to all members of the space": "Sends a notification to all members of the space",
   "System Administrator": "System Administrator",
-  "Error while detecting the mentions": "Error while detecting the mentions",
   "Username must be at least {{minimumCharactersUsername}} characters long": "Username must be at least {{minimumCharactersUsername}} characters long",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "Username must be at maximum {{maximumCharactersUsername}} characters long",
   "Username can't contain any whitespace": "Username can't contain any whitespace",
@@ -95,6 +91,5 @@
   "Error while checking reserved usernames": "Error while checking reserved usernames",
   "This word is reserved for group mentions": "This word is reserved for group mentions",
   "Error while checking username availability": "Error while checking username availability",
-  "This username is not available": "This username is not available",
-  "all": "all"
+  "This username is not available": "This username is not available"
 }
