@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-const sharedSpaceManager = 'Shared space manager'
+const sharedSpaceManager = 'Space manager'
 
 let workspaceId
 
