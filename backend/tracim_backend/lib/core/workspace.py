@@ -254,6 +254,10 @@ class WorkspaceApi(object):
         query = query.order_by(Workspace.label)
         return query.all()
 
+    def get_all_accessible_for_user(self, user: User) -> typing.List[Workspace]:
+        query = self._base_query().filter(Workspace.access_type.in_([]))
+        query = query.filter(Workspace.workspace_id.notin_())
+
     def get_all_manageable(self) -> typing.List[Workspace]:
         """Get all workspaces the current user has manager rights on."""
         workspaces = []  # type: typing.List[Workspace]

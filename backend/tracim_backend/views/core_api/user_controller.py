@@ -37,6 +37,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
@@ -780,6 +781,27 @@ class UserController(Controller):
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    def get_accessible_workspaces(
+        self, context, request: TracimRequest
+    ) -> typing.List[WorkspaceInContext]:
+        """
+        Return the list of accessible workspace for the given user id.
+        An accessible workspace is:
+          - a workspace the user is not member of (`workspaces` API returns them)
+          - which can be previewed to allow self-join/ask for subscription
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user, session=request.dbsession, config=app_config,
+        )
+
+        workspaces = wapi.get_all_accessible_for_user(request.candidate_user)
+        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -993,3 +1015,13 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User accessible workspaces (not member of, but can see information about them to subscribe)
+        configurator.add_route(
+            "get_accessible_workspaces",
+            "/users/{user_id:\d+}/accessible_workspaces",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(
+            self.get_accessible_workspaces, route_name="get_accessible_workspaces"
+        )
