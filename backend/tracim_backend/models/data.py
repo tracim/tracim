@@ -51,6 +51,14 @@ from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.roles import WorkspaceRoles
 
 
+class WorkspaceAccessType(enum.Enum):
+    """Workspace access Types"""
+
+    CONFIDENTIAL = "confidential"
+    ON_REQUEST = "on_request"
+    OPEN = "open"
+
+
 class Workspace(DeclarativeBase):
 
     __tablename__ = "workspaces"
@@ -74,7 +82,6 @@ class Workspace(DeclarativeBase):
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
-
     revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
     public_upload_enabled = Column(
@@ -93,6 +100,11 @@ class Workspace(DeclarativeBase):
     )
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     owner = relationship("User", remote_side=[User.user_id])
+    access_type = Column(
+        Enum(WorkspaceAccessType),
+        nullable=False,
+        server_default=WorkspaceAccessType.CONFIDENTIAL.name,
+    )
 
     @hybrid_property
     def contents(self) -> List["Content"]:
