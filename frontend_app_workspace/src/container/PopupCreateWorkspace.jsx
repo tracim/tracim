@@ -17,7 +17,7 @@ const debug = {
     slug: 'workspace',
     faIcon: 'bank',
     hexcolor: '#7d4e24',
-    creationLabel: 'Create a shared space',
+    creationLabel: 'Create a space',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543',
     apiHeader: {
@@ -99,12 +99,12 @@ export class PopupCreateWorkspace extends React.Component {
       case 200: this.handleClose(); break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {
-          case 3007: this.sendGlobalFlashMessage(props.t('A shared space with that name already exists')); break
-          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore shared space')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+          case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
+          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
     }
   }
 
@@ -115,12 +115,12 @@ export class PopupCreateWorkspace extends React.Component {
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={props.t('New shared space')}
+        label={props.t('New space')}
         faIcon={state.config.faIcon}
         contentName={state.newWorkspaceName}
         onChangeContentName={this.handleChangeNewWorkspaceName}
         btnValidateLabel={props.t('Validate and create')}
-        inputPlaceholder={props.t("Shared space's name")}
+        inputPlaceholder={props.t("Space's name")}
       />
     )
   }

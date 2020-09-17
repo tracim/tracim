@@ -29,7 +29,7 @@ export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
   hexcolor: GLOBAL_primaryColor,
-  creationLabel: i18n.t('Create a shared space'),
+  creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
 }
 

@@ -81,8 +81,8 @@ class WorkspaceListItem extends React.Component {
 
           <div className='sidebar__content__navigation__workspace__item__icon'>
             {(props.isOpenInSidebar
-              ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide shared space')} />
-              : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />
+              ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide space')} />
+              : <i className={classnames('fa fa-chevron-down')} title={props.t('See space')} />
             )}
           </div>
         </div>

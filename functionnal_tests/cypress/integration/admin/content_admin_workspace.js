@@ -33,7 +33,7 @@ describe('content :: admin > workspace', function () {
     // Delete
     cy.get('.adminWorkspace__workspaceTable tbody tr:first .adminWorkspace__table__delete__icon').click()
     cy.get('.adminworkspaceuser__popup .highlightBtn').click()
-    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'There is no shared space yet')
+    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'There is no space yet')
   })
   it('checks the create workspace button', function() {
     cy.get('.adminWorkspace__btnnewworkspace__btn').click()

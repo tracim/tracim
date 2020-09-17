@@ -9,8 +9,8 @@ export const MENTION_REGEX = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
 export const GROUP_MENTION_LIST = [
   {
     mention: 'all',
-    detail: 'Sends a notification to all members of the shared space',
-    tradKey: [i18n.t('Sends a notification to all members of the shared space')],
+    detail: 'Sends a notification to all members of the space',
+    tradKey: [i18n.t('Sends a notification to all members of the space')],
     isCommon: true
   }
 ]

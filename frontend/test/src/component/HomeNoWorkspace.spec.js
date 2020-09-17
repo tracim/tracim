@@ -16,7 +16,7 @@ describe('<HomeNoWorkspace />', () => {
 
   describe('static design', () => {
     it('if canCreateWorkspace is true it should contains a div with a message to create a new Workspace', () =>
-      expect(wrapper.find('div.homepagecard__text')).to.text().equal('You will create your first shared space')
+      expect(wrapper.find('div.homepagecard__text')).to.text().equal('You will create your first space')
     )
 
     it('if canCreateWorkspace is true it should display a button to create a new Workspace', () =>
