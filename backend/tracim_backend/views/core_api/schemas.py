@@ -32,6 +32,7 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
+from tracim_backend.app_models.validator import workspace_access_type_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
@@ -79,6 +80,7 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
@@ -977,6 +979,11 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     agenda_enabled = marshmallow.fields.Bool(
         required=False, description="has workspace has an associated agenda ?", default=True
     )
+    access_type = StrippedString(
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        validate=workspace_access_type_validator,
+        required=True,
+    )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
         description="is workspace allowing manager to give access external user"
@@ -1026,6 +1033,11 @@ class WorkspaceMinimalSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
+    access_type = StrippedString(
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        validate=workspace_access_type_validator,
+        required=True,
+    )
 
 
 class WorkspaceDigestSchema(WorkspaceMinimalSchema):
