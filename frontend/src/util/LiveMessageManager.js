@@ -177,6 +177,7 @@ export class LiveMessageManager {
         const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`, { signal: controller.signal })
         clearTimeout(fetchTimeoutId)
         if (response.status === 401) {
+          this.reconnectionTimerId = 0
           GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, data: {} })
           this.closeLiveMessageConnection()
           return
