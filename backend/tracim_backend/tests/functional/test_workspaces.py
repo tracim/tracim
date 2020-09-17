@@ -1702,6 +1702,113 @@ class TestWorkspaceMembersEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
+    def test_api__update_workspace_member_role__err_400__cannot_change_role_of_last_workspace_manager(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+    ):
+        """
+        Update workspace member role: user is last workspace manager so it cannot lower his role
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+
+        uapi = user_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2",
+            password="admin2@admin2.admin2",
+            profile=Profile.USER,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get(current_user=admin2)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        # update workspace role
+        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        params = {"role": "content-manager"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=admin2.user_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+
+    def test_api__update_workspace_member_role__ok_200__not_last_workspace_manager(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+    ):
+        """
+        Update worskpace member role : user is not last workspace manager, so it can lower his
+        role in workspace.
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+
+        uapi = user_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2",
+            password="admin2@admin2.admin2",
+            profile=Profile.USER,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get(current_user=admin2)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        # update workspace role
+        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        params = {"role": "content-manager"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=admin2.user_id
+            ),
+            status=200,
+            params=params,
+        )
+        user_role = res.json_body
+        assert user_role["role"] == "content-manager"
+        assert user_role["do_notify"] is True
+        assert user_role["user_id"] == admin2.user_id
+        assert user_role["workspace_id"] == workspace.workspace_id
+
     def test_api__update_workspace_member_role__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
@@ -1916,8 +2023,8 @@ class TestWorkspaceMembersEndpoint(object):
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
-        Delete worskpace member role.
-        Unallow to delete himself as workspace_manager
+        Delete self worskpace member role.
+        Unallow to delete himself as workspace_manager as user is the last workspace manager
         """
 
         uapi = user_api_factory.get()
@@ -1961,8 +2068,8 @@ class TestWorkspaceMembersEndpoint(object):
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
-        Delete worskpace member role.
-        Unallow to delete himself as workspace_manager
+        Delete self worskpace member role.
+        As there is other workspace manager to the workspace, deletion is acceptable
         """
 
         uapi = user_api_factory.get()
@@ -2013,8 +2120,8 @@ class TestWorkspaceMembersEndpoint(object):
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
-        Delete worskpace member role.
-        Unallow to delete himself as workspace_manager
+        Delete self worskpace member role.
+        As user is not workspace manager to the workspace, deletion is acceptable
         """
 
         uapi = user_api_factory.get()
