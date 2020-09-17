@@ -26,6 +26,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -99,6 +100,7 @@ class WorkspaceApi(object):
         agenda_enabled: bool = True,
         public_download_enabled: bool = True,
         public_upload_enabled: bool = True,
+        access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
         save_now: bool = False,
     ) -> Workspace:
         if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
@@ -115,6 +117,7 @@ class WorkspaceApi(object):
         workspace.created = datetime.utcnow()
         workspace.updated = datetime.utcnow()
         workspace.owner = self._user
+        workspace.access_type = access_type
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
