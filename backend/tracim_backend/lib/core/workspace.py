@@ -416,7 +416,7 @@ class WorkspaceApi(object):
         """
         _ = self.translator.get_translation
         query = self._base_query_without_roles().filter(
-            Workspace.label.ilike("{0}%".format(_("Workspace")))
+            Workspace.label.ilike("{0}%".format(_("Space")))
         )
 
-        return _("Workspace {}").format(query.count() + 1)
+        return _("Space {}").format(query.count() + 1)

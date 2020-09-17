@@ -104,12 +104,12 @@ msgstr "Nova pasta"
 msgid "New folder {0}"
 msgstr "Nova pasta {0}"
 
-#: tracim_backend/lib/core/workspace.py:405
-msgid "Workspace"
+#: tracim_backend/lib/core/workspace.py:419
+msgid "Space"
 msgstr "Espaço"
 
-#: tracim_backend/lib/core/workspace.py:408
-msgid "Workspace {}"
+#: tracim_backend/lib/core/workspace.py:422
+msgid "Space {}"
 msgstr "Espaço {}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:284
