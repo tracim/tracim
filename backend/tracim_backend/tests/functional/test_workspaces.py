@@ -265,6 +265,7 @@ class TestWorkspaceEndpoint(object):
             "agenda_enabled": False,
             "public_upload_enabled": False,
             "public_download_enabled": False,
+            "default_user_role": "contributor",
         }
         # Before
         res = web_testapp.get("/api/workspaces/1", status=200)
@@ -296,7 +297,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
-        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
         assert last_event.workspace == workspace
@@ -315,7 +316,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
-        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
