@@ -163,6 +163,12 @@ describe('mention.js', () => {
         description: 'user who is not mentioned'
       },
       {
+        content: mentionForFoo,
+        expectedContent: `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`,
+        username: 'fo',
+        description: 'user who is not mentioned, bis'
+      },
+      {
         content: '<span>plop</span>',
         expectedContent: '<span>plop</span>',
         username: 'foo',
