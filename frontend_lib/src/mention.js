@@ -5,7 +5,7 @@ export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
-export const MENTION_REGEX = /(?<=\s|^)@([a-zA-Z0-9\-_]+)(?=\s|$)/
+export const MENTION_REGEX = /@([a-zA-Z0-9\-_]+)(?=\s|$)/
 export const GROUP_MENTION_LIST = [
   {
     mention: 'all',
@@ -21,8 +21,7 @@ const wrapMentionsFromText = (text, doc) => {
   // takes a text as string, and returns a document fragment
   // containing this text, with tags added for the mentions
   const match = text.match(MENTION_REGEX)
-
-  if (!match) {
+  if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
     return doc.createTextNode(text)
   }
 
@@ -82,7 +81,7 @@ const getDocumentFromHTMLString = (htmlString) => {
   return doc
 }
 
-const getMentions = function* (node) {
+const getMentions = function * (node) {
   for (const candidate of node.querySelectorAll(MENTION_TAG_NAME)) {
     if (isAWrappedMention(candidate)) {
       yield candidate
@@ -93,9 +92,9 @@ const getMentions = function* (node) {
 export const addClassToMentionsOfUser = (rawContent, username, userClassName = MENTION_ME_CLASS) => {
   const body = getDocumentFromHTMLString(rawContent).body
 
-  const releventMentions = [username, ...GROUP_MENTION_TRANSLATION_LIST]
+  const relevantMentions = [username, ...GROUP_MENTION_TRANSLATION_LIST]
   for (const wrappedMention of getMentions(body)) {
-    if (releventMentions.some(mention => wrappedMention.textContent.includes('@' + mention))) {
+    if (relevantMentions.some(mention => wrappedMention.textContent.trim() === '@' + mention)) {
       wrappedMention.classList.add(userClassName)
     }
   }
