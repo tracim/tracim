@@ -1,6 +1,6 @@
 const MENTION_AUTOCOMPLETE_REGEX = /(?:^|\s)@([a-zA-Z\-_]*)$/
 
-const seekUserNameEnd = (text, offset) => {
+const seekUsernameEnd = (text, offset) => {
   while (offset < text.length && /[a-zA-Z\-_]/.test(text[offset])) {
     offset++
   }
