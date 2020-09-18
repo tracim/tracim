@@ -175,11 +175,12 @@ class RoleApi(object):
             return False
 
         # INFO - G.M - 2020-17-09 - check other potential workspace_manager of workspace
-        return not bool(
+        return (
             self.get_all_for_workspace_query(workspace_id)
             .filter(UserRoleInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level)
             .filter(UserRoleInWorkspace.user_id != user_id)
             .count()
+            == 0
         )
 
     def get_all_for_workspace_query(self, workspace_id: int) -> Query:
