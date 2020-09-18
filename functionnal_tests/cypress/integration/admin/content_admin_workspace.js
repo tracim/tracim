@@ -28,7 +28,7 @@ describe('content :: admin > workspace', function () {
     // Cancel
     cy.get('.adminworkspaceuser__popup').should('be.visible')
     cy.get('.adminworkspaceuser__popup .outlineTextBtn').click()
-    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'My Space')
+    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'My space')
 
     // Delete
     cy.get('.adminWorkspace__workspaceTable tbody tr:first .adminWorkspace__table__delete__icon').click()
