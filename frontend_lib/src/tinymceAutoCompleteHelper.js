@@ -97,7 +97,7 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
 
 export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
   if (!item.mention) {
-    console.log('BUG: this member does not have a username')
+    console.log('Error: this member does not have a username')
     return
   }
 
