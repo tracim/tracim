@@ -11,7 +11,7 @@ const seekUsernameEnd = (text, offset) => {
 const getTextOnCursor = () => {
   const sel = tinymce.activeEditor.selection.getSel()
   const text = sel.anchorNode.textContent
-  const end = seekUserNameEnd(text, sel.anchorOffset)
+  const end = seekUsernameEnd(text, sel.anchorOffset)
   return text.substring(0, end)
 }
 
