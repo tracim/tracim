@@ -790,7 +790,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceInContext]:
         """
-        Return the list of accessible workspace for the given user id.
+        Return the list of accessible workspaces by the given user id.
         An accessible workspace is:
           - a workspace the user is not member of (`workspaces` API returns them)
           - has an OPEN or ON_REQUEST access type
