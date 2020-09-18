@@ -71,6 +71,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMinimalSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
@@ -784,15 +785,15 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    @hapic.output_body(WorkspaceMinimalSchema(many=True))
     def get_accessible_workspaces(
-        self, context, request: TracimRequest
+        self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceInContext]:
         """
         Return the list of accessible workspace for the given user id.
         An accessible workspace is:
           - a workspace the user is not member of (`workspaces` API returns them)
-          - which can be previewed to allow self-join/ask for subscription
+          - has an OPEN or ON_REQUEST access type
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(

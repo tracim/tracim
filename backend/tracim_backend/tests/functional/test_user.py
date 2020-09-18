@@ -9,8 +9,10 @@ from webtest import TestApp
 
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import UserApiFactory
@@ -2725,6 +2727,72 @@ class TestUserWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
+
+    @pytest.mark.parametrize(
+        "workspace_access_type, accessible_workspaces_count, user_credentials",
+        [
+            (WorkspaceAccessType.CONFIDENTIAL, 0, "foo@bar.par",),
+            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin",),
+            (WorkspaceAccessType.OPEN, 1, "foo@bar.par"),
+            (WorkspaceAccessType.ON_REQUEST, 1, "foo@bar.par",),
+        ],
+    )
+    def test_api__get_accessible_workspaces__ok__200__nominal_cases(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        workspace_access_type,
+        accessible_workspaces_count,
+        user_credentials,
+    ):
+        """
+        Check obtain all workspaces reachables for one user who does
+        not exist
+        with a correct user auth.
+        """
+        with transaction.manager:
+            uapi = user_api_factory.get()
+            try:
+                user = uapi.create_user(
+                    email=user_credentials, password=user_credentials, do_notify=False
+                )
+            except EmailAlreadyExists:
+                user = uapi.get_one_by_email(user_credentials)
+            wapi = workspace_api_factory.get()
+            wapi.create_workspace(
+                label="Hello", description="Foo", access_type=workspace_access_type
+            )
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        res = web_testapp.get(
+            "/api/users/{}/accessible_workspaces".format(user.user_id), status=200
+        )
+        assert isinstance(res.json_body, list)
+        assert len(res.json_body) == accessible_workspaces_count
+        assert not len(res.json_body) or res.json_body[0] == {
+            "label": "Hello",
+            "access_type": workspace_access_type.value,
+            "slug": "hello",
+            "workspace_id": 1,
+            "description": "Foo",
+        }
+
+    def test_api__get_accessible_workspaces__ok__403__other_user(
+        self, web_testapp, user_api_factory,
+    ):
+        """
+        Check obtain all workspaces reachables for one user who does
+        not exist
+        with a correct user auth.
+        """
+        user_credentials = "foo@bar.par"
+        with transaction.manager:
+            uapi = user_api_factory.get()
+            uapi.create_user(email=user_credentials, password=user_credentials, do_notify=False)
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        web_testapp.get("/api/users/1/accessible_workspaces", status=403)
 
 
 @pytest.mark.usefixtures("base_fixture")

@@ -1031,6 +1031,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 class WorkspaceMinimalSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    description = StrippedString(example="All intranet data.")
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
     access_type = StrippedString(
@@ -1060,7 +1061,6 @@ class WorkspaceDigestSchema(WorkspaceMinimalSchema):
 
 
 class WorkspaceSchema(WorkspaceDigestSchema):
-    description = StrippedString(example="All intranet data.")
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
     )

@@ -107,7 +107,6 @@ class WorkspaceApi(object):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -258,8 +257,23 @@ class WorkspaceApi(object):
         return query.all()
 
     def get_all_accessible_for_user(self, user: User) -> typing.List[Workspace]:
-        query = self._base_query().filter(Workspace.access_type.in_([]))
-        query = query.filter(Workspace.workspace_id.notin_())
+        """
+        Return workspaces accessible by user.
+        Accessible workspaces:
+          - are of type OPEN or ON_REQUEST
+          - do not have user as a member
+        """
+        query = self._base_query_without_roles().filter(
+            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+        )
+        query = query.filter(
+            Workspace.workspace_id.notin_(
+                self._session.query(UserRoleInWorkspace.workspace_id).filter(
+                    UserRoleInWorkspace.user_id == user.user_id
+                )
+            )
+        )
+        return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:
         """Get all workspaces the current user has manager rights on."""
