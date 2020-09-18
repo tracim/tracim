@@ -387,8 +387,8 @@ class UserNotMemberOfWorkspace(TracimException):
     error_code = ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
 
 
-class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
-    error_code = ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+class LastWorkspaceManagerRoleCantBeModified(TracimException):
+    error_code = ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
 
 
 class UserCantChangeIsOwnProfile(TracimException):
