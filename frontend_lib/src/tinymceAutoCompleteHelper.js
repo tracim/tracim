@@ -102,14 +102,11 @@ export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
   const sel = tinymce.activeEditor.selection.getSel()
   const text = sel.anchorNode.textContent
 
-  let posAt = sel.anchorOffset
-  while (posAt >= 0 && text[posAt] !== '@') {
-    posAt--
-  }
+  const posAt = text.lastIndexOf('@', sel.anchorOffset - 1)
 
   let textBegin, textEnd
 
-  if (text[posAt] === '@') {
+  if (posAt > -1) {
     textBegin = text.substring(0, posAt) + '@' + item.mention + '\u00A0'
     textEnd = text.substring(seekUserNameEnd(text, sel.anchorOffset))
   } else {
