@@ -2747,9 +2747,8 @@ class TestUserWorkspaceEndpoint(object):
         user_credentials,
     ):
         """
-        Check obtain all workspaces reachables for one user who does
-        not exist
-        with a correct user auth.
+        Check that we get all workspaces reachable by one user who does
+        not exist with a correct user auth.
         """
         with transaction.manager:
             uapi = user_api_factory.get()
