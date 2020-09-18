@@ -83,6 +83,7 @@
   "standard": {
     "globals": [
       "tinymce",
+      "Element",
       "DOMParser",
       "globalThis"
     ],
