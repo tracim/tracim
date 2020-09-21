@@ -17,11 +17,11 @@ export const HomeNoWorkspace = props =>
 
     <div className='homepagecard__text'>
       {(props.canCreateWorkspace
-        ? props.t('You will create your first shared space')
+        ? props.t('You will create your first space')
         : (
           <div className='homepagecard__text__user'>
             <div className='homepagecard__text__user__top'>
-              {props.t("You aren't member of any shared space yet")}
+              {props.t("You aren't member of any space yet")}
             </div>
             <div>{props.t('Please refer to an administrator or a trusted user')}</div>
           </div>
@@ -35,7 +35,7 @@ export const HomeNoWorkspace = props =>
         data-cy='homepagecard__btn'
         onClick={props.onClickCreateWorkspace}
       >
-        {props.t('Create a shared space')}
+        {props.t('Create a space')}
       </button>
     )}
 

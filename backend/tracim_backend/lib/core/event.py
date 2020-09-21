@@ -460,9 +460,12 @@ class EventBuilder:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
             session=context.dbsession,
-            current_user=current_user,
             config=self._config,
             show_deleted=True,
+            # INFO - G.M - 2020-17-09 - we do explicitly don't set user here to not
+            # have filter on workspace, in some case we do want user create event on workspace
+            # he doesn't have access: when he remove itself from workspace for example
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(role.workspace_id)

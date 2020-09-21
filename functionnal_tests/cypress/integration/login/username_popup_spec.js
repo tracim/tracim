@@ -95,6 +95,7 @@ describe('Login', function () {
     })
 
     it('should show error if invalid password', function () {
+      this.skip() // FIXME - GB - 2020-09-17 - this tests is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(newUsername)
       cy.get(confirmButton).click()

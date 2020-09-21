@@ -138,7 +138,7 @@ export class CollaborativeEditionFrame extends React.Component {
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
-            this.sendGlobalFlashMessage(props.t('Workspace not found'))
+            this.sendGlobalFlashMessage(props.t('Space not found'))
             this.redirectTo()
             throw new Error(responseContent.body.message)
         }

@@ -122,11 +122,11 @@ const WORKSPACE_MANAGER = {
   faIcon: 'gavel',
   hexcolor: '#ed0007',
   tradKey: [
-    i18n.t('Shared space manager'),
-    i18n.t('Content manager + add members and edit shared spaces')
+    i18n.t('Space manager'),
+    i18n.t('Content manager + add members and edit spaces')
   ], // trad key allow the parser to generate an entry in the json file
-  label: 'Shared space manager', // label must be used in components
-  description: 'Content manager + add members and edit shared spaces'
+  label: 'Space manager', // label must be used in components
+  description: 'Content manager + add members and edit spaces'
 }
 const CONTENT_MANAGER = {
   id: 4,
@@ -191,10 +191,10 @@ const MANAGER = {
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Trusted user'),
-    i18n.t('User + create shared spaces, add members in shared spaces')
+    i18n.t('User + create spaces, add members in spaces')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'Trusted user', // label must be used in components
-  description: 'User + create shared spaces, add members in shared spaces'
+  description: 'User + create spaces, add members in spaces'
 }
 const USER = {
   id: 1,
@@ -203,10 +203,10 @@ const USER = {
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
-    i18n.t('Access to shared spaces where user is member')
+    i18n.t('Access to spaces where user is member')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'User', // label must be used in components
-  description: 'Access to shared spaces where user is member'
+  description: 'Access to spaces where user is member'
 }
 export const PROFILE = {
   administrator: ADMINISTRATOR,
