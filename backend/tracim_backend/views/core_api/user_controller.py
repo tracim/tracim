@@ -785,7 +785,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(WorkspaceMinimalSchema(many=True))
+    @hapic.output_body(WorkspaceDigestSchema(many=True))
     def get_accessible_workspaces(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceInContext]:
@@ -800,7 +800,7 @@ class UserController(Controller):
             current_user=request.candidate_user, session=request.dbsession, config=app_config,
         )
 
-        workspaces = wapi.get_all_accessible_for_user(request.candidate_user)
+        workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     def bind(self, configurator: Configurator) -> None:

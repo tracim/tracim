@@ -1031,17 +1031,12 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 class WorkspaceMinimalSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    description = StrippedString(example="All intranet data.")
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
-    access_type = StrippedString(
-        example=WorkspaceAccessType.CONFIDENTIAL.value,
-        validate=workspace_access_type_validator,
-        required=True,
-    )
 
 
 class WorkspaceDigestSchema(WorkspaceMinimalSchema):
+    description = StrippedString(example="All intranet data.")
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
@@ -1054,6 +1049,11 @@ class WorkspaceDigestSchema(WorkspaceMinimalSchema):
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
         default=True,
+    )
+    access_type = StrippedString(
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        validate=workspace_access_type_validator,
+        required=True,
     )
 
     class Meta:

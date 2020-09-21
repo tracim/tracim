@@ -256,7 +256,7 @@ class WorkspaceApi(object):
         query = query.order_by(Workspace.label)
         return query.all()
 
-    def get_all_accessible_for_user(self, user: User) -> typing.List[Workspace]:
+    def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
         """
         Return workspaces accessible by user.
         Accessible workspaces:

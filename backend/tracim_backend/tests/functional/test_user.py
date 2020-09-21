@@ -2732,9 +2732,9 @@ class TestUserWorkspaceEndpoint(object):
         "workspace_access_type, accessible_workspaces_count, user_credentials",
         [
             (WorkspaceAccessType.CONFIDENTIAL, 0, "foo@bar.par",),
-            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin",),
             (WorkspaceAccessType.OPEN, 1, "foo@bar.par"),
             (WorkspaceAccessType.ON_REQUEST, 1, "foo@bar.par",),
+            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin",),
         ],
     )
     def test_api__get_accessible_workspaces__ok__200__nominal_cases(
@@ -2747,8 +2747,11 @@ class TestUserWorkspaceEndpoint(object):
         user_credentials,
     ):
         """
-        Check that we get all workspaces reachable by one user who does
-        not exist with a correct user auth.
+        Check accessible spaces API with different nominal cases:
+        - CONFIDENTIAL not in accessible
+        - OPEN in accessible
+        - ON_REQUEST in accessible
+        - if user is member, space is not in accessible
         """
         with transaction.manager:
             uapi = user_api_factory.get()
@@ -2770,20 +2773,59 @@ class TestUserWorkspaceEndpoint(object):
         assert isinstance(res.json_body, list)
         assert len(res.json_body) == accessible_workspaces_count
         assert not len(res.json_body) or res.json_body[0] == {
+            "agenda_enabled": True,
+            "is_deleted": False,
+            "public_download_enabled": True,
+            "public_upload_enabled": True,
             "label": "Hello",
             "access_type": workspace_access_type.value,
             "slug": "hello",
             "workspace_id": 1,
             "description": "Foo",
+            "sidebar_entries": [
+                {
+                    "fa_icon": "home",
+                    "hexcolor": "#fdfdfd",
+                    "label": "Dashboard",
+                    "route": "/ui/workspaces/1/dashboard",
+                    "slug": "dashboard",
+                },
+                {
+                    "fa_icon": "th",
+                    "hexcolor": "#bbbbbb",
+                    "label": "All Contents",
+                    "route": "/ui/workspaces/1/contents",
+                    "slug": "contents/all",
+                },
+                {
+                    "fa_icon": "comments-o",
+                    "hexcolor": "#ad4cf9",
+                    "label": "Threads",
+                    "route": "/ui/workspaces/1/contents?type=thread",
+                    "slug": "contents/thread",
+                },
+                {
+                    "fa_icon": "paperclip",
+                    "hexcolor": "#ff9900",
+                    "label": "Files",
+                    "route": "/ui/workspaces/1/contents?type=file",
+                    "slug": "contents/file",
+                },
+                {
+                    "fa_icon": "file-text-o",
+                    "hexcolor": "#3f52e3",
+                    "label": "Text Documents",
+                    "route": "/ui/workspaces/1/contents?type=html-document",
+                    "slug": "contents/html-document",
+                },
+            ],
         }
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
         self, web_testapp, user_api_factory,
     ):
         """
-        Check obtain all workspaces reachables for one user who does
-        not exist
-        with a correct user auth.
+        Check that accessible workspaces of a given user is not authorized for another.
         """
         user_credentials = "foo@bar.par"
         with transaction.manager:
