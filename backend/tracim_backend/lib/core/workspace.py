@@ -57,12 +57,20 @@ class WorkspaceApi(object):
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     def _base_query_without_roles(self):
+        """
+        Prepare query that would return all not deleted workspaces.
+        """
         query = self._session.query(Workspace)
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
+        """
+        Prepare query that would return all not deleted workspaces where the current user:
+          - is a member
+          - OR has an admin profile
+        """
         if not self._user:
             return self._base_query_without_roles()
 
