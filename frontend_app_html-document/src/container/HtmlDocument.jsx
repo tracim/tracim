@@ -38,6 +38,7 @@ import {
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
+  putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
@@ -46,8 +47,7 @@ import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead,
-  putUserConfiguration
+  putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -434,7 +434,7 @@ export class HtmlDocument extends React.Component {
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 

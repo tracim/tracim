@@ -15,11 +15,13 @@ import {
   PopinFixedContent,
   PopinFixedRightPart,
   CUSTOM_EVENT,
-  removeAtInUsername
+  removeAtInUsername,
+  getWorkspaceDetail,
+  deleteWorkspace,
+  getMyselfKnownMember
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
-  getWorkspaceDetail,
   getWorkspaceMember,
   putLabel,
   putDescription,
@@ -28,9 +30,7 @@ import {
   putUploadEnabled,
   putMemberRole,
   deleteMember,
-  getMyselfKnownMember,
   postWorkspaceMember,
-  deleteWorkspace,
   getAppList
 } from '../action.async.js'
 import Radium from 'radium'
@@ -400,7 +400,7 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, state.content.workspace_id))
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, null, state.content.workspace_id))
     switch (fetchUserKnownMemberList.apiResponse.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.body }); break
       default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list', 'warning'))

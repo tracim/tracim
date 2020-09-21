@@ -1,75 +1,26 @@
-import { FETCH_CONFIG } from 'tracim_frontend_lib'
+import { baseFetch } from 'tracim_frontend_lib'
 
 export const getHtmlDocContent = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`)
 
 export const getHtmlDocComment = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
 
 export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const putUserConfiguration = (apiUrl, userId, config) =>
-  fetch(`${apiUrl}/users/${userId}/config`, {
-    credentials: 'include',
-    headers: FETCH_CONFIG.headers,
-    method: 'PUT',
-    body: JSON.stringify({
-      parameters: config
-    })
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions`)
 
 export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newContent) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT',
-    body: JSON.stringify({
-      label: label,
-      raw_content: newContent
-    })
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
+    label: label,
+    raw_content: newContent
   })
 
 export const postHtmlDocContent = (apiUrl, workspaceId, folderId, contentType, newContentName) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      parent_id: folderId,
-      content_type: contentType,
-      label: newContentName
-    })
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents`, {
+    parent_id: folderId,
+    content_type: contentType,
+    label: newContentName
   })
 
-export const putHtmlDocRead = (user, apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
+export const putHtmlDocRead = (apiUrl, user, workspaceId, contentId) =>
+  baseFetch('PUT', `${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`)

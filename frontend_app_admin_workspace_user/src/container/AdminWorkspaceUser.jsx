@@ -15,6 +15,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent,
   checkUsernameValidity,
+  deleteWorkspace,
+  getWorkspaceMemberList,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
@@ -25,11 +27,9 @@ import {
   MINIMUM_CHARACTERS_PUBLIC_NAME
 } from '../helper.js'
 import {
-  deleteWorkspace,
   getUserDetail,
   getUserList,
   getWorkspaceList,
-  getWorkspaceMemberList,
   postAddUser,
   putMyselfProfile,
   putUserDisable,

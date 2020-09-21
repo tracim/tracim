@@ -224,6 +224,43 @@ describe('LiveMessageManager class', () => {
     })
   })
 
+  it('should kill extraneous leaders', () => {
+    // we are faking two leaders by opening the event source connection on both managers
+
+    const manager1 = createManager(30000, 0)
+    manager1.openLiveMessageConnection(userId, apiUrl)
+    manager1.openEventSourceConnection(userId, apiUrl)
+    manager1.eventSource.emitOpen()
+    manager1.eventSource.emit('stream-open')
+
+    const manager2 = createManager(30000, 0)
+    manager2.openLiveMessageConnection(userId, apiUrl)
+    manager2.openEventSourceConnection(userId, apiUrl)
+    manager2.eventSource.emitOpen()
+    manager2.eventSource.emit('stream-open')
+
+    expect(!manager1.eventSource || !manager2.eventSource).to.be.equal(true)
+
+    manager1.closeLiveMessageConnection()
+    manager2.closeLiveMessageConnection()
+  })
+
+  describe('the dispatchLiveMessage method', () => {
+    it('should not dispatch the same message twice', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+
+      global.lastCustomEventTypes = new Set()
+      manager.dispatchLiveMessage({ event_id: 42 })
+      expect(global.lastCustomEventTypes.size).to.equal(1)
+      global.lastCustomEventTypes = new Set()
+      manager.dispatchLiveMessage({ event_id: 42 })
+      expect(global.lastCustomEventTypes.size).to.equal(0)
+
+      manager.closeLiveMessageConnection()
+    })
+  })
+
   after(() => {
     // NOTE SG 2020-07-03 - close all connections to clear timeouts so that mocha exits properly
     // NOTE RJ 2020-08-19 - and between tests, so that managers from different tests do not interact with each other
