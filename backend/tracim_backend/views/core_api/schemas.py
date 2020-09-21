@@ -529,7 +529,7 @@ class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
         return WorkspaceMemberFilterQuery(**data)
 
 
-class WorkspaceIdPathSchema(marshmallow.Schema):
+class WorkspaceIdSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
         required=True,
@@ -537,6 +537,8 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
         validate=strictly_positive_int_validator,
     )
 
+
+class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)

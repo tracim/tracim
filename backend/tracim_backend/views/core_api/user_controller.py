@@ -14,11 +14,13 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UsernameAlreadyExists
+from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -26,6 +28,7 @@ from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -37,6 +40,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
@@ -70,6 +74,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
@@ -133,6 +138,29 @@ class UserController(Controller):
             include_with_role=hapic_data.query.show_workspace_with_role,
         )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
+    @hapic.input_body(WorkspaceIdSchema())
+    @hapic.output_body(WorkspaceDigestSchema())
+    def join_workspace(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Join a workspace.
+        Only possible for OPEN workspaces.
+        Subscribing to a ON_REQUEST workspace is done through /api/users/<user_id>/workspace_subscriptions.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        workspace = wapi.add_current_user_as_member(workspace_id=hapic_data.body["workspace_id"])
+        return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -788,9 +816,17 @@ class UserController(Controller):
 
         # user workspace
         configurator.add_route(
-            "user_workspace", "/users/{user_id:\d+}/workspaces", request_method="GET"  # noqa: W605
+            "get_user_workspace",
+            "/users/{user_id:\d+}/workspaces",
+            request_method="GET",  # noqa: W605
         )
-        configurator.add_view(self.user_workspace, route_name="user_workspace")
+        configurator.add_view(self.user_workspace, route_name="get_user_workspace")
+        configurator.add_route(
+            "post_user_workspace",
+            "/users/{user_id:\d+}/workspaces",
+            request_method="POST",  # noqa: W605
+        )
+        configurator.add_view(self.join_workspace, route_name="post_user_workspace")
 
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
