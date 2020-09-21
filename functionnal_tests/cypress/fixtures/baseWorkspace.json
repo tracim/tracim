@@ -1,6 +1,7 @@
 {
   "description": "A super description of my workspace.",
   "access_type": "confidential",
+  "default_user_role": "reader",
   "label": "My Workspace",
   "workspace_id": 1
 }

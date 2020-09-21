@@ -46,7 +46,11 @@ describe('content :: admin > workspace', function () {
     cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'Modified w')
   })
   it('checks workspace added and deleted TLM', function() {
-    cy.request('POST', 'api/workspaces', { label: 'A new workspace', description: '', access_type: 'confidential' })
+    cy.request(
+      'POST',
+      'api/workspaces',
+      { label: 'A new workspace', description: '', access_type: 'confidential', default_user_role: 'reader'}
+    )
     cy.get('.adminWorkspace__workspaceTable tbody tr').should('have.length', 2)
     cy.request('PUT', 'api/workspaces/2/trashed')
     cy.get('.adminWorkspace__workspaceTable tbody tr').should('have.length', 1)
