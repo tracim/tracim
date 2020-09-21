@@ -1,35 +1,9 @@
-import { FETCH_CONFIG } from 'tracim_frontend_lib'
+import { baseFetch } from 'tracim_frontend_lib'
 
 export const getAgendaList = (apiUrl, workspaceId = null) => {
-  const href = workspaceId
-    ? `users/me/agenda?workspace_ids=${workspaceId}`
-    : 'users/me/agenda'
+  const param = workspaceId
+    ? `?workspace_ids=${workspaceId}`
+    : ''
 
-  return fetch(`${apiUrl}/${href}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-}
-
-export const getWorkspaceDetail = (apiUrl, workspaceId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-}
-
-export const getWorkspaceMemberList = (apiUrl, workspaceId) => {
-  return fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  return baseFetch('GET', `${apiUrl}/users/me/agenda${param}`)
 }

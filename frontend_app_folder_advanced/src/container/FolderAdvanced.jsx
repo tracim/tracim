@@ -3,6 +3,7 @@ import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  getContentTypeList,
   appContentFactory,
   PopinFixed,
   PopinFixedHeader,
@@ -24,7 +25,6 @@ import {
 import { debug } from '../debug.js'
 import {
   getFolder,
-  getContentTypeList,
   putFolder
 } from '../action.async.js'
 

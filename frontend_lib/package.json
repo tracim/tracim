@@ -82,7 +82,8 @@
   },
   "standard": {
     "globals": [
-      "tinymce"
+      "tinymce",
+      "fetch"
     ],
     "parser": "babel-eslint",
     "ignore": []
