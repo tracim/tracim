@@ -968,7 +968,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     )
     default_user_role = StrippedString(
         example=WorkspaceRoles.READER.slug,
-        description="default role for new user in this workspace",
+        description="default role for new users in this workspace",
         validate=user_role_validator,
         required=False,
         allow_none=True,
@@ -994,7 +994,7 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         required=True,
     )
     default_user_role = StrippedString(
-        description="default role for new user in this workspace",
+        description="default role for new users in this workspace",
         example=WorkspaceRoles.READER.slug,
         validate=user_role_validator,
         required=True,
@@ -1079,7 +1079,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         example=WorkspaceRoles.READER.slug,
         validate=user_role_validator,
         required=True,
-        description="default role for new user in this workspace",
+        description="default role for new users in this workspace",
     )
     description = StrippedString(example="All intranet data.")
     created = marshmallow.fields.DateTime(
