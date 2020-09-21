@@ -1,6 +1,4 @@
 {
-  "@all please notice that I did an important update on this content.": "@tous veuillez noter que j'ai fait une mise à jour importante sur ce contenu.",
-  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -76,18 +74,16 @@
   "Administrator": "Administrateur",
   "User": "Utilisateur",
   "Trusted user": "Utilisateur de confiance",
-  "Content manager + add members and edit shared spaces": "Gestionnaire de contenu + ajouter des membres et modifiers les espaces partagés",
+  "Content manager + add members and edit spaces": "Gestionnaire de contenu + ajouter des membres et modifiers les espaces",
   "Contributor + create folders and manage contents": "Contributeur + créer des dossiers et gérer les contenus",
   "Reader + create/modify content": "Lecteur + créer/modifier les contenus",
   "Read contents": "Lire les contenus",
-  "Access to shared spaces where user is member": "Accès aux espaces partagés où l'utilisateur est membre",
+  "Access to spaces where user is member": "Accès aux espaces où l'utilisateur est membre",
   "Trusted user + create users, administration of instance": "Utilisateur de confiance + créer des utilisateurs, administration d'instance",
-  "User + create shared spaces, add members in shared spaces": "Utilisateur + créer des espaces partagés, ajouter des membres dans les espaces partagés",
-  "Shared space manager": "Responsable",
+  "User + create spaces, add members in spaces": "Utilisateur + créer des espaces, ajouter des membres dans les espaces",
+  "Space manager": "Responsable",
   "Refresh?": "Rafraîchir ?",
-  "Sends a notification to all members of the shared space": "Envoie une notification à tous les membres de l'espace partagé",
   "System Administrator": "Administrateur du système",
-  "Error while detecting the mentions": "Erreur lors de la détection des mentions",
   "Username must be at least {{minimumCharactersUsername}} characters long": "L'identifiant doit être composé d'au moins {{minimumCharactersUsername}} caractères",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "L'identifiant doit être composé d'au maximum {{maximumCharactersUsername}} caractères",
   "Username can't contain any whitespace": "L'identifiant ne doit pas contenir d'espace",
@@ -95,6 +91,5 @@
   "Error while checking reserved usernames": "Erreur lors de la vérification des noms d'utilisateur réservés",
   "This word is reserved for group mentions": "Ce mot est réservé aux mentions de groupe",
   "Error while checking username availability": "Erreur lors de la vérification de la disponibilité de l'identifiant",
-  "This username is not available": "Cet identifiant n'est pas disponible",
-  "all": "tous"
+  "This username is not available": "Cet identifiant n'est pas disponible"
 }

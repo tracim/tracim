@@ -4,7 +4,7 @@
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#ffffff",
-  "description": "Documentez, diffusez vos fichiers, discutez à bâtons rompus, organisez vos agendas avec tracim, votre espace partagé en ligne.",
+  "description": "Documentez, diffusez vos fichiers, discutez à bâtons rompus, organisez vos agendas avec tracim, votre espace en ligne.",
   "icons": [{
     "src": "/assets/images/wa-tracim-logo-72x72.png",
     "sizes": "72x72",

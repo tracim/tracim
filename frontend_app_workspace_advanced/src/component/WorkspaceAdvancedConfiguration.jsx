@@ -19,7 +19,7 @@ const WorkspaceAdvancedConfiguration = props => {
         <div className='formBlock__field workspace_advanced__description__text '>
           <textarea
             className='workspace_advanced__description__text__textarea'
-            placeholder={props.t("Shared space's description")}
+            placeholder={props.t("Space's description")}
             value={props.description}
             onChange={props.onChangeDescription}
             rows='3'
@@ -40,7 +40,7 @@ const WorkspaceAdvancedConfiguration = props => {
 
       <div className='formBlock workspace_advanced__delete'>
         <div className='formBlock__title workspace_advanced__delete__title'>
-          {props.t('Delete shared space')}
+          {props.t('Delete space')}
         </div>
 
         <div className='formBlock__field workspace_advanced__delete__content'>

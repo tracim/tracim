@@ -6,13 +6,13 @@ describe('content :: home_page', function () {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.HOME })
 
-    cy.get('#content').contains('Create a shared space')
+    cy.get('#content').contains('Create a space')
 
     cy.changeLanguage('fr')
-    cy.get('#content').contains('Créer un espace partagé')
+    cy.get('#content').contains('Créer un espace')
 
     cy.changeLanguage('pt')
-    cy.get('#content').contains('Criar um espaço partilhado')
+    cy.get('#content').contains('Criar um espaço')
   })
 
   it('should have translations', () => {

@@ -1,6 +1,4 @@
 {
-  "@all please notice that I did an important update on this content.": "@todos percebam que fiz uma actualização importante neste conteúdo.",
-  "A content with same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
   "Send": "Enviar",
@@ -68,8 +66,8 @@
   "Password": "Palavra-passe",
   "Uploaded files": "Ficheiros subidos",
   "You have not yet chosen any files to upload.": "Você ainda não escolheu nenhum ficheiro para upload.",
-  "Shared space manager": "Gestor de espaço partilhado",
-  "Content manager + add members and edit shared spaces": "Gestor de conteúdo + acrescentar membros e editar espaços partilhados",
+  "Space manager": "Gestor de espaço",
+  "Content manager + add members and edit spaces": "Gestor de conteúdo + acrescentar membros e editar espaços",
   "Content manager": "Gestor de conteúdo",
   "Contributor + create folders and manage contents": "Contribuidor + criar pastas e gerir conteúdos",
   "Contributor": "Contribuidor",
@@ -79,15 +77,13 @@
   "Administrator": "Administrador",
   "Trusted user + create users, administration of instance": "Utilizador confiável + criar utilizadores, administração da instância",
   "Trusted user": "Utilizador confiável",
-  "User + create shared spaces, add members in shared spaces": "Utilizador + criar espaços partilhados, acrescentar membros nos espaços partilhados",
+  "User + create spaces, add members in spaces": "Utilizador + criar espaços, acrescentar membros nos espaços",
   "User": "Utilizador",
-  "Access to shared spaces where user is member": "Acesso a espaços partilhados onde o utilizador é membro",
+  "Access to spaces where user is member": "Acesso a espaços onde o utilizador é membro",
   "Simple edition": "Edição simples",
   "Advanced edition": "Edição avançada",
   "Refresh?": "Actualizar?",
-  "Sends a notification to all members of the shared space": "Envia uma notificação a todos os membros do espaço partilhado",
   "System Administrator": "Administrador do sistema",
-  "Error while detecting the mentions": "Erro ao detectar as menções",
   "Username must be at least {{minimumCharactersUsername}} characters long": "O identificador deve ter pelo menos {{minimumCharactersUsername}} carateres",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "O identificador deve ter no máximo {{maximumCharactersUsername}} carateres",
   "Username can't contain any whitespace": "O identificador não pode conter nenhum espaço em branco",
@@ -95,6 +91,5 @@
   "Error while checking reserved usernames": "Erro ao verificar nomes de utilizador reservados",
   "This word is reserved for group mentions": "Esta palavra é reservada às menções de grupo",
   "Error while checking username availability": "Erro ao verificar a disponibilidade do identificador",
-  "This username is not available": "Este identificador não está disponível",
-  "all": "todos"
+  "This username is not available": "Este identificador não está disponível"
 }

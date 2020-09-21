@@ -60,7 +60,7 @@ export class AdminUser extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: props.t('An administrator can always create shared spaces'),
+          msg: props.t('An administrator can always create spaces'),
           type: 'warning',
           delay: undefined
         }
@@ -163,7 +163,7 @@ export class AdminUser extends React.Component {
                   <th className='adminUser__table__fullName' scope='col'>{props.t('User')}</th>
                   <th className='adminUser__table__username' scope='col'>{props.t('Username')}</th>
                   <th className='adminUser__table__email' scope='col'>{props.t('Email')}</th>
-                  <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create shared space')}</th>
+                  <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create space')}</th>
                   <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>

@@ -92,13 +92,13 @@ msgstr ""
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:400
-msgid "Workspace"
-msgstr "Shared space"
+#: tracim_backend/lib/core/workspace.py:419
+msgid "Space"
+msgstr "Space"
 
-#: tracim_backend/lib/core/workspace.py:403
-msgid "Workspace {}"
-msgstr "Shared space {}"
+#: tracim_backend/lib/core/workspace.py:422
+msgid "Space {}"
+msgstr "Space {}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:289
 msgid "{username} & all members of {workspace}"
@@ -175,7 +175,7 @@ msgstr ""
 #: tracim_backend/templates/mail/created_account_body_html.mak:19
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
-"collaborators by logging into your shared space: {a_link}"
+"collaborators by logging into your space: {a_link}"
 msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
@@ -220,7 +220,7 @@ msgstr ""
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:2
 msgid ""
 "{username} (<a href=\"{email_link}\">{email}</a>) shared one or several "
-"files with you in this shared space: <a "
+"files with you in this space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
 

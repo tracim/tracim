@@ -505,7 +505,7 @@ export class Gallery extends React.Component {
         this.setHeadTitle(`${props.t('Gallery')} · ${fetchResultWorkspaceDetail.body.label}`)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading shared space detail'))
+        this.sendGlobalFlashMessage(props.t('Error while loading space detail'))
     }
     return workspaceLabel
   }

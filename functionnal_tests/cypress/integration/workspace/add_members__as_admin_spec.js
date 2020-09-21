@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-const sharedSpaceManager = 'Shared space manager'
+const sharedSpaceManager = 'Space manager'
 
 let workspaceId
 
@@ -25,7 +25,7 @@ describe('Add a member at dashboard', () => {
     cy.cancelXHR()
   })
 
-  it('should add a new member as shared space manager using email', () => {
+  it('should add a new member as space manager using email', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -41,7 +41,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using public name', () => {
+  it('should add a new member as space manager using public name', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
@@ -57,7 +57,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using username with @', () => {
+  it('should add a new member as space manager using username with @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(`@${user.username}`)
@@ -73,7 +73,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using username without @', () => {
+  it('should add a new member as space manager using username without @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)
@@ -148,7 +148,7 @@ describe('Add a member at dashboard', () => {
           .contains(sharedSpaceManager)
           .click()
         cy.contains('Validate').click()
-        cy.get('[data-cy=flashmessage]').contains('This user already is in the workspace')
+        cy.get('[data-cy=flashmessage]').contains('This user already is in the space')
       })
   })
 

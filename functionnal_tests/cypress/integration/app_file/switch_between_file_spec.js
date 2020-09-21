@@ -86,7 +86,7 @@ describe('App File', () => {
   })
 
   describe('Open file with different role', () => {
-    it('should display the download share button when the user is logged as shared space manager', () => {
+    it('should display the download share button when the user is logged as space manager', () => {
       cy.loginAs('administrators')
       cy.visitPage({
         pageName: p.CONTENT_OPEN,

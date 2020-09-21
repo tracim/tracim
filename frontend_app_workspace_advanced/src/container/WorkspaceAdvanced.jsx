@@ -221,7 +221,7 @@ export class WorkspaceAdvanced extends React.Component {
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
 
     if (resDetail.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(props.t('Error while loading shared space details', 'warning'))
+      this.sendGlobalFlashMessage(props.t('Error while loading space details', 'warning'))
       resDetail.body = {}
     }
     if (resMember.apiResponse.status !== 200) {
@@ -255,7 +255,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space label', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new space label', 'warning'))
     }
   }
 
@@ -474,11 +474,11 @@ export class WorkspaceAdvanced extends React.Component {
             this.sendGlobalFlashMessage(<ErrorMsg />, 'warning')
             break
           }
-          case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the shared space'), 'warning'); break
-          default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
+          case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the space'), 'warning'); break
+          default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space'), 'warning')
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space', 'warning'))
     }
   }
 
@@ -495,7 +495,7 @@ export class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: '/ui' } })
         this.handleClickBtnCloseApp()
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while deleting shared space', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting space', 'warning'))
     }
   }
 

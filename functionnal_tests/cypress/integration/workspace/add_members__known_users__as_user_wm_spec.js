@@ -1,4 +1,4 @@
-const sharedSpaceManager = 'Shared space manager'
+const sharedSpaceManager = 'Space manager'
 const ROLE_WORKSPACE_MANAGER = 'workspace-manager'
 
 context('Known users as a workspace-manager', function () {
