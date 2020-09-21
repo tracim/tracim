@@ -110,7 +110,7 @@ export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
 
   if (posAt > -1) {
     textBegin = text.substring(0, posAt) + '@' + item.mention + '\u00A0'
-    textEnd = text.substring(seekUserNameEnd(text, sel.anchorOffset))
+    textEnd = text.substring(seekUsernameEnd(text, sel.anchorOffset))
   } else {
     console.log('Error: mention autocomplete: did not find "@"')
     textBegin = sel.anchorNode.textContent + ' @' + item.mention + '\u00A0'
