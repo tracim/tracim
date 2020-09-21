@@ -9,6 +9,7 @@ import transaction
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -28,9 +29,17 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         """
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace2",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
@@ -45,11 +54,23 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         """
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace2", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace2",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
-        params = {"label": "superworkspace3", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace3",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
 
 
@@ -159,6 +180,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["label"] == workspace.label
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
+        assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
@@ -181,15 +203,13 @@ class TestWorkspaceEndpoint(object):
         """
         Check obtain workspace reachable for user.
         """
-
-        workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
-        profile = Profile.ADMIN
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         workspace_api = workspace_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
@@ -204,6 +224,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["label"] == workspace.label
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
+        assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
@@ -248,6 +269,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is True
         assert workspace["public_upload_enabled"] is True
         assert workspace["public_download_enabled"] is True
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
         # modify workspace
         res = web_testapp.put_json("/api/workspaces/1", status=200, params=params)
@@ -262,6 +284,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
         assert last_event.workspace == workspace
@@ -279,6 +302,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
@@ -446,6 +470,7 @@ class TestWorkspaceEndpoint(object):
             "label": "Documentation",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "access_type": "confidential",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace1_id = res.json_body["workspace_id"]
@@ -454,6 +479,7 @@ class TestWorkspaceEndpoint(object):
             "label": "Documentation2",
             "description": "mysuperdescription",
             "agenda_enabled": False,
+            "access_type": "confidential",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace2_id = res.json_body["workspace_id"]
@@ -490,6 +516,7 @@ class TestWorkspaceEndpoint(object):
             "agenda_enabled": False,
             "public_upload_enabled": False,
             "public_download_enabled": False,
+            "access_type": "open",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -512,17 +539,23 @@ class TestWorkspaceEndpoint(object):
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
 
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
 
     def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """
         Test create workspace : label already used
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "superworkspace", "description": "mysuperdescription"}
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "access_type": "confidential",
+        }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         web_testapp.post_json("/api/workspaces", status=200, params=params)
 
@@ -1057,15 +1090,13 @@ class TestWorkspaceMembersEndpoint(object):
             do_notify=False,
             profile=Profile.TRUSTED_USER,
         )
-        workspace_api = workspace_api_factory.get()
-        workspace = workspace_api.create_workspace("test_2", save_now=True)
-        uapi = user_api_factory.get()
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
+        workspace_api = workspace_api_factory.get(current_user=admin2)
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1073,7 +1104,7 @@ class TestWorkspaceMembersEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id, user_id), status=200
         ).json_body
-        assert len(res) == 1
+        assert len(res) == 2
         user_role = res[0]
         assert user_role["role"] == "reader"
         assert user_role["user_id"] == user_id
@@ -1143,15 +1174,14 @@ class TestWorkspaceMembersEndpoint(object):
             do_notify=False,
             profile=Profile.TRUSTED_USER,
         )
-        workspace_api = workspace_api_factory.get()
-        workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
+        workspace_api = workspace_api_factory.get(current_user=admin2)
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1302,14 +1332,12 @@ class TestWorkspaceMembersEndpoint(object):
         have any right
         """
 
-        workspace_api = workspace_api_factory.get()
-        workspace = workspace_api.create_workspace("test_2", save_now=True)
         uapi = user_api_factory.get()
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
+        workspace_api = workspace_api_factory.get(current_user=admin2)
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         transaction.commit()
         workspace_id = workspace.workspace_id
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1333,7 +1361,7 @@ class TestWorkspaceMembersEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
         ).json_body
-        assert len(res) == 1
+        assert len(res) == 2
         user_role = res[0]
         assert user_role_found["role"] == user_role["role"]
         assert user_role_found["user_id"] == user_role["user_id"]
@@ -1364,6 +1392,7 @@ class TestWorkspaceMembersEndpoint(object):
         )
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
@@ -1606,6 +1635,7 @@ class TestWorkspaceMembersEndpoint(object):
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
@@ -1685,14 +1715,13 @@ class TestWorkspaceMembersEndpoint(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
-        uapi = user_api_factory.get()
 
-        profile = Profile.ADMIN
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
+        uapi = user_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         # update workspace role
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1707,6 +1736,113 @@ class TestWorkspaceMembersEndpoint(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
+
+    def test_api__update_workspace_member_role__err_400__cannot_change_role_of_last_workspace_manager(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+    ):
+        """
+        Update workspace member role: user is last workspace manager so it cannot lower his role
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+
+        uapi = user_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2",
+            password="admin2@admin2.admin2",
+            profile=Profile.USER,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get(current_user=admin2)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        # update workspace role
+        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        params = {"role": "content-manager"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=admin2.user_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+
+    def test_api__update_workspace_member_role__ok_200__not_last_workspace_manager(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+    ):
+        """
+        Update worskpace member role : user is not last workspace manager, so it can lower his
+        role in workspace.
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+
+        uapi = user_api_factory.get()
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2",
+            password="admin2@admin2.admin2",
+            profile=Profile.USER,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get(current_user=admin2)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        # update workspace role
+        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        params = {"role": "content-manager"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=admin2.user_id
+            ),
+            status=200,
+            params=params,
+        )
+        user_role = res.json_body
+        assert user_role["role"] == "content-manager"
+        assert user_role["do_notify"] is True
+        assert user_role["user_id"] == admin2.user_id
+        assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__update_workspace_member_role__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1741,6 +1877,7 @@ class TestWorkspaceMembersEndpoint(object):
         rapi = role_api_factory.get(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
         rapi.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
@@ -1917,12 +2054,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
-    def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(
+    def test_api__delete_workspace_member_role__err_400__last_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ):
         """
-        Delete worskpace member role.
-        Unallow to delete himself as workspace_manager
+        Delete self worskpace member role.
+        Unallow to delete himself as workspace_manager as user is the last workspace manager
         """
 
         uapi = user_api_factory.get()
@@ -1942,11 +2079,10 @@ class TestWorkspaceMembersEndpoint(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -1956,12 +2092,116 @@ class TestWorkspaceMembersEndpoint(object):
             ),
             status=400,
         )
-        assert res.json_body["code"] == ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+        assert res.json_body["code"] == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
         # after
         roles = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace.workspace_id), status=200
         ).json_body
         assert user2.user_id in [role["user_id"] for role in roles]
+
+    def test_api__delete_workspace_member_role__ok_200__not_last_workspace_manager(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+    ):
+        """
+        Delete self worskpace member role.
+        As there is other workspace manager to the workspace, deletion is acceptable
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.TRUSTED_USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        res = web_testapp.delete(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user2.user_id
+            ),
+            status=204,
+        )
+        # after
+        res = web_testapp.get(
+            "/api/workspaces/{}/members".format(workspace.workspace_id), status=400
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        roles = web_testapp.get(
+            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200
+        ).json_body
+        assert user2.user_id not in [role["user_id"] for role in roles]
+
+    def test_api__delete_workspace_member_role__ok_200__self_role_simple_user(
+        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+    ):
+        """
+        Delete self worskpace member role.
+        As user is not workspace manager to the workspace, deletion is acceptable
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test2@test2.test2",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        res = web_testapp.delete(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user2.user_id
+            ),
+            status=204,
+        )
+        # after
+        res = web_testapp.get(
+            "/api/workspaces/{}/members".format(workspace.workspace_id), status=400
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        roles = web_testapp.get(
+            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200
+        ).json_body
+        assert user2.user_id not in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__err_400__simple_user(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
