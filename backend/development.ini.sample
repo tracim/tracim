@@ -101,6 +101,14 @@ basic_setup.session_secret = change_this_value_please!
 # be loaded, allowing to add new feature to an existing Tracim.
 ; plugin.folder_path = %(here)s/plugins
 
+### Workspace ###
+# list of access_type allowed for new workspace. Access_type available in Tracim are:
+# - confidential: not visible publicly, access only by invitation workspace_manager/admin
+# - on_request: publicly visible, access by invitation or request with validation by workspace manager/admin)
+# - open: publicly visible and access by invitation or request without validation
+; workspace.allowed_access_types = confidential,on_request,open
+# example:
+# workspace.allowed_access_types = confidential
 
 ## CORS Special config
 # you can override access control allowed origin here with list of comma separated

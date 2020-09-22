@@ -75,6 +75,88 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_only_confidential_workspace"}], indirect=True
+)
+class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
+    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["label"] == "superworkspace"
+        assert workspace["agenda_enabled"] is False
+        assert workspace["public_upload_enabled"] is False
+        assert workspace["public_download_enabled"] is False
+        assert workspace["description"] == "mysuperdescription"
+        assert workspace["owner"]["user_id"] == 1
+        assert workspace["owner"]["avatar_url"] is None
+        assert workspace["owner"]["public_name"] == "Global manager"
+        assert workspace["owner"]["username"] == "TheAdmin"
+        assert workspace["owner"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+
+    def test_api__create_workspace__err_400__unallowed_access_type(
+        self, web_testapp, event_helper
+    ) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "open",
+        }
+        res = web_testapp.post_json("/api/workspaces", status=400, params=params)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.UNALLOWED_WORKSPACE_ACCESS_TYPE
+
+    def test_api__create_workspace__err_400__unvalid_access_type(
+        self, web_testapp, event_helper
+    ) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "invalid",
+        }
+        res = web_testapp.post_json("/api/workspaces", status=400, params=params)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section", [{"name": "functional_test_workspace_size_limit"}], indirect=True
