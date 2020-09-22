@@ -110,7 +110,12 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(e, position, this.setState.bind(this), this.props.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+    tinymceAutoCompleteHandleInput(
+      e,
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.props.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   handleTinyMceKeyDown = event => {
@@ -126,7 +131,7 @@ export class CommentTextArea extends React.Component {
     )
   }
 
-  handleTinyMceKeyUp = event => {
+  handleTinyMceKeyUp = (event) => {
     const { state } = this
 
     tinymceAutoCompleteHandleKeyUp(
@@ -137,8 +142,12 @@ export class CommentTextArea extends React.Component {
     )
   }
 
-  handleTinyMceSelectionChange = selectionId => {
-    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
+  handleTinyMceSelectionChange = (e, position) => {
+    tinymceAutoCompleteHandleSelectionChange(
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.props.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   render () {

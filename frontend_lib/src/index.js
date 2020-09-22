@@ -118,7 +118,6 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan
 } from './tinymceAutoCompleteHelper.js'
 
 import {
@@ -251,7 +250,6 @@ export {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan,
   updateTLMAuthor,
   baseFetch,
   putEditContent,

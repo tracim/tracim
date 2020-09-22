@@ -5,7 +5,7 @@
   "{{author}} mentioned you in {{content}} in {{workspace}}": "{{author}} mencionou-o no {{content}} em {{workspace}}",
   "{{author}} mentioned you in a comment in {{content}} in {{workspace}}": "{{author}} mencionou-o num comentário do {{content}} em {{workspace}}",
   "{{author}} updated a new version of {{content}} in {{workspace}}": "{{author}} actualizou uma nova versão de {{content}} em {{workspace}}",
-  "{{author}} updated the status of {{content}} in {{workspace}}": "{author}} actualizou o status de {{content}} em {{workspace}}",
+  "{{author}} updated the status of {{content}} in {{workspace}}": "{{author}} actualizou o status de {{content}} em {{workspace}}",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Create a space": "Criar um espaço",
   "Dashboard": "Painel",
