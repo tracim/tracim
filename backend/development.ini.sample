@@ -344,6 +344,10 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.base_url = http://localhost:3030
 ; webdav.ui.enabled = True
 
+### Notifications ###
+# These events are not displayed in notifications to the user
+web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified
+
 ####
 # JOB EXECUTION
 ####

@@ -243,16 +243,13 @@ export class NotificationWall extends React.Component {
       }
     }
 
-    return null
-
-    // RJ - 2020-09-21 - NOTE: we don't want to show unhandled notifications to the user
-    // return {
-    //   icon: 'bell',
-    //   text: `${notification.author} ${notification.type}`,
-    //   url: notification.content
-    //     ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-    //     : ''
-    // }
+    return {
+      icon: 'bell',
+      text: `${notification.author} ${notification.type}`,
+      url: notification.content
+        ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
+        : ''
+    }
   }
 
   handleClickMarkAllAsRead = async () => {
@@ -273,14 +270,6 @@ export class NotificationWall extends React.Component {
 
     if (!props.notificationPage.list) return null
 
-    const detailledNotifications = props.notificationPage.list.reduce((res, notification) => {
-      const details = this.getNotificationDetails(notification)
-      if (details) {
-        res.push({ notification, details })
-      }
-      return res
-    }, [])
-
     return (
       <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
         <PopinFixedHeader
@@ -300,9 +289,9 @@ export class NotificationWall extends React.Component {
         </PopinFixedHeader>
 
         <div className='notification__list'>
-          {detailledNotifications.map((detailledNotification, i) => {
-            const { notification, details } = detailledNotification
-            const icons = details.icon.split('+')
+          {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+            const notificationDetails = this.getNotificationDetails(notification)
+            const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
                 ? <i className={`fa fa-fw fa-${icons[0]}`} />
@@ -317,7 +306,7 @@ export class NotificationWall extends React.Component {
                 key={notification.id}
               >
                 <Link
-                  to={details.url}
+                  to={notificationDetails.url}
                   onClick={() => this.handleClickNotification(notification.id)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
@@ -330,7 +319,7 @@ export class NotificationWall extends React.Component {
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (
-                          details.text + ' ' +
+                          notificationDetails.text + ' ' +
                           `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
                             escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
                           '</span>'

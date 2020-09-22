@@ -110,6 +110,7 @@
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp",
       "GLOBAL_primaryColor",
+      "GLOBAL_excludedNotifications",
       "FormData",
       "XMLHttpRequest",
       "Image",

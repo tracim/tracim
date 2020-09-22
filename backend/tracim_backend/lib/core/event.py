@@ -92,7 +92,8 @@ class EventApi:
         read_status: ReadStatus = ReadStatus.ALL,
         event_id: typing.Optional[int] = None,
         user_id: typing.Optional[int] = None,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        include_event_types: typing.List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: typing.List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: typing.Optional[typing.List[int]] = None,
         after_event_id: int = 0,
     ) -> Query:
@@ -109,18 +110,47 @@ class EventApi:
             # ALL doesn't need any filtering and is the only other handled case
             assert read_status == ReadStatus.ALL
 
-        if event_types:
+        if include_event_types:
             event_type_filters = []
-            for event_type in event_types:
-                event_type_filter = and_(
-                    Event.entity_type == event_type.entity,
-                    Event.operation == event_type.operation,
-                    Event.entity_subtype == event_type.subtype,
-                )
+            for event_type in include_event_types:
+                if event_type.subtype:
+                    event_type_filter = and_(
+                        Event.entity_type == event_type.entity,
+                        Event.operation == event_type.operation,
+                        Event.entity_subtype == event_type.subtype,
+                    )
+                else:
+                    event_type_filter = and_(
+                        Event.entity_type == event_type.entity,
+                        Event.operation == event_type.operation,
+                    )
+
                 event_type_filters.append(event_type_filter)
 
             if len(event_type_filters) > 1:
                 query = query.filter(or_(*event_type_filters))
+            else:
+                query = query.filter(event_type_filters[0])
+
+        if exclude_event_types:
+            event_type_filters = []
+            for event_type in exclude_event_types:
+                if event_type.subtype:
+                    event_type_filter = or_(
+                        Event.entity_type != event_type.entity,
+                        Event.operation != event_type.operation,
+                        Event.entity_subtype != event_type.subtype,
+                    )
+                else:
+                    event_type_filter = or_(
+                        Event.entity_type != event_type.entity,
+                        Event.operation != event_type.operation,
+                    )
+
+                event_type_filters.append(event_type_filter)
+
+            if len(event_type_filters) > 1:
+                query = query.filter(and_(*event_type_filters))
             else:
                 query = query.filter(event_type_filters[0])
 
@@ -185,14 +215,16 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         exclude_author_ids: typing.List[int] = None,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        include_event_types: typing.List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: typing.List[EventTypeDatabaseParameters] = None,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: typing.Optional[int] = None,
     ) -> Page:
         query = self._base_query(
             user_id=user_id,
             read_status=read_status,
-            event_types=event_types,
+            include_event_types=include_event_types,
+            exclude_event_types=exclude_event_types,
             exclude_author_ids=exclude_author_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
@@ -201,12 +233,14 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        include_event_types: typing.List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: typing.List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: typing.List[int] = None,
     ) -> int:
         return self._base_query(
             user_id=user_id,
-            event_types=event_types,
+            include_event_types=include_event_types,
+            exclude_event_types=exclude_event_types,
             read_status=read_status,
             exclude_author_ids=exclude_author_ids,
         ).count()
