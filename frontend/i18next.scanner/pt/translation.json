@@ -4,8 +4,8 @@
   "{{author}} commented on {{content}} in {{workspace}}": "{{author}} comentou em {{content}} em {{workspace}}",
   "{{author}} mentioned you in {{content}} in {{workspace}}": "{{author}} mencionou-o no {{content}} em {{workspace}}",
   "{{author}} mentioned you in a comment in {{content}} in {{workspace}}": "{{author}} mencionou-o num comentário do {{content}} em {{workspace}}",
-  "{{author}} updated a new version of {{content}} in {{workspace}}": "{{author}} actualizou uma nova versão de {{content}} em {{workspace}}",
-  "{{author}} updated the status of {{content}} in {{workspace}}": "{{author}} actualizou o status de {{content}} em {{workspace}}",
+  "{{author}} updated {{content}} in {{workspace}}": "{{author}} actualizou {{content}} em {{workspace}}",
+  "{{author}} changed the status of {{content}} in {{workspace}}": "{{author}} modificou o status de {{content}} em {{workspace}}",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Create a shared space": "Criar um espaço partilhado",
   "Dashboard": "Painel",
@@ -266,5 +266,15 @@
   "Your username has been set": "O seu identificador foi definido",
   "{{author}} added {{user}} to {{workspace}}": "{{author}} acrescentou {{user}} à {{workspace}}",
   "Unknown shared space": "Espaço partilhado desconhecido",
-  "Error loading unread notification number": "Erro ao carregar o número de notificações não lidas"
+  "Error loading unread notification number": "Erro ao carregar o número de notificações não lidas",
+  "{{author}} deleted {{content}} from {{workspace}}": "{{author}} eliminou {{content}} de {{space}}",
+  "{{author}} restored {{content}} in {{workspace}}": "{{author}} restaurou {{content}} no espaço {{space}}",
+  "{{author}} created {{user}}'s profile": "{{author}} criou o perfil de {{user}}",
+  "{{author}} modified {{user}}'s profile": "{{author}} modificou o perfil de {{user}}",
+  "{{author}} deleted {{user}}'s profile": "{{author}} eliminou o perfil de {{user}}",
+  "{{author}} restored {{user}}'s profile": "{{author}} restaurou o perfil de {{user}}",
+  "{{author}} created the space {{space}}": "{{author}} criou o espaço {{space}}",
+  "{{author}} modified the space {{space}}": "{{author}} modificou o espaço {{space}}",
+  "{{author}} deleted the space {{space}}": "{{author}} eliminou o espaço {{space}}",
+  "{{author}} restored the space {{space}}": "{{author}} restaurou o espaço {{space}}"
 }

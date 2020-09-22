@@ -1,7 +1,7 @@
 {
   "{{author}} commented on {{content}} in {{workspace}}": "{{author}} commented on {{content}} in {{workspace}}",
-  "{{author}} updated the status of {{content}} in {{workspace}}": "{{author}} updated the status of {{content}} in {{workspace}}",
-  "{{author}} updated a new version of {{content}} in {{workspace}}": "{{author}} updated a new version of {{content}} in {{workspace}}",
+  "{{author}} changed the status of {{content}} in {{workspace}}": "{{author}} changed the status of {{content}} in {{workspace}}",
+  "{{author}} updated {{content}} in {{workspace}}": "{{author}} updated {{content}} in {{workspace}}",
   "{{author}} added you to {{workspace}}": "{{author}} added you to {{workspace}}",
   "{{author}} mentioned you in a comment in {{content}} in {{workspace}}": "{{author}} mentioned you in a comment in {{content}} in {{workspace}}",
   "{{author}} mentioned you in {{content}} in {{workspace}}": "{{author}} mentioned you in {{content}} in {{workspace}}",
@@ -266,5 +266,15 @@
   "Your username has been set": "Your username has been set",
   "{{author}} added {{user}} to {{workspace}}": "{{author}} added {{user}} to {{workspace}}",
   "Unknown shared space": "Unknown shared space",
-  "Error loading unread notification number": "Error loading unread notification number"
+  "Error loading unread notification number": "Error loading unread notification number",
+  "{{author}} deleted {{content}} from {{workspace}}": "{{author}} deleted {{content}} from {{workspace}}",
+  "{{author}} restored {{content}} in {{workspace}}": "{{author}} restored {{content}} in {{workspace}}",
+  "{{author}} created {{user}}'s profile": "{{author}} created {{user}}'s profile",
+  "{{author}} modified {{user}}'s profile": "{{author}} modified {{user}}'s profile",
+  "{{author}} deleted {{user}}'s profile": "{{author}} deleted {{user}}'s profile",
+  "{{author}} restored {{user}}'s profile": "{{author}} restored {{user}}'s profile",
+  "{{author}} created the space {{space}}": "{{author}} created the space {{space}}",
+  "{{author}} modified the space {{space}}": "{{author}} modified the space {{space}}",
+  "{{author}} deleted the space {{space}}": "{{author}} deleted the space {{space}}",
+  "{{author}} restored the space {{space}}": "{{author}} restored the space {{space}}"
 }
