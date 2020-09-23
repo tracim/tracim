@@ -31,6 +31,7 @@ import {
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import {
+  PAGE,
   ANCHOR_NAMESPACE,
   NUMBER_RESULTS_BY_PAGE
 } from '../util/helper.js'
@@ -38,8 +39,15 @@ import {
 import { escape as escapeHtml } from 'lodash'
 
 export class NotificationWall extends React.Component {
-  handleClickNotification = async notificationId => {
+  handleClickNotification = async (e, notificationId, notificationDetails) => {
     const { props } = this
+
+    if (!notificationDetails.url) {
+      if (notificationDetails.emptyUrlMsg) {
+        props.dispatch(newFlashMessage(notificationDetails.emptyUrlMsg, notificationDetails.msgType || 'warning'))
+      }
+      e.preventDefault()
+    }
 
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
@@ -96,23 +104,23 @@ export class NotificationWall extends React.Component {
       interpolation: { escapeValue: false }
     }
 
+    const contentUrl = notification.content ? PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id) : ''
+
     if (entityType === TLM_ENTITY.CONTENT) {
-      if (eventType === TLM_EVENT.CREATED && contentType === TLM_SUB.COMMENT) {
-        return {
-          icon: 'comments-o',
-          text: props.t('{{author}} commented on {{content}} in {{workspace}}', i18nOpts),
-          url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.parentId}`
-        }
-      }
-
-      const url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-
       switch (eventType) {
         case TLM_EVENT.CREATED: {
+          if (contentType === TLM_SUB.COMMENT) {
+            return {
+              icon: 'comments-o',
+              text: props.t('{{author}} commented on {{content}} in {{workspace}}', i18nOpts),
+              url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+            }
+          }
+
           return {
             icon: 'magic',
             text: props.t('{{author}} created {{content}} in {{workspace}}', i18nOpts),
-            url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
+            url: contentUrl
           }
         }
         case TLM_EVENT.MODIFIED: {
@@ -120,55 +128,29 @@ export class NotificationWall extends React.Component {
             return {
               icon: 'random',
               text: props.t('{{author}} changed the status of {{content}} in {{workspace}}', i18nOpts),
-              url: url
+              url: contentUrl
             }
           }
 
           return {
             icon: 'history',
             text: props.t('{{author}} updated {{content}} in {{workspace}}', i18nOpts),
-            url: url
+            url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
             icon: 'magic',
             text: props.t('{{author}} deleted {{content}} from {{workspace}}', i18nOpts),
-            url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
+            url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
             icon: 'magic',
             text: props.t('{{author}} restored {{content}} in {{workspace}}', i18nOpts),
-            url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
+            url: contentUrl
           }
-        }
-      }
-    }
-
-    if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
-      switch (eventType) {
-        case TLM_EVENT.CREATED: return {
-          icon: 'user-o+plus',
-          text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
-          url: `/ui/workspaces/${notification.workspace.id}/dashboard`
-        }
-        case TLM_EVENT.MODIFIED: return {
-          icon: 'user-o+history',
-          text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
-          url: `/ui/workspaces/${notification.workspace.id}/dashboard`
-        }
-        case TLM_EVENT.DELETED: return {
-          icon: 'user-o+times',
-          text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
-          url: `/ui/workspaces/${notification.workspace.id}/dashboard`
         }
       }
     }
@@ -178,67 +160,97 @@ export class NotificationWall extends React.Component {
         return {
           icon: 'comment-o',
           text: props.t('{{author}} mentioned you in a comment in {{content}} in {{workspace}}', i18nOpts),
-          url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.parentId}`
+          url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
         }
       }
 
       return {
         icon: 'at',
         text: props.t('{{author}} mentioned you in {{content}} in {{workspace}}', i18nOpts),
-        url: `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
+        url: contentUrl
       }
     }
 
     if (entityType === TLM_ENTITY.USER) {
-      const url = (props.user.profile === PROFILE.administrator.slug) ? `/ui/admin/user/${notification.user.userId}` : ''
+      const details = {
+        url: (props.user.profile === PROFILE.administrator.slug) ? PAGE.ADMIN.USER_EDIT(notification.user.userId) : '',
+        emptyUrlMsg: props.t("Only an administrator can see this user's profile"),
+        msgType: 'info'
+      }
 
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
+          ...details,
           icon: 'user-plus',
-          text: props.t("{{author}} created {{user}}'s profile", i18nOpts),
-          url: url
+          text: props.t("{{author}} created {{user}}'s profile", i18nOpts)
         }
         case TLM_EVENT.MODIFIED: return {
+          ...details,
           icon: 'user+history',
-          text: props.t("{{author}} modified {{user}}'s profile", i18nOpts),
-          url: url
+          text: props.t("{{author}} modified {{user}}'s profile", i18nOpts)
         }
         case TLM_EVENT.DELETED: return {
+          ...details,
           icon: 'user-times',
-          text: props.t("{{author}} deleted {{user}}'s profile", i18nOpts),
-          url: url
+          text: props.t("{{author}} deleted {{user}}'s profile", i18nOpts)
         }
         case TLM_EVENT.UNDELETED: return {
+          ...details,
           icon: 'user+undo',
-          text: props.t("{{author}} restored {{user}}'s profile", i18nOpts),
-          url: url
+          text: props.t("{{author}} restored {{user}}'s profile", i18nOpts)
+        }
+      }
+    }
+
+    const dashboardUrl = notification.workspace ? PAGE.WORKSPACE.DASHBOARD(notification.workspace.id) : ''
+
+    if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          icon: 'user-o+plus',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.MODIFIED: return {
+          icon: 'user-o+history',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.DELETED: return {
+          icon: 'user-o+times',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+          url: dashboardUrl
         }
       }
     }
 
     if (entityType === TLM_ENTITY.WORKSPACE) {
-      const url = `/ui/workspaces/${notification.workspace.id}/dashboard`
-
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
           icon: 'university+plus',
           text: props.t('{{author}} created the space {{space}}'),
-          url: url
+          url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'university+history',
           text: props.t('{{author}} modified the space {{space}}'),
-          url: url
+          url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
           icon: 'university+times',
           text: props.t('{{author}} deleted the space {{space}}'),
-          url: url
+          url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
           icon: 'university+undo',
           text: props.t('{{author}} restored the space {{space}}'),
-          url: url
+          url: dashboardUrl
         }
       }
     }
@@ -246,9 +258,9 @@ export class NotificationWall extends React.Component {
     return {
       icon: 'bell',
       text: `${notification.author} ${notification.type}`,
-      url: notification.content
-        ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-        : ''
+      url: contentUrl,
+      emptyUrlMsg: props.t('This notification has no associated content'),
+      msgType: 'warning'
     }
   }
 
@@ -306,8 +318,8 @@ export class NotificationWall extends React.Component {
                 key={notification.id}
               >
                 <Link
-                  to={notificationDetails.url}
-                  onClick={() => this.handleClickNotification(notification.id)}
+                  to={notificationDetails.url || '#'}
+                  onClick={(e) => this.handleClickNotification(e, notification.id, notificationDetails)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
