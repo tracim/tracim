@@ -97,7 +97,7 @@ export class NotificationWall extends React.Component {
     }
 
     if (entityType === TLM_ENTITY.CONTENT) {
-      if (eventType === TLM_EVENT.created && contentType === TLM_SUB.COMMENT) {
+      if (eventType === TLM_EVENT.CREATED && contentType === TLM_SUB.COMMENT) {
         return {
           icon: 'comments-o',
           text: props.t('{{author}} commented on {{content}} in {{workspace}}', i18nOpts),
