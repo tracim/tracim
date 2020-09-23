@@ -133,7 +133,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNALLOWED_WORKSPACE_ACCESS_TYPE
+        assert res.json_body["code"] == ErrorCode.DISALLOWED_WORKSPACE_ACCESS_TYPE
 
     def test_api__create_workspace__err_400__unvalid_access_type(
         self, web_testapp, event_helper

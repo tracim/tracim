@@ -319,8 +319,8 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
-class UnallowedWorkspaceAccessType(TracimException):
-    error_code = ErrorCode.UNALLOWED_WORKSPACE_ACCESS_TYPE
+class DisallowedWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.DISALLOWED_WORKSPACE_ACCESS_TYPE
 
 
 class UserNotAllowedToCreateMoreWorkspace(TracimException):
