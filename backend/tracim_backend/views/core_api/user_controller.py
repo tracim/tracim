@@ -70,8 +70,7 @@ from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMinimalSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
@@ -117,7 +116,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    @hapic.output_body(WorkspaceSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -785,7 +784,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    @hapic.output_body(WorkspaceSchema(many=True))
     def get_accessible_workspaces(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceInContext]:

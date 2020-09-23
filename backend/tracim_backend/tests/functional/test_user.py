@@ -2772,53 +2772,19 @@ class TestUserWorkspaceEndpoint(object):
         )
         assert isinstance(res.json_body, list)
         assert len(res.json_body) == accessible_workspaces_count
-        assert not len(res.json_body) or res.json_body[0] == {
-            "agenda_enabled": True,
-            "is_deleted": False,
-            "public_download_enabled": True,
-            "public_upload_enabled": True,
-            "label": "Hello",
-            "access_type": workspace_access_type.value,
-            "slug": "hello",
-            "workspace_id": 1,
-            "description": "Foo",
-            "sidebar_entries": [
-                {
-                    "fa_icon": "home",
-                    "hexcolor": "#fdfdfd",
-                    "label": "Dashboard",
-                    "route": "/ui/workspaces/1/dashboard",
-                    "slug": "dashboard",
-                },
-                {
-                    "fa_icon": "th",
-                    "hexcolor": "#bbbbbb",
-                    "label": "All Contents",
-                    "route": "/ui/workspaces/1/contents",
-                    "slug": "contents/all",
-                },
-                {
-                    "fa_icon": "comments-o",
-                    "hexcolor": "#ad4cf9",
-                    "label": "Threads",
-                    "route": "/ui/workspaces/1/contents?type=thread",
-                    "slug": "contents/thread",
-                },
-                {
-                    "fa_icon": "paperclip",
-                    "hexcolor": "#ff9900",
-                    "label": "Files",
-                    "route": "/ui/workspaces/1/contents?type=file",
-                    "slug": "contents/file",
-                },
-                {
-                    "fa_icon": "file-text-o",
-                    "hexcolor": "#3f52e3",
-                    "label": "Text Documents",
-                    "route": "/ui/workspaces/1/contents?type=html-document",
-                    "slug": "contents/html-document",
-                },
-            ],
+        assert not len(res.json_body) or set(res.json_body[0].keys()) == {
+            "agenda_enabled",
+            "is_deleted",
+            "public_download_enabled",
+            "public_upload_enabled",
+            "label",
+            "access_type",
+            "slug",
+            "workspace_id",
+            "description",
+            "sidebar_entries",
+            "created",
+            "owner",
         }
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
