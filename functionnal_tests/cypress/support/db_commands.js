@@ -93,7 +93,8 @@ Cypress.Commands.add('createRandomWorkspace', () => {
   const data = {
     description: `A super description of ${workspaceName}.`,
     label: workspaceName,
-    access_type: 'confidential'
+    access_type: 'confidential',
+    default_user_role: 'reader'
   }
   cy
     .request('POST', url, data)

@@ -85,6 +85,7 @@ from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.roles import WorkspaceRoles
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -965,6 +966,14 @@ class WorkspaceModifySchema(marshmallow.Schema):
         default=None,
         allow_none=True,
     )
+    default_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        description="default role for new users in this workspace",
+        validate=user_role_validator,
+        required=False,
+        allow_none=True,
+        default=None,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -982,6 +991,12 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
+        required=True,
+    )
+    default_user_role = StrippedString(
+        description="default role for new users in this workspace",
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
         required=True,
     )
     public_upload_enabled = marshmallow.fields.Bool(
@@ -1060,6 +1075,12 @@ class WorkspaceDigestSchema(WorkspaceMinimalSchema):
 
 
 class WorkspaceSchema(WorkspaceDigestSchema):
+    default_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
+        required=True,
+        description="default role for new users in this workspace",
+    )
     description = StrippedString(example="All intranet data.")
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
