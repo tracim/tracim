@@ -76,7 +76,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-comments-o',
-            text: '{{author}} commented on {{content}} in {{workspace}}',
+            text: '{{author}} commented on {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
           })
       })
@@ -88,7 +88,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-magic',
-            text: '{{author}} created {{content}} in {{workspace}}',
+            text: '{{author}} created {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -100,7 +100,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-history',
-            text: '{{author}} updated a new version of {{content}} in {{workspace}}',
+            text: '{{author}} updated a new version of {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -113,7 +113,7 @@ describe('<NotificationWall />', () => {
         }))
           .to.deep.equal({
             icon: 'fa-user-o',
-            text: '{{author}} added you to {{workspace}}',
+            text: '{{author}} added you to {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })
       })

@@ -100,7 +100,7 @@ export class NotificationWall extends React.Component {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
       content: `<span title='${escapedContentLabel}'class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      workspace: `<span title="${escapedWorkspaceLabel}" class='documentTitle__highlight'>${escapedWorkspaceLabel}</span>`,
+      space: `<span title="${escapedWorkspaceLabel}" class='documentTitle__highlight'>${escapedWorkspaceLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -112,14 +112,14 @@ export class NotificationWall extends React.Component {
           if (contentType === TLM_SUB.COMMENT) {
             return {
               icon: 'comments-o',
-              text: props.t('{{author}} commented on {{content}} in {{workspace}}', i18nOpts),
+              text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
               url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
             }
           }
 
           return {
             icon: 'magic',
-            text: props.t('{{author}} created {{content}} in {{workspace}}', i18nOpts),
+            text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -127,28 +127,28 @@ export class NotificationWall extends React.Component {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
               icon: 'random',
-              text: props.t('{{author}} changed the status of {{content}} in {{workspace}}', i18nOpts),
+              text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
               url: contentUrl
             }
           }
 
           return {
             icon: 'history',
-            text: props.t('{{author}} updated {{content}} in {{workspace}}', i18nOpts),
+            text: props.t('{{author}} updated {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
             icon: 'magic',
-            text: props.t('{{author}} deleted {{content}} from {{workspace}}', i18nOpts),
+            text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
             icon: 'magic',
-            text: props.t('{{author}} restored {{content}} in {{workspace}}', i18nOpts),
+            text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -159,14 +159,14 @@ export class NotificationWall extends React.Component {
       if (notification.content.type === CONTENT_TYPE.COMMENT) {
         return {
           icon: 'comment-o',
-          text: props.t('{{author}} mentioned you in a comment in {{content}} in {{workspace}}', i18nOpts),
+          text: props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts),
           url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
         }
       }
 
       return {
         icon: 'at',
-        text: props.t('{{author}} mentioned you in {{content}} in {{workspace}}', i18nOpts),
+        text: props.t('{{author}} mentioned you in {{content}} in {{space}}', i18nOpts),
         url: contentUrl
       }
     }
@@ -209,47 +209,47 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.CREATED: return {
           icon: 'user-o+plus',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'user-o+history',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
           icon: 'user-o+times',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{workspace}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{workspace}}', i18nOpts),
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
           url: dashboardUrl
         }
       }
     }
 
-    if (entityType === TLM_ENTITY.WORKSPACE) {
+    if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
           icon: 'university+plus',
-          text: props.t('{{author}} created the space {{space}}'),
+          text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'university+history',
-          text: props.t('{{author}} modified the space {{space}}'),
+          text: props.t('{{author}} modified the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
           icon: 'university+times',
-          text: props.t('{{author}} deleted the space {{space}}'),
+          text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
           icon: 'university+undo',
-          text: props.t('{{author}} restored the space {{space}}'),
+          text: props.t('{{author}} restored the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
       }
