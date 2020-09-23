@@ -112,7 +112,7 @@ class WorkspaceApi(object):
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
         if access_type not in self._config.WORKSPACE__ALLOWED_ACCESS_TYPES:
             raise DisallowedWorkspaceAccessType(
-                'Access type "{}" for workspace is not allowed'.format(access_type.name)
+                'Access type "{}" is not allowed for this workspace'.format(access_type.name)
             )
         workspace = Workspace()
         workspace.label = label

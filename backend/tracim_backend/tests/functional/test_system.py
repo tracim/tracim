@@ -304,7 +304,7 @@ class TestWorkspaceAccessType(object):
 
     def test_api__get_workspace_access_type__ok_200__nominal_case(self, web_testapp):
         """
-        Get alls allowed workspace access types list with a registered user.
+        Get the list of allowed workspace access types with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/workspace_access_types", status=200)
