@@ -97,6 +97,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_upload_enabled": False,
             "public_download_enabled": False,
             "access_type": "confidential",
+            "default_user_role": "reader",
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -135,6 +136,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_upload_enabled": False,
             "public_download_enabled": False,
             "access_type": "open",
+            "default_user_role": "reader",
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
@@ -155,6 +157,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_upload_enabled": False,
             "public_download_enabled": False,
             "access_type": "invalid",
+            "default_user_role": "reader",
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
