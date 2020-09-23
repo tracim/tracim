@@ -276,5 +276,7 @@
   "{{author}} created the space {{space}}": "{{author}} a créé l'espace {{space}}",
   "{{author}} modified the space {{space}}": "{{author}} a mis à jour l'espace {{space}}",
   "{{author}} deleted the space {{space}}": "{{author}} a supprimé l'espace {{space}}",
-  "{{author}} restored the space {{space}}": "{{author}} a restauré l'espace {{space}}"
+  "{{author}} restored the space {{space}}": "{{author}} a restauré l'espace {{space}}",
+  "Only an administrator can see this user's profile": "Seule un administrateur peut consulter ce profil utilisateur",
+  "This notification has no associated content": "Cette notification n'a pas de contenu associé"
 }

@@ -276,5 +276,7 @@
   "{{author}} created the space {{space}}": "{{author}} created the space {{space}}",
   "{{author}} modified the space {{space}}": "{{author}} modified the space {{space}}",
   "{{author}} deleted the space {{space}}": "{{author}} deleted the space {{space}}",
-  "{{author}} restored the space {{space}}": "{{author}} restored the space {{space}}"
+  "{{author}} restored the space {{space}}": "{{author}} restored the space {{space}}",
+  "Only an administrator can see this user's profile": "Only an administrator can see this user's profile",
+  "This notification has no associated content": "This notification has no associated content"
 }
