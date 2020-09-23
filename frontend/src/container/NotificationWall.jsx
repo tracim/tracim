@@ -327,7 +327,7 @@ export class NotificationWall extends React.Component {
                       }}
                     />
                   </div>
-                  {!notification.read && <i className='notification__list__item__circle fa circle' />}
+                  {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
                 </Link>
               </ListItemWrapper>
             )
