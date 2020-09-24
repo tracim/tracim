@@ -600,14 +600,16 @@ class LiveMessageQuery(object):
         self,
         read_status: str,
         count: int,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         page_token: Optional[str] = None,
         exclude_author_ids: str = "",
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
         self.page_token = page_token
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 
@@ -618,10 +620,12 @@ class UserMessagesSummaryQuery(object):
 
     def __init__(
         self,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: str = "",
     ) -> None:
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 

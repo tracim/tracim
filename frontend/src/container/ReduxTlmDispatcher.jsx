@@ -35,7 +35,6 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.UNDELETED, handler: this.handleUserChanged },
-      { entityType: TLM_ET.USER_INVITATION, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
 
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },

@@ -1523,7 +1523,8 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         validate=page_token_validator,
     )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
-    event_types = EventTypeListField()
+    include_event_types = EventTypeListField()
+    exclude_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
@@ -1556,7 +1557,8 @@ class PathSuffixSchema(marshmallow.Schema):
 class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
-    event_types = EventTypeListField()
+    exclude_event_types = EventTypeListField()
+    include_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
