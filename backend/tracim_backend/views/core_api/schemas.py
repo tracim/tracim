@@ -682,7 +682,6 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     limit = marshmallow.fields.Int(
         example=15,
         default=0,
-        allow_none=True,
         description="limit the number of results to this value, if not 0",
         validate=strictly_positive_int_validator,
     )

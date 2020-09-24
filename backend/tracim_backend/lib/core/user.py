@@ -217,24 +217,26 @@ class UserApi(object):
         # only if the requesting user is in each and every included workspace.
         # Otherwise, we don't want to allow that.
         # By default, we return a maximum of KNOWN_MEMBERS_ITEMS_LIMIT members (when limit is not set),
+        # This method is too complex and needs to be split.
+        # See https://github.com/tracim/tracim/issues/3635
 
         user_in_every_included_workspaces = False  # type: bool
-        include_user_ids = None  # type: typing.Optional[typing.List[int]]
+        include_user_ids = None  # type: typing.Optional[typing.Set[int]]
 
         if include_workspace_ids:
             user_in_every_included_workspaces = True
 
-            include_user_ids = []
+            include_user_ids = set()
             for workspace_id in include_workspace_ids:
                 user_ids = self.get_members_of_workspaces([workspace_id])
-                include_user_ids += user_ids
+                include_user_ids.update(user_ids)
                 if user_in_every_included_workspaces:
                     user_in_every_included_workspaces = self._user.user_id in user_ids
 
             if user_in_every_included_workspaces and limit:
                 nb_elems = limit
         elif include_workspace_ids:
-            include_user_ids = self.get_members_of_workspaces(include_workspace_ids)
+            include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
 
         if not user_in_every_included_workspaces and len(acp) < 2:
             raise TooShortAutocompleteString(

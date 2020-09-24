@@ -2,7 +2,7 @@ const MENTION_AUTOCOMPLETE_REGEX = /(?:^|\s)@([a-zA-Z\-_]*)$/
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
-let lastSelAndOffset = null
+let previousSelAndOffset = null
 
 const seekUsernameEnd = (text, offset) => {
   while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
@@ -28,13 +28,13 @@ const getSelAndOffset = () => {
 export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, isAutoCompleteActivated) => {
   const selAndOffset = getSelAndOffset()
 
-  if (lastSelAndOffset && lastSelAndOffset.text === selAndOffset.text && lastSelAndOffset.offset === selAndOffset.offset) {
+  if (previousSelAndOffset && previousSelAndOffset.text === selAndOffset.text && previousSelAndOffset.offset === selAndOffset.offset) {
     // RJ - 2020-09-14 - NOTE: handleInput is called twice after typing a key because the selection also changes.
     // This check allows not doing the work twice.
     return
   }
 
-  lastSelAndOffset = selAndOffset
+  previousSelAndOffset = selAndOffset
 
   if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
     if (isAutoCompleteActivated) {
@@ -54,9 +54,9 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
 }
 
 const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, setState) => {
-  const mentionCandidate = getTextOnCursor(lastSelAndOffset).match(MENTION_AUTOCOMPLETE_REGEX)
+  const mentionCandidate = getTextOnCursor(previousSelAndOffset).match(MENTION_AUTOCOMPLETE_REGEX)
   if (!mentionCandidate) {
-    lastSelAndOffset = null
+    previousSelAndOffset = null
     setState({ isAutoCompleteActivated: false })
     return
   }
@@ -71,7 +71,7 @@ const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, se
 
 export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchMentionList) => {
   if (!isAutoCompleteActivated || event.key !== 'Backspace') return
-  lastSelAndOffset = getSelAndOffset()
+  previousSelAndOffset = getSelAndOffset()
   tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
 }
 
