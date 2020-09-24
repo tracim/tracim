@@ -32,7 +32,7 @@ context('Unknown users', function () {
     cy.get('[data-cy=addmember]')
       .type(this.userToAdd.public_name)
     cy.get('[data-cy=autocomplete__item__name]')
-      .contains('I know this user exist')
+      .contains('I know this user exists')
       .click()
     cy.get('[data-cy=memberlist]')
       .contains(sharedSpaceManager)

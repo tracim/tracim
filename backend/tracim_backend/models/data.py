@@ -105,6 +105,9 @@ class Workspace(DeclarativeBase):
         nullable=False,
         server_default=WorkspaceAccessType.CONFIDENTIAL.name,
     )
+    default_user_role = Column(
+        Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
+    )
 
     @hybrid_property
     def contents(self) -> List["Content"]:
