@@ -4,7 +4,6 @@ from os.path import dirname
 import typing
 
 from pluggy import PluginManager
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
@@ -26,6 +25,7 @@ from tracim_backend.lib.webdav.lock_storage import LockStorage
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tracim_session import TracimSession
 
 
 class WebdavTracimContext(TracimContext):
@@ -47,12 +47,12 @@ class WebdavTracimContext(TracimContext):
         return self.environ["http_authenticator.realm"]
 
     @property
-    def dbsession(self) -> Session:
+    def dbsession(self) -> TracimSession:
         assert self._session
         return self._session
 
     @dbsession.setter
-    def dbsession(self, session: Session) -> None:
+    def dbsession(self, session: TracimSession) -> None:
         self._session = session
 
     @property

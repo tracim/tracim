@@ -7,6 +7,7 @@ from os.path import dirname
 import re
 from time import mktime
 import typing
+from typing import List
 
 import transaction
 from wsgidav import compat
@@ -90,13 +91,13 @@ class RootResource(DAVCollection):
         return "<DAVCollection: RootResource>"
 
     @webdav_check_right(is_user)
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> List[str]:
         """
         This method returns the names (here workspace's labels) of all its children
 
         Though for perfomance issue, we're not using this function anymore
         """
-        members_names = []
+        members_names = []  # type: List[str]
         for workspace in self.workspace_api.get_all():
             if workspace.label in members_names:
                 # INFO - G.M - 2020-09-24
@@ -106,9 +107,10 @@ class RootResource(DAVCollection):
                 pass
             else:
                 members_names.append(webdav_convert_file_name_to_display(workspace.label))
+        return members_names
 
     @webdav_check_right(is_user)
-    def getMember(self, label: str) -> DAVCollection:
+    def getMember(self, label: str) -> typing.Optional[DAVCollection]:
         """
         This method returns the child Workspace that corresponds to a given name
 
@@ -161,7 +163,6 @@ class RootResource(DAVCollection):
         """
 
         members = []
-        members_names = []
         for workspace in self.workspace_api.get_all():
             # fix path
             workspace_label = workspace.label
@@ -177,8 +178,6 @@ class RootResource(DAVCollection):
                     label=workspace_label,
                 )
             )
-            members_names.append(workspace_label)
-
         return members
 
 
@@ -217,9 +216,6 @@ class WorkspaceResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
-    def getPreferredPath(self):
-        return self.path
-
     def getCreationDate(self) -> float:
         return mktime(self.workspace.created.timetuple())
 
@@ -256,14 +252,9 @@ class WorkspaceResource(DAVCollection):
     @webdav_check_right(is_contributor)
     def createEmptyResource(self, file_name: str):
         """
-        [For now] we don't allow to create files right under workspaces.
-        Though if we come to allow it, deleting the error's raise will make it possible.
+        Create a new file on the current workspace.
         """
-
         content = None
-
-        # Note: To prevent bugs, check here again if resource already exist
-        # fixed path
         fixed_file_name = webdav_convert_file_name_to_display(file_name)
         path = os.path.join(self.path, file_name)
         resource = self.provider.getResourceInst(path, self.environ)
@@ -834,14 +825,6 @@ class OtherFileResource(FileResource):
         if not self.path.endswith(".html"):
             self.path += ".html"
 
-    @webdav_check_right(is_reader)
-    def getDisplayName(self) -> str:
-        return webdav_convert_file_name_to_display(self.content.file_name)
-
-    @webdav_check_right(is_reader)
-    def getPreferredPath(self):
-        return self.path
-
     def __repr__(self) -> str:
         return "<DAVNonCollection: OtherFileResource (%s)" % self.content.file_name
 
@@ -854,6 +837,10 @@ class OtherFileResource(FileResource):
         return "text/html; charset=utf-8"
 
     @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {"type": self.content.type.capitalize()}
+
+    @webdav_check_right(is_reader)
     def getContent(self):
         # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
         # big file in memory. see https://github.com/tracim/tracim/issues/1913
@@ -862,10 +849,6 @@ class OtherFileResource(FileResource):
         filestream.write(bytes(self.content_designed, "utf-8"))
         filestream.seek(0)
         return filestream
-
-    @webdav_check_right(is_reader)
-    def getDisplayInfo(self):
-        return {"type": self.content.type.capitalize()}
 
     def design(self):
         # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
