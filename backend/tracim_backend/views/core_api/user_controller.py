@@ -199,6 +199,7 @@ class UserController(Controller):
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
             include_workspace_ids=hapic_data.query.include_workspace_ids,
+            limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]

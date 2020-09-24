@@ -682,6 +682,14 @@ class KnownMembersQuerySchema(marshmallow.Schema):
         description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
     )
 
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=0,
+        allow_none=True,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
+    )
+
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return KnownMembersQuery(**data)
