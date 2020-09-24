@@ -10,7 +10,6 @@ from marshmallow.validate import OneOf
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
-from tracim_backend.app_models.validator import acp_validator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -660,9 +659,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
-    acp = StrippedString(
-        example="test", description="search text to query", validate=acp_validator, required=True
-    )
+    acp = StrippedString(example="test", description="search text to query", required=True)
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,

@@ -60,8 +60,9 @@ export class CommentTextArea extends React.Component {
   }
 
   handleInputKeyPress = e => {
-    const { state } = this
+    if (this.props.wysiwyg) return
 
+    const { state } = this
     if (!this.state.isAutoCompleteActivated) return
 
     switch (e.key) {
@@ -86,6 +87,11 @@ export class CommentTextArea extends React.Component {
             autoCompleteCursorPosition: prevState.autoCompleteCursorPosition + 1
           }))
         }
+        e.preventDefault()
+        break
+      }
+      case 'Escape': {
+        this.setState({ isAutoCompleteActivated: false })
         e.preventDefault()
         break
       }
@@ -181,7 +187,7 @@ export class CommentTextArea extends React.Component {
           value={props.newComment}
           onChange={!props.wysiwyg ? props.onChangeNewComment : () => {}}
           disabled={props.disableComment}
-          onKeyDown={!props.wysiwyg ? this.handleInputKeyPress : () => {}}
+          onKeyDown={this.handleInputKeyPress}
           ref={ref => { this.textAreaRef = ref }}
         />
       </>

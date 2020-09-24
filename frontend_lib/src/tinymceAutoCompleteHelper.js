@@ -2,6 +2,8 @@ const MENTION_AUTOCOMPLETE_REGEX = /(?:^|\s)@([a-zA-Z\-_]*)$/
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
+let lastSelAndOffset = null
+
 const seekUsernameEnd = (text, offset) => {
   while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
     offset++
@@ -10,15 +12,31 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-const getTextOnCursor = () => {
+const getTextOnCursor = (selAndOffset) => {
+  const end = seekUsernameEnd(selAndOffset.text, selAndOffset.offset)
+  return selAndOffset.text.substring(0, end)
+}
+
+const getSelAndOffset = () => {
   const sel = tinymce.activeEditor.selection.getSel()
-  const text = sel.anchorNode.textContent
-  const end = seekUsernameEnd(text, sel.anchorOffset)
-  return text.substring(0, end)
+  return {
+    text: sel.anchorNode.textContent,
+    offset: sel.anchorOffset
+  }
 }
 
 export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, isAutoCompleteActivated) => {
-  if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor())) {
+  const selAndOffset = getSelAndOffset()
+
+  if (lastSelAndOffset && lastSelAndOffset.text === selAndOffset.text && lastSelAndOffset.offset === selAndOffset.offset) {
+    // RJ - 2020-09-14 - NOTE: handleInput is called twice after typing a key because the selection also changes.
+    // This check allows not doing the work twice.
+    return
+  }
+
+  lastSelAndOffset = selAndOffset
+
+  if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
     if (isAutoCompleteActivated) {
       tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
       return
@@ -36,8 +54,9 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
 }
 
 const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, setState) => {
-  const mentionCandidate = getTextOnCursor().match(MENTION_AUTOCOMPLETE_REGEX)
+  const mentionCandidate = getTextOnCursor(lastSelAndOffset).match(MENTION_AUTOCOMPLETE_REGEX)
   if (!mentionCandidate) {
+    lastSelAndOffset = null
     setState({ isAutoCompleteActivated: false })
     return
   }
@@ -52,7 +71,7 @@ const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, se
 
 export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchMentionList) => {
   if (!isAutoCompleteActivated || event.key !== 'Backspace') return
-
+  lastSelAndOffset = getSelAndOffset()
   tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
 }
 

@@ -7,7 +7,6 @@ const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const NUMBER_RESULTS_BY_PAGE = 15
 
 export const history = require('history').createBrowserHistory()
 

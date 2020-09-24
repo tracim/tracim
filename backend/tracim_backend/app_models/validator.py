@@ -87,7 +87,6 @@ regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))  # n
 # string matching list of string (without',') separated by ','
 regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))  # noqa: W605
 
-acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)
 action_description_validator = OneOf(ActionDescription.allowed_values())
 content_global_status_validator = OneOf([status.value for status in GlobalStatus])

@@ -76,9 +76,9 @@ export const putContentRestoreDelete = (apiUrl, workspaceId, contentId) => {
   })
 }
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, maxCount = 0) => {
-  const maxCountParam = maxCount ? '&limit=' + maxCount : ''
-  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&include_workspace_ids=${workspaceIdToInclude}` + maxCountParam, {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, limit = 0) => {
+  const limitParam = limit ? '&limit=' + limit : ''
+  return fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&include_workspace_ids=${workspaceIdToInclude}` + limitParam, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
