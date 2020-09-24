@@ -191,7 +191,7 @@ class WorkspaceApi(object):
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
         rapi = RoleApi(current_user=self._user, session=self._session, config=self._config,)
-        rapi.create_one(self._user, workspace, 1, with_notif=True)
+        rapi.create_one(self._user, workspace, workspace.default_user_role.level, with_notif=True)
         return workspace
 
     def get_one(self, workspace_id: int) -> Workspace:
