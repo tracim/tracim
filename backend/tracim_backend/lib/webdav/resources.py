@@ -328,9 +328,6 @@ class WorkspaceResource(DAVCollection):
         [For now] we don't allow to create files right under workspaces.
         Though if we come to allow it, deleting the error's raise will make it possible.
         """
-        # TODO : remove commentary here raise DAVError(HTTP_FORBIDDEN)
-        if "/.deleted/" in self.path or "/.archived/" in self.path:
-            raise DAVError(HTTP_FORBIDDEN)
 
         content = None
 
@@ -552,53 +549,12 @@ class FolderResource(WorkspaceResource):
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
-        # if content is either deleted or archived, we'll check that we try moving it to the parent
-        # if yes, then we'll unarchive / undelete them, else the action's not allowed
-        if self.content.is_deleted or self.content.is_archived:
-            # we remove all archived and deleted from the path and we check to the destpath
-            # has to be equal or else path not valid
-            # ex: /a/b/.deleted/resource, to be valid destpath has to be = /a/b/resource (no other solution)
-            current_path = re.sub(r"/\.(deleted|archived)", "", self.path)
-
-            if current_path == destpath:
-                ManageActions(
-                    action_type=ActionDescription.UNDELETION
-                    if self.content.is_deleted
-                    else ActionDescription.UNARCHIVING,
-                    api=self.content_api,
-                    content=self.content,
-                    session=self.session,
-                ).action()
-            else:
-                invalid_path = True
-        # if the content is not deleted / archived, check if we're trying to delete / archive it by
-        # moving it to a .deleted / .archived folder
-        elif basename(dirname(destpath)) in [".deleted", ".archived"]:
-            # same test as above ^
-            dest_path = re.sub(r"/\.(deleted|archived)", "", destpath)
-
-            if dest_path == self.path:
-                ManageActions(
-                    action_type=ActionDescription.DELETION
-                    if ".deleted" in destpath
-                    else ActionDescription.ARCHIVING,
-                    api=self.content_api,
-                    content=self.content,
-                    session=self.session,
-                ).action()
-            else:
-                invalid_path = True
-        # else we check if the path is good (not at the root path / not in a deleted/archived path)
+        # we check if the path is good (not at the root path /)
         # and we move the content
-        else:
-            invalid_path = any(x in destpath for x in [".deleted", ".archived"])
-            invalid_path = invalid_path or any(x in self.path for x in [".deleted", ".archived"])
-            invalid_path = (
-                invalid_path or dirname(destpath) == self.environ["http_authenticator.realm"]
-            )
+        invalid_path = dirname(destpath) == self.environ["http_authenticator.realm"]
 
-            if not invalid_path:
-                self.move_folder(destpath)
+        if not invalid_path:
+            self.move_folder(destpath)
 
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
@@ -797,54 +753,10 @@ class FileResource(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         invalid_path = False
+        invalid_path = dirname(destpath) == self.environ["http_authenticator.realm"]
 
-        # if content is either deleted or archived, we'll check that we try moving it to the parent
-        # if yes, then we'll unarchive / undelete them, else the action's not allowed
-        if self.content.is_deleted or self.content.is_archived:
-            # we remove all archived and deleted from the path and we check to the destpath
-            # has to be equal or else path not valid
-            # ex: /a/b/.deleted/resource, to be valid destpath has to be = /a/b/resource (no other solution)
-            current_path = re.sub(r"/\.(deleted|archived)", "", self.path)
-
-            if current_path == destpath:
-                ManageActions(
-                    action_type=ActionDescription.UNDELETION
-                    if self.content.is_deleted
-                    else ActionDescription.UNARCHIVING,
-                    api=self.content_api,
-                    content=self.content,
-                    session=self.session,
-                ).action()
-            else:
-                invalid_path = True
-        # if the content is not deleted / archived, check if we're trying to delete / archive it by
-        # moving it to a .deleted / .archived folder
-        elif basename(dirname(destpath)) in [".deleted", ".archived"]:
-            # same test as above ^
-            dest_path = re.sub(r"/\.(deleted|archived)", "", destpath)
-
-            if dest_path == self.path:
-                ManageActions(
-                    action_type=ActionDescription.DELETION
-                    if ".deleted" in destpath
-                    else ActionDescription.ARCHIVING,
-                    api=self.content_api,
-                    content=self.content,
-                    session=self.session,
-                ).action()
-            else:
-                invalid_path = True
-        # else we check if the path is good (not at the root path / not in a deleted/archived path)
-        # and we move the content
-        else:
-            invalid_path = any(x in destpath for x in [".deleted", ".archived"])
-            invalid_path = invalid_path or any(x in self.path for x in [".deleted", ".archived"])
-            invalid_path = (
-                invalid_path or dirname(destpath) == self.environ["http_authenticator.realm"]
-            )
-
-            if not invalid_path:
-                self.move_file(destpath)
+        if not invalid_path:
+            self.move_file(destpath)
 
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
