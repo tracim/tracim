@@ -25,6 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
+  NUMBER_RESULTS_BY_PAGE,
   TracimComponent,
   Avatar,
   ComposedIcon,
@@ -33,7 +34,6 @@ import {
 import {
   PAGE,
   ANCHOR_NAMESPACE,
-  NUMBER_RESULTS_BY_PAGE
 } from '../util/helper.js'
 
 import { escape as escapeHtml } from 'lodash'

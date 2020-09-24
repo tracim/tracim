@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
+  NUMBER_RESULTS_BY_PAGE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
@@ -341,9 +342,7 @@ export function appContentFactory (WrappedComponent) {
     searchForMentionInQuery = async (query, workspaceId) => {
       const mentionList = getMatchingGroupMentionList(query)
 
-      if (query.length < 2) return mentionList
-
-      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, NUMBER_RESULTS_BY_PAGE))
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
         case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]

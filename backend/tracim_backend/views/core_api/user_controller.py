@@ -14,6 +14,7 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
@@ -183,6 +184,7 @@ class UserController(Controller):
     @hapic.input_query(KnownMembersQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
     @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
         Get known users list
@@ -199,6 +201,7 @@ class UserController(Controller):
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
             include_workspace_ids=hapic_data.query.include_workspace_ids,
+            limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
