@@ -2,7 +2,6 @@ import { CONTENT_TYPE } from './helper.js'
 
 // TLM Event Type list
 const USER = 'user'
-const USER_INVITATION = 'user_invitation'
 const CONTENT = 'content'
 const MENTION = 'mention'
 const SHAREDSPACE = 'workspace'
@@ -18,7 +17,6 @@ export const TLM_SUB_TYPE = CONTENT_TYPE
 
 export const TLM_ENTITY_TYPE = {
   USER,
-  USER_INVITATION,
   CONTENT,
   MENTION,
   SHAREDSPACE,
