@@ -29,7 +29,7 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
   const selAndOffset = getSelAndOffset()
 
   if (previousSelAndOffset && previousSelAndOffset.text === selAndOffset.text && previousSelAndOffset.offset === selAndOffset.offset) {
-    // RJ - 2020-09-14 - NOTE: handleInput is called twice after typing a key because the selection also changes.
+    // INFO - RJ - 2020-09-14 - handleInput is called twice after typing a key because the selection also changes.
     // This check allows not doing the work twice.
     return
   }
