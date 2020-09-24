@@ -520,6 +520,7 @@ class WorkspaceUpdate(object):
         self,
         label: Optional[str] = None,
         description: Optional[str] = None,
+        default_user_role: Optional[str] = None,
         agenda_enabled: Optional[bool] = None,
         public_upload_enabled: Optional[bool] = None,
         public_download_enabled: Optional[bool] = None,
@@ -529,6 +530,9 @@ class WorkspaceUpdate(object):
         self.agenda_enabled = agenda_enabled
         self.public_upload_enabled = public_upload_enabled
         self.public_download_enabled = public_download_enabled
+        self.default_user_role = None
+        if default_user_role:
+            self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
 
 
 class WorkspaceCreate(object):
@@ -541,6 +545,7 @@ class WorkspaceCreate(object):
         label: str,
         description: str,
         access_type: str,
+        default_user_role: str,
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
@@ -551,6 +556,7 @@ class WorkspaceCreate(object):
         self.public_upload_enabled = public_upload_enabled
         self.public_download_enabled = public_download_enabled
         self.access_type = WorkspaceAccessType(access_type)
+        self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
 
 
 class ContentCreation(object):
@@ -758,6 +764,11 @@ class WorkspaceInContext(object):
     def access_type(self) -> str:
         """access type of the workspace"""
         return self.workspace.access_type.value
+
+    @property
+    def default_user_role(self) -> str:
+        """default user role of the workspace"""
+        return self.workspace.default_user_role.slug
 
     @property
     def id(self) -> int:

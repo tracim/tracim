@@ -10,12 +10,11 @@
   "Draw": "Draw",
   "Create an office document": "Create an office document",
   "Content not found": "Content not found",
-  "Workspace not found": "Workspace not found",
+  "Space not found": "Space not found",
   "You cannot edit this type of file online": "You cannot edit this type of file online",
   "Unknown error": "Unknown error",
   "Unknown url": "Unknown url",
   "Edit online": "Edit online",
   "View online": "View online",
-  "New Office document": "New Office document",
-  "Error while loading shared space detail": "Error while loading shared space detail"
+  "New Office document": "New Office document"
 }

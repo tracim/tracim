@@ -25,7 +25,7 @@ const AdminLink = props => {
           data-cy='adminlink__workspace__link'
         >
           <i className={`fa fa-fw fa-${workspaceConfig.faIcon} mr-2`} />
-          {props.t('Shared spaces')}
+          {props.t('Spaces')}
         </Link>
 
         <Link

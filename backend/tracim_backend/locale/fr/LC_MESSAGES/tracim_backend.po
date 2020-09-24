@@ -106,13 +106,13 @@ msgstr "Nouveau dossier"
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:400
-msgid "Workspace"
-msgstr "Espace partagé"
+#: tracim_backend/lib/core/workspace.py:419
+msgid "Space"
+msgstr "Espace"
 
-#: tracim_backend/lib/core/workspace.py:403
-msgid "Workspace {}"
-msgstr "Espace partagé {0}"
+#: tracim_backend/lib/core/workspace.py:422
+msgid "Space {}"
+msgstr "Espace {0}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:289
 msgid "{username} & all members of {workspace}"
@@ -195,10 +195,10 @@ msgstr "mot de passe : {password}"
 #: tracim_backend/templates/mail/created_account_body_html.mak:19
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
-"collaborators by logging into your shared space: {a_link}"
+"collaborators by logging into your space: {a_link}"
 msgstr ""
 "Commencez à discuter, partager des fichiers, agendas et documentations "
-"avec vos collaborateurs en vous connectant dans votre espace partagé : "
+"avec vos collaborateurs en vous connectant dans votre espace : "
 "{a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
@@ -245,11 +245,11 @@ msgstr "généré par le logiciel tracim"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:2
 msgid ""
 "{username} (<a href=\"{email_link}\">{email}</a>) shared one or several "
-"files with you in this shared space: <a "
+"files with you in this space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
 "{username} (<a href=\"{email_link}\">{email}</a>) a partagé un ou "
-"plusieurs fichiers avec vous dans cet espace partagé : <a "
+"plusieurs fichiers avec vous dans cet espace : <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:9
@@ -348,11 +348,11 @@ msgstr "{username} (via Tracim)"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:2
 msgid ""
-"You have invited {nb_receivers} people to upload files in this shared "
+"You have invited {nb_receivers} people to upload files in this "
 "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
 "Vous avez invité {nb_receivers} personne(s) à téléverser des fichiers "
-"dans cet espace partagé <a href={sharedspace_url}>{sharedspace_name}</a> "
+"dans cet espace <a href={sharedspace_url}>{sharedspace_name}</a> "
 ":"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:10

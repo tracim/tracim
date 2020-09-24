@@ -42,13 +42,7 @@ export class LiveMessageManager {
     this.host = host
 
     this.setStatus(LIVE_MESSAGE_STATUS.PENDING)
-
-    if (!this.broadcastChannel) {
-      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
-      this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
-      this.broadcastChannel.postMessage({ canIHaveStatus: true })
-      this.electLeader()
-    }
+    this.openBroadcastChannel()
   }
 
   electLeader () {
@@ -59,6 +53,13 @@ export class LiveMessageManager {
   broadcastChannelMessageReceived (message) {
     if (message.canIHaveStatus && this.eventSource) {
       this.broadcastChannel.postMessage({ status: this.status })
+    }
+
+    if (this.eventSource && (message.status || message.tlm)) {
+      // NOTE - 2020-09-14 - RJ
+      // There are two leaders. We reset the connection and
+      // hope that a proper leader election will fix the situation.
+      this.restartLiveMessageConnection()
     }
 
     if (message.status) {
@@ -131,13 +132,31 @@ export class LiveMessageManager {
     }
   }
 
-  closeLiveMessageConnection () {
-    this.closeEventSourceConnection()
-
+  closeBroadcastChannel () {
     if (this.broadcastChannel) {
       this.broadcastChannel.close()
       this.broadcastChannel = null
     }
+  }
+
+  openBroadcastChannel () {
+    if (!this.broadcastChannel) {
+      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+      this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
+      this.broadcastChannel.postMessage({ canIHaveStatus: true })
+      this.electLeader()
+    }
+  }
+
+  restartLiveMessageConnection () {
+    this.closeEventSourceConnection()
+    this.closeBroadcastChannel()
+    this.openBroadcastChannel()
+  }
+
+  closeLiveMessageConnection () {
+    this.closeEventSourceConnection()
+    this.closeBroadcastChannel()
 
     console.log('%c.:. TLM Closed')
     this.setStatus(LIVE_MESSAGE_STATUS.CLOSED)
@@ -177,6 +196,7 @@ export class LiveMessageManager {
         const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`, { signal: controller.signal })
         clearTimeout(fetchTimeoutId)
         if (response.status === 401) {
+          this.reconnectionTimerId = 0
           GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, data: {} })
           this.closeLiveMessageConnection()
           return
@@ -196,6 +216,11 @@ export class LiveMessageManager {
   }
 
   dispatchLiveMessage (tlm) {
+    if (this.lastEventId >= tlm.event_id) {
+      console.log('INFO: prevented a live message to be dispatched a second time:', tlm)
+      return
+    }
+
     console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
 
     this.lastEventId = Math.max(this.lastEventId, tlm.event_id)

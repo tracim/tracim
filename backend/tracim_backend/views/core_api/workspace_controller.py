@@ -12,10 +12,10 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
@@ -29,6 +29,7 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
 from tracim_backend.lib.utils.authorization import can_delete_workspace
+from tracim_backend.lib.utils.authorization import can_leave_workspace
 from tracim_backend.lib.utils.authorization import can_modify_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import can_see_workspace_information
@@ -164,6 +165,7 @@ class WorkspaceController(Controller):
             agenda_enabled=hapic_data.body.agenda_enabled,
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
+            default_user_role=hapic_data.body.default_user_role,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -191,6 +193,7 @@ class WorkspaceController(Controller):
             agenda_enabled=hapic_data.body.agenda_enabled,
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
+            default_user_role=hapic_data.body.default_user_role,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
@@ -277,6 +280,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -300,9 +304,9 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
-    @check_right(can_modify_workspace)
+    @check_right(can_leave_workspace)
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_workspaces_members_role(

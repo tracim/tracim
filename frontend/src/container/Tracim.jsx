@@ -111,11 +111,12 @@ export class Tracim extends React.Component {
 
   handleDisconnectedFromApi = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
-    this.liveMessageManager.closeLiveMessageConnection()
-    if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+    this.handleUserDisconnected(data)
+    if (!document.location.pathname.includes('/login')) document.location.href = `${PAGE.LOGIN}?dc=1`
   }
 
   handleUserConnected = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.USER_CONNECTED, data)
     this.liveMessageManager.openLiveMessageConnection(data.user_id)
   }
 

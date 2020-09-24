@@ -27,6 +27,7 @@ from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -109,6 +110,7 @@ class WorkspaceApi(object):
         public_download_enabled: bool = True,
         public_upload_enabled: bool = True,
         access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
+        default_user_role: WorkspaceRoles = WorkspaceRoles.READER,
         save_now: bool = False,
     ) -> Workspace:
         if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
@@ -125,6 +127,7 @@ class WorkspaceApi(object):
         workspace.updated = datetime.utcnow()
         workspace.owner = self._user
         workspace.access_type = access_type
+        workspace.default_user_role = default_user_role
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -149,6 +152,7 @@ class WorkspaceApi(object):
         agenda_enabled: typing.Optional[bool] = None,
         public_upload_enabled: typing.Optional[bool] = None,
         public_download_enabled: typing.Optional[bool] = None,
+        default_user_role: typing.Optional[WorkspaceRoles] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -170,6 +174,8 @@ class WorkspaceApi(object):
             workspace.public_upload_enabled = public_upload_enabled
         if public_download_enabled is not None:
             workspace.public_download_enabled = public_download_enabled
+        if default_user_role:
+            workspace.default_user_role = default_user_role
         workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)
@@ -445,7 +451,7 @@ class WorkspaceApi(object):
         """
         _ = self.translator.get_translation
         query = self._base_query_without_roles().filter(
-            Workspace.label.ilike("{0}%".format(_("Workspace")))
+            Workspace.label.ilike("{0}%".format(_("Space")))
         )
 
-        return _("Workspace {}").format(query.count() + 1)
+        return _("Space {}").format(query.count() + 1)

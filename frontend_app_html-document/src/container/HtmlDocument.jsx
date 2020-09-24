@@ -34,10 +34,10 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan,
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
+  putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
@@ -46,8 +46,7 @@ import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead,
-  putUserConfiguration
+  putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -280,12 +279,21 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  handleTinyMceInput = (event, tinymcePosition) => {
-    tinymceAutoCompleteHandleInput(event, tinymcePosition, this.setState.bind(this), this.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
-  handleTinyMceSelectionChange = selectionId => {
-    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
+  handleTinyMceSelectionChange = (e, position) => {
+    tinymceAutoCompleteHandleSelectionChange(
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   handleTinyMceKeyUp = event => {
@@ -434,7 +442,7 @@ export class HtmlDocument extends React.Component {
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
@@ -484,11 +492,11 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
-    const contentWithoutAnyAutoCompleteSpan = tinymceRemoveAllAutocompleteSpan()
+    const content = tinymce.activeEditor.getContent()
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(contentWithoutAnyAutoCompleteSpan, state.loggedUser.username)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(content, state.loggedUser.username)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
@@ -526,7 +534,7 @@ export class HtmlDocument extends React.Component {
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
-          case 1001:
+          case 2067:
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
             break
           case 2044:

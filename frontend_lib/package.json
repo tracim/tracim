@@ -82,7 +82,11 @@
   },
   "standard": {
     "globals": [
-      "tinymce"
+      "tinymce",
+      "fetch",
+      "Element",
+      "DOMParser",
+      "globalThis"
     ],
     "parser": "babel-eslint",
     "ignore": []
