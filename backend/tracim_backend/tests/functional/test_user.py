@@ -3849,7 +3849,7 @@ class TestKnownMembersEndpoint(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
 
     def test_api__get_user__ok_200__normal_user_by_email(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
