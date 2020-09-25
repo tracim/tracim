@@ -13,8 +13,8 @@ export const ExtandedAction = props => {
     <DropdownMenu
       buttonIcon='fa-ellipsis-h'
       buttonTooltip={props.t('Actions')}
-      customClassButton='extandedaction outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-      dataCyButton='extended_action'
+      buttonCustomClass='extandedaction outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+      buttonDataCy='extended_action'
       isButton
     >
       {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= props.onClickExtendedAction.edit.allowedRoleId && (

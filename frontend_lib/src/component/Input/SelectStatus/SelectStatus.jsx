@@ -28,8 +28,8 @@ export const SelectStatus = props => {
           </span>
         }
         buttonTooltip={props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
-        customClassButton='selectStatus__dropdownbtn check btn outlineTextBtn'
-        customClassMenu='selectStatus__submenu'
+        buttonCustomClass='selectStatus__dropdownbtn check btn outlineTextBtn'
+        menuCustomClass='selectStatus__submenu'
         isButton
       >
         {props.availableStatus.map(s =>

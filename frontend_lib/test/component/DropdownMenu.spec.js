@@ -67,21 +67,21 @@ describe('<DropdownMenu />', () => {
       expect(wrapper.find('button.dropdown-toggle').prop('title')).to.equal(label)
     })
 
-    it('if it has a customClassButton prop, the dropdown button should have this class', () => {
+    it('if it has a buttonCustomClass prop, the dropdown button should have this class', () => {
       const buttonClassName = 'class'
-      wrapper.setProps({ customClassButton: buttonClassName })
+      wrapper.setProps({ buttonCustomClass: buttonClassName })
       expect(wrapper.find('button.dropdown-toggle').prop('className')).to.include(buttonClassName)
     })
 
-    it('if it has a customClassMenu prop, the dropdown menu should have this class', () => {
+    it('if it has a menuCustomClass prop, the dropdown menu should have this class', () => {
       const menuClassName = 'class'
-      wrapper.setProps({ customClassMenu: menuClassName })
+      wrapper.setProps({ menuCustomClass: menuClassName })
       expect(wrapper.find('div.dropdown-menu').prop('className')).to.include(menuClassName)
     })
 
-    it('if it has a dataCyButton prop, the dropdown button should have this data-cy', () => {
+    it('if it has a buttonDataCy prop, the dropdown button should have this data-cy', () => {
       const dataCy = 'some_data-cy'
-      wrapper.setProps({ dataCyButton: dataCy })
+      wrapper.setProps({ buttonDataCy: dataCy })
       expect(wrapper.find('button.dropdown-toggle').prop('data-cy')).to.equal(dataCy)
     })
 

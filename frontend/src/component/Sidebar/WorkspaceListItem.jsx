@@ -92,7 +92,7 @@ class WorkspaceListItem extends React.Component {
           {state.showDropdownMenuButton && (
             <DropdownMenu
               buttonIcon='fa-ellipsis-v'
-              customClassButton='sidebar__content__navigation__workspace__item__menu'
+              buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
               buttonTooltip={props.t('Actions')}
             >
               {props.allowedAppList.map(allowedApp =>

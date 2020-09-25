@@ -20,9 +20,9 @@ export const MenuProfil = props => {
           />
         }
         buttonLabel={props.user.publicName}
-        customClassButton='menuprofil__dropdown__name'
-        customClassMenu='menuprofil__dropdown__setting'
-        dataCyButton='menuprofil__dropdown__button'
+        buttonCustomClass='menuprofil__dropdown__name'
+        menuCustomClass='menuprofil__dropdown__setting'
+        buttonDataCy='menuprofil__dropdown__button'
       >
         <Link
           to={PAGE.ACCOUNT}

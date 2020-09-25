@@ -11,8 +11,8 @@ const AdminLink = props => {
     <DropdownMenu
       buttonIcon='fa-cog'
       buttonLabel={props.t('Administration')}
-      customClassButton='adminlink__btn outlineTextBtn'
-      dataCyButton='adminlink__dropdown__btn'
+      buttonCustomClass='adminlink__btn outlineTextBtn'
+      buttonDataCy='adminlink__dropdown__btn'
       isButton
     >
       <Link

@@ -12,9 +12,9 @@ const DropdownMenu = props => {
         className={classnames(
           'btn dropdown-toggle',
           props.isButton ? 'nohover primaryColorBorder' : 'transparentButton',
-          props.customClassButton
+          props.buttonCustomClass
         )}
-        data-cy={props.dataCyButton}
+        data-cy={props.buttonDataCy}
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         id='dropdownMenuButton'
@@ -30,11 +30,11 @@ const DropdownMenu = props => {
 
       <div
         aria-labelledby='dropdownMenuButton'
-        className={classnames('dropdownMenu dropdown-menu', props.customClassMenu)}
+        className={classnames('dropdownMenu dropdown-menu', props.menuCustomClass)}
       >
         {props.children.length > 1
-          ? props.children.map(child => <DropdownMenuItem customClass={props.customClassItem}> {child} </DropdownMenuItem>)
-          : <DropdownMenuItem customClass={props.customClassItem}> {props.children} </DropdownMenuItem>
+          ? props.children.map(child => <DropdownMenuItem customClass={props.itemCustomClass}> {child} </DropdownMenuItem>)
+          : <DropdownMenuItem customClass={props.itemCustomClass}> {props.children} </DropdownMenuItem>
         }
       </div>
     </div>
@@ -49,10 +49,10 @@ DropdownMenu.propTypes = {
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
   buttonTooltip: PropTypes.string,
-  customClassButton: PropTypes.string,
-  customClassItem: PropTypes.string,
-  customClassMenu: PropTypes.string,
-  dataCyButton: PropTypes.string,
+  buttonCustomClass: PropTypes.string,
+  itemCustomClass: PropTypes.string,
+  menuCustomClass: PropTypes.string,
+  buttonDataCy: PropTypes.string,
   isButton: PropTypes.bool
 }
 
@@ -62,9 +62,9 @@ DropdownMenu.defaultProps = {
   buttonImage: '',
   buttonLabel: '',
   buttonTooltip: '',
-  customClassButton: '',
-  customClassMenu: '',
-  customClassItem: '',
-  dataCyButton: '',
+  buttonCustomClass: '',
+  menuCustomClass: '',
+  itemCustomClass: '',
+  buttonDataCy: '',
   isButton: false
 }

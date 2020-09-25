@@ -118,7 +118,7 @@ class Folder extends React.Component {
                     </span>
                   }
                   buttonTooltip={props.t('Create in folder')}
-                  customClassButton='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                  buttonCustomClass='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
                   isButton
                 >
                   {folderAvailableApp.map(app =>

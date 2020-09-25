@@ -11,8 +11,8 @@ const DropdownLang = props => {
       <DropdownMenu
         buttonImage={activeLang.icon}
         buttonLabel={activeLang.label}
-        customClassButton='dropdownlang__dropdown__btnlanguage outlineTextBtn'
-        customClassMenu='dropdownlang__dropdown__subdropdown'
+        buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn'
+        menuCustomClass='dropdownlang__dropdown__subdropdown'
         isButton
       >
         {props.langList.filter(lang => lang.id !== props.langActiveId).map(lang =>
