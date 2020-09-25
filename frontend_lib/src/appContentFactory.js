@@ -347,7 +347,7 @@ export function appContentFactory (WrappedComponent) {
       const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, NUMBER_RESULTS_BY_PAGE))
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
-        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
         default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
       }
       return mentionList

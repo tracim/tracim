@@ -52,11 +52,10 @@ export class CommentTextArea extends React.Component {
     }
 
     const mentionList = await this.props.searchForMentionInQuery(mentionCandidate)
-    const mentionWithUsernameList = mentionList.filter(mention => mention.username)
     this.setState({
       isAutoCompleteActivated: true,
-      autoCompleteCursorPosition: mentionWithUsernameList.length - 1,
-      autoCompleteItemList: mentionWithUsernameList
+      autoCompleteCursorPosition: mentionList.length - 1,
+      autoCompleteItemList: mentionList
     })
   }
 
@@ -98,6 +97,11 @@ export class CommentTextArea extends React.Component {
             autoCompleteCursorPosition: prevState.autoCompleteCursorPosition + 1
           }))
         }
+        e.preventDefault()
+        break
+      }
+      case 'Escape': {
+        this.setState({ isAutoCompleteActivated: false })
         e.preventDefault()
         break
       }
