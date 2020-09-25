@@ -27,6 +27,7 @@ from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import WorkspaceAccessType
 
 ENV_VAR_PREFIX = "TRACIM_"
 CONFIG_LOG_TEMPLATE = (
@@ -392,6 +393,12 @@ class CFG(object):
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
+        self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
+            self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
+            separator=",",
+            cast_func=WorkspaceAccessType,
+            do_strip=True,
+        )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(

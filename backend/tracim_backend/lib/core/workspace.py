@@ -10,6 +10,7 @@ from tracim_backend import app_list
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -117,6 +118,10 @@ class WorkspaceApi(object):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
+        if access_type not in self._config.WORKSPACE__ALLOWED_ACCESS_TYPES:
+            raise DisallowedWorkspaceAccessType(
+                'Access type "{}" is not allowed for this workspace'.format(access_type.name)
+            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -182,12 +187,32 @@ class WorkspaceApi(object):
 
         return workspace
 
-    def get_one(self, id):
+    def add_current_user_as_member(self, workspace_id: int) -> Workspace:
+        """
+        Adds the current user as a member of the given workspace id.
+        Only works for OPEN workspaces.
+
+        Role is set to the workspace default role.
+        """
+        query = self._base_query_without_roles().filter(Workspace.workspace_id == workspace_id)
+        query = query.filter(Workspace.access_type == WorkspaceAccessType.OPEN)
         try:
-            return self._base_query().filter(Workspace.workspace_id == id).one()
+            workspace = query.one()
         except NoResultFound as exc:
             raise WorkspaceNotFound(
-                "workspace {} does not exist or not visible for user".format(id)
+                "workspace {} does not exist or not visible for user".format(workspace_id)
+            ) from exc
+        rapi = RoleApi(current_user=self._user, session=self._session, config=self._config,)
+        rapi.create_one(self._user, workspace, workspace.default_user_role.level, with_notif=True)
+        return workspace
+
+    def get_one(self, workspace_id: int) -> Workspace:
+        query = self._base_query().filter(Workspace.workspace_id == workspace_id)
+        try:
+            return query.one()
+        except NoResultFound as exc:
+            raise WorkspaceNotFound(
+                "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
 
     def get_one_by_label(self, label: str) -> Workspace:

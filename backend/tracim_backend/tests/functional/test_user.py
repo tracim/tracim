@@ -14,6 +14,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -2801,6 +2802,74 @@ class TestUserWorkspaceEndpoint(object):
 
         web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
         web_testapp.get("/api/users/1/accessible_workspaces", status=403)
+
+    @pytest.mark.parametrize(
+        "default_user_role", [WorkspaceRoles.READER, WorkspaceRoles.CONTRIBUTOR]
+    )
+    def test_api__join_workspace__ok_200__nominal_cases(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        web_testapp,
+        app_config,
+        default_user_role: WorkspaceRoles,
+    ):
+        """
+        Join an open workspace.
+        """
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(
+            label="Foo", access_type=WorkspaceAccessType.OPEN, default_user_role=default_user_role
+        )
+        user_credentials = "john.doe@world.biz"
+        user = user_api_factory.get().create_user(
+            email=user_credentials, password=user_credentials, do_notify=False
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        res = web_testapp.post_json(
+            "/api/users/{}/workspaces".format(user.user_id),
+            params={"workspace_id": workspace.workspace_id},
+            status=200,
+        )
+        result = res.json_body
+        assert result["workspace_id"] == workspace.workspace_id
+        assert result["label"] == "Foo"
+        member = web_testapp.get(
+            "/api/workspaces/{}/members/{}".format(workspace.workspace_id, user.user_id), status=200
+        ).json_body
+        assert member["role"] == default_user_role.label
+
+    @pytest.mark.parametrize(
+        "access_type", [WorkspaceAccessType.ON_REQUEST, WorkspaceAccessType.CONFIDENTIAL],
+    )
+    def test_api__join_workspace__ok_400__wrong_access_type(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        web_testapp,
+        app_config,
+        access_type: WorkspaceAccessType,
+    ):
+        """
+        Error cases for joining a workspace: not OPEN access type
+        """
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(label="Foo", access_type=access_type)
+        user_credentials = "john.doe@world.biz"
+        user = user_api_factory.get().create_user(
+            email=user_credentials, password=user_credentials, do_notify=False
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        res = web_testapp.post_json(
+            "/api/users/{}/workspaces".format(user.user_id),
+            params={"workspace_id": workspace.workspace_id},
+            status=400,
+        )
+        assert res.json_body["code"] == 1002
 
 
 @pytest.mark.usefixtures("base_fixture")
