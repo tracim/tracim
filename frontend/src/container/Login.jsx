@@ -47,7 +47,7 @@ import {
 } from '../action-creator.async.js'
 import {
   PAGE,
-  COOKIE_FRONTEND,
+  COOKIE_FRONTEND
 } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 

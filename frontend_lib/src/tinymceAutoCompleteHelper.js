@@ -78,12 +78,11 @@ export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteAc
 export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoCompleteActivated, autoCompleteCursorPosition, autoCompleteItemList) => {
   if (!isAutoCompleteActivated) return
 
-  if (event.key === 'Escape') {
-    setState({ isAutoCompleteActivated: false })
-    return
-  }
-
   switch (event.key) {
+    case 'Escape': {
+      setState({ isAutoCompleteActivated: false })
+      break
+    }
     case ' ': {
       setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] })
       break
@@ -114,25 +113,31 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
   }
 }
 
-export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
-  if (!item.mention) {
+// RJ - 2020-09-25 - FIXME
+// Duplicate code with tinymceAutoCompleteHelper.js
+// See https://github.com/tracim/tracim/issues/3639
+
+export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) => {
+  if (!autoCompleteItem.mention) {
     console.log('Error: this member does not have a username')
     return
   }
 
   const sel = tinymce.activeEditor.selection.getSel()
+  const cursorPos = sel.anchorOffset
+  const spaceAfterMention = '\u00A0'
+
+  const charAtCursor = cursorPos - 1
   const text = sel.anchorNode.textContent
-
-  const posAt = text.lastIndexOf('@', sel.anchorOffset - 1)
-
+  const posAt = text.lastIndexOf('@', charAtCursor)
   let textBegin, textEnd
 
   if (posAt > -1) {
-    textBegin = text.substring(0, posAt) + '@' + item.mention + '\u00A0'
-    textEnd = text.substring(seekUsernameEnd(text, sel.anchorOffset))
+    textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+    textEnd = text.substring(seekUsernameEnd(text, cursorPos))
   } else {
     console.log('Error: mention autocomplete: did not find "@"')
-    textBegin = sel.anchorNode.textContent + ' @' + item.mention + '\u00A0'
+    textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
     textEnd = ''
   }
 

@@ -848,7 +848,7 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-const eventTypesParam = '&exclude_event_types=' + GLOBAL_excludedNotifications.replace(/\s/g, '')
+const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
 
 export const getNotificationList = (userId, notificationsPerPage, nextPageToken = null) => async dispatch => {
   const fetchGetNotificationWall = await fetchWrapper({

@@ -118,7 +118,7 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
+  tinymceAutoCompleteHandleSelectionChange
 } from './tinymceAutoCompleteHelper.js'
 
 import { getContentComment } from './action.async.js'

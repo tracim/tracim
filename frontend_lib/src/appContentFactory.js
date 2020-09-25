@@ -178,11 +178,13 @@ export function appContentFactory (WrappedComponent) {
           switch (response.body.code) {
             case 2067:
               this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
             default:
               this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
