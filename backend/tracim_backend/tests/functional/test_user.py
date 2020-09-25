@@ -2785,6 +2785,7 @@ class TestUserWorkspaceEndpoint(object):
             "sidebar_entries",
             "created",
             "owner",
+            "default_user_role",
         }
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
