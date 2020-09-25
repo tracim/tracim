@@ -15,20 +15,9 @@ const DropdownMenuItem = props => {
 export default DropdownMenuItem
 
 DropdownMenuItem.propTypes = {
-  label: PropTypes.string.isRequired,
-  customClass: PropTypes.string,
-  dataCy: PropTypes.string,
-  icon: PropTypes.string,
-  image: PropTypes.string,
-  onClickItem: PropTypes.func,
-  url: PropTypes.string
+  customClass: PropTypes.string
 }
 
 DropdownMenuItem.defaultProps = {
-  customClass: '',
-  dataCy: '',
-  icon: '',
-  image: '',
-  onClickItem: () => { },
-  url: ''
+  customClass: ''
 }

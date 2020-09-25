@@ -11,11 +11,9 @@ export const SelectStatus = props => {
   return (
     <div className='selectStatus'>
       <DropdownMenu
+        buttonDisabled={props.disabled}
         buttonOpts={
-          <span
-            style={{ color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent' }}
-            disabled={props.disabled}
-          >
+          <span style={{ color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent' }}>
             <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__mobileVersion': props.mobileVersion })} >
               {props.t('Status')}:
             </span>

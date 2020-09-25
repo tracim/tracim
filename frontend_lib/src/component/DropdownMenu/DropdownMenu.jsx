@@ -16,6 +16,7 @@ const DropdownMenu = props => {
         )}
         data-cy={props.dataCyButton}
         data-toggle='dropdown'
+        disabled={props.buttonDisabled}
         id='dropdownMenuButton'
         onClick={e => e.stopPropagation()}
         title={props.buttonTooltip ? props.buttonTooltip : props.buttonLabel}
@@ -32,8 +33,8 @@ const DropdownMenu = props => {
         className={classnames('dropdownMenu dropdown-menu', props.customClassMenu)}
       >
         {props.children.length > 1
-          ? props.children.map(child => <DropdownMenuItem> {child} </DropdownMenuItem>)
-          : <DropdownMenuItem> {props.children} </DropdownMenuItem>
+          ? props.children.map(child => <DropdownMenuItem customClass={props.customClassItem}> {child} </DropdownMenuItem>)
+          : <DropdownMenuItem customClass={props.customClassItem}> {props.children} </DropdownMenuItem>
         }
       </div>
     </div>
@@ -43,6 +44,7 @@ const DropdownMenu = props => {
 export default DropdownMenu
 
 DropdownMenu.propTypes = {
+  buttonDisabled: PropTypes.bool,
   buttonIcon: PropTypes.string,
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
@@ -50,10 +52,12 @@ DropdownMenu.propTypes = {
   customClassButton: PropTypes.string,
   customClassItem: PropTypes.string,
   customClassMenu: PropTypes.string,
-  dataCyButton: PropTypes.string
+  dataCyButton: PropTypes.string,
+  isButton: PropTypes.bool
 }
 
 DropdownMenu.defaultProps = {
+  buttonDisabled: false,
   buttonIcon: '',
   buttonImage: '',
   buttonLabel: '',
@@ -61,5 +65,6 @@ DropdownMenu.defaultProps = {
   customClassButton: '',
   customClassMenu: '',
   customClassItem: '',
-  dataCyButton: ''
+  dataCyButton: '',
+  isButton: false
 }
