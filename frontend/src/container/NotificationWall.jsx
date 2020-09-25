@@ -33,7 +33,7 @@ import {
 } from 'tracim_frontend_lib'
 import {
   PAGE,
-  ANCHOR_NAMESPACE,
+  ANCHOR_NAMESPACE
 } from '../util/helper.js'
 
 import { escape as escapeHtml } from 'lodash'
@@ -314,7 +314,7 @@ export class NotificationWall extends React.Component {
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
-                id={`${ANCHOR_NAMESPACE.contentItem}:${notification.id}`}
+                id={`${ANCHOR_NAMESPACE.notificationItem}:${notification.id}`}
                 key={notification.id}
               >
                 <Link

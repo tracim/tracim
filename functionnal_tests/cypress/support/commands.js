@@ -53,7 +53,10 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
   cy.window()
     .its('tinyMCE')
     .its('activeEditor')
-    .type(content)
+    .then(activeEditor => {
+      activeEditor.setContent(content)
+      activeEditor.save()
+    })
 })
 
 Cypress.Commands.add('inputInTinyMCE', (content) => {
