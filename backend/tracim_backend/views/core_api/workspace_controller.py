@@ -10,6 +10,7 @@ from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
@@ -145,6 +146,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(DisallowedWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
@@ -173,6 +175,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(DisallowedWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotAllowedToCreateMoreWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())

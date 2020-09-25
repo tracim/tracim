@@ -294,3 +294,30 @@ class TestErrorCodeEndpoint(object):
         # check if all error_codes are available by checking number of item
         # received
         assert len(res.json_body) == len(list(map(int, ErrorCode)))
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestWorkspaceAccessType(object):
+    """
+    Tests for /api/system/workspace_access_types
+    """
+
+    def test_api__get_workspace_access_type__ok_200__nominal_case(self, web_testapp):
+        """
+        Get the list of allowed workspace access types with a registered user.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/workspace_access_types", status=200)
+        assert set(res.json["items"]) == set(("confidential", "on_request", "open"))
+
+    def test_api__get_workspace_access_type__err_401__unregistered_user(self, web_testapp):
+        """
+        Get allowed workspace access types list with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/workspace_access_types", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] is None
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()

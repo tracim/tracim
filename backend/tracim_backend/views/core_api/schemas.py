@@ -1151,6 +1151,10 @@ class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
 
 
+class WorkspaceAccessTypeSchema(marshmallow.Schema):
+    items = marshmallow.fields.List(String(example="confidential"), required=True)
+
+
 class GetUsernameAvailability(marshmallow.Schema):
     username = StrippedString(example="The-powerUser_42", required=True)
 
@@ -1171,7 +1175,7 @@ class AboutSchema(marshmallow.Schema):
 
 
 class ReservedUsernamesSchema(marshmallow.Schema):
-    items = marshmallow.fields.List(String(), required=True)
+    items = marshmallow.fields.List(String(example="all"), required=True)
 
 
 class ErrorCodeSchema(marshmallow.Schema):

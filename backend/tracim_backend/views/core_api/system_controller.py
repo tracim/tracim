@@ -24,6 +24,7 @@ from tracim_backend.views.core_api.schemas import GetUsernameAvailability
 from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
+from tracim_backend.views.core_api.schemas import WorkspaceAccessTypeSchema
 
 SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
@@ -58,6 +59,20 @@ class SystemController(Controller):
             for content_type in content_types
         ]
         return content_types_in_context
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(WorkspaceAccessTypeSchema())
+    def workspace_access_types(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get List of allowed workspace access types
+        """
+        return {
+            "items": [
+                access_type.value
+                for access_type in request.app_config.WORKSPACE__ALLOWED_ACCESS_TYPES
+            ]
+        }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -153,7 +168,13 @@ class SystemController(Controller):
         configurator.add_route("content_types", "/system/content_types", request_method="GET")
         configurator.add_view(self.content_types, route_name="content_types")
 
-        # Content_types
+        # Allowed Workspace access types
+        configurator.add_route(
+            "workspace_access_type", "/system/workspace_access_types", request_method="GET"
+        )
+        configurator.add_view(self.workspace_access_types, route_name="workspace_access_type")
+
+        # Timezones
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
         configurator.add_view(self.timezones_list, route_name="timezones_list")
 

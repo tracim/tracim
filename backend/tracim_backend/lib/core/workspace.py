@@ -10,6 +10,7 @@ from tracim_backend import app_list
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -109,7 +110,10 @@ class WorkspaceApi(object):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-
+        if access_type not in self._config.WORKSPACE__ALLOWED_ACCESS_TYPES:
+            raise DisallowedWorkspaceAccessType(
+                'Access type "{}" is not allowed for this workspace'.format(access_type.name)
+            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
