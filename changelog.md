@@ -4,7 +4,7 @@
 ### New Features
 
 - Start showing members in the mention suggestions right away
-- Keep only chosen TLMs in notification panel.  
+- Disable some notification types by default to unclutter the notification wall
 
 ### Fixed Issues
 
