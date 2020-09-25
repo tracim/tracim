@@ -17,7 +17,7 @@
 
 ### Other Changes
 
-- New parameters `web.notifications.excluded` added in `development.ini.sample` to define what you want to exclude in notifications panel. You need to update your configuration file manually on existing installations.
+- New parameter `web.notifications.excluded` added in `development.ini.sample` to define what you want to exclude in notifications panel. There is no need to update your configuration file on existing installations if you want to keep the default set of excluded notifications.
 
 
 ## 3.1.1 / 2020-09-21
