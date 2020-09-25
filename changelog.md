@@ -1,4 +1,25 @@
 
+## 3.1.2 / 2020-09-25
+
+### New Features
+
+- Start showing members in the mention suggestions right away
+- Disable some notification types by default to unclutter the notification wall
+
+### Fixed Issues
+
+- Mention: [#3631](https://github.com/tracim/tracim/issues/3631)
+
+## Known Issues
+
+- Editing out a mention does not remove its associated metadata, which leads to an error when saving the document being edited in app text documents (issue [#3640](https://github.com/tracim/tracim/issues/3640)
+- Clicking on a notification sometimes does not correctly open the associated content (issue [#3578](https://github.com/tracim/tracim/issues/3578))
+
+### Other Changes
+
+- New parameter `web.notifications.excluded` added in `development.ini.sample` to define what you want to exclude in notifications panel. There is no need to update your configuration file on existing installations if you want to keep the default set of excluded notifications.
+
+
 ## 3.1.1 / 2020-09-21
 
 ### Fixed Issues
