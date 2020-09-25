@@ -1,4 +1,13 @@
 
+## 3.1.2 / 2020-09-25
+
+### Fixed Issues
+
+- Mention: [#3630](https://github.com/tracim/tracim/issues/3630),  
+[#3631](https://github.com/tracim/tracim/issues/3631)
+- TLM: [#3477](https://github.com/tracim/tracim/issues/3477)
+
+
 ## 3.1.1 / 2020-09-21
 
 ### Fixed Issues
