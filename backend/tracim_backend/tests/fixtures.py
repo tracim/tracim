@@ -338,9 +338,7 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return Provider(
-        show_archived=False, show_deleted=False, show_history=False, app_config=app_config,
-    )
+    return Provider(app_config=app_config,)
 
 
 @pytest.fixture()

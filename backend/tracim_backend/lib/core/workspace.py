@@ -209,22 +209,6 @@ class WorkspaceApi(object):
 
     def get_one_by_label(self, label: str) -> Workspace:
         """
-        Get one workspace by label, handle both direct
-        and "~~{workspace_id}" end form, to allow getting a specific workspace when
-        workspace_name is ambiguous (multiple workspace with same label)
-        :param label: label of workspace or "label~~{workspace_name} form.
-        :return: workspace found according to label given
-        """
-        splitted_label = label.split("~~", maxsplit=1)
-        # INFO - G.M - 2019-10-10 - unambiguous form with workspace id
-        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
-            return self.get_one(splitted_label[1])
-        # INFO - G.M - 2019-10-10 - Ambiguous form with workspace label
-        else:
-            return self._get_one_by_label(label)
-
-    def _get_one_by_label(self, label: str) -> Workspace:
-        """
         get workspace according to label given, if multiple workspace have
         same label, return first one found.
         """
