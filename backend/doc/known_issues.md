@@ -19,18 +19,11 @@ These variables should contain absolute paths and should be quoted.
     env = TRACIM_CONF_PATH=/home/me/tracim/backend/development.ini
 
 
-## Webdav
+## WebDAV
 
-### Same space name are not all showed properly in webdav
+### Spaces with the same name are not properly displayed in WebDAV
 
-It's a known limitation of tracim 3.2+ version, you cannot show multiple space
-with same name at the same level through webdav. The webdav view will only show you the "first" one
-according to the tracim database. All the visible spaces are fully working.
-In order to workaround this issue, you can either:
-
-- rename space
-- set same name space as children of different spaces
-
-Be careful about the 2nd solution, user should be members of both parent and children to
-see the hierarchy. If user has only access to 2 children same name space, it will get
-the same issue in webdav.
+In Tracim v3.2+. you cannot show multiple spaces with same name at the same level through WebDAV. The WebDAV view will only show you the one that was created first.
+In order to workaround this issue, we recommand that you rename the conflicting spaces.
+If it is not an option, you may also move the conflicting spaces into other spaces.
+Be careful with this solution: users should be members of the parents to see the full hierarchy. If a user only has access to the spaces with the same name but not their parents, they will still have the issue.
