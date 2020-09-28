@@ -18,6 +18,7 @@ const AdminLink = props => {
       <Link
         to={PAGE.ADMIN.WORKSPACE}
         data-cy='adminlink__workspace__link'
+        key='adminlink__workspace__link'
       >
         <i className={`fa fa-fw fa-${workspaceConfig.faIcon}`} />
         {props.t('Spaces')}
@@ -26,6 +27,7 @@ const AdminLink = props => {
       <Link
         to={PAGE.ADMIN.USER}
         data-cy='adminlink__user__link'
+        key='adminlink__user__link'
       >
         <i className='fa fa-fw fa-users' />
         {props.t('Users')}

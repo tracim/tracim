@@ -22,6 +22,7 @@ export const ExtandedAction = props => {
           className='transparentButton'
           onClick={props.onClickExtendedAction.edit.callback}
           data-cy='extended_action_edit'
+          key='extended_action_edit'
         >
           <i className='fa fa-fw fa-pencil' />
           {props.onClickExtendedAction.edit.label}
@@ -52,6 +53,7 @@ export const ExtandedAction = props => {
           className='transparentButton'
           onClick={props.onClickExtendedAction.delete.callback}
           data-cy='extended_action_delete'
+          key='extended_action_delete'
         >
           <i className='fa fa-fw fa-trash-o' />
           {props.onClickExtendedAction.delete.label}
@@ -64,6 +66,7 @@ export const ExtandedAction = props => {
           onClick={e => e.stopPropagation()}
           data-cy='extended_action_gallery'
           to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
+          key='extended_action_gallery'
         >
           <i className='fa fa-fw fa-picture-o' />
           {props.t('Gallery')}
