@@ -1229,8 +1229,8 @@ class ContentTypeSchema(marshmallow.Schema):
         example="#FF0000",
         description="HTML encoded color associated to the application. Example:#FF0000 for red",
     )
-    label = StrippedString(example="Text Documents")
-    creation_label = StrippedString(example="Write a document")
+    label = StrippedString(example="Notes")
+    creation_label = StrippedString(example="Write a note")
     available_statuses = marshmallow.fields.Nested(StatusSchema, many=True)
 
 

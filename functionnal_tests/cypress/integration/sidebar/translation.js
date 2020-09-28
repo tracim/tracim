@@ -10,12 +10,12 @@ describe('content :: home_page', function () {
   })
 
   it('should have translations', () => {
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Text Documents')
+    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Notes')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documents texte')
+    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Notes')
 
     cy.changeLanguage('pt')
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documentos de texto')
+    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Notas')
   })
 })
