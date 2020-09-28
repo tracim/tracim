@@ -105,9 +105,8 @@ class RootResource(DAVCollection):
                 # We decide to show only first same name workspace (in order of get_all() which is workspace
                 # id order). So, same name workspace are not supported from webdav but doesn't cause
                 # much trouble: only one workspace is accessible without any issue.
-                pass
-            else:
-                members_names.append(webdav_convert_file_name_to_display(workspace.label))
+                continue
+            members_names.append(webdav_convert_file_name_to_display(workspace.label))
         return members_names
 
     @webdav_check_right(is_user)
@@ -163,10 +162,17 @@ class RootResource(DAVCollection):
         of all its direct children
         """
 
+        members_names = []  # type: List[str]
         members = []
         for workspace in self.workspace_api.get_all():
             # fix path
             workspace_label = workspace.label
+            if workspace_label in members_names:
+                # INFO - G.M - 2020-09-24
+                # We decide to show only first same name workspace (in order of get_all() which is workspace
+                # id order). So, same name workspace are not supported from webdav but doesn't cause
+                # much trouble: only one workspace is accessible without any issue.
+                continue
             path = add_trailing_slash(self.path)
             # return item
             workspace_path = "{}{}".format(path, workspace_label)
@@ -179,6 +185,7 @@ class RootResource(DAVCollection):
                     label=workspace_label,
                 )
             )
+            members_names.append(workspace_label)
         return members
 
 
