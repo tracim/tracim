@@ -14,7 +14,7 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}|{config_name: <68}|"  with all apps enabled to update this list properly --->
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
 
 | <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -40,6 +40,7 @@ The priority order is (from less to more priority):
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_WORKSPACE__ALLOWED_ACCESS_TYPES                                    | workspace.allowed_access_types                                 | WORKSPACE__ALLOWED_ACCESS_TYPES                                    |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
 | TRACIM_DEBUG                                                              | debug                                                          | DEBUG                                                              |
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |

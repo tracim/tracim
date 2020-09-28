@@ -530,7 +530,7 @@ class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
         return WorkspaceMemberFilterQuery(**data)
 
 
-class WorkspaceIdPathSchema(marshmallow.Schema):
+class WorkspaceIdSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
         required=True,
@@ -538,6 +538,8 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
         validate=strictly_positive_int_validator,
     )
 
+
+class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
@@ -1149,6 +1151,10 @@ class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
 
 
+class WorkspaceAccessTypeSchema(marshmallow.Schema):
+    items = marshmallow.fields.List(String(example="confidential"), required=True)
+
+
 class GetUsernameAvailability(marshmallow.Schema):
     username = StrippedString(example="The-powerUser_42", required=True)
 
@@ -1169,7 +1175,7 @@ class AboutSchema(marshmallow.Schema):
 
 
 class ReservedUsernamesSchema(marshmallow.Schema):
-    items = marshmallow.fields.List(String(), required=True)
+    items = marshmallow.fields.List(String(example="all"), required=True)
 
 
 class ErrorCodeSchema(marshmallow.Schema):

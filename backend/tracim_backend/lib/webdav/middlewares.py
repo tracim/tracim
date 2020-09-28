@@ -21,9 +21,9 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.models.setup_models import create_dbsession_for_context
 
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):
@@ -283,7 +283,7 @@ class TracimEnv(BaseMiddleware):
                 yield chunk
             transaction.commit()
         except Exception:
-            transaction.rollback()
+            transaction.abort()
             raise
         finally:
             # NOTE SGD 2020-06-30: avoid circular reference between environment dict and context.
