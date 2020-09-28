@@ -37,6 +37,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
+  NUMBER_RESULTS_BY_PAGE,
   checkUsernameValidity,
   formatAbsoluteDate,
   permissiveNumberEqual,
@@ -117,7 +118,7 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
+  tinymceAutoCompleteHandleSelectionChange
 } from './tinymceAutoCompleteHelper.js'
 
 import {
@@ -242,6 +243,7 @@ export {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
+  NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
   MentionAutoComplete,

@@ -24,6 +24,7 @@ import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageMana
 import {
   CUSTOM_EVENT,
   PROFILE,
+  NUMBER_RESULTS_BY_PAGE,
   serialize,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -32,7 +33,6 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  NUMBER_RESULTS_BY_PAGE,
   toggleFavicon
 } from '../util/helper.js'
 import {

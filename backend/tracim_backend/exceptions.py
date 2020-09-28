@@ -472,6 +472,7 @@ class UnallowedSubContent(TracimException):
 
 
 class TooShortAutocompleteString(TracimException):
+    error_code = ErrorCode.ACP_STRING_TOO_SHORT
     pass
 
 
