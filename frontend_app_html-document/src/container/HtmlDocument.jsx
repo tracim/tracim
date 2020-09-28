@@ -283,7 +283,7 @@ export class HtmlDocument extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery, 
+      this.searchForMentionInQuery,
       this.state.isAutoCompleteActivated
     )
   }
