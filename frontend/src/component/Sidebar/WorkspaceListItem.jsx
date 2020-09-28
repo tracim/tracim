@@ -58,7 +58,7 @@ class WorkspaceListItem extends React.Component {
     return props.label.substring(0, 2).toUpperCase()
   }
 
-  handleMouseHoverAtItem = () => this.setState(prev => ({ showDropdownMenuButton: !prev.showDropdownMenuButton }))
+  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: !prev.showDropdownMenuButton }))
 
   render () {
     const { props, state } = this
@@ -68,8 +68,8 @@ class WorkspaceListItem extends React.Component {
         className='sidebar__content__navigation__workspace__item'
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
-        onMouseEnter={this.handleMouseHoverAtItem}
-        onMouseLeave={this.handleMouseHoverAtItem}
+        onMouseEnter={this.handleItemHover}
+        onMouseLeave={this.handleItemHover}
       >
         <div
           className='sidebar__content__navigation__workspace__item__wrapper'
