@@ -384,7 +384,7 @@ class WorkspaceResource(AbstractContentContainer, DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return webdav_convert_file_name_to_display(self.label)
+        return webdav_convert_file_name_to_display(self.label + Workspace.VIRTUAL_EXTENSION)
 
     def getDisplayInfo(self):
         return {"type": "workspace".capitalize()}
