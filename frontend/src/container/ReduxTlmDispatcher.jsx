@@ -80,7 +80,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
-    if (this.props.user.userId !== data.fields.author.user_id && !EXCLUDED_NOTIFICATIONS.some(type => data.type.startsWith(type))) {
+    if (this.props.user.userId !== data.fields.author.user_id && !EXCLUDED_NOTIFICATIONS.some(type => data.event_type.startsWith(type))) {
       this.props.dispatch(addNotification(data))
     }
   }
