@@ -34,7 +34,7 @@ context('Add file(s) with PopupCreateFile', function () {
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('.previewcomponent__dloption__icon').should('have.length', 1)
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .get('#dropdownMenu2').contains('Opened')
+        .get('.selectStatus').contains('Opened')
       cy.url().should('include', `/ui/workspaces/${workspaceId}/contents/file/`)
     })
   })

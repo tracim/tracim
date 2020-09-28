@@ -44,27 +44,27 @@ const DropdownMenu = props => {
 export default DropdownMenu
 
 DropdownMenu.propTypes = {
+  buttonCustomClass: PropTypes.string,
+  buttonDataCy: PropTypes.string,
   buttonDisabled: PropTypes.bool,
   buttonIcon: PropTypes.string,
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
   buttonTooltip: PropTypes.string,
-  buttonCustomClass: PropTypes.string,
   itemCustomClass: PropTypes.string,
   menuCustomClass: PropTypes.string,
-  buttonDataCy: PropTypes.string,
   isButton: PropTypes.bool
 }
 
 DropdownMenu.defaultProps = {
+  buttonCustomClass: '',
+  buttonDataCy: '',
   buttonDisabled: false,
   buttonIcon: '',
   buttonImage: '',
   buttonLabel: '',
   buttonTooltip: '',
-  buttonCustomClass: '',
   menuCustomClass: '',
   itemCustomClass: '',
-  buttonDataCy: '',
   isButton: false
 }

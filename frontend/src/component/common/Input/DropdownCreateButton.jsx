@@ -6,9 +6,10 @@ import { DropdownMenu } from 'tracim_frontend_lib'
 export const DropdownCreateButton = props => {
   return (
     <DropdownMenu
+      buttonCustomClass='dropdownCreateBtn__label highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
+      buttonDataCy='dropdownCreateBtn'
       buttonLabel={`${props.t('Create')}...`}
       buttonTooltip={props.t('Create')}
-      buttonCustomClass='dropdownCreateBtn__label highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
       isButton
     >
       {props.availableApp.map(app =>
