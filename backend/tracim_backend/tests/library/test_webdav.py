@@ -7,7 +7,9 @@ from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import TracimDomainController
+from tracim_backend.lib.webdav.resources import FolderResource
 from tracim_backend.lib.webdav.resources import RootResource
+from tracim_backend.lib.webdav.resources import WorkspaceResource
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -90,7 +92,7 @@ class TestWebDav(object):
                 user_api_factory.get().get_one_by_email("admin@admin.admin")
             ),
         )
-        assert root, "Path / should return a RootResource instance"
+        assert root, "Path / a RootResource should return instance"
         assert isinstance(root, RootResource), "Path / should return a RootResource instance"
 
         children = root.getMemberList()
@@ -116,7 +118,9 @@ class TestWebDav(object):
             "/Recipes/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
-        assert Recipes, "Path /Recipes should return a Wrkspace instance"
+        assert isinstance(
+            Recipes, WorkspaceResource
+        ), "Path /Recipes should return a Wrkspace instance"
 
         children = Recipes.getMemberList()
         eq_(2, len(children), msg="Recipes should list 2 folders instead {0}".format(len(children)))
@@ -130,14 +134,15 @@ class TestWebDav(object):
     def test_unit__list_content__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        Salads = webdav_provider.getResourceInst(
+        Desserts_dir = webdav_provider.getResourceInst(
             "/Recipes/Desserts",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
-        assert Salads, "Path /Salads should return a Wrkspace instance"
-
-        children = Salads.getMemberList()
-        eq_(5, len(children), msg="Salads should list 5 Files instead {0}".format(len(children)))
+        assert isinstance(
+            Desserts_dir, FolderResource
+        ), "Path /Desserts should return a Folder instance"
+        children = Desserts_dir.getMemberList()
+        eq_(5, len(children), msg="Dessert should list 5 Files instead {0}".format(len(children)))
 
         content_names = [c.name for c in children]
         assert (
