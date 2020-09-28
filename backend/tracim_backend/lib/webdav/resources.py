@@ -310,8 +310,17 @@ class AbstractContentContainer(DAVCollection, ABC):
         Access to the list of content of current workspace/folder
         """
         members = []
-
-        children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
+        if self.content:
+            parent_id = self.content.content_id
+            children = self.content_api.get_all(
+                content_type=content_type_list.Any_SLUG,
+                workspace=self.workspace,
+                parent_ids=[parent_id],
+            )
+        else:
+            children = self.content_api.get_all(
+                content_type=content_type_list.Any_SLUG, workspace=self.workspace, parent_ids=[0]
+            )
 
         for content in children:
             content_path = "%s/%s" % (
