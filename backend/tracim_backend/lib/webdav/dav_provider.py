@@ -216,7 +216,7 @@ class Provider(DAVProvider):
                 environ=environ,
                 workspace=workspace,
                 tracim_context=tracim_context,
-                label=workspace.label,
+                label=workspace.filemanager_filename,
             )
 
         # And now we'll work on the path to establish which type or resource is requested

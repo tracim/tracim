@@ -214,6 +214,8 @@ class WorkspaceApi(object):
         """
         # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
         # to unsure working
+        if label.endswith(".space"):
+            label = label[:-6]
         result = self.default_order_workspace(
             self._base_query().filter(Workspace.label == label)
         ).all()

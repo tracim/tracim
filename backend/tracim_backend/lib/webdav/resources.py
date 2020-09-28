@@ -100,13 +100,15 @@ class RootResource(DAVCollection):
         """
         members_names = []  # type: List[str]
         for workspace in self.workspace_api.get_all():
-            if workspace.label in members_names:
+            if workspace.filemanager_filename in members_names:
                 # INFO - G.M - 2020-09-24
                 # We decide to show only first same name workspace (in order of get_all() which is workspace
                 # id order). So, same name workspace are not supported from webdav but doesn't cause
                 # much trouble: only one workspace is accessible without any issue.
                 continue
-            members_names.append(webdav_convert_file_name_to_display(workspace.label))
+            members_names.append(
+                webdav_convert_file_name_to_display(workspace.filemanager_filename)
+            )
         return members_names
 
     @webdav_check_right(is_user)
@@ -122,7 +124,7 @@ class RootResource(DAVCollection):
             workspace_path = "%s%s%s" % (
                 self.path,
                 "" if self.path == "/" else "/",
-                webdav_convert_file_name_to_display(workspace.label),
+                webdav_convert_file_name_to_display(workspace.filemanager_filename),
             )
             # return item
             return WorkspaceResource(
@@ -130,7 +132,7 @@ class RootResource(DAVCollection):
                 environ=self.environ,
                 workspace=workspace,
                 tracim_context=self.tracim_context,
-                label=workspace.label,
+                label=workspace.filemanager_filename,
             )
         except AttributeError:
             return None
@@ -166,7 +168,7 @@ class RootResource(DAVCollection):
         members = []
         for workspace in self.workspace_api.get_all():
             # fix path
-            workspace_label = workspace.label
+            workspace_label = workspace.filemanager_filename
             if workspace_label in members_names:
                 # INFO - G.M - 2020-09-24
                 # We decide to show only first same name workspace (in order of get_all() which is workspace
@@ -384,7 +386,7 @@ class WorkspaceResource(AbstractContentContainer, DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return webdav_convert_file_name_to_display(self.label + Workspace.VIRTUAL_EXTENSION)
+        return webdav_convert_file_name_to_display(self.label)
 
     def getDisplayInfo(self):
         return {"type": "workspace".capitalize()}
@@ -432,7 +434,7 @@ class FolderResource(AbstractContentContainer, DAVCollection):
             self,
             path,
             environ,
-            label=workspace.label,
+            label=workspace.filemanager_filename,
             workspace=workspace,
             tracim_context=tracim_context,
         )

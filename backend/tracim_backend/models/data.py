@@ -62,11 +62,6 @@ class WorkspaceAccessType(enum.Enum):
 class Workspace(DeclarativeBase):
 
     __tablename__ = "workspaces"
-    # INFO - G.M - The virtual extension of workspace is the extension of file to use when needed to
-    # show a workspace in a context where it's not possible to show 2 same name file, the goal of
-    # this is to easiest the usage of sub-workspace and avoid collision between file and workspace
-    # in context file-like like webdav
-    VIRTUAL_EXTENSION = ".space"
     workspace_id = Column(
         Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
     )
@@ -112,6 +107,18 @@ class Workspace(DeclarativeBase):
     default_user_role = Column(
         Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
     )
+
+    @property
+    def filemanager_filename(self):
+        """
+        unambigous filename for file_manager
+        """
+        # INFO - G.M - The virtual extension of workspace is the extension of file to use when needed to
+        # show a workspace in a context where it's not possible to show 2 same name file, the goal of
+        # this is to easiest the usage of sub-workspace and avoid collision between file and workspace
+        # in context file-like like webdav
+        virtual_extension = ".space"
+        return "{}{}".format(self.label, virtual_extension)
 
     @hybrid_property
     def contents(self) -> List["Content"]:
