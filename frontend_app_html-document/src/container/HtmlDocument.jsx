@@ -537,7 +537,7 @@ export class HtmlDocument extends React.Component {
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
             break
           case 2044:
-            this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
+            this.sendGlobalFlashMessage(props.t('You must change the status or restore this note before any change'))
             break
           default:
             this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
