@@ -1047,18 +1047,29 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         description = "Entry element of a workspace menu"
 
 
-class WorkspaceMinimalSchema(marshmallow.Schema):
+class WorkspaceDigestSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
+
+
+class WorkspaceSchema(WorkspaceDigestSchema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
         required=True,
     )
-
-
-class WorkspaceDigestSchema(WorkspaceMinimalSchema):
+    default_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
+        required=True,
+        description="default role for new users in this workspace",
+    )
+    description = StrippedString(example="All intranet data.")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Workspace creation date"
+    )
+    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
@@ -1074,24 +1085,7 @@ class WorkspaceDigestSchema(WorkspaceMinimalSchema):
     )
 
     class Meta:
-        description = "Digest of workspace informations"
-
-
-class WorkspaceSchema(WorkspaceDigestSchema):
-    default_user_role = StrippedString(
-        example=WorkspaceRoles.READER.slug,
-        validate=user_role_validator,
-        required=True,
-        description="default role for new users in this workspace",
-    )
-    description = StrippedString(example="All intranet data.")
-    created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Workspace creation date"
-    )
-    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
-
-    class Meta:
-        description = "Full workspace informations"
+        description = "Full workspace information"
 
 
 class UserConfigSchema(marshmallow.Schema):
@@ -1112,9 +1106,7 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
         "if limit is reach, no file can be created/updated "
         "in any user owned workspaces. 0 mean no limit."
     )
-    workspace = marshmallow.fields.Nested(
-        WorkspaceMinimalSchema(), attribute="workspace_in_context"
-    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
 class WorkspaceMemberDigestSchema(marshmallow.Schema):
