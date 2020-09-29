@@ -253,6 +253,42 @@ class UserRoleInWorkspace(DeclarativeBase):
         return [role.slug for role in WorkspaceRoles.get_all_valid_role()]
 
 
+class WorkspaceSubscriptionState(enum.Enum):
+    """Workspace subscription state Types"""
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+
+class WorkspaceSubscription(DeclarativeBase):
+    __tablename__ = "workspace_subscriptions"
+
+    state = Column(
+        Enum(WorkspaceSubscriptionState),
+        nullable=False,
+        server_default=WorkspaceSubscriptionState.PENDING.name,
+    )
+    created_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    workspace_id = Column(
+        Integer,
+        ForeignKey("workspaces.workspace_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
+    )
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    evaluation_date = Column(DateTime, nullable=True)
+    evaluator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True, default=None)
+    workspace = relationship(
+        "Workspace", remote_side=[Workspace.workspace_id], backref="subscriptions"
+    )
+    author = relationship("User", foreign_keys=[author_id], backref="workspace_subscriptions")
+    evaluator = relationship(
+        "User", foreign_keys=[evaluator_id], backref="workspace_evaluated_subscriptions"
+    )
+
+
 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 # class RoleType(object):
 #     def __init__(self, role_id):
