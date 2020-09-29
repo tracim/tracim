@@ -419,6 +419,10 @@ class ProfileDoesNotExist(TracimException):
     pass
 
 
+class SubcriptionDoesNotExist(TracimException):
+    pass
+
+
 class UserRoleNotFound(TracimException):
     error_code = ErrorCode.USER_ROLE_NOT_FOUND
 

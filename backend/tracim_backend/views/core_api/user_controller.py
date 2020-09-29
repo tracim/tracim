@@ -26,6 +26,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -39,6 +40,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
@@ -73,12 +75,14 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -110,6 +114,10 @@ SWAGGER_TAG__USER_EVENT_ENDPOINTS = generate_documentation_swagger_tag(
 
 SWAGGER_TAG__USER_CONFIG_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_CONFIG_ENDPOINTS
+)
+
+SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 )
 
 
@@ -806,6 +814,31 @@ class UserController(Controller):
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(WorkspaceSubscriptionSchema(many=True))
+    def user_subscriptions(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        return subscription_lib.get_user_subscription(request.candidate_user.user_id)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(WorkspaceIdSchema())
+    @hapic.output_body(WorkspaceSubscriptionSchema())
+    def submit_subscription(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        return subscription_lib.submit_subscription(workspace_id=hapic_data.body["workspace_id"])
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -1027,3 +1060,18 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User subscriptions
+        configurator.add_route(
+            "subscriptions_get",
+            "/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.user_subscriptions, route_name="subscriptions_get")
+
+        configurator.add_route(
+            "subscriptions_put",
+            "/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.submit_subscription, route_name="subscriptions_put")

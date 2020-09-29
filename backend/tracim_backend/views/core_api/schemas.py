@@ -33,6 +33,7 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.app_models.validator import workspace_access_type_validator
+from tracim_backend.app_models.validator import workspace_subscription_state_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
@@ -1605,3 +1606,16 @@ class UserMessagesSummarySchema(marshmallow.Schema):
     unread_messages_count = marshmallow.fields.Int(example=12)
     user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
     user = marshmallow.fields.Nested(UserDigestSchema())
+
+
+class WorkspaceSubscriptionSchema(marshmallow.Schema):
+    state = StrippedString(example="pending", validate=workspace_subscription_state_validator)
+    created_date = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="subscription creation date"
+    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
+    author = marshmallow.fields.Nested(UserDigestSchema())
+    evaluation_date = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="evaluation date", allow_none=True
+    )
+    evaluator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
