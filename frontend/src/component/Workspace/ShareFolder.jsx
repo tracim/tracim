@@ -76,7 +76,6 @@ class ShareFolder extends React.Component {
                   <button
                     className='transparentButton'
                     onClick={this.handleClickOpenShareFolderApp}
-                    key='folder__header__button_extended_action'
                   >
                     <i className='fa fa-fw fa-pencil' />
                     {props.t('Manage')}
