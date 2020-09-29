@@ -428,7 +428,7 @@ class WorkspaceController(Controller):
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
-    @hapic.output_body(WorkspaceSubscriptionSchema(many=True))
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def accept_subscription(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[WorkspaceSubscription]:
@@ -438,14 +438,14 @@ class WorkspaceController(Controller):
         subscription = subscription_lib.get_one(
             author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return subscription_lib.accept_subscription(
+        subscription_lib.accept_subscription(
             subscription=subscription, user_role=hapic_data.body.role
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
-    @hapic.output_body(WorkspaceSubscriptionSchema(many=True))
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def reject_subscription(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[WorkspaceSubscription]:
@@ -455,7 +455,7 @@ class WorkspaceController(Controller):
         subscription = subscription_lib.get_one(
             author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return subscription_lib.reject_subscription(subscription=subscription,)
+        subscription_lib.reject_subscription(subscription=subscription)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_reader)

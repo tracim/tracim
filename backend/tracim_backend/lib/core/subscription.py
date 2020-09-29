@@ -1,0 +1,93 @@
+from datetime import datetime
+from typing import List
+from typing import Optional
+
+from sqlalchemy.orm import Query
+from sqlalchemy.orm.exc import NoResultFound
+
+from tracim_backend.config import CFG
+from tracim_backend.exceptions import SubcriptionDoesNotExist
+from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.models.auth import User
+from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.data import WorkspaceSubscriptionState
+from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.tracim_session import TracimSession
+
+
+class SubscriptionLib(object):
+    def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG,) -> None:
+        session.assert_event_mechanism()
+        self._session = session
+        self._user = current_user
+        self._config = config
+        self._role_lib = RoleApi(
+            session=self._session, config=self._config, current_user=self._user
+        )
+
+    def _base_query(self) -> Query:
+        return self._session.query(WorkspaceSubscription)
+
+    def get_user_subscription(self, author_id: int) -> List[WorkspaceSubscription]:
+        return (
+            self._base_query()
+            .filter(WorkspaceSubscription.author_id == author_id)
+            .order_by(WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id)
+            .all()
+        )
+
+    def get_workspace_subscriptions(self, workspace_id: int) -> List[WorkspaceSubscription]:
+        return (
+            self._base_query()
+            .filter(WorkspaceSubscription.workspace_id == workspace_id)
+            .order_by(WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id)
+            .all()
+        )
+
+    def get_one(self, author_id: int, workspace_id: int) -> WorkspaceSubscription:
+        try:
+            return (
+                self._base_query()
+                .filter(WorkspaceSubscription.author_id == author_id)
+                .filter(WorkspaceSubscription.workspace_id == workspace_id)
+                .one()
+            )
+        except NoResultFound as exc:
+            raise SubcriptionDoesNotExist(
+                'Subscription for workspace "{}" '
+                'and author "{}" not found in database'.format(workspace_id, author_id)
+            ) from exc
+
+    def submit_subscription(self, workspace_id: int):
+        new_subscription = WorkspaceSubscription(
+            state=WorkspaceSubscriptionState.PENDING,
+            created_date=datetime.utcnow(),
+            workspace_id=workspace_id,
+            author=self._user,
+        )
+        self._session.add(new_subscription)
+        self._session.flush()
+        return new_subscription
+
+    def accept_subscription(self, subscription: WorkspaceSubscription, user_role: WorkspaceRoles):
+        subscription.state = WorkspaceSubscriptionState.ACCEPTED
+        subscription.evaluator = self._user
+        subscription.evaluation_date = datetime.utcnow()
+        new_role = self._role_lib.create_one(
+            user=subscription.author,
+            workspace=subscription.workspace,
+            role_level=user_role.level,
+            with_notif=True,
+        )
+        self._session.add(subscription)
+        self._session.add(new_role)
+        self._session.flush()
+        return subscription
+
+    def reject_subscription(self, subscription: WorkspaceSubscription):
+        subscription.state = WorkspaceSubscriptionState.REJECTED
+        subscription.evaluator = self._user
+        subscription.evaluation_date = datetime.utcnow()
+        self._session.add(subscription)
+        self._session.flush()
+        return subscription

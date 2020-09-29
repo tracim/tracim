@@ -1601,7 +1601,9 @@ class UserMessagesSummarySchema(marshmallow.Schema):
 
 
 class WorkspaceSubscriptionSchema(marshmallow.Schema):
-    state = StrippedString(example="pending", validate=workspace_subscription_state_validator)
+    state = StrippedString(
+        example="pending", validate=workspace_subscription_state_validator, attribute="state_slug"
+    )
     created_date = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="subscription creation date"
     )

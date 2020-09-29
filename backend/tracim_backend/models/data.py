@@ -288,6 +288,10 @@ class WorkspaceSubscription(DeclarativeBase):
         "User", foreign_keys=[evaluator_id], backref="workspace_evaluated_subscriptions"
     )
 
+    @property
+    def state_slug(self):
+        return self.state.value
+
 
 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 # class RoleType(object):
