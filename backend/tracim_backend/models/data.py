@@ -1467,6 +1467,7 @@ class Content(DeclarativeBase):
                     )
         return types
 
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
         for comment in self.get_comments():
@@ -1557,6 +1558,7 @@ class RevisionReadStatus(DeclarativeBase):
     user = relationship("User")
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class NodeTreeItem(object):
     """
         This class implements a model that allow to simply represents
@@ -1570,6 +1572,7 @@ class NodeTreeItem(object):
         self.is_selected = is_selected
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class VirtualEvent(object):
     @classmethod
     def create_from(cls, object):
