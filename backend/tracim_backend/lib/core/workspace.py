@@ -59,12 +59,20 @@ class WorkspaceApi(object):
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     def _base_query_without_roles(self):
+        """
+        Prepare query that would return all not deleted workspaces.
+        """
         query = self._session.query(Workspace)
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
+        """
+        Prepare query that would return all not deleted workspaces where the current user:
+          - is a member
+          - OR has an admin profile
+        """
         if not self._user:
             return self._base_query_without_roles()
 
@@ -209,22 +217,6 @@ class WorkspaceApi(object):
 
     def get_one_by_label(self, label: str) -> Workspace:
         """
-        Get one workspace by label, handle both direct
-        and "~~{workspace_id}" end form, to allow getting a specific workspace when
-        workspace_name is ambiguous (multiple workspace with same label)
-        :param label: label of workspace or "label~~{workspace_name} form.
-        :return: workspace found according to label given
-        """
-        splitted_label = label.split("~~", maxsplit=1)
-        # INFO - G.M - 2019-10-10 - unambiguous form with workspace id
-        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
-            return self.get_one(splitted_label[1])
-        # INFO - G.M - 2019-10-10 - Ambiguous form with workspace label
-        else:
-            return self._get_one_by_label(label)
-
-    def _get_one_by_label(self, label: str) -> Workspace:
-        """
         get workspace according to label given, if multiple workspace have
         same label, return first one found.
         """
@@ -285,6 +277,25 @@ class WorkspaceApi(object):
 
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
+        return query.all()
+
+    def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
+        """
+        Return workspaces accessible by user.
+        Accessible workspaces:
+          - are of type OPEN or ON_REQUEST
+          - do not have user as a member
+        """
+        query = self._base_query_without_roles().filter(
+            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+        )
+        query = query.filter(
+            Workspace.workspace_id.notin_(
+                self._session.query(UserRoleInWorkspace.workspace_id).filter(
+                    UserRoleInWorkspace.user_id == user.user_id
+                )
+            )
+        )
         return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:

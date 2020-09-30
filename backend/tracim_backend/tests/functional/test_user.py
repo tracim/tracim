@@ -9,6 +9,7 @@ from webtest import TestApp
 
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -2720,6 +2721,80 @@ class TestUserWorkspaceEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
+
+    @pytest.mark.parametrize(
+        "workspace_access_type, accessible_workspaces_count, user_credentials",
+        [
+            (WorkspaceAccessType.CONFIDENTIAL, 0, "foo@bar.par",),
+            (WorkspaceAccessType.OPEN, 1, "foo@bar.par"),
+            (WorkspaceAccessType.ON_REQUEST, 1, "foo@bar.par",),
+            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin",),
+        ],
+    )
+    def test_api__get_accessible_workspaces__ok__200__nominal_cases(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        workspace_access_type,
+        accessible_workspaces_count,
+        user_credentials,
+    ):
+        """
+        Check accessible spaces API with different nominal cases:
+        - CONFIDENTIAL not in accessible
+        - OPEN in accessible
+        - ON_REQUEST in accessible
+        - if user is member, space is not in accessible
+        """
+        with transaction.manager:
+            uapi = user_api_factory.get()
+            try:
+                user = uapi.create_user(
+                    email=user_credentials, password=user_credentials, do_notify=False
+                )
+            except EmailAlreadyExists:
+                user = uapi.get_one_by_email(user_credentials)
+            wapi = workspace_api_factory.get()
+            wapi.create_workspace(
+                label="Hello", description="Foo", access_type=workspace_access_type
+            )
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        res = web_testapp.get(
+            "/api/users/{}/accessible_workspaces".format(user.user_id), status=200
+        )
+        assert isinstance(res.json_body, list)
+        assert len(res.json_body) == accessible_workspaces_count
+        assert not len(res.json_body) or set(res.json_body[0].keys()) == {
+            "agenda_enabled",
+            "is_deleted",
+            "public_download_enabled",
+            "public_upload_enabled",
+            "label",
+            "access_type",
+            "slug",
+            "workspace_id",
+            "description",
+            "sidebar_entries",
+            "created",
+            "owner",
+            "default_user_role",
+        }
+
+    def test_api__get_accessible_workspaces__ok__403__other_user(
+        self, web_testapp, user_api_factory,
+    ):
+        """
+        Check that accessible workspaces of a given user is not authorized for another.
+        """
+        user_credentials = "foo@bar.par"
+        with transaction.manager:
+            uapi = user_api_factory.get()
+            uapi.create_user(email=user_credentials, password=user_credentials, do_notify=False)
+
+        web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
+        web_testapp.get("/api/users/1/accessible_workspaces", status=403)
 
     @pytest.mark.parametrize(
         "default_user_role", [WorkspaceRoles.READER, WorkspaceRoles.CONTRIBUTOR]
