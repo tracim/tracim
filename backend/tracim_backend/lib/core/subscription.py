@@ -66,28 +66,35 @@ class SubscriptionLib(object):
             raise InvalidWorkspaceAccessType(
                 "Workspace access type is not valid for subscription submission"
             )
-        new_subscription = WorkspaceSubscription(
-            state=WorkspaceSubscriptionState.PENDING,
-            created_date=datetime.utcnow(),
-            workspace_id=workspace.workspace_id,
-            author=self._user,
-        )
-        self._session.add(new_subscription)
+        try:
+            subscription = self.get_one(
+                author_id=self._user.user_id, workspace_id=workspace.workspace_id
+            )
+        except SubcriptionDoesNotExist:
+            subscription = WorkspaceSubscription(
+                workspace_id=workspace.workspace_id, author_id=self._user.user_id
+            )
+        subscription.state = WorkspaceSubscriptionState.PENDING
+        subscription.created_date = datetime.utcnow()
+        subscription.evaluator_id = None
+        subscription.evaluation_date = None
+        self._session.add(subscription)
+        self._session.add(subscription)
         self._session.flush()
-        return new_subscription
+        return subscription
 
     def accept_subscription(self, subscription: WorkspaceSubscription, user_role: WorkspaceRoles):
         subscription.state = WorkspaceSubscriptionState.ACCEPTED
         subscription.evaluator = self._user
         subscription.evaluation_date = datetime.utcnow()
-        new_role = self._role_lib.create_one(
+        role = self._role_lib.create_one(
             user=subscription.author,
             workspace=subscription.workspace,
             role_level=user_role.level,
             with_notif=True,
         )
         self._session.add(subscription)
-        self._session.add(new_role)
+        self._session.add(role)
         self._session.flush()
         return subscription
 
