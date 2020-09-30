@@ -11,6 +11,7 @@ from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUse
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import ReservedUsernameError
@@ -850,16 +851,20 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.handle_exception(InvalidWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(WorkspaceIdSchema())
     @hapic.output_body(WorkspaceSubscriptionSchema())
     def submit_subscription(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceSubscription]:
+        workspace = WorkspaceApi(
+            current_user=None, session=request.dbsession, config=request.app_config
+        ).get_one(hapic_data.body["workspace_id"])
         subscription_lib = SubscriptionLib(
             current_user=request.current_user, session=request.dbsession, config=request.app_config,
         )
-        return subscription_lib.submit_subscription(workspace_id=hapic_data.body["workspace_id"])
+        return subscription_lib.submit_subscription(workspace=workspace)
 
     def bind(self, configurator: Configurator) -> None:
         """

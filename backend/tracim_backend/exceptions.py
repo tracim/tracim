@@ -186,6 +186,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class InvalidWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
+
+
 class ImmutableAttribute(TracimException):
     pass
 

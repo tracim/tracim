@@ -6,9 +6,12 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import SubcriptionDoesNotExist
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.data import WorkspaceSubscriptionState
 from tracim_backend.models.roles import WorkspaceRoles
@@ -58,11 +61,15 @@ class SubscriptionLib(object):
                 'and author "{}" not found in database'.format(workspace_id, author_id)
             ) from exc
 
-    def submit_subscription(self, workspace_id: int):
+    def submit_subscription(self, workspace: Workspace):
+        if workspace.access_type != WorkspaceAccessType.ON_REQUEST:
+            raise InvalidWorkspaceAccessType(
+                "Workspace access type is not valid for subscription submission"
+            )
         new_subscription = WorkspaceSubscription(
             state=WorkspaceSubscriptionState.PENDING,
             created_date=datetime.utcnow(),
-            workspace_id=workspace_id,
+            workspace_id=workspace.workspace_id,
             author=self._user,
         )
         self._session.add(new_subscription)
