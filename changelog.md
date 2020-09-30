@@ -1,4 +1,11 @@
 
+## 3.1.3 / 2020-09-28
+
+### Fixed Issues
+
+- Notifications: [#3643](https://github.com/tracim/tracim/issues/3643)
+
+
 ## 3.1.2 / 2020-09-25
 
 ### New Features
