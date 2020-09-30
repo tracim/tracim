@@ -15,6 +15,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
@@ -103,6 +104,7 @@ class TestUserSubscriptionEndpoint(object):
         web_testapp: TestApp,
         subscription_lib_factory: SubscriptionLibFactory,
         admin_user: User,
+        event_helper: EventHelper,
     ):
         on_request_workspace = workspace_api_factory.get().create_workspace(
             "on_request", access_type=WorkspaceAccessType.ON_REQUEST, save_now=True
@@ -141,6 +143,16 @@ class TestUserSubscriptionEndpoint(object):
         res = web_testapp.get(
             "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
         )
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_subscription.created"
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
+        assert last_event.author == author
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace = web_testapp.get(
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace
+        assert last_event.subscription == subscription
 
     def test__subscribe_workspace__err__400__not_a_on_request_workspace(
         self,
@@ -202,6 +214,7 @@ class TestUserSubscriptionEndpoint(object):
         web_testapp: TestApp,
         subscription_lib_factory: SubscriptionLibFactory,
         admin_user: User,
+        event_helper: EventHelper,
     ):
         on_request_workspace = workspace_api_factory.get().create_workspace(
             "on_request", access_type=WorkspaceAccessType.ON_REQUEST, save_now=True
@@ -252,6 +265,17 @@ class TestUserSubscriptionEndpoint(object):
         assert subscription["evaluation_date"] is None
         assert subscription["evaluator"] is None
 
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_subscription.modified"
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
+        assert last_event.author == author
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace = web_testapp.get(
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace
+        assert last_event.subscription == subscription
+
         # after resubscribe
         res = web_testapp.get(
             "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
@@ -264,6 +288,17 @@ class TestUserSubscriptionEndpoint(object):
         assert subscription["created_date"]
         assert subscription["evaluation_date"] is None
         assert subscription["evaluator"] is None
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "workspace_subscription.modified"
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
+        assert last_event.author == author
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace = web_testapp.get(
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace
+        assert last_event.subscription == subscription
 
 
 @pytest.mark.usefixtures("base_fixture")

@@ -71,9 +71,7 @@ class SubscriptionLib(object):
                 author_id=self._user.user_id, workspace_id=workspace.workspace_id
             )
         except SubcriptionDoesNotExist:
-            subscription = WorkspaceSubscription(
-                workspace_id=workspace.workspace_id, author_id=self._user.user_id
-            )
+            subscription = WorkspaceSubscription(workspace=workspace, author=self._user)
         subscription.state = WorkspaceSubscriptionState.PENDING
         subscription.created_date = datetime.utcnow()
         subscription.evaluator_id = None
