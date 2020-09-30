@@ -5,11 +5,10 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../util/helper.js'
+import { DRAG_AND_DROP, PAGE } from '../../util/helper.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
-const color = require('color')
 
 class WorkspaceListItem extends React.Component {
   shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
@@ -36,6 +35,7 @@ class WorkspaceListItem extends React.Component {
     return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
   }
 
+  // TODO Use this func to do the drag-and-drop when the action menu is merge
   getIcon = () => {
     const { props } = this
 
@@ -61,21 +61,18 @@ class WorkspaceListItem extends React.Component {
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
       >
-        <div
+        <Link
           className='sidebar__content__navigation__workspace__item__wrapper'
           onClick={props.onClickTitle}
+          to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           <div
-            className='sidebar__content__navigation__workspace__item__number'
-            style={{
-              backgroundColor: GLOBAL_primaryColor,
-              color: color(GLOBAL_primaryColor).isLight() ? '#333333' : '#fdfdfd'
-            }}
+            className={classnames(
+              'sidebar__content__navigation__workspace__item__name',
+              { sidebar__content__navigation__workspace__item__current: props.isOpenInSidebar }
+            )}
+            title={props.label}
           >
-            {this.getIcon()}
-          </div>
-
-          <div className='sidebar__content__navigation__workspace__item__name' title={props.label}>
             {props.label}
           </div>
 
@@ -85,7 +82,7 @@ class WorkspaceListItem extends React.Component {
               : <i className={classnames('fa fa-chevron-down')} title={props.t('See space')} />
             )}
           </div>
-        </div>
+        </Link>
 
         <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
           <ul className='sidebar__content__navigation__workspace__item__submenu'>

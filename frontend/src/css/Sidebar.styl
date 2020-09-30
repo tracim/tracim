@@ -97,7 +97,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             height 100%
             cursor pointer
             background-color sidebarColor // #1168
-            border-color sidebarColor
+            border-color darkGrey
             &:hover
               background-color sidebarColorDarken // #1168
           &__number
@@ -117,6 +117,9 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             white-space nowrap
             overflow hidden
             text-overflow ellipsis
+          &__current
+            text-decoration underline
+            font-weight bold
           &__icon
             display flex
             align-items center

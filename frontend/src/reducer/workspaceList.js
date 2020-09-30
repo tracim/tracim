@@ -52,7 +52,7 @@ export function workspaceList (state = [], action, lang) {
       return state.filter(ws => ws.id !== action.workspace.workspace_id)
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
-      return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))
+      return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : false }))
 
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({

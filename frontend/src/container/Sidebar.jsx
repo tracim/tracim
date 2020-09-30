@@ -88,7 +88,7 @@ export class Sidebar extends React.Component {
       const workspaceIdInUrl = parseInt(props.match.params.idws)
 
       if (props.workspaceList.find(ws => ws.id === workspaceIdInUrl) !== undefined) {
-        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true))
+        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true)) // TODO see if works
       }
     }
   }
@@ -105,7 +105,7 @@ export class Sidebar extends React.Component {
       .some(url => props.location.pathname.startsWith(url))
   }
 
-  handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
+  handleClickWorkspace = spaceId => this.props.dispatch(setWorkspaceListIsOpenInSidebar(spaceId, true))
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
@@ -143,17 +143,17 @@ export class Sidebar extends React.Component {
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  {workspaceList.map(ws =>
+                  {workspaceList.map(space =>
                     <WorkspaceListItem
-                      workspaceId={ws.id}
-                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
-                      label={ws.label}
-                      allowedAppList={ws.sidebarEntryList}
+                      workspaceId={space.id}
+                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, space.memberList, ROLE_LIST)}
+                      label={space.label}
+                      allowedAppList={space.sidebarEntryList}
                       activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
-                      isOpenInSidebar={ws.isOpenInSidebar}
-                      onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
+                      isOpenInSidebar={space.isOpenInSidebar}
                       onClickAllContent={this.handleClickAllContent}
-                      key={ws.id}
+                      key={space.id}
+                      onClickTitle={() => this.handleClickWorkspace(space.id)}
                     />
                   )}
                 </ul>
