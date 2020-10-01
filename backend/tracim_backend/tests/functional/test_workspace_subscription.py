@@ -152,7 +152,10 @@ class TestUserSubscriptionEndpoint(object):
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == workspace
-        assert last_event.subscription == subscription
+        assert last_event.subscription["state"] == subscription["state"]
+        assert last_event.subscription["workspace"] == subscription["workspace"]
+        assert last_event.subscription["author"] == subscription["author"]
+        assert last_event.subscription["evaluator"] == subscription["evaluator"]
 
     def test__subscribe_workspace__err__400__not_a_on_request_workspace(
         self,
@@ -274,7 +277,10 @@ class TestUserSubscriptionEndpoint(object):
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == workspace
-        assert last_event.subscription == subscription
+        assert last_event.subscription["state"] == subscription["state"]
+        assert last_event.subscription["workspace"] == subscription["workspace"]
+        assert last_event.subscription["author"] == subscription["author"]
+        assert last_event.subscription["evaluator"] == subscription["evaluator"]
 
         # after resubscribe
         res = web_testapp.get(
@@ -298,7 +304,10 @@ class TestUserSubscriptionEndpoint(object):
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == workspace
-        assert last_event.subscription == subscription
+        assert last_event.subscription["state"] == subscription["state"]
+        assert last_event.subscription["workspace"] == subscription["workspace"]
+        assert last_event.subscription["author"] == subscription["author"]
+        assert last_event.subscription["evaluator"] == subscription["evaluator"]
 
 
 @pytest.mark.usefixtures("base_fixture")
