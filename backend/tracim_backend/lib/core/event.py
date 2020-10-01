@@ -589,12 +589,12 @@ def _get_workspace_subscription_event_receiver_ids(
 ) -> typing.Set[int]:
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    author = event.subscription["author"]["author_id"]
+    author = event.subscription["author"]["user_id"]
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_managers = role_api.get_workspace_member_ids(
         event.workspace["workspace_id"], min_role=WorkspaceRoles.WORKSPACE_MANAGER
     )
-    return set(administrators + workspace_managers + author)
+    return set(administrators + workspace_managers + [author])
 
 
 def _get_content_event_receiver_ids(
