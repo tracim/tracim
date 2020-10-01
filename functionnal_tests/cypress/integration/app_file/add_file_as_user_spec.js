@@ -1,3 +1,4 @@
+import { PAGES as p } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 context('Add file(s) with PopupCreateFile', function () {
@@ -14,7 +15,7 @@ context('Add file(s) with PopupCreateFile', function () {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visit(`/ui/workspaces/${workspaceId}/dashboard`)
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
   })
 
   afterEach(function () {
@@ -34,7 +35,7 @@ context('Add file(s) with PopupCreateFile', function () {
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('.previewcomponent__dloption__icon').should('have.length', 1)
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .get('#dropdownMenu2').contains('Opened')
+        .get('.selectStatus').contains('Opened')
       cy.url().should('include', `/ui/workspaces/${workspaceId}/contents/file/`)
     })
   })
