@@ -47,6 +47,7 @@ from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
@@ -315,6 +316,11 @@ def role_api_factory(session, app_config, admin_user) -> RoleApiFactory:
 @pytest.fixture
 def application_api_factory(app_list) -> ApplicationApiFactory:
     return ApplicationApiFactory(app_list)
+
+
+@pytest.fixture
+def subscription_lib_factory(session, app_config, admin_user) -> ApplicationApiFactory:
+    return SubscriptionLibFactory(session, app_config, admin_user)
 
 
 @pytest.fixture()
