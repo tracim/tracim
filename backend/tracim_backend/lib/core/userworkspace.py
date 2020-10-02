@@ -194,16 +194,22 @@ class RoleApi(object):
     def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
         return self.get_all_for_workspace_query(workspace.workspace_id).all()
 
-    def get_workspace_members(self, workspace_id: int) -> typing.List[User]:
+    def get_workspace_members(
+        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
+    ) -> typing.List[User]:
         query = self._apply_base_filters(
             self._session.query(User)
             .join(UserRoleInWorkspace)
             .filter(UserRoleInWorkspace.workspace_id == workspace_id)
         )
+        if min_role:
+            query = query.filter(UserRoleInWorkspace.role >= min_role.level)
         return query.all()
 
-    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
-        return [user.user_id for user in self.get_workspace_members(workspace_id)]
+    def get_workspace_member_ids(
+        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
+    ) -> typing.List[int]:
+        return [user.user_id for user in self.get_workspace_members(workspace_id, min_role)]
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()
