@@ -180,7 +180,7 @@ Cypress.Commands.add('cancelXHR', () => {
 })
 
 Cypress.Commands.add('changeLanguage', (langCode) => {
-  cy.get('#headerDropdownMenuButton')
+  cy.get('.dropdownlang')
     .click()
 
   cy.get('.dropdownlang__dropdown__subdropdown')

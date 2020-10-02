@@ -85,6 +85,8 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
+import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
+
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
@@ -165,6 +167,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export {
   appContentFactory,
   addRevisionFromTLM,
+  DropdownMenu,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,

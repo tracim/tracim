@@ -48,11 +48,7 @@ class WebdavAppFactory(object):
 
         config["provider_mapping"] = {
             app_config.WEBDAV__ROOT_PATH: Provider(
-                show_history=app_config.WEBDAV_SHOW_ARCHIVED,
-                show_archived=app_config.WEBDAV_SHOW_DELETED,
-                show_deleted=app_config.WEBDAV_SHOW_HISTORY,
-                manage_locks=app_config.WEBDAV_MANAGE_LOCK,
-                app_config=app_config,
+                manage_locks=app_config.WEBDAV_MANAGE_LOCK, app_config=app_config,
             )
         }
         config["block_size"] = app_config.WEBDAV__BLOCK_SIZE

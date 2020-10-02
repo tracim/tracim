@@ -42,7 +42,9 @@ describe('App Agenda', () => {
         .click()
 
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: workspace2.workspace_id } })
-        .find('[data-cy="sidebar_subdropdown-agenda"]')
+        .find('.sidebar__content__navigation__workspace__item__menu')
+        .click()
+        .get('[data-cy="sidebar_subdropdown-agenda"]')
         .click()
 
       cy.get('[data-cy="layoutPageTitle"]')

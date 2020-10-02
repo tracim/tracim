@@ -39,6 +39,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
@@ -71,8 +72,8 @@ from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
@@ -118,7 +119,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    @hapic.output_body(WorkspaceSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -144,7 +145,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.input_body(WorkspaceIdSchema())
-    @hapic.output_body(WorkspaceDigestSchema())
+    @hapic.output_body(WorkspaceSchema())
     def join_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Join a workspace.
@@ -806,6 +807,27 @@ class UserController(Controller):
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(WorkspaceSchema(many=True))
+    def get_accessible_workspaces(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceInContext]:
+        """
+        Return the list of accessible workspaces by the given user id.
+        An accessible workspace is:
+          - a workspace the user is not member of (`workspaces` API returns them)
+          - has an OPEN or ON_REQUEST access type
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user, session=request.dbsession, config=app_config,
+        )
+
+        workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
+        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -1027,3 +1049,13 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User accessible workspaces (not member of, but can see information about them to subscribe)
+        configurator.add_route(
+            "get_accessible_workspaces",
+            "/users/{user_id:\d+}/accessible_workspaces",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(
+            self.get_accessible_workspaces, route_name="get_accessible_workspaces"
+        )
