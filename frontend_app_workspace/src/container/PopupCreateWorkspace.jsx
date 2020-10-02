@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  CardPopupCreateContent,
+  CardPopup,
   handleFetchResult,
   addAllResourceI18n,
   CUSTOM_EVENT,
@@ -111,17 +111,48 @@ export class PopupCreateWorkspace extends React.Component {
   render () {
     const { props, state } = this
     return (
-      <CardPopupCreateContent
+      <CardPopup
+        customClass='popupCreateContent'
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
-        onValidate={this.handleValidate}
-        label={props.t('New space')}
-        faIcon={state.config.faIcon}
-        contentName={state.newWorkspaceName}
-        onChangeContentName={this.handleChangeNewWorkspaceName}
-        btnValidateLabel={props.t('Validate and create')}
-        inputPlaceholder={props.t("Space's name")}
-      />
+      >
+        <div className='createcontent'>
+          <div className='createcontent__contentname mb-4'>
+            <div className='createcontent__contentname__icon ml-1 mr-3'>
+              <i className={`fa fa-${state.config.faIcon}`} style={{ color: state.config.hexcolor }} />
+            </div>
+
+            <div className='createcontent__contentname__title' style={{ color: state.config.hexcolor }}>
+              {props.t('New space')}
+            </div>
+          </div>
+          <span> {props.t("Space's name")} </span>
+          <input
+            type='text'
+            className='createcontent__form__input'
+            data-cy='createcontent__form__input'
+            placeholder={props.t("Space's name")}
+            value={state.newWorkspaceName}
+            onChange={this.handleChangeNewWorkspaceName}
+            onKeyDown={this.handleInputKeyDown}
+            autoFocus
+          />
+          <span> {props.t("Space's type")} </span>
+
+          <span> {props.t('Parent space')} </span>
+          <div className='createcontent__form__button'>
+            <button
+              type='button'
+              className='createcontent__form__button btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+              data-cy='popup__createcontent__form__button'
+              onClick={this.handleValidate}
+              disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0}
+            >
+              {props.t('Validate and create')}
+            </button>
+          </div>
+        </div>
+      </CardPopup>
     )
   }
 }

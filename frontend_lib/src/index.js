@@ -94,6 +94,7 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarningMessage.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
+import FormRoleList from './component/NewMemberForm/FormRoleList.jsx'
 
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
@@ -281,5 +282,6 @@ export {
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  FormRoleList
 }
