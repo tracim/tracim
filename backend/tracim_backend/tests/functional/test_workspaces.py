@@ -112,6 +112,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
+        assert workspace["parent_id"] is None
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"

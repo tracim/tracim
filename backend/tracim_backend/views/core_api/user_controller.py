@@ -135,6 +135,7 @@ class UserController(Controller):
             request.candidate_user,
             include_owned=hapic_data.query.show_owned_workspace,
             include_with_role=hapic_data.query.show_workspace_with_role,
+            parents_ids=hapic_data.query.parents_ids,
         )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
@@ -143,7 +144,6 @@ class UserController(Controller):
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(UserWorkspaceFilterQuerySchema())
     @hapic.input_body(WorkspaceIdSchema())
     @hapic.output_body(WorkspaceSchema())
     def join_workspace(self, context, request: TracimRequest, hapic_data=None):

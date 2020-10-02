@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from operator import or_
 import typing
 
 from sqlalchemy import func
@@ -112,6 +113,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
         default_user_role: WorkspaceRoles = WorkspaceRoles.READER,
+        parent_id: typing.Optional[int] = None,
         save_now: bool = False,
     ) -> Workspace:
         if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
@@ -133,6 +135,7 @@ class WorkspaceApi(object):
         workspace.owner = self._user
         workspace.access_type = access_type
         workspace.default_user_role = default_user_role
+        workspace.parent_id = parent_id
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -239,8 +242,37 @@ class WorkspaceApi(object):
         """
         return query.order_by(Workspace.workspace_id)
 
-    def get_all(self):
+    def _parent_id_filter(self, query: Query, parent_ids: typing.List[int]) -> Query:
+        """ Filtering result by parent ids"""
+        if parent_ids == 0:
+            return query.filter(Workspace.parent_id == None)  # noqa: E711
+        if parent_ids is None or parent_ids == []:
+            return query
+
+        if parent_ids:
+            allowed_parent_ids = []
+            allow_root = False
+            for parent_id in parent_ids:
+                if parent_id == 0:
+                    allow_root = True
+                else:
+                    allowed_parent_ids.append(parent_id)
+            if allow_root:
+                query = query.filter(
+                    or_(
+                        Workspace.parent_id.in_(allowed_parent_ids), Workspace.parent_id == None
+                    )  # noqa: E711
+                )
+            else:
+                query = query.filter(Workspace.parent_id.in_(allowed_parent_ids))
+        return query
+
+    def get_all(self) -> typing.List[Workspace]:
         return self.default_order_workspace(self._base_query()).all()
+
+    def get_all_children(self, parent_ids: typing.List[int]) -> typing.List[Workspace]:
+        workspaces = self._parent_id_filter(parent_ids=parent_ids, query=self._base_query())
+        return self.default_order_workspace(workspaces).all()
 
     def get_user_used_space(self, user: User) -> int:
         workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
@@ -253,7 +285,11 @@ class WorkspaceApi(object):
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
     def get_all_for_user(
-        self, user: User, include_owned: bool = True, include_with_role: bool = True
+        self,
+        user: User,
+        include_owned: bool = True,
+        include_with_role: bool = True,
+        parents_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[Workspace]:
         """
         Get all workspaces of user
@@ -262,6 +298,7 @@ class WorkspaceApi(object):
         :param include_with_role: include workspace where user has a role
         :return: list of workspaces found
         """
+
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -275,6 +312,7 @@ class WorkspaceApi(object):
             owned_workspaces = self._get_workspaces_owned_by_user(user.user_id)
             workspace_ids.extend([workspace.workspace_id for workspace in owned_workspaces])
 
+        query = self._parent_id_filter(query, parent_ids=parents_ids)
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
         return query.all()

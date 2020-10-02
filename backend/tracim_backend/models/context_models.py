@@ -549,6 +549,7 @@ class WorkspaceCreate(object):
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
+        parent_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -557,6 +558,7 @@ class WorkspaceCreate(object):
         self.public_download_enabled = public_download_enabled
         self.access_type = WorkspaceAccessType(access_type)
         self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.parent_id = parent_id
 
 
 class ContentCreation(object):
@@ -865,6 +867,10 @@ class WorkspaceInContext(object):
     @property
     def allowed_space(self) -> int:
         return self.config.LIMITATION__WORKSPACE_SIZE
+
+    @property
+    def parent_id(self) -> int:
+        return self.workspace.parent_id
 
 
 class UserRoleWorkspaceInContext(object):

@@ -63,6 +63,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchem
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDiskSpaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
@@ -130,18 +131,20 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @check_right(is_administrator)
+    @hapic.input_body(WorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceSchema(many=True))
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns the list of all workspaces. This route is for admin only.
         Standard users must use their own route: /api/users/me/workspaces
+        Filtering by parent_ids is possible through this endpoint
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        workspaces = wapi.get_all()
+        workspaces = wapi.get_all_children(parent_ids=hapic_data.body.parent_id)
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
@@ -197,6 +200,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
+            parent_id=hapic_data.body.parent_id,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)

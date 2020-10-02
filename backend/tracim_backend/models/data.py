@@ -108,6 +108,9 @@ class Workspace(DeclarativeBase):
     default_user_role = Column(
         Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
     )
+    parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
+    parent = relationship("Workspace", foreign_keys=[parent_id], back_populates="children")
+    children = relationship("Workspace")
 
     @hybrid_property
     def contents(self) -> List["Content"]:
