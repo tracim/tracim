@@ -144,7 +144,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        workspaces = wapi.get_all_children(parent_ids=hapic_data.body.parent_id)
+        workspaces = wapi.get_all_children(parent_ids=hapic_data.body.parent_ids)
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
@@ -191,6 +191,9 @@ class WorkspaceController(Controller):
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        parent = None
+        if hapic_data.body.parent_id:
+            parent = wapi.get_one(workspace_id=hapic_data.body.parent_id)
         workspace = wapi.create_workspace(
             label=hapic_data.body.label,
             description=hapic_data.body.description,
@@ -200,7 +203,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
-            parent_id=hapic_data.body.parent_id,
+            parent=parent,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)

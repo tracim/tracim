@@ -493,6 +493,7 @@ class UserWorkspaceFilterQuery(object):
     ):
         self.show_owned_workspace = bool(show_owned_workspace)
         self.show_workspace_with_role = bool(show_workspace_with_role)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
 
 
 class MessageIdsPath(object):

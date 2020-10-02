@@ -113,7 +113,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
         default_user_role: WorkspaceRoles = WorkspaceRoles.READER,
-        parent_id: typing.Optional[int] = None,
+        parent: Workspace = None,
         save_now: bool = False,
     ) -> Workspace:
         if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
@@ -135,7 +135,7 @@ class WorkspaceApi(object):
         workspace.owner = self._user
         workspace.access_type = access_type
         workspace.default_user_role = default_user_role
-        workspace.parent_id = parent_id
+        workspace.parent = parent
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
