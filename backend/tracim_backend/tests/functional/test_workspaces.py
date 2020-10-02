@@ -777,6 +777,57 @@ class TestWorkspaceEndpoint(object):
         assert last_event.author
         assert last_event.client_token is None
 
+    def test_api__delete_workspace__ok_200__admin_recursive(
+        self, web_testapp, user_api_factory, workspace_api_factory, event_helper
+    ) -> None:
+        """
+        Test delete workspace as admin, check if recursive delete does work as expected.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        uapi = user_api_factory.get()
+        uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=Profile.TRUSTED_USER,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        parent = workspace_api.create_workspace("parent", save_now=True)
+        child = workspace_api.create_workspace("child", save_now=True, parent=parent)
+        grandson = workspace_api.create_workspace("grandson", save_now=True, parent=child)
+        transaction.commit()
+        parent_workspace_id = int(parent.workspace_id)
+        child_workspace_id = int(child.workspace_id)
+        grandson_workspace_id = int(grandson.workspace_id)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # delete
+        web_testapp.put("/api/workspaces/{}/trashed".format(parent_workspace_id), status=204)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/workspaces/{}".format(parent_workspace_id), status=400)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        res = web_testapp.get("/api/workspaces/{}".format(child_workspace_id), status=400)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        res = web_testapp.get("/api/workspaces/{}".format(grandson_workspace_id), status=400)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/workspaces/{}".format(parent_workspace_id), status=200)
+        workspace = res.json_body
+        assert workspace["is_deleted"] is True
+        res = web_testapp.get("/api/workspaces/{}".format(child_workspace_id), status=200)
+        workspace = res.json_body
+        assert workspace["is_deleted"] is True
+        res = web_testapp.get("/api/workspaces/{}".format(grandson_workspace_id), status=200)
+        workspace = res.json_body
+        assert workspace["is_deleted"] is True
+
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
     ) -> None:
@@ -925,6 +976,61 @@ class TestWorkspaceEndpoint(object):
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is False
+
+    def test_api__undelete_workspace__ok_200__admin_recursive(
+        self, web_testapp, user_api_factory, workspace_api_factory
+    ) -> None:
+        """
+        Test undelete workspace as admin
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        uapi = user_api_factory.get()
+        uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=Profile.TRUSTED_USER,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        parent = workspace_api.create_workspace("parent", save_now=True)
+        child = workspace_api.create_workspace("child", save_now=True, parent=parent)
+        grandson = workspace_api.create_workspace("grandson", save_now=True, parent=child)
+        workspace_api.delete(parent, flush=True)
+        transaction.commit()
+        parent_workspace_id = int(parent.workspace_id)
+        child_workspace_id = int(child.workspace_id)
+        grandson_workspace_id = int(grandson.workspace_id)
+        # undelete
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/workspaces/{}".format(parent_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is True
+
+        res = web_testapp.get("/api/workspaces/{}".format(child_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is True
+
+        res = web_testapp.get("/api/workspaces/{}".format(grandson_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is True
+
+        web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(parent_workspace_id), status=204
+        )
+
+        res = web_testapp.get("/api/workspaces/{}".format(parent_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is False
+
+        res = web_testapp.get("/api/workspaces/{}".format(child_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is False
+
+        res = web_testapp.get("/api/workspaces/{}".format(grandson_workspace_id), status=200)
+        parent = res.json_body
+        assert parent["is_deleted"] is False
 
     def test_api__undelete_workspace__ok_200__manager_workspace_manager(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
