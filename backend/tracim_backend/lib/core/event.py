@@ -44,12 +44,14 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
@@ -59,6 +61,7 @@ from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 
 RQ_QUEUE_NAME = "event"
 
@@ -79,6 +82,7 @@ class EventApi:
     }
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
+    workspace_subscription_schema = WorkspaceSubscriptionSchema()
 
     def __init__(
         self, current_user: typing.Optional[User], session: TracimSession, config: CFG
@@ -496,6 +500,49 @@ class EventBuilder:
             context=context,
         )
 
+    # WorkspaceSubscription events
+    @hookimpl
+    def on_workspace_subscription_created(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.CREATED, subscription, context)
+
+    @hookimpl
+    def on_workspace_subscription_modified(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.MODIFIED, subscription, context)
+
+    @hookimpl
+    def on_workspace_subscription_deleted(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.DELETED, subscription, context)
+
+    def _create_subscription_event(
+        self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(subscription.workspace_id)
+        )
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
+                subscription
+            ).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
     def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
@@ -537,6 +584,19 @@ def _get_workspace_event_receiver_ids(
     return set(administrators + workspace_members)
 
 
+def _get_workspace_subscription_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> typing.Set[int]:
+    user_api = UserApi(current_user=None, session=session, config=config)
+    administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
+    author = event.subscription["author"]["user_id"]
+    role_api = RoleApi(current_user=None, session=session, config=config)
+    workspace_managers = role_api.get_workspace_member_ids(
+        event.workspace["workspace_id"], min_role=WorkspaceRoles.WORKSPACE_MANAGER
+    )
+    return set(administrators + workspace_managers + [author])
+
+
 def _get_content_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> typing.Set[int]:
@@ -558,6 +618,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
         EntityType.WORKSPACE_MEMBER: _get_workspace_event_receiver_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
+        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
     }  # type: typing.Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:

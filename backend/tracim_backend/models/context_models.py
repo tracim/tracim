@@ -490,7 +490,7 @@ class RoleUpdate(object):
     """
 
     def __init__(self, role: str) -> None:
-        self.role = role
+        self.role = WorkspaceRoles.get_role_from_slug(role)
 
 
 class WorkspaceMemberInvitation(object):
