@@ -3,14 +3,20 @@ import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP, PAGE } from '../../util/helper.js'
-import { ROLE } from 'tracim_frontend_lib'
+import { DRAG_AND_DROP } from '../../util/helper.js'
+import { ROLE, DropdownMenu } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
 class WorkspaceListItem extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      showDropdownMenuButton: false
+    }
+  }
+
   shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
     if (workspaceId !== activeWorkspaceId) return false
 
@@ -52,14 +58,18 @@ class WorkspaceListItem extends React.Component {
     return props.label.substring(0, 2).toUpperCase()
   }
 
+  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: !prev.showDropdownMenuButton }))
+
   render () {
-    const { props } = this
+    const { props, state } = this
     return (
       <li
         id={props.workspaceId}
         className='sidebar__content__navigation__workspace__item'
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
+        onMouseEnter={this.handleItemHover}
+        onMouseLeave={this.handleItemHover}
       >
         <Link
           className='sidebar__content__navigation__workspace__item__wrapper'
@@ -76,45 +86,26 @@ class WorkspaceListItem extends React.Component {
             {props.label}
           </div>
 
-          <div className='sidebar__content__navigation__workspace__item__icon'>
-            {(props.isOpenInSidebar
-              ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide space')} />
-              : <i className={classnames('fa fa-chevron-down')} title={props.t('See space')} />
-            )}
-          </div>
-        </Link>
-
-        <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
-          <ul className='sidebar__content__navigation__workspace__item__submenu'>
-            {props.allowedAppList.map(allowedApp =>
-              <li
-                data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
-                key={allowedApp.slug}
-              >
-                <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
-                  <div
-                    className={classnames(
-                      'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                      { activeFilter: this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
-                    )}
-                  >
-                    <div className='dropdown__icon' style={{ backgroundColor: allowedApp.hexcolor }}>
-                      <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
-                    </div>
-
-                    <div className='sidebar__content__navigation__workspace__item__submenu__dropdown__showdropdown'>
-                      <div className='dropdown__title' id='navbarDropdown'>
-                        <div className='dropdown__title__text'>
-                          {props.t(allowedApp.label)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          {state.showDropdownMenuButton && (
+            <DropdownMenu
+              buttonIcon='fa-ellipsis-v'
+              buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
+              buttonTooltip={props.t('Actions')}
+            >
+              {props.allowedAppList.map(allowedApp =>
+                <Link
+                  to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
+                  data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
+                  key={allowedApp.slug}
+                  childrenKey={allowedApp.slug}
+                >
+                  <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
+                  {props.t(allowedApp.label)}
                 </Link>
-              </li>
-            )}
-          </ul>
-        </AnimateHeight>
+              )}
+            </DropdownMenu>
+          )}
+          </Link>
       </li>
     )
   }
@@ -149,8 +140,8 @@ WorkspaceListItem.propTypes = {
 
 WorkspaceListItem.defaultProps = {
   allowedAppList: [],
-  onClickTitle: () => {},
-  onClickAllContent: () => {},
+  onClickTitle: () => { },
+  onClickAllContent: () => { },
   isOpenInSidebar: false,
   activeFilterList: [],
   activeWorkspaceId: -1

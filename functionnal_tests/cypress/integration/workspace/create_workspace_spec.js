@@ -36,33 +36,6 @@ describe('Workspace', () => {
       .parents('li.sidebar__content__navigation__workspace__item')
   )
 
-  describe('Dashboard', () => {
-    describe('Creating two new workspaces', () => {
-      it('should display the new workspaces properly with the right workspace opened in the sidebar', () => {
-        const workspaceTitle1 = 'second workspace'
-        const workspaceTitle2 = 'third workspace'
-
-        createOneWorkspace(cy, workspaceTitle1)
-          .get('.dashboard')
-          .get('[data-cy="dashboardWorkspaceLabel"]')
-          .contains(workspaceTitle1)
-
-        getWorkspaceItemByName(cy, workspaceTitle1)
-          .find('.sidebar__content__navigation__workspace__item__submenu')
-          .should('be.visible')
-
-        createOneWorkspace(cy, workspaceTitle2)
-          .get('.dashboard')
-          .get('[data-cy="dashboardWorkspaceLabel"]')
-          .contains(workspaceTitle2)
-
-        getWorkspaceItemByName(cy, workspaceTitle2)
-          .find('.sidebar__content__navigation__workspace__item__submenu')
-          .should('be.visible')
-      })
-    })
-  })
-
   describe('Creating a workspace while a lot of workspace are already created', () => {
     const nbWorkspace = 20
     const newWorkspaceName = '0'
@@ -80,9 +53,7 @@ describe('Workspace', () => {
       cy.visit('/ui')
       cy.get('.sidebar__scrollview').scrollTo('bottom')
       createOneWorkspace(cy, newWorkspaceName)
-      getWorkspaceItemByName(cy, newWorkspaceName)
-        .find('.sidebar__content__navigation__workspace__item__submenu')
-        .should('be.visible')
+      getWorkspaceItemByName(cy, newWorkspaceName).should('be.visible')
     })
   })
 })

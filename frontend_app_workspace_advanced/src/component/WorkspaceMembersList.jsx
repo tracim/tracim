@@ -1,7 +1,8 @@
 import React from 'react'
 import {
-  NewMemberForm,
-  Avatar
+  Avatar,
+  DropdownMenu,
+  NewMemberForm
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -52,46 +53,30 @@ export const WorkspaceMembersList = props => {
                   )}
                 </div>
 
-                <div className='workspace_advanced__userlist__list__item__role dropdown'>
+                <div className='workspace_advanced__userlist__list__item__role'>
                   {(() => {
                     const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                     return (
-                      <button
-                        className='btndropdown dropdown-toggle'
-                        type='button'
-                        id={`dropdownMenuButton_${m.user_id}`}
-                        data-toggle='dropdown'
-                        aria-haspopup='true'
-                        aria-expanded='false'
+                      <DropdownMenu
+                        buttonOpts={<i className={`fa fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
+                        buttonLabel={props.t(role.label)}
+                        buttonCustomClass='btndropdown transparentButton'
+                        isButton
                       >
-                        <div className='btndropdown__icon' style={{ color: role.hexcolor }}>
-                          <i className={`fa fa-${role.faIcon}`} />
-                        </div>
-
-                        <div className='btndropdown__text mr-auto'>
-                          {props.t(role.label)}
-                        </div>
-                      </button>
+                        {props.roleList.map(r =>
+                          <button
+                            className='transparentButton'
+                            onClick={() => props.onClickNewRole(m.user_id, r.slug)}
+                            key={`role_${r.id}`}
+                            childrenKey={`role_${r.id}`}
+                          >
+                            <i className={`fa fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                            {props.t(r.label)}
+                          </button>
+                        )}
+                      </DropdownMenu>
                     )
                   })()}
-
-                  <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    {props.roleList.map(r =>
-                      <div
-                        className='subdropdown__item primaryColorBgActive dropdown-item'
-                        onClick={() => props.onClickNewRole(m.user_id, r.slug)}
-                        key={`role_${r.id}`}
-                      >
-                        <div className='subdropdown__item__icon' style={{ color: r.hexcolor }}>
-                          <i className={`fa fa-fw fa-${r.faIcon}`} />
-                        </div>
-
-                        <div className='subdropdown__item__text'>
-                          {props.t(r.label)}
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
 
                 {(m.user_id !== props.loggedUser.userId

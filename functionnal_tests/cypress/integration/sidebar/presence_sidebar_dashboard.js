@@ -1,6 +1,6 @@
 import { PAGES as p } from '../../support/urls_commands.js'
 
-describe('content :: home_page', function () {
+describe('Sidebar', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -13,11 +13,10 @@ describe('content :: home_page', function () {
     })
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
-  it('', function () {
-    cy.get('.sidebar__content .fa-chevron-up').should('be.visible')
+  it('should have a link to Dashboard in the hidden menu', function () {
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
     cy.get('li').contains('Dashboard').should('have.attr', 'href', '/ui/workspaces/1/dashboard')
-    cy.get('.fa-home').should('be.visible')
-    cy.get('.fa-home').click()
+    cy.get('.fa-home').should('be.visible').click()
     cy.url().should('include', '/workspaces/1/dashboard')
     cy.get('.dashboard__header.pageTitleGeneric').should('be.visible')
   })
