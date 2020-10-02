@@ -109,7 +109,52 @@ class Workspace(DeclarativeBase):
         Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
     )
     parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
-    children = relationship("Workspace", backref=backref("parent", remote_side=[workspace_id]))
+    children = relationship(
+        "Workspace",
+        backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+    )
+
+    @property
+    def recursive_children(self) -> List["Workspace"]:
+        """typing.Listtyping.List
+        :return: list of children Workspace
+        :rtype Content
+        """
+        statement = text(
+            """
+            with RECURSIVE children_id as (
+                select workspaces.workspace_id as id from workspaces
+                where workspaces.parent_id = :workspace_id
+                union all
+                select workspaces.workspace_id as id from workspaces
+                join children_id c on c.id = workspaces.parent_id
+            )
+            select children_id.id as workspace_id from children_id;
+            """
+        )
+        children_ids = [
+            elem[0]
+            for elem in object_session(self)
+            .execute(statement, {"workspace_id": self.workspace_id})
+            .fetchall()
+        ]
+        if children_ids:
+            return (
+                object_session(self)
+                .query(Workspace)
+                .filter(Workspace.workspace_id.in_(children_ids))
+                .order_by(Workspace.workspace_id)
+            ).all()
+        return []
+
+    def get_children(self, recursively: bool = False) -> List["Workspace"]:
+        """
+        Get all children of content recursively or not (including children of children...)
+        """
+        if recursively:
+            return self.recursive_children
+        else:
+            return self.children
 
     @hybrid_property
     def contents(self) -> List["Content"]:
