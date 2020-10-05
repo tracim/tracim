@@ -4,7 +4,7 @@ import Avatar from '../Avatar/Avatar.jsx'
 import { ROLE } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
-import FormRoleList from './FormRoleList.jsx'
+import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -129,11 +129,17 @@ export const NewMemberForm = props => {
         </div>
       </div>
 
-      <FormRoleList
-        roleList={props.roleList}
-        onChangeRole={props.onChangeRole}
-        role={props.role}
-      />
+      <div className='memberlist__form__role'>
+        <div className='memberlist__form__role__text'>
+          {props.t('Choose the role of the member')}
+        </div>
+
+        <SingleChoiceList
+          roleList={props.roleList}
+          onChangeRole={props.onChangeRole}
+          role={props.role}
+        />
+      </div>
 
       <div className='memberlist__form__submitbtn'>
         <button

@@ -1,8 +1,14 @@
 {
-  "Validate and create": "Validar e criar",
+  "Create": "Criar",
+  "Default role": "Função predefinida",
   "Space's name": "Nome do espaço",
   "New space": "Novo espaço",
-  "A space with that name already exists": "Jà existe um espaço com esse nome",
+  "A space with that name already exists": "Já existe um espaço com esse nome",
   "Error while saving new space": "Erro ao salvar novo espaço",
+  "Next": "Seguinte",
+  "None": "Nenhum",
+  "Parent space:": "Espaço pai:",
+  "Space's name:": "Nome do espaço:",
+  "Space's type:": "Tipo do espaço:",
   "You cannot create anymore space": "Não pode criar mais espaços"
 }

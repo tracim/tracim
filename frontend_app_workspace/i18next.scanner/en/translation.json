@@ -1,8 +1,14 @@
 {
-  "Validate and create": "Validate and create",
+  "Create": "Create",
+  "Default role:": "Default role:",
   "Space's name": "Space's name",
   "New space": "New space",
   "A space with that name already exists": "A space with that name already exists",
   "Error while saving new space": "Error while saving new space",
+  "None": "None",
+  "Next": "Next",
+  "Parent space:": "Parent space:",
+  "Space's name:": "Space's name:",
+  "Space's type:": "Space's type:",
   "You cannot create anymore space": "You cannot create anymore space"
 }

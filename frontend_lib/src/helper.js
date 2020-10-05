@@ -215,6 +215,46 @@ export const PROFILE = {
 }
 export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 
+const OPEN = {
+  id: 2,
+  slug: 'open',
+  faIcon: 'sun-o',
+  tradKey: [
+    i18n.t('Open'),
+    i18n.t('Any user will be able to see, join and open this space.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Open',
+  description: 'Any user will be able to see, join and open this space.'
+}
+const ON_REQUEST = {
+  id: 3,
+  slug: 'on-request',
+  faIcon: 'handshake-o',
+  tradKey: [
+    i18n.t('On request'),
+    i18n.t('Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'On request',
+  description: 'Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.'
+}
+const CONFIDENTIAL = {
+  id: 4,
+  slug: 'confidential',
+  faIcon: 'user-secret',
+  tradKey: [
+    i18n.t('Confidential'),
+    i18n.t('Only invited users will be able to see and open this space, invitation is sent by space managers.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Confidential',
+  description: 'Only invited users will be able to see and open this space, invitation is sent by space managers.'
+}
+export const SPACE_TYPE = {
+  open: OPEN,
+  onRequest: ON_REQUEST,
+  confidential: CONFIDENTIAL
+}
+export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+
 export const APP_FEATURE_MODE = {
   VIEW: 'view',
   EDIT: 'edit',

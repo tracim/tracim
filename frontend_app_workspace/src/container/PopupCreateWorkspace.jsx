@@ -1,10 +1,14 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import Select from 'react-select'
 import {
-  CardPopup,
-  handleFetchResult,
   addAllResourceI18n,
+  CardPopup,
   CUSTOM_EVENT,
+  SingleChoiceList,
+  handleFetchResult,
+  ROLE_LIST,
+  SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postWorkspace } from '../action.async.js'
@@ -26,15 +30,16 @@ const debug = {
     },
     translation: {
       en: {},
-      fr: {}
+      fr: {},
+      pt: {}
     }
   },
   loggedUser: {
     userId: 5,
-    username: 'Smoi',
-    firstname: 'Côme',
-    lastname: 'Stoilenom',
-    email: 'osef@algoo.fr',
+    username: '',
+    firstname: '',
+    lastname: '',
+    email: '',
     avatar: ''
   },
   workspaceId: 1,
@@ -47,7 +52,11 @@ export class PopupCreateWorkspace extends React.Component {
     this.state = {
       appName: 'workspace',
       config: props.data ? props.data.config : debug.config,
+      isFirstPage: true,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      newDefaultRole: '',
+      newParentSpace: 0,
+      newType: '',
       newWorkspaceName: ''
     }
 
@@ -83,6 +92,14 @@ export class PopupCreateWorkspace extends React.Component {
 
   handleChangeNewWorkspaceName = e => this.setState({ newWorkspaceName: e.target.value })
 
+  handleChangeNewDefaultRole = newRole => this.setState({ newDefaultRole: newRole })
+
+  handleChangeSpacesType = newType => this.setState({ newType: newType })
+
+  handleChangeParentSpace = newParentSpace => this.setState({ newParentSpace: newParentSpace.value })
+
+  handleClickNext = () => this.setState({ isFirstPage: false })
+
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
     data: {
@@ -112,45 +129,89 @@ export class PopupCreateWorkspace extends React.Component {
     const { props, state } = this
     return (
       <CardPopup
-        customClass='popupCreateContent'
+        customClass='newSpace'
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
       >
-        <div className='createcontent'>
-          <div className='createcontent__contentname mb-4'>
-            <div className='createcontent__contentname__icon ml-1 mr-3'>
+        <div>
+          <div className='newSpace__title'>
+            <div className='newSpace__title__icon'>
               <i className={`fa fa-${state.config.faIcon}`} style={{ color: state.config.hexcolor }} />
             </div>
 
-            <div className='createcontent__contentname__title' style={{ color: state.config.hexcolor }}>
+            <div className='newSpace__title__name' style={{ color: state.config.hexcolor }}>
               {props.t('New space')}
             </div>
           </div>
-          <span> {props.t("Space's name")} </span>
-          <input
-            type='text'
-            className='createcontent__form__input'
-            data-cy='createcontent__form__input'
-            placeholder={props.t("Space's name")}
-            value={state.newWorkspaceName}
-            onChange={this.handleChangeNewWorkspaceName}
-            onKeyDown={this.handleInputKeyDown}
-            autoFocus
-          />
-          <span> {props.t("Space's type")} </span>
 
-          <span> {props.t('Parent space')} </span>
-          <div className='createcontent__form__button'>
-            <button
-              type='button'
-              className='createcontent__form__button btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-              data-cy='popup__createcontent__form__button'
-              onClick={this.handleValidate}
-              disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0}
-            >
-              {props.t('Validate and create')}
-            </button>
-          </div>
+          {state.isFirstPage
+            ? (
+              <>
+                <div className='newSpace__label'> {props.t("Space's name:")} </div>
+                <input
+                  type='text'
+                  className='newSpace__input'
+                  placeholder={props.t("Space's name")}
+                  value={state.newWorkspaceName}
+                  onChange={this.handleChangeNewWorkspaceName}
+                  onKeyDown={this.handleInputKeyDown}
+                  autoFocus
+                />
+
+                <div className='newSpace__label'> {props.t("Space's type:")} </div>
+
+                <SingleChoiceList
+                  roleList={SPACE_TYPE_LIST}
+                  onChangeRole={this.handleChangeSpacesType}
+                  role={state.newType}
+                />
+
+                <div className='newSpace__label'> {props.t('Parent space:')} </div>
+                <Select
+                  className='newSpace__input'
+                  isSearchable
+                  onChange={this.handleChangeParentSpace}
+                  options={[
+                    { value: 0, label: props.t('None') },
+                    { value: 1, label: 'Strawberry' },
+                    { value: 2, label: 'Vanilla' }
+                  ]}
+                  defaultValue={{ value: 0, label: props.t('None') }}
+                />
+
+                <div className='newSpace__button'>
+                  <button
+                    type='button'
+                    className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickNext}
+                    disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                  >
+                    {props.t('Next')} <i className='fa fa-arrow-right newSpace__button__icon' />
+                  </button>
+                </div>
+              </>
+            )
+            : (
+              <>
+                <div className='newSpace__label'> {props.t('Default role:')} </div>
+                <SingleChoiceList
+                  roleList={ROLE_LIST}
+                  onChangeRole={this.handleChangeNewDefaultRole}
+                  role={state.newDefaultRole}
+                />
+
+                <div className='newSpace__button'>
+                  <button
+                    type='button'
+                    className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    onClick={this.handleValidate}
+                    disabled={!state.newDefaultRole || state.newDefaultRole.length === 0}
+                  >
+                    {props.t('Create')} <i className='fa fa-check newSpace__button__icon' />
+                  </button>
+                </div>
+              </>
+            )}
         </div>
       </CardPopup>
     )
