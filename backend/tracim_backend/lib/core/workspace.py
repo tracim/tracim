@@ -386,28 +386,19 @@ class WorkspaceApi(object):
     def save(self, workspace: Workspace):
         self._session.flush()
 
-    def _delete(self, workspace: Workspace):
+    def delete(self, workspace: Workspace, flush=True):
         workspace.is_deleted = True
         label = "{label}-{action}-{date}".format(
             label=workspace.label, action="deleted", date=current_date_for_filename()
         )
         workspace.label = label
-        self._session.add(workspace)
 
-    def delete(self, workspace: Workspace, flush=True):
-        self._delete(workspace)
-        for workspace in workspace.get_children(recursively=True):
-            self._delete(workspace)
         if flush:
             self._session.flush()
 
-    def _undelete(self, workspace: Workspace):
+    def undelete(self, workspace: Workspace, flush=True):
         workspace.is_deleted = False
 
-    def undelete(self, workspace: Workspace, flush=True):
-        self._undelete(workspace)
-        for workspace in workspace.get_children(recursively=True):
-            self._undelete(workspace)
         if flush:
             self._session.flush()
 
