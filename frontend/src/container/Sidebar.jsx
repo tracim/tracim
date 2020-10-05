@@ -33,6 +33,7 @@ export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      activeWorkspaceId: -1,
       sidebarClose: isMobile
     }
 
@@ -81,14 +82,15 @@ export class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar(props)) return
 
     if (
-      props.match.params &&
-      props.match.params.idws &&
-      props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
+      props.location.pathname.includes('workspaces/') &&
+      !props.workspaceList.some(space => space.isOpenInSidebar === true)
     ) {
-      const workspaceIdInUrl = parseInt(props.match.params.idws)
+      const urlElements = props.location.pathname.split('/')
+      const workspaceIdInUrl = parseInt(urlElements[urlElements.indexOf('workspaces') + 1])
 
-      if (props.workspaceList.find(ws => ws.id === workspaceIdInUrl) !== undefined) {
-        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true)) // TODO see if works
+      if (props.workspaceList.find(space => space.id === workspaceIdInUrl) !== undefined) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true))
+        this.setState({ activeWorkspaceId: workspaceIdInUrl })
       }
     }
   }
@@ -116,19 +118,18 @@ export class Sidebar extends React.Component {
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
-    const { sidebarClose } = this.state
-    const { user, workspaceList, t } = this.props
+    const { props, state } = this
 
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
       <div className='sidebar'>
-        <div className={classnames('sidebar__expand', { sidebarclose: sidebarClose })} onClick={this.handleClickToggleSidebar}>
-          {sidebarClose
-            ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />}
+        <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
+          {state.sidebarClose
+            ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { sidebarclose: sidebarClose })}>
+        <div className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
@@ -141,15 +142,15 @@ export class Sidebar extends React.Component {
             <div className='sidebar__content'>
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-              <nav className={classnames('sidebar__content__navigation', { sidebarclose: sidebarClose })}>
+              <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  {workspaceList.map(space =>
+                  {props.workspaceList.map(space =>
                     <WorkspaceListItem
                       workspaceId={space.id}
-                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, space.memberList, ROLE_LIST)}
+                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
                       label={space.label}
                       allowedAppList={space.sidebarEntryList}
-                      activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
+                      activeWorkspaceId={state.activeWorkspaceId}
                       isOpenInSidebar={space.isOpenInSidebar}
                       onClickAllContent={this.handleClickAllContent}
                       key={space.id}
@@ -159,14 +160,14 @@ export class Sidebar extends React.Component {
                 </ul>
               </nav>
 
-              {getUserProfile(user.profile).id >= PROFILE.manager.id && (
+              {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
                 <div className='sidebar__content__btnnewworkspace'>
                   <button
                     className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickNewWorkspace}
                     data-cy='sidebarCreateWorkspaceBtn'
                   >
-                    {t('Create a space')}
+                    {props.t('Create a space')}
                   </button>
                 </div>
               )}

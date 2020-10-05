@@ -4,8 +4,9 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../util/helper.js'
+import { DRAG_AND_DROP, PAGE } from '../../util/helper.js'
 import { ROLE, DropdownMenu } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')
 
@@ -13,7 +14,7 @@ class WorkspaceListItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showDropdownMenuButton: false
+      showDropdownMenuButton: isMobile
     }
   }
 
@@ -41,24 +42,17 @@ class WorkspaceListItem extends React.Component {
     return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
   }
 
-  // TODO Use this func to do the drag-and-drop when the action menu is merge
   getIcon = () => {
     const { props } = this
 
-    const isDropActive = props.canDrop && props.isOver
+    const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
+    const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
-    if (isDropActive) {
-      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
-      const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
-
-      if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />
-      return <i className='fa fa-times-circle' />
-    }
-
-    return props.label.substring(0, 2).toUpperCase()
+    if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return 'fa-arrow-circle-down'
+    return 'fa fa-times-circle'
   }
 
-  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: !prev.showDropdownMenuButton }))
+  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : !prev.showDropdownMenuButton }))
 
   render () {
     const { props, state } = this
@@ -76,6 +70,10 @@ class WorkspaceListItem extends React.Component {
           onClick={props.onClickTitle}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
+          {(props.canDrop && props.isOver) && (
+            <i className={`fa ${this.getIcon()} sidebar__content__navigation__workspace__item__dragNdrop`} />
+          )}
+
           <div
             className={classnames(
               'sidebar__content__navigation__workspace__item__name',
@@ -105,7 +103,7 @@ class WorkspaceListItem extends React.Component {
               )}
             </DropdownMenu>
           )}
-          </Link>
+        </Link>
       </li>
     )
   }
