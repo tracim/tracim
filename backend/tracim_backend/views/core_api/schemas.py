@@ -1050,7 +1050,8 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         example=42,
         description="id of the parent workspace id.",
         allow_none=True,
-        required=True,
+        default=None,
+        required=False,
         validate=positive_int_validator,
     )
 

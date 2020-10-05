@@ -1215,6 +1215,69 @@ class TestWorkspacesEndpoints(object):
         assert workspace["label"] == "test3"
         assert workspace["slug"] == "test3"
 
+    def test_api__get_workspaces__ok_200__with_parent_ids(self, workspace_api_factory, web_testapp):
+        """
+        Check obtain all workspaces reachables for user with user auth with explicit parent_ids
+        """
+
+        workspace_api = workspace_api_factory.get()
+        parent1 = workspace_api.create_workspace("parent1")
+        child1_1 = workspace_api.create_workspace("child1_1", parent=parent1)
+        child1_2 = workspace_api.create_workspace("child1_2", parent=parent1)
+        parent2 = workspace_api.create_workspace("parent2")
+        child2_1 = workspace_api.create_workspace("child2_1", parent=parent2)
+        workspace_api.create_workspace("child2_2", parent=parent2)
+        grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
+        grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        implicit_all = web_testapp.get("/api/workspaces", status=200)
+        assert len(implicit_all.json_body) == 8
+
+        parent_ids_list = [
+            "0",
+            parent1.workspace_id,
+            parent2.workspace_id,
+            child2_1.workspace_id,
+            child1_2.workspace_id,
+        ]
+        parent_ids = ",".join([str(item) for item in parent_ids_list])
+        explicit_all = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": parent_ids}
+        )
+        assert explicit_all.json_body == implicit_all.json_body
+
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": child2_1.workspace_id}
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson2_1_1.workspace_id
+
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": child1_2.workspace_id}
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson1_2_2.workspace_id
+
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": "0"})
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+
+        parent_ids = parent1.workspace_id
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+
+        parent_ids = "0,{}".format(parent1.workspace_id)
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        assert len(res.json_body) == 4
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[2]["workspace_id"] == child1_2.workspace_id
+        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
+
     def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
         """
         Check obtain all workspaces reachables for one user

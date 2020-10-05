@@ -138,7 +138,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @check_right(is_administrator)
-    @hapic.input_body(WorkspaceFilterQuerySchema())
+    @hapic.input_query(WorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceSchema(many=True))
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -151,7 +151,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        workspaces = wapi.get_all_children(parent_ids=hapic_data.body.parent_ids)
+        workspaces = wapi.get_all_children(parent_ids=hapic_data.query.parent_ids)
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
