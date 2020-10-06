@@ -116,7 +116,7 @@ class Workspace(DeclarativeBase):
 
     @property
     def recursive_children(self) -> List["Workspace"]:
-        """typing.Listtyping.List
+        """
         :return: list of children Workspace
         :rtype Content
         """
