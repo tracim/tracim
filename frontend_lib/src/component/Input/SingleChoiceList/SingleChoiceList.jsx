@@ -7,7 +7,7 @@ export const SingleChoiceList = props => {
   return (
     <ul className='singleChoiceList'>
       {props.list.map(listItem =>
-        <li key={listItem.slug}>
+        <li key={listItem.slug} title={props.t(listItem.label)}>
           <label className='singleChoiceList__item' htmlFor={`${listItem.slug}_${radioHash}`}>
             <div className='singleChoiceList__item__radiobtn mr-2'>
               <input

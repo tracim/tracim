@@ -136,9 +136,12 @@ export class PopupCreateWorkspace extends React.Component {
         <div className='newSpace__menu'>
           <div className='newSpace__title'>
             <div className='newSpace__title__icon'>
-              <i className={`fa fa-${state.config.faIcon}`} style={{ color: state.config.hexcolor }} />
+              <i
+                className={`fa fa-${state.config.faIcon}`}
+                style={{ color: state.config.hexcolor }}
+                title={props.t('New space')}
+              />
             </div>
-
             <div className='newSpace__title__name' style={{ color: state.config.hexcolor }}>
               {props.t('New space')}
             </div>
@@ -167,10 +170,11 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    type='button'
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickNextOrBack}
                     disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                    onClick={this.handleClickNextOrBack}
+                    title={props.t('Next')}
+                    type='button'
                   >
                     {props.t('Next')} <i className='fa fa-arrow-right newSpace__button__icon' />
                   </button>
@@ -225,19 +229,21 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    type='button'
                     className='btn newSpace__button__back highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickNextOrBack}
                     disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                    onClick={this.handleClickNextOrBack}
+                    title={props.t('Back')}
+                    type='button'
                   >
                     <i className='fa fa-arrow-left newSpace__button__back__icon' /> {props.t('Back')}
                   </button>
 
                   <button
-                    type='button'
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    onClick={this.handleValidate}
                     disabled={!state.newDefaultRole || state.newDefaultRole.length === 0}
+                    onClick={this.handleValidate}
+                    title={props.t('Create')}
+                    type='button'
                   >
                     {props.t('Create')} <i className='fa fa-check newSpace__button__icon' />
                   </button>
