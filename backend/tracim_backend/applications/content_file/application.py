@@ -43,9 +43,5 @@ class ContentFileApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ContentFileApp(
-        label="Files",
-        slug="contents/file",
-        fa_icon="paperclip",
-        config={},
-        main_route="/ui/workspaces/{workspace_id}/contents?type=file",
+        label="Files", slug="contents/file", fa_icon="paperclip", config={}, main_route="",
     )

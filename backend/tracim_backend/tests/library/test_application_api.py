@@ -42,11 +42,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         thread = DummyApp(
-            label="Threads",
-            slug="contents/thread",
-            fa_icon="comments-o",
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
+            label="Threads", slug="contents/thread", fa_icon="comments-o", config={}, main_route="",
         )
         content_type = TracimContentType(
             slug="thread",
@@ -68,7 +64,7 @@ class TestApplicationApi(object):
             slug="contents/markdownpluspage",
             fa_icon="file-code-o",
             config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
+            main_route="",
         )
         content_type = TracimContentType(
             slug="markdownpage",
