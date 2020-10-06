@@ -512,7 +512,6 @@ class WorkspaceFilterQuerySchema(marshmallow.Schema):
         " If not parent_ids at all, then return all workspaces."
         " If one parent_id to 0, then return root workspaces."
         " If set to another value, return all direct subworkspaces"
-        " content of this workspace"
         " If multiple value of parent_ids separated by comma,"
         " return mix of all workspaces of all theses parent_ids",
         default="0",
