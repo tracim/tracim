@@ -135,9 +135,9 @@ export const NewMemberForm = props => {
         </div>
 
         <SingleChoiceList
-          roleList={props.roleList}
-          onChangeRole={props.onChangeRole}
-          role={props.role}
+          list={props.roleList}
+          onChange={props.onChangeRole}
+          currentValue={props.role}
         />
       </div>
 

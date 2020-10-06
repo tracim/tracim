@@ -98,7 +98,7 @@ export class PopupCreateWorkspace extends React.Component {
 
   handleChangeParentSpace = newParentSpace => this.setState({ newParentSpace: newParentSpace.value })
 
-  handleClickNext = () => this.setState({ isFirstPage: false })
+  handleClickNextOrBack = () => this.setState(prev => ({ isFirstPage: !prev.isFirstPage }))
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
@@ -133,7 +133,7 @@ export class PopupCreateWorkspace extends React.Component {
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
       >
-        <div>
+        <div className='newSpace__menu'>
           <div className='newSpace__title'>
             <div className='newSpace__title__icon'>
               <i className={`fa fa-${state.config.faIcon}`} style={{ color: state.config.hexcolor }} />
@@ -159,31 +159,17 @@ export class PopupCreateWorkspace extends React.Component {
                 />
 
                 <div className='newSpace__label'> {props.t("Space's type:")} </div>
-
                 <SingleChoiceList
-                  roleList={SPACE_TYPE_LIST}
-                  onChangeRole={this.handleChangeSpacesType}
-                  role={state.newType}
-                />
-
-                <div className='newSpace__label'> {props.t('Parent space:')} </div>
-                <Select
-                  className='newSpace__input'
-                  isSearchable
-                  onChange={this.handleChangeParentSpace}
-                  options={[
-                    { value: 0, label: props.t('None') },
-                    { value: 1, label: 'Strawberry' },
-                    { value: 2, label: 'Vanilla' }
-                  ]}
-                  defaultValue={{ value: 0, label: props.t('None') }}
+                  list={SPACE_TYPE_LIST}
+                  onChange={this.handleChangeSpacesType}
+                  currentValue={state.newType}
                 />
 
                 <div className='newSpace__button'>
                   <button
                     type='button'
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickNext}
+                    onClick={this.handleClickNextOrBack}
                     disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
                   >
                     {props.t('Next')} <i className='fa fa-arrow-right newSpace__button__icon' />
@@ -193,14 +179,60 @@ export class PopupCreateWorkspace extends React.Component {
             )
             : (
               <>
+                <div className='newSpace__label'> {props.t('Parent space:')} </div>
+                <Select
+                  className='newSpace__input'
+                  isSearchable
+                  onChange={this.handleChangeParentSpace}
+                  options={[
+                    { value: 0, label: props.t('None') },
+                    { value: 1, label: 'Chocolate' },
+                    { value: 2, label: 'Strawberry' },
+                    { value: 3, label: 'Very big name of a icecream flavor not just Chocolate, Strawberry or Vanilla, a very very very big name... very big name! I love icecream!' },
+                    { value: 4, label: 'Chocolate' },
+                    { value: 5, label: 'Strawberry' },
+                    { value: 6, label: 'Vanilla' },
+                    { value: 7, label: 'Strawberry' },
+                    { value: 8, label: 'Vanilla' },
+                    { value: 9, label: 'Strawberry' },
+                    { value: 10, label: 'Strawberry' },
+                    { value: 11, label: 'Chocolate' },
+                    { value: 12, label: 'Strawberry' },
+                    { value: 13, label: 'Chocolate' },
+                    { value: 14, label: 'Vanilla' },
+                    { value: 15, label: 'Strawberry' },
+                    { value: 16, label: 'Chocolate' },
+                    { value: 17, label: 'Vanilla' },
+                    { value: 18, label: 'Vanilla' },
+                    { value: 19, label: 'Chocolate' },
+                    { value: 20, label: 'Vanilla' },
+                    { value: 21, label: 'Chocolate' },
+                    { value: 22, label: 'Strawberry' },
+                    { value: 23, label: 'Strawberry' },
+                    { value: 24, label: 'Chocolate' },
+                    { value: 25, label: 'Strawberry' },
+                    { value: 26, label: 'Vanilla' }
+                  ]}
+                  defaultValue={{ value: 0, label: props.t('None') }}
+                />
+
                 <div className='newSpace__label'> {props.t('Default role:')} </div>
                 <SingleChoiceList
-                  roleList={ROLE_LIST}
-                  onChangeRole={this.handleChangeNewDefaultRole}
-                  role={state.newDefaultRole}
+                  list={ROLE_LIST}
+                  onChange={this.handleChangeNewDefaultRole}
+                  currentValue={state.newDefaultRole}
                 />
 
                 <div className='newSpace__button'>
+                  <button
+                    type='button'
+                    className='btn newSpace__button__back highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickNextOrBack}
+                    disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                  >
+                    <i className='fa fa-arrow-left newSpace__button__back__icon' /> {props.t('Back')}
+                  </button>
+
                   <button
                     type='button'
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
