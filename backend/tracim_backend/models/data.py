@@ -120,6 +120,8 @@ class Workspace(DeclarativeBase):
         :return: list of children Workspace
         :rtype Content
         """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
         statement = text(
             """
             with RECURSIVE children_id as (
@@ -1345,6 +1347,8 @@ class Content(DeclarativeBase):
         :return: list of children Content
         :rtype Content
         """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
         statement = text(
             """
     with RECURSIVE children_id as (
