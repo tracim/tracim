@@ -7,5 +7,6 @@ export const postWorkspace = (apiUrl, newWorkspaceName) =>
     // FIXME 2020-09-15 S.G. - replace these parameters by the one got from the user
     // during https://github.com/tracim/tracim/issues/3577
     access_type: 'confidential',
-    default_user_role: 'reader'
+    default_user_role: 'reader',
+    parent_id: null
   })
