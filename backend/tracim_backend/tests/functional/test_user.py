@@ -2965,21 +2965,23 @@ class TestUserWorkspaceEndpoint(object):
         )
         assert isinstance(res.json_body, list)
         assert len(res.json_body) == accessible_workspaces_count
-        assert not len(res.json_body) or set(res.json_body[0].keys()) == {
-            "agenda_enabled",
-            "is_deleted",
-            "public_download_enabled",
-            "public_upload_enabled",
-            "label",
-            "access_type",
-            "slug",
-            "workspace_id",
-            "description",
-            "sidebar_entries",
-            "created",
-            "owner",
-            "default_user_role",
-        }
+        assert not len(res.json_body) or set(res.json_body[0].keys()).issuperset(
+            {
+                "agenda_enabled",
+                "is_deleted",
+                "public_download_enabled",
+                "public_upload_enabled",
+                "label",
+                "access_type",
+                "slug",
+                "workspace_id",
+                "description",
+                "sidebar_entries",
+                "created",
+                "owner",
+                "default_user_role",
+            }
+        )
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
         self, web_testapp, user_api_factory,
