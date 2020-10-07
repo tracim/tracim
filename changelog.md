@@ -1,3 +1,9 @@
+## 3.1.4 / 2020-10-07
+
+### Fixed Issues
+
+- TLM: [#3547](https://github.com/tracim/tracim/issues/3547) (issue added by mistake in the changelog of the 3.1.1)
+
 
 ## 3.1.3 / 2020-09-28
 
