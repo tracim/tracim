@@ -13,6 +13,7 @@ import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   serialize
 } from 'tracim_frontend_lib'
@@ -46,8 +47,7 @@ import {
 } from '../action-creator.async.js'
 import {
   PAGE,
-  COOKIE_FRONTEND,
-  NUMBER_RESULTS_BY_PAGE
+  COOKIE_FRONTEND
 } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 

@@ -80,6 +80,7 @@
 
     <script type='text/javascript'>
       GLOBAL_primaryColor = '${primary_color_str}'
+      GLOBAL_excludedNotifications = '${excluded_notifications}'.replace(/\s/g, '')
     </script>
   </head>
 

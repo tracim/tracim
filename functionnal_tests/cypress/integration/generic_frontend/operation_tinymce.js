@@ -53,7 +53,8 @@ describe('TinyMce text editor', function () {
 
       it('the autocompletion should find @johndoe when typing it, even with a space', function () {
         cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE(' @john')
+          cy.inputInTinyMCE(' ')
+          cy.inputInTinyMCE('@john')
           cy.get('.autocomplete').contains('@johndoe')
         })
       })

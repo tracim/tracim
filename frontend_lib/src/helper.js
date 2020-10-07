@@ -419,6 +419,8 @@ export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
+export const NUMBER_RESULTS_BY_PAGE = 15
+
 // Check that the given username is valid.
 // Return an object:
 // {isUsernameValid: false, usernameInvalidMsg: 'Username invalid'}
