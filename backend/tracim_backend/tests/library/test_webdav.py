@@ -243,7 +243,7 @@ class TestWebDav(object):
 
         # create it
         new_file = webdav_put_new_test_file_helper(
-            webdav_provider, environ, "/Recipes/Salads/greek_salad.txt", b"Greek Salad\n"
+            webdav_provider, environ, "/Recipes.space/Salads/greek_salad.txt", b"Greek Salad\n"
         )
         assert new_file, "Result should not be None instead {0}".format(new_file)
 

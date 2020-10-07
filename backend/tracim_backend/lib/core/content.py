@@ -808,13 +808,20 @@ class ContentApi(object):
     ):
         query = self._base_query(workspace)
         query = query.filter((Content.label + Content.file_extension) == filename)
-        query = query.filter(Content.parent_id == parent.parent_id)
+        if parent:
+            query = query.filter(Content.parent_id == parent.content_id)
+        else:
+            query = query.filter(Content.parent_id == None)  # noqa: E711
         try:
             return query.order_by(Content.cached_revision_id.desc()).one()
         except NoResultFound as exc:
+            if parent:
+                parent_string = "with parent {}".format(parent.content_id)
+            else:
+                parent_string = "at workspace root"
             raise ContentNotFound(
-                'Content with filename "{}" with parent "{}" in workspace "{}" not found'.format(
-                    filename, parent.content_id, workspace.workspace_id
+                'Content with filename "{}" {} in workspace "{}" not found'.format(
+                    filename, parent_string, workspace.workspace_id
                 )
             ) from exc
 

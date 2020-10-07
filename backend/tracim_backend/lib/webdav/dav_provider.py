@@ -34,54 +34,62 @@ class WebdavPath(object):
         )
         self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
         path_parts = path.split("/")
+        self.workspaces = deque()
+        self.contents = deque()
         if path and path != "/" and len(path_parts) >= 2:
             root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[1])
-            root_workspace = self.workspace_api.get_one_by_filemanager_filename(
-                root_workspace_filemanager_filename
-            )
-            search_sub_workspace = True
-            current_workspace = root_workspace
-            self.workspaces = deque((root_workspace,))
-            self.contents = deque()
+            try:
+                root_workspace = self.workspace_api.get_one_by_filemanager_filename(
+                    root_workspace_filemanager_filename
+                )
+            except WorkspaceNotFound:
+                root_workspace = None
+            self.workspaces.append(root_workspace)
             # INFO - G.M - 2020-10-07 - Get all workspace tree + content_tree
-            for path_part in path_parts[1:]:
-                section = webdav_convert_file_name_to_bdd(path_part)
-                if search_sub_workspace:
+            if root_workspace:
+                search_sub_workspace = True
+                for path_part in path_parts[1:]:
+                    section = webdav_convert_file_name_to_bdd(path_part)
+                    if search_sub_workspace:
+                        try:
+                            workspace = self.workspace_api.get_one_by_filemanager_filename(
+                                section, parent=self.workspaces[-1]
+                            )
+                            self.workspaces.append(workspace)
+                            continue
+                        except WorkspaceNotFound:
+                            search_sub_workspace = False
+                            pass
                     try:
-                        workspace = self.workspace_api.get_one_by_filemanager_filename(
-                            section, parent=current_workspace
+                        content = self.content_api.get_one_by_filename(
+                            filename=section,
+                            workspace=self.workspaces[-1],
+                            parent=self.contents[-1] if self.contents else None,
                         )
-                        self.workspaces.append(workspace)
-                        continue
-                    except WorkspaceNotFound:
-                        search_sub_workspace = False
-                        pass
-                try:
-                    content = self.content_api.get_one_by_filename(
-                        filename=section,
-                        workspace=self.workspaces[-1],
-                        parent=self.contents[-1] if self.contents else None,
-                    )
-                except ContentNotFound:
-                    content = None
-                self.contents.append(content)
-
-        else:
-            # Only root
-            self.workspaces = []
-            self.contents = []
+                    except ContentNotFound:
+                        content = None
+                    self.contents.append(content)
 
     @property
     def current_workspace(self) -> typing.Optional[Workspace]:
-        return self.workspaces[-1]
+        try:
+            return self.workspaces[-1]
+        except IndexError:
+            return None
 
     @property
     def current_content(self) -> typing.Optional[Content]:
-        return self.contents[-1]
+        try:
+            return self.contents[-1]
+        except IndexError:
+            return None
 
     @property
     def current_parent_content(self) -> typing.Optional[Content]:
-        return self.contents[-2]
+        try:
+            return self.contents[-2]
+        except IndexError:
+            return None
 
     @property
     def exists(self):
@@ -89,7 +97,7 @@ class WebdavPath(object):
         if self.path == "/":
             return True
         # workspace root
-        if self.current_content == [] and self.current_workspace:
+        if self.contents == deque() and self.current_workspace:
             return True
         # content
         if self.current_content:
