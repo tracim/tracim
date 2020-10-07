@@ -8,6 +8,7 @@ import {
   SingleChoiceList,
   handleFetchResult,
   ROLE_LIST,
+  SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -107,14 +108,24 @@ export class PopupCreateWorkspace extends React.Component {
 
       switch (fetchGetUserSpaces.apiResponse.status) {
         case 200: {
-          const spaceList = [
+          let spaceList = fetchGetUserSpaces.body
+
+          if (state.newType === SPACE_TYPE.confidential.slug) spaceList = spaceList.filter(space => space.access_type === SPACE_TYPE.confidential.slug)
+          else if (state.newType === SPACE_TYPE.onRequest.slug) {
+            spaceList = spaceList.filter(space =>
+              space.access_type === SPACE_TYPE.onRequest.slug || space.access_type === SPACE_TYPE.confidential.slug
+            )
+          }
+
+          spaceList = [
             { value: null, label: props.t('None') }, // INFO - GB - 2020-10-07 - Root
-            ...fetchGetUserSpaces.body.map(space => {
+            ...spaceList.map(space => {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
               const spaceLabel = <span><i className={`fa fa-${spaceType.faIcon}`} /> {space.label}</span>
               return { value: space.workspace_id, label: spaceLabel }
             })
           ]
+
           this.setState({ parentOptions: spaceList, isFirstStep: false })
           break
         }
