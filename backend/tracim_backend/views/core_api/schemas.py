@@ -10,7 +10,6 @@ from marshmallow.validate import OneOf
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
-from tracim_backend.app_models.validator import acp_validator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -666,9 +665,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
-    acp = StrippedString(
-        example="test", description="search text to query", validate=acp_validator, required=True
-    )
+    acp = StrippedString(example="test", description="search text to query", required=True)
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
@@ -686,6 +683,13 @@ class KnownMembersQuerySchema(marshmallow.Schema):
         validate=regex_string_as_list_of_int,
         example="3,4",
         description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
+    )
+
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=0,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -1551,7 +1555,8 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         validate=page_token_validator,
     )
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
-    event_types = EventTypeListField()
+    include_event_types = EventTypeListField()
+    exclude_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load
@@ -1584,7 +1589,8 @@ class PathSuffixSchema(marshmallow.Schema):
 class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
-    event_types = EventTypeListField()
+    exclude_event_types = EventTypeListField()
+    include_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load

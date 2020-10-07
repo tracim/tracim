@@ -37,7 +37,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -170,7 +169,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         session,
         web_testapp,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -277,7 +275,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -413,7 +410,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         session,
         admin_user,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -753,7 +749,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -876,7 +871,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -1007,7 +1001,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -2883,7 +2876,6 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -2998,7 +2990,6 @@ class TestUserDiskSpace(object):
     def test_api__get_user_disk_space__ok_200__admin(
         self, user_api_factory, web_testapp, workspace_api_factory
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3040,7 +3031,6 @@ class TestUserEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3074,7 +3064,6 @@ class TestUserEndpoint(object):
         assert res["allowed_space"] == 0
 
     def test_api__get_user__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3105,7 +3094,6 @@ class TestUserEndpoint(object):
         assert res["allowed_space"] == 0
 
     def test_api__get_user__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3190,7 +3178,6 @@ class TestUserEndpoint(object):
     def test_api__create_user__err_400__with_no_username_and_no_email(
         self, web_testapp, user_api_factory, app_config
     ):
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "password": "mysuperpassword",
@@ -3375,7 +3362,6 @@ class TestUserEndpoint(object):
         assert last_event.fields["user"]["public_name"] == "John Doe"
 
     def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3406,7 +3392,6 @@ class TestUserEndpoint(object):
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__err_403__other_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3516,7 +3501,6 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3541,7 +3525,6 @@ class TestUserWithNotificationEndpoint(object):
         assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.put("/api/users/{}/trashed".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
@@ -3558,7 +3541,6 @@ class TestUsersEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp, admin_user):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3589,7 +3571,6 @@ class TestUsersEndpoint(object):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3621,7 +3602,6 @@ class TestKnownMembersEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin__by_name(self, user_api_factory, admin_user, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3667,7 +3647,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3710,7 +3689,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
         self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3758,7 +3736,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3821,7 +3798,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3898,7 +3874,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(
         self, user_api_factory, web_testapp, admin_user
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3941,7 +3916,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3987,7 +3961,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4021,12 +3994,11 @@ class TestKnownMembersEndpoint(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
 
     def test_api__get_user__ok_200__normal_user_by_email(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4099,7 +4071,6 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     def test_api__get_user__ok_200__show_all_members(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4178,7 +4149,6 @@ class TestSetEmailPasswordLdapEndpoint(object):
     """
 
     def test_api__set_user_email__ok_200__ldap_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4215,7 +4185,6 @@ class TestSetEmailPasswordLdapEndpoint(object):
     def test_api__set_user_password_ldap__ok_200__admin(
         self, user_api_factory, web_testapp, session
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4264,7 +4233,6 @@ class TestSetEmailEndpoint(object):
     """
 
     def test_api__set_user_email__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4296,7 +4264,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_400__admin_same_email(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4333,7 +4300,6 @@ class TestSetEmailEndpoint(object):
     def test_api__set_user_email__err_403__admin_wrong_password(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4370,7 +4336,6 @@ class TestSetEmailEndpoint(object):
     def test_api__set_user_email__err_400__admin_string_is_not_email(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4407,7 +4372,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4441,7 +4405,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4724,7 +4687,6 @@ class TestSetPasswordEndpoint(object):
     """
 
     def test_api__set_user_password__ok_200__admin(self, user_api_factory, web_testapp, session):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4764,7 +4726,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__err_403__admin_wrong_password(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4809,7 +4770,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__err_400__admin_passwords_do_not_match(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4856,7 +4816,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__ok_200__user_itself(
         self, user_api_factory, web_testapp, session
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4894,7 +4853,6 @@ class TestSetPasswordEndpoint(object):
         assert user.validate_password("mynewpassword")
 
     def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4941,7 +4899,6 @@ class TestSetUserInfoEndpoint(object):
     """
 
     def test_api__set_user_info__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4982,7 +4939,6 @@ class TestSetUserInfoEndpoint(object):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5023,7 +4979,6 @@ class TestSetUserInfoEndpoint(object):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5070,7 +5025,6 @@ class TestSetUserProfileEndpoint(object):
     """
 
     def test_api__set_user_profile__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5183,7 +5137,6 @@ class TestSetUserAllowedSpaceEndpoint(object):
     """
 
     def test_api__set_user_allowed_space__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5275,7 +5228,6 @@ class TestSetUserEnableDisableEndpoints(object):
     """
 
     def test_api_enable_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5308,7 +5260,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is True
 
     def test_api_disable_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5341,7 +5292,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is False
 
     def test_api_disable_user__err_400__cant_disable_myself_admin(self, admin_user, web_testapp):
-
         user_id = int(admin_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -5360,7 +5310,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is True
 
     def test_api_enable_user__err_403__other_account(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5397,7 +5346,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__other_account(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
