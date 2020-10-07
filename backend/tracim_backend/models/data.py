@@ -116,9 +116,8 @@ class Workspace(DeclarativeBase):
 
     @property
     def recursive_children(self) -> List["Workspace"]:
-        """typing.Listtyping.List
+        """
         :return: list of children Workspace
-        :rtype Content
         """
         # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
         # see https://github.com/tracim/tracim/issues/3670
@@ -151,7 +150,7 @@ class Workspace(DeclarativeBase):
 
     def get_children(self, recursively: bool = False) -> List["Workspace"]:
         """
-        Get all children of content recursively or not (including children of children...)
+        Get all children of workspace recursively or not (including children of children...)
         """
         if recursively:
             return self.recursive_children

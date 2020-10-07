@@ -2664,7 +2664,7 @@ class TestUserWorkspaceEndpoint(object):
         role_api_factory,
     ):
         """
-        Check obtain all workspaces reachables for user with different filter
+        Check the retrieval of all workspaces reachable by user with different filters
         """
 
         workspace_api = workspace_api_factory.get()
@@ -2768,7 +2768,7 @@ class TestUserWorkspaceEndpoint(object):
         self, workspace_api_factory, web_testapp, admin_user
     ):
         """
-        Check obtain all users workspaces reachables for user with user auth with explicit parent_ids
+        Check the retrieval of all users workspaces reachable by user with user auth with explicit parent_ids
         """
         user = admin_user
         workspace_api = workspace_api_factory.get()
