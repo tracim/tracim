@@ -228,7 +228,7 @@ const OPEN = {
 }
 const ON_REQUEST = {
   id: 3,
-  slug: 'on-request',
+  slug: 'on_request',
   faIcon: 'handshake-o',
   tradKey: [
     i18n.t('On request'),

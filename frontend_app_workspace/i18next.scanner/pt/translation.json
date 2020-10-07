@@ -2,6 +2,7 @@
   "Back": "Voltar",
   "Create": "Criar",
   "Default role": "Função predefinida",
+  "Error while getting user spaces": "Erro ao obter espaços do utilizador",
   "Space's name": "Nome do espaço",
   "New space": "Novo espaço",
   "A space with that name already exists": "Já existe um espaço com esse nome",
@@ -11,5 +12,6 @@
   "Parent space:": "Espaço pai:",
   "Space's name:": "Nome do espaço:",
   "Space's type:": "Tipo do espaço:",
+  "Some input is invalid": "Algumas entradas são inválidas",
   "You cannot create anymore space": "Não pode criar mais espaços"
 }

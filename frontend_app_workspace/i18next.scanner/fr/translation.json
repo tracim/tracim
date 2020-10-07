@@ -2,6 +2,7 @@
   "Back": "Retour",
   "Create": "Créer",
   "Default role": "Rôle par défaut",
+  "Error while getting user spaces": "Erreur lors de l'obtention d'espaces utilisateurs",
   "Space's name": "Nom de l'espace",
   "New space": "Nouvel espace",
   "A space with that name already exists": "Un espace avec ce nom existe déjà",
@@ -9,6 +10,7 @@
   "Next": "Suivant",
   "None": "Aucun",
   "Parent space:": "Espace parent :",
+  "Some input is invalid": "Certaines entrées ne sont pas valides",
   "Space's name:": "Nom de l'espace :",
   "Space's type:": "Type de l'espace :",
   "You cannot create anymore space": "Vous ne pouvez pas créer d'espaces supplémentaire"

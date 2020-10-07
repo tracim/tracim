@@ -2,6 +2,7 @@
   "Back": "Back",
   "Create": "Create",
   "Default role:": "Default role:",
+  "Error while getting user spaces": "Error while getting user spaces",
   "Space's name": "Space's name",
   "New space": "New space",
   "A space with that name already exists": "A space with that name already exists",
@@ -9,6 +10,7 @@
   "None": "None",
   "Next": "Next",
   "Parent space:": "Parent space:",
+  "Some input is invalid": "Some input is invalid",
   "Space's name:": "Space's name:",
   "Space's type:": "Space's type:",
   "You cannot create anymore space": "You cannot create anymore space"

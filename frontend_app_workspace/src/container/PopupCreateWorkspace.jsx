@@ -11,7 +11,7 @@ import {
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { postWorkspace } from '../action.async.js'
+import { getUserSpaces, postWorkspace } from '../action.async.js'
 import i18n from '../i18n.js'
 
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -52,12 +52,13 @@ export class PopupCreateWorkspace extends React.Component {
     this.state = {
       appName: 'workspace',
       config: props.data ? props.data.config : debug.config,
-      isFirstPage: true,
+      isFirstStep: true,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       newDefaultRole: '',
       newParentSpace: 0,
       newType: '',
-      newWorkspaceName: ''
+      newWorkspaceName: '',
+      parentOptions: []
     }
 
     // i18n has been init, add resources from frontend
@@ -98,7 +99,29 @@ export class PopupCreateWorkspace extends React.Component {
 
   handleChangeParentSpace = newParentSpace => this.setState({ newParentSpace: newParentSpace.value })
 
-  handleClickNextOrBack = () => this.setState(prev => ({ isFirstPage: !prev.isFirstPage }))
+  handleClickNextOrBack = async () => {
+    const { props, state } = this
+
+    if (state.isFirstStep) {
+      const fetchGetUserSpaces = await handleFetchResult(await getUserSpaces(state.config.apiUrl, state.loggedUser.userId))
+
+      switch (fetchGetUserSpaces.apiResponse.status) {
+        case 200: {
+          const spaceList = [
+            { value: null, label: props.t('None') }, // INFO - GB - 2020-10-07 - Root
+            ...fetchGetUserSpaces.body.map(space => {
+              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
+              const spaceLabel = <span><i className={`fa fa-${spaceType.faIcon}`} /> {space.label}</span>
+              return { value: space.workspace_id, label: spaceLabel }
+            })
+          ]
+          this.setState({ parentOptions: spaceList, isFirstStep: false })
+          break
+        }
+        default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
+      }
+    } else this.setState({ isFirstStep: true })
+  }
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
@@ -110,12 +133,13 @@ export class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName))
+    const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName, state.newType, state.newDefaultRole))
 
     switch (fetchSaveNewWorkspace.apiResponse.status) {
       case 200: this.handleClose(); break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {
+          case 2001: this.sendGlobalFlashMessage(props.t('Some input is invalid')); break
           case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
           case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
@@ -147,7 +171,7 @@ export class PopupCreateWorkspace extends React.Component {
             </div>
           </div>
 
-          {state.isFirstPage
+          {state.isFirstStep
             ? (
               <>
                 <div className='newSpace__label'> {props.t("Space's name:")} </div>
@@ -188,36 +212,8 @@ export class PopupCreateWorkspace extends React.Component {
                   className='newSpace__input'
                   isSearchable
                   onChange={this.handleChangeParentSpace}
-                  options={[
-                    { value: 0, label: props.t('None') },
-                    { value: 1, label: 'Chocolate' },
-                    { value: 2, label: 'Strawberry' },
-                    { value: 3, label: 'Very big name of a icecream flavor not just Chocolate, Strawberry or Vanilla, a very very very big name... very big name! I love icecream!' },
-                    { value: 4, label: 'Chocolate' },
-                    { value: 5, label: 'Strawberry' },
-                    { value: 6, label: 'Vanilla' },
-                    { value: 7, label: 'Strawberry' },
-                    { value: 8, label: 'Vanilla' },
-                    { value: 9, label: 'Strawberry' },
-                    { value: 10, label: 'Strawberry' },
-                    { value: 11, label: 'Chocolate' },
-                    { value: 12, label: 'Strawberry' },
-                    { value: 13, label: 'Chocolate' },
-                    { value: 14, label: 'Vanilla' },
-                    { value: 15, label: 'Strawberry' },
-                    { value: 16, label: 'Chocolate' },
-                    { value: 17, label: 'Vanilla' },
-                    { value: 18, label: 'Vanilla' },
-                    { value: 19, label: 'Chocolate' },
-                    { value: 20, label: 'Vanilla' },
-                    { value: 21, label: 'Chocolate' },
-                    { value: 22, label: 'Strawberry' },
-                    { value: 23, label: 'Strawberry' },
-                    { value: 24, label: 'Chocolate' },
-                    { value: 25, label: 'Strawberry' },
-                    { value: 26, label: 'Vanilla' }
-                  ]}
-                  defaultValue={{ value: 0, label: props.t('None') }}
+                  options={state.parentOptions}
+                  defaultValue={{ value: null, label: props.t('None') }}
                 />
 
                 <div className='newSpace__label'> {props.t('Default role:')} </div>
