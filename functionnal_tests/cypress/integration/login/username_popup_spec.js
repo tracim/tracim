@@ -103,6 +103,7 @@ describe('Login', function () {
     })
 
     it('should be able to set username', function () {
+      this.skip() // FIXME - RJ - 2020-10-07 - this tests is unstable and it will be fixed in https://github.com/tracim/tracim/issues/3483
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
