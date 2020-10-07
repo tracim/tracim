@@ -60,6 +60,7 @@ class WorkspaceAccessType(enum.Enum):
 
 
 class Workspace(DeclarativeBase):
+    FILEMANAGER_EXTENSION = ".space"
 
     __tablename__ = "workspaces"
     workspace_id = Column(

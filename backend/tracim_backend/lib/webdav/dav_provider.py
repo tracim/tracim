@@ -22,10 +22,16 @@ from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import TracimSession
+
+
+class WebdavPath(object):
+    def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
+        webdav_convert_file_name_to_bdd(self.path.split("/")[1])
 
 
 class WebdavTracimContext(TracimContext):
@@ -40,7 +46,12 @@ class WebdavTracimContext(TracimContext):
         self._plugin_manager = plugin_manager
 
     def set_path(self, path: str):
-        self.path = path
+        self.path = WebdavPath(
+            path=path,
+            current_user=self.current_user,
+            session=self.dbsession,
+            app_config=self.app_config,
+        )
 
     @property
     def root_path(self) -> str:
@@ -101,7 +112,7 @@ class WebdavTracimContext(TracimContext):
             config=self.app_config,
             show_deleted=True,
         )
-        return wapi.get_one_by_label(workspace_id)
+        return wapi.get_one_by_filemanager_filename(workspace_id)
 
     def _get_current_workspace_label(self) -> str:
         return webdav_convert_file_name_to_bdd(self.path.split("/")[1])
@@ -124,7 +135,7 @@ class WebdavTracimContext(TracimContext):
         wapi = WorkspaceApi(
             current_user=self.current_user, session=self.dbsession, config=self.app_config,
         )
-        workspace = wapi.get_one_by_label(workspace_name)
+        workspace = wapi.get_one_by_filemanager_filename(workspace_name)
         parents = []
         if len(splited_local_path) > 2:
             parent_string = splited_local_path[1:-1]

@@ -170,7 +170,7 @@ class TestNotificationsSync(object):
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
         wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_label("Recipes")
+        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
@@ -208,7 +208,7 @@ class TestNotificationsSync(object):
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
         wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_label("Recipes")
+        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
@@ -294,7 +294,7 @@ class TestNotificationsAsync(object):
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
         wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_label("Recipes")
+        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 

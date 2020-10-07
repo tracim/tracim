@@ -215,18 +215,23 @@ class WorkspaceApi(object):
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
 
-    def get_one_by_label(self, label: str) -> Workspace:
+    def get_one_by_filemanager_filename(
+        self, filemanager_filename: str, parent: typing.Optional[Workspace] = None
+    ) -> Workspace:
         """
         get workspace according to label given, if multiple workspace have
         same label, return first one found.
         """
         # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
         # to unsure working
-        if label.endswith(".space"):
-            label = label[:-6]
-        result = self.default_order_workspace(
-            self._base_query().filter(Workspace.label == label)
-        ).all()
+        if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
+            label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
+        query = self._base_query().filter(Workspace.label == label)
+        if parent:
+            query = query.filter(Workspace.parent_id == parent.parent_id)
+        else:
+            query = query.filter(Workspace.parent_id == None)  # noqa: E711
+        result = self.default_order_workspace(query).all()
         if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)

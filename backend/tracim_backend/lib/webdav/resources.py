@@ -119,7 +119,7 @@ class RootResource(DAVCollection):
         Though for perfomance issue, we're not using this function anymore
         """
         try:
-            workspace = self.workspace_api.get_one_by_label(label)
+            workspace = self.workspace_api.get_one_by_filemanager_filename(label)
             # fix path
             workspace_path = "%s%s%s" % (
                 self.path,
