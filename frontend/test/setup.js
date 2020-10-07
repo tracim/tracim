@@ -34,7 +34,7 @@ if (!global.window && !global.document) {
   global.navigator = window.navigator
   global.lastCustomEventTypes = new Set()
   global.GLOBAL_primaryColor = globalPrimaryColor.hex
-  global.GLOBAL_dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
+  global.GLOBAL_dispatchEvent = global.document.dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
   global.EventSource = EventSource
   global.CustomEvent = () => {}
   global.fetch = require('node-fetch')
@@ -44,5 +44,4 @@ if (!global.window && !global.document) {
 
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
-sinon.stub(document, 'dispatchEvent')
 sinon.stub(console, 'log')
