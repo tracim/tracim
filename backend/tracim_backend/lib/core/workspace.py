@@ -59,12 +59,20 @@ class WorkspaceApi(object):
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     def _base_query_without_roles(self):
+        """
+        Prepare query that would return all not deleted workspaces.
+        """
         query = self._session.query(Workspace)
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
+        """
+        Prepare query that would return all not deleted workspaces where the current user:
+          - is a member
+          - OR has an admin profile
+        """
         if not self._user:
             return self._base_query_without_roles()
 
@@ -271,6 +279,25 @@ class WorkspaceApi(object):
 
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
+        return query.all()
+
+    def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
+        """
+        Return workspaces accessible by user.
+        Accessible workspaces:
+          - are of type OPEN or ON_REQUEST
+          - do not have user as a member
+        """
+        query = self._base_query_without_roles().filter(
+            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+        )
+        query = query.filter(
+            Workspace.workspace_id.notin_(
+                self._session.query(UserRoleInWorkspace.workspace_id).filter(
+                    UserRoleInWorkspace.user_id == user.user_id
+                )
+            )
+        )
         return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:

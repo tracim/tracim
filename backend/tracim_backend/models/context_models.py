@@ -405,11 +405,13 @@ class KnownMembersQuery(object):
         exclude_user_ids: str = None,
         exclude_workspace_ids: str = None,
         include_workspace_ids: str = None,
+        limit: int = None,
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
         self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
 
 
 class AgendaFilterQuery(object):
@@ -490,7 +492,7 @@ class RoleUpdate(object):
     """
 
     def __init__(self, role: str) -> None:
-        self.role = role
+        self.role = WorkspaceRoles.get_role_from_slug(role)
 
 
 class WorkspaceMemberInvitation(object):
@@ -607,14 +609,16 @@ class LiveMessageQuery(object):
         self,
         read_status: str,
         count: int,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         page_token: Optional[str] = None,
         exclude_author_ids: str = "",
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
         self.page_token = page_token
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 
@@ -625,10 +629,12 @@ class UserMessagesSummaryQuery(object):
 
     def __init__(
         self,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: str = "",
     ) -> None:
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 

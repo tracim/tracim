@@ -37,6 +37,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
+  NUMBER_RESULTS_BY_PAGE,
   checkUsernameValidity,
   formatAbsoluteDate,
   permissiveNumberEqual,
@@ -85,6 +86,8 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
+import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
+
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
@@ -117,7 +120,7 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
+  tinymceAutoCompleteHandleSelectionChange
 } from './tinymceAutoCompleteHelper.js'
 
 import {
@@ -165,6 +168,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export {
   appContentFactory,
   addRevisionFromTLM,
+  DropdownMenu,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
@@ -242,6 +246,7 @@ export {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
+  NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
   MentionAutoComplete,

@@ -4,7 +4,7 @@ const sharedSpaceManager = 'Space manager'
 
 let workspaceId
 
-describe('Add a member at dashboard', () => {
+describe('Add a member from the dashboard', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -152,7 +152,8 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should not allow adding a member twice using the same username', () => {
+  it('should not allow adding a member twice using the same username', function () {
+    this.skip() // RJ - 2020-09-24 - unstable test, see issue #3483
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)

@@ -748,7 +748,6 @@ export class WorkspaceContent extends React.Component {
             >
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
-                  parentClass='workspace__header__btnaddcontent'
                   folderId={null} // null because it is workspace root content
                   onClickCreateContent={this.handleClickCreateContent}
                   availableApp={createContentAvailableApp}
@@ -859,7 +858,6 @@ export class WorkspaceContent extends React.Component {
 
                 {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
-                    customClass='workspace__content__button'
                     folderId={null}
                     onClickCreateContent={this.handleClickCreateContent}
                     availableApp={createContentAvailableApp}

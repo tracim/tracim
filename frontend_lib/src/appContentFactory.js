@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
+  NUMBER_RESULTS_BY_PAGE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
@@ -177,11 +178,13 @@ export function appContentFactory (WrappedComponent) {
           switch (response.body.code) {
             case 2067:
               this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
             default:
               this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
@@ -341,12 +344,10 @@ export function appContentFactory (WrappedComponent) {
     searchForMentionInQuery = async (query, workspaceId) => {
       const mentionList = getMatchingGroupMentionList(query)
 
-      if (query.length < 2) return mentionList
-
-      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
-        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
         default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
       }
       return mentionList

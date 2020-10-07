@@ -1,4 +1,4 @@
-describe('content :: home_page', function () {
+describe('Sidebar', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -9,8 +9,8 @@ describe('content :: home_page', function () {
     cy.visit('/ui')
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
-  it('', function () {
-    cy.get('.sidebar__content .fa-chevron-up').should('be.visible')
+  it('should have a link to All contents in the hidden menu', function () {
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
     cy.get('li').contains('All Contents').should('have.attr', 'href', '/ui/workspaces/1/contents')
     cy.get('.fa-th').should('be.visible')
     cy.get('.fa-th').click()

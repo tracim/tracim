@@ -26,7 +26,7 @@ describe('<CommentTextArea />', () => {
   wrapper.instance().textAreaRef = initialTextAreaRef
 
   describe('intern functions', () => {
-    describe('handleInputKeyPress()', () => {
+    describe('handleInputKeyDown()', () => {
       const preventDefaultSpy = sinon.spy()
       const initialEvent = {
         key: 'A',
@@ -48,7 +48,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should set isAutoCompleteActivated to false and clean autoCompleteItemList', () => {
-            wrapper.instance().handleInputKeyPress({ ...initialEvent, key: ' ' })
+            wrapper.instance().handleInputKeyDown({ ...initialEvent, key: ' ' })
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
             expect(wrapper.state('autoCompleteItemList')).to.deep.equal([])
           })
@@ -60,7 +60,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should prevent default', () => {
-            wrapper.instance().handleInputKeyPress({ ...initialEvent, key: 'Enter' })
+            wrapper.instance().handleInputKeyDown({ ...initialEvent, key: 'Enter' })
             expect(preventDefaultSpy.calledOnce).to.equal(true)
           })
         })
@@ -74,7 +74,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should decrement autoCompleteCursorPosition and prevent default', () => {
-            wrapper.instance().handleInputKeyPress({ ...initialEvent, key: 'ArrowUp' })
+            wrapper.instance().handleInputKeyDown({ ...initialEvent, key: 'ArrowUp' })
             expect(wrapper.state('autoCompleteCursorPosition')).to.equal(0)
             expect(preventDefaultSpy.calledOnce).to.equal(true)
           })
@@ -89,7 +89,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should decrement autoCompleteCursorPosition and prevent default', () => {
-            wrapper.instance().handleInputKeyPress({ ...initialEvent, key: 'ArrowDown' })
+            wrapper.instance().handleInputKeyDown({ ...initialEvent, key: 'ArrowDown' })
             expect(wrapper.state('autoCompleteCursorPosition')).to.equal(1)
             expect(preventDefaultSpy.calledOnce).to.equal(true)
           })
@@ -106,6 +106,7 @@ describe('<CommentTextArea />', () => {
         })
 
         it('should call props.onChangeNewComment with the right mention', () => {
+          onChangeNewCommentSpy.resetHistory()
           wrapper.instance().handleClickAutoCompleteItem({ mention: 'all', detail: 'notify all' })
           expect(onChangeNewCommentSpy.calledOnceWith({ target: { value: '@all ' } })).to.equal(true)
         })

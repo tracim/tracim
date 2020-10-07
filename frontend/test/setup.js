@@ -39,6 +39,7 @@ if (!global.window && !global.document) {
   global.CustomEvent = () => {}
   global.fetch = require('node-fetch')
   global.AbortController = AbortController
+  global.GLOBAL_excludedNotifications = ''
 }
 
 Enzyme.configure({ adapter: new Adapter() })
