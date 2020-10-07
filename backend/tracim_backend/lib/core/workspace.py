@@ -225,7 +225,12 @@ class WorkspaceApi(object):
         # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
         # to unsure working
         if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
-            label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
+            raise WorkspaceNotFound(
+                'Invalid Workspace name. Filemanager_filename should end with "{}"'.format(
+                    Workspace.FILEMANAGER_EXTENSION
+                )
+            )
+        label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
         query = self._base_query().filter(Workspace.label == label)
         if parent:
             query = query.filter(Workspace.parent_id == parent.parent_id)

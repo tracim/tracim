@@ -1,10 +1,9 @@
 # coding: utf8
-from os.path import basename
+from collections import deque
 from os.path import dirname
 import typing
 
 from pluggy import PluginManager
-from sqlalchemy.orm.exc import NoResultFound
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 
@@ -14,7 +13,6 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.content import ContentRevisionRO
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
@@ -24,14 +22,78 @@ from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import TracimSession
 
 
 class WebdavPath(object):
     def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
-        webdav_convert_file_name_to_bdd(self.path.split("/")[1])
+        self.path = path
+        self.workspace_api = WorkspaceApi(
+            current_user=current_user, session=session, config=app_config
+        )
+        self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
+        path_parts = path.split("/")
+        if path and path != "/" and len(path_parts) >= 2:
+            root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[1])
+            root_workspace = self.workspace_api.get_one_by_filemanager_filename(
+                root_workspace_filemanager_filename
+            )
+            search_sub_workspace = True
+            current_workspace = root_workspace
+            self.workspaces = deque((root_workspace,))
+            self.contents = deque()
+            # INFO - G.M - 2020-10-07 - Get all workspace tree + content_tree
+            for path_part in path_parts[1:]:
+                section = webdav_convert_file_name_to_bdd(path_part)
+                if search_sub_workspace:
+                    try:
+                        workspace = self.workspace_api.get_one_by_filemanager_filename(
+                            section, parent=current_workspace
+                        )
+                        self.workspaces.append(workspace)
+                        continue
+                    except WorkspaceNotFound:
+                        search_sub_workspace = False
+                        pass
+                try:
+                    content = self.content_api.get_one_by_filename(
+                        filename=section,
+                        workspace=self.workspaces[-1],
+                        parent=self.contents[-1] if self.contents else None,
+                    )
+                except ContentNotFound:
+                    content = None
+                self.contents.append(content)
+
+        else:
+            # Only root
+            self.workspaces = []
+            self.contents = []
+
+    @property
+    def current_workspace(self) -> typing.Optional[Workspace]:
+        return self.workspaces[-1]
+
+    @property
+    def current_content(self) -> typing.Optional[Content]:
+        return self.contents[-1]
+
+    @property
+    def current_parent_content(self) -> typing.Optional[Content]:
+        return self.contents[-2]
+
+    @property
+    def exists(self):
+        # root
+        if self.path == "/":
+            return True
+        # workspace root
+        if self.current_content == [] and self.current_workspace:
+            return True
+        # content
+        if self.current_content:
+            return True
 
 
 class WebdavTracimContext(TracimContext):
@@ -46,7 +108,7 @@ class WebdavTracimContext(TracimContext):
         self._plugin_manager = plugin_manager
 
     def set_path(self, path: str):
-        self.path = WebdavPath(
+        self.processed_path = WebdavPath(
             path=path,
             current_user=self.current_user,
             session=self.dbsession,
@@ -100,22 +162,7 @@ class WebdavTracimContext(TracimContext):
         if you are editing content 21 in workspace 3,
         current_workspace will be 3.
         """
-        return self._generate_if_none(
-            self._current_workspace, self._get_workspace, self._get_current_workspace_label,
-        )
-
-    def _get_workspace(self, workspace_id_fetcher):
-        workspace_id = workspace_id_fetcher()
-        wapi = WorkspaceApi(
-            current_user=self.current_user,
-            session=self.dbsession,
-            config=self.app_config,
-            show_deleted=True,
-        )
-        return wapi.get_one_by_filemanager_filename(workspace_id)
-
-    def _get_current_workspace_label(self) -> str:
-        return webdav_convert_file_name_to_bdd(self.path.split("/")[1])
+        return self.processed_path.current_workspace
 
     @property
     def current_content(self):
@@ -123,58 +170,27 @@ class WebdavTracimContext(TracimContext):
         Current content if exist, if you are editing content 21, current content
         will be content 21.
         """
-        return self._generate_if_none(
-            self._current_content, self._get_content, self._get_content_path
-        )
-
-    def _get_content(self, content_path_fetcher):
-        content_path = content_path_fetcher()
-
-        splited_local_path = content_path.strip("/").split("/")
-        workspace_name = webdav_convert_file_name_to_bdd(splited_local_path[0])
-        wapi = WorkspaceApi(
-            current_user=self.current_user, session=self.dbsession, config=self.app_config,
-        )
-        workspace = wapi.get_one_by_filemanager_filename(workspace_name)
-        parents = []
-        if len(splited_local_path) > 2:
-            parent_string = splited_local_path[1:-1]
-            parents = [webdav_convert_file_name_to_bdd(x) for x in parent_string]
-
-        content_api = ContentApi(
-            config=self.app_config, current_user=self.current_user, session=self.dbsession,
-        )
-        return content_api.get_one_by_filename_and_parent_labels(
-            content_label=webdav_convert_file_name_to_bdd(basename(content_path)),
-            content_parent_labels=parents,
-            workspace=workspace,
-        )
-
-    def _get_content_path(self):
-        return normpath(self.path)
-
-    def _get_candidate_parent_content_path(self):
-        return normpath(dirname(self._destpath))
+        return self.processed_path.current_content
 
     def set_destpath(self, destpath: str):
-        self._destpath = destpath
-
-    def _get_candidate_workspace_path(self):
-        return webdav_convert_file_name_to_bdd(self._destpath.split("/")[1])
+        self.processed_destpath = WebdavPath(
+            path=destpath,
+            current_user=self.current_user,
+            session=self.dbsession,
+            app_config=self.app_config,
+        )
 
     @property
     def candidate_parent_content(self) -> Content:
-        return self._generate_if_none(
-            self._candidate_parent_content,
-            self._get_content,
-            self._get_candidate_parent_content_path,
-        )
+        return self.processed_destpath.current_parent_content
 
     @property
     def candidate_workspace(self) -> Workspace:
-        return self._generate_if_none(
-            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_path,
-        )
+        return self.processed_destpath.current_workspace
+
+    @property
+    def path_exist(self) -> bool:
+        return self.processed_path.exists
 
 
 class Provider(DAVProvider):
@@ -202,8 +218,6 @@ class Provider(DAVProvider):
         tracim_context = environ["tracim_context"]
         path = normpath(path)
         tracim_context.set_path(path)
-        user = tracim_context.current_user
-        session = tracim_context.dbsession
         if not self.exists(path, environ):
             return None
         root_path = tracim_context.root_path
@@ -229,17 +243,6 @@ class Provider(DAVProvider):
                 tracim_context=tracim_context,
                 label=workspace.filemanager_filename,
             )
-
-        # And now we'll work on the path to establish which type or resource is requested
-
-        ContentApi(
-            current_user=user,
-            session=session,
-            config=self.app_config,
-            show_archived=False,
-            show_deleted=False,
-            namespaces_filter=[ContentNamespaces.CONTENT],
-        )
 
         try:
             content = tracim_context.current_content
@@ -275,39 +278,4 @@ class Provider(DAVProvider):
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        root_path = environ["http_authenticator.realm"]
-        parent_path = dirname(path)
-        user = tracim_context.current_user
-        session = tracim_context.dbsession
-        if path == root_path:
-            return True
-
-        try:
-            workspace = tracim_context.current_workspace
-        except WorkspaceNotFound:
-            workspace = None
-
-        if parent_path == root_path or workspace is None:
-            return workspace is not None
-
-        ContentApi(
-            current_user=user,
-            session=session,
-            config=self.app_config,
-            show_archived=False,
-            show_deleted=False,
-            namespaces_filter=[ContentNamespaces.CONTENT],
-        )
-
-        try:
-            content = tracim_context.current_content
-        except ContentNotFound:
-            content = None
-
-        return content is not None
-
-    def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
-        try:
-            return api.get_one(revision.content_id, content_type_list.Any_SLUG)
-        except NoResultFound:
-            return None
+        return tracim_context.path_exist
