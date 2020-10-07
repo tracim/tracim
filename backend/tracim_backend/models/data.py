@@ -210,6 +210,9 @@ class Workspace(DeclarativeBase):
                     yield child
 
 
+Index("idx__workspaces__parent_id", Workspace.parent_id)
+
+
 class UserRoleInWorkspace(DeclarativeBase):
     __tablename__ = "user_workspace"
 
