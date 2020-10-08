@@ -112,6 +112,7 @@ class Workspace(DeclarativeBase):
     children = relationship(
         "Workspace",
         backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+        order_by="Workspace.workspace_id",
     )
 
     @property
