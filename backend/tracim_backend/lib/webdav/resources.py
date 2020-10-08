@@ -178,7 +178,7 @@ class WorkspaceOnlyContainer(WebdavContainer):
     def _generate_child_workspace_resource(
         self, parent_path: str, child_workspace: Workspace
     ) -> "WorkspaceResource":
-        workspace_label = child_workspace.filemanager_filename
+        workspace_label = webdav_convert_file_name_to_display(child_workspace.filemanager_filename)
         path = add_trailing_slash(parent_path)
         workspace_path = "{}{}".format(path, workspace_label)
         return get_workspace_resource(
