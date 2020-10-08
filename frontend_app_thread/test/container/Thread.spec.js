@@ -63,7 +63,7 @@ describe('<Thread />', () => {
               ...commentTlm,
               parent_id: contentThread.thread.content_id,
               content_id: 9,
-              created: '2022-06-09T10:28:43.511Z',
+              created: '2022-06-09T10:28:43.511Z'
             }
           }
         }
@@ -123,7 +123,6 @@ describe('<Thread />', () => {
               }
             }
           }
-          let oldTimelineLength = 0
 
           before(() => {
             props.addCommentToTimeline.resetHistory()
@@ -214,7 +213,7 @@ describe('<Thread />', () => {
           const tlmData = {
             fields: {
               ...baseRevisionTlm,
-              content: { ...baseRevisionTlm.content, is_deleted: true}
+              content: { ...baseRevisionTlm.content, is_deleted: true }
             }
           }
 

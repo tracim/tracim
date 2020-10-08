@@ -9,7 +9,7 @@ export const SingleChoiceList = props => {
       {props.list.map(listItem =>
         <li key={listItem.slug} title={props.t(listItem.label)}>
           <label className='singleChoiceList__item' htmlFor={`${listItem.slug}_${radioHash}`}>
-            <div className='singleChoiceList__item__radiobtn mr-2'>
+            <div className='singleChoiceList__item__radioButton'>
               <input
                 id={`${listItem.slug}_${radioHash}`}
                 type='radio'
@@ -22,7 +22,7 @@ export const SingleChoiceList = props => {
             </div>
 
             <div className='singleChoiceList__item__text'>
-              <div className='singleChoiceList__item__text__icon mr-1' style={{ color: listItem.hexcolor }}>
+              <div className='singleChoiceList__item__text__icon' style={{ color: listItem.hexcolor }}>
                 <i className={`fa fa-fw fa-${listItem.faIcon}`} />
               </div>
 

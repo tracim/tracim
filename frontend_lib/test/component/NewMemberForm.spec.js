@@ -51,16 +51,6 @@ describe('<NewMemberForm />', () => {
       expect(wrapper.find('#addmember').prop('value')).to.equal(props.publicName)
     })
 
-    it(`should display ${props.roleList.length} roles`, () => {
-      expect(wrapper.find('.memberlist__form__role__list__item').length).equal(props.roleList.length)
-      for (let i = 0; i < props.roleList.length; i++) {
-        expect(wrapper.find(`[value='${props.roleList[i].slug}']`).length)
-          .to.equal(1)
-        expect(wrapper.find(`[value='${props.roleList[i].slug}']`).prop('checked'))
-          .to.equal(props.roleList[i].slug === props.role)
-      }
-    })
-
     it(`should have the submit button disabled property set to ${!props.autoCompleteClicked}`, () => {
       expect(wrapper.find('.memberlist__form__submitbtn > button').prop('disabled'))
         .to.equal(!props.autoCompleteClicked)
@@ -98,11 +88,6 @@ describe('<NewMemberForm />', () => {
       wrapper.find('div.autocomplete__item').first().simulate('click')
       expect(onClickAutoCompleteCallBack.called).to.equal(true)
       wrapper.setProps({ searchedKnownMemberList: props.searchedKnownMemberList })
-    })
-
-    it('should call props.onChangeRole when handler onChangeRole is called', () => {
-      wrapper.find('.item__radiobtn > input').first().simulate('change')
-      expect(onChangeRoleCallBack.called).to.equal(true)
     })
 
     it('should call props.onChangePersonalData when handler onChangePersonalData is called', () => {
