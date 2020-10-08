@@ -1,5 +1,6 @@
 {
   "Back": "Back",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.",
   "Create": "Create",
   "Default role:": "Default role:",
   "Error while getting user spaces": "Error while getting user spaces",
@@ -10,7 +11,7 @@
   "None": "None",
   "Next": "Next",
   "Parent space:": "Parent space:",
-  "Some input is invalid": "Some input is invalid",
+  "Some input are invalid": "Some input are invalid",
   "Space's name:": "Space's name:",
   "Space's type:": "Space's type:",
   "You cannot create anymore space": "You cannot create anymore space"

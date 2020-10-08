@@ -44,12 +44,16 @@
     display flex
     justify-content flex-end
     margin-top 20px
-    &__icon
-      margin-left 5px
     &__back
       margin-right auto
-      &__icon
-        margin-right 5px
+  &__icon
+    &__right
+      margin-left 5px
+    &__left
+      margin-right 5px
+  &__warningMessage
+    font-size fontSizeSmall
+    margin 5px 0
 
 @media (max-width: max-xs)
   .newSpace

@@ -12,7 +12,7 @@ import {
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { getUserSpaces, postWorkspace } from '../action.async.js'
+import { getUserSpaces, postSpace } from '../action.async.js'
 import i18n from '../i18n.js'
 
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -58,8 +58,9 @@ export class PopupCreateWorkspace extends React.Component {
       newDefaultRole: '',
       newParentSpace: 0,
       newType: '',
-      newWorkspaceName: '',
-      parentOptions: []
+      newName: '',
+      parentOptions: [],
+      showWarningMessage: false
     }
 
     // i18n has been init, add resources from frontend
@@ -92,13 +93,16 @@ export class PopupCreateWorkspace extends React.Component {
     }
   })
 
-  handleChangeNewWorkspaceName = e => this.setState({ newWorkspaceName: e.target.value })
+  handleChangeNewName = e => this.setState({ newName: e.target.value })
 
   handleChangeNewDefaultRole = newRole => this.setState({ newDefaultRole: newRole })
 
   handleChangeSpacesType = newType => this.setState({ newType: newType })
 
-  handleChangeParentSpace = newParentSpace => this.setState({ newParentSpace: newParentSpace.value })
+  handleChangeParentSpace = newParentSpace => this.setState({
+    newParentSpace: newParentSpace.value,
+    showWarningMessage: newParentSpace.parentId !== null
+  })
 
   handleClickNextOrBack = async () => {
     const { props, state } = this
@@ -122,7 +126,7 @@ export class PopupCreateWorkspace extends React.Component {
             ...spaceList.map(space => {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
               const spaceLabel = <span><i className={`fa fa-${spaceType.faIcon}`} /> {space.label}</span>
-              return { value: space.workspace_id, label: spaceLabel }
+              return { value: space.workspace_id, label: spaceLabel, parentId: space.parent_id }
             })
           ]
 
@@ -144,13 +148,13 @@ export class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName, state.newType, state.newDefaultRole))
+    const fetchPostSpace = await handleFetchResult(await postSpace(state.config.apiUrl, state.newDefaultRole, state.newParentSpace, state.newName, state.newType))
 
-    switch (fetchSaveNewWorkspace.apiResponse.status) {
+    switch (fetchPostSpace.apiResponse.status) {
       case 200: this.handleClose(); break
       case 400:
-        switch (fetchSaveNewWorkspace.body.code) {
-          case 2001: this.sendGlobalFlashMessage(props.t('Some input is invalid')); break
+        switch (fetchPostSpace.body.code) {
+          case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break
           case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
           case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
@@ -190,8 +194,8 @@ export class PopupCreateWorkspace extends React.Component {
                   type='text'
                   className='newSpace__input'
                   placeholder={props.t("Space's name")}
-                  value={state.newWorkspaceName}
-                  onChange={this.handleChangeNewWorkspaceName}
+                  value={state.newName}
+                  onChange={this.handleChangeNewName}
                   onKeyDown={this.handleInputKeyDown}
                   autoFocus
                 />
@@ -206,12 +210,12 @@ export class PopupCreateWorkspace extends React.Component {
                 <div className='newSpace__button'>
                   <button
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                    disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Next')}
                     type='button'
                   >
-                    {props.t('Next')} <i className='fa fa-arrow-right newSpace__button__icon' />
+                    {props.t('Next')} <i className='fa fa-arrow-right newSpace__icon__right' />
                   </button>
                 </div>
               </>
@@ -226,6 +230,12 @@ export class PopupCreateWorkspace extends React.Component {
                   options={state.parentOptions}
                   defaultValue={{ value: null, label: props.t('None') }}
                 />
+                {state.showWarningMessage && (
+                  <div className='newSpace__warningMessage'>
+                    <i className='fa fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
+                    {props.t('Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.')}
+                  </div>
+                )}
 
                 <div className='newSpace__label'> {props.t('Default role:')} </div>
                 <SingleChoiceList
@@ -237,12 +247,12 @@ export class PopupCreateWorkspace extends React.Component {
                 <div className='newSpace__button'>
                   <button
                     className='btn newSpace__button__back highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    disabled={!state.newWorkspaceName || state.newWorkspaceName.length === 0 || !state.newType || state.newType.length === 0}
+                    disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Back')}
                     type='button'
                   >
-                    <i className='fa fa-arrow-left newSpace__button__back__icon' /> {props.t('Back')}
+                    <i className='fa fa-arrow-left newSpace__icon__left' /> {props.t('Back')}
                   </button>
 
                   <button
@@ -252,7 +262,7 @@ export class PopupCreateWorkspace extends React.Component {
                     title={props.t('Create')}
                     type='button'
                   >
-                    {props.t('Create')} <i className='fa fa-check newSpace__button__icon' />
+                    {props.t('Create')} <i className='fa fa-check newSpace__icon__right' />
                   </button>
                 </div>
               </>
