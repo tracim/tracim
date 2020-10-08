@@ -1,13 +1,12 @@
 # coding: utf8
 from collections import deque
-from os.path import dirname
+import enum
 import typing
 
 from pluggy import PluginManager
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
@@ -20,10 +19,18 @@ from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
+from tracim_backend.lib.webdav.resources import get_content_resource
+from tracim_backend.lib.webdav.resources import get_workspace_resource
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import TracimSession
+
+
+class ResourceLevelType(enum.Enum):
+    ROOT = "root"
+    WORKSPACE = "workspace"
+    CONTENT = "content"
 
 
 class WebdavPath(object):
@@ -33,11 +40,12 @@ class WebdavPath(object):
             current_user=current_user, session=session, config=app_config
         )
         self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
-        path_parts = path.split("/")
+
         self.workspaces = deque()
         self.contents = deque()
-        if path and path != "/" and len(path_parts) >= 2:
-            root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[1])
+        path_parts = self._path_splitter(self.path)
+        if len(path_parts) >= 1:
+            root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[0])
             try:
                 root_workspace = self.workspace_api.get_one_by_filemanager_filename(
                     root_workspace_filemanager_filename
@@ -70,6 +78,15 @@ class WebdavPath(object):
                         content = None
                     self.contents.append(content)
 
+    def _path_splitter(self, path: str) -> typing.List[str]:
+        path_parts = path.split("/")
+        # removing leading or trailing empty path part
+        if not path_parts[0]:
+            path_parts = path_parts[1:]
+        if path_parts and not path_parts[-1]:
+            path_parts = path_parts[:-1]
+        return path_parts
+
     @property
     def current_workspace(self) -> typing.Optional[Workspace]:
         try:
@@ -92,16 +109,17 @@ class WebdavPath(object):
             return None
 
     @property
-    def exists(self):
-        # root
+    def current_path_level(self) -> typing.Optional[ResourceLevelType]:
+        """
+        return the level type of the current o
+        """
         if self.path == "/":
-            return True
-        # workspace root
+            return ResourceLevelType.ROOT
         if self.contents == deque() and self.current_workspace:
-            return True
-        # content
+            return ResourceLevelType.WORKSPACE
         if self.current_content:
-            return True
+            return ResourceLevelType.CONTENT
+        return None
 
 
 class WebdavTracimContext(TracimContext):
@@ -196,10 +214,6 @@ class WebdavTracimContext(TracimContext):
     def candidate_workspace(self) -> Workspace:
         return self.processed_destpath.current_workspace
 
-    @property
-    def path_exist(self) -> bool:
-        return self.processed_path.exists
-
 
 class Provider(DAVProvider):
     """
@@ -223,61 +237,32 @@ class Provider(DAVProvider):
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
-        tracim_context = environ["tracim_context"]
         path = normpath(path)
+        tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        if not self.exists(path, environ):
-            return None
-        root_path = tracim_context.root_path
-
-        # If the requested path is the root, then we return a RootResource resource
-        if path == root_path:
+        current_path_level = tracim_context.processed_path.current_path_level
+        # root
+        if current_path_level == ResourceLevelType.ROOT:
             return resources.RootResource(path=path, environ=environ, tracim_context=tracim_context)
-
-        try:
+        if current_path_level == ResourceLevelType.WORKSPACE:
             workspace = tracim_context.current_workspace
-        except WorkspaceNotFound:
-            workspace = None
-
-        # If the request path is in the form root/name, then we return a WorkspaceResource resource
-        parent_path = dirname(path)
-        if parent_path == root_path:
-            if not workspace:
-                return None
-            return resources.WorkspaceResource(
+            return get_workspace_resource(
                 path=path,
                 environ=environ,
                 workspace=workspace,
                 tracim_context=tracim_context,
                 label=workspace.filemanager_filename,
             )
-
-        try:
+        if current_path_level == ResourceLevelType.CONTENT:
             content = tracim_context.current_content
-        except ContentNotFound:
-            content = None
-
-        # And if we're still going, the client is asking for a standard Folder/File/Page/Thread so we check the type7
-        # and return the corresponding resource
-
-        if content is None:
-            return None
-        if content.type == content_type_list.Folder.slug:
-            return resources.FolderResource(
+            return get_content_resource(
                 path=path,
                 environ=environ,
                 workspace=content.workspace,
                 content=content,
                 tracim_context=tracim_context,
             )
-        elif content.type == content_type_list.File.slug:
-            return resources.FileResource(
-                path=path, environ=environ, content=content, tracim_context=tracim_context,
-            )
-        else:
-            return resources.OtherFileResource(
-                path=path, environ=environ, content=content, tracim_context=tracim_context,
-            )
+        return None
 
     def exists(self, path, environ) -> bool:
         """
@@ -286,4 +271,5 @@ class Provider(DAVProvider):
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        return tracim_context.path_exist
+        current_path_level = tracim_context.processed_path.current_path_level
+        return current_path_level is not None

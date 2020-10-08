@@ -236,7 +236,7 @@ class WorkspaceApi(object):
         label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
         query = self._base_query().filter(Workspace.label == label)
         if parent:
-            query = query.filter(Workspace.parent_id == parent.parent_id)
+            query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
             query = query.filter(Workspace.parent_id == None)  # noqa: E711
         result = self.default_order_workspace(query).all()
