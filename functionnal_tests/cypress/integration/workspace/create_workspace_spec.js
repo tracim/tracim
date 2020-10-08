@@ -1,4 +1,6 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
+import { PAGES as p } from '../../support/urls_commands'
+
 
 describe('Workspace', () => {
   before(() => {
@@ -7,53 +9,57 @@ describe('Workspace', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visit('/ui')
+    cy.visitPage({ pageName: p.HOME })
   })
 
-  it('should create a new workspace while no others are created', () => {
-    const workspaceTitle = 'first workspace'
+  const createOneSpace = (cy, spaceName) => {
+    return cy.get('.newSpace__input').should('be.visible').type(spaceName)
+    .get('.singleChoiceList__item').first().should('be.visible').click()
+    .get('.newSpace__button .btn').should('be.visible').click()
+    .get('div.newSpace__input').should('be.visible')
+    .get('.singleChoiceList__item').first().should('be.visible').click()
+    .get('.newSpace__button .btn').last().should('be.visible').click()
+  }
+
+  it('should create a new space while no others are created', () => {
+    const spaceTitle = 'Space Title'
 
     cy.get('[data-cy=homepagecard__btn]').should('be.visible').click()
-      .get('[data-cy=createcontent__form__input]').should('be.visible').type(workspaceTitle)
-      .get('[data-cy=popup__createcontent__form__button]').should('be.visible').click()
+    createOneSpace(cy, spaceTitle)
+
     cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: 1 } })
       .get('.dashboard')
       .get('[data-cy="dashboardWorkspaceLabel"]')
-      .contains(workspaceTitle)
+      .contains(spaceTitle)
 
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
       .should('exist')
   })
 
-  const createOneWorkspace = (cy, workspaceName) => {
-    return cy.get('[data-cy="sidebarCreateWorkspaceBtn"]').click()
-      .get('[data-cy="createcontent__form__input"]').type(workspaceName)
-      .get('[data-cy="popup__createcontent__form__button"]').click()
-  }
-
-  const getWorkspaceItemByName = (cy, workspaceTitle) => (
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspaceTitle}"]`)
+  const getWorkspaceItemByName = (cy, spaceTitle) => (
+    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
       .parents('li.sidebar__content__navigation__workspace__item')
   )
 
   describe('Creating a workspace while a lot of workspace are already created', () => {
-    const nbWorkspace = 20
-    const newWorkspaceName = '0'
+    const nbOfSpaces = 20
+    const newSpaceName = '0'
 
     beforeEach(() => {
       cy.resetDB()
       cy.setupBaseDB()
       cy.loginAs('administrators')
-      for (let i = 1; i < nbWorkspace; i++) {
+      for (let i = 1; i < nbOfSpaces; i++) {
         cy.createRandomWorkspace()
       }
     })
 
     it('should scroll to the new workspace in the sidebar', () => {
-      cy.visit('/ui')
+      cy.visitPage({ pageName: p.HOME })
       cy.get('.sidebar__scrollview').scrollTo('bottom')
-      createOneWorkspace(cy, newWorkspaceName)
-      getWorkspaceItemByName(cy, newWorkspaceName).should('be.visible')
+      cy.get('.sidebar__content__btnnewworkspace__btn').should('be.visible').click()
+      createOneSpace(cy, newSpaceName)
+      getWorkspaceItemByName(cy, newSpaceName).should('be.visible')
     })
   })
 })

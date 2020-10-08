@@ -110,8 +110,9 @@ export class PopupCreateWorkspace extends React.Component {
         case 200: {
           let spaceList = fetchGetUserSpaces.body
           /* FIXME - GB - 2020-10-08 - The code below is commented until we choose between keep it or delete it (filter of parent type according chosen type)
-          if (state.newType === SPACE_TYPE.confidential.slug) spaceList = spaceList.filter(space => space.access_type === SPACE_TYPE.confidential.slug)
-          else if (state.newType === SPACE_TYPE.onRequest.slug) {
+          if (state.newType === SPACE_TYPE.confidential.slug) {
+            spaceList = spaceList.filter(space => space.access_type === SPACE_TYPE.confidential.slug)
+          } else if (state.newType === SPACE_TYPE.onRequest.slug) {
             spaceList = spaceList.filter(space =>
               space.access_type === SPACE_TYPE.onRequest.slug || space.access_type === SPACE_TYPE.confidential.slug
             )

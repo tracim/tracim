@@ -82,7 +82,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.item__radiobtn > input')
+        .find('.singleChoiceList__item__radioButton > input')
         .first()
         .click()
 
@@ -116,7 +116,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.item__radiobtn > input')
+        .find('.singleChoiceList__item__radioButton > input')
         .first()
         .click()
 
@@ -150,7 +150,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.item__radiobtn > input')
+        .find('.singleChoiceList__item__radioButton > input')
         .first()
         .click()
 

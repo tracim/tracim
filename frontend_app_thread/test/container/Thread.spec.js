@@ -126,7 +126,6 @@ describe('<Thread />', () => {
 
           before(() => {
             props.addCommentToTimeline.resetHistory()
-            oldTimelineLength = wrapper.state('timeline').length
             wrapper.instance().handleCommentCreated(tlmData)
           })
 
