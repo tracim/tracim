@@ -7,5 +7,6 @@ export const postWorkspace = (apiUrl, newWorkspaceName, newType, newDefaultRole)
     label: newWorkspaceName,
     description: '',
     access_type: newType,
-    default_user_role: newDefaultRole
+    default_user_role: newDefaultRole,
+    parent_id: null
   })

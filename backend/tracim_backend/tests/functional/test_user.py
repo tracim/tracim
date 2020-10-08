@@ -2647,6 +2647,198 @@ class TestUserWorkspaceEndpoint(object):
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == set()
 
+    def test_api__get_user_workspaces__ok_200__with_filter_and_parent_ids(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        admin_user,
+        application_api_factory,
+        web_testapp,
+        role_api_factory,
+    ):
+        """
+        Check the retrieval of all workspaces reachable by user with different filters
+        """
+
+        workspace_api = workspace_api_factory.get()
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
+        owned_only_workspace = workspace_api.create_workspace(
+            "owned_only", parent=owned_and_role_workspace
+        )
+        user_api = user_api_factory.get()
+        user_api.create_user("toto@toto.toto", do_notify=False)
+        profile = Profile.ADMIN
+        test_user = user_api.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api_test_user = workspace_api_factory.get(test_user)
+        role_only_workspace = workspace_api_test_user.create_workspace(
+            label="role_only", parent=owned_only_workspace
+        )
+        rapi = role_api_factory.get()
+        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(
+            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        transaction.commit()
+        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1", "parent_ids": "0"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            owned_and_role_workspace.workspace_id,
+        }
+        params = {
+            "show_workspace_with_role": "1",
+            "show_owned_workspace": "1",
+            "parent_ids": role_only_workspace.workspace_id,
+        }
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == set()
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+        parent_ids = ",".join(
+            [str(role_only_workspace.workspace_id), str(owned_only_workspace.workspace_id)]
+        )
+        params = {
+            "show_workspace_with_role": "1",
+            "show_owned_workspace": "0",
+            "parent_ids": parent_ids,
+        }
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+        }
+
+    def test_api__get_users_workspaces__ok_200__with_parent_ids_as_admin(
+        self, workspace_api_factory, web_testapp, admin_user
+    ):
+        """
+        Check the retrieval of all users workspaces reachable by user with user auth with explicit parent_ids
+        """
+        user = admin_user
+        workspace_api = workspace_api_factory.get()
+        parent1 = workspace_api.create_workspace("parent1")
+        child1_1 = workspace_api.create_workspace("child1_1", parent=parent1)
+        child1_2 = workspace_api.create_workspace("child1_2", parent=parent1)
+        parent2 = workspace_api.create_workspace("parent2")
+        child2_1 = workspace_api.create_workspace("child2_1", parent=parent2)
+        workspace_api.create_workspace("child2_2", parent=parent2)
+        grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
+        grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        implicit_all = web_testapp.get("/api/users/{}/workspaces".format(user.user_id), status=200)
+        assert len(implicit_all.json_body) == 8
+
+        parent_ids_list = [
+            "0",
+            parent1.workspace_id,
+            parent2.workspace_id,
+            child2_1.workspace_id,
+            child1_2.workspace_id,
+        ]
+        parent_ids = ",".join([str(item) for item in parent_ids_list])
+        explicit_all = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert explicit_all.json_body == implicit_all.json_body
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": child2_1.workspace_id},
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson2_1_1.workspace_id
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": child1_2.workspace_id},
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson1_2_2.workspace_id
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id), status=200, params={"parent_ids": "0"}
+        )
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+
+        parent_ids = parent1.workspace_id
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+
+        parent_ids = "0,{}".format(parent1.workspace_id)
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert len(res.json_body) == 4
+        # INFO - G.M - 2020-10-05 - workspace are sorted by label in this endpoint
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+        assert res.json_body[2]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
+
     @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__ok_200__nominal_case(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
@@ -2766,21 +2958,11 @@ class TestUserWorkspaceEndpoint(object):
         )
         assert isinstance(res.json_body, list)
         assert len(res.json_body) == accessible_workspaces_count
-        assert not len(res.json_body) or set(res.json_body[0].keys()) == {
-            "agenda_enabled",
-            "is_deleted",
-            "public_download_enabled",
-            "public_upload_enabled",
-            "label",
-            "access_type",
-            "slug",
-            "workspace_id",
-            "description",
-            "sidebar_entries",
-            "created",
-            "owner",
-            "default_user_role",
-        }
+        # only check label and workspace_id,
+        # just to be sure to retrieve workspace like object
+        assert not len(res.json_body) or set(res.json_body[0].keys()).issuperset(
+            {"label", "workspace_id"}
+        )
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
         self, web_testapp, user_api_factory,
