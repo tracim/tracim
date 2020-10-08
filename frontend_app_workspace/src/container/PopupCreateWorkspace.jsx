@@ -56,7 +56,7 @@ export class PopupCreateWorkspace extends React.Component {
       isFirstStep: true,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       newDefaultRole: '',
-      newParentSpace: 0,
+      newParentSpaceId: 0,
       newType: '',
       newName: '',
       parentOptions: [],
@@ -100,7 +100,7 @@ export class PopupCreateWorkspace extends React.Component {
   handleChangeSpacesType = newType => this.setState({ newType: newType })
 
   handleChangeParentSpace = newParentSpace => this.setState({
-    newParentSpace: newParentSpace.value,
+    newParentSpaceId: newParentSpace.spaceId,
     showWarningMessage: newParentSpace.parentId !== null
   })
 
@@ -122,11 +122,11 @@ export class PopupCreateWorkspace extends React.Component {
             )
           } */
           spaceList = [
-            { value: null, label: props.t('None') }, // INFO - GB - 2020-10-07 - Root
+            { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }, // INFO - GB - 2020-10-07 - Root
             ...spaceList.map(space => {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
               const spaceLabel = <span><i className={`fa fa-${spaceType.faIcon}`} /> {space.label}</span>
-              return { value: space.workspace_id, label: spaceLabel, parentId: space.parent_id }
+              return { value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id }
             })
           ]
 
@@ -148,7 +148,7 @@ export class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchPostSpace = await handleFetchResult(await postSpace(state.config.apiUrl, state.newDefaultRole, state.newParentSpace, state.newName, state.newType))
+    const fetchPostSpace = await handleFetchResult(await postSpace(state.config.apiUrl, state.newDefaultRole, state.newParentSpaceId, state.newName, state.newType))
 
     switch (fetchPostSpace.apiResponse.status) {
       case 200: this.handleClose(); break
@@ -228,7 +228,7 @@ export class PopupCreateWorkspace extends React.Component {
                   isSearchable
                   onChange={this.handleChangeParentSpace}
                   options={state.parentOptions}
-                  defaultValue={{ value: null, label: props.t('None') }}
+                  defaultValue={state.parentOptions[0]}
                 />
                 {state.showWarningMessage && (
                   <div className='newSpace__warningMessage'>

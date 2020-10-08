@@ -22,10 +22,10 @@ describe('<PopupCreateWorkspace />', () => {
   const wrapper = shallow(<PopupCreateWorkspace {...props} />)
 
   describe('internal functions', () => {
-    describe('handleChangeNewWorkspaceName', () => {
-      it('should update newWorkspaceName state with the chosen name', () => {
-        wrapper.instance().handleChangeNewWorkspaceName({ target: { value: 'name' } })
-        expect(wrapper.state('newWorkspaceName')).to.equal('name')
+    describe('handleChangeNewName', () => {
+      it('should update newName state with the chosen name', () => {
+        wrapper.instance().handleChangeNewName({ target: { value: 'name' } })
+        expect(wrapper.state('newName')).to.equal('name')
       })
     })
 
@@ -44,9 +44,19 @@ describe('<PopupCreateWorkspace />', () => {
     })
 
     describe('handleChangeParentSpace', () => {
-      it('should update newParentSpace state with the chosen space id', () => {
-        wrapper.instance().handleChangeParentSpace({ value: 4 })
-        expect(wrapper.state('newParentSpace')).to.equal(4)
+      it('should update newParentSpaceId state with the chosen space id', () => {
+        wrapper.instance().handleChangeParentSpace({ spaceId: 4, parentId: null })
+        expect(wrapper.state('newParentSpaceId')).to.equal(4)
+      })
+
+      it('should update showWarningMessage state to true if parentId is not null', () => {
+        wrapper.instance().handleChangeParentSpace({ spaceId: 4, parentId: 5 })
+        expect(wrapper.state('showWarningMessage')).to.equal(true)
+      })
+
+      it('should update showWarningMessage state to false if parentId is null', () => {
+        wrapper.instance().handleChangeParentSpace({ spaceId: 4, parentId: null })
+        expect(wrapper.state('showWarningMessage')).to.equal(false)
       })
     })
 
@@ -56,7 +66,9 @@ describe('<PopupCreateWorkspace />', () => {
           wrapper.setState({ isFirstStep: true })
           mockGetUserSpaces200(apiUrl, props.loggedUser.userId, [])
           wrapper.instance().handleClickNextOrBack().then(() => {
-            expect(wrapper.update().state('parentOptions')).to.deep.equal([{ value: null, label: props.t('None') }])
+            expect(wrapper.update().state('parentOptions')).to.deep.equal(
+              [{ value: props.t('None'), label: props.t('None'), spaceId: null, parentId: null }]
+            )
           }).then(done, done)
         })
 
