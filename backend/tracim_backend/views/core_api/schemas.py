@@ -35,6 +35,7 @@ from tracim_backend.app_models.validator import workspace_access_type_validator
 from tracim_backend.app_models.validator import workspace_subscription_state_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -478,10 +479,21 @@ class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
         return MessageIdsPath(**data)
 
 
+class WorkspaceFilterQuery(object):
+    def __init__(self, parent_ids: str = None):
+        self.parent_ids = string_to_list(parent_ids, ",", int)
+
+
 class UserWorkspaceFilterQuery(object):
-    def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
+    def __init__(
+        self,
+        show_owned_workspace: int = 1,
+        show_workspace_with_role: int = 1,
+        parent_ids: str = None,
+    ):
         self.show_owned_workspace = bool(show_owned_workspace)
         self.show_workspace_with_role = bool(show_workspace_with_role)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
 
 
 class MessageIdsPath(object):
@@ -490,7 +502,26 @@ class MessageIdsPath(object):
         self.user_id = user_id
 
 
-class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
+class WorkspaceFilterQuerySchema(marshmallow.Schema):
+    parent_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="0,4,5",
+        description="comma separated list of parent ids,"
+        " parent_id allow to filter workspaces."
+        " If not parent_ids at all, then return all workspaces."
+        " If one parent_id to 0, then return root workspaces."
+        " If set to another value, return all direct subworkspaces"
+        " If multiple value of parent_ids separated by comma,"
+        " return mix of all workspaces of all theses parent_ids",
+        default="0",
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return WorkspaceFilterQuery(**data)
+
+
+class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_owned_workspace = marshmallow.fields.Int(
         example=1,
         default=1,
@@ -1018,6 +1049,14 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         "to some file into it ?",
         default=True,
     )
+    parent_id = marshmallow.fields.Int(
+        example=42,
+        description="id of the parent workspace id.",
+        allow_none=True,
+        default=None,
+        required=False,
+        validate=positive_int_validator,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1086,6 +1125,13 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
         default=True,
+    )
+    parent_id = marshmallow.fields.Int(
+        example=42,
+        description="id of the parent workspace id.",
+        allow_none=True,
+        required=True,
+        validate=positive_int_validator,
     )
 
     class Meta:
