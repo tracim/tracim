@@ -44,7 +44,7 @@ describe('content :: admin > workspace', function () {
     cy.get('.newSpace__button .btn').click()
 
     cy.get('.singleChoiceList__item').first().click()
-    cy.get('.newSpace__button .btn').last().click()
+    cy.contains('.newSpace__button .btn', 'Create').click()
 
     cy.location('pathname').should('be.equal', '/ui/workspaces/2/dashboard')
   })

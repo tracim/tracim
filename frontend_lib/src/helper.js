@@ -531,3 +531,7 @@ export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleS
 export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
+
+export const createSpaceArborescence = spaceList => {
+
+}

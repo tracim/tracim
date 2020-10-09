@@ -1,6 +1,5 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import classnames from 'classnames'
 import Select from 'react-select'
 import {
   addAllResourceI18n,
@@ -13,6 +12,8 @@ import {
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
+import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import { getUserSpaces, postSpace } from '../action.async.js'
 import i18n from '../i18n.js'
 
@@ -21,7 +22,7 @@ import i18n from '../i18n.js'
 const debug = {
   config: {
     slug: 'workspace',
-    faIcon: 'bank',
+    faIcon: 'users',
     hexcolor: '#7d4e24',
     creationLabel: 'Create a space',
     domContainer: 'appFeatureContainer',
@@ -61,6 +62,7 @@ export class PopupCreateWorkspace extends React.Component {
       newType: '',
       newName: '',
       parentOptions: [],
+      popoverDefaultRoleInfoOpen: false,
       showWarningMessage: false
     }
 
@@ -126,7 +128,7 @@ export class PopupCreateWorkspace extends React.Component {
             { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }, // INFO - GB - 2020-10-07 - Root
             ...spaceList.map(space => {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
-              const spaceLabel = <span><i className={`fa fa-${spaceType.faIcon}`} /> {space.label}</span>
+              const spaceLabel = <span title={space.label}><i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
               return { value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id }
             })
           ]
@@ -136,7 +138,7 @@ export class PopupCreateWorkspace extends React.Component {
         }
         default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
       }
-    } else this.setState({ isFirstStep: true })
+    } else this.setState({ isFirstStep: true, showWarningMessage: false })
   }
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -165,9 +167,13 @@ export class PopupCreateWorkspace extends React.Component {
     }
   }
 
+  handleTogglePopoverDefaultRoleInfo = () => {
+    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
+  }
+
   render () {
     const { props, state } = this
-    const buttonStyle = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
     return (
       <CardPopup
         customClass='newSpace'
@@ -211,7 +217,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className={buttonStyle}
+                    className={buttonStyleCallToAction}
                     disabled={!state.newName || !state.newType}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Next')}
@@ -240,6 +246,27 @@ export class PopupCreateWorkspace extends React.Component {
                 )}
 
                 <div className='newSpace__label'> {props.t('Default role:')} </div>
+                <button
+                  type='button'
+                  className='btn transparentButton newSpace__label__info'
+                  id='popoverDefaultRoleInfo'
+                >
+                  <i className='fa fa-fw fa-question-circle' />
+                </button>
+
+                <Popover
+                  placement='bottom'
+                  isOpen={state.popoverDefaultRoleInfoOpen}
+                  target='popoverDefaultRoleInfo'
+                  // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                  toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
+                  trigger={isMobile ? 'focus' : 'hover'}
+                >
+                  <PopoverBody>
+                    {props.t('This is the role that members will have by default when they join your space.')}
+                  </PopoverBody>
+                </Popover>
+
                 <SingleChoiceList
                   list={ROLE_LIST}
                   onChange={this.handleChangeNewDefaultRole}
@@ -248,7 +275,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className={classnames(buttonStyle, 'newSpace__button__back')}
+                    className='btn primaryColorBorder outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover newSpace__button__back'
                     disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Back')}
@@ -258,7 +285,7 @@ export class PopupCreateWorkspace extends React.Component {
                   </button>
 
                   <button
-                    className={buttonStyle}
+                    className={buttonStyleCallToAction}
                     disabled={!state.newDefaultRole}
                     onClick={this.handleValidate}
                     title={props.t('Create')}

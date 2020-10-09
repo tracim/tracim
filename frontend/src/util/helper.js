@@ -26,7 +26,7 @@ export const ANCHOR_NAMESPACE = {
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
-  faIcon: 'bank',
+  faIcon: 'users',
   hexcolor: GLOBAL_primaryColor,
   creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
