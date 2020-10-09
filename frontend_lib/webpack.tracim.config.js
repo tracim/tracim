@@ -1,5 +1,5 @@
 module.exports = require('./webpack.config.js')
-module.exports.externals = require('tracim_frontend_vendors/dist/externals.json')
+module.exports.externals = Object.fromEntries(Object.keys(require('tracim_frontend_vendors')).map(dep => [dep, "tracim_frontend_vendors['" + dep + "']"]))
 
 Object.assign(module.exports.output, {
   libraryTarget: 'var',

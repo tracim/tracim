@@ -1,8 +1,6 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isPoduction: ', isProduction)
-
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {

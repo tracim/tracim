@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    main: './dist/require-file.js'
+    main: './src/index.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
