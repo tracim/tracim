@@ -5,7 +5,7 @@ import pytest
 
 from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.notifications import DummyNotifier
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import TracimDomainController
 from tracim_backend.lib.webdav.resources import FolderResource
 from tracim_backend.lib.webdav.resources import RootResource
@@ -38,7 +38,7 @@ class TestWebdavFactory(object):
         assert len(config["middleware_stack"]) == 6
         assert "provider_mapping" in config
         assert "/" in config["provider_mapping"]
-        assert isinstance(config["provider_mapping"]["/"], Provider)
+        assert isinstance(config["provider_mapping"]["/"], TracimDavProvider)
         assert "domaincontroller" in config
         assert isinstance(config["domaincontroller"], TracimDomainController)
 

@@ -33,7 +33,14 @@ class ResourceLevelType(enum.Enum):
     CONTENT = "content"
 
 
-class WebdavPath(object):
+class ProcessedWebdavPath(object):
+    """
+    Processor for Webdav Path:
+    - get all workspaces hierarchy from path
+    - get all content hierarchy from path
+    - provide useful properties to handle Webdav Request
+    """
+
     def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
         self.path = path
         self.workspace_api = WorkspaceApi(
@@ -111,7 +118,13 @@ class WebdavPath(object):
     @property
     def current_path_level(self) -> typing.Optional[ResourceLevelType]:
         """
-        return the level type of the current o
+        return the level type of the current path:
+        - return ResourceLevelType.ROOT is path is root path
+        - return ResourceLevelType.WORKSPACE if path is at workspace level (can be direct
+        workspace root or subworkspace root)
+        - return ResourceLevelType.CONTENT if path is at content level (can be direct content at workspace
+        root or content within directory hierarchy)
+        - Return None if path is not valid
         """
         if self.path == "/":
             return ResourceLevelType.ROOT
@@ -132,9 +145,11 @@ class WebdavTracimContext(TracimContext):
         self._app_config = app_config
         self._session = None
         self._plugin_manager = plugin_manager
+        self.processed_path = None
+        self.processed_destpath = None
 
     def set_path(self, path: str):
-        self.processed_path = WebdavPath(
+        self.processed_path = ProcessedWebdavPath(
             path=path,
             current_user=self.current_user,
             session=self.dbsession,
@@ -199,7 +214,7 @@ class WebdavTracimContext(TracimContext):
         return self.processed_path.current_content
 
     def set_destpath(self, destpath: str):
-        self.processed_destpath = WebdavPath(
+        self.processed_destpath = ProcessedWebdavPath(
             path=destpath,
             current_user=self.current_user,
             session=self.dbsession,
@@ -215,7 +230,7 @@ class WebdavTracimContext(TracimContext):
         return self.processed_destpath.current_workspace
 
 
-class Provider(DAVProvider):
+class TracimDavProvider(DAVProvider):
     """
     This class' role is to provide to wsgidav _DAVResource. Wsgidav will then use them to execute action and send
     informations to the client
@@ -224,7 +239,7 @@ class Provider(DAVProvider):
     def __init__(
         self, app_config: CFG, manage_locks=True,
     ):
-        super(Provider, self).__init__()
+        super(TracimDavProvider, self).__init__()
 
         if manage_locks:
             self.lockManager = LockManager(LockStorage())

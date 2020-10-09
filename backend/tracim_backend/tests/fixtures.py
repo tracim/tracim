@@ -31,7 +31,7 @@ from tracim_backend.lib.core.event import RQ_QUEUE_NAME
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -344,12 +344,12 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return Provider(app_config=app_config,)
+    return TracimDavProvider(app_config=app_config,)
 
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: Provider, session: Session, admin_user: User, app_config: CFG
+    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
         provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,

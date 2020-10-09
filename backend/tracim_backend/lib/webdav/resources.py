@@ -52,7 +52,7 @@ logger = logging.getLogger()
 
 if typing.TYPE_CHECKING:
     from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
-    from tracim_backend.lib.webdav.dav_provider import Provider
+    from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
 
 
 def webdav_check_right(authorization_checker: AuthorizationChecker):
@@ -89,6 +89,9 @@ def get_content_resource(
     workspace: Workspace,
     tracim_context: "WebdavTracimContext",
 ) -> _DAVResource:
+    """
+    Helper to get correct content webdav resource according to content type
+    """
     if content.type == content_type_list.Folder.slug:
         return FolderResource(
             path=path,
@@ -108,6 +111,10 @@ def get_content_resource(
 
 
 class WebdavContainer(ABC):
+    """
+    A Webdav Container should implement theses methods.
+    """
+
     @abstractmethod
     def createEmptyResource(self, file_name: str):
         pass
@@ -130,16 +137,29 @@ class WebdavContainer(ABC):
 
 
 class WorkspaceOnlyContainer(WebdavContainer):
+    """
+    Container that can get children workspace
+    """
+
     def __init__(
         self,
         path: str,
         environ: dict,
         label: str,
         workspace: typing.Optional[Workspace],
-        provider: "Provider",
+        provider: "TracimDavProvider",
         tracim_context: "WebdavTracimContext",
         list_orphan_workspaces: bool = False,
     ) -> None:
+        """
+        Some rules:
+        - if workspace given is None, return workspaces with no parent
+        - if workspace given is correct, return
+        - if list_orphan_workspaces is True, it
+         add user known workspaces without any user known parent to the list.
+         - in case of workspace collision, only the first named workspace (sorted by workspace_id
+         from lower to higher) will be returned
+        """
         self.path = path
         self.environ = environ
         self.workspace = workspace
@@ -237,16 +257,28 @@ class WorkspaceOnlyContainer(WebdavContainer):
 
 
 class ContentOnlyContainer(WebdavContainer):
+    """
+    Container that can get children content
+    """
+
     def __init__(
         self,
         path: str,
         environ: dict,
         label: str,
         content: Content,
-        provider: "Provider",
+        provider: "TracimDavProvider",
         workspace: Workspace,
         tracim_context: "WebdavTracimContext",
     ) -> None:
+        """
+        Some rules:
+        - if content given is None, return workspace root contents
+        - if content given is correct, return subcontent of this content
+         add user known workspaces without any user known parent to the list.
+         - in case of content collision, only the first named content (sorted by content_id
+         from lower to higher) will be returned.
+        """
         self.path = path
         self.environ = environ
         self.workspace = workspace
@@ -276,10 +308,14 @@ class ContentOnlyContainer(WebdavContainer):
                 content_type=content_type_list.Any_SLUG,
                 workspace=self.workspace,
                 parent_ids=[parent_id],
+                order_by_properties=["content_id"],
             )
         else:
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG, workspace=self.workspace, parent_ids=[0]
+                content_type=content_type_list.Any_SLUG,
+                workspace=self.workspace,
+                parent_ids=[0],
+                order_by_properties=["content_id"],
             )
         for child in children:
             if child.file_name in members_names:
@@ -404,9 +440,14 @@ class WorkspaceAndContentContainer(WebdavContainer):
         label: str,
         content: typing.Optional[Content],
         workspace: typing.Optional[Workspace],
-        provider: "Provider",
+        provider: "TracimDavProvider",
         tracim_context: "WebdavTracimContext",
     ) -> None:
+        """
+        Some rules:
+        - combined rules of both WorkspaceOnlyContainer and ContentOnlyContainer
+        - in case of content and workspace collision, workspaces have the priority
+        """
         self.path = path
         self.environ = environ
         self.workspace = workspace
@@ -471,7 +512,9 @@ class WorkspaceAndContentContainer(WebdavContainer):
 
 class RootResource(DAVCollection):
     """
-    RootResource ressource that represents tracim's home, which contains all workspaces
+    RootResource ressource that represents tracim's home, which contains all workspaces without
+    any parents or user's orphan workspaces
+    Direct children can only be workspaces.
     """
 
     def __init__(self, path: str, environ: dict, tracim_context: "WebdavTracimContext"):
@@ -526,7 +569,10 @@ class RootResource(DAVCollection):
 class WorkspaceResource(DAVCollection):
     """
     Workspace resource corresponding to tracim's workspaces.
-    Direct children can only be folders, though files might come later on and are supported
+    Direct children can be:
+    - workspace
+    - folder
+    - any other type of content
     """
 
     def __init__(
@@ -606,7 +652,7 @@ class WorkspaceResource(DAVCollection):
 class FolderResource(DAVCollection):
     """
     FolderResource resource corresponding to tracim's folders.
-    Direct children can only be either folder, files, pages or threads
+    Direct children can only be content (folder, html-document, file, etc...)
     By default when creating new folders, we allow them to contain all types of content
     """
 
