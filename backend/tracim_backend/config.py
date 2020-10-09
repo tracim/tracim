@@ -27,6 +27,7 @@ from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import WorkspaceAccessType
 
 ENV_VAR_PREFIX = "TRACIM_"
 CONFIG_LOG_TEMPLATE = (
@@ -140,14 +141,16 @@ class CFG(object):
             logger.info(
                 self,
                 "LOADED_APP:{state}:{slug}:{label}".format(
-                    state="ENABLED" if app.is_active else "DISABLED", slug=app.slug, label=app.label
+                    state="ENABLED" if app.is_active else "DISABLED",
+                    slug=app.slug,
+                    label=app.label,
                 ),
             )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
 
     def deprecate_parameter(
-        self, parameter_name: str, parameter_value: typing.Any, extended_information: str
+        self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
     ) -> None:
         """
 
@@ -225,25 +228,6 @@ class CFG(object):
             "gallery"
         )
         extend_apps = ""
-        # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
-        #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
-        # should be deprecated.
-        self.CALDAV__ENABLED = asbool(
-            self.get_raw_config(
-                "caldav.enabled",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config(
-                "collaborative_document_edition.activated",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
             self.get_raw_config("app.enabled", default_enabled_app),
@@ -309,12 +293,12 @@ class CFG(object):
         """Parse configuration file and env variables"""
         self.log_config_header("Global config parameters:")
         self._load_global_config()
-        self.log_config_header("Live Messages Config parameters:")
-        self._load_live_messages_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
         self.log_config_header("Jobs config parameters:")
         self._load_jobs_config()
+        self.log_config_header("Live Messages Config parameters:")
+        self._load_live_messages_config()
         self.log_config_header("Email config parameters:")
         self._load_email_config()
         self.log_config_header("LDAP config parameters:")
@@ -373,6 +357,10 @@ class CFG(object):
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
+            "web.notifications.excluded",
+            "user.created,user.modified,user.deleted,user.undeleted,workspace.modified,workspace.deleted,workspace.undeleted,workspace_member.modified,content.modified",
+        )
 
         # base url of the frontend
         self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
@@ -401,21 +389,20 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
-        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config(
-            "user.reset_password.validity",
-            deprecated=True,
-            deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
-        )
-        if self.USER__RESET_PASSWORD__VALIDITY:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
-        else:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
-                self.get_raw_config(
-                    "user.reset_password.token_lifetime", defaut_reset_password_validity
-                )
+
+        self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
+            self.get_raw_config(
+                "user.reset_password.token_lifetime", defaut_reset_password_validity
             )
+        )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
+        self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
+            self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
+            separator=",",
+            cast_func=WorkspaceAccessType,
+            do_strip=True,
+        )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(
@@ -460,8 +447,12 @@ class CFG(object):
         )
 
     def _load_live_messages_config(self) -> None:
-        self.LIVE_MESSAGES__CONTROL_URI = self.get_raw_config(
-            "live_messages.control_uri", "http://localhost:5561"
+        self.LIVE_MESSAGES__CONTROL_ZMQ_URI = self.get_raw_config(
+            "live_messages.control_zmq_uri", "tcp://localhost:5563"
+        )
+        async_processing = str(self.JOBS__PROCESSING_MODE == self.CST.ASYNC)
+        self.LIVE_MESSAGES__BLOCKING_PUBLISH = asbool(
+            self.get_raw_config("live_messages.blocking_publish", async_processing)
         )
 
     def _load_limitation_config(self) -> None:
@@ -510,11 +501,6 @@ class CFG(object):
         ]
 
         self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
-        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
-            "email.notification.from",
-            deprecated=True,
-            deprecated_extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
-        )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"
@@ -602,7 +588,7 @@ class CFG(object):
             self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
-            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock")
+            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock"),
         )
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
@@ -652,9 +638,6 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.WEBDAV_SHOW_DELETED = False
-        self.WEBDAV_SHOW_ARCHIVED = False
-        self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
 
     def _load_ldap_config(self) -> None:
@@ -691,7 +674,7 @@ class CFG(object):
             "search.elasticsearch.index_alias"
         )
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE
+            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
@@ -700,7 +683,7 @@ class CFG(object):
         ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE
+                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE,
             ),
             separator=",",
             cast_func=str,
@@ -756,12 +739,17 @@ class CFG(object):
         self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
         if self.SESSION__TYPE == "file":
             self.check_mandatory_param(
-                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file"
+                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file",
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
             )
-        elif self.SESSION__TYPE in ["ext:database", "ext:mongodb", "ext:redis", "ext:memcached"]:
+        elif self.SESSION__TYPE in [
+            "ext:database",
+            "ext:mongodb",
+            "ext:redis",
+            "ext:memcached",
+        ]:
             self.check_mandatory_param(
                 "SESSION__URL",
                 self.SESSION__URL,
@@ -835,7 +823,9 @@ class CFG(object):
             )
 
     def _check_live_messages_config_validity(self) -> None:
-        self.check_mandatory_param("LIVE_MESSAGES__CONTROL_URI", self.LIVE_MESSAGES__CONTROL_URI)
+        self.check_mandatory_param(
+            "LIVE_MESSAGES__CONTROL_ZMQ_URI", self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+        )
 
     def _check_email_config_validity(self) -> None:
         """
@@ -939,7 +929,7 @@ class CFG(object):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}."'.format(
-                            template_description=template_description, template_path=template_path
+                            template_description=template_description, template_path=template_path,
                         )
                     )
 
@@ -956,10 +946,10 @@ class CFG(object):
     def _check_ldap_config_validity(self):
         if AuthType.LDAP in self.AUTH_TYPES:
             self.check_mandatory_param(
-                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method"
+                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
-                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method"
+                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
                 "LDAP_BIND_PASS",

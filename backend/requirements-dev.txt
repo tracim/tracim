@@ -1,0 +1,6 @@
+# base
+-r requirements.txt
+# Test requirements
+-r requirements-test.txt
+# Devtools
+-r requirements-devtool.txt

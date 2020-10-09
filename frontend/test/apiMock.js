@@ -147,6 +147,12 @@ const mockGetConfig200 = (apiUrl) => {
     .reply(200, {})
 }
 
+const mockGetUserConfig200 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .get(`/users/${userId}/config`)
+    .reply(200, { parameters: {} })
+}
+
 const mockGetAppList200 = (apiUrl, appList) => {
   return nock(apiUrl)
     .get('/system/applications')
@@ -183,6 +189,37 @@ const mockGetFolderContentList200 = (apiUrl, workspaceId, folderIdList, resultCo
     .reply(200, resultContentList)
 }
 
+const mockPutNotificationAsRead204 = (apiUrl, userId, notificationId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/${notificationId}/read`)
+    .reply(204, true)
+}
+
+const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/read`)
+    .reply(204, true)
+}
+
+const mockGetWhoami = (apiUrl, status) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .reply(status, '')
+}
+
+const mockGetWhoamiWithDelay = (apiUrl, status, delay) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .delayConnection(delay)
+    .reply(status, '')
+}
+
+const mockGetWhoamiFailure = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .replyWithError('Error foobar')
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -190,8 +227,10 @@ export {
   mockGetContentType200,
   mockGetAppList200,
   mockGetConfig200,
+  mockGetUserConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
+  mockPutAllNotificationAsRead204,
   mockPutContentItemMove200,
   mockPutContentItemMove400,
   mockPutUserWorkspaceDoNotify204,
@@ -202,10 +241,14 @@ export {
   mockPutUserEmail200,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403,
+  mockPutNotificationAsRead204,
   mockPutUserPassword204,
   mockPutUserPassword403,
   mockGetLoggedUserCalendar200,
   mockGetUserCalendar200,
   mockGetUser200,
-  mockGetFolderContentList200
+  mockGetFolderContentList200,
+  mockGetWhoami,
+  mockGetWhoamiFailure,
+  mockGetWhoamiWithDelay
 }

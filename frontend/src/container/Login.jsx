@@ -12,8 +12,8 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
+  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   serialize
 } from 'tracim_frontend_lib'
@@ -25,14 +25,22 @@ import {
   setAppList,
   setConfig,
   resetBreadcrumbs,
+  setUserConfiguration,
   setUserLang,
-  setWorkspaceListMemberList
+  setWorkspaceListMemberList,
+  setNotificationNotReadCounter,
+  setNotificationList,
+  setNextPage,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
+  getNotificationList,
+  getUserConfiguration,
+  getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
   putUserLang
@@ -96,13 +104,7 @@ class Login extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Login'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Login')))
   }
 
   handleChangeRememberMe = e => {
@@ -149,7 +151,9 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceList()
-        props.tlm.manager.openLiveMessageConnection(fetchPostUserLogin.json.user_id)
+        this.loadNotificationNotRead(loggedUser.user_id)
+        this.loadNotificationList(loggedUser.user_id)
+        this.loadUserConfiguration(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -220,6 +224,42 @@ class Login extends React.Component {
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
+  loadUserConfiguration = async userId => {
+    const { props } = this
+
+    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
+    switch (fetchGetUserConfig.status) {
+      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
+    }
+  }
+
+  loadNotificationNotRead = async (userId) => {
+    const { props } = this
+
+    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
+
+    switch (fetchNotificationNotRead.status) {
+      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
+    }
+  }
+
+  loadNotificationList = async (userId) => {
+    const { props } = this
+
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+        break
+    }
+  }
+
   setDefaultUserLang = async loggedUser => {
     const { props } = this
     const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
@@ -254,7 +294,7 @@ class Login extends React.Component {
               <InputGroupText
                 parentClassName='loginpage__card__form__groupelogin'
                 customClass='mb-3 mt-4'
-                icon='fa-at'
+                icon='fa-user'
                 type='text'
                 placeHolder={props.t('Email address or username')}
                 invalidMsg={props.t('Invalid email or username')}

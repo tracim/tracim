@@ -6,7 +6,7 @@ import { BtnSwitch, ROLE_LIST } from 'tracim_frontend_lib'
 export const Notification = props =>
   <div className='account__userpreference__setting__notification'>
     <div className='notification__sectiontitle subTitle ml-2 ml-sm-0'>
-      {props.t('Shared spaces and notifications')}
+      {props.t('Spaces and notifications')}
     </div>
 
     <div className='notification__text ml-2 ml-sm-0' />
@@ -15,7 +15,7 @@ export const Notification = props =>
       <table className='table'>
         <thead>
           <tr>
-            <th>{props.t('Shared space')}</th>
+            <th>{props.t('Space')}</th>
             <th>{props.t('Role')}</th>
             <th>{props.t('Notification')}</th>
           </tr>
@@ -58,7 +58,7 @@ export const Notification = props =>
             })
             : (
               <tr>
-                <td>{props.t('You are not a member of any shared space yet')}</td>
+                <td>{props.t('You are not a member of any space yet')}</td>
                 <td />
                 <td />
               </tr>

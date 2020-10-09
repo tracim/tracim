@@ -1,7 +1,8 @@
+
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .file
-  height calc(100% - 61px)
+  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -27,7 +28,7 @@
     &__statewrapper
       height 100%
       overflow-y auto
-      &.displayState > .previewcomponent // render .file__contentpage__statewrapper.displayState .file__contentpage__preview
+      &.promptMessageWrapper > .previewcomponent // render .file__contentpage__statewrapper.promptMessageWrapper .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__wrapper
       width 40%
@@ -128,13 +129,13 @@
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .file
-    height calc(100% - headerHeight)
+    height "calc(100% - %s)" % headerHeight
     &__contentpage__content__left
       min-height 250px
 
 @media (max-width: max-xs)
   .file
-    height calc(100% - headerHeight)
+    height "calc(100% - %s)" % headerHeight
     &__option__menu
       &__addversion
         padding 8px 5px

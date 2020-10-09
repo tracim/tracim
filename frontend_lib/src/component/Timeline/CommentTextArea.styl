@@ -1,0 +1,27 @@
+@import '../../css/Variable.styl'
+
+.textarea
+  position relative
+  flex 0 1 auto
+  margin 20px
+  &__autocomplete
+    position absolute
+    width 100%
+    transform translateY(-100%)
+    top 0
+    padding 3px 0
+    background-color offWhite
+    border-radius 5px
+    box-shadow shadow-all
+    font-size 14px
+    &__delimiter
+      height 2px
+      margin 5px 20px
+      background-color grey
+    &__item
+      display flex
+      flex-direction row
+      padding 1px 10px
+      cursor pointer
+      &__active
+        background-color grey-hover

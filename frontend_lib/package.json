@@ -81,7 +81,13 @@
     "whatwg-fetch": "^3.0.0"
   },
   "standard": {
-    "globals": [],
+    "globals": [
+      "tinymce",
+      "fetch",
+      "Element",
+      "DOMParser",
+      "globalThis"
+    ],
     "parser": "babel-eslint",
     "ignore": []
   },

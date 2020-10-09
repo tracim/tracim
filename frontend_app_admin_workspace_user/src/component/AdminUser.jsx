@@ -60,7 +60,7 @@ export class AdminUser extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
-          msg: props.t('An administrator can always create shared spaces'),
+          msg: props.t('An administrator can always create spaces'),
           type: 'warning',
           delay: undefined
         }
@@ -158,13 +158,13 @@ export class AdminUser extends React.Component {
             <table className='table'>
               <thead>
                 <tr>
-                  <th scope='col'>{props.t('Active')}</th>
-                  <th />
-                  <th scope='col'>{props.t('User')}</th>
-                  <th scope='col'>{props.t('Username')}</th>
-                  <th scope='col'>{props.t('Email')}</th>
-                  <th scope='col'>{props.t('Can create shared space')}</th>
-                  <th scope='col'>{props.t('Administrator')}</th>
+                  <th className='adminUser__table__active' scope='col'>{props.t('Active')}</th>
+                  <th className='adminUser__table__profile' />
+                  <th className='adminUser__table__fullName' scope='col'>{props.t('User')}</th>
+                  <th className='adminUser__table__username' scope='col'>{props.t('Username')}</th>
+                  <th className='adminUser__table__email' scope='col'>{props.t('Email')}</th>
+                  <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create space')}</th>
+                  <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>
 
@@ -203,11 +203,11 @@ export class AdminUser extends React.Component {
                         </Link>
                       </td>
 
-                      <td className='adminUser__table__tr__td-text' title={u.username}>
+                      <td title={u.username}>
                         {u.username && `@${u.username}`}
                       </td>
 
-                      <td className='adminUser__table__tr__td-text' title={u.email}>
+                      <td title={u.email}>
                         {u.email}
                       </td>
 

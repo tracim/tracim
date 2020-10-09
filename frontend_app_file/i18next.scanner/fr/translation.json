@@ -1,7 +1,9 @@
 {
+  "click here!": "cliquez ici !",
   "Last version": "Dernière version",
   "Restore": "Restaurer",
   "Error while creating file": "Erreur lors de la création du fichier",
+  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Download file": "Télécharger le fichier",
@@ -47,7 +49,7 @@
   "Validate and create": "Valider et créer",
   "Number of shares:": "Nombre de partages :",
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
-  "Error, the shared space exceed its maximum size": "Erreur, l'espace partagé dépasse sa taille maximale",
+  "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
   "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Some file(s) couldn't be uploaded": "Certains fichiers n'ont pas pu être téléversés",
   "Files already uploaded:": "Fichiers déjà téléversés",
@@ -57,10 +59,9 @@
   "Play video": "Lire la vidéo",
   "In that case, you can download the video and try opening it manually.": "Dans ce cas, vous pouvez télécharger la vidéo et essayer de la lire manuellement",
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Pour télécharger la vidéo, quittez le mode plein écran et cliquez sur le bouton de téléchargement {{icon}}.",
+  "To notify all members of the space of your modification": "Pour notifier tous les membres de l'espace de votre modification",
   "Note: Your browser might not be able to read this file.": "Remarque: Votre navigateur peut ne pas pouvoir lire le fichier.",
-  "File has been updated": "Le fichier a été mis à jour",
-  "File has been deleted": "Le fichier a été supprimé",
-  "File has been restored": "Le fichier a été restauré",
   "The file has been updated, it can't be edited anymore": "Le fichier a été mis à jour, il ne peut plus être édité",
-  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
+  "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur"
 }

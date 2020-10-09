@@ -1,5 +1,5 @@
 export const htmlDocument = {
-  label: 'Text Documents',
+  label: 'Notes',
   slug: 'contents/html-document',
   isActive: true,
   faIcon: 'file-text-o',

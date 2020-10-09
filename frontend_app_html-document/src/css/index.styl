@@ -1,7 +1,8 @@
+
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .html-document
-  height calc(100% - 61px)
+  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -10,6 +11,7 @@
         color white
   &__editionmode
     &__container
+      position relative
       height 100%
       min-height 400px
   &__lastversionbtn
@@ -94,6 +96,15 @@
 .received
   .timeline__messagelist__item__content
     background-color htmlColor
+
+.buttonLink
+  border none
+  background-color transparent
+  text-decoration underline
+  padding 0 5px
+  cursor pointer
+  &:hover
+    text-decoration underline
 
 // MEDIAQUERIES
 

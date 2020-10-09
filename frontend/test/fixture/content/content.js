@@ -11,6 +11,7 @@ export const contentFromApi = {
     user_id: 2
   },
   current_revision_id: 42,
+  current_revision_type: 'edition',
   is_editable: true,
   created: '2019-05-25T10:17:37Z',
   status: 'open',
@@ -29,6 +30,8 @@ export const contentFromApi = {
     'comment'
   ],
   content_type: 'html-document',
+  parent_content_type: '',
+  parent_label: '',
   parent_id: null,
   label: 'Test content html',
   is_archived: false,

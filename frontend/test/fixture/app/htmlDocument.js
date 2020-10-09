@@ -1,9 +1,9 @@
 export const htmlDocument = {
-  label: 'Text Documents',
+  label: 'Notes',
   slug: 'contents/html-document',
   isActive: true,
   faIcon: 'file-text-o',
   hexcolor: '#00CC00',
   config: {},
-  creationLabel: 'Create a htmlDocument'
+  creationLabel: 'Create a note'
 }

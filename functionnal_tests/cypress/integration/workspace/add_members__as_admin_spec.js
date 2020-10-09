@@ -1,10 +1,10 @@
 import { PAGES } from '../../support/urls_commands'
 
-const sharedSpaceManager = 'Shared space manager'
+const sharedSpaceManager = 'Space manager'
 
 let workspaceId
 
-describe('Add a member at dashboard', () => {
+describe('Add a member from the dashboard', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -25,7 +25,7 @@ describe('Add a member at dashboard', () => {
     cy.cancelXHR()
   })
 
-  it('should add a new member as shared space manager using email', () => {
+  it('should add a new member as space manager using email', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -41,7 +41,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using public name', () => {
+  it('should add a new member as space manager using public name', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
@@ -57,7 +57,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using username with @', () => {
+  it('should add a new member as space manager using username with @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(`@${user.username}`)
@@ -73,7 +73,7 @@ describe('Add a member at dashboard', () => {
       })
   })
 
-  it('should add a new member as shared space manager using username without @', () => {
+  it('should add a new member as space manager using username without @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)
@@ -117,7 +117,7 @@ describe('Add a member at dashboard', () => {
         cy.get('[data-cy=memberlist__btnadd]').click()
         cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
         cy.get('[data-cy=autocomplete__item__name]').should('be.visible')
-          .contains('I know this user exist')
+          .contains('I know this user exists')
           .click()
         cy.get('[data-cy=memberlist]')
           .contains(sharedSpaceManager)
@@ -148,11 +148,12 @@ describe('Add a member at dashboard', () => {
           .contains(sharedSpaceManager)
           .click()
         cy.contains('Validate').click()
-        cy.get('[data-cy=flashmessage]').contains('This user already is in the workspace')
+        cy.get('[data-cy=flashmessage]').contains('This user already is in the space')
       })
   })
 
-  it('should not allow adding a member twice using the same username', () => {
+  it('should not allow adding a member twice using the same username', function () {
+    this.skip() // RJ - 2020-09-24 - unstable test, see issue #3483
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)

@@ -6,16 +6,21 @@ describe('content :: home_page', function () {
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.HOME })
-    cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
 
   it('should have translations', () => {
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Text Documents')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('All Contents').should('be.visible')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documents texte')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('Tous les contenus').should('be.visible')
 
     cy.changeLanguage('pt')
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documentos de texto')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('Todos os conteúdos').should('be.visible')
   })
 })

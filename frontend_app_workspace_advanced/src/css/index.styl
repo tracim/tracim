@@ -16,6 +16,7 @@
 .workspace_advanced
   height 100%
   overflow-y auto
+  overflow-x hidden
   &-content
     padding 10px 10px 0 10px
   &__contentpage__content
@@ -62,11 +63,7 @@
           .btndropdown
             display flex
             align-items center
-            border none
-            padding 0 15px
-            background-color transparent
-            cursor pointer
-            max-width 250px
+            max-width 16rem
             width 100%
             &__icon
               width 25px
@@ -126,12 +123,6 @@
     &__content
       padding-left 20px
 
-.btndropdown
-  &__text
-    text-align left
-  &:hover:not(:active)
-    background-color: grey-hover
-
 .workspace_advanced__popup
   .cardPopup__container
     width 400px
@@ -151,7 +142,7 @@
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .workspace_advanced
-    height calc(100% - 61px) // headerHeight
+    height "calc(100% - %s)" % headerHeight
     &-content
       width 100%
     &__contentpage__content
@@ -161,7 +152,7 @@
 
 @media (min-width: min-md) and (max-width: max-md)
   .workspace_advanced
-    height calc(100% - 61px) // headerHeight
+    height "calc(100% - %s)" % headerHeight
     width 100%
     &-content
       width 100%
@@ -172,7 +163,7 @@
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .workspace_advanced
-    height calc(100% - 61px) // headerHeight
+    height "calc(100% - %s)" % headerHeight
     width 100%
     &-content
       width 100%
@@ -183,7 +174,7 @@
 
 @media (max-width: max-xs)
   .workspace_advanced
-    height calc(100% - 61px) // headerHeight
+    height "calc(100% - %s)" % headerHeight
     width 100%
     &-content
       width 100%

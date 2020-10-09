@@ -1,11 +1,9 @@
 # coding: utf8
 from os.path import basename
 from os.path import dirname
-import re
 import typing
 
 from pluggy import PluginManager
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
@@ -27,6 +25,7 @@ from tracim_backend.lib.webdav.lock_storage import LockStorage
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tracim_session import TracimSession
 
 
 class WebdavTracimContext(TracimContext):
@@ -48,12 +47,12 @@ class WebdavTracimContext(TracimContext):
         return self.environ["http_authenticator.realm"]
 
     @property
-    def dbsession(self) -> Session:
+    def dbsession(self) -> TracimSession:
         assert self._session
         return self._session
 
     @dbsession.setter
-    def dbsession(self, session: Session) -> None:
+    def dbsession(self, session: TracimSession) -> None:
         self._session = session
 
     @property
@@ -118,8 +117,8 @@ class WebdavTracimContext(TracimContext):
         )
 
     def _get_content(self, content_path_fetcher):
-        path = content_path_fetcher()
-        content_path = self.reduce_path(path)
+        content_path = content_path_fetcher()
+
         splited_local_path = content_path.strip("/").split("/")
         workspace_name = webdav_convert_file_name_to_bdd(splited_local_path[0])
         wapi = WorkspaceApi(
@@ -135,7 +134,7 @@ class WebdavTracimContext(TracimContext):
             config=self.app_config, current_user=self.current_user, session=self.dbsession,
         )
         return content_api.get_one_by_filename_and_parent_labels(
-            content_label=webdav_convert_file_name_to_bdd(basename(path)),
+            content_label=webdav_convert_file_name_to_bdd(basename(content_path)),
             content_parent_labels=parents,
             workspace=workspace,
         )
@@ -166,27 +165,6 @@ class WebdavTracimContext(TracimContext):
             self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_path,
         )
 
-    def reduce_path(self, path: str) -> str:
-        """
-        As we use the given path to request the database
-
-        ex: if the path is /a/b/.deleted/c/.archived, we're trying to get the archived content of the 'c' resource,
-        we need to keep the path /a/b/c
-
-        ex: if the path is /a/b/.history/my_file, we're trying to get the history of the file my_file, thus we need
-        the path /a/b/my_file
-
-        ex: if the path is /a/b/.history/my_file/(1985 - edition) my_old_name, we're looking for,
-        thus we remove all useless information
-        """
-        path = re.sub(r"/\.archived", r"", path)
-        path = re.sub(r"/\.deleted", r"", path)
-        path = re.sub(r"/\.history/[^/]+/(\d+)-.+", r"/\1", path)
-        path = re.sub(r"/\.history/([^/]+)", r"/\1", path)
-        path = re.sub(r"/\.history", r"", path)
-
-        return path
-
 
 class Provider(DAVProvider):
     """
@@ -195,12 +173,7 @@ class Provider(DAVProvider):
     """
 
     def __init__(
-        self,
-        app_config: CFG,
-        show_history=True,
-        show_deleted=True,
-        show_archived=True,
-        manage_locks=True,
+        self, app_config: CFG, manage_locks=True,
     ):
         super(Provider, self).__init__()
 
@@ -208,18 +181,6 @@ class Provider(DAVProvider):
             self.lockManager = LockManager(LockStorage())
 
         self.app_config = app_config
-        self._show_archive = show_archived
-        self._show_delete = show_deleted
-        self._show_history = show_history
-
-    def show_history(self):
-        return self._show_history
-
-    def show_delete(self):
-        return self._show_delete
-
-    def show_archive(self):
-        return self._show_archive
 
     #########################################################
     # Everything override from DAVProvider
@@ -228,12 +189,12 @@ class Provider(DAVProvider):
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
         tracim_context = environ["tracim_context"]
+        path = normpath(path)
         tracim_context.set_path(path)
         user = tracim_context.current_user
         session = tracim_context.dbsession
         if not self.exists(path, environ):
             return None
-        path = normpath(path)
         root_path = tracim_context.root_path
 
         # If the requested path is the root, then we return a RootResource resource
@@ -264,8 +225,8 @@ class Provider(DAVProvider):
             current_user=user,
             session=session,
             config=self.app_config,
-            show_archived=False,  # self._show_archive,
-            show_deleted=False,  # self._show_delete
+            show_archived=False,
+            show_deleted=False,
             namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
@@ -300,13 +261,11 @@ class Provider(DAVProvider):
         """
         Called by wsgidav to check if a certain path is linked to a _DAVResource
         """
-
+        path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        path = normpath(path)
-        working_path = tracim_context.reduce_path(path)
         root_path = environ["http_authenticator.realm"]
-        parent_path = dirname(working_path)
+        parent_path = dirname(path)
         user = tracim_context.current_user
         session = tracim_context.dbsession
         if path == root_path:
@@ -320,9 +279,7 @@ class Provider(DAVProvider):
         if parent_path == root_path or workspace is None:
             return workspace is not None
 
-        # TODO bastien: Arnaud avait mis a True, verif le comportement
-        # lorsque l'on explore les dossiers archive et deleted
-        content_api = ContentApi(
+        ContentApi(
             current_user=user,
             session=session,
             config=self.app_config,
@@ -331,64 +288,12 @@ class Provider(DAVProvider):
             namespaces_filter=[ContentNamespaces.CONTENT],
         )
 
-        revision_id = re.search(r"/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$", path)
+        try:
+            content = tracim_context.current_content
+        except ContentNotFound:
+            content = None
 
-        is_archived = self.is_path_archive(path)
-
-        is_deleted = self.is_path_delete(path)
-
-        if revision_id:
-            revision_id = revision_id.group(1)
-            content = content_api.get_one_revision(revision_id)
-        else:
-            try:
-                content = tracim_context.current_content
-            except ContentNotFound:
-                content = None
-
-        return (
-            content is not None
-            and content.is_deleted == is_deleted
-            and content.is_archived == is_archived
-        )
-
-    def is_path_archive(self, path):
-        """
-        This function will check if a given path is linked to a file that's archived or not. We're checking if the
-        given path end with one of these string :
-
-        ex:
-            - /a/b/.archived/my_file
-            - /a/b/.archived/.history/my_file
-            - /a/b/.archived/.history/my_file/(3615 - edition) my_file
-        """
-
-        return (
-            re.search(
-                r"/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$",
-                path,
-            )
-            is not None
-        )
-
-    def is_path_delete(self, path):
-        """
-        This function will check if a given path is linked to a file that's deleted or not. We're checking if the
-        given path end with one of these string :
-
-        ex:
-            - /a/b/.deleted/my_file
-            - /a/b/.deleted/.history/my_file
-            - /a/b/.deleted/.history/my_file/(3615 - edition) my_file
-        """
-
-        return (
-            re.search(
-                r"/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$",
-                path,
-            )
-            is not None
-        )
+        return content is not None
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:

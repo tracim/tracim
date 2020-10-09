@@ -11,7 +11,10 @@ import {
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { uniqBy } from 'lodash'
-import { serialize } from 'tracim_frontend_lib'
+import {
+  serialize,
+  NUMBER_RESULTS_BY_PAGE
+} from 'tracim_frontend_lib'
 
 export const serializeSearchItemProps = {
   author: 'author',
@@ -42,7 +45,7 @@ export const serializeSearchItemProps = {
 
 const defaultResult = {
   currentNumberPage: 1,
-  numberResultsByPage: 10,
+  numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
   searchedKeywords: '',
   resultsList: []
 }

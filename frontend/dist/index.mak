@@ -5,9 +5,9 @@
     <meta name='viewport' content='width=device-width, user-scalable=no'>
 
     <title>${website_title}</title>
-    <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}">
     <link rel='manifest' href='/assets/manifest.json?token=${cache_token}'>
 
     <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css?token=${cache_token}'>
@@ -67,6 +67,11 @@
         font-family: 'Quicksand';
         src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
       }
+      @font-face {
+        font-family: 'Quicksand';
+        src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
+        font-weight: bold;
+      }
 
       body {
         font-family: 'Quicksand';
@@ -75,6 +80,7 @@
 
     <script type='text/javascript'>
       GLOBAL_primaryColor = '${primary_color_str}'
+      GLOBAL_excludedNotifications = '${excluded_notifications}'.replace(/\s/g, '')
     </script>
   </head>
 

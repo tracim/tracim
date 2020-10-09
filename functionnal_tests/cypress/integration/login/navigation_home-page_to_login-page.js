@@ -43,7 +43,7 @@ describe('Login page', function () {
       .click()
 
     cy.getTag({ selectorName: s.HEADER })
-      .find('div.menuprofil__dropdown__setting__link .fa-sign-out')
+      .find('[data-cy="menuprofil__dropdown__logout__link"]')
       .click()
   })
 
@@ -78,7 +78,7 @@ describe('Login page', function () {
       .click()
 
     cy.getTag({ selectorName: s.HEADER })
-      .find('div.menuprofil__dropdown__setting__link .fa-sign-out')
+    .find('[data-cy="menuprofil__dropdown__logout__link"]')
       .click()
   })
 })

@@ -17,15 +17,9 @@ describe('<MenuProfil />', () => {
 
   const wrapper = shallow(<MenuProfilWithoutHOC {...props} t={key => key} />)
 
-  describe('static design', () => {
-    it('should display the public name in a div', () =>
-      expect(wrapper.find('div.menuprofil__dropdown__name__text')).to.text().equal(props.user.publicName)
-    )
-  })
-
   describe('handler', () => {
     it('onClickLogoutCallBack should be called when logout div is clicked', () => {
-      wrapper.find('div.menuprofil__dropdown__setting__link').simulate('click')
+      wrapper.find('button.transparentButton').simulate('click')
       expect(onClickLogoutCallBack.called).to.equal(true)
     })
   })

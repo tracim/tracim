@@ -39,7 +39,7 @@ describe('operation :: workspace > delete > custom-form', function () {
           cy.get('.custom-form.visible').should('be.visible')
           cy.get('.custom-form.visible .wsContentGeneric__header__title').contains(titre1)
           cy.get('.align-items-center button:nth-child(2)').click()
-          cy.get('.custom-form__contentpage__left__wrapper > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
+          cy.get('.custom-form__contentpage__left__wrapper > [data-cy="promptMessage"] .promptMessage__btn').should('be.visible')
           cy.get('.custom-form__header__close').click()
           cy.get('.custom-form.visible').should('not.be.visible')
         }

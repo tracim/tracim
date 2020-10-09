@@ -6,7 +6,7 @@ import PreviewComponent from './PreviewComponent.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
 import {
   APP_FEATURE_MODE,
-  DisplayState,
+  PromptMessage,
   FileDropzone
 } from 'tracim_frontend_lib'
 
@@ -70,13 +70,32 @@ export class FileComponent extends React.Component {
       <div
         className={classnames(
           'file__contentpage__statewrapper',
-          { displayState: props.isArchived || props.isDeleted || props.isDeprecated }
+          { promptMessageWrapper: props.isArchived || props.isDeleted || props.isDeprecated }
         )}
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
 
+        {props.displayNotifyAllMessage && (
+          <PromptMessage
+            msg={
+              <span>{props.t('To notify all members of the space of your modification')},
+                <button
+                  className='btn buttonLink'
+                  onClick={props.onClickNotifyAll}
+                >
+                  {props.t('click here!')}
+                </button>
+              </span>
+            }
+            btnType='link'
+            icon='hand-o-right'
+            btnLabel={<i className='fa fa-times' />}
+            onClickBtn={props.onClickCloseNotifyAllMessage}
+          />
+        )}
+
         {props.isArchived && (
-          <DisplayState
+          <PromptMessage
             msg={props.t('This content is archived')}
             btnType='button'
             icon='archive'
@@ -86,7 +105,7 @@ export class FileComponent extends React.Component {
         )}
 
         {props.isDeleted && (
-          <DisplayState
+          <PromptMessage
             msg={props.t('This content is deleted')}
             btnType='button'
             icon='trash'
@@ -96,7 +115,7 @@ export class FileComponent extends React.Component {
         )}
 
         {props.isDeprecated && (
-          <DisplayState
+          <PromptMessage
             msg={props.t('This content is deprecated')}
             icon={props.deprecatedStatus.faIcon}
           />

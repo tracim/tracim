@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
+import { ALLOWED_CHARACTERS_USERNAME } from 'tracim_frontend_lib'
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   editableUserAuthTypeList
 } from '../../util/helper.js'
 

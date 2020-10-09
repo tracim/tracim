@@ -1,52 +1,17 @@
-import { FETCH_CONFIG } from 'tracim_frontend_lib'
+import { baseFetch } from 'tracim_frontend_lib'
 
 export const getThreadContent = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const getThreadComment = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/threads/${contentId}`)
 
 export const getThreadRevision = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/revisions`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/revisions`)
 
 export const postThreadContent = (apiUrl, workspaceId, folderId, contentType, newContentName) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      parent_id: folderId,
-      content_type: contentType,
-      label: newContentName
-    })
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents`, {
+    parent_id: folderId,
+    content_type: contentType,
+    label: newContentName
   })
 
-export const putThreadRead = (user, apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
+export const putThreadRead = (user, apiUrl, workspaceId, contentId) =>
+  baseFetch('PUT', `${apiUrl}/users/${user.userId}/workspaces/${workspaceId}/contents/${contentId}/read`)

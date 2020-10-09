@@ -62,7 +62,7 @@ describe('Searching keywords', () => {
     //       cy.get(contentThreadTitleLongGetter).click()
     //       cy.get('[data-cy=archive__button]').click()
 
-    //       cy.get('[data-cy=displaystate]')
+    //       cy.get('[data-cy=promptMessage]')
     //       cy.get(searchInput).type('{enter}')
 
     //       cy.get(contentThreadGetter).should('be.visible')
@@ -81,7 +81,7 @@ describe('Searching keywords', () => {
     //       cy.get(contentThreadGetter).click()
     //       cy.get('[data-cy=delete__button]').click()
 
-    //       cy.get('[data-cy=displaystate]')
+    //       cy.get('[data-cy=promptMessage]')
     //       cy.get(searchInput).type('{enter}')
 
     //       cy.get('.content').should('have.length', 1)

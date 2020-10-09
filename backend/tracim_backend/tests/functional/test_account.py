@@ -225,7 +225,7 @@ class TestAccountKnownMembersEndpoint(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
 
     def test_api__get_user__ok_200__normal_user_by_email(
         self,
@@ -357,7 +357,7 @@ class TestSetEmailEndpoint(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
         # Check After
         res = web_testapp.get("/api/users/me", status=307).follow(status=200)
         res = res.json_body

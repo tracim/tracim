@@ -2,6 +2,7 @@
 from tracim_backend.fixtures import Fixture
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.userconfig import UserConfig
 
 
 class Base(Fixture):
@@ -14,6 +15,7 @@ class Base(Fixture):
         u.email = "admin@admin.admin"
         u.password = "admin@admin.admin"
         u.profile = Profile.ADMIN
+        u.config = UserConfig()
         self._session.add(u)
 
 
@@ -27,6 +29,7 @@ class Test(Fixture):
         lawrence.email = "lawrence-not-real-email@fsf.local"
         lawrence.password = "foobarbaz"
         lawrence.profile = Profile.TRUSTED_USER
+        lawrence.config = UserConfig()
         self._session.add(lawrence)
 
         bob = User()
@@ -35,6 +38,7 @@ class Test(Fixture):
         bob.email = "bob@fsf.local"
         bob.password = "foobarbaz"
         bob.profile = Profile.TRUSTED_USER
+        bob.config = UserConfig()
         self._session.add(bob)
 
         reader = User()
@@ -42,4 +46,5 @@ class Test(Fixture):
         reader.email = "john-the-reader@reader.local"
         reader.password = "read"
         reader.profile = Profile.USER
+        reader.config = UserConfig()
         self._session.add(reader)

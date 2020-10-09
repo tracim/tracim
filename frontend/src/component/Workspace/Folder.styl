@@ -13,6 +13,7 @@ border-style = 1px solid grey
   border-bottom border-style
 .content
   border border-style
+  border-bottom 0px
   &.item-last
     border-bottom border-style
 // @Info: the very last line of file or folder has it's border bottom added in js
@@ -112,7 +113,6 @@ folderopen()
       white-space nowrap
       text-overflow ellipsis
       overflow hidden
-      font-size 17px
       color darkGrey
       font-weight bold
       ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
@@ -131,7 +131,6 @@ folderopen()
           color white
         &__text
           margin-right 40px
-          font-size 17px
           &::after
             margin-left 20px
           &-desktop

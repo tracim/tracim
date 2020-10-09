@@ -11,7 +11,7 @@ export const htmlDocument = {
   slug: 'html-document',
   faIcon,
   hexcolor,
-  creationLabel: 'Write a document',
+  creationLabel: 'Write a note',
   availableStatuses: [
     open,
     validated,

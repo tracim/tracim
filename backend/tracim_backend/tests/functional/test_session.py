@@ -14,10 +14,10 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 class TestLogoutEndpoint(object):
     def test_api__access_logout_get_enpoint__ok__nominal_case(self, web_testapp):
-        web_testapp.post_json("/api/auth/logout", status=204)
+        web_testapp.get("/api/auth/logout", status=204)
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self, web_testapp):
-        web_testapp.get("/api/auth/logout", status=204)
+        web_testapp.post_json("/api/auth/logout", status=204)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -756,46 +756,11 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-
-@pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_with_cookie_realtime"}], indirect=True
-)
-class TestSessionEndpointWithCookieAuthTokenRealtime(object):
-    def test_api__test_cookie_auth_token__ok__renew(self, web_testapp):
+    def test_api__whoami__ok_200__with_cookie(self, web_testapp):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
-        res = web_testapp.post_json("/api/auth/login", params=params, status=200)
-        assert "Set-Cookie" in res.headers
-        assert "session_key" in web_testapp.cookies
-        user_session_key = web_testapp.cookies["session_key"]
+        web_testapp.post_json("/api/auth/login", params=params, status=200)
         sleep(0.3)
-        res = web_testapp.get("/api/auth/whoami", status=200)
-        assert "Set-Cookie" not in res.headers
-        assert "session_key" in web_testapp.cookies
-        assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(0.3)
-        res = web_testapp.get("/api/auth/whoami", status=200)
-        assert "Set-Cookie" not in res.headers
-        assert "session_key" in web_testapp.cookies
-        assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(0.3)
-        res = web_testapp.get("/api/auth/whoami", status=200)
-        assert "Set-Cookie" not in res.headers
-        assert "session_key" in web_testapp.cookies
-        assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(0.3)
-        res = web_testapp.get("/api/auth/whoami", status=200)
-        assert "Set-Cookie" not in res.headers
-        assert "session_key" in web_testapp.cookies
-        assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(0.3)
-        res = web_testapp.get("/api/auth/whoami", status=200)
-        assert "Set-Cookie" not in res.headers
-        assert "session_key" in web_testapp.cookies
-        assert web_testapp.cookies["session_key"] == user_session_key
-        sleep(1)
-        res = web_testapp.get("/api/auth/whoami", params=params, status=401)
-        assert "Set-Cookie" in res.headers
+        web_testapp.get("/api/auth/whoami", status=200)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -891,6 +856,30 @@ class TestSessionEndpointWithCookieAuthToken(object):
             assert res.json_body["code"] is None
             assert "message" in res.json.keys()
             assert "details" in res.json.keys()
+
+    def test_api__test_cookie_auth_token__ok__renew(self, web_testapp):
+        params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
+        with freeze_time() as frozen_time:
+            res = web_testapp.post_json("/api/auth/login", params=params, status=200)
+            # The cookie is set after login
+            assert "Set-Cookie" in res.headers
+            assert "session_key" in web_testapp.cookies
+            user_session_key = web_testapp.cookies["session_key"]
+            # further requests do not set cookie again
+            res = web_testapp.get("/api/auth/whoami", status=200)
+            assert "Set-Cookie" not in res.headers
+            assert "session_key" in web_testapp.cookies
+            assert web_testapp.cookies["session_key"] == user_session_key
+            # until its age is more than 50% of its max
+            for _ in range(2):
+                # print(_)
+                frozen_time.tick(datetime.timedelta(seconds=350))
+                res = web_testapp.get("/api/auth/whoami", status=200)
+                assert "Set-Cookie" in res.headers
+                assert "session_key" in web_testapp.cookies
+                assert web_testapp.cookies["session_key"] == user_session_key
+            # session timeout is updated when accessed so it is still valid
+            res = web_testapp.get("/api/auth/whoami", status=200)
 
 
 @pytest.mark.usefixtures("base_fixture")

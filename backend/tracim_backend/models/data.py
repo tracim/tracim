@@ -5,7 +5,9 @@ from datetime import timedelta
 import enum
 import json
 import os
-import typing
+from typing import Any
+from typing import List
+from typing import Optional
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
@@ -49,6 +51,14 @@ from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.roles import WorkspaceRoles
 
 
+class WorkspaceAccessType(enum.Enum):
+    """Workspace access Types"""
+
+    CONFIDENTIAL = "confidential"
+    ON_REQUEST = "on_request"
+    OPEN = "open"
+
+
 class Workspace(DeclarativeBase):
 
     __tablename__ = "workspaces"
@@ -72,7 +82,6 @@ class Workspace(DeclarativeBase):
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
-
     revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
     public_upload_enabled = Column(
@@ -91,9 +100,66 @@ class Workspace(DeclarativeBase):
     )
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     owner = relationship("User", remote_side=[User.user_id])
+    access_type = Column(
+        Enum(WorkspaceAccessType),
+        nullable=False,
+        server_default=WorkspaceAccessType.CONFIDENTIAL.name,
+    )
+    default_user_role = Column(
+        Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
+    )
+    parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
+    children = relationship(
+        "Workspace",
+        backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+        order_by="Workspace.workspace_id",
+    )
+
+    @property
+    def recursive_children(self) -> List["Workspace"]:
+        """
+        :return: list of children Workspace
+        """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
+        statement = text(
+            """
+            with RECURSIVE children_id as (
+                select workspaces.workspace_id as id from workspaces
+                where workspaces.parent_id = :workspace_id
+                union all
+                select workspaces.workspace_id as id from workspaces
+                join children_id c on c.id = workspaces.parent_id
+            )
+            select children_id.id as workspace_id from children_id;
+            """
+        )
+        children_ids = [
+            elem[0]
+            for elem in object_session(self)
+            .execute(statement, {"workspace_id": self.workspace_id})
+            .fetchall()
+        ]
+        if children_ids:
+            return (
+                object_session(self)
+                .query(Workspace)
+                .filter(Workspace.workspace_id.in_(children_ids))
+                .order_by(Workspace.workspace_id)
+            ).all()
+        return []
+
+    def get_children(self, recursively: bool = False) -> List["Workspace"]:
+        """
+        Get all children of workspace recursively or not (including children of children...)
+        """
+        if recursively:
+            return self.recursive_children
+        else:
+            return self.children
 
     @hybrid_property
-    def contents(self) -> ["Content"]:
+    def contents(self) -> List["Content"]:
         # Return a list of unique revisions parent content
         contents = []
         for revision in self.revisions:
@@ -126,7 +192,7 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
-    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
+    def get_allowed_content_types(self) -> List[TracimContentType]:
         # @see Content.get_allowed_content_types()
         return content_type_list.endpoint_allowed_types()
 
@@ -144,8 +210,10 @@ class Workspace(DeclarativeBase):
                     yield child
 
 
-class UserRoleInWorkspace(DeclarativeBase):
+Index("idx__workspaces__parent_id", Workspace.parent_id)
 
+
+class UserRoleInWorkspace(DeclarativeBase):
     __tablename__ = "user_workspace"
 
     user_id = Column(
@@ -220,14 +288,14 @@ class UserRoleInWorkspace(DeclarativeBase):
         return self.role_object().label
 
     @classmethod
-    def get_all_role_values(cls) -> typing.List[int]:
+    def get_all_role_values(cls) -> List[int]:
         """
         Return all valid role value
         """
         return [role.level for role in WorkspaceRoles.get_all_valid_role()]
 
     @classmethod
-    def get_all_role_slug(cls) -> typing.List[str]:
+    def get_all_role_slug(cls) -> List[str]:
         """
         Return all valid role slug
         """
@@ -235,6 +303,46 @@ class UserRoleInWorkspace(DeclarativeBase):
         # and get_all_role_values are both used for API, this method should
         # return item in the same order as get_all_role_values
         return [role.slug for role in WorkspaceRoles.get_all_valid_role()]
+
+
+class WorkspaceSubscriptionState(enum.Enum):
+    """Workspace subscription state Types"""
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+
+class WorkspaceSubscription(DeclarativeBase):
+    __tablename__ = "workspace_subscriptions"
+
+    state = Column(
+        Enum(WorkspaceSubscriptionState),
+        nullable=False,
+        server_default=WorkspaceSubscriptionState.PENDING.name,
+    )
+    created_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    workspace_id = Column(
+        Integer,
+        ForeignKey("workspaces.workspace_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
+    )
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    evaluation_date = Column(DateTime, nullable=True)
+    evaluator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True, default=None)
+    workspace = relationship(
+        "Workspace", remote_side=[Workspace.workspace_id], backref="subscriptions"
+    )
+    author = relationship("User", foreign_keys=[author_id], backref="workspace_subscriptions")
+    evaluator = relationship(
+        "User", foreign_keys=[evaluator_id], backref="workspace_evaluated_subscriptions"
+    )
+
+    @property
+    def state_slug(self):
+        return self.state.value
 
 
 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
@@ -788,7 +896,7 @@ class ContentRevisionRO(DeclarativeBase):
                 ) from exc
         return copy_rev
 
-    def __setattr__(self, key: str, value: typing.Any):
+    def __setattr__(self, key: str, value: Any):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
         :param key: attribute name
@@ -1017,7 +1125,7 @@ class Content(DeclarativeBase):
         self.revision.file_extension = value
 
     @file_extension.expression
-    def file_extension(cls) -> InstrumentedAttribute:
+    def file_extension(cls) -> str:
         return ContentRevisionRO.file_extension
 
     @hybrid_property
@@ -1227,7 +1335,7 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.owner
 
     @property
-    def children(self) -> ["Content"]:
+    def children(self) -> List["Content"]:
         return (
             object_session(self)
             .query(Content)
@@ -1237,11 +1345,13 @@ class Content(DeclarativeBase):
         )
 
     @property
-    def recursive_children(self) -> ["Content"]:
-        """
+    def recursive_children(self) -> List["Content"]:
+        """typing.Listtyping.List
         :return: list of children Content
         :rtype Content
         """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
         statement = text(
             """
     with RECURSIVE children_id as (
@@ -1272,7 +1382,7 @@ class Content(DeclarativeBase):
             )
         return []
 
-    def get_children(self, recursively: bool = False) -> ["Content"]:
+    def get_children(self, recursively: bool = False) -> List["Content"]:
         """
         Get all children of content recursively or not (including children of children...)
         """
@@ -1320,7 +1430,7 @@ class Content(DeclarativeBase):
         self.current_revision = new_rev
         return new_rev
 
-    def get_valid_children(self, content_types: list = None) -> ["Content"]:
+    def get_valid_children(self, content_types: List[str] = None) -> List["Content"]:
         query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
             ContentRevisionRO.is_archived == False  # noqa: E712
         )
@@ -1395,10 +1505,10 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self) -> typing.List["Content"]:
+    def get_comments(self) -> List["Content"]:
         return self.get_valid_children(content_types=[content_type_list.Comment.slug])
 
-    def get_last_comment_from(self, user: User) -> "Content":
+    def get_last_comment_from(self, user: User) -> Optional["Content"]:
         # TODO - Make this more efficient
         last_comment_updated = None
         last_comment = None
@@ -1429,7 +1539,7 @@ class Content(DeclarativeBase):
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         return BeautifulSoup(self.description, "html.parser").text
 
-    def get_allowed_content_types(self) -> typing.List[TracimContentType]:
+    def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
         allowed_types = self.properties["allowed_content"]
         for type_label, is_allowed in allowed_types.items():
@@ -1451,7 +1561,8 @@ class Content(DeclarativeBase):
                     )
         return types
 
-    def get_history(self, drop_empty_revision=False) -> "[VirtualEvent]":
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
+    def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
         for comment in self.get_comments():
             events.append(VirtualEvent.create_from_content(comment))
@@ -1482,9 +1593,9 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    def get_tree_revisions(self) -> typing.List[ContentRevisionRO]:
+    def get_tree_revisions(self) -> List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
-        revisions = []  # type: typing.List[ContentRevisionRO]
+        revisions = []  # type: List[ContentRevisionRO]
         for revision in self.revisions:
             revisions.append(revision)
         for child in self.get_children(recursively=True):
@@ -1492,7 +1603,7 @@ class Content(DeclarativeBase):
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
 
-    def get_tree_revisions_advanced(self) -> typing.List[ContentRevisionRO]:
+    def get_tree_revisions_advanced(self) -> List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
         RevisionsData = namedtuple("revision_data", ["revision", "is_current_rev"])
         revisions_data = []
@@ -1541,6 +1652,7 @@ class RevisionReadStatus(DeclarativeBase):
     user = relationship("User")
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class NodeTreeItem(object):
     """
         This class implements a model that allow to simply represents
@@ -1548,14 +1660,13 @@ class NodeTreeItem(object):
         is not directly related to sqlalchemy and database
     """
 
-    def __init__(
-        self, node: Content, children: typing.List["NodeTreeItem"], is_selected: bool = False
-    ):
+    def __init__(self, node: Content, children: List["NodeTreeItem"], is_selected: bool = False):
         self.node = node
         self.children = children
         self.is_selected = is_selected
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class VirtualEvent(object):
     @classmethod
     def create_from(cls, object):

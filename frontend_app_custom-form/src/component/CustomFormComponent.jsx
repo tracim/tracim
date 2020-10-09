@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  DisplayState
+  PromptMessage
 } from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
 import { translate } from 'react-i18next'
@@ -10,7 +10,7 @@ const CustomFormComponent = props => {
   return (
     <div className='custom-form__contentpage__left__wrapper'>
       {props.isArchived && (
-        <DisplayState
+        <PromptMessage
           msg={props.t('This content is archived')}
           btnType='button'
           icon='archive'
@@ -20,7 +20,7 @@ const CustomFormComponent = props => {
       )}
 
       {props.isDeleted && (
-        <DisplayState
+        <PromptMessage
           msg={props.t('This content is deleted')}
           btnType='button'
           icon='trash'
@@ -30,7 +30,7 @@ const CustomFormComponent = props => {
       )}
 
       {props.isDeprecated && (
-        <DisplayState
+        <PromptMessage
           msg={props.t('This content is deprecated')}
           icon={props.deprecatedStatus.faIcon}
         />
@@ -40,7 +40,7 @@ const CustomFormComponent = props => {
         className='wsContentHtmlDocument__contentpage__textnote custom-form__contentpage__textnote'
       >
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
-          <DisplayState
+          <PromptMessage
             msg={props.t('You have a pending draft')}
             type='link'
             icon='hand-o-right'
