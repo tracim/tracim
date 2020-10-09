@@ -257,7 +257,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                   <button
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    disabled={!state.newDefaultRole || state.newDefaultRole.length === 0}
+                    disabled={!state.newDefaultRole}
                     onClick={this.handleValidate}
                     title={props.t('Create')}
                     type='button'
