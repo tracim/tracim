@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import classnames from 'classnames'
 import Select from 'react-select'
 import {
   addAllResourceI18n,
@@ -166,6 +167,7 @@ export class PopupCreateWorkspace extends React.Component {
 
   render () {
     const { props, state } = this
+    const buttonStyle = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
     return (
       <CardPopup
         customClass='newSpace'
@@ -209,7 +211,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    className={buttonStyle}
                     disabled={!state.newName || !state.newType}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Next')}
@@ -246,7 +248,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className='btn newSpace__button__back highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    className={classnames(buttonStyle, 'newSpace__button__back')}
                     disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Back')}
@@ -256,7 +258,7 @@ export class PopupCreateWorkspace extends React.Component {
                   </button>
 
                   <button
-                    className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                    className={buttonStyle}
                     disabled={!state.newDefaultRole}
                     onClick={this.handleValidate}
                     title={props.t('Create')}
