@@ -186,6 +186,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class InvalidWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
+
+
 class ImmutableAttribute(TracimException):
     pass
 
@@ -419,6 +423,10 @@ class ProfileDoesNotExist(TracimException):
     pass
 
 
+class SubcriptionDoesNotExist(TracimException):
+    pass
+
+
 class UserRoleNotFound(TracimException):
     error_code = ErrorCode.USER_ROLE_NOT_FOUND
 
@@ -472,6 +480,7 @@ class UnallowedSubContent(TracimException):
 
 
 class TooShortAutocompleteString(TracimException):
+    error_code = ErrorCode.ACP_STRING_TOO_SHORT
     pass
 
 

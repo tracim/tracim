@@ -91,5 +91,7 @@
   "Error while checking reserved usernames": "Erreur lors de la vérification des noms d'utilisateur réservés",
   "This word is reserved for group mentions": "Ce mot est réservé aux mentions de groupe",
   "Error while checking username availability": "Erreur lors de la vérification de la disponibilité de l'identifiant",
-  "This username is not available": "Cet identifiant n'est pas disponible"
+  "This username is not available": "Cet identifiant n'est pas disponible",
+  "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
+  "all": "tous"
 }

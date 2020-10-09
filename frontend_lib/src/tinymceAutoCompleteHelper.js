@@ -2,6 +2,8 @@ const MENTION_AUTOCOMPLETE_REGEX = /(?:^|\s)@([a-zA-Z\-_]*)$/
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
+let previousSelAndOffset = null
+
 const seekUsernameEnd = (text, offset) => {
   while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
     offset++
@@ -10,15 +12,31 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-const getTextOnCursor = () => {
+const getTextOnCursor = (selAndOffset) => {
+  const end = seekUsernameEnd(selAndOffset.text, selAndOffset.offset)
+  return selAndOffset.text.substring(0, end)
+}
+
+const getSelAndOffset = () => {
   const sel = tinymce.activeEditor.selection.getSel()
-  const text = sel.anchorNode.textContent
-  const end = seekUsernameEnd(text, sel.anchorOffset)
-  return text.substring(0, end)
+  return {
+    text: sel.anchorNode.textContent,
+    offset: sel.anchorOffset
+  }
 }
 
 export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, isAutoCompleteActivated) => {
-  if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor())) {
+  const selAndOffset = getSelAndOffset()
+
+  if (previousSelAndOffset && previousSelAndOffset.text === selAndOffset.text && previousSelAndOffset.offset === selAndOffset.offset) {
+    // INFO - RJ - 2020-09-14 - handleInput is called twice after typing a key because the selection also changes.
+    // This check allows not doing the work twice.
+    return
+  }
+
+  previousSelAndOffset = selAndOffset
+
+  if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
     if (isAutoCompleteActivated) {
       tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
       return
@@ -36,8 +54,9 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
 }
 
 const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, setState) => {
-  const mentionCandidate = getTextOnCursor().match(MENTION_AUTOCOMPLETE_REGEX)
+  const mentionCandidate = getTextOnCursor(previousSelAndOffset).match(MENTION_AUTOCOMPLETE_REGEX)
   if (!mentionCandidate) {
+    previousSelAndOffset = null
     setState({ isAutoCompleteActivated: false })
     return
   }
@@ -52,19 +71,18 @@ const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, se
 
 export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchMentionList) => {
   if (!isAutoCompleteActivated || event.key !== 'Backspace') return
-
+  previousSelAndOffset = getSelAndOffset()
   tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
 }
 
 export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoCompleteActivated, autoCompleteCursorPosition, autoCompleteItemList) => {
   if (!isAutoCompleteActivated) return
 
-  if (event.key === 'Escape') {
-    setState({ isAutoCompleteActivated: false })
-    return
-  }
-
   switch (event.key) {
+    case 'Escape': {
+      setState({ isAutoCompleteActivated: false })
+      break
+    }
     case ' ': {
       setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] })
       break
@@ -95,25 +113,31 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
   }
 }
 
-export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
-  if (!item.mention) {
+// RJ - 2020-09-25 - FIXME
+// Duplicate code with tinymceAutoCompleteHelper.js
+// See https://github.com/tracim/tracim/issues/3639
+
+export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) => {
+  if (!autoCompleteItem.mention) {
     console.log('Error: this member does not have a username')
     return
   }
 
   const sel = tinymce.activeEditor.selection.getSel()
+  const cursorPos = sel.anchorOffset
+  const spaceAfterMention = '\u00A0'
+
+  const charAtCursor = cursorPos - 1
   const text = sel.anchorNode.textContent
-
-  const posAt = text.lastIndexOf('@', sel.anchorOffset - 1)
-
+  const posAt = text.lastIndexOf('@', charAtCursor)
   let textBegin, textEnd
 
   if (posAt > -1) {
-    textBegin = text.substring(0, posAt) + '@' + item.mention + '\u00A0'
-    textEnd = text.substring(seekUsernameEnd(text, sel.anchorOffset))
+    textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+    textEnd = text.substring(seekUsernameEnd(text, cursorPos))
   } else {
     console.log('Error: mention autocomplete: did not find "@"')
-    textBegin = sel.anchorNode.textContent + ' @' + item.mention + '\u00A0'
+    textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
     textEnd = ''
   }
 
