@@ -210,7 +210,7 @@ export class PopupCreateWorkspace extends React.Component {
                 <div className='newSpace__button'>
                   <button
                     className='btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
+                    disabled={!state.newName || !state.newType}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Next')}
                     type='button'
