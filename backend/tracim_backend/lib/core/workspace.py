@@ -238,7 +238,19 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            query = query.filter(Workspace.parent_id == None)  # noqa: E711
+            workspace_ids = []
+            rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+            workspace_ids.extend(
+                rapi.get_user_workspaces_ids(
+                    user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
+                )
+            )
+            query = query.filter(
+                or_(
+                    Workspace.parent_id == None,  # noqa: E711
+                    Workspace.parent_id.notin_(workspace_ids),
+                )
+            )
         result = self.default_order_workspace(query).all()
         if len(result) == 0:
             raise WorkspaceNotFound(
@@ -328,6 +340,19 @@ class WorkspaceApi(object):
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
         return query.all()
+
+    def get_user_orphan_workspaces(self, user: User):
+        """Get all user workspace where user is not member of the parent and parent does exist"""
+        query = self._base_query()
+        workspace_ids = []
+        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        workspace_ids.extend(
+            rapi.get_user_workspaces_ids(user_id=user.user_id, min_role=UserRoleInWorkspace.READER)
+        )
+        query = query.filter(Workspace.workspace_id.in_(workspace_ids))
+        query = query.filter(Workspace.parent_id.isnot(None))
+        query = query.filter(Workspace.parent_id.notin_(workspace_ids))
+        return self.default_order_workspace(query).all()
 
     def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
         """

@@ -138,6 +138,7 @@ class WorkspaceOnlyContainer(WebdavContainer):
         workspace: typing.Optional[Workspace],
         provider: "Provider",
         tracim_context: "WebdavTracimContext",
+        list_orphan_workspaces: bool = False,
     ) -> None:
         self.path = path
         self.environ = environ
@@ -153,6 +154,7 @@ class WorkspaceOnlyContainer(WebdavContainer):
             force_role=True,
             config=tracim_context.app_config,
         )
+        self.list_orphan_workspaces = list_orphan_workspaces
 
     # Internal methods
     def _get_members(
@@ -161,7 +163,9 @@ class WorkspaceOnlyContainer(WebdavContainer):
         members_names = already_existing_names or []  # type: List[str]
         members = []
         workspace_id = self.workspace.workspace_id if self.workspace else 0  # type: int
-        workspace_children = self.workspace_api.get_all_children([workspace_id])
+        workspace_children = list(self.workspace_api.get_all_children([workspace_id]))
+        if self.list_orphan_workspaces:
+            workspace_children.extend(self.workspace_api.get_user_orphan_workspaces(self.user))
         for workspace in workspace_children:
             workspace_label = workspace.filemanager_filename
             if workspace_label in members_names:
@@ -479,6 +483,7 @@ class RootResource(DAVCollection):
             workspace=None,
             tracim_context=tracim_context,
             provider=self.provider,
+            list_orphan_workspaces=True,
         )
         self.tracim_context = tracim_context
 

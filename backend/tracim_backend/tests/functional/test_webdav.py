@@ -179,7 +179,12 @@ class TestFunctionalWebdavGet(object):
         role_api_factory,
         webdav_testapp,
     ) -> None:
-
+        """
+        user should get this tree hierarchy:
+        .
+        └── parent
+            └── "webdav_workspace_label"
+        """
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -204,10 +209,71 @@ class TestFunctionalWebdavGet(object):
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
-        res = webdav_testapp.get(
-            "/parent.space/{}.space".format(urlencoded_webdav_workspace_label), status="*"
+        webdav_testapp.get("/parent.space", status=200)
+        webdav_testapp.get("/{}.space", status=404)
+        webdav_testapp.get(
+            "/parent.space/{}.space".format(urlencoded_webdav_workspace_label), status=200
         )
-        assert res.status_code == HTTPStatus.OK
+
+    def test_functional__webdav_access_to_workspace__orphan_space_access(
+        self,
+        session,
+        user_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        webdav_testapp,
+    ) -> None:
+        """
+        Check access to orphan space at root and access to partially orphany tree:
+        .
+        ├── other
+        └── parent
+            └── children
+                └── //myworkspace
+        with user test@test.test as READER right to "other", "children" and "//myworkspace":
+        tree obtain by user should be:
+        .
+        ├── other
+        └── children
+            └── //myworkspace
+        """
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        other_workspace = workspace_api.create_workspace("other", save_now=True)
+        workspace_parent = workspace_api.create_workspace("parent", save_now=True)
+        workspace_children = workspace_api.create_workspace("children", save_now=True)
+        webdav_workspace_label = "//myworkspace"
+        workspace = workspace_api.create_workspace(
+            webdav_workspace_label, save_now=True, parent=workspace_parent
+        )
+        rapi = role_api_factory.get()
+        rapi.create_one(user, other_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace_children, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        # convert to %encoded for valid_url
+        urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
+        # check availability of new created content using webdav
+        webdav_testapp.get("/other.space", status=200)
+        webdav_testapp.get("/parent.space", status=404)
+        webdav_testapp.get("/children.space", status=200)
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=404)
+        webdav_testapp.get(
+            "/children.space/{}.space".format(urlencoded_webdav_workspace_label), status="*"
+        )
 
     @pytest.mark.parametrize(
         "workspace_label, webdav_workspace_label",
@@ -229,8 +295,15 @@ class TestFunctionalWebdavGet(object):
         role_api_factory,
         webdav_testapp,
     ) -> None:
+        """
+        user should get this tree hierarchy:
+        .
+        └── parent
+            └── child
+                └── grandson
+                    └── "workspace_label"
+        """
         uapi = user_api_factory.get()
-
         profile = Profile.USER
         user = uapi.create_user(
             "test@test.test",
@@ -262,15 +335,32 @@ class TestFunctionalWebdavGet(object):
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
         webdav_testapp.get("/parent.space", status=200)
+        webdav_testapp.get("/child.space", status=404)
+        webdav_testapp.get("/grandson.space", status=404)
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=404)
+
         webdav_testapp.get("/parent.space/child.space", status=200)
+        webdav_testapp.get("/parent.space/parent.space", status=404)
+        webdav_testapp.get("/parent.space/grandson.space", status=404)
+        webdav_testapp.get("/parent/{}.space".format(urlencoded_webdav_workspace_label), status=404)
+
         webdav_testapp.get("/parent.space/child.space/grandson.space", status=200)
-        res = webdav_testapp.get(
+        webdav_testapp.get("/parent.space/child.space/parent.space", status=404)
+        webdav_testapp.get("/parent.space/child.space/child.space", status=404)
+        webdav_testapp.get(
+            "/parent.space/child.space/{}.space".format(urlencoded_webdav_workspace_label),
+            status=404,
+        )
+
+        webdav_testapp.get(
             "/parent.space/child.space/grandson.space/{}.space".format(
                 urlencoded_webdav_workspace_label
             ),
-            status="*",
+            status=200,
         )
-        assert res.status_code == HTTPStatus.OK
+        webdav_testapp.get("/parent.space/child.space/grandson.space/child.space", status=404)
+        webdav_testapp.get("/parent.space/child.space/grandson.space/grandson.space", status=404)
+        webdav_testapp.get("/parent.space/child.space/grandson.space/parent.space", status=404)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(
         self, user_api_factory, workspace_api_factory, webdav_testapp
