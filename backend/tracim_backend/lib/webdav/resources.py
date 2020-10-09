@@ -594,11 +594,11 @@ class WorkspaceResource(DAVCollection):
     def getMemberList(self) -> [_DAVResource]:
         return self.container.getMemberList()
 
-    @webdav_check_right(is_trusted_user)
+    @webdav_check_right(is_contributor)
     def createEmptyResource(self, name: str):
         return self.container.createEmptyResource(file_name=name)
 
-    @webdav_check_right(is_trusted_user)
+    @webdav_check_right(is_content_manager)
     def createCollection(self, name: str):
         return self.container.createCollection(label=name)
 
