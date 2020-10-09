@@ -29,7 +29,7 @@ if [ "$1" = "-d" ]; then
 fi
 
 log "build frontend_app_custom-form"
-yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
+yarn run buildoptimized$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/custom-form.app$devext.js ../frontend/dist/app/custom-form.app.js && loggood "success" || logerror "some error"
 log "copying en translation.json"

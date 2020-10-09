@@ -45,12 +45,12 @@ cd "$DEFAULTDIR/frontend_vendors"
 
 # Tracim Lib for unit tests
 # NOTE - RJ - 2020-08-20 - the absence of $dev is intentional
-log "Building tracim_frontend_lib"
+log "Building unoptimized tracim_frontend_lib for tests"
 yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
-log "Building tracim_frontend_lib for Tracim"
-yarn workspace tracim_frontend_lib run buildwithextvendors$dev && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
+log "Building optimized tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run buildoptimized$dev && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
@@ -63,6 +63,6 @@ done
 
 # build Tracim
 log "building the Tracim frontend"
-yarn workspace tracim run buildwithextvendors$dev && loggood "success" || logerror "Could not build the Tracim frontend."
+yarn workspace tracim run buildoptimized$dev && loggood "success" || logerror "Could not build the Tracim frontend."
 
 loggood "-- frontend build successful."

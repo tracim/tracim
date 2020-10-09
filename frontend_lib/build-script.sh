@@ -7,14 +7,14 @@ CONFIG=webpack.config.js
 while [ "$1" != "" ]; do
     case "$1" in
         tracim)
-            CONFIG=webpack.tracim.config.js
+            CONFIG=webpack.optimized.config.js
         ;;
 
         dev)
             PRODUCTION=false
         ;;
 
-        buildwithextvendors-dev)
+        buildoptimized-dev)
             PRODUCTION=false
         ;;
 

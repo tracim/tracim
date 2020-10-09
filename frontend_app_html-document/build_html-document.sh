@@ -31,7 +31,7 @@ fi
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
 log "building frontend_app_html-document"
-yarn run buildwithextvendors$dev && loggood "success" || logerror "some error"
+yarn run buildoptimized$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/html-document.app$devext.js ../frontend/dist/app/html-document.app.js && loggood "success" || logerror "some error"
 log "copying en translation.json"

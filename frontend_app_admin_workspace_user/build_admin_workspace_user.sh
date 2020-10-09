@@ -29,7 +29,7 @@ if [ "$1" = "-d" ]; then
 fi
 
 log "building frontend_app_admin_workspace_user"
-yarn run buildwithextvendors$dev  && loggood "success" || logerror "some error"
+yarn run buildoptimized$dev  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/admin_workspace_user.app$devext.js ../frontend/dist/app/admin_workspace_user.app.js  && loggood "success" || logerror "some error"
 log "copying en translation.json"

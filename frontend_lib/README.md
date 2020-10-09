@@ -50,7 +50,7 @@ This will produce two scripst:
 - `dist/tracim_frontend_lib.tracim.lib.js`: the library part, declaring the `tracim_fontend_lib` global variable
 - `dist/tracim_frontend_lib.tracim.style.js`: the styling part
 
-The Webpack configuration used to build tracim_frontend_lib this way `webpack.tracim.config.js`.
+The Webpack configuration used to build tracim_frontend_lib this way `webpack.optimized.config.js`.
 
 ## When to use this bundle
 
