@@ -35,6 +35,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         params = {
@@ -42,6 +43,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
@@ -62,6 +64,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         params = {
@@ -69,6 +72,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         params = {
@@ -76,6 +80,7 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
 
@@ -98,6 +103,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_download_enabled": False,
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -112,6 +118,58 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
+        assert workspace["parent_id"] is None
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+
+    def test_api__create_workspace__ok_200__with_parent_id(self, web_testapp, event_helper) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "superworkspaceparent",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": None,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        parent_id = res.json_body["workspace_id"]
+        params = {
+            "label": "superworkspace",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": parent_id,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["label"] == "superworkspace"
+        assert workspace["agenda_enabled"] is False
+        assert workspace["public_upload_enabled"] is False
+        assert workspace["public_download_enabled"] is False
+        assert workspace["description"] == "mysuperdescription"
+        assert workspace["owner"]["user_id"] == 1
+        assert workspace["owner"]["avatar_url"] is None
+        assert workspace["owner"]["public_name"] == "Global manager"
+        assert workspace["owner"]["username"] == "TheAdmin"
+        assert workspace["owner"]
+        assert workspace["parent_id"] == parent_id
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
@@ -137,6 +195,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_download_enabled": False,
             "access_type": "open",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
@@ -158,6 +217,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
             "public_download_enabled": False,
             "access_type": "invalid",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
@@ -253,7 +313,8 @@ class TestWorkspaceEndpoint(object):
             profile=Profile.USER,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
+        parent_workspace = workspace_api.create_workspace("test_parent", save_now=True)
+        workspace = workspace_api.create_workspace("test", parent=parent_workspace, save_now=True)
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         workspace_api = workspace_api_factory.get()
@@ -273,6 +334,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["is_deleted"] is False
         assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         assert workspace_dict["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace_dict["parent_id"] == parent_workspace.workspace_id
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
@@ -569,6 +631,7 @@ class TestWorkspaceEndpoint(object):
             "agenda_enabled": False,
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace1_id = res.json_body["workspace_id"]
@@ -579,6 +642,7 @@ class TestWorkspaceEndpoint(object):
             "agenda_enabled": False,
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         workspace2_id = res.json_body["workspace_id"]
@@ -617,6 +681,7 @@ class TestWorkspaceEndpoint(object):
             "public_download_enabled": False,
             "access_type": "open",
             "default_user_role": "contributor",
+            "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -658,6 +723,7 @@ class TestWorkspaceEndpoint(object):
             "description": "mysuperdescription",
             "access_type": "confidential",
             "default_user_role": "reader",
+            "parent_id": None,
         }
         web_testapp.post_json("/api/workspaces", status=200, params=params)
         web_testapp.post_json("/api/workspaces", status=200, params=params)
@@ -1042,6 +1108,69 @@ class TestWorkspacesEndpoints(object):
         workspace = res[2]
         assert workspace["label"] == "test3"
         assert workspace["slug"] == "test3"
+
+    def test_api__get_workspaces__ok_200__with_parent_ids(self, workspace_api_factory, web_testapp):
+        """
+        Check obtain all workspaces reachables for user with user auth with explicit parent_ids
+        """
+
+        workspace_api = workspace_api_factory.get()
+        parent1 = workspace_api.create_workspace("parent1")
+        child1_1 = workspace_api.create_workspace("child1_1", parent=parent1)
+        child1_2 = workspace_api.create_workspace("child1_2", parent=parent1)
+        parent2 = workspace_api.create_workspace("parent2")
+        child2_1 = workspace_api.create_workspace("child2_1", parent=parent2)
+        workspace_api.create_workspace("child2_2", parent=parent2)
+        grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
+        grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        implicit_all = web_testapp.get("/api/workspaces", status=200)
+        assert len(implicit_all.json_body) == 8
+
+        parent_ids_list = [
+            "0",
+            parent1.workspace_id,
+            parent2.workspace_id,
+            child2_1.workspace_id,
+            child1_2.workspace_id,
+        ]
+        parent_ids = ",".join([str(item) for item in parent_ids_list])
+        explicit_all = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": parent_ids}
+        )
+        assert explicit_all.json_body == implicit_all.json_body
+
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": child2_1.workspace_id}
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson2_1_1.workspace_id
+
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": child1_2.workspace_id}
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson1_2_2.workspace_id
+
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": "0"})
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+
+        parent_ids = parent1.workspace_id
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+
+        parent_ids = "0,{}".format(parent1.workspace_id)
+        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        assert len(res.json_body) == 4
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[2]["workspace_id"] == child1_2.workspace_id
+        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
 
     def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
         """

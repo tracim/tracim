@@ -405,11 +405,13 @@ class KnownMembersQuery(object):
         exclude_user_ids: str = None,
         exclude_workspace_ids: str = None,
         include_workspace_ids: str = None,
+        limit: int = None,
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
         self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
 
 
 class AgendaFilterQuery(object):
@@ -549,6 +551,7 @@ class WorkspaceCreate(object):
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
+        parent_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -557,6 +560,7 @@ class WorkspaceCreate(object):
         self.public_download_enabled = public_download_enabled
         self.access_type = WorkspaceAccessType(access_type)
         self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.parent_id = parent_id
 
 
 class ContentCreation(object):
@@ -607,14 +611,16 @@ class LiveMessageQuery(object):
         self,
         read_status: str,
         count: int,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         page_token: Optional[str] = None,
         exclude_author_ids: str = "",
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
         self.page_token = page_token
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 
@@ -625,10 +631,12 @@ class UserMessagesSummaryQuery(object):
 
     def __init__(
         self,
-        event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: str = "",
     ) -> None:
-        self.event_types = event_types
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 
@@ -865,6 +873,10 @@ class WorkspaceInContext(object):
     @property
     def allowed_space(self) -> int:
         return self.config.LIMITATION__WORKSPACE_SIZE
+
+    @property
+    def parent_id(self) -> int:
+        return self.workspace.parent_id
 
 
 class UserRoleWorkspaceInContext(object):

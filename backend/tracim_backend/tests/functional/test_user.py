@@ -37,7 +37,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -170,7 +169,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         session,
         web_testapp,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -277,7 +275,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -413,7 +410,6 @@ class TestUserRecentlyActiveContentEndpoint(object):
         session,
         admin_user,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -753,7 +749,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -876,7 +871,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -1007,7 +1001,6 @@ class TestUserReadStatusEndpoint(object):
         web_testapp,
         session,
     ):
-
         # init DB
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
@@ -2654,6 +2647,198 @@ class TestUserWorkspaceEndpoint(object):
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == set()
 
+    def test_api__get_user_workspaces__ok_200__with_filter_and_parent_ids(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        admin_user,
+        application_api_factory,
+        web_testapp,
+        role_api_factory,
+    ):
+        """
+        Check the retrieval of all workspaces reachable by user with different filters
+        """
+
+        workspace_api = workspace_api_factory.get()
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
+        owned_only_workspace = workspace_api.create_workspace(
+            "owned_only", parent=owned_and_role_workspace
+        )
+        user_api = user_api_factory.get()
+        user_api.create_user("toto@toto.toto", do_notify=False)
+        profile = Profile.ADMIN
+        test_user = user_api.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api_test_user = workspace_api_factory.get(test_user)
+        role_only_workspace = workspace_api_test_user.create_workspace(
+            label="role_only", parent=owned_only_workspace
+        )
+        rapi = role_api_factory.get()
+        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(
+            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        transaction.commit()
+        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1", "parent_ids": "0"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            owned_and_role_workspace.workspace_id,
+        }
+        params = {
+            "show_workspace_with_role": "1",
+            "show_owned_workspace": "1",
+            "parent_ids": role_only_workspace.workspace_id,
+        }
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == set()
+
+        params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+            owned_and_role_workspace.workspace_id,
+        }
+        parent_ids = ",".join(
+            [str(role_only_workspace.workspace_id), str(owned_only_workspace.workspace_id)]
+        )
+        params = {
+            "show_workspace_with_role": "1",
+            "show_owned_workspace": "0",
+            "parent_ids": parent_ids,
+        }
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+        )
+        workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
+        assert set(workspaces_ids) == {
+            role_only_workspace.workspace_id,
+        }
+
+    def test_api__get_users_workspaces__ok_200__with_parent_ids_as_admin(
+        self, workspace_api_factory, web_testapp, admin_user
+    ):
+        """
+        Check the retrieval of all users workspaces reachable by user with user auth with explicit parent_ids
+        """
+        user = admin_user
+        workspace_api = workspace_api_factory.get()
+        parent1 = workspace_api.create_workspace("parent1")
+        child1_1 = workspace_api.create_workspace("child1_1", parent=parent1)
+        child1_2 = workspace_api.create_workspace("child1_2", parent=parent1)
+        parent2 = workspace_api.create_workspace("parent2")
+        child2_1 = workspace_api.create_workspace("child2_1", parent=parent2)
+        workspace_api.create_workspace("child2_2", parent=parent2)
+        grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
+        grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        implicit_all = web_testapp.get("/api/users/{}/workspaces".format(user.user_id), status=200)
+        assert len(implicit_all.json_body) == 8
+
+        parent_ids_list = [
+            "0",
+            parent1.workspace_id,
+            parent2.workspace_id,
+            child2_1.workspace_id,
+            child1_2.workspace_id,
+        ]
+        parent_ids = ",".join([str(item) for item in parent_ids_list])
+        explicit_all = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert explicit_all.json_body == implicit_all.json_body
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": child2_1.workspace_id},
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson2_1_1.workspace_id
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": child1_2.workspace_id},
+        )
+        assert len(res.json_body) == 1
+        assert res.json_body[0]["workspace_id"] == grandson1_2_2.workspace_id
+
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id), status=200, params={"parent_ids": "0"}
+        )
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+
+        parent_ids = parent1.workspace_id
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert len(res.json_body) == 2
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+
+        parent_ids = "0,{}".format(parent1.workspace_id)
+        res = web_testapp.get(
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": parent_ids},
+        )
+        assert len(res.json_body) == 4
+        # INFO - G.M - 2020-10-05 - workspace are sorted by label in this endpoint
+        assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
+        assert res.json_body[2]["workspace_id"] == parent1.workspace_id
+        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
+
     @pytest.mark.usefixtures("default_content_fixture")
     def test_api__get_user_workspaces__ok_200__nominal_case(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
@@ -2773,21 +2958,11 @@ class TestUserWorkspaceEndpoint(object):
         )
         assert isinstance(res.json_body, list)
         assert len(res.json_body) == accessible_workspaces_count
-        assert not len(res.json_body) or set(res.json_body[0].keys()) == {
-            "agenda_enabled",
-            "is_deleted",
-            "public_download_enabled",
-            "public_upload_enabled",
-            "label",
-            "access_type",
-            "slug",
-            "workspace_id",
-            "description",
-            "sidebar_entries",
-            "created",
-            "owner",
-            "default_user_role",
-        }
+        # only check label and workspace_id,
+        # just to be sure to retrieve workspace like object
+        assert not len(res.json_body) or set(res.json_body[0].keys()).issuperset(
+            {"label", "workspace_id"}
+        )
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
         self, web_testapp, user_api_factory,
@@ -2883,7 +3058,6 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -2998,7 +3172,6 @@ class TestUserDiskSpace(object):
     def test_api__get_user_disk_space__ok_200__admin(
         self, user_api_factory, web_testapp, workspace_api_factory
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3040,7 +3213,6 @@ class TestUserEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3074,7 +3246,6 @@ class TestUserEndpoint(object):
         assert res["allowed_space"] == 0
 
     def test_api__get_user__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3105,7 +3276,6 @@ class TestUserEndpoint(object):
         assert res["allowed_space"] == 0
 
     def test_api__get_user__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3190,7 +3360,6 @@ class TestUserEndpoint(object):
     def test_api__create_user__err_400__with_no_username_and_no_email(
         self, web_testapp, user_api_factory, app_config
     ):
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "password": "mysuperpassword",
@@ -3375,7 +3544,6 @@ class TestUserEndpoint(object):
         assert last_event.fields["user"]["public_name"] == "John Doe"
 
     def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3406,7 +3574,6 @@ class TestUserEndpoint(object):
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__err_403__other_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3516,7 +3683,6 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3541,7 +3707,6 @@ class TestUserWithNotificationEndpoint(object):
         assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.put("/api/users/{}/trashed".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
@@ -3558,7 +3723,6 @@ class TestUsersEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp, admin_user):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3589,7 +3753,6 @@ class TestUsersEndpoint(object):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3621,7 +3784,6 @@ class TestKnownMembersEndpoint(object):
     """
 
     def test_api__get_user__ok_200__admin__by_name(self, user_api_factory, admin_user, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3667,7 +3829,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3710,7 +3871,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
         self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3758,7 +3918,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3821,7 +3980,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3898,7 +4056,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(
         self, user_api_factory, web_testapp, admin_user
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3941,7 +4098,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3987,7 +4143,6 @@ class TestKnownMembersEndpoint(object):
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4021,12 +4176,11 @@ class TestKnownMembersEndpoint(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
 
     def test_api__get_user__ok_200__normal_user_by_email(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4099,7 +4253,6 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     def test_api__get_user__ok_200__show_all_members(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4178,7 +4331,6 @@ class TestSetEmailPasswordLdapEndpoint(object):
     """
 
     def test_api__set_user_email__ok_200__ldap_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4215,7 +4367,6 @@ class TestSetEmailPasswordLdapEndpoint(object):
     def test_api__set_user_password_ldap__ok_200__admin(
         self, user_api_factory, web_testapp, session
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4264,7 +4415,6 @@ class TestSetEmailEndpoint(object):
     """
 
     def test_api__set_user_email__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4296,7 +4446,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_400__admin_same_email(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4333,7 +4482,6 @@ class TestSetEmailEndpoint(object):
     def test_api__set_user_email__err_403__admin_wrong_password(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4370,7 +4518,6 @@ class TestSetEmailEndpoint(object):
     def test_api__set_user_email__err_400__admin_string_is_not_email(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4407,7 +4554,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4441,7 +4587,6 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4724,7 +4869,6 @@ class TestSetPasswordEndpoint(object):
     """
 
     def test_api__set_user_password__ok_200__admin(self, user_api_factory, web_testapp, session):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4764,7 +4908,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__err_403__admin_wrong_password(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4809,7 +4952,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__err_400__admin_passwords_do_not_match(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4856,7 +4998,6 @@ class TestSetPasswordEndpoint(object):
     def test_api__set_user_password__ok_200__user_itself(
         self, user_api_factory, web_testapp, session
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4894,7 +5035,6 @@ class TestSetPasswordEndpoint(object):
         assert user.validate_password("mynewpassword")
 
     def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4941,7 +5081,6 @@ class TestSetUserInfoEndpoint(object):
     """
 
     def test_api__set_user_info__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4982,7 +5121,6 @@ class TestSetUserInfoEndpoint(object):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__ok_200__user_itself(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5023,7 +5161,6 @@ class TestSetUserInfoEndpoint(object):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__err_403__other_normal_user(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5070,7 +5207,6 @@ class TestSetUserProfileEndpoint(object):
     """
 
     def test_api__set_user_profile__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5183,7 +5319,6 @@ class TestSetUserAllowedSpaceEndpoint(object):
     """
 
     def test_api__set_user_allowed_space__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5275,7 +5410,6 @@ class TestSetUserEnableDisableEndpoints(object):
     """
 
     def test_api_enable_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5308,7 +5442,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is True
 
     def test_api_disable_user__ok_200__admin(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5341,7 +5474,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is False
 
     def test_api_disable_user__err_400__cant_disable_myself_admin(self, admin_user, web_testapp):
-
         user_id = int(admin_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -5360,7 +5492,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["is_active"] is True
 
     def test_api_enable_user__err_403__other_account(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5397,7 +5528,6 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__other_account(self, user_api_factory, web_testapp):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER

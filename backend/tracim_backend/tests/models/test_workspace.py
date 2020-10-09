@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 import pytest
 import transaction
 
@@ -47,3 +49,59 @@ class TestWorkspaceModel(object):
         assert workspace.get_size() == 0
         assert workspace.get_size(include_deleted=True) == 0
         assert workspace.get_size(include_archived=True) == 12
+
+    @pytest.mark.usefixtures("base_fixture")
+    def test_unit__get_children__nominal_case(self, admin_user, session):
+        """
+        Test recursive and not recursive method of get_children with a complex workspace family tree
+        """
+        grandparent = Workspace(label="grandparent", owner=admin_user)
+        parent = Workspace(label="parent", owner=admin_user, parent=grandparent)
+        child_1 = Workspace(label="child_1", owner=admin_user, parent=parent)
+        child_2 = Workspace(label="child_2", owner=admin_user, parent=parent)
+        child_3 = Workspace(label="child_3", owner=admin_user, parent=parent)
+        grandson_1_1 = Workspace(label="grandson_1_1", owner=admin_user, parent=child_1)
+        grandson_3_1 = Workspace(label="grandson_3_1", owner=admin_user, parent=child_3)
+        grandson_3_2 = Workspace(label="grandson_3_2", owner=admin_user, parent=child_3)
+
+        session.add(grandparent)
+        session.add(parent)
+        session.add(child_1)
+        session.add(child_2)
+        session.add(child_3)
+        session.add(grandson_1_1)
+        session.add(grandson_3_1)
+        session.add(grandson_3_2)
+        session.flush()
+        transaction.commit()
+
+        assert grandson_1_1.get_children(recursively=False) == []
+        assert grandson_1_1.get_children(recursively=True) == []
+        assert grandson_3_1.get_children(recursively=False) == []
+        assert grandson_3_1.get_children(recursively=True) == []
+        assert grandson_3_2.get_children(recursively=False) == []
+        assert grandson_3_2.get_children(recursively=True) == []
+
+        rec_child_3_children = child_3_children = [grandson_3_1, grandson_3_2]
+        rec_child_2_children = child_2_children = []
+        rec_child_1_children = child_1_children = [grandson_1_1]
+        assert child_1.get_children(recursively=False) == child_1_children
+        assert child_1.get_children(recursively=True) == rec_child_1_children
+        assert child_2.get_children(recursively=False) == child_2_children
+        assert child_2.get_children(recursively=True) == rec_child_2_children
+        assert child_3.get_children(recursively=False) == child_3_children
+        assert child_3.get_children(recursively=True) == rec_child_3_children
+
+        parent_children = [child_1, child_2, child_3]
+        rec_parent_children = sorted(
+            rec_child_1_children + rec_child_2_children + rec_child_3_children + parent_children,
+            key=attrgetter("workspace_id"),
+        )
+        assert parent.get_children(recursively=False) == parent_children
+        assert parent.get_children(recursively=True) == rec_parent_children
+
+        rec_grandparent_children = sorted(
+            rec_parent_children + [parent], key=attrgetter("workspace_id")
+        )
+        assert grandparent.get_children(recursively=False) == [parent]
+        assert grandparent.get_children(recursively=True) == rec_grandparent_children

@@ -68,7 +68,7 @@ from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 
-DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
+KNOWN_MEMBERS_ITEMS_LIMIT = 5
 
 
 class UserApi(object):
@@ -192,7 +192,7 @@ class UserApi(object):
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
         include_workspace_ids: typing.List[int] = None,
-        nb_elem: int = DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT,
+        limit: int = 0,
         filter_results: bool = True,
     ) -> typing.List[User]:
         """
@@ -201,15 +201,46 @@ class UserApi(object):
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
         :param include_workspace_ids: only include users from these workspaces
-        :nb_elem: number of users to return, default value should be low for
-        security and privacy reasons
+        :limit: maximum number of users to return. This value will be capped to
+                KNOWN_MEMBERS_ITEMS_LIMIT if requesting users from workspaces that
+                the requester is not part of.
         :filter_results: If true, do filter result according to user workspace if user is provided
         :return: List of found users
         """
 
-        if len(acp) < 2:
+        nb_elems = KNOWN_MEMBERS_ITEMS_LIMIT
+
+        # RJ - 2020-09-14-NOTE
+        # This is a bit convoluted. Keep in mind that we want to allow:
+        #  - listing a number of members greater than KNOWN_MEMBERS_ITEMS_LIMIT
+        #  - autocomplete less than 2 characters
+        # only if the requesting user is in each and every included workspace.
+        # Otherwise, we don't want to allow that.
+        # By default, we return a maximum of KNOWN_MEMBERS_ITEMS_LIMIT members (when limit is not set),
+        # This method is too complex and needs to be split.
+        # See https://github.com/tracim/tracim/issues/3635
+
+        user_in_every_included_workspaces = False  # type: bool
+        include_user_ids = None  # type: typing.Optional[typing.Set[int]]
+
+        if include_workspace_ids:
+            user_in_every_included_workspaces = True
+
+            include_user_ids = set()
+            for workspace_id in include_workspace_ids:
+                user_ids = self.get_members_of_workspaces([workspace_id])
+                include_user_ids.update(user_ids)
+                if user_in_every_included_workspaces:
+                    user_in_every_included_workspaces = self._user.user_id in user_ids
+
+            if user_in_every_included_workspaces and limit:
+                nb_elems = limit
+        elif include_workspace_ids:
+            include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
+
+        if not user_in_every_included_workspaces and len(acp) < 2:
             raise TooShortAutocompleteString(
-                'String "{acp}" is too short, the acp string needs to have more than one character'.format(
+                'String "{acp}" is too short, the acp string needs to have more than one character, or you need to be in every workspace you include.'.format(
                     acp=acp
                 )
             )
@@ -242,11 +273,10 @@ class UserApi(object):
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
 
-        if include_workspace_ids:
-            include_user_ids = self.get_members_of_workspaces(include_workspace_ids)
+        if include_user_ids:
             query = query.filter(User.user_id.in_(include_user_ids))
 
-        query = query.limit(nb_elem)
+        query = query.limit(nb_elems)
         return query.all()
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:

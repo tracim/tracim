@@ -12,7 +12,7 @@ export const debug = {
     slug: 'custom-form',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
-    creationLabel: 'Write a document',
+    creationLabel: 'Write a note',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://192.168.1.163:6543/api',
     workspace_id: 1,

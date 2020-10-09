@@ -42,10 +42,11 @@ export const putContentRestoreArchive = (apiUrl, workspaceId, contentId) =>
 export const putContentRestoreDelete = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`)
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, workspaceIdToExclude) => {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, workspaceIdToExclude, limit = 0) => {
   let opts = ''
   if (workspaceIdToInclude) opts += `&include_workspace_ids=${workspaceIdToInclude}`
   if (workspaceIdToExclude) opts += `&exclude_workspace_ids=${workspaceIdToExclude}`
+  if (limit) opts += `&limit=${limit}`
   return baseFetch('GET', `${apiUrl}/users/me/known_members?acp=${userNameToSearch}${opts}`)
 }
 
