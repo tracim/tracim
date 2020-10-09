@@ -103,8 +103,8 @@ class TracimApplication(ABC):
         ...     content_type = TracimContentType(
         ...         slug='html-document',
         ...         fa_icon=self.fa_icon,
-        ...         label="Text Document",
-        ...         creation_label="Write a document",
+        ...         label="Note",
+        ...         creation_label="Write a note",
         ...         available_statuses=content_status_list.get_all(),
         ...         slug_aliases=["page"],
         ...         allow_sub_content=False,

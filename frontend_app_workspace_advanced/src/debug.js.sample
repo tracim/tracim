@@ -29,7 +29,7 @@ const SIDEBAR = [{
 }, {
   faIcon: 'file-text-o',
   hexcolor: '#00CC00',
-  label: 'Text Documents',
+  label: 'Notes',
   route: `/ui/workspaces/${workspaceId}/contents?type=html-document`,
   slug: 'contents/html-document'
 }, {

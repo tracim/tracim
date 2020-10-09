@@ -54,7 +54,7 @@ class PopupCreateHtmlDocument extends React.Component {
     if (state.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New text document'), state.config.workspace.label]) }
+        data: { title: buildHeadTitle([props.t('New note'), state.config.workspace.label]) }
       })
     }
   }
@@ -105,7 +105,7 @@ class PopupCreateHtmlDocument extends React.Component {
             break
         }
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while creating document'))
+      default: this.sendGlobalFlashMessage(this.props.t('Error while creating note'))
     }
   }
 
@@ -114,13 +114,13 @@ class PopupCreateHtmlDocument extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Document')}
+        label={this.props.t('New note')}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}
         btnValidateLabel={this.props.t('Validate and create')}
-        inputPlaceholder={this.props.t("Document's title")}
+        inputPlaceholder={this.props.t("Note's title")}
       />
     )
   }

@@ -8,6 +8,6 @@ export const htmlDocument = {
   slug,
   faIcon,
   hexcolor,
-  creationLabel: 'Write a document',
+  creationLabel: 'Write a note',
   availableStatus: statusList
 }
