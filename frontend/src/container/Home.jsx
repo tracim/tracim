@@ -77,7 +77,7 @@ export class Home extends React.Component {
   }
 
   componentWillUnmount () {
-    this.debouncedCheckUsernameValidity.cancel()
+    this.debouncedCheckUsername.cancel()
   }
 
   setHeadTitle = () => {
@@ -145,23 +145,25 @@ export class Home extends React.Component {
   handleChangeNewUsername = async e => {
     const username = e.target.value
     this.setState({ newUsername: username })
-    this.debouncedCheckUsernameValidity(username)
+    this.debouncedCheckUsername()
   }
 
-  checkUsernameValidity = async (username) => {
-    if (!username) {
+  checkUsername = async () => {
+    const { props, state } = this
+
+    if (!state.newUsername) {
       this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
       return
     }
-    const { props } = this
+
     try {
-      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, this.state.newUsername, props))
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, state.newUsername, props))
     } catch (errorWhileChecking) {
       props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
 
-  debouncedCheckUsernameValidity = debounce(checkUsernameValidity, CHECK_USERNAME_DEBOUNCE_WAIT)
+  debouncedCheckUsername = debounce(this.checkUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 
