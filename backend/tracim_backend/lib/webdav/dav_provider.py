@@ -222,7 +222,7 @@ class WebdavTracimContext(TracimContext):
         )
 
     @property
-    def candidate_parent_content(self) -> Content:
+    def candidate_parent_content(self) -> typing.Optional[Content]:
         return self.processed_destpath.current_parent_content
 
     @property
