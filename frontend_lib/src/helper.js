@@ -532,18 +532,34 @@ export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
 
+// export const createSpaceArborescence = spaceList => {
+//   let newSpaceList = []
+//   spaceList = spaceList.map(space => space.children ? space : { ...space, children: [] })
+//   spaceList.forEach(space => {
+//     if (space.parent_id === null) {
+//       newSpaceList.push(space)
+//    } else {
+//      const parentSpaceIndex = spaceList.findIndex(parentSpace => parentSpace.workspace_id === space.parent_id)
+//      if (parentSpaceIndex === -1) newSpaceList.push(space)
+//      else spaceList[parentSpaceIndex].children.push(space)
+//    }
+//  })
+//  return newSpaceList
+// }
+
 export const createSpaceArborescence = spaceList => {
-  // let newSpacesObject = { children: { } }
-  let newSpaceList = []
-  spaceList = spaceList.map(space => space.children ? space : { ...space, children: { } })
-  spaceList.forEach(space => {
-    if (space.parent_id === null) {
-      newSpaceList.push(space) // newSpacesObject.children[Object.keys(newSpacesObject.children).length + 1] = space
+  const newSpaceList = spaceList.map(space => ({ ...space, children: [] }))
+  const spaceById = {}
+  const res = []
+  for (const space of newSpaceList) {
+    spaceById[space.workspace_id] = space
+  }
+  for (const space of newSpaceList) {
+    if (space.parent_id && spaceById[space.parent_id]) {
+      spaceById[space.parent_id].children.push(space)
     } else {
-      const parentSpaceIndex = spaceList.findIndex(parentSpace => parentSpace.workspace_id === space.parent_id)
-      if (parentSpaceIndex === -1) newSpaceList.push(space) // newSpacesObject.children[Object.keys(newSpacesObject.children).length + 1] = space
-      else spaceList[parentSpaceIndex].children[Object.keys(spaceList[parentSpaceIndex].children).length + 1] = space
+      res.push(space)
     }
-  })
-  return newSpaceList //newSpacesObject
+  }
+  return res
 }

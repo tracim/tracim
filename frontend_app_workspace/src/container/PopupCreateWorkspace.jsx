@@ -116,23 +116,23 @@ export class PopupCreateWorkspace extends React.Component {
 
       switch (fetchGetUserSpaces.apiResponse.status) {
         case 200: {
-          let spaceList = createSpaceArborescence(fetchGetUserSpaces.body)
-          /* FIXME - GB - 2020-10-08 - The code below is commented until we choose between keep it or delete it (filter of parent type according chosen type)
-          if (state.newType === SPACE_TYPE.confidential.slug) {
-            spaceList = spaceList.filter(space => space.access_type === SPACE_TYPE.confidential.slug)
-          } else if (state.newType === SPACE_TYPE.onRequest.slug) {
-            spaceList = spaceList.filter(space =>
-              space.access_type === SPACE_TYPE.onRequest.slug || space.access_type === SPACE_TYPE.confidential.slug
-            )
-          } */
-          spaceList = [
-            { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }, // INFO - GB - 2020-10-07 - Root
-            ...spaceList.map(space => {
-              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
-              const spaceLabel = <span title={space.label}><i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
-              return { value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id }
-            })
-          ]
+          const spaceList = [{ value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }] // INFO - GB - 2020-10-07 - Root
+
+          const addChildrenToList = (level, obj) => {
+            for (const space in obj) {
+              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === obj[space].access_type)
+              const spaceLabel = <span title={obj[space].label}>{'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {obj[space].label}</span>
+              spaceList.push({ value: obj[space].label, label: spaceLabel, parentId: obj[space].parent_id, spaceId: obj[space].workspace_id })
+              if (Object.keys(obj[space].children).length !== 0) addChildrenToList(level + 1, obj[space].children)
+            }
+          }
+
+          createSpaceArborescence(fetchGetUserSpaces.body).forEach(space => {
+            const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
+            const spaceLabel = <span title={space.label}><i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
+            spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
+            // if (Object.keys(space.children).length !== 0) addChildrenToList(1, space.children, spaceList)
+          })
 
           this.setState({ parentOptions: spaceList, isFirstStep: false })
           break
