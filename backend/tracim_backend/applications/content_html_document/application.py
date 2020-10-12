@@ -1,8 +1,8 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.mention import DescriptionMentionParser
 from tracim_backend.lib.core.mention import MentionBuilder
@@ -55,5 +55,5 @@ def create_app() -> TracimApplication:
         slug="contents/{}".format(HTML_DOCUMENTS_TYPE),
         fa_icon="file-text-o",
         config={},
-        main_route="/ui/workspaces/{workspace_id}/contents?type=" + HTML_DOCUMENTS_TYPE,
+        main_route="",
     )

@@ -80,7 +80,7 @@ class TracimApplication(ABC):
         :param fa_icon: font-awesome icon associated to the application, ex: paperclip
         :param config: specific config of the app.
         :param main_route: route used in app sidebar entry, allow "workspace_id" as variable, ex:
-         "/ui/workspaces/{workspace_id}/contents?type=file",
+         "/ui/workspaces/{workspace_id}/agenda",
         """
         self.label = label
         self.slug = slug

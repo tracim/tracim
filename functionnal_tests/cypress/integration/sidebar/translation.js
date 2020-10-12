@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-describe('content :: home_page', function () {
+describe('The sidebar', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
