@@ -112,7 +112,7 @@ def get_content_resource(
 
 class WebdavContainer(ABC):
     """
-    A Webdav Container should implement theses methods.
+    A Webdav Container should implement these methods.
     """
 
     @abstractmethod
