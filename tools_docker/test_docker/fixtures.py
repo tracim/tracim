@@ -9,14 +9,14 @@ import testinfra
 
 
 test_config_value = dotenv_values(os.path.dirname(os.path.realpath(__file__))+'/test_config.env')
-STOP_DOCKER_AT_END = strtobool(test_config_value['STOP_DOCKER_AT_END'])
+STOP_CONTAINER_AT_THE_END = strtobool(test_config_value['STOP_CONTAINER_AT_THE_END'])
 DOCKER_TRACIM_IMAGE = test_config_value['DOCKER_TRACIM_IMAGE']
 DOCKER_ELASTICSEARCH_IMAGE =  test_config_value['DOCKER_ELASTICSEARCH_IMAGE']
 DOCKER_COLLABORA_IMAGE = test_config_value['DOCKER_COLLABORA_IMAGE']
 DOCKER_TEST_NETWORK = test_config_value['DOCKER_TEST_NETWORK']
-SLEEP_AFTER_START_TRACIM_DOCKER = int(test_config_value['SLEEP_AFTER_START_TRACIM_DOCKER'])
-SLEEP_AFTER_START_ELASTICSEARCH_DOCKER = int(test_config_value['SLEEP_AFTER_START_ELASTICSEARCH_DOCKER'])
-SLEEP_AFTER_START_COLLABORA_DOCKER = int(test_config_value['SLEEP_AFTER_START_COLLABORA_DOCKER'])
+SLEEP_AFTER_START_TRACIM_CONTAINER = int(test_config_value['SLEEP_AFTER_START_TRACIM_CONTAINER'])
+SLEEP_AFTER_START_ELASTICSEARCH_CONTAINER = int(test_config_value['SLEEP_AFTER_START_ELASTICSEARCH_CONTAINER'])
+SLEEP_AFTER_START_COLLABORA_CONTAINER = int(test_config_value['SLEEP_AFTER_START_COLLABORA_CONTAINER'])
 TRACIM_DOMAIN_NAME = test_config_value['TRACIM_DOMAIN_NAME']
 TRACIM_ETC_FOLDER = test_config_value['TRACIM_ETC_FOLDER']
 TRACIM_VAR_FOLDER = test_config_value['TRACIM_VAR_FOLDER']
@@ -63,10 +63,10 @@ def tracim(request, tracim_docker_params, elasticsearch, collabora):
     # run a container
     docker_id = subprocess.check_output(tracim_docker_params).decode().strip()
     # return a testinfra connection to the container
-    sleep(SLEEP_AFTER_START_TRACIM_DOCKER)
+    sleep(SLEEP_AFTER_START_TRACIM_CONTAINER)
     yield testinfra.get_host("docker://" + docker_id)
     # at the end of the test suite, destroy the container
-    if STOP_DOCKER_AT_END:
+    if STOP_CONTAINER_AT_THE_END:
         subprocess.check_call(['docker', 'rm', '-f', docker_id])
 
 @pytest.fixture(scope='session')
@@ -88,10 +88,10 @@ def elasticsearch(request):
 
     ).decode().strip()
     # return a testinfra connection to the container
-    sleep(SLEEP_AFTER_START_ELASTICSEARCH_DOCKER)
+    sleep(SLEEP_AFTER_START_ELASTICSEARCH_CONTAINER)
     yield testinfra.get_host("docker://" + docker_id)
     # at the end of the test suite, destroy the container
-    if STOP_DOCKER_AT_END:
+    if STOP_CONTAINER_AT_THE_END:
         subprocess.check_call(['docker', 'rm', '-f', docker_id])
 
 
@@ -117,8 +117,8 @@ def collabora(request):
 
     ).decode().strip()
     # return a testinfra connection to the container
-    sleep(SLEEP_AFTER_START_COLLABORA_DOCKER)
+    sleep(SLEEP_AFTER_START_COLLABORA_CONTAINER)
     yield testinfra.get_host("docker://" + docker_id)
     # at the end of the test suite, destroy the container
-    if STOP_DOCKER_AT_END:
+    if STOP_CONTAINER_AT_THE_END:
         subprocess.check_call(['docker', 'rm', '-f', docker_id])

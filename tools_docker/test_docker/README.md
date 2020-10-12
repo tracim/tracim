@@ -9,11 +9,12 @@ for emails and you need to setup dns resolving using a special Docker image)
 
 ## Prerequisities
 
-- pip install pytest testinfra python-dotenv
-- build tracim docker image "DOCKER_TRACIM_IMAGE" (see test_config.env)
-- build elasticsearch docker image "DOCKER_ELASTICSEARCH_IMAGE"
-- cp tracim.sample.env tracim.env
-- cp test_config.sample.env test_config.env
+- install some python packages:
+`pip install pytest testinfra python-dotenv`
+- build tracim docker image `DOCKER_TRACIM_IMAGE` (see test_config.env)
+- build elasticsearch docker image `DOCKER_ELASTICSEARCH_IMAGE`
+- create tracim env config file from sample:`cp tracim.sample.env tracim.env`
+- create docker test config file from sample: `cp test_config.sample.env test_config.env`
 
 for hostname resolving from host, use:
 
@@ -27,7 +28,9 @@ defreitas/dns-proxy-server
 
 Tests can now be started:
 
+```sh
 pytest test_docker
+```
 
 It will check in the Docker container if all the Tracim services are correctly running after launching the Tracim, Collabora and ElasticSearch Docker containers
 
