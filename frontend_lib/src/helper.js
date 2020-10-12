@@ -533,5 +533,17 @@ export const permissiveNumberEqual = (var1, var2) => {
 }
 
 export const createSpaceArborescence = spaceList => {
-
+  // let newSpacesObject = { children: { } }
+  let newSpaceList = []
+  spaceList = spaceList.map(space => space.children ? space : { ...space, children: { } })
+  spaceList.forEach(space => {
+    if (space.parent_id === null) {
+      newSpaceList.push(space) // newSpacesObject.children[Object.keys(newSpacesObject.children).length + 1] = space
+    } else {
+      const parentSpaceIndex = spaceList.findIndex(parentSpace => parentSpace.workspace_id === space.parent_id)
+      if (parentSpaceIndex === -1) newSpaceList.push(space) // newSpacesObject.children[Object.keys(newSpacesObject.children).length + 1] = space
+      else spaceList[parentSpaceIndex].children[Object.keys(spaceList[parentSpaceIndex].children).length + 1] = space
+    }
+  })
+  return newSpaceList //newSpacesObject
 }

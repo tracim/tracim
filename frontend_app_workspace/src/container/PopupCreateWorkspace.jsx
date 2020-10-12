@@ -4,6 +4,7 @@ import Select from 'react-select'
 import {
   addAllResourceI18n,
   CardPopup,
+  createSpaceArborescence,
   CUSTOM_EVENT,
   SingleChoiceList,
   handleFetchResult,
@@ -115,7 +116,7 @@ export class PopupCreateWorkspace extends React.Component {
 
       switch (fetchGetUserSpaces.apiResponse.status) {
         case 200: {
-          let spaceList = fetchGetUserSpaces.body
+          let spaceList = createSpaceArborescence(fetchGetUserSpaces.body)
           /* FIXME - GB - 2020-10-08 - The code below is commented until we choose between keep it or delete it (filter of parent type according chosen type)
           if (state.newType === SPACE_TYPE.confidential.slug) {
             spaceList = spaceList.filter(space => space.access_type === SPACE_TYPE.confidential.slug)
@@ -245,27 +246,29 @@ export class PopupCreateWorkspace extends React.Component {
                   </div>
                 )}
 
-                <div className='newSpace__label'> {props.t('Default role:')} </div>
-                <button
-                  type='button'
-                  className='btn transparentButton newSpace__label__info'
-                  id='popoverDefaultRoleInfo'
-                >
-                  <i className='fa fa-fw fa-question-circle' />
-                </button>
+                <div className='newSpace__label'>
+                  {props.t('Default role:')}
+                  <button
+                    type='button'
+                    className='btn transparentButton newSpace__label__info'
+                    id='popoverDefaultRoleInfo'
+                  >
+                    <i className='fa fa-fw fa-question-circle' />
+                  </button>
 
-                <Popover
-                  placement='bottom'
-                  isOpen={state.popoverDefaultRoleInfoOpen}
-                  target='popoverDefaultRoleInfo'
-                  // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                  toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                  trigger={isMobile ? 'focus' : 'hover'}
-                >
-                  <PopoverBody>
-                    {props.t('This is the role that members will have by default when they join your space.')}
-                  </PopoverBody>
-                </Popover>
+                  <Popover
+                    placement='bottom'
+                    isOpen={state.popoverDefaultRoleInfoOpen}
+                    target='popoverDefaultRoleInfo'
+                    // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                    toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
+                    trigger={isMobile ? 'focus' : 'hover'}
+                  >
+                    <PopoverBody>
+                      {props.t('This is the role that members will have by default when they join your space.')}
+                    </PopoverBody>
+                  </Popover>
+                </div>
 
                 <SingleChoiceList
                   list={ROLE_LIST}
