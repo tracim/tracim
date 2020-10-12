@@ -512,7 +512,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
 
 class RootResource(DAVCollection):
     """
-    RootResource ressource that represents tracim's home, which contains all workspaces without
+    RootResource resource that represents Tracim's home, which contains all workspaces without
     any parents or user's orphan workspaces
     Direct children can only be workspaces.
     """
