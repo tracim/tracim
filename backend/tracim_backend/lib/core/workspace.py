@@ -342,7 +342,7 @@ class WorkspaceApi(object):
         return query.all()
 
     def get_user_orphan_workspaces(self, user: User):
-        """Get all user workspace where user is not member of the parent and parent does exist"""
+        """Get all user workspaces where the users is not member of the parent and parent exists"""
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
