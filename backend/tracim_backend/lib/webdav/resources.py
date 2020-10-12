@@ -90,7 +90,7 @@ def get_content_resource(
     tracim_context: "WebdavTracimContext",
 ) -> _DAVResource:
     """
-    Helper to get correct content webdav resource according to content type
+    Helper to get the correct content WebDAV resource according to the content type
     """
     if content.type == content_type_list.Folder.slug:
         return FolderResource(
