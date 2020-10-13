@@ -118,21 +118,16 @@ export class PopupCreateWorkspace extends React.Component {
         case 200: {
           const spaceList = [{ value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }] // INFO - GB - 2020-10-07 - Root
 
-          const addChildrenToList = (level, obj) => {
-            for (const space in obj) {
-              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === obj[space].access_type)
-              const spaceLabel = <span title={obj[space].label}>{'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {obj[space].label}</span>
-              spaceList.push({ value: obj[space].label, label: spaceLabel, parentId: obj[space].parent_id, spaceId: obj[space].workspace_id })
-              if (Object.keys(obj[space].children).length !== 0) addChildrenToList(level + 1, obj[space].children)
-            }
+          const addSpacesToList = (level, initialList) => {
+            initialList.forEach(space => {
+              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
+              const spaceLabel = <span title={space.label}>{'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
+              spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
+              if (space.children.length !== 0) addSpacesToList(level + 1, space.children)
+            })
           }
 
-          createSpaceArborescence(fetchGetUserSpaces.body).forEach(space => {
-            const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
-            const spaceLabel = <span title={space.label}><i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
-            spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
-            // if (Object.keys(space.children).length !== 0) addChildrenToList(1, space.children, spaceList)
-          })
+          addSpacesToList(0, createSpaceArborescence(fetchGetUserSpaces.body))
 
           this.setState({ parentOptions: spaceList, isFirstStep: false })
           break
