@@ -27,7 +27,7 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import TracimSession
 
 
-class ResourceLevelType(enum.Enum):
+class ResourceType(enum.Enum):
     ROOT = "root"
     WORKSPACE = "workspace"
     CONTENT = "content"
@@ -116,22 +116,22 @@ class ProcessedWebdavPath(object):
             return None
 
     @property
-    def current_path_level(self) -> typing.Optional[ResourceLevelType]:
+    def current_path_resource_type(self) -> typing.Optional[ResourceType]:
         """
-        return the level type of the current path:
-        - return ResourceLevelType.ROOT is path is root path
-        - return ResourceLevelType.WORKSPACE if path is at workspace level (can be direct
+        return the resource type of the current path:
+        - return ResourceType.ROOT is path is root path
+        - return ResourceType.WORKSPACE if path is at workspace "level" (can be direct
         workspace root or subworkspace root)
-        - return ResourceLevelType.CONTENT if path is at content level (can be direct content at workspace
+        - return ResourceType.CONTENT if path is at content "level" (can be direct content at workspace
         root or content within directory hierarchy)
         - Return None if path is not valid
         """
         if self.path == "/":
-            return ResourceLevelType.ROOT
+            return ResourceType.ROOT
         if self.contents == [] and self.current_workspace:
-            return ResourceLevelType.WORKSPACE
+            return ResourceType.WORKSPACE
         if self.current_content:
-            return ResourceLevelType.CONTENT
+            return ResourceType.CONTENT
         return None
 
 
@@ -251,11 +251,11 @@ class TracimDavProvider(DAVProvider):
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        current_path_level = tracim_context.processed_path.current_path_level
+        current_path_resource_type = tracim_context.processed_path.current_path_resource_type
         # root
-        if current_path_level == ResourceLevelType.ROOT:
+        if current_path_resource_type == ResourceType.ROOT:
             return resources.RootResource(path=path, environ=environ, tracim_context=tracim_context)
-        if current_path_level == ResourceLevelType.WORKSPACE:
+        if current_path_resource_type == ResourceType.WORKSPACE:
             workspace = tracim_context.current_workspace
             return get_workspace_resource(
                 path=path,
@@ -264,7 +264,7 @@ class TracimDavProvider(DAVProvider):
                 tracim_context=tracim_context,
                 label=workspace.filemanager_filename,
             )
-        if current_path_level == ResourceLevelType.CONTENT:
+        if current_path_resource_type == ResourceType.CONTENT:
             content = tracim_context.current_content
             return get_content_resource(
                 path=path,
@@ -282,5 +282,5 @@ class TracimDavProvider(DAVProvider):
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        current_path_level = tracim_context.processed_path.current_path_level
-        return current_path_level is not None
+        current_path_resource_type = tracim_context.processed_path.current_path_resource_type
+        return current_path_resource_type is not None
