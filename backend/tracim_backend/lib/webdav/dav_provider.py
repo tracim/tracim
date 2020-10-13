@@ -1,5 +1,4 @@
 # coding: utf8
-from collections import deque
 import enum
 import typing
 
@@ -49,8 +48,8 @@ class ProcessedWebdavPath(object):
         )
         self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
 
-        self.workspaces = deque()
-        self.contents = deque()
+        self.workspaces = []
+        self.contents = []
         path_parts = self._path_splitter(self.path)
         if len(path_parts) >= 1:
             root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[0])
@@ -129,7 +128,7 @@ class ProcessedWebdavPath(object):
         """
         if self.path == "/":
             return ResourceLevelType.ROOT
-        if self.contents == deque() and self.current_workspace:
+        if self.contents == [] and self.current_workspace:
             return ResourceLevelType.WORKSPACE
         if self.current_content:
             return ResourceLevelType.CONTENT
