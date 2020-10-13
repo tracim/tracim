@@ -225,8 +225,6 @@ class WorkspaceApi(object):
         get workspace according to label given, if multiple workspace have
         same label, return first one found.
         """
-        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
-        # to unsure working
         if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
             raise WorkspaceNotFound(
                 'Invalid Workspace name. Filemanager_filename should end with "{}"'.format(
@@ -322,7 +320,6 @@ class WorkspaceApi(object):
         :param include_with_role: include workspace where user has a role
         :return: list of workspaces found
         """
-
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)

@@ -5,6 +5,7 @@ import typing
 
 from pluggy import PluginManager
 from wsgidav.dav_provider import DAVProvider
+from wsgidav.dav_provider import _DAVResource
 from wsgidav.lock_manager import LockManager
 
 from tracim_backend.config import CFG
@@ -148,17 +149,13 @@ class WebdavTracimContext(TracimContext):
         self.processed_path = None
         self.processed_destpath = None
 
-    def set_path(self, path: str):
+    def set_path(self, path: str) -> None:
         self.processed_path = ProcessedWebdavPath(
             path=path,
             current_user=self.current_user,
             session=self.dbsession,
             app_config=self.app_config,
         )
-
-    @property
-    def root_path(self) -> str:
-        return self.environ["http_authenticator.realm"]
 
     @property
     def dbsession(self) -> TracimSession:
@@ -178,7 +175,7 @@ class WebdavTracimContext(TracimContext):
         return self._plugin_manager
 
     @property
-    def current_user(self):
+    def current_user(self) -> User:
         """
         Current authenticated user if exist
         """
@@ -186,7 +183,7 @@ class WebdavTracimContext(TracimContext):
             self.set_user(self._get_user(self._get_current_webdav_username))
         return self._current_user
 
-    def _get_user(self, get_webdav_username: typing.Callable):
+    def _get_user(self, get_webdav_username: typing.Callable) -> User:
         login = get_webdav_username()
         uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
         return uapi.get_one_by_login(login)
@@ -197,7 +194,7 @@ class WebdavTracimContext(TracimContext):
         return self.environ["http_authenticator.username"]
 
     @property
-    def current_workspace(self):
+    def current_workspace(self) -> typing.Optional[Workspace]:
         """
         Workspace of current ressources used if exist, for example,
         if you are editing content 21 in workspace 3,
@@ -206,14 +203,14 @@ class WebdavTracimContext(TracimContext):
         return self.processed_path.current_workspace
 
     @property
-    def current_content(self):
+    def current_content(self) -> typing.Optional[Content]:
         """
         Current content if exist, if you are editing content 21, current content
         will be content 21.
         """
         return self.processed_path.current_content
 
-    def set_destpath(self, destpath: str):
+    def set_destpath(self, destpath: str) -> None:
         self.processed_destpath = ProcessedWebdavPath(
             path=destpath,
             current_user=self.current_user,
@@ -226,7 +223,7 @@ class WebdavTracimContext(TracimContext):
         return self.processed_destpath.current_parent_content
 
     @property
-    def candidate_workspace(self) -> Workspace:
+    def candidate_workspace(self) -> typing.Optional[Workspace]:
         return self.processed_destpath.current_workspace
 
 
@@ -248,7 +245,7 @@ class TracimDavProvider(DAVProvider):
 
     #########################################################
     # Everything override from DAVProvider
-    def getResourceInst(self, path: str, environ: dict):
+    def getResourceInst(self, path: str, environ: dict) -> typing.Optional[_DAVResource]:
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """

@@ -124,7 +124,7 @@ class WebdavContainer(ABC):
         pass
 
     @abstractmethod
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         pass
 
     @abstractmethod
