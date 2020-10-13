@@ -19,7 +19,7 @@ export class NewShareDownload extends React.Component {
     }
   }
 
-  popoverMultipleEmailsToggle = () => {
+  togglePopoverMultipleEmails = () => {
     this.setState(prevState => ({
       popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
     }))
@@ -77,7 +77,7 @@ export class NewShareDownload extends React.Component {
             placement='bottom'
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
-            toggle={this.popoverMultipleEmailsToggle}
+            toggle={this.togglePopoverMultipleEmails}
             trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
