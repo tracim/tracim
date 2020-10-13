@@ -51,6 +51,11 @@ class ProcessedWebdavPath(object):
         self.workspaces = []
         self.contents = []
         path_parts = self._path_splitter(self.path)
+        # TODO - G.M - 2020-10-09 - Find a proper way to refactor this code to make easier to
+        # understood. This code is a bit confusing because:
+        # - distinction between invalid path, proper destination path (for move) and root is not so
+        # clear.
+        # - We do add None value into both self.contents and self.workspaces list.
         if len(path_parts) >= 1:
             root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[0])
             try:
