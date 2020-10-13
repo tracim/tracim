@@ -533,7 +533,7 @@ export const permissiveNumberEqual = (var1, var2) => {
 }
 
 export const createSpaceArborescence = spaceList => {
-  const spaceListWithChildren = spaceList.map(space => space.children ? space : { ...space, children: [] })
+  const spaceListWithChildren = spaceList.map(space => space.children ? { ...space } : { ...space, children: [] })
   const spaceById = {}
   const newSpaceList = []
   for (const space of spaceListWithChildren) {
