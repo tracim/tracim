@@ -2,7 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
-  createSpaceArborescence,
+  createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -172,7 +172,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export {
   appContentFactory,
   addRevisionFromTLM,
-  createSpaceArborescence,
+  createSpaceTree,
   DropdownMenu,
   TracimComponent,
   addAllResourceI18n,

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import {
-  createSpaceArborescence,
+  createSpaceTree,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
@@ -375,30 +375,30 @@ describe('helper.js', () => {
     }
   })
 
-  describe('createSpaceArborescence', () => {
+  describe('createSpaceTree', () => {
     it('should return a empty array if spaceList is empty', () => {
-      expect(createSpaceArborescence([])).to.be.deep.equal([])
+      expect(createSpaceTree([])).to.be.deep.equal([])
     })
 
     it('should return a the same array if spaceList is an array with only one element that already has children', () => {
       const array = [{ children: [{ label: 'a' }, { label: 'b' }] }]
-      expect(createSpaceArborescence(array)).to.be.deep.equal(array)
+      expect(createSpaceTree(array)).to.be.deep.equal(array)
     })
 
     it('should return a the array added by a children prop if spaceList is an array with only one element', () => {
-      expect(createSpaceArborescence([{ label: 'a' }])).to.be.deep.equal([{ label: 'a', children: [] }])
+      expect(createSpaceTree([{ label: 'a' }])).to.be.deep.equal([{ label: 'a', children: [] }])
     })
 
     it('should return a array the respective arborescence given for spaceList', () => {
       const intialArray = [{ workspace_id: 1 }, { parent_id: 1 }]
       const finalArray = [{ workspace_id: 1, children: [{ parent_id: 1, children: [] }] }]
-      expect(createSpaceArborescence(intialArray)).to.be.deep.equal(finalArray)
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
     })
 
     it('should return a array the respective arborescence given for spaceList even if the parent already has children', () => {
       const intialArray = [{ workspace_id: 1, children: [{ label: 'a' }] }, { parent_id: 1 }]
       const finalArray = [{ workspace_id: 1, children: [{ label: 'a' }, { parent_id: 1, children: [] }] }]
-      expect(createSpaceArborescence(intialArray)).to.be.deep.equal(finalArray)
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
     })
 
     it('should return a array the respective arborescence given for spaceList even if its bigger than 2 levels', () => {
@@ -418,7 +418,7 @@ describe('helper.js', () => {
           ]
         }
       ]
-      expect(createSpaceArborescence(intialArray)).to.be.deep.equal(finalArray)
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
     })
 
     it('should return a array the respective arborescence given for spaceList even if it has more than one child', () => {
@@ -431,7 +431,7 @@ describe('helper.js', () => {
           ]
         }
       ]
-      expect(createSpaceArborescence(intialArray)).to.be.deep.equal(finalArray)
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
     })
   })
 })

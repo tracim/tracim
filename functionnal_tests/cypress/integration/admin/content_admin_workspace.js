@@ -43,7 +43,8 @@ describe('content :: admin > workspace', function () {
     cy.get('.singleChoiceList__item__text__content__description').first().click()
     cy.get('.newSpace__button .btn').click()
 
-    cy.get('.singleChoiceList__item__text__content__description').first().click()
+    cy.get('div.newSpace__input').should('be.visible')
+    cy.get('.singleChoiceList__item__text__icon').first().should('be.visible').click()
     cy.contains('.newSpace__button .btn', 'Create').should('not.be.disabled').click()
 
     cy.location('pathname').should('be.equal', '/ui/workspaces/2/dashboard')

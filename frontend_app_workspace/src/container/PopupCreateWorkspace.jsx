@@ -4,7 +4,7 @@ import Select from 'react-select'
 import {
   addAllResourceI18n,
   CardPopup,
-  createSpaceArborescence,
+  createSpaceTree,
   CUSTOM_EVENT,
   SingleChoiceList,
   handleFetchResult,
@@ -126,7 +126,7 @@ export class PopupCreateWorkspace extends React.Component {
             })
           }
 
-          addSpacesToList(0, createSpaceArborescence(fetchGetUserSpaces.body))
+          addSpacesToList(0, createSpaceTree(fetchGetUserSpaces.body))
 
           this.setState({ parentOptions: spaceList, isFirstStep: false })
           break
