@@ -1,6 +1,5 @@
 import React from 'react'
 import i18n from './i18n.js'
-import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,

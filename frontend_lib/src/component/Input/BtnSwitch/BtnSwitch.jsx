@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 export const BtnSwitch = props =>
   <div
-    className={classnames('btnswitch', { 'disabled': props.disabled })}
+    className={classnames('btnswitch', { disabled: props.disabled })}
     title={props.checked ? props.activeLabel : props.inactiveLabel}
   >
     <label

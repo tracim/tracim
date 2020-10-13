@@ -270,14 +270,14 @@ export const getOrCreateSessionClientToken = () => {
 }
 
 export const COMMON_REQUEST_HEADERS = {
-  'Accept': 'application/json',
+  Accept: 'application/json',
   'X-Tracim-ClientToken': getOrCreateSessionClientToken()
 }
 
 export const FETCH_CONFIG = {
   headers: {
     ...COMMON_REQUEST_HEADERS,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 
