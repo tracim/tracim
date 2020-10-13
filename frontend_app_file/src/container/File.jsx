@@ -36,24 +36,25 @@ import {
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
-  sortTimelineByDate,
   addRevisionFromTLM,
   RefreshWarningMessage,
   setupCommonRequestHeaders,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber
+  getCurrentContentVersionNumber,
+  getContentComment,
+  getFileContent,
+  getFileRevision,
+  putFileContent,
+  putMyselfFileRead,
+  putUserConfiguration,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
-  getFileContent,
-  getFileComment,
-  getFileRevision,
   getShareLinksList,
-  postShareLinksList,
-  putFileContent,
-  putMyselfFileRead
+  postShareLinksList
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
@@ -184,23 +185,17 @@ export class File extends React.Component {
     }
   }
 
-  handleContentCommentCreated = (data) => {
-    if (data.fields.content.parent_id === this.state.content.content_id) {
-      const sortedNewTimeLine = sortTimelineByDate([
-        ...this.state.timeline,
-        {
-          ...data.fields.content,
-          created_raw: data.fields.content.created,
-          created: displayDistanceDate(data.fields.content.created, this.state.loggedUser.lang),
-          timelineType: data.fields.content.content_type,
-          hasBeenRead: data.fields.client_token === this.sessionClientToken
-        }
-      ])
-      this.setState({
-        timeline: sortedNewTimeLine,
-        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-      })
-    }
+  handleContentCommentCreated = (tlm) => {
+    const { props, state } = this
+    // Not a comment for our content
+    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    this.setState({
+      timeline: newTimeline,
+      isLastTimelineItemCurrentToken: createdByLoggedUser
+    })
   }
 
   handleContentDeletedOrRestored = data => {
@@ -265,8 +260,7 @@ export class File extends React.Component {
       }
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
@@ -334,7 +328,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const [resComment, resRevision] = await Promise.all([
-      handleFetchResult(await getFileComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 
@@ -344,7 +338,7 @@ export class File extends React.Component {
       return
     }
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -409,7 +403,16 @@ export class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: break
+      case 200: {
+        const newConfiguration = state.loggedUser.config
+        newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
+
+        this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, config: newConfiguration } }))
+
+        const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
+        if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
+        break
+      }
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -437,9 +440,16 @@ export class File extends React.Component {
   handleClickValidateNewCommentBtn = () => {
     const { props, state } = this
     try {
-      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+      props.appContentSaveNewComment(
+        state.content,
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        state.config.slug,
+        state.loggedUser.username
+      )
     } catch (e) {
-        this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
@@ -558,23 +568,32 @@ export class File extends React.Component {
     setupCommonRequestHeaders(xhr)
     xhr.withCredentials = true
 
-    xhr.onreadystatechange = () => {
+    xhr.onreadystatechange = async () => {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
-          case 204:
-            this.setState({
+          case 204: {
+            const newConfiguration = state.loggedUser.config
+            newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
+
+            this.setState(prev => ({
+              ...prev,
               newFile: '',
               newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
               fileCurrentPage: 1,
-              mode: APP_FEATURE_MODE.VIEW
-            })
+              mode: APP_FEATURE_MODE.VIEW,
+              loggedUser: { ...prev.loggedUser, config: newConfiguration }
+            }))
+
+            const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
+            if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
             break
+          }
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
               case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
               case 6004: this.sendGlobalFlashMessage(props.t('You have reach your storage limit, you cannot add new files')); break
               default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
@@ -791,6 +810,8 @@ export class File extends React.Component {
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
+          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
         />
       )
     }
@@ -848,6 +869,65 @@ export class File extends React.Component {
     } else {
       return [timelineObject, propertiesObject]
     }
+  }
+
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
+  }
+
+  handleCloseNotifyAllMessage = async () => {
+    const { state, props } = this
+    const newConfiguration = state.loggedUser.config
+
+    newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = false
+    this.setState(prev => ({
+      ...prev,
+      loggedUser: {
+        ...prev.loggedUser,
+        config: newConfiguration
+      }
+    }))
+
+    const fetchPutUserConfiguration = await handleFetchResult(
+      await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
+    )
+    if (fetchPutUserConfiguration.status !== 204) {
+      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+    }
+  }
+
+  handleClickNotifyAll = async () => {
+    const { state, props } = this
+
+    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    this.handleCloseNotifyAllMessage()
+  }
+
+  shouldDisplayNotifyAllMessage = () => {
+    const { state } = this
+    if (
+      !state.loggedUser.config ||
+      state.content.current_revision_type === 'creation' ||
+      (
+        state.newContent.last_modifier &&
+        state.newContent.last_modifier.user_id !== state.loggedUser.userId
+      ) ||
+      (
+        !state.newContent.last_modifier &&
+        state.content.last_modifier &&
+        state.content.last_modifier.user_id !== state.loggedUser.userId
+      )
+    ) return false
+
+    return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
   render () {
@@ -997,6 +1077,9 @@ export class File extends React.Component {
             previewVideo={state.previewVideo}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
+            displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
+            onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
+            onClickNotifyAll={this.handleClickNotifyAll}
           />
 
           <PopinFixedRightPart

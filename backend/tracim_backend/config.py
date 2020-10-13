@@ -27,6 +27,7 @@ from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import WorkspaceAccessType
 
 ENV_VAR_PREFIX = "TRACIM_"
 CONFIG_LOG_TEMPLATE = (
@@ -227,25 +228,6 @@ class CFG(object):
             "gallery"
         )
         extend_apps = ""
-        # TODO - G.M - 2020-01-09 - remove this retrocompat code, as
-        #  CALDAV__ENABLED and COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
-        # should be deprecated.
-        self.CALDAV__ENABLED = asbool(
-            self.get_raw_config(
-                "caldav.enabled",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
-        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
-            self.get_raw_config(
-                "collaborative_document_edition.activated",
-                "False",
-                deprecated=True,
-                deprecated_extended_information="It will not be taken into account.",
-            )
-        )
         default_enabled_app = default_enabled_app.format(extend_apps=extend_apps)
         self.APP__ENABLED = string_to_unique_item_list(
             self.get_raw_config("app.enabled", default_enabled_app),
@@ -375,6 +357,10 @@ class CFG(object):
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
+            "web.notifications.excluded",
+            "user.created,user.modified,user.deleted,user.undeleted,workspace.modified,workspace.deleted,workspace.undeleted,workspace_member.modified,content.modified",
+        )
 
         # base url of the frontend
         self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
@@ -403,21 +389,20 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = "900"
-        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config(
-            "user.reset_password.validity",
-            deprecated=True,
-            deprecated_extended_information="please use USER__RESET_PASSWORD__TOKEN_LIFETIME instead",
-        )
-        if self.USER__RESET_PASSWORD__VALIDITY:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
-        else:
-            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
-                self.get_raw_config(
-                    "user.reset_password.token_lifetime", defaut_reset_password_validity
-                )
+
+        self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(
+            self.get_raw_config(
+                "user.reset_password.token_lifetime", defaut_reset_password_validity
             )
+        )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
 
+        self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
+            self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
+            separator=",",
+            cast_func=WorkspaceAccessType,
+            do_strip=True,
+        )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(
@@ -516,11 +501,6 @@ class CFG(object):
         ]
 
         self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
-        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config(
-            "email.notification.from",
-            deprecated=True,
-            deprecated_extended_information="use instead EMAIL__NOTIFICATION__FROM__EMAIL and EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL",
-        )
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"
@@ -658,9 +638,6 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.WEBDAV_SHOW_DELETED = False
-        self.WEBDAV_SHOW_ARCHIVED = False
-        self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
 
     def _load_ldap_config(self) -> None:

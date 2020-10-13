@@ -35,7 +35,7 @@ future==0.18.2            # via ffmpeg-python
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.2          # via tracim_backend (setup.py)
 gripcontrol==4.0.0        # via tracim_backend (setup.py)
-hapic[marshmallow]==0.83  # via tracim_backend (setup.py)
+hapic[marshmallow]==0.84  # via tracim_backend (setup.py)
 html2text==2020.1.16      # via tracim_backend (setup.py)
 humanize==0.5.1           # via tracim_backend (setup.py)
 hupper==1.4.2             # via pyramid

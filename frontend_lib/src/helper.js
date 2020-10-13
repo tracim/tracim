@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
@@ -122,11 +122,11 @@ const WORKSPACE_MANAGER = {
   faIcon: 'gavel',
   hexcolor: '#ed0007',
   tradKey: [
-    i18n.t('Shared space manager'),
-    i18n.t('Content manager + add members and edit shared spaces')
+    i18n.t('Space manager'),
+    i18n.t('Content manager + add members and edit spaces')
   ], // trad key allow the parser to generate an entry in the json file
-  label: 'Shared space manager', // label must be used in components
-  description: 'Content manager + add members and edit shared spaces'
+  label: 'Space manager', // label must be used in components
+  description: 'Content manager + add members and edit spaces'
 }
 const CONTENT_MANAGER = {
   id: 4,
@@ -191,10 +191,10 @@ const MANAGER = {
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Trusted user'),
-    i18n.t('User + create shared spaces, add members in shared spaces')
+    i18n.t('User + create spaces, add members in spaces')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'Trusted user', // label must be used in components
-  description: 'User + create shared spaces, add members in shared spaces'
+  description: 'User + create spaces, add members in spaces'
 }
 const USER = {
   id: 1,
@@ -203,10 +203,10 @@ const USER = {
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
-    i18n.t('Access to shared spaces where user is member')
+    i18n.t('Access to spaces where user is member')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'User', // label must be used in components
-  description: 'Access to shared spaces where user is member'
+  description: 'Access to spaces where user is member'
 }
 export const PROFILE = {
   administrator: ADMINISTRATOR,
@@ -219,6 +219,27 @@ export const APP_FEATURE_MODE = {
   VIEW: 'view',
   EDIT: 'edit',
   REVISION: 'revision'
+}
+
+export const updateTLMAuthor = author => {
+  return author
+    ? { ...author, is_from_system_admin: false }
+    : {
+      allowed_space: 0,
+      auth_type: 'internal',
+      avatar_url: null,
+      created: '',
+      email: '',
+      is_active: true,
+      is_deleted: false,
+      is_from_system_admin: true,
+      lang: 'en',
+      profile: 'administrators',
+      public_name: i18n.t('System Administrator'),
+      timezone: '',
+      user_id: 0,
+      username: ''
+    }
 }
 
 // INFO - GB - 2019-07-05 - This password generator function was based on
@@ -393,74 +414,12 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
   return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
 }
 
-export const wrapMentionsInSpanTags = (text) => {
-  try {
-    const mentionRegex = /(^|\s)@([a-zA-Z0-9\-_]+)($|\s)/
-
-    const parser = new DOMParser()
-    const parsedText = parser.parseFromString(text, 'text/html')
-
-    const depthFirstSearchAndMentionAnalysis = childNodesList => {
-      let childNodesListCopy = [...childNodesList]
-      let i = 0
-
-      childNodesListCopy.forEach((node) => {
-        let value = node.nodeValue
-
-        if (node.nodeName === '#text' && value.includes('@')) {
-          const mentionsInThisNode = value.split(/\s/).filter(token => mentionRegex.test(token))
-
-          if (mentionsInThisNode.length > 0) {
-            let mentionIndex = 0
-            let lastMentionIndex = 0
-            let fragment = document.createDocumentFragment()
-            let htmlTagCounter = 0
-
-            mentionsInThisNode.forEach((mention, i) => {
-              mentionIndex = value.indexOf(mention, lastMentionIndex)
-
-              let mentionWithSpan = document.createElement('span')
-              mentionWithSpan.className = 'mention'
-              mentionWithSpan.id = `mention-${uuidv4()}`
-              mentionWithSpan.textContent = mention
-
-              if (mentionIndex !== 0) {
-                htmlTagCounter++
-                fragment.appendChild(document.createTextNode(value.substring(lastMentionIndex, mentionIndex)))
-              }
-
-              fragment.appendChild(mentionWithSpan)
-              htmlTagCounter++
-
-              if (mentionsInThisNode.length - 1 === i) {
-                htmlTagCounter++
-                fragment.appendChild(document.createTextNode(value.substring(mentionIndex + mention.length)))
-              }
-
-              lastMentionIndex = mentionIndex + mention.length - 1
-            })
-            childNodesList[i].replaceWith(fragment)
-            i = i + htmlTagCounter
-          } else i++
-        } else {
-          if (!(node.nodeName.toLowerCase() === 'span' && node.className === 'mention')) depthFirstSearchAndMentionAnalysis(node.childNodes)
-          i++
-        }
-      })
-    }
-
-    depthFirstSearchAndMentionAnalysis(parsedText.body.childNodes)
-    return parsedText.body.innerHTML
-  } catch (e) {
-    console.error('Error while parsing mention', e)
-    throw new Error(i18n.t('Error while detecting the mentions'))
-  }
-}
-
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
+
+export const NUMBER_RESULTS_BY_PAGE = 15
 
 // Check that the given username is valid.
 // Return an object:
@@ -522,4 +481,13 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     isUsernameValid: true,
     usernameInvalidMsg: ''
   }
+}
+
+export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+
+// Equality test done as numbers with the following rules:
+// - strings are converted to numbers before comparing
+// - undefined and null are converted to 0 before comparing
+export const permissiveNumberEqual = (var1, var2) => {
+  return Number(var1 || 0) === Number(var2 || 0)
 }

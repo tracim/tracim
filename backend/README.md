@@ -40,7 +40,7 @@ For better preview support:
 #### Supported database engines
 
 - SQLite 3.9+
-- PostgreSQL 9.3+
+- PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
 
@@ -64,9 +64,9 @@ Activate it in your terminal session (**all Tracim command execution must be exe
 
     source env/bin/activate
 
-Upgrade packaging tools:
+Install packaging tools:
 
-    pip install --upgrade pip setuptools wheel
+    pip install -r requirements-build.txt
 
 (Optional) Install strict supported version of dependencies with requirement.txt:
 
@@ -74,7 +74,8 @@ Upgrade packaging tools:
 
 Install the project in editable mode with its develop requirements:
 
-    pip install -e ".[dev]"
+    pip install -r requirements-test.txt
+    pip install -e "."
 
 If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
 the default one (SQLite bundled with python), you need to install the python driver for those databases
@@ -85,11 +86,12 @@ specific driver.
 
 For PostgreSQL:
 
-    pip install -e ".[dev,postgresql]"
+    pip install -r requirements-db-postgres.txt
 
 For MySQL/MariaDB:
 
-    pip install -e ".[dev,mysql]"
+    pip install -r requirements-db-mysql.txt
+
 
 Configuration
 ---------------
@@ -360,7 +362,7 @@ Run your project's tests:
 
 Install the required versions:
 
-    pip install -r requirements-static-tests.txt
+    pip install -r requirements-devtool.txt
 
 Run mypy checks:
 

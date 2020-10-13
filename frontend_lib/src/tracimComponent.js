@@ -1,6 +1,6 @@
 import React from 'react'
 import { CUSTOM_EVENT } from './customEvent.js'
-import { buildTracimLiveMessageEventType } from './helper.js'
+import { buildTracimLiveMessageEventType, updateTLMAuthor } from './helper.js'
 
 export function TracimComponent (WrappedComponent) {
   return class TracimComponent extends React.Component {
@@ -40,6 +40,7 @@ export function TracimComponent (WrappedComponent) {
 
     execRegisteredLiveMessageHandler = ({ detail: { type, data } }) => {
       if (Object.prototype.hasOwnProperty.call(this.registeredLiveMessageHandlerList, type)) {
+        data.fields.author = updateTLMAuthor(data.fields.author)
         this.registeredLiveMessageHandlerList[type](data)
       }
     }

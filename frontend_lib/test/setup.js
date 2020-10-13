@@ -21,6 +21,7 @@ if (!global.window && !global.document) {
   })
 
   global.CustomEvent = window.CustomEvent
+  global.Element = window.Element
   global.window = window
   global.document = window.document
   global.navigator = window.navigator

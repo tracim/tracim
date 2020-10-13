@@ -1,18 +1,30 @@
 import abc
 import contextlib
 from datetime import datetime
-import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Generator
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Set
+from typing import Union
 
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
+from sqlalchemy import cast
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
+from sqlalchemy import not_
 from sqlalchemy import null
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import text
+from sqlalchemy.types import String
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -41,12 +53,14 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
@@ -56,10 +70,11 @@ from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 
 RQ_QUEUE_NAME = "event"
 
-JsonDict = typing.Dict[str, typing.Any]
+JsonDict = Dict[str, Any]
 
 
 class EventApi:
@@ -76,20 +91,53 @@ class EventApi:
     }
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
+    workspace_subscription_schema = WorkspaceSubscriptionSchema()
 
-    def __init__(
-        self, current_user: typing.Optional[User], session: TracimSession, config: CFG
-    ) -> None:
+    def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
         self._session = session
         self._config = config
 
+    def _filter_event_types(
+        self, query: Query, event_types: Optional[List[EventTypeDatabaseParameters]], exclude: bool
+    ) -> Query:
+        if event_types:
+            event_type_filters = []
+            for event_type in event_types:
+                if event_type.subtype:
+                    event_type_filter = and_(
+                        Event.entity_type == event_type.entity,
+                        Event.operation == event_type.operation,
+                        Event.entity_subtype == event_type.subtype,
+                    )
+                else:
+                    event_type_filter = and_(
+                        Event.entity_type == event_type.entity,
+                        Event.operation == event_type.operation,
+                    )
+
+                event_type_filters.append(event_type_filter)
+
+            if len(event_type_filters) > 1:
+                f = or_(*event_type_filters)
+            else:
+                f = event_type_filters[0]
+
+            if exclude:
+                f = not_(f)
+
+            return query.filter(f)
+
+        return query
+
     def _base_query(
         self,
         read_status: ReadStatus = ReadStatus.ALL,
-        event_id: typing.Optional[int] = None,
-        user_id: typing.Optional[int] = None,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        event_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        include_event_types: List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        exclude_author_ids: Optional[List[int]] = None,
         after_event_id: int = 0,
     ) -> Query:
         query = self._session.query(Message).join(Event)
@@ -105,23 +153,49 @@ class EventApi:
             # ALL doesn't need any filtering and is the only other handled case
             assert read_status == ReadStatus.ALL
 
-        if event_types:
+        query = self._filter_event_types(query, include_event_types, False)
+        query = self._filter_event_types(query, exclude_event_types, True)
+
+        if exclude_event_types:
             event_type_filters = []
-            for event_type in event_types:
-                event_type_filter = and_(
-                    Event.entity_type == event_type.entity,
-                    Event.operation == event_type.operation,
-                    Event.entity_subtype == event_type.subtype,
-                )
+            for event_type in exclude_event_types:
+                if event_type.subtype:
+                    event_type_filter = or_(
+                        Event.entity_type != event_type.entity,
+                        Event.operation != event_type.operation,
+                        Event.entity_subtype != event_type.subtype,
+                    )
+                else:
+                    event_type_filter = or_(
+                        Event.entity_type != event_type.entity,
+                        Event.operation != event_type.operation,
+                    )
+
                 event_type_filters.append(event_type_filter)
 
             if len(event_type_filters) > 1:
-                query = query.filter(or_(*event_type_filters))
+                query = query.filter(and_(*event_type_filters))
             else:
                 query = query.filter(event_type_filters[0])
 
+        if exclude_author_ids:
+            for author_id in exclude_author_ids:
+                # RJ & SG - 2020-09-11 - HACK
+                # We wanted to use Event.fields["author"] == JSON.NULL instead of this
+                # soup involving a cast and a get out of my way text("'null'") to
+                # know whether a JSON field is null. However, this does not work on
+                # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
+
+                query = query.filter(
+                    or_(
+                        cast(Event.fields["author"], String) == text("'null'"),
+                        Event.fields["author"]["user_id"].as_integer() != author_id,
+                    )
+                )
+
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
+
         return query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
@@ -148,7 +222,7 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_read(self, user_id: int) -> typing.List[Message]:
+    def mark_user_messages_as_read(self, user_id: int) -> List[Message]:
         unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
         for message in unread_messages:
             message.read = datetime.utcnow()
@@ -156,7 +230,7 @@ class EventApi:
         self._session.flush()
         return unread_messages
 
-    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> typing.List[Message]:
+    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> List[Message]:
         query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
         return query.all()
 
@@ -164,12 +238,18 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
-        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
-        page_token: typing.Optional[int] = None,
+        exclude_author_ids: List[int] = None,
+        include_event_types: List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: Optional[int] = None,
     ) -> Page:
         query = self._base_query(
-            user_id=user_id, read_status=read_status, event_types=event_types,
+            user_id=user_id,
+            read_status=read_status,
+            include_event_types=include_event_types,
+            exclude_event_types=exclude_event_types,
+            exclude_author_ids=exclude_author_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
 
@@ -177,19 +257,25 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        event_types: typing.List[EventTypeDatabaseParameters] = None,
+        include_event_types: List[EventTypeDatabaseParameters] = None,
+        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        exclude_author_ids: List[int] = None,
     ) -> int:
         return self._base_query(
-            user_id=user_id, event_types=event_types, read_status=read_status
+            user_id=user_id,
+            include_event_types=include_event_types,
+            exclude_event_types=exclude_event_types,
+            read_status=read_status,
+            exclude_author_ids=exclude_author_ids,
         ).count()
 
     def create_event(
         self,
         entity_type: EntityType,
         operation: OperationType,
-        additional_fields: typing.Dict[str, JsonDict],
+        additional_fields: Dict[str, JsonDict],
         context: TracimContext,
-        entity_subtype: typing.Optional[str] = None,
+        entity_subtype: Optional[str] = None,
     ) -> Event:
         current_user = context.safe_current_user()
         user_api = UserApi(
@@ -198,10 +284,12 @@ class EventApi:
             config=self._config,
             show_deleted=True,
         )
+        if current_user:
+            author = self.user_schema.dump(user_api.get_user_with_context(current_user)).data
+        else:
+            author = None
         fields = {
-            Event.AUTHOR_FIELD: self.user_schema.dump(
-                user_api.get_user_with_context(current_user)
-            ).data,
+            Event.AUTHOR_FIELD: author,
             Event.CLIENT_TOKEN_FIELD: context.client_token,
         }
         fields.update(additional_fields)
@@ -213,6 +301,7 @@ class EventApi:
         )
         context.dbsession.add(event)
         context.pending_events.append(event)
+        return event
 
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
@@ -429,9 +518,12 @@ class EventBuilder:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
             session=context.dbsession,
-            current_user=current_user,
             config=self._config,
             show_deleted=True,
+            # INFO - G.M - 2020-17-09 - we do explicitly don't set user here to not
+            # have filter on workspace, in some case we do want user create event on workspace
+            # he doesn't have access: when he remove itself from workspace for example
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(role.workspace_id)
@@ -462,7 +554,50 @@ class EventBuilder:
             context=context,
         )
 
-    def _has_just_been_deleted(self, obj: typing.Union[User, Workspace, ContentRevisionRO]) -> bool:
+    # WorkspaceSubscription events
+    @hookimpl
+    def on_workspace_subscription_created(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.CREATED, subscription, context)
+
+    @hookimpl
+    def on_workspace_subscription_modified(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.MODIFIED, subscription, context)
+
+    @hookimpl
+    def on_workspace_subscription_deleted(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        self._create_subscription_event(OperationType.DELETED, subscription, context)
+
+    def _create_subscription_event(
+        self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(subscription.workspace_id)
+        )
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
+                subscription
+            ).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _has_just_been_deleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
@@ -470,9 +605,7 @@ class EventBuilder:
             return was_changed
         return False
 
-    def _has_just_been_undeleted(
-        self, obj: typing.Union[User, Workspace, ContentRevisionRO]
-    ) -> bool:
+    def _has_just_been_undeleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check whether an object has been undeleted since queried from database."""
         if not obj.is_deleted:
             history = inspect(obj).attrs.is_deleted.history
@@ -481,9 +614,7 @@ class EventBuilder:
         return False
 
 
-def _get_user_event_receiver_ids(
-    event: Event, session: TracimSession, config: CFG
-) -> typing.Set[int]:
+def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     user_api = UserApi(current_user=event.user, session=session, config=config)
     receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
     if event.user:
@@ -495,7 +626,7 @@ def _get_user_event_receiver_ids(
 
 def _get_workspace_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
-) -> typing.Set[int]:
+) -> Set[int]:
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     role_api = RoleApi(current_user=None, session=session, config=config)
@@ -503,15 +634,26 @@ def _get_workspace_event_receiver_ids(
     return set(administrators + workspace_members)
 
 
-def _get_content_event_receiver_ids(
+def _get_workspace_subscription_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
-) -> typing.Set[int]:
+) -> Set[int]:
+    user_api = UserApi(current_user=None, session=session, config=config)
+    administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
+    author = event.subscription["author"]["user_id"]
+    role_api = RoleApi(current_user=None, session=session, config=config)
+    workspace_managers = role_api.get_workspace_member_ids(
+        event.workspace["workspace_id"], min_role=WorkspaceRoles.WORKSPACE_MANAGER
+    )
+    return set(administrators + workspace_managers + [author])
+
+
+def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
     return set(workspace_members)
 
 
-GetReceiverIdsCallable = typing.Callable[[Event, TracimSession, CFG], typing.Iterable[int]]
+GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
 class BaseLiveMessageBuilder(abc.ABC):
@@ -524,7 +666,8 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
         EntityType.WORKSPACE_MEMBER: _get_workspace_event_receiver_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
-    }  # type: typing.Dict[str, GetReceiverIdsCallable]
+        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+    }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:
         self._config = config
@@ -538,7 +681,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
     @contextlib.contextmanager
     @abc.abstractmethod
-    def context(self) -> typing.Generator[TracimContext, None, None]:
+    def context(self) -> Generator[TracimContext, None, None]:
         pass
 
     @abc.abstractmethod
@@ -565,7 +708,7 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
-    def _get_receiver_ids(self, event: Event, session: Session) -> typing.Iterable[int]:
+    def _get_receiver_ids(self, event: Event, session: Session) -> Iterable[int]:
         try:
             get_receiver_ids = self._get_receiver_ids_callables[event.entity_type]
             return get_receiver_ids(event, session, self._config)
@@ -580,7 +723,7 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
         super().__init__(context.app_config)
 
     @contextlib.contextmanager
-    def context(self) -> typing.Generator[TracimContext, None, None]:
+    def context(self) -> Generator[TracimContext, None, None]:
         with worker_context() as context:
             yield context
 
@@ -602,7 +745,7 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
         self._context = context
 
     @contextlib.contextmanager
-    def context(self) -> typing.Generator[TracimContext, None, None]:
+    def context(self) -> Generator[TracimContext, None, None]:
         yield self._context
 
     def publish_messages_for_event(self, event_id: int) -> None:

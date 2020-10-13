@@ -16,26 +16,38 @@ import {
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  buildTracimLiveMessageEventType,
   CONTENT_TYPE,
+  PROFILE,
   displayDistanceDate,
   GenericButton,
   ListItemWrapper,
   PopinFixedHeader,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
+  TLM_CORE_EVENT_TYPE as TLM_EVENT,
+  TLM_ENTITY_TYPE as TLM_ENTITY,
+  TLM_SUB_TYPE as TLM_SUB,
+  NUMBER_RESULTS_BY_PAGE,
   TracimComponent,
-  Avatar
+  Avatar,
+  ComposedIcon,
+  formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import {
-  ANCHOR_NAMESPACE,
-  NUMBER_RESULTS_BY_PAGE
+  PAGE,
+  ANCHOR_NAMESPACE
 } from '../util/helper.js'
 
+import { escape as escapeHtml } from 'lodash'
+
 export class NotificationWall extends React.Component {
-  handleClickNotification = async notificationId => {
+  handleClickNotification = async (e, notificationId, notificationDetails) => {
     const { props } = this
+
+    if (!notificationDetails.url) {
+      if (notificationDetails.emptyUrlMsg) {
+        props.dispatch(newFlashMessage(notificationDetails.emptyUrlMsg, notificationDetails.msgType || 'warning'))
+      }
+      e.preventDefault()
+    }
 
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
@@ -66,100 +78,190 @@ export class NotificationWall extends React.Component {
 
   getNotificationDetails = notification => {
     const { props } = this
-    let icon, text, url
 
-    switch (notification.type) {
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT):
-        icon = 'fa-comments-o'
-        text = props.t('{{author}} commented on {{content}} at {{workspace}}', {
-          author: notification.author,
-          content: `<span class='contentTitle__highlight'>${notification.content.parentLabel}</span>`,
-          workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-          interpolation: { escapeValue: false }
-        })
-        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
-        break
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.HTML_DOCUMENT):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FOLDER):
-        icon = 'fa-magic'
-        text = props.t('{{author}} created {{content}} at {{workspace}}', {
-          author: notification.author,
-          content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
-          workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-          interpolation: { escapeValue: false }
-        })
-        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-        break
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.HTML_DOCUMENT):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD):
-      case buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FOLDER):
-        if (notification.content.currentRevisionType === 'status-update') {
-          icon = 'fa-random'
-          text = props.t('{{author}} updated the status of {{content}} at {{workspace}}', {
-            author: notification.author,
-            content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-        } else {
-          icon = 'fa-history'
-          text = props.t('{{author}} updated a new version of {{content}} at {{workspace}}', {
-            author: notification.author,
-            content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-        }
-        url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-        break
-      case buildTracimLiveMessageEventType(TLM_ET.SHAREDSPACE_MEMBER, TLM_CET.CREATED):
-        icon = 'fa-user-o'
-        text = props.user.userId === notification.user.userId
-          ? props.t('{{author}} added you to {{workspace}}', {
-            author: notification.author,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-          : props.t('{{author}} added {{user}} to {{workspace}}', {
-            author: notification.author,
-            user: notification.user.publicName,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-        url = `/ui/workspaces/${notification.workspace.id}/dashboard`
-        break
-      case buildTracimLiveMessageEventType(TLM_ET.MENTION, TLM_CET.CREATED):
-        if (notification.content.type === CONTENT_TYPE.COMMENT) {
-          icon = 'fa-comment-o'
-          text = props.t('{{author}} mentioned you in a comment in {{content}} at {{workspace}}', {
-            author: notification.author,
-            content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.parentContentType}/${notification.content.id}`
-        } else {
-          icon = 'fa-at'
-          text = props.t('{{author}} mentioned you in {{content}} at {{workspace}}', {
-            author: notification.author,
-            content: `<span class='contentTitle__highlight'>${notification.content.label}</span>`,
-            workspace: `<span class='documentTitle__highlight'>${notification.workspace.label}</span>`,
-            interpolation: { escapeValue: false }
-          })
-          url = `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-        }
-        break
-      default:
-        icon = 'fa-bell'
-        text = `${notification.author} ${notification.type}`
-        url = notification.content
-          ? `/ui/workspaces/${notification.workspace.id}/contents/${notification.content.type}/${notification.content.id}`
-          : '/ui'
+    const [entityType, eventType, contentType] = notification.type.split('.')
+
+    const escapedAuthor = escapeHtml(notification.author)
+    const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
+
+    const escapedContentLabel = (
+      notification.content
+        ? escapeHtml(
+          ((contentType === TLM_SUB.COMMENT) || (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
+            ? notification.content.parentLabel
+            : notification.content.label
+        )
+        : ''
+    )
+
+    const escapedWorkspaceLabel = notification.workspace ? escapeHtml(notification.workspace.label) : ''
+
+    const i18nOpts = {
+      user: `<span title='${escapedUser}'>${escapedUser}</span>`,
+      author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
+      content: `<span title='${escapedContentLabel}'class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+      space: `<span title="${escapedWorkspaceLabel}" class='documentTitle__highlight'>${escapedWorkspaceLabel}</span>`,
+      interpolation: { escapeValue: false }
     }
-    return { icon, text, url }
+
+    const contentUrl = notification.content ? PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id) : ''
+
+    if (entityType === TLM_ENTITY.CONTENT) {
+      switch (eventType) {
+        case TLM_EVENT.CREATED: {
+          if (contentType === TLM_SUB.COMMENT) {
+            return {
+              icon: 'comments-o',
+              text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
+              url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+            }
+          }
+
+          return {
+            icon: 'magic',
+            text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
+            url: contentUrl
+          }
+        }
+        case TLM_EVENT.MODIFIED: {
+          if (notification.content.currentRevisionType === 'status-update') {
+            return {
+              icon: 'random',
+              text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
+              url: contentUrl
+            }
+          }
+
+          return {
+            icon: 'history',
+            text: props.t('{{author}} updated {{content}} in {{space}}', i18nOpts),
+            url: contentUrl
+          }
+        }
+        case TLM_EVENT.DELETED: {
+          return {
+            icon: 'magic',
+            text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
+            url: contentUrl
+          }
+        }
+        case TLM_EVENT.UNDELETED: {
+          return {
+            icon: 'magic',
+            text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
+            url: contentUrl
+          }
+        }
+      }
+    }
+
+    if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
+      if (notification.content.type === CONTENT_TYPE.COMMENT) {
+        return {
+          icon: 'comment-o',
+          text: props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts),
+          url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+        }
+      }
+
+      return {
+        icon: 'at',
+        text: props.t('{{author}} mentioned you in {{content}} in {{space}}', i18nOpts),
+        url: contentUrl
+      }
+    }
+
+    if (entityType === TLM_ENTITY.USER) {
+      const details = {
+        url: (props.user.profile === PROFILE.administrator.slug) ? PAGE.ADMIN.USER_EDIT(notification.user.userId) : '',
+        emptyUrlMsg: props.t("Only an administrator can see this user's profile"),
+        msgType: 'info'
+      }
+
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          ...details,
+          icon: 'user-plus',
+          text: props.t("{{author}} created {{user}}'s profile", i18nOpts)
+        }
+        case TLM_EVENT.MODIFIED: return {
+          ...details,
+          icon: 'user+history',
+          text: props.t("{{author}} modified {{user}}'s profile", i18nOpts)
+        }
+        case TLM_EVENT.DELETED: return {
+          ...details,
+          icon: 'user-times',
+          text: props.t("{{author}} deleted {{user}}'s profile", i18nOpts)
+        }
+        case TLM_EVENT.UNDELETED: return {
+          ...details,
+          icon: 'user+undo',
+          text: props.t("{{author}} restored {{user}}'s profile", i18nOpts)
+        }
+      }
+    }
+
+    const dashboardUrl = notification.workspace ? PAGE.WORKSPACE.DASHBOARD(notification.workspace.id) : ''
+
+    if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          icon: 'user-o+plus',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.MODIFIED: return {
+          icon: 'user-o+history',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.DELETED: return {
+          icon: 'user-o+times',
+          text: props.user.userId === notification.user.userId
+            ? props.t('{{author}} added you to {{space}}', i18nOpts)
+            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+      }
+    }
+
+    if (entityType === TLM_ENTITY.SHAREDSPACE) {
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          icon: 'university+plus',
+          text: props.t('{{author}} created the space {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.MODIFIED: return {
+          icon: 'university+history',
+          text: props.t('{{author}} modified the space {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.DELETED: return {
+          icon: 'university+times',
+          text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+        case TLM_EVENT.UNDELETED: return {
+          icon: 'university+undo',
+          text: props.t('{{author}} restored the space {{space}}', i18nOpts),
+          url: dashboardUrl
+        }
+      }
+    }
+
+    return {
+      icon: 'bell',
+      text: `${notification.author} ${notification.type}`,
+      url: contentUrl,
+      emptyUrlMsg: props.t('This notification has no associated content'),
+      msgType: 'warning'
+    }
   }
 
   handleClickMarkAllAsRead = async () => {
@@ -201,28 +303,39 @@ export class NotificationWall extends React.Component {
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
             const notificationDetails = this.getNotificationDetails(notification)
+            const icons = notificationDetails.icon.split('+')
+            const icon = (
+              icons.length === 1
+                ? <i className={`fa fa-fw fa-${icons[0]}`} />
+                : <ComposedIcon mainIcon={icons[0]} smallIcon={icons[1]} />
+            )
 
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
-                id={`${ANCHOR_NAMESPACE.contentItem}:${notification.id}`}
+                id={`${ANCHOR_NAMESPACE.notificationItem}:${notification.id}`}
                 key={notification.id}
               >
                 <Link
-                  to={notificationDetails.url}
-                  onClick={() => this.handleClickNotification(notification.id)}
+                  to={notificationDetails.url || '#'}
+                  onClick={(e) => this.handleClickNotification(e, notification.id, notificationDetails)}
                   className={
                     classnames('notification__list__item', { itemRead: notification.read })
                   }
                   key={notification.id}
                 >
-                  <i className={`notification__list__item__icon fa ${notificationDetails.icon}`} />
+                  {icon}
                   <div className='notification__list__item__text'>
                     <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: `${notificationDetails.text} ${displayDistanceDate(notification.created, props.user.lang)}`
+                        __html: (
+                          notificationDetails.text + ' ' +
+                          `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
+                            escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
+                          '</span>'
+                        )
                       }}
                     />
                   </div>

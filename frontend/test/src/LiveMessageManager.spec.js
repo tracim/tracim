@@ -79,7 +79,6 @@ describe('LiveMessageManager class', () => {
   })
 
   describe('the openEventSourceConnection() method', () => {
-
     it('should create an EventSource', () => {
       const manager = createManager(30000, 0)
       manager.openLiveMessageConnection(userId, apiUrl)
@@ -220,6 +219,43 @@ describe('LiveMessageManager class', () => {
       expect(await promiseStatus1).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
       expect(await promiseStatus2).to.be.equal(LIVE_MESSAGE_STATUS.CLOSED)
       expect(global.lastCustomEventTypes.has(CUSTOM_EVENT.DISCONNECTED_FROM_API)).to.be.equal(true)
+
+      manager.closeLiveMessageConnection()
+    })
+  })
+
+  it('should kill extraneous leaders', () => {
+    // we are faking two leaders by opening the event source connection on both managers
+
+    const manager1 = createManager(30000, 0)
+    manager1.openLiveMessageConnection(userId, apiUrl)
+    manager1.openEventSourceConnection(userId, apiUrl)
+    manager1.eventSource.emitOpen()
+    manager1.eventSource.emit('stream-open')
+
+    const manager2 = createManager(30000, 0)
+    manager2.openLiveMessageConnection(userId, apiUrl)
+    manager2.openEventSourceConnection(userId, apiUrl)
+    manager2.eventSource.emitOpen()
+    manager2.eventSource.emit('stream-open')
+
+    expect(!manager1.eventSource || !manager2.eventSource).to.be.equal(true)
+
+    manager1.closeLiveMessageConnection()
+    manager2.closeLiveMessageConnection()
+  })
+
+  describe('the dispatchLiveMessage method', () => {
+    it('should not dispatch the same message twice', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+
+      global.lastCustomEventTypes = new Set()
+      manager.dispatchLiveMessage({ event_id: 42 })
+      expect(global.lastCustomEventTypes.size).to.equal(1)
+      global.lastCustomEventTypes = new Set()
+      manager.dispatchLiveMessage({ event_id: 42 })
+      expect(global.lastCustomEventTypes.size).to.equal(0)
 
       manager.closeLiveMessageConnection()
     })

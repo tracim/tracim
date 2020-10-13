@@ -28,7 +28,7 @@ export const sidebarEntryList = [
     route: '/ui/workspaces/6/contents?type=html-document',
     hexcolor: '#00CC00',
     fa_icon: 'file-text-o',
-    label: 'Text Documents'
+    label: 'Notes'
   }, {
     slug: 'agenda',
     route: '/ui/workspaces/6/agenda',

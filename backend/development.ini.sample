@@ -79,7 +79,7 @@ basic_setup.session_secret = change_this_value_please!
 # - collaborative_document_edition -> add support for collaborative document edition,
 #   add support for collaborative edition server like collabora/libreofficeOnline.
 # - share_content -> allow user to share Tracim content with external user
-# - upload_permission -> allow external with permission to upload some file in a workspace.
+# - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
 # default app.enabled config explicit list config:
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,share_content,upload_permission,gallery
@@ -101,6 +101,14 @@ basic_setup.session_secret = change_this_value_please!
 # be loaded, allowing to add new feature to an existing Tracim.
 ; plugin.folder_path = %(here)s/plugins
 
+### Workspace ###
+# list of access_type allowed for new workspaces. In Tracim; these values for access_type are available:
+# - confidential: not visible publicly, access only by invitation workspace_manager/admin
+# - on_request: publicly visible, access by invitation or request with validation by workspace manager/admin)
+# - open: publicly visible and access by invitation or request without validation
+; workspace.allowed_access_types = confidential,on_request,open
+# example:
+# workspace.allowed_access_types = confidential
 
 ## CORS Special config
 # you can override access control allowed origin here with list of comma separated
@@ -136,14 +144,14 @@ basic_setup.session_secret = change_this_value_please!
 # example:
 # limitation.content_length_file_size = 104857600
 
-# max size of all files of a workspace in bytes
+# max size of all files of a space in bytes
 # by default 0 meaning no limit. 1073741824(1GB) is a good value
 ; limitation.workspace_size = 0
 # example:
 # limitation.workspace_size = 1073741824
 
 ## default allowed space for new user if not provided in bytes, 0 mean no space
-## limit. Limit is on the sum of sizes of owned by user workspace.
+## limit. Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
 
 ####
@@ -282,8 +290,8 @@ api.key = %(basic_setup.api_key)s
 ; user.default_profile = users
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about
-## member with no common workspace. If False, it can access to these informations.
-## This is used by search mechanism for invitation of user in workspace.
+## member with no common space. If False, it can access to these informations.
+## This is used by search mechanism for invitation of user in space.
 ; known_members.filter = True
 
 ####
@@ -344,6 +352,15 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.base_url = http://localhost:3030
 ; webdav.ui.enabled = True
 
+### Notifications ###
+# Comma-separated events listed in this setting are not displayed in notifications to the user.
+# Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
+# ENTITY_TYPE  = user | workspace | content | mention | workspace_member
+# EVENT_TYPE   = created | modified | deleted | undeleted
+# CONTENT_TYPE = html-document | file | thread | folder | comment
+# To include all notifications, use web.notifications.excluded = ""
+; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified
+
 ####
 # JOB EXECUTION
 ####
@@ -373,8 +390,8 @@ website.base_url = %(basic_setup.website_base_url)s
 
 ## send some notification when user make specific action in Tracim
 ; email.notification.activated = False
-## you can enable or disable if invited user to shared space will be notified
-## on this shared space by default.
+## you can enable or disable if invited user to space will be notified
+## on this space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
 # You can activate notification specific log using 'tracim_email_notification' logger.

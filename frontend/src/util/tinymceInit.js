@@ -30,10 +30,18 @@ import { uniqueId } from 'lodash'
     }
   }
 
-  globalThis.wysiwyg = function (selector, lang, handleOnChange) {
+  globalThis.wysiwyg = function (
+    selector,
+    lang,
+    handleOnChange,
+    handleTinyMceInput,
+    handleTinyMceKeyDown,
+    handleTinyMceKeyUp,
+    handleTinyMceSelectionChange
+  ) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
-    // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
+    // solves the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
     $(document).on('focusin', function (e) {
       if ($(e.target).closest('.mce-window').length) {
         e.stopImmediatePropagation()
@@ -82,8 +90,7 @@ import { uniqueId } from 'lodash'
           if ($editor.getBody().textContent) {
             $editor.dom.add($editor.getBody(), 'p', { id: id }, '&nbsp;')
             $editor.selection.select($editor.dom.select(`p#${id}`)[0])
-          }
-          else {
+          } else {
             $editor.selection.select($editor.getBody(), true)
           }
 
@@ -95,9 +102,36 @@ import { uniqueId } from 'lodash'
           document.dispatchEvent(event)
         })
 
-        $editor.on('change keyup', function (e) {
-          handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
-        })
+        const getPosition = (e) => {
+          const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar-grp').first()
+          const selectionNode = $($editor.selection.getNode())
+          const nodePosition = selectionNode.position()
+          const nodeOffset = selectionNode.offset()
+          const nodeHeight = selectionNode.height()
+          const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
+          return {
+            top: (isFullscreen ? $editor.getContainer().offsetTop + nodePosition.top : nodePosition.top) + toolbarPosition.height(),
+            isSelectionToTheTop: nodePosition.top === 0,
+            selectionHeight: (nodeOffset.top * 2) + nodeHeight,
+            isFullscreen
+          }
+        }
+
+        if (handleOnChange) {
+          $editor.on('change keyup', function (e) {
+            handleOnChange({ target: { value: $editor.getContent() } }) // target.value to emulate a js event so the react handler can expect one
+          })
+        }
+
+        if (handleTinyMceKeyDown) $editor.on('keydown', handleTinyMceKeyDown)
+        if (handleTinyMceKeyUp) $editor.on('keyup', handleTinyMceKeyUp)
+        if (handleTinyMceInput) $editor.on('input', (e) => { handleTinyMceInput(e, getPosition()) })
+
+        if (handleTinyMceSelectionChange) {
+          $editor.on('selectionchange', function (e) {
+            handleTinyMceSelectionChange($editor.selection.getNode().id, getPosition())
+          })
+        }
 
         // ////////////////////////////////////////////
         // add custom btn to handle image by selecting them with system explorer

@@ -24,13 +24,13 @@
 //
 //       cy.visitPage({ pageName: PAGES.AGENDA, params: { workspaceId: workspace.workspace_id } })
 //
-//       cy.get('.agendaPage__title').contains('Agenda of shared space My Workspace')
+//       cy.get('.agendaPage__title').contains('Agenda of space My Workspace')
 //
 //       cy.changeLanguage('fr')
-//       cy.get('.agendaPage__title').contains("Agenda de l'espace partagé My Workspace")
+//       cy.get('.agendaPage__title').contains("Agenda de l'espace My Workspace")
 //
 //       cy.changeLanguage('pt')
-//       cy.get('.agendaPage__title').contains('Agenda do espaço partilhado My Workspace')
+//       cy.get('.agendaPage__title').contains('Agenda do espaço My Workspace')
 //     })
 //   })
 // })

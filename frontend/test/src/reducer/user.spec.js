@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import userReducer, { serializeUserProps, defaultUser } from '../../../src/reducer/user.js'
 import {
   SET,
+  setUserConfiguration,
   setUserConnected,
   setUserDisconnected,
   setUserLang,
@@ -10,6 +11,7 @@ import {
   updateUserAgendaUrl,
   USER,
   USER_AGENDA_URL,
+  USER_CONFIGURATION,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG
@@ -67,6 +69,15 @@ describe('user reducer', () => {
     ).to.deep.equal({
       ...serialize(globalManagerFromApi, serializeUserProps),
       logged: true
+    })
+  })
+
+  it(`should handle ${SET}/${USER_CONFIGURATION}`, () => {
+    expect(
+      userReducer(defaultUser, setUserConfiguration({ param1: 'value1' }))
+    ).to.deep.equal({
+      ...defaultUser,
+      config: { param1: 'value1' }
     })
   })
 })

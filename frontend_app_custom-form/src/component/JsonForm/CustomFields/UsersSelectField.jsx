@@ -1,8 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
-import { handleFetchResult } from 'tracim_frontend_lib'
-import { getWorkspaceMemberList } from '../../../action.async'
+import { handleFetchResult, getWorkspaceMemberList } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 

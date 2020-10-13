@@ -13,6 +13,7 @@ import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   serialize
 } from 'tracim_frontend_lib'
@@ -24,6 +25,7 @@ import {
   setAppList,
   setConfig,
   resetBreadcrumbs,
+  setUserConfiguration,
   setUserLang,
   setWorkspaceListMemberList,
   setNotificationNotReadCounter,
@@ -37,6 +39,7 @@ import {
   getContentTypeList,
   getMyselfWorkspaceList,
   getNotificationList,
+  getUserConfiguration,
   getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
@@ -44,8 +47,7 @@ import {
 } from '../action-creator.async.js'
 import {
   PAGE,
-  COOKIE_FRONTEND,
-  NUMBER_RESULTS_BY_PAGE
+  COOKIE_FRONTEND
 } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 
@@ -151,6 +153,7 @@ class Login extends React.Component {
         this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
+        this.loadUserConfiguration(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -219,6 +222,16 @@ class Login extends React.Component {
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+  }
+
+  loadUserConfiguration = async userId => {
+    const { props } = this
+
+    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
+    switch (fetchGetUserConfig.status) {
+      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
+    }
   }
 
   loadNotificationNotRead = async (userId) => {

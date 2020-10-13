@@ -87,7 +87,7 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
     # commit ( in order  to not have trouble like
     # https://github.com/tracim/tracim_backend/issues/52
     # or detached objects problems).
-    # These problem happened because we use "commit" in our current code.
+    # These problems happened because we use "commit" in our current code.
     # Understand what those params really mean and check if it can cause
     # troubles somewhere else.
     # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc

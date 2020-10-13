@@ -7,6 +7,7 @@ from pluggy import PluginManager
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
@@ -141,6 +142,7 @@ class MentionBuilder:
 
         old_mentions = parser.get_mentions(content.revisions[-2])
         new_mentions = set(mentions) - set(old_mentions)
+
         if not new_mentions:
             return
 
@@ -166,6 +168,22 @@ class MentionBuilder:
     def _create_mention_events(
         cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
     ) -> None:
+        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+
+        workspace_members_usernames = [
+            user.username for user in role_api.get_workspace_members(content.workspace_id)
+        ]
+
+        for mention in mentions:
+            recipient = mention.recipient
+            if (
+                recipient not in workspace_members_usernames
+                and recipient not in ALL__GROUP_MENTIONS
+            ):
+                raise UserNotMemberOfWorkspace(
+                    "This user is not a member of this workspace: {}".format(mention.recipient)
+                )
+
         current_user = context.current_user
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
         content_in_context = content_api.get_content_in_context(content)

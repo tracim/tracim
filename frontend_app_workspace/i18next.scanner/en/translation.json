@@ -1,8 +1,8 @@
 {
   "Validate and create": "Validate and create",
-  "Shared space's name": "Shared space's name",
-  "New shared space": "New shared space",
-  "A shared space with that name already exists": "A shared space with that name already exists",
-  "Error while saving new shared space": "Error while saving new shared space",
-  "You cannot create anymore shared space": "You cannot create anymore shared space"
+  "Space's name": "Space's name",
+  "New space": "New space",
+  "A space with that name already exists": "A space with that name already exists",
+  "Error while saving new space": "Error while saving new space",
+  "You cannot create anymore space": "You cannot create anymore space"
 }

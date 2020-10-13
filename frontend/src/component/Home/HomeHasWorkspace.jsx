@@ -23,7 +23,7 @@ export const HomeHasWorkspace = props =>
     <div className='homepagecard__delimiter delimiter primaryColorBg' />
 
     <div className='homepagecard__text'>
-      {props.t('Please select a shared space in the left sidebar by clicking on it')}
+      {props.t('Please select a space in the left sidebar by clicking on it')}
     </div>
 
     <div className='homepagecard__endtext'>

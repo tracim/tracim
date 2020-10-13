@@ -11,7 +11,8 @@ const testComponent = props => {
     false,
     'new comment that includes a mention here @admin which should be wrapped',
     () => { console.log('setState called') },
-    'html-document'
+    'html-document',
+    'foo'
   )
 
   props.appContentSaveNewComment(
@@ -19,7 +20,8 @@ const testComponent = props => {
     true,
     'Another comment that contains HTML and a mention @admin which should be wrapped too',
     () => { console.log('setState called') },
-    'html-document'
+    'html-document',
+    'foo'
   )
   return (
     <div>

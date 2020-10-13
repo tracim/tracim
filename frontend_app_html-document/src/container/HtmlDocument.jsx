@@ -11,7 +11,6 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
-  displayDistanceDate,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
@@ -25,19 +24,26 @@ import {
   RefreshWarningMessage,
   ROLE,
   SelectStatus,
-  sortTimelineByDate,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  wrapMentionsInSpanTags
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  getContentComment,
+  handleMentionsBeforeSave,
+  addClassToMentionsOfUser,
+  putUserConfiguration,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
-  getHtmlDocComment,
   getHtmlDocRevision,
   putHtmlDocContent,
   putHtmlDocRead
@@ -58,12 +64,11 @@ export class HtmlDocument extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       externalTranslationList: [
-        props.t('Text Document'),
-        props.t('Text Documents'),
-        props.t('Text document'),
-        props.t('text document'),
-        props.t('text documents'),
-        props.t('Write a document')
+        props.t('Note'),
+        props.t('Notes'),
+        props.t('note'),
+        props.t('notes'),
+        props.t('Write a note')
       ],
       rawContentBeforeEdit: '',
       timeline: [],
@@ -73,7 +78,10 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      isLastTimelineItemCurrentToken: false,
+      isAutoCompleteActivated: false,
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -90,7 +98,7 @@ export class HtmlDocument extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -103,7 +111,11 @@ export class HtmlDocument extends React.Component {
     if (data.fields.content.content_id !== state.content.content_id) return
 
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = { ...state.content, ...data.fields.content }
+    const newContentObject = {
+      ...state.content,
+      ...data.fields.content,
+      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, state.loggedUser.username)
+    }
     this.setState(prev => ({
       ...prev,
       content: clientToken === data.fields.client_token
@@ -112,7 +124,7 @@ export class HtmlDocument extends React.Component {
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
-      rawContentBeforeEdit: data.fields.content.raw_content,
+      rawContentBeforeEdit: newContentObject.raw_content,
       timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
       isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
     }))
@@ -122,26 +134,16 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleContentCreated = data => {
-    const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id || data.fields.content.content_type !== 'comment') return
+  handleContentCommentCreated = (tlm) => {
+    const { props, state } = this
+    // Not a comment for our content
+    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
-    const sortedNewTimeline = sortTimelineByDate(
-      [
-        ...state.timeline,
-        {
-          ...data.fields.content,
-          created: displayDistanceDate(data.fields.content.created, state.loggedUser.lang),
-          created_raw: data.fields.content.created,
-          timelineType: 'comment',
-          hasBeenRead: data.fields.client_token === this.sessionClientToken
-        }
-      ]
-    )
-
+    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
     this.setState({
-      timeline: sortedNewTimeline,
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      timeline: newTimeline,
+      isLastTimelineItemCurrentToken: createdByLoggedUser
     })
   }
 
@@ -222,21 +224,99 @@ export class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg('#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
       globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      globalThis.wysiwyg(
+        '#wysiwygNewVersion',
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) globalThis.wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygNewVersion')
+    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
 
     // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
     if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+      initWysiwyg(
+        state,
+        state.loggedUser.lang,
+        this.handleChangeText,
+        this.handleTinyMceInput,
+        this.handleTinyMceKeyDown,
+        this.handleTinyMceKeyUp,
+        this.handleTinyMceSelectionChange
+      )
     }
+  }
+
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygTimelineComment',
+      this.state.loggedUser.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
+  }
+
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  handleTinyMceSelectionChange = (e, position) => {
+    tinymceAutoCompleteHandleSelectionChange(
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchForMentionInQuery
+    )
+  }
+
+  handleTinyMceKeyDown = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchForMentionInQuery
+    )
   }
 
   componentWillUnmount () {
@@ -312,7 +392,7 @@ export class HtmlDocument extends React.Component {
     const { props, state } = this
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultComment = getHtmlDocComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resHtmlDocument, resComment, resRevision] = await Promise.all([
@@ -321,7 +401,7 @@ export class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser.lang)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     const localStorageComment = localStorage.getItem(
       generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
@@ -344,23 +424,24 @@ export class HtmlDocument extends React.Component {
     )
     const hasLocalStorageRawContent = !!localStorageRawContent
 
+    const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
     this.setState({
       mode: modeToRender,
       content: {
         ...resHtmlDocument.body,
         raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
           ? localStorageRawContent
-          : resHtmlDocument.body.raw_content
+          : rawContentBeforeEdit
       },
       newComment: localStorageComment || '',
-      rawContentBeforeEdit: resHtmlDocument.body.raw_content,
+      rawContentBeforeEdit: rawContentBeforeEdit,
       timeline: revisionWithComment,
       isLastTimelineItemCurrentToken: false
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    await putHtmlDocRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
@@ -410,9 +491,11 @@ export class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
+    const content = tinymce.activeEditor.getContent()
+
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = wrapMentionsInSpanTags(state.content.raw_content)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(content, state.loggedUser.username)
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
@@ -429,18 +512,32 @@ export class HtmlDocument extends React.Component {
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
-      case 200:
+      case 200: {
+        state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
-        this.setState({ mode: APP_FEATURE_MODE.VIEW })
+        this.setState(prev => ({
+          mode: APP_FEATURE_MODE.VIEW,
+          content: {
+            ...prev.content,
+            raw_content: newDocumentForApiWithMention
+          }
+        }))
+        const fetchPutUserConfiguration = await handleFetchResult(
+          await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
+        )
+        if (fetchPutUserConfiguration.status !== 204) {
+          this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+        }
         break
+      }
       case 400:
         this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
-          case 1001:
+          case 2067:
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
             break
           case 2044:
-            this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
+            this.sendGlobalFlashMessage(props.t('You must change the status or restore this note before any change'))
             break
           default:
             this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
@@ -466,10 +563,21 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  }
+
   handleClickValidateNewCommentBtn = async () => {
     const { props, state } = this
     try {
-      props.appContentSaveNewComment(state.content, state.timelineWysiwyg, state.newComment, this.setState.bind(this), state.config.slug)
+      props.appContentSaveNewComment(
+        state.content,
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        state.config.slug,
+        state.loggedUser.username
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
@@ -562,6 +670,52 @@ export class HtmlDocument extends React.Component {
     }))
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
+  }
+
+  handleCloseNotifyAllMessage = async () => {
+    const { state, props } = this
+    const newConfiguration = state.loggedUser.config
+    newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = false
+
+    this.setState(prev => ({
+      ...prev,
+      loggedUser: {
+        ...prev.loggedUser,
+        config: newConfiguration
+      }
+    }))
+
+    const fetchPutUserConfiguration = await handleFetchResult(
+      await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
+    )
+    if (fetchPutUserConfiguration.status !== 204) {
+      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+    }
+  }
+
+  handleClickNotifyAll = async () => {
+    const { state, props } = this
+
+    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    this.handleCloseNotifyAllMessage()
+  }
+
+  shouldDisplayNotifyAllMessage = () => {
+    const { state } = this
+
+    const lastModifierIsLoggedUser = (content) => {
+      return content.last_modifier && content.last_modifier.user_id === state.loggedUser.userId
+    }
+
+    if (
+      !state.loggedUser.config ||
+      state.content.current_revision_type === 'creation' ||
+      !lastModifierIsLoggedUser(state.newContent) ||
+      (!state.newContent.last_modifier && !lastModifierIsLoggedUser(state.content)) ||
+      state.mode !== APP_FEATURE_MODE.VIEW
+    ) return false
+
+    return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
   render () {
@@ -673,6 +827,14 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            tinymcePosition={state.tinymcePosition}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
+            onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
+            displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
+            onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
+            onClickNotifyAll={this.handleClickNotifyAll}
           />
 
           <PopinFixedRightPart
@@ -698,6 +860,8 @@ export class HtmlDocument extends React.Component {
                   onClickRevisionBtn={this.handleClickShowRevision}
                   shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                  searchForMentionInQuery={this.searchForMentionInQuery}
+                  onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
                 />
               )
             }]}

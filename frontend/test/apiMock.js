@@ -147,6 +147,12 @@ const mockGetConfig200 = (apiUrl) => {
     .reply(200, {})
 }
 
+const mockGetUserConfig200 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .get(`/users/${userId}/config`)
+    .reply(200, { parameters: {} })
+}
+
 const mockGetAppList200 = (apiUrl, appList) => {
   return nock(apiUrl)
     .get('/system/applications')
@@ -221,6 +227,7 @@ export {
   mockGetContentType200,
   mockGetAppList200,
   mockGetConfig200,
+  mockGetUserConfig200,
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
   mockPutAllNotificationAsRead204,

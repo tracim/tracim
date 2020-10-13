@@ -3,6 +3,7 @@ import typing
 import pytest
 import transaction
 
+from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.mention import DescriptionMentionParser
 from tracim_backend.lib.core.mention import Mention
@@ -13,11 +14,12 @@ from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.revision_protection import new_revision
-
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import TracimTestContext
 
-html_with_one_mention = '<p>Foo bar</p><span id="foo">@foo</span><span id="mention-foo">@bar</span>'
+html_with_one_mention_bar = (
+    '<p>Foo bar</p><span id="foo">@foo</span><span id="mention-foo">@bar</span>'
+)
 
 comment_without_mention = (
     "<p>Bonjour,</p>"
@@ -48,7 +50,7 @@ def create_content(
             user = uapi.get_one_by_email(email="this.is@user")
         except Exception:
             user = uapi.create_minimal_user(
-                email="this.is@user", profile=Profile.ADMIN, save_now=True
+                email="this.is@user", profile=Profile.ADMIN, save_now=True, username="bar"
             )
         if parent_content:
             workspace = parent_content.workspace
@@ -77,7 +79,7 @@ def one_content_with_a_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        html_with_one_mention, user_api_factory, workspace_api_factory, session, app_config,
+        html_with_one_mention_bar, user_api_factory, workspace_api_factory, session, app_config,
     )
 
 
@@ -87,6 +89,32 @@ def one_content_without_mention(
 ) -> Content:
     return create_content(
         comment_without_mention, user_api_factory, workspace_api_factory, session, app_config,
+    )
+
+
+@pytest.fixture
+def one_content_with_a_mention_all(
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
+) -> Content:
+    return create_content(
+        "<span id='mention-all'>@all</span>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+    )
+
+
+@pytest.fixture
+def one_content_with_a_nasty_mention(
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
+) -> Content:
+    return create_content(
+        "<span id='mention-nasty'>@nasty</span>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
 
 
@@ -129,6 +157,40 @@ def one_updated_content_with_no_new_mention(
 
 
 @pytest.fixture
+def one_updated_content_with_new_mention_all(
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
+) -> Content:
+    content = create_content(
+        "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
+    )
+    with new_revision(session=session, tm=transaction.manager, content=content):
+        content.description = content.description + "<span id='mention-all'>@all</span>"
+        api = ContentApi(current_user=content.owner, session=session, config=app_config)
+        api.update_content(content, new_label=content.label)
+        api.save(content)
+    return content
+
+
+@pytest.fixture
+def one_updated_content_with_a_new_nasty_mention(
+    base_fixture, user_api_factory, workspace_api_factory, session, app_config
+) -> Content:
+    content = create_content(
+        '<span id="mention-foo">@foo</span>',
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+    )
+    with new_revision(session=session, tm=transaction.manager, content=content):
+        content.description = content.description + '<span id="mention-nasty">@nasty</span>'
+        api = ContentApi(current_user=content.owner, session=session, config=app_config)
+        api.update_content(content, new_label=content.label)
+        api.save(content)
+    return content
+
+
+@pytest.fixture
 def one_comment_with_a_mention(
     base_fixture,
     user_api_factory,
@@ -138,7 +200,7 @@ def one_comment_with_a_mention(
     one_content_with_a_mention: Content,
 ) -> Content:
     return create_content(
-        html_with_one_mention,
+        html_with_one_mention_bar,
         user_api_factory,
         workspace_api_factory,
         session,
@@ -152,7 +214,7 @@ class TestMentionBuilder:
     @pytest.mark.parametrize(
         "html,mentions",
         [
-            (html_with_one_mention, [Mention("bar", "foo")]),
+            (html_with_one_mention_bar, [Mention("bar", "foo")]),
             (comment_without_mention, []),
             (html_with_several_mentions, [Mention("bar", "foo"), Mention("foo", "bar")]),
         ],
@@ -203,6 +265,28 @@ class TestMentionBuilder:
         builder.on_content_created(one_content_without_mention, context)
         assert not context.pending_events
 
+    def test_unit_on_content_created__ok__mention_all(
+        self, session_factory, app_config, one_content_with_a_mention_all: Content
+    ) -> None:
+        builder = MentionBuilder()
+        context = TracimTestContext(
+            app_config, session_factory, user=one_content_with_a_mention_all.owner
+        )
+        builder.on_content_created(one_content_with_a_mention_all, context)
+        assert len(context.pending_events) == 1
+
+    def test_unit_on_content_created__fails__one_nasty_mention(
+        self, session_factory, app_config, one_content_with_a_nasty_mention: Content
+    ) -> None:
+        builder = MentionBuilder()
+        context = TracimTestContext(
+            app_config, session_factory, user=one_content_with_a_nasty_mention.owner
+        )
+        with pytest.raises(UserNotMemberOfWorkspace):
+            builder.on_content_created(one_content_with_a_nasty_mention, context)
+
+        assert not context.pending_events
+
     def test_unit_on_content_modified__ok__one_new_mention(
         self, session_factory, app_config, one_updated_content_with_one_new_mention: Content
     ) -> None:
@@ -225,6 +309,29 @@ class TestMentionBuilder:
             app_config, session_factory, user=one_updated_content_with_no_new_mention.owner
         )
         builder.on_content_modified(one_updated_content_with_no_new_mention, context)
+        assert not context.pending_events
+
+    def test_unit_on_content_modified__ok__new_mention_all(
+        self, session_factory, app_config, one_updated_content_with_new_mention_all: Content
+    ) -> None:
+        builder = MentionBuilder()
+        context = TracimTestContext(
+            app_config, session_factory, user=one_updated_content_with_new_mention_all.owner
+        )
+        builder.on_content_modified(one_updated_content_with_new_mention_all, context)
+        assert len(context.pending_events) == 1
+
+    def test_unit_on_content_modified__fails__one_new_nasty_mention(
+        self, session_factory, app_config, one_updated_content_with_a_new_nasty_mention: Content
+    ) -> None:
+        builder = MentionBuilder()
+        context = TracimTestContext(
+            app_config, session_factory, user=one_updated_content_with_a_new_nasty_mention.owner
+        )
+
+        with pytest.raises(UserNotMemberOfWorkspace):
+            builder.on_content_modified(one_updated_content_with_a_new_nasty_mention, context)
+
         assert not context.pending_events
 
     @pytest.mark.parametrize("recipient, receiver_ids", [("all", [2]), ("TheAdmin", [1])])

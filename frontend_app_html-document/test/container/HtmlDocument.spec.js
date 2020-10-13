@@ -6,7 +6,8 @@ import {
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentContent200,
   mockGetHtmlDocumentRevision200,
-  mockPutHtmlDocumentRead200
+  mockPutHtmlDocumentRead200,
+  mockPutUserConfiguration204
 } from '../apiMock.js'
 import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { HtmlDocument } from '../../src/container/HtmlDocument.jsx'
@@ -17,7 +18,8 @@ import { debug } from '../../src/debug.js'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    content: contentHtmlDocument,
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    content: contentHtmlDocument.htmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
@@ -27,10 +29,10 @@ describe('<HtmlDocument />', () => {
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
 
-  mockGetHtmlDocumentContent200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.htmlDocument)
-  mockPutHtmlDocumentRead200(debug.loggedUser, debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id)
-  mockGetHtmlDocumentComment200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.commentList).persist()
-  mockGetHtmlDocumentRevision200(debug.config.apiUrl, contentHtmlDocument.htmlDocument.workspace_id, contentHtmlDocument.htmlDocument.content_id, contentHtmlDocument.revisionList).persist()
+  mockGetHtmlDocumentContent200(debug.config.apiUrl, props.content.workspace_id, props.content.content_id, props.content)
+  mockPutHtmlDocumentRead200(debug.loggedUser.userId, debug.config.apiUrl, props.content.workspace_id, props.content.content_id)
+  mockGetHtmlDocumentComment200(debug.config.apiUrl, props.content.workspace_id, props.content.content_id, contentHtmlDocument.commentList).persist()
+  mockGetHtmlDocumentRevision200(debug.config.apiUrl, props.content.workspace_id, props.content.content_id, contentHtmlDocument.revisionList).persist()
 
   const wrapper = shallow(<HtmlDocument {...props} />)
   wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
@@ -43,9 +45,9 @@ describe('<HtmlDocument />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType content', () => {
-      describe('handleContentCreated', () => {
+      describe('handleContentCommentCreated', () => {
         describe('create a new comment', () => {
-          it('should update the timeline if is related to the current html-document', () => {
+          it('should call addCommentToTimeline if is related to the current html-document', () => {
             const tlmData = {
               fields: {
                 content: {
@@ -55,9 +57,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            wrapper.instance().handleContentCreated(tlmData)
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
-            expect(hasComment).to.equal(true)
+            props.addCommentToTimeline.resetHistory()
+            wrapper.instance().handleContentCommentCreated(tlmData)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
 
           it('should not update the timeline if is not related to the current html-document', () => {
@@ -70,10 +72,9 @@ describe('<HtmlDocument />', () => {
                 }
               }
             }
-            const oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCreated(tlmDataOtherContent)
-
-            expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
+            props.addCommentToTimeline.resetHistory()
+            wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
           })
         })
       })
@@ -279,6 +280,125 @@ describe('<HtmlDocument />', () => {
       it('should update showRefreshWarning state', () => {
         wrapper.instance().handleClickRefresh()
         expect(wrapper.state('showRefreshWarning')).to.deep.equal(false)
+      })
+    })
+
+    describe('shouldDisplayNotifyAllMessage', () => {
+      it("should return false if loggedUser don't have config", () => {
+        wrapper.setState(prev => ({ loggedUser: { ...prev.loggedUser, config: null } }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content.current_revision_type is creation', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'creation'
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user and there in no newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          },
+          newContent: {}
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user at the newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if user configuration content_id.notify_all_members_message is false', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.content_id}.notify_all_members_message`] = false
+        wrapper.setState(prev => ({
+          ...prev,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if the app mode is not VIEW', () => {
+        wrapper.setState(prev => ({
+          ...prev,
+          mode: APP_FEATURE_MODE.EDIT
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return true if user configuration content_id.notify_all_members_message is true', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.content_id}.notify_all_members_message`] = true
+        wrapper.setState(prev => ({
+          ...prev,
+          mode: APP_FEATURE_MODE.VIEW,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(true)
+      })
+    })
+
+    describe('handleCloseNotifyAllMessage', () => {
+      it('should set content_id.notify_all_members_message as false', () => {
+        mockPutUserConfiguration204(debug.config.apiUrl, debug.loggedUser.userId)
+        wrapper.instance().handleCloseNotifyAllMessage()
+        expect(wrapper.state('loggedUser').config[`content.${props.content.content_id}.notify_all_members_message`]).to.equal(false)
       })
     })
   })

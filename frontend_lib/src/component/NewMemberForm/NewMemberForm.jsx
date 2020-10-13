@@ -96,7 +96,7 @@ export const NewMemberForm = props => {
                         <div className='autocomplete__item__name__unknownuser'>
                           {props.publicName}
                           <div className='autocomplete__item__name__unknownuser__msg'>
-                            {props.t('I know this user exist')}
+                            {props.t('I know this user exists')}
                           </div>
                         </div>
                       </div>

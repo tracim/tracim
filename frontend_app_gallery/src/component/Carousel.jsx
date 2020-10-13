@@ -33,7 +33,7 @@ export class Carousel extends React.Component {
 
     if (props.slides.length === 0) {
       return props.isWorkspaceRoot
-        ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that shared space's root.")}</div>
+        ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that space's root.")}</div>
         : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
 

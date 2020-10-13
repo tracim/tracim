@@ -27,6 +27,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -135,6 +136,20 @@ class RoleApiFactory(object):
 
     def get(self, current_user: typing.Optional[User] = None) -> RoleApi:
         return RoleApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
+class SubscriptionLibFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> SubscriptionLib:
+        return SubscriptionLib(
             session=self.session,
             config=self.app_config,
             current_user=current_user or self.admin_user,

@@ -47,6 +47,7 @@ from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
@@ -253,7 +254,7 @@ def base_fixture(session, app_config) -> Session:
 @pytest.fixture
 def test_fixture(session, app_config) -> Session:
     """
-    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    Warning! This fixture is now deprecated. Don't use it for new tests.
     """
     with transaction.manager:
         try:
@@ -269,7 +270,7 @@ def test_fixture(session, app_config) -> Session:
 @pytest.fixture
 def default_content_fixture(base_fixture, app_config) -> Session:
     """
-    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    Warning! This fixture is now deprecated. Don't use it for new tests.
     """
     with transaction.manager:
         try:
@@ -317,6 +318,11 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
     return ApplicationApiFactory(app_list)
 
 
+@pytest.fixture
+def subscription_lib_factory(session, app_config, admin_user) -> ApplicationApiFactory:
+    return SubscriptionLibFactory(session, app_config, admin_user)
+
+
 @pytest.fixture()
 def admin_user(session: Session) -> User:
     return session.query(User).filter(User.email == "admin@admin.admin").one()
@@ -338,9 +344,7 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return Provider(
-        show_archived=False, show_deleted=False, show_history=False, app_config=app_config,
-    )
+    return Provider(app_config=app_config,)
 
 
 @pytest.fixture()
@@ -401,3 +405,8 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
 @pytest.fixture
 def event_helper(session) -> EventHelper:
     return EventHelper(session)
+
+
+@pytest.fixture
+def html_with_nasty_mention() -> str:
+    return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace <span id='mention-victim'>@victimnotmemberofthisworkspace</span>, are you? </p>"

@@ -24,6 +24,7 @@ import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageMana
 import {
   CUSTOM_EVENT,
   PROFILE,
+  NUMBER_RESULTS_BY_PAGE,
   serialize,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -32,19 +33,19 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  NUMBER_RESULTS_BY_PAGE,
   toggleFavicon
 } from '../util/helper.js'
 import {
-  getConfig,
   getAppList,
+  getConfig,
   getContentTypeList,
-  getNotificationList,
-  getUserIsConnected,
   getMyselfWorkspaceList,
+  getNotificationList,
+  getUserConfiguration,
+  getUserIsConnected,
   putUserLang,
-  getWorkspaceMemberList,
-  getUserMessagesSummary
+  getUserMessagesSummary,
+  getWorkspaceMemberList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -54,6 +55,7 @@ import {
   setContentTypeList,
   setNextPage,
   setNotificationList,
+  setUserConfiguration,
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
@@ -109,11 +111,12 @@ export class Tracim extends React.Component {
 
   handleDisconnectedFromApi = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
-    this.liveMessageManager.closeLiveMessageConnection()
-    if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+    this.handleUserDisconnected(data)
+    if (!document.location.pathname.includes('/login')) document.location.href = `${PAGE.LOGIN}?dc=1`
   }
 
   handleUserConnected = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.USER_CONNECTED, data)
     this.liveMessageManager.openLiveMessageConnection(data.user_id)
   }
 
@@ -192,6 +195,7 @@ export class Tracim extends React.Component {
         this.loadWorkspaceList()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadNotificationList(fetchUser.user_id)
+        this.loadUserConfiguration(fetchUser.user_id)
 
         this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id)
         break
@@ -235,6 +239,16 @@ export class Tracim extends React.Component {
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
+  }
+
+  loadUserConfiguration = async userId => {
+    const { props } = this
+
+    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
+    switch (fetchGetUserConfig.status) {
+      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
+    }
   }
 
   loadWorkspaceList = async (openInSidebarId = undefined) => {

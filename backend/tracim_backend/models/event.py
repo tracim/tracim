@@ -38,6 +38,7 @@ class EntityType(enum.Enum):
     USER = "user"
     WORKSPACE = "workspace"
     WORKSPACE_MEMBER = "workspace_member"
+    WORKSPACE_SUBSCRIPTION = "workspace_subscription"
     CONTENT = "content"
     MENTION = "mention"
 
@@ -113,6 +114,7 @@ class Event(DeclarativeBase):
     WORKSPACE_FIELD = "workspace"
     CONTENT_FIELD = "content"
     MEMBER_FIELD = "member"
+    SUBSCRIPTION_FIELD = "subscription"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
@@ -130,6 +132,7 @@ class Event(DeclarativeBase):
     user = index_property("fields", USER_FIELD)
     content = index_property("fields", CONTENT_FIELD)
     member = index_property("fields", MEMBER_FIELD)
+    subscription = index_property("fields", SUBSCRIPTION_FIELD)
     client_token = index_property("fields", CLIENT_TOKEN_FIELD)
 
     @property
@@ -156,7 +159,7 @@ class Message(DeclarativeBase):
     __tablename__ = "messages"
 
     receiver_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True)
-    event_id = Column(Integer, ForeignKey("events.event_id"), primary_key=True)
+    event_id = Column(Integer, ForeignKey("events.event_id", ondelete="CASCADE"), primary_key=True)
     sent = Column(DateTime)
     read = Column(DateTime)
 

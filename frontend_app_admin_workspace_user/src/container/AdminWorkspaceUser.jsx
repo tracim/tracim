@@ -15,6 +15,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent,
   checkUsernameValidity,
+  deleteWorkspace,
+  getWorkspaceMemberList,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
@@ -25,11 +27,9 @@ import {
   MINIMUM_CHARACTERS_PUBLIC_NAME
 } from '../helper.js'
 import {
-  deleteWorkspace,
   getUserDetail,
   getUserList,
   getWorkspaceList,
-  getWorkspaceMemberList,
   postAddUser,
   putMyselfProfile,
   putUserDisable,
@@ -105,7 +105,7 @@ export class AdminWorkspaceUser extends React.Component {
   updateTitleAndBreadcrumbs = () => {
     const { props } = this
     if (this.state.config.type === 'workspace') {
-      this.setHeadTitle(props.t('Shared space management'))
+      this.setHeadTitle(props.t('Space management'))
     } else if (this.state.config.type === 'user') {
       this.setHeadTitle(props.t('User account management'))
     }
@@ -186,7 +186,7 @@ export class AdminWorkspaceUser extends React.Component {
         }))
         break
       }
-      default: this.sendGlobalFlashMsg(props.t('Error while loading shared spaces list', 'warning'))
+      default: this.sendGlobalFlashMsg(props.t('Error while loading spaces list', 'warning'))
     }
   }
 
@@ -228,7 +228,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (state.config.type === 'workspace') {
       breadcrumbsList.push({
-        link: <Link to='/ui/admin/workspace'>{props.t('Shared space')}</Link>,
+        link: <Link to='/ui/admin/workspace'>{props.t('Space')}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     } else if (state.config.type === 'user') {
@@ -250,7 +250,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     if (deleteWorkspaceResponse.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while deleting shared space'), 'warning')
+      this.sendGlobalFlashMsg(props.t('Error while deleting space'), 'warning')
     }
     this.handleClosePopupDeleteWorkspace()
   }
@@ -268,7 +268,7 @@ export class AdminWorkspaceUser extends React.Component {
     const newWorkspaceList = state.content.workspaceList.slice()
     /* INFO SG 2020-06-15:
      *  - the list is ordered by id and a newly created workspace has a greater id than all others.
-     *  - initialize member list as empty since the shared space member created message will handle
+     *  - initialize member list as empty since the space member created message will handle
      *    adding the initial user.
      */
     newWorkspaceList.push({ ...workspace, memberList: [] })

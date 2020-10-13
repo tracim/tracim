@@ -30,6 +30,8 @@ export const contentFromApi = {
     'comment'
   ],
   content_type: 'html-document',
+  parent_content_type: '',
+  parent_label: '',
   parent_id: null,
   label: 'Test content html',
   is_archived: false,

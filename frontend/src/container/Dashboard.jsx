@@ -155,9 +155,9 @@ export class Dashboard extends React.Component {
         break
       case 400:
         props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage('Unknown shared space'))
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
 
@@ -380,14 +380,14 @@ export class Dashboard extends React.Component {
             return false
           }
           case 3008:
-            props.dispatch(newFlashMessage(props.t('This user already is in the workspace'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('This user already is in the space'), 'warning'))
             return false
           default:
-            props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
             return false
         }
       default:
-        props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
         return false
     }
   }

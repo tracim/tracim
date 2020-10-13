@@ -13,7 +13,7 @@ describe('navigate :: workspace > create_new > thread', function () {
       })
     })
     cy.get('[data-cy="dropdownCreateBtn"]').click()
-    cy.get('.subdropdown__link__thread__text').click()
+    cy.get('.show .fa-comments-o').should('be.visible').click()
     cy.get('[data-cy="createcontent__form__input"]').type('test')
     cy.get('[data-cy="popup__createcontent__form__button"]').click()
   })

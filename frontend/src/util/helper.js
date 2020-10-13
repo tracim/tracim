@@ -7,7 +7,6 @@ const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const NUMBER_RESULTS_BY_PAGE = 15
 
 export const history = require('history').createBrowserHistory()
 
@@ -29,7 +28,7 @@ export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
   hexcolor: GLOBAL_primaryColor,
-  creationLabel: i18n.t('Create a shared space'),
+  creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
 }
 
@@ -110,12 +109,15 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 
-export const sortWorkspaceContents = (a, b) => {
+const naturalCompareLabels = (itemA, itemB, lang) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
+}
+
+export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1
   if (b.type === 'folder' && a.type !== 'folder') return 1
-  if (a.label > b.label) return 1
-  if (b.label > a.label) return -1
-  return 0
+  return naturalCompareLabels(a, b, lang)
 }
 
 export const CONTENT_NAMESPACE = {
@@ -123,10 +125,12 @@ export const CONTENT_NAMESPACE = {
   UPLOAD: 'upload'
 }
 
-export const sortWorkspaceList = (a, b) => {
-  if (a.label > b.label) return 1
-  if (b.label > a.label) return -1
-  return 0
+export const sortWorkspaceList = (workspaceList, lang) => {
+  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
+}
+
+export const sortContentList = (workspaceContents, lang) => {
+  return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }
 
 export const toggleFavicon = (hasNewNotification) => {

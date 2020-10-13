@@ -4,15 +4,14 @@ import { withRouter } from 'react-router'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
-import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { ROLE } from 'tracim_frontend_lib'
+import { DropdownMenu, ROLE } from 'tracim_frontend_lib'
 import {
   PAGE,
   DRAG_AND_DROP,
-  sortWorkspaceContents,
+  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../../util/helper.js'
@@ -107,41 +106,40 @@ class Folder extends React.Component {
           <div className='folder__header__button'>
             <div className='folder__header__button__addbtn'>
               {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
-                <div title={props.t('Create in folder')}>
-                  <button
-                    className={classnames(
-                      'folder__header__button__addbtn__text',
-                      'btn',
-                      'outlineTextBtn',
-                      'primaryColorBorder',
-                      'primaryColorBgHover',
-                      'primaryColorBorderDarkenHover',
-                      'dropdown-toggle'
-                    )}
-                    type='button'
-                    id='dropdownMenuButton'
-                    data-toggle='dropdown'
-                    aria-haspopup='true'
-                    aria-expanded='false'
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <span className='folder__header__button__addbtn__text-desktop'>
-                      {`${props.t('Create in folder')}...`}
+                <DropdownMenu
+                  buttonOpts={
+                    <span>
+                      <span className='folder__header__button__addbtn__text-desktop'>
+                        {`${props.t('Create in folder')}...`}
+                      </span>
+                      <span className='folder__header__button__addbtn__text-responsive'>
+                        <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
+                      </span>
                     </span>
-
-                    <span className='folder__header__button__addbtn__text-responsive'>
-                      <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
-                    </span>
-                  </button>
-
-                  <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <SubDropdownCreateButton
-                      folderId={props.folderData.id}
-                      availableApp={folderAvailableApp}
-                      onClickCreateContent={(e, folderId, slug) => props.onClickCreateContent(e, folderId, slug)}
-                    />
-                  </div>
-                </div>
+                  }
+                  buttonTooltip={props.t('Create in folder')}
+                  buttonCustomClass='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                  isButton
+                >
+                  {folderAvailableApp.map(app =>
+                    <button
+                      className='transparentButton'
+                      onClick={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        props.onClickCreateContent(e, props.folderData.id, app.slug)
+                      }}
+                      key={app.slug}
+                      childrenKey={app.slug}
+                    >
+                      <i
+                        className={`fa fa-fw fa-${app.faIcon}`}
+                        style={{ color: app.hexcolor }}
+                      />
+                      {props.t(app.creationLabel)}
+                    </button>
+                  )}
+                </DropdownMenu>
               )}
 
               <div className='d-none d-md-flex' title={props.t('Actions')}>
@@ -180,7 +178,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.sort(sortWorkspaceContents).map((content, i) => content.type === 'folder'
+          {sortContentList(folderContentList, props.lang).map((content, i) => content.type === 'folder'
             ? (
               <FolderContainer
                 availableApp={props.availableApp}

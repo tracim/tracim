@@ -22,6 +22,7 @@ import {
   REMOVE,
   SET,
   USER,
+  USER_CONFIGURATION,
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER
 } from '../../../src/action-creator.sync'
@@ -32,6 +33,7 @@ import {
   mockGetConfig200,
   mockGetContentType200,
   mockGetMyselfWorkspaceList200,
+  mockGetUserConfig200,
   mockGetWorkspaceMemberList200
 } from '../../apiMock'
 import { notificationPage } from '../../fixture/notification/notificationPage.js'
@@ -47,6 +49,7 @@ describe('<Tracim />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
   const appendBreadcrumbsCallBack = sinon.spy()
   const setWorkspaceListMemberListCallBack = sinon.spy()
+  const setUserConfigurationCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -64,6 +67,9 @@ describe('<Tracim />', () => {
         break
       case `${SET}/${USER}/Connected`:
         setUserConnectedCallBack()
+        break
+      case `${SET}/${USER_CONFIGURATION}`:
+        setUserConfigurationCallBack()
         break
       case `${SET}/${WORKSPACE_LIST}`:
         setWorkspaceListCallBack()
@@ -146,6 +152,15 @@ describe('<Tracim />', () => {
         mockGetContentType200(FETCH_CONFIG.apiUrl, contentType)
         wrapperInstance.loadAppConfig().then(() => {
           expect(setContentTypeListCallBack.called).to.equal(true)
+        }).then(done, done)
+      })
+    })
+
+    describe('loadUserConfiguration', () => {
+      it('should call setUserConfiguration', (done) => {
+        mockGetUserConfig200(FETCH_CONFIG.apiUrl, user.userId)
+        wrapperInstance.loadUserConfiguration(user.userId).then(() => {
+          expect(setUserConfigurationCallBack.called).to.equal(true)
         }).then(done, done)
       })
     })

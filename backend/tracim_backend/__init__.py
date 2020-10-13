@@ -6,10 +6,13 @@ import warnings
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
+from transaction._transaction import Status as TransactionStatus
+from transaction.interfaces import NoTransaction
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
@@ -46,6 +49,7 @@ from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticat
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -71,6 +75,47 @@ except ImportError:
 # useful to avoid apispec error
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
+
+
+class TracimPyramidContext(PyramidContext):
+    """
+    Customize the hapic context to avoid committing a transaction when an exception is caught
+    by hapic.
+    """
+
+    def doom_request_transaction(self, exc: Exception, *args, **kwargs) -> None:
+        try:
+            # NOTE 2020-09-09 - S.G.
+            # we have to search for the request object in all arguments
+            # as we cannot be sure of its place in it.
+            # For example if a handler is an object method the first argument
+            # will be the controller object, not the request object.
+            request = next(arg for arg in args if isinstance(arg, Request))
+            transaction_status = request.tm.get().status
+            # INFO - 2020-10-01 - G.M : In some specific case: we do arrive in situation
+            # where transaction is not active anymore, in such situation, it's not possible
+            # to doom the request and we do get " ValueError('non-doomable')" Exception.
+            # to handle this case in a more clear way, we do Doom only active Transaction.
+            if transaction_status == TransactionStatus.ACTIVE:
+                request.tm.doom()
+            else:
+                # INFO - 2020-10-01 - G.M : debug unattended transaction status
+                # for troubleshooting future issues
+                logger.debug(
+                    self,
+                    'Transaction not active, status : "{}", cannot be doomed'.format(
+                        transaction_status
+                    ),
+                )
+        except StopIteration:
+            logger.error(self, "Cannot find request object in arguments")
+        except NoTransaction:
+            # INFO - 2020-10-01 - G.M - In some very specific case like PageNotFound case, pyramid
+            # doesn't provide a true transaction, so doom it will raise a NoTransaction exception.
+            logger.debug(self, "Transaction not initialized, cannot be doomed")
+
+    global_exception_caught = doom_request_transaction
+    local_exception_caught = doom_request_transaction
 
 
 def web(global_config: OrderedDict, **local_settings) -> Router:
@@ -151,7 +196,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Add SqlAlchemy DB
     init_models(configurator, app_config)
     # set Hapic
-    context = PyramidContext(
+    context = TracimPyramidContext(
         configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
     )
     hapic.set_context(context)

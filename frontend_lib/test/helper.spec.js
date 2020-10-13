@@ -12,10 +12,11 @@ import {
   setupCommonRequestHeaders,
   serialize,
   addRevisionFromTLM,
-  wrapMentionsInSpanTags,
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
-  MAXIMUM_CHARACTERS_USERNAME
+  MAXIMUM_CHARACTERS_USERNAME,
+  permissiveNumberEqual,
+  updateTLMAuthor
 } from '../src/helper.js'
 
 import {
@@ -52,6 +53,35 @@ describe('helper.js', () => {
       const expectedMsg = 'random<br />Message'
       const returnedMsg = convertBackslashNToBr(msg)
       expect(returnedMsg).to.equal(expectedMsg)
+    })
+  })
+
+  describe('updateTLMAuthor()', () => {
+    it('should return the author object added with is_from_system_admin if author is not null', () => {
+      const author = { username: 'Author' }
+      const returnedObject = updateTLMAuthor(author)
+      expect(returnedObject).to.deep.equal({ ...author, is_from_system_admin: false })
+    })
+
+    it('should return the System Administrator author object if author is null', () => {
+      const systemAdministratorAuthor = {
+        allowed_space: 0,
+        auth_type: 'internal',
+        avatar_url: null,
+        created: '',
+        email: '',
+        is_active: true,
+        is_deleted: false,
+        is_from_system_admin: true,
+        lang: 'en',
+        profile: 'administrators',
+        public_name: 'System Administrator',
+        timezone: '',
+        user_id: 0,
+        username: ''
+      }
+      const returnedObject = updateTLMAuthor(null)
+      expect(returnedObject).to.deep.equal(systemAdministratorAuthor)
     })
   })
 
@@ -246,144 +276,6 @@ describe('helper.js', () => {
     })
   })
 
-  describe('function wrapMentionsInSpanTags', () => {
-    const DOMParser = new global.DOMParser()
-
-    describe('with a source without any mention', () => {
-      const textWithoutMention = 'This is a text without any mention'
-      const result = wrapMentionsInSpanTags(textWithoutMention)
-
-      it('should not modify the source', () => expect(textWithoutMention).to.equal(result))
-    })
-
-    describe('with only one mention in the source', () => {
-      describe('with source as simple text', () => {
-        describe('with the mention at the middle of a sentence', () => {
-          const textWithMentionAtMiddle = 'This is a text with a mention @admin that should be wrapped'
-          const result = wrapMentionsInSpanTags(textWithMentionAtMiddle)
-          const parsedResult = DOMParser.parseFromString(result, 'text/html')
-          const addedSpanList = parsedResult.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-
-        describe('with the mention at the beginning of a sentence', () => {
-          const textWithMentionAtBeginning = '@admin'
-          const result = wrapMentionsInSpanTags(textWithMentionAtBeginning)
-          const parsedResult = DOMParser.parseFromString(result, 'text/html')
-          const addedSpanList = parsedResult.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-      })
-
-      describe('with source as HTML text', () => {
-        describe('with the mention at the middle of a sentence', () => {
-          const htmlTextWithMentionAtMiddle = '<div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>'
-          const result = wrapMentionsInSpanTags(htmlTextWithMentionAtMiddle)
-          const parsedResult = DOMParser.parseFromString(result, 'text/html')
-          const addedSpanList = parsedResult.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-
-        describe('with the mention at the beginning of a sentence', () => {
-          const htmlTextWithMentionAtBeginning = '<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>'
-          const result = wrapMentionsInSpanTags(htmlTextWithMentionAtBeginning)
-          const parsedResult = DOMParser.parseFromString(result, 'text/html')
-          const addedSpanList = parsedResult.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it('should have the span id starting with "mention-"', () => expect(addedSpanListId.startsWith('mention-')).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-      })
-    })
-
-    describe('with 3 mention in the source', () => {
-      describe('with source as simple text', () => {
-        const textWithMultipleMentions = 'This is a text @user1 with 3 mention @admin that should be @user2 wrapped'
-        const result = wrapMentionsInSpanTags(textWithMultipleMentions)
-        const parsedResult = DOMParser.parseFromString(result, 'text/html')
-        const addedSpanList = parsedResult.getElementsByTagName('span')
-
-        it('should have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
-        it('should contain the username in each span tag', () => {
-          expect(addedSpanList[0].textContent).to.equal('@user1')
-          expect(addedSpanList[1].textContent).to.equal('@admin')
-          expect(addedSpanList[2].textContent).to.equal('@user2')
-        })
-        it('should have each span id starting with "mention-"', () => {
-          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
-        })
-      })
-
-      describe('with source as HTML text', () => {
-        const htmlTextWithMention = '<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>'
-        const result = wrapMentionsInSpanTags(htmlTextWithMention)
-        const parsedResult = DOMParser.parseFromString(result, 'text/html')
-        const addedSpanList = parsedResult.getElementsByTagName('span')
-
-        it('should only have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
-        it('should contain the username in the span tag', () => {
-          expect(addedSpanList[0].textContent).to.equal('@user1')
-          expect(addedSpanList[1].textContent).to.equal('@admin')
-          expect(addedSpanList[2].textContent).to.equal('@user2')
-        })
-        it('should have each span id starting with "mention-"', () => {
-          expect(addedSpanList[0].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[1].id.startsWith('mention-')).to.equal(true)
-          expect(addedSpanList[2].id.startsWith('mention-')).to.equal(true)
-        })
-      })
-    })
-
-    describe('with an @ in the source but without a space before', () => {
-      const textWithAtWithoutPreSpace = 'This is a text with a mention@admin that should NOT be wrapped'
-      const result = wrapMentionsInSpanTags(textWithAtWithoutPreSpace)
-      const parsedResult = DOMParser.parseFromString(result, 'text/html')
-      const addedSpanList = parsedResult.getElementsByTagName('span')
-
-      it('should not have any span tag', () => {
-        expect(addedSpanList).to.have.lengthOf(0)
-      })
-    })
-
-    describe('if the source is NULL', () => {
-      it('should throw an error exception', () => {
-        try {
-          wrapMentionsInSpanTags(null)
-        } catch (e) {
-          expect(e instanceof Error).should.equal(true)
-        }
-      })
-    })
-  })
-
   describe('the checkUsernameValidity function', () => {
     const mockProps = {
       t: m => m
@@ -432,5 +324,53 @@ describe('helper.js', () => {
         expect(e).to.be.a('Error')
       }
     })
+  })
+
+  describe('the permissiveNumberEqual function', () => {
+    const testCases = [
+      {
+        var1: 0,
+        var2: 1,
+        expectedResult: false
+      },
+      {
+        var1: 0,
+        var2: 0,
+        expectedResult: true
+      },
+      {
+        var1: 12,
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 1,
+        var2: '12',
+        expectedResult: false
+      },
+      {
+        var1: '12',
+        var2: '12',
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: null,
+        expectedResult: true
+      },
+      {
+        var1: 0,
+        var2: undefined,
+        expectedResult: true
+      }
+    ]
+    for (const { var1, var2, expectedResult } of testCases) {
+      const typeOfVar1 = typeof var1
+      const typeOfVar2 = typeof var2
+      const result = permissiveNumberEqual(var1, var2)
+      it(`should compare "${var1}" (${typeOfVar1}) and "${var2}" (${typeOfVar2}) to "${expectedResult}"`, () => {
+        expect(result).to.be.equal(expectedResult)
+      })
+    }
   })
 })

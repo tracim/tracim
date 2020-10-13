@@ -49,10 +49,11 @@ RUN \
 # Go in backend folder
     cd /tracim/backend \
 # Install backend
-    && python3 -m pip install -U pip setuptools wheel \
+    && python3 -m pip install -r requirements-build.txt \
     && python3 -m pip install -r requirements.txt \
-    && python3 -m pip install -e ".[postgresql]" \
-    && python3 -m pip install -e ".[mysql]" \
+    && python3 -m pip install -r requirements-db-postgres.txt \
+    && python3 -m pip install -r requirements-db-mysql.txt \
+    && python3 -m pip install -e "." \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
 

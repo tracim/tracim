@@ -8,7 +8,8 @@ import {
   mockPutMyselfFileRead200,
   mockGetFileComment200,
   mockGetShareLinksList200,
-  mockGetFileRevision200
+  mockGetFileRevision200,
+  mockPutUserConfiguration204
 } from '../apiMock.js'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
@@ -19,6 +20,7 @@ describe('<File />', () => {
   const props = {
     setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     registerLiveMessageHandlerList: () => { },
     registerCustomEventHandlerList: () => { },
     i18n: {},
@@ -47,7 +49,7 @@ describe('<File />', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('Create a new comment', () => {
-          it('should have the new comment in the Timeline', () => {
+          it('should call addCommentToTimeline', () => {
             const tlmData = {
               fields: {
                 author: {
@@ -63,9 +65,7 @@ describe('<File />', () => {
               }
             }
             wrapper.instance().handleContentCommentCreated(tlmData)
-
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.fields.content.content_id))
-            expect(hasComment).to.equal(true)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
         })
 
@@ -345,6 +345,116 @@ describe('<File />', () => {
       })
       it('should be in view mode', () => {
         expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
+      })
+    })
+
+    describe('shouldDisplayNotifyAllMessage', () => {
+      it("should return false if loggedUser don't have config", () => {
+        wrapper.setState(prev => ({ loggedUser: { ...prev.loggedUser, config: null } }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content.current_revision_type is creation', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'creation'
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user and there in no newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          },
+          newContent: {}
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user at the newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if user configuration content_id.notify_all_members_message is false', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.file.content_id}.notify_all_members_message`] = false
+        wrapper.setState(prev => ({
+          ...prev,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return true if user configuration content_id.notify_all_members_message is true', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.file.content_id}.notify_all_members_message`] = true
+        wrapper.setState(prev => ({
+          ...prev,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(true)
+      })
+    })
+
+    describe('handleCloseNotifyAllMessage', () => {
+      it('should set content_id.notify_all_members_message as false', () => {
+        mockPutUserConfiguration204(debug.config.apiUrl, debug.loggedUser.userId)
+        wrapper.instance().handleCloseNotifyAllMessage()
+        expect(wrapper.state('loggedUser').config[`content.${props.content.file.content_id}.notify_all_members_message`]).to.equal(false)
       })
     })
   })

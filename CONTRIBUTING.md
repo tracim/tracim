@@ -17,7 +17,7 @@ To enforce most required guidelines, please use the precommit mechanism.
 This will perform some automatic checks before committing.
 This is required to contribute to Tracim.
 
-To use it, you need the `pre-commit` Python package (installed automatically with `pip install -e ".[dev]"` on the backend)
+To use it, you need the `pre-commit` Python package (installed with `pip install -r requirements-dev.txt` on the backend)
 you can then install hooks with:
 
     pre-commit install

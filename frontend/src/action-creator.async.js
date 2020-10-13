@@ -23,6 +23,7 @@ import {
   setRedirectLogin,
   setUserDisconnected,
   USER,
+  USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
   USER_KNOWN_MEMBER_LIST,
@@ -50,7 +51,7 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
+import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -196,6 +197,19 @@ export const getUser = userId => async dispatch => {
       method: 'GET'
     },
     actionName: USER,
+    dispatch
+  })
+}
+
+export const getUserConfiguration = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/config`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: USER_CONFIGURATION,
     dispatch
   })
 }
@@ -834,9 +848,11 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-export const getNotificationList = (userId, notificationsByPage, nextPageToken = null) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?count=${notificationsByPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
+
+export const getNotificationList = (userId, notificationsPerPage, nextPageToken = null) => async dispatch => {
+  const fetchGetNotificationWall = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_ids=${userId}${eventTypesParam}&count=${notificationsPerPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
@@ -845,6 +861,17 @@ export const getNotificationList = (userId, notificationsByPage, nextPageToken =
     actionName: NOTIFICATION_LIST,
     dispatch
   })
+
+  if (fetchGetNotificationWall.status === 200) {
+    fetchGetNotificationWall.json.items = fetchGetNotificationWall.json.items.map(notification => ({
+      ...notification,
+      fields: {
+        ...notification.fields,
+        author: updateTLMAuthor(notification.fields.author)
+      }
+    }))
+  }
+  return fetchGetNotificationWall
 }
 
 export const putNotificationAsRead = (userId, eventId) => dispatch => {
@@ -875,7 +902,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 
 export const getUserMessagesSummary = userId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${eventTypesParam}`,
     param: {
       credentials: 'include',
       headers: {

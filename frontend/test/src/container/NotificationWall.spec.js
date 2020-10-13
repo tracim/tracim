@@ -50,7 +50,8 @@ describe('<NotificationWall />', () => {
     dispatch: dispatchCallBack,
     notificationPage: {
       list: [{
-        id: 1
+        id: 1,
+        type: ''
       }]
     },
     t: tradKey => tradKey,
@@ -66,7 +67,8 @@ describe('<NotificationWall />', () => {
       const baseNotification = {
         content: serialize(contentFromApi, serializeContentProps),
         workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
-        user: serialize(globalManagerFromApi, serializeUserProps)
+        user: serialize(globalManagerFromApi, serializeUserProps),
+        author: 'Leslie'
       }
       it(`should return type comment object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)}`, () => {
         expect(NotificationWallInstance.getNotificationDetails({
@@ -74,9 +76,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon: 'fa-comments-o',
-            text: '{{author}} commented on {{content}} at {{workspace}}',
-            url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.id}`
+            icon: 'comments-o',
+            text: '{{author}} commented on {{content}} in {{space}}',
+            url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
           })
       })
 
@@ -86,8 +88,8 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fa-magic',
-            text: '{{author}} created {{content}} at {{workspace}}',
+            icon: 'magic',
+            text: '{{author}} created {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -98,8 +100,8 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fa-history',
-            text: '{{author}} updated a new version of {{content}} at {{workspace}}',
+            icon: 'history',
+            text: '{{author}} updated {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -111,17 +113,47 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'fa-user-o',
-            text: '{{author}} added you to {{workspace}}',
+            icon: 'user-o+plus',
+            text: '{{author}} added you to {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })
+      })
+
+      it('should produce span tags, and have title attributes on them', () => {
+        function mocki18nextT (text, opts) {
+          if (!opts) return text
+
+          if (opts.interpolation.escapeValue !== false) {
+            throw new Error('Expected interpolation.escapeValue to be false')
+          }
+
+          for (const p of Object.keys(opts)) {
+            text = text.replace(new RegExp('\\{\\{' + p + '\\}\\}', 'g'), opts[p])
+          }
+
+          return text
+        }
+
+        const translatedNotificationWallInstance = shallow(<NotificationWall {...{ ...props, t: mocki18nextT }} />).instance()
+
+        const htmlText = translatedNotificationWallInstance.getNotificationDetails({
+          ...baseNotification,
+          type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
+        }).text
+
+        const div = document.createElement('div')
+        div.innerHTML = htmlText
+        const spanList = [...div.querySelectorAll('span')]
+
+        expect(spanList.length).to.be.greaterThan(0)
+        expect(spanList.every(span => span.title && span.title === span.textContent)).to.equal(true)
       })
     })
 
     describe('handleClickNotification', () => {
       it('should call onCloseNotificationWallCallBack()', (done) => {
         mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
-        NotificationWallInstance.handleClickNotification(1).then(() => {
+        NotificationWallInstance.handleClickNotification({}, 1, { url: '/ui' }).then(() => {
           expect(onCloseNotificationWallCallBack.called).to.equal(true)
         }).then(done, done)
       })

@@ -2,7 +2,7 @@
 <html lang="${lang}">
 <body>
 <p>${_('Hello {username},').format(username=emitter.display_name)}</p>
-<p>${_('You have invited {nb_receivers} people to upload files in this shared space <a href={sharedspace_url}>{sharedspace_name}</a>:').format(sharedspace_name=html_escape(workspace.label), sharedspace_url=html_escape(workspace.frontend_url), nb_receivers=html_escape(len(upload_permission_receivers)))|n}</p>
+<p>${_('You have invited {nb_receivers} people to upload files in this space <a href={sharedspace_url}>{sharedspace_name}</a>:').format(sharedspace_name=html_escape(workspace.label), sharedspace_url=html_escape(workspace.frontend_url), nb_receivers=html_escape(len(upload_permission_receivers)))|n}</p>
 <ul>
 % for upload_permission in upload_permission_receivers:
 <li>${_('<i><a href="{email_link}">{email}</a></i> at this link: <a href="{url}">{url}</a>').format(email=html_escape(upload_permission.email_user.email_address), email_link=html_escape(upload_permission.email_user.email_link), url=html_escape(upload_permission.url))| n}</li>
