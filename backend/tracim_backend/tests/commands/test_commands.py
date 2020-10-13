@@ -1075,6 +1075,66 @@ class TestCommands(object):
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
 
+    def test_func__delete_user__ok__force_delete_and_deleted_workspace(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Non-regression test when force deleting a user which owns a is_deleted=True workspace.
+        """
+        uapi = user_api_factory.get()
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=Profile.TRUSTED_USER,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get(current_user=test_user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+        )
+        content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api.delete(test_workspace)
+        transaction.commit()
+
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "--force",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 0
+
     def test_func__anonymize_user__ok__nominal_case(
         self,
         session,
