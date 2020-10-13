@@ -62,12 +62,31 @@ describe('<PopupCreateWorkspace />', () => {
 
     describe('handleClickNextOrBack', () => {
       describe('in first step', () => {
-        it('should update parentOptions state with the list of spaces + the root', (done) => {
+        it('should update parentOptions state with the root space if the space list is empty', (done) => {
           wrapper.setState({ isFirstStep: true })
           mockGetUserSpaces200(apiUrl, props.loggedUser.userId, [])
           wrapper.instance().handleClickNextOrBack().then(() => {
             expect(wrapper.update().state('parentOptions')).to.deep.equal(
               [{ value: props.t('None'), label: props.t('None'), spaceId: null, parentId: null }]
+            )
+          }).then(done, done)
+        })
+
+        it('should add - to space label at parentOptions state if it is a child and -- if grandchild', (done) => {
+          wrapper.setState({ isFirstStep: true })
+          mockGetUserSpaces200(apiUrl, props.loggedUser.userId, [
+            { workspace_id: 1, parent_id: null, access_type: 'confidential', label: 'a' },
+            { workspace_id: 2, parent_id: 1, access_type: 'confidential', label: 'b' },
+            { workspace_id: 3, parent_id: 2, access_type: 'confidential', label: 'c' }
+          ])
+          wrapper.instance().handleClickNextOrBack().then(() => {
+            expect(wrapper.update().state('parentOptions')).to.deep.equal(
+              [
+                { value: props.t('None'), label: props.t('None'), spaceId: null, parentId: null },
+                { value: 'a', label: <span title='a'>{''} <i className='fa fa-fw fa-user-secret' /> {'a'}</span>, spaceId: 1, parentId: null },
+                { value: 'b', label: <span title='b'>{'-'} <i className='fa fa-fw fa-user-secret' /> {'b'}</span>, spaceId: 2, parentId: 1 },
+                { value: 'c', label: <span title='c'>{'--'} <i className='fa fa-fw fa-user-secret' /> {'c'}</span>, spaceId: 3, parentId: 2 }
+              ]
             )
           }).then(done, done)
         })

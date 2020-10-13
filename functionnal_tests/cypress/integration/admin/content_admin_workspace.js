@@ -40,11 +40,11 @@ describe('content :: admin > workspace', function () {
     cy.get('.adminWorkspace__btnnewworkspace__btn').click()
 
     cy.get('.newSpace__input').click().type('A test space')
-    cy.get('.singleChoiceList__item').first().click()
+    cy.get('.singleChoiceList__item__text__content__description').first().click()
     cy.get('.newSpace__button .btn').click()
 
-    cy.get('.singleChoiceList__item').first().click()
-    cy.contains('.newSpace__button .btn', 'Create').click()
+    cy.get('.singleChoiceList__item__text__content__description').first().click()
+    cy.contains('.newSpace__button .btn', 'Create').should('not.be.disabled').click()
 
     cy.location('pathname').should('be.equal', '/ui/workspaces/2/dashboard')
   })

@@ -9,7 +9,6 @@ import {
   SingleChoiceList,
   handleFetchResult,
   ROLE_LIST,
-  // SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
