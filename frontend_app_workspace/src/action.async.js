@@ -10,3 +10,6 @@ export const postSpace = (apiUrl, newDefaultRole, newParentSpace, newName, newTy
     label: newName,
     parent_id: newParentSpace
   })
+
+export const getAllowedSpaceTypes = (apiUrl) =>
+  baseFetch('GET', `${apiUrl}/system/workspace_access_types`)

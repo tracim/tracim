@@ -14,7 +14,11 @@ import {
 } from 'tracim_frontend_lib'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
-import { getUserSpaces, postSpace } from '../action.async.js'
+import {
+  getAllowedSpaceTypes,
+  getUserSpaces,
+  postSpace
+} from '../action.async.js'
 import i18n from '../i18n.js'
 
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -54,11 +58,12 @@ export class PopupCreateWorkspace extends React.Component {
     super(props)
     this.state = {
       appName: 'workspace',
+      allowedTypes: [],
       config: props.data ? props.data.config : debug.config,
       isFirstStep: true,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       newDefaultRole: '',
-      newParentSpaceId: 0,
+      newParentSpace: { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null },
       newType: '',
       newName: '',
       parentOptions: [],
@@ -96,6 +101,10 @@ export class PopupCreateWorkspace extends React.Component {
     }
   })
 
+  componentDidMount () {
+    this.getTypeList()
+  }
+
   handleChangeNewName = e => this.setState({ newName: e.target.value })
 
   handleChangeNewDefaultRole = newRole => this.setState({ newDefaultRole: newRole })
@@ -103,7 +112,7 @@ export class PopupCreateWorkspace extends React.Component {
   handleChangeSpacesType = newType => this.setState({ newType: newType })
 
   handleChangeParentSpace = newParentSpace => this.setState({
-    newParentSpaceId: newParentSpace.spaceId,
+    newParentSpace: newParentSpace,
     showWarningMessage: newParentSpace.parentId !== null
   })
 
@@ -120,7 +129,11 @@ export class PopupCreateWorkspace extends React.Component {
           const addSpacesToList = (level, initialList) => {
             initialList.forEach(space => {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
-              const spaceLabel = <span title={space.label}>{'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}</span>
+              const spaceLabel = (
+                <span title={space.label}>
+                  {'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}
+                </span>
+              )
               spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
               if (space.children.length !== 0) addSpacesToList(level + 1, space.children)
             })
@@ -133,7 +146,7 @@ export class PopupCreateWorkspace extends React.Component {
         }
         default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
       }
-    } else this.setState({ isFirstStep: true, showWarningMessage: false })
+    } else this.setState({ isFirstStep: true })
   }
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -146,7 +159,13 @@ export class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchPostSpace = await handleFetchResult(await postSpace(state.config.apiUrl, state.newDefaultRole, state.newParentSpaceId, state.newName, state.newType))
+    const fetchPostSpace = await handleFetchResult(await postSpace(
+      state.config.apiUrl,
+      state.newDefaultRole,
+      state.newParentSpace.spaceId,
+      state.newName,
+      state.newType
+    ))
 
     switch (fetchPostSpace.apiResponse.status) {
       case 200: this.handleClose(); break
@@ -164,6 +183,19 @@ export class PopupCreateWorkspace extends React.Component {
 
   handleTogglePopoverDefaultRoleInfo = () => {
     this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
+  }
+
+  getTypeList = async () => {
+    const fetchGetAllowedSpaceTypes = await handleFetchResult(await getAllowedSpaceTypes(this.state.config.apiUrl))
+
+    switch (fetchGetAllowedSpaceTypes.apiResponse.status) {
+      case 200: {
+        const apiTypeList = fetchGetAllowedSpaceTypes.body.items
+        this.setState({ allowedTypes: SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug)) })
+        break
+      }
+      default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
+    }
   }
 
   render () {
@@ -205,7 +237,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__label'> {props.t("Space's type:")} </div>
                 <SingleChoiceList
-                  list={SPACE_TYPE_LIST}
+                  list={state.allowedTypes}
                   onChange={this.handleChangeSpacesType}
                   currentValue={state.newType}
                 />
@@ -231,7 +263,7 @@ export class PopupCreateWorkspace extends React.Component {
                   isSearchable
                   onChange={this.handleChangeParentSpace}
                   options={state.parentOptions}
-                  defaultValue={state.parentOptions[0]}
+                  defaultValue={state.newParentSpace}
                 />
                 {state.showWarningMessage && (
                   <div className='newSpace__warningMessage'>
