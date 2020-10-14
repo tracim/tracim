@@ -17,7 +17,7 @@ you need to set tracim config like this to use default pushpin port:
 
 ~~~ini
 basic_setup.website_base_url = http://localhost:7999
-live_messages.control_uri = http://localhost:5561
+live_messages.control_zmq_uri = tcp://localhost:5563
 ~~~
 
 :warning:  Temporary, you also need to ensure "jobs.processing_mode" parameter is unset or set to "sync".

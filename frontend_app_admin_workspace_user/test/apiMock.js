@@ -24,9 +24,16 @@ const mockGetUserDetails200 = (apiUrl, user) => {
     .reply(200, user)
 }
 
+const mockPostUser200 = (apiUrl) => {
+  return nock(apiUrl)
+    .post('/users')
+    .reply(200, {})
+}
+
 export {
   mockGetWorkspaces200,
   mockGetUsers200,
   mockGetUserDetails200,
-  mockGetWorkspaceMembers200
+  mockGetWorkspaceMembers200,
+  mockPostUser200
 }

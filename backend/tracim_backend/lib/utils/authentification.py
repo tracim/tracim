@@ -1,5 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
+import datetime
+import time
 import typing
 
 from pyramid.authentication import BasicAuthAuthenticationPolicy
@@ -55,10 +57,12 @@ class TracimAuthenticationPolicy(ABC):
         except AuthenticationFailed:
             return None
 
-    def _remote_authenticated_user(self, request: Request, login: str) -> typing.Optional[User]:
+    def _remote_authenticated_user(
+        self, request: Request, login: typing.Optional[str]
+    ) -> typing.Optional[User]:
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
-        if not app_config.REMOTE_USER_HEADER:
+        if not app_config.REMOTE_USER_HEADER or not login:
             return None
         try:
             return uapi.remote_authenticate(login)
@@ -125,6 +129,9 @@ class TracimBasicAuthAuthenticationPolicy(
 
 @implementer(IAuthenticationPolicy)
 class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
+
+    COOKIE_LAST_SET_TIME = "cookie_last_set_time"
+
     def __init__(self, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
         self.callback = None
@@ -141,9 +148,35 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
         except UserDoesNotExist:
             user = None
-        # do not allow invalid_user + ask for cleanup of session cookie
+        # do not allow invalid_user
         if not user or not user.is_active or user.is_deleted:
             return None
+
+        # ensure cookie expiry date is updated if it is too old
+        if not request.session.new:
+            # all computation is done in timestamps (Epoch)
+            cookie_last_set_time = (
+                request.session.get(self.COOKIE_LAST_SET_TIME) or request.session.created
+            )
+
+            # convert beaker parameter to timestamp
+            cookie_expires = request.session.cookie_expires
+            cookie_expires_time = None  # type: typing.Optional[float]
+            if isinstance(cookie_expires, datetime.datetime):
+                cookie_expires_time = cookie_expires.timestamp()
+            elif isinstance(cookie_expires, datetime.timedelta):
+                cookie_expires_time = cookie_last_set_time + cookie_expires.total_seconds()
+            # the cases left are when session.cookie_expires is a boolean
+            # which means there is no expiry date, so no renewal to do
+
+            if cookie_expires_time is not None:
+                max_cookie_age = cookie_expires_time - cookie_last_set_time
+                current_cookie_age = time.time() - cookie_last_set_time
+                if current_cookie_age > 0.5 * max_cookie_age:
+                    request.session[self.COOKIE_LAST_SET_TIME] = time.time()
+                    request.session.save()
+                    request.session._update_cookie_out()
+
         return user
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
@@ -172,8 +205,13 @@ class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthentic
             return None
         return user
 
-    def unauthenticated_userid(self, request: TracimRequest) -> str:
-        return request.environ.get(self.remote_user_login_header) or ""
+    def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the configured header.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
+        return request.environ.get(self.remote_user_login_header)
 
     def remember(
         self, request: TracimRequest, userid: int, **kw: typing.Any
@@ -215,7 +253,12 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
             return None
         return user
 
-    def unauthenticated_userid(self, request: TracimRequest) -> str:
+    def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the configured header.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
         return request.headers.get(self.api_user_login_header)
 
     def remember(
@@ -255,7 +298,13 @@ class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthe
             return None
         return user
 
-    def unauthenticated_userid(self, request: TracimRequest) -> str:
+    def unauthenticated_userid(self, request: TracimRequest) -> typing.Optional[str]:
+        """Return the user id found in the query parameter.
+        The user id in this case in the user's token.
+
+        MUST return None if no user id is found as pyramid_multiauth tests
+        the validity with `userid is None`.
+        """
         return request.params.get(AUTH_TOKEN_QUERY_PARAMETER)
 
     def remember(

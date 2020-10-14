@@ -325,12 +325,12 @@ class EmailManager(object):
             send_email_through(self.config, email_sender.send_mail, message)
 
     def notify_created_account(
-        self, user: User, password: str, origin_user: typing.Optional[User] = None
+        self, user: User, password: typing.Optional[str], origin_user: typing.Optional[User] = None
     ) -> None:
         """
         Send created account email to given user.
 
-        :param password: choosed password
+        :param password: chosen password
         :param user: user to notify
         """
         logger.info(self, "Generating created account mail to {}".format(user.email))

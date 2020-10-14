@@ -65,12 +65,10 @@ else
     alembic -c /etc/tracim/development.ini upgrade head
 fi
 
-mkdir -p /var/run/uwsgi/app/
-chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
 
-# activate apache mods
-a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires
+# activate apache modules
+a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires proxy_uwsgi
 
 # Activate or deactivate webdav
 if [ "$START_WEBDAV" = "1" ]; then
@@ -78,13 +76,11 @@ if [ "$START_WEBDAV" = "1" ]; then
         ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
     fi
     sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
-    sed -i "s|^\s*#ProxyPass http://127.0.0.1:3030/webdav|    ProxyPass http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*#ProxyPassReverse http://127.0.0.1:3030/webdav|    ProxyPassReverse http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*# Define START_WEBDAV|    Define START_WEBDAV|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
     sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
-    sed -i "s|^\s*ProxyPass http://127.0.0.1:3030/webdav|    #ProxyPass http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*ProxyPassReverse http://127.0.0.1:3030/webdav|    #ProxyPassReverse http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*Define START_WEBDAV|    # Define START_WEBDAV|g" /etc/tracim/apache2.conf
 fi
 
 # Activate or deactivate caldav
@@ -93,12 +89,10 @@ if [ "$START_CALDAV" = "1" ]; then
         ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
     fi
     DEFAULT_APP_LIST="$DEFAULT_APP_LIST,agenda"
-    sed -i "s|^\s*#ProxyPass /agenda http://127.0.0.1:8080/agenda|    ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*# Define START_CALDAV|    Define START_CALDAV|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
-    sed -i "s|^\s*ProxyPass /agenda http://127.0.0.1:8080/agenda|    #ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
-    sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*Define START_CALDAV|    # Define START_CALDAV|g" /etc/tracim/apache2.conf
 fi
 
 # INFO - G.M - 2020-01-28 - enable collaborative_document_edition app as default app

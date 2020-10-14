@@ -182,7 +182,7 @@ describe('Account page', () => {
     })
     describe('Change username', () => {
       const newUserName = 'newRandomUsername'
-      const longNewUsername = 'aa'.repeat(200)
+      const longNewUsername = 'a'.repeat(256)
 
       it('should update the header with the new username', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
@@ -205,17 +205,6 @@ describe('Account page', () => {
           .contains(newUserName)
       })
 
-      it('should show an error message when new username is too long', () => {
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
-          .click()
-        cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=personaldata__form__txtinput__username]')
-          .type(longNewUsername)
-          cy.get('.personaldata__form__txtinput__msgerror')
-            .should('be.visible')
-      })
-
       it('should show the allowed characters list', () => {
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
@@ -226,10 +215,19 @@ describe('Account page', () => {
         cy.get('.personaldata__form__txtinput__msginfo')
           .should('be.visible')
       })
-    })
 
-    describe('Set a too small username', () => {
-      it('should show the error message and disable the form button', () => {
+      it('should show an error message when new username is too long', () => {
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
+          .click()
+        cy.getTag({ selectorName: s.TRACIM_CONTENT })
+          .find('[data-cy=personaldata__form__txtinput__username]')
+          .type(longNewUsername)
+        cy.get('.personaldata__form__txtinput__msgerror')
+          .should('be.visible')
+      })
+
+      it('should show an error message when new username is too short', () => {
         const smallUsername = 'aa'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')

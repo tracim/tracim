@@ -18,7 +18,7 @@
 </ul>
 
 <p>
-    ${_('Let start to discuss, share files, agenda and documentation with collaborators by logging into your shared space: {a_link}').format(a_link=a_link)| n}
+    ${_('Let start to discuss, share files, agenda and documentation with collaborators by logging into your space: {a_link}').format(a_link=a_link)| n}
 </p>
 <p>${_("note: as soon as you are connected, we strongly recommend that you change your password and delete this email.")}</p>
 <p>${_("Enjoy your day :)")}</p>

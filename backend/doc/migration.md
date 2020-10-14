@@ -230,7 +230,7 @@ def downgrade():
 ```
 
 As you see, for the version of Alembic (1.0.5) currently used in Tracim, you need to:
-- drop explicit constraint for MySQL 8.0+ 
+- drop explicit constraint for MySQL 8.0+
 - do rename for MySQL and MariaDB without creating constraint, then reapply type with
 the constraint to be sure the constraint will be readded.
 

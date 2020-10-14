@@ -16,10 +16,14 @@ import {
   FOLDER,
   FOLDER_READ,
   newFlashMessage,
+  NOTIFICATION,
+  NOTIFICATION_LIST,
+  NOTIFICATION_NOT_READ_COUNT,
   SEARCHED_KEYWORDS,
   setRedirectLogin,
   setUserDisconnected,
   USER,
+  USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
   USER_KNOWN_MEMBER_LIST,
@@ -32,7 +36,6 @@ import {
   USER_USERNAME,
   USER_WORKSPACE_DO_NOTIFY,
   USER_WORKSPACE_LIST,
-  USERNAME_AVAILABILITY,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -48,7 +51,7 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
+import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -198,6 +201,19 @@ export const getUser = userId => async dispatch => {
   })
 }
 
+export const getUserConfiguration = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/config`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: USER_CONFIGURATION,
+    dispatch
+  })
+}
+
 export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
@@ -298,21 +314,6 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
       })
     },
     actionName: USER_USERNAME,
-    dispatch
-  })
-}
-
-export const getUsernameAvailability = (username) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/system/username-availability?username=${username}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: USERNAME_AVAILABILITY,
     dispatch
   })
 }
@@ -843,6 +844,73 @@ export const getGuestUploadInfo = token => dispatch => {
       method: 'GET'
     },
     actionName: 'GuestUpload',
+    dispatch
+  })
+}
+
+const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
+
+export const getNotificationList = (userId, notificationsPerPage, nextPageToken = null) => async dispatch => {
+  const fetchGetNotificationWall = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_ids=${userId}${eventTypesParam}&count=${notificationsPerPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+
+  if (fetchGetNotificationWall.status === 200) {
+    fetchGetNotificationWall.json.items = fetchGetNotificationWall.json.items.map(notification => ({
+      ...notification,
+      fields: {
+        ...notification.fields,
+        author: updateTLMAuthor(notification.fields.author)
+      }
+    }))
+  }
+  return fetchGetNotificationWall
+}
+
+export const putNotificationAsRead = (userId, eventId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION,
+    dispatch
+  })
+}
+
+export const putAllNotificationAsRead = (userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+export const getUserMessagesSummary = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${eventTypesParam}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
 }

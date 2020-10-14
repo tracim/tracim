@@ -24,7 +24,8 @@ from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
+from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
@@ -40,6 +41,7 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
+from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
@@ -50,7 +52,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UsernameAlreadyExistInDb
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
@@ -62,9 +64,11 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.userconfig import UserConfig
 
-DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT = 5
+KNOWN_MEMBERS_ITEMS_LIMIT = 5
 
 
 class UserApi(object):
@@ -76,7 +80,7 @@ class UserApi(object):
         show_deleted: bool = False,
         show_deactivated: bool = True,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -97,8 +101,7 @@ class UserApi(object):
         """
         Return UserInContext object from User
         """
-        user = UserInContext(user=user, dbsession=self._session, config=self._config)
-        return user
+        return UserInContext(user=user, dbsession=self._session, config=self._config)
 
     # Getters
 
@@ -156,11 +159,6 @@ class UserApi(object):
             ) from exc
         return user
 
-    # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
-
-    def get_one_by_id(self, id: int) -> User:
-        return self.get_one(user_id=id)
-
     def get_current_user(self) -> User:
         """
         Get current_user
@@ -172,48 +170,90 @@ class UserApi(object):
     def _get_all_query(self) -> Query:
         return self._base_query().order_by(func.lower(User.display_name))
 
-    def get_all(self) -> typing.Iterable[User]:
+    def get_all(self) -> typing.List[User]:
         return self._get_all_query().all()
 
     def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
         query = self._apply_base_filters(self._session.query(User.user_id))
         return [res[0] for res in query.filter(User.profile == profile)]
 
-    def get_known_user(
+    def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
+        user_ids_in_workspaces_tuples = (
+            self._session.query(UserRoleInWorkspace.user_id)
+            .distinct(UserRoleInWorkspace.user_id)
+            .filter(UserRoleInWorkspace.workspace_id.in_(workspace_ids))
+            .all()
+        )
+        return [item[0] for item in user_ids_in_workspaces_tuples]
+
+    def get_known_users(
         self,
         acp: str,
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
-        nb_elem: typing.List[int] = DEFAULT_KNOWN_MEMBERS_ITEMS_LIMIT,
+        include_workspace_ids: typing.List[int] = None,
+        limit: int = 0,
         filter_results: bool = True,
-    ) -> typing.Iterable[User]:
+    ) -> typing.List[User]:
         """
-        Return list of known user by current UserApi user.
+        Return list of known users by current UserApi user.
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
-        :nb_elem: number of user to return, default value should be low for
-        security and privacy reasons
+        :param include_workspace_ids: only include users from these workspaces
+        :limit: maximum number of users to return. This value will be capped to
+                KNOWN_MEMBERS_ITEMS_LIMIT if requesting users from workspaces that
+                the requester is not part of.
         :filter_results: If true, do filter result according to user workspace if user is provided
         :return: List of found users
         """
-        if len(acp) < 2:
+
+        nb_elems = KNOWN_MEMBERS_ITEMS_LIMIT
+
+        # RJ - 2020-09-14-NOTE
+        # This is a bit convoluted. Keep in mind that we want to allow:
+        #  - listing a number of members greater than KNOWN_MEMBERS_ITEMS_LIMIT
+        #  - autocomplete less than 2 characters
+        # only if the requesting user is in each and every included workspace.
+        # Otherwise, we don't want to allow that.
+        # By default, we return a maximum of KNOWN_MEMBERS_ITEMS_LIMIT members (when limit is not set),
+        # This method is too complex and needs to be split.
+        # See https://github.com/tracim/tracim/issues/3635
+
+        user_in_every_included_workspaces = False  # type: bool
+        include_user_ids = None  # type: typing.Optional[typing.Set[int]]
+
+        if include_workspace_ids:
+            user_in_every_included_workspaces = True
+
+            include_user_ids = set()
+            for workspace_id in include_workspace_ids:
+                user_ids = self.get_members_of_workspaces([workspace_id])
+                include_user_ids.update(user_ids)
+                if user_in_every_included_workspaces:
+                    user_in_every_included_workspaces = self._user.user_id in user_ids
+
+            if user_in_every_included_workspaces and limit:
+                nb_elems = limit
+        elif include_workspace_ids:
+            include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
+
+        if not user_in_every_included_workspaces and len(acp) < 2:
             raise TooShortAutocompleteString(
-                '"{acp}" is a too short string, acp string need to have more than one character'.format(
+                'String "{acp}" is too short, the acp string needs to have more than one character, or you need to be in every workspace you include.'.format(
                     acp=acp
                 )
             )
-        exclude_workspace_ids = exclude_workspace_ids or []  # DFV
-        exclude_user_ids = exclude_user_ids or []  # DFV
+
         if exclude_workspace_ids:
-            user_ids_in_workspaces_tuples = (
-                self._session.query(UserRoleInWorkspace.user_id)
-                .distinct(UserRoleInWorkspace.user_id)
-                .filter(UserRoleInWorkspace.workspace_id.in_(exclude_workspace_ids))
-                .all()
-            )
-            user_ids_in_workspaces = [item[0] for item in user_ids_in_workspaces_tuples]
-            exclude_user_ids.extend(user_ids_in_workspaces)
+            if include_workspace_ids:
+                raise CannotUseBothIncludeAndExcludeWorkspaceUsers(
+                    "Parameters exclude_workspace_ids and include_workspace_ids cannot be both used at the same time"
+                )
+
+            user_ids_in_workspaces = self.get_members_of_workspaces(exclude_workspace_ids)
+            exclude_user_ids = (exclude_user_ids or []) + user_ids_in_workspaces
+
         query = self._base_query().order_by(User.display_name)
         query = query.filter(
             or_(
@@ -222,16 +262,25 @@ class UserApi(object):
                 User.username.ilike("%{}%".format(acp)),
             )
         )
+
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         assert not (filter_results and not self._user)
         if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
             users_in_workspaces = self._get_user_ids_in_same_workspace(self._user.user_id)
             query = query.filter(User.user_id.in_(users_in_workspaces))
+
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
-        query = query.limit(nb_elem)
+
+        if include_user_ids:
+            query = query.filter(User.user_id.in_(include_user_ids))
+
+        query = query.limit(nb_elems)
         return query.all()
+
+    def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
+        return ALL__GROUP_MENTIONS
 
     def _get_user_ids_in_same_workspace(self, user_id: int):
         user_workspaces_id_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
@@ -374,7 +423,7 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
-    def _remote_user_authenticate(self, user: User, login: str) -> User:
+    def _remote_user_authenticate(self, user: typing.Optional[User], login: str) -> User:
         """
         Authenticate with remote_auth, return authenticated user
         or raise Exception like WrongAuthTypeForUser,
@@ -641,24 +690,30 @@ class UserApi(object):
         is_email_correct = self._check_email_correctness(email)
         if not is_email_correct:
             raise EmailValidationFailed("Email given form {} is uncorrect".format(email))
-        email_already_exist_in_db = self.check_email_already_in_db(email)
-        if email_already_exist_in_db:
-            raise EmailAlreadyExistInDb(
+        EMAIL_ALREADY_EXISTS = self.check_email_already_in_db(email)
+        if EMAIL_ALREADY_EXISTS:
+            raise EmailAlreadyExists(
                 "Email given {} already exist, please choose something else".format(email)
             )
         return True
 
-    def _check_username(self, username: str) -> None:
-        """Check given username. Raise InvalidUsernameFormat if not match required format and
-        UsernameAlreadyExistInDb if username already used.
+    def check_username(self, username: str) -> None:
+        """Check given username.
+
+        Raise:
+            - InvalidUsernameFormat if username does not match the required format
+            - UsernameAlreadyExists if username is already used by another user
+            - ReservedUsernameError if username is reserved (group mentions)
         """
         if not self._check_username_correctness(username):
             raise InvalidUsernameFormat("Username '{}' is not correct".format(username))
 
         if self.check_username_already_in_db(username):
-            raise UsernameAlreadyExistInDb(
+            raise UsernameAlreadyExists(
                 "Username given '{}' already exist, please choose something else".format(username)
             )
+        if username in self.get_reserved_usernames():
+            raise ReservedUsernameError("'{}' is a reserved username".format(username))
 
     def check_email_already_in_db(self, email: str) -> bool:
         """
@@ -681,9 +736,10 @@ class UserApi(object):
         # TODO - G.M - 2018-07-05 - find a better way to check email
         if not email:
             return False
-        email = email.split("@")
-        if len(email) != 2:
+
+        if len(email.split("@")) != 2:
             return False
+
         return True
 
     def _check_username_correctness(self, username: str) -> bool:
@@ -742,7 +798,7 @@ class UserApi(object):
 
         if username is not None:
             if username != user.username:
-                self._check_username(username)
+                self.check_username(username)
                 user.username = username
 
         if password is not None:
@@ -868,7 +924,6 @@ class UserApi(object):
                 raise EmailRequired("Email is required to create an user")
             if not username:
                 raise EmailOrUsernameRequired("Email or username is required to create an user")
-
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
@@ -876,7 +931,7 @@ class UserApi(object):
         if lowercase_email is not None:
             self._check_email(lowercase_email)
         if username is not None:
-            self._check_username(username)
+            self.check_username(username)
         user = User()
         user.email = lowercase_email
         user.username = username
@@ -889,16 +944,15 @@ class UserApi(object):
         user.profile = profile
 
         if save_now:
-            self._session.add(user)
-            self._session.flush()
+            self.save(user)
 
         return user
 
     def reset_password_notification(self, user: User, do_save: bool = False) -> str:
         """
         Reset password notification
-        :param user: User who want is password resetted
-        :param do_save: save update ?
+        :param user: The user for which the password is reset
+        :param do_save: should we save the update?
         :return: reset_password_token
         """
         self._check_user_auth_validity(user)
@@ -958,16 +1012,22 @@ class UserApi(object):
             self.save(user)
 
     def save(self, user: User):
+        is_new_user = not user.user_id
+
         self._session.add(user)
+
+        if is_new_user:
+            self._session.add(UserConfig(user=user))
+
         self._session.flush()
 
     def execute_updated_user_actions(self, user: User) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
-        This method do post-update user actions
+        This method does post-update user actions
         """
 
         # TODO - G.M - 04-04-2018 - [auth]
@@ -995,7 +1055,7 @@ class UserApi(object):
 
     def execute_created_user_actions(self, user: User) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -1016,15 +1076,15 @@ class UserApi(object):
                 if agenda_already_exist:
                     logger.warning(
                         self,
-                        "user {} is just created but his own agenda already exist !!".format(
+                        "user {} has just been created but their own agenda already exists".format(
                             user.user_id
                         ),
                     )
             except AgendaServerConnectionError as exc:
-                logger.error(self, "Cannot connect to agenda server")
+                logger.error(self, "Cannot connect to the agenda server")
                 logger.exception(self, exc)
             except Exception as exc:
-                logger.error(self, "Something goes wrong during agenda create/update")
+                logger.error(self, "Something went wrong during agenda create/update")
                 logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user: User) -> None:

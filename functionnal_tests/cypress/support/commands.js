@@ -59,12 +59,27 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
     })
 })
 
-Cypress.Commands.add('assertTinyMCEContent', () => {
+Cypress.Commands.add('inputInTinyMCE', (content) => {
+  cy.window()
+    .its('tinyMCE')
+    .its('activeEditor')
+    .then(activeEditor => {
+      activeEditor.focus()
+      activeEditor.execCommand('mceInsertContent', false, content)
+      content.split('').forEach(contentChar => {
+        activeEditor.fire('input', { data: contentChar })
+        activeEditor.fire('keyup', { key: contentChar })
+        activeEditor.fire('keydown', { key: contentChar })
+      })
+    })
+})
+
+Cypress.Commands.add('assertTinyMCEContent', (content) => {
   cy.window({ timeout: 5000 })
     .its('tinyMCE')
     .its('activeEditor')
     .then(activeEditor => {
-      activeEditor.getContent()
+      expect(activeEditor.getContent()).to.have.string(content)
     })
 })
 
@@ -161,11 +176,11 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/api/doc/')
+  cy.visit('/assets/cypress-blank.html')
 })
 
 Cypress.Commands.add('changeLanguage', (langCode) => {
-  cy.get('#headerDropdownMenuButton')
+  cy.get('.dropdownlang')
     .click()
 
   cy.get('.dropdownlang__dropdown__subdropdown')

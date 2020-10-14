@@ -2,6 +2,7 @@
 This is just a sample of Tracim backend plugin using pluggy hook
 """
 from pluggy import PluginManager
+
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User

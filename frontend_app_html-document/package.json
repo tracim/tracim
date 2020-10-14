@@ -61,6 +61,7 @@
     "jsdom": "^15.1.1",
     "mocha": "^7.1.1",
     "pnp-webpack-plugin": "^1.6.4",
+    "sinon": "^7.4.1",
     "stylus-native-loader": "^1.1.0",
     "webpack-dev-server": "^3.10.3"
   },

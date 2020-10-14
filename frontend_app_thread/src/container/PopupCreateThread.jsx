@@ -8,9 +8,6 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   appContentFactory,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
@@ -39,10 +36,6 @@ class PopupCreateThread extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated }
-    ])
   }
 
   componentDidMount () {
@@ -56,33 +49,13 @@ class PopupCreateThread extends React.Component {
     this.setHeadTitle()
   }
 
-  handleContentCreated = data => {
-    const { state } = this
-
-    if (Number(data.content.parent_id) !== Number(state.folderId) ||
-      state.loggedUser.userId !== data.author.user_id ||
-      state.newContentName !== data.content.label
-    ) return
-
-    this.handleClose()
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-      data: {
-        workspaceId: data.content.workspace_id,
-        contentType: state.appName,
-        contentId: data.content.content_id
-      }
-    })
-  }
-
   setHeadTitle = () => {
     const { state, props } = this
 
-    if (state.config && state.config.system && state.config.system.config && state.config.workspace) {
+    if (state.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New Thread'), state.config.workspace.label, state.config.system.config.instance_name]) }
+        data: { title: buildHeadTitle([props.t('New Thread'), state.config.workspace.label]) }
       })
     }
   }
@@ -115,7 +88,18 @@ class PopupCreateThread extends React.Component {
     const resSave = await handleFetchResult(await fetchSaveThreadDoc)
 
     switch (resSave.apiResponse.status) {
-      case 200: break
+      case 200:
+        this.handleClose()
+
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+          data: {
+            workspaceId: resSave.body.workspace_id,
+            contentType: state.appName,
+            contentId: resSave.body.content_id
+          }
+        })
+        break
       case 400:
         switch (resSave.body.code) {
           case 3002:

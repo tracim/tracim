@@ -47,7 +47,7 @@ describe('delete a html-document content', function () {
             cy.get('.html-document.visible').should('be.visible')
             cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
             cy.get('.wsContentGeneric__option__menu__action[data-cy="delete__button"]').click()
-            cy.get('.html-document__contentpage__left__wrapper > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
+            cy.get('.html-document__contentpage__left__wrapper > [data-cy="promptMessage"] .promptMessage__btn').should('be.visible')
             cy.get('.html-document__header__close').click()
             cy.get('.html-document.visible').should('not.be.visible')
             cy.get('.content__name').contains(titre1).should('not.exist')

@@ -1,11 +1,13 @@
 import React from 'react'
 import { expect } from 'chai'
+import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import {
   mockGetWorkspaces200,
   mockGetWorkspaceMembers200,
   mockGetUsers200,
-  mockGetUserDetails200
+  mockGetUserDetails200,
+  mockPostUser200
 } from '../apiMock.js'
 import { AdminWorkspaceUser } from '../../src/container/AdminWorkspaceUser.jsx'
 
@@ -37,6 +39,231 @@ describe('<AdminWorkspaceUser />', () => {
     }
   }
 
+  describe('intern functions', () => {
+    mockGetWorkspaces200(
+      props.data.config.apiUrl,
+      [{ workspace_id: 1, label: 'Hello', description: '' }]
+    ).persist()
+    const wrapper = shallow(<AdminWorkspaceUser {...props} />)
+    const initialName = 'John'
+    const initialUsername = 'john'
+    const initialEmail = 'john.doe@johndoe.com'
+    const initialProfile = 'administrators'
+    const initialPassword = 'password'
+
+    describe('handleClickAddUser()', () => {
+      const sendGlobalFlashMsgSpy = sinon.spy()
+      const initialSendGlobalFlashMsg = wrapper.instance().sendGlobalFlashMsg
+      wrapper.instance().sendGlobalFlashMsg = sendGlobalFlashMsgSpy
+
+      after(() => {
+        wrapper.instance().sendGlobalFlashMsg = initialSendGlobalFlashMsg
+      })
+
+      describe('adding a new user with a name too small', () => {
+        before(() => {
+          wrapper.instance().handleClickAddUser(
+            'a',
+            initialUsername,
+            initialEmail,
+            initialEmail,
+            initialProfile,
+            initialPassword
+          )
+        })
+
+        afterEach(() => {
+          sendGlobalFlashMsgSpy.resetHistory()
+        })
+
+        it('should display a warning flash message', () => {
+          expect(sendGlobalFlashMsgSpy.calledOnceWith(
+            props.t('Full name must be at least {{minimumCharactersPublicName}} characters')
+          )).to.equal(true)
+        })
+      })
+
+      describe('adding a new user with a wrong password', () => {
+        const addUserWithDifferentPassword = password => {
+          wrapper.instance().handleClickAddUser(
+            initialName,
+            initialUsername,
+            initialEmail,
+            initialProfile,
+            password
+          )
+        }
+
+        describe('when emailNotificationActivated is disabled', () => {
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display a flash message when the password is not defined', () => {
+            addUserWithDifferentPassword('')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('Please set a password')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is not long enough', () => {
+            addUserWithDifferentPassword('pa')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too short (minimum 6 characters)')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is too long', () => {
+            let password = ''
+            for (let i = 0; i < 530; i++) {
+              password += 'a'
+            }
+            addUserWithDifferentPassword(password)
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too long (maximum 512 characters)')
+            )).to.equal(true)
+          })
+        })
+        describe('when emailNotificationActivated is enabled', () => {
+          const wrapperStateConfig = wrapper.state().config
+
+          before(() => {
+            wrapper.setState({
+              config: {
+                ...wrapperStateConfig,
+                system: {
+                  ...wrapperStateConfig.system,
+                  config: {
+                    ...wrapperStateConfig.system.config,
+                    email_notification_activated: true
+                  }
+                }
+              }
+            })
+          })
+
+          after(() => {
+            wrapper.setState({
+              config: wrapperStateConfig
+            })
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display a flash message when the password is not long enough', () => {
+            addUserWithDifferentPassword('pa')
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too short (minimum 6 characters)')
+            )).to.equal(true)
+          })
+
+          it('should display a flash message when the password is too long', () => {
+            let password = ''
+            for (let i = 0; i < 530; i++) {
+              password += 'a'
+            }
+            addUserWithDifferentPassword(password)
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('New password is too long (maximum 512 characters)')
+            )).to.equal(true)
+          })
+        })
+      })
+
+      describe('adding a new user with a valid form', () => {
+        describe('when emailNotificationActivated is disabled', () => {
+          before(() => {
+            mockPostUser200(props.data.config.apiUrl)
+            wrapper.instance().handleClickAddUser(
+              initialName,
+              initialUsername,
+              initialEmail,
+              initialProfile,
+              initialPassword
+            )
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          it('should display the success flash message', () => {
+            expect(sendGlobalFlashMsgSpy.calledOnceWith(
+              props.t('User created')
+            )).to.equal(true)
+          })
+        })
+        describe('when emailNotificationActivated is enabled', () => {
+          const wrapperStateConfig = wrapper.state().config
+
+          before(() => {
+            wrapper.setState({
+              config: {
+                ...wrapperStateConfig,
+                system: {
+                  ...wrapperStateConfig.system,
+                  config: {
+                    ...wrapperStateConfig.system.config,
+                    email_notification_activated: true
+                  }
+                }
+              }
+            })
+          })
+
+          after(() => {
+            wrapper.setState({
+              config: wrapperStateConfig
+            })
+          })
+
+          afterEach(() => {
+            sendGlobalFlashMsgSpy.resetHistory()
+          })
+
+          describe('with a password', () => {
+            before(() => {
+              mockPostUser200(props.data.config.apiUrl)
+              wrapper.instance().handleClickAddUser(
+                initialName,
+                initialUsername,
+                initialEmail,
+                initialProfile,
+                initialPassword
+              )
+            })
+
+            it('should display the success flash message', () => {
+              expect(sendGlobalFlashMsgSpy.calledOnceWith(
+                props.t('User created and email sent')
+              )).to.equal(true)
+            })
+          })
+
+          describe('without a password', () => {
+            before(() => {
+              mockPostUser200(props.data.config.apiUrl)
+              wrapper.instance().handleClickAddUser(
+                initialName,
+                initialUsername,
+                initialEmail,
+                initialProfile,
+                ''
+              )
+            })
+            it('should display the success flash message', () => {
+              expect(sendGlobalFlashMsgSpy.calledOnceWith(
+                props.t('User created and email sent')
+              )).to.equal(true)
+            })
+          })
+        })
+      })
+    })
+  })
+
   describe('TLM handlers', () => {
     describe('eventType workspace', () => {
       props.data.config.type = 'workspace'
@@ -51,9 +278,7 @@ describe('<AdminWorkspaceUser />', () => {
         }
         mockGetWorkspaceMembers200(props.data.config.apiUrl, workspace.workspace_id, [])
 
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         before(() => {
@@ -63,7 +288,7 @@ describe('<AdminWorkspaceUser />', () => {
         it('should add the created workspace to the end of the list', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
         })
       })
 
@@ -75,16 +300,14 @@ describe('<AdminWorkspaceUser />', () => {
         }
 
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         before(() => {
           wrapper.instance().handleWorkspaceModified(tlmData)
         })
         it('should replace the modified workspace', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
         })
       })
 
@@ -96,9 +319,7 @@ describe('<AdminWorkspaceUser />', () => {
         }
 
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          workspace: workspace
-        }
+        const tlmData = { fields: { workspace: workspace } }
         before(() => {
           wrapper.instance().handleWorkspaceDeleted(tlmData)
         })
@@ -120,10 +341,12 @@ describe('<AdminWorkspaceUser />', () => {
         description: ''
       }
       const member = {
-        user_id: 1,
-        user: props.data.loggedUser,
-        workspace: workspace,
+        do_notify: true,
         role: 'contributor'
+      }
+      const user = {
+        ...props.data.loggedUser,
+        is_active: true
       }
 
       describe('handleWorkspaceMemberCreated', () => {
@@ -131,8 +354,11 @@ describe('<AdminWorkspaceUser />', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         const tlmData = {
-          workspace: workspace,
-          member: member
+          fields: {
+            workspace: workspace,
+            member: member,
+            user: user
+          }
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberCreated(tlmData)
@@ -140,7 +366,14 @@ describe('<AdminWorkspaceUser />', () => {
         it('should add the created member to the end of the workspace\'s member list', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace.memberList).to.deep.equal([member])
+          expect(lastWorkspace.memberList).to.deep.equal([{
+            ...member,
+            is_active: user.is_active,
+            user: user,
+            user_id: user.user_id,
+            workspace: workspace,
+            workspace_id: workspace.workspace_id
+          }])
         })
       })
 
@@ -148,8 +381,11 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetWorkspaceMembers200(props.data.config.apiUrl, 1, [member])
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = {
-          workspace: workspace,
-          member: member
+          fields: {
+            workspace: workspace,
+            member: member,
+            user: user
+          }
         }
         before(() => {
           wrapper.instance().handleWorkspaceMemberDeleted(tlmData)
@@ -191,9 +427,7 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUsers200(props.data.config.apiUrl, [admin])
         mockGetUserDetails200(props.data.config.apiUrl, adminDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          user: userDetails
-        }
+        const tlmData = { fields: { user: userDetails } }
 
         before(() => {
           wrapper.instance().handleUserCreated(tlmData)
@@ -210,9 +444,7 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUserDetails200(props.data.config.apiUrl, adminDetails)
         mockGetUserDetails200(props.data.config.apiUrl, userDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
-        const tlmData = {
-          user: userDetails
-        }
+        const tlmData = { fields: { user: userDetails } }
         before(() => {
           wrapper.instance().handleUserDeleted(tlmData)
         })
@@ -230,7 +462,9 @@ describe('<AdminWorkspaceUser />', () => {
         mockGetUserDetails200(props.data.config.apiUrl, userDetails)
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = {
-          user: { ...userDetails, public_name: 'Foo2' }
+          fields: {
+            user: { ...userDetails, public_name: 'Foo2' }
+          }
         }
         before(() => {
           wrapper.instance().handleUserModified(tlmData)
@@ -238,7 +472,7 @@ describe('<AdminWorkspaceUser />', () => {
         it('should update the user list with the message\'s user', () => {
           const userList = wrapper.state('content').userList
           const lastUser = userList[userList.length - 1]
-          expect(lastUser).to.deep.equal(tlmData.user)
+          expect(lastUser).to.deep.equal(tlmData.fields.user)
         })
       })
     })

@@ -62,6 +62,30 @@ const mockPutContentDeleteRestore204 = (apiUrl, workspaceId, contentId) => {
     .reply(204, '')
 }
 
+const mockGetReservedUsernames200 = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/system/reserved-usernames')
+    .reply(200, { items: ['all', 'tous', 'todos'] })
+}
+
+const mockGetReservedUsernames500 = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/system/reserved-usernames')
+    .reply(500, {})
+}
+
+const mockGetUsernameAvailability200 = (apiUrl, username, available) => {
+  return nock(apiUrl)
+    .get(`/system/username-availability?username=${username}`)
+    .reply(200, { available: available, username: username })
+}
+
+const mockGetUsernameAvailability500 = (apiUrl, username) => {
+  return nock(apiUrl)
+    .get(`/system/username-availability?username=${username}`)
+    .reply(500, {})
+}
+
 export {
   mockPutContent200,
   mockPostContentComment200,
@@ -69,5 +93,9 @@ export {
   mockPutContentArchive204,
   mockPutContentDelete204,
   mockPutContentArchiveRestore204,
-  mockPutContentDeleteRestore204
+  mockPutContentDeleteRestore204,
+  mockGetReservedUsernames200,
+  mockGetUsernameAvailability200,
+  mockGetReservedUsernames500,
+  mockGetUsernameAvailability500
 }

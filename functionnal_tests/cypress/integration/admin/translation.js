@@ -9,13 +9,13 @@ describe('content :: admin > workspace', function () {
   })
 
   it('should have translations', () => {
-    cy.get('.adminWorkspace__description').contains('List of every shared spaces')
+    cy.get('.adminWorkspace__description').contains('List of every spaces')
 
     cy.changeLanguage('fr')
-    cy.get('.adminWorkspace__description').contains('Liste de tous les espaces partagés')
+    cy.get('.adminWorkspace__description').contains('Liste de tous les espaces')
 
     cy.changeLanguage('pt')
-    cy.get('.adminWorkspace__description').contains('Lista de todos os espaços partilhados')
+    cy.get('.adminWorkspace__description').contains('Lista de todos os espaços')
   })
 })
 

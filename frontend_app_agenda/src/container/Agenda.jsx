@@ -4,8 +4,9 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  buildHeadTitle,
   handleFetchResult,
+  getWorkspaceDetail,
+  getWorkspaceMemberList,
   PageContent,
   PageTitle,
   PageWrapper,
@@ -17,11 +18,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
-import {
-  getAgendaList,
-  getWorkspaceDetail,
-  getWorkspaceMemberList
-} from '../action.async.js'
+import { getAgendaList } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {
@@ -85,38 +82,37 @@ export class Agenda extends React.Component {
 
   // TLM Handlers
   handleUserModified = data => {
-    const { state } = this
-    if (state.loggedUser.userId !== data.user.user_id) return
+    if (this.state.loggedUser.userId !== data.fields.user.user_id) return
 
     this.setState(prev => ({
       loggedUser: {
         ...prev.loggedUser,
-        authType: data.user.auth_type,
-        avatarUrl: data.user.avatar_url,
-        email: data.user.email,
-        isActive: data.user.is_active,
-        profile: data.user.profile,
-        publicName: data.user.public_name,
-        timezone: data.user.timezone,
-        username: data.user.username
+        authType: data.fields.user.auth_type,
+        avatarUrl: data.fields.user.avatar_url,
+        email: data.fields.user.email,
+        isActive: data.fields.user.is_active,
+        profile: data.fields.user.profile,
+        publicName: data.fields.user.public_name,
+        timezone: data.fields.user.timezone,
+        username: data.fields.user.username
       },
-      editionAuthor: data.author.public_name,
+      editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page and if it's not the language that changes (handled by custom event)
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      showRefreshWarning: state.userWorkspaceList.length !== 1 && state.loggedUser.lang === data.user.lang
+      showRefreshWarning: prev.userWorkspaceList.length !== 1 && prev.loggedUser.lang === data.fields.user.lang
     }))
   }
 
   handleSharedspaceModified = data => {
     const { state } = this
-    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.workspace.workspace_id)) return
+    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.fields.workspace.workspace_id)) return
 
     this.setState({
       content: {
-        workspaceLabel: data.workspace.label
+        workspaceLabel: data.fields.workspace.label
       },
-      editionAuthor: data.author.public_name,
+      editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page
       // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
@@ -140,7 +136,7 @@ export class Agenda extends React.Component {
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
-    console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
       if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
@@ -156,14 +152,10 @@ export class Agenda extends React.Component {
   }
 
   setHeadTitle = (title) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([title, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: title }
+    })
   }
 
   loadAgendaList = async workspaceId => {
@@ -179,10 +171,10 @@ export class Agenda extends React.Component {
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
-          default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+          default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+      default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
     }
   }
 
@@ -292,7 +284,7 @@ export class Agenda extends React.Component {
           href: a.agenda_url,
           hrefLabel: a.agenda_type === 'private'
             ? props.t('User')
-            : state.userWorkspaceList.length > 1 ? props.t('Shared spaces') : props.t('Shared space'),
+            : state.userWorkspaceList.length > 1 ? props.t('Spaces') : props.t('Space'),
           settingsAccount: a.agenda_type === 'private',
           withCredentials: a.with_credentials,
           loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
@@ -311,7 +303,7 @@ export class Agenda extends React.Component {
         <div
           dangerouslySetInnerHTML={{
             __html: props.t(
-              'Agenda of shared space {{workspaceLabel}}', {
+              'Agenda of space {{workspaceLabel}}', {
                 workspaceLabel: state.content.workspaceLabel,
                 interpolation: { escapeValue: false }
               }

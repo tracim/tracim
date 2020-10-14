@@ -53,20 +53,20 @@ export class Sidebar extends React.Component {
   handleTlmMemberCreated = tlmFieldObject => {
     const { props } = this
 
-    const tlmUser = tlmFieldObject.user
-    const tlmAuthor = tlmFieldObject.author
-    const tlmWorkspace = tlmFieldObject.workspace
+    const tlmUser = tlmFieldObject.fields.user
+    const tlmAuthor = tlmFieldObject.fields.author
+    const tlmWorkspace = tlmFieldObject.fields.workspace
     const loggedUserId = props.user.userId
 
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
-      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.member))
+      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.fields.member))
 
       // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
       // user created a new workspace
       // the clientToken is to avoid redirecting the eventually opened other browser's tabs
       const clientToken = getOrCreateSessionClientToken()
-      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.client_token) {
+      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.fields.client_token) {
         props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
         if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
           document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
@@ -166,7 +166,7 @@ export class Sidebar extends React.Component {
                     onClick={this.handleClickNewWorkspace}
                     data-cy='sidebarCreateWorkspaceBtn'
                   >
-                    {t('Create a shared space')}
+                    <i className='fa fa-plus' /> {t('Create a space')}
                   </button>
                 </div>
               )}

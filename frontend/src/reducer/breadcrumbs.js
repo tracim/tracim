@@ -27,7 +27,7 @@ const orderBreadcrumbs = crumbList => {
     return crumbList
   }
 
-  return crumbList.sort((a, b) => a.order < b.order)
+  return crumbList.sort((a, b) => a.order - b.order)
 }
 
 export function breadcrumbs (state = [], action) {

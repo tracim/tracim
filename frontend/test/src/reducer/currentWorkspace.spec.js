@@ -23,11 +23,13 @@ import {
   setWorkspaceReadStatusList,
   setWorkspaceRecentActivityList,
   UPDATE,
+  updateUser,
   updateUserWorkspaceSubscriptionNotif,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
   addWorkspaceReadStatus,
+  USER,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
@@ -470,6 +472,27 @@ describe('reducer currentWorkspace.js', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithAgendaUrl,
           agendaUrl: newAgendaUrl
+        })
+      })
+    })
+
+    describe(`${UPDATE}/${USER}`, () => {
+      const newInitialState = {
+        ...initialState,
+        memberList: [{
+          ...serializeMember(globalManagerAsMemberFromApi),
+          doNotify: false
+        }]
+      }
+      const rez = currentWorkspace(newInitialState, updateUser({ ...globalManagerFromApi, username: 'newUsername' }))
+      it('should return a workspace object with the new user inside memberList', () => {
+        expect(rez).to.deep.equal({
+          ...newInitialState,
+          memberList: [{
+            ...globalManagerAsMember,
+            doNotify: false,
+            username: 'newUsername'
+          }]
         })
       })
     })

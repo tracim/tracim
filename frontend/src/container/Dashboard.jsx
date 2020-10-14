@@ -39,7 +39,8 @@ import {
   setWorkspaceReadStatusList,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
-  setBreadcrumbs
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
@@ -95,7 +96,7 @@ export class Dashboard extends React.Component {
   }
 
   handleWorkspaceModified = data => {
-    if (this.props.curWs.id !== data.workspace.workspace_id) return
+    if (this.props.curWs.id !== data.fields.workspace.workspace_id) return
     this.setHeadTitle()
     this.buildBreadcrumbs()
   }
@@ -154,9 +155,9 @@ export class Dashboard extends React.Component {
         break
       case 400:
         props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage('Unknown shared space'))
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
 
@@ -208,18 +209,10 @@ export class Dashboard extends React.Component {
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: {
-          title: buildHeadTitle([
-            props.t('Dashboard'),
-            props.curWs.label,
-            props.system.config.instance_name
-          ])
-        }
-      })
-    }
+    const headTitle = buildHeadTitle(
+      [props.t('Dashboard'), props.curWs.label]
+    )
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   buildBreadcrumbs = () => {
@@ -387,14 +380,14 @@ export class Dashboard extends React.Component {
             return false
           }
           case 3008:
-            props.dispatch(newFlashMessage(props.t('This user already is in the workspace'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('This user already is in the space'), 'warning'))
             return false
           default:
-            props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
             return false
         }
       default:
-        props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
         return false
     }
   }
@@ -419,7 +412,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'bank',
+          faIcon: 'users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },
@@ -595,7 +588,7 @@ export class Dashboard extends React.Component {
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
-                  onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
+                  onClickMarkAllAsRead={this.handleClickMarkRecentActivityAsRead}
                   onClickSeeMore={this.handleClickSeeMore}
                   t={props.t}
                 />

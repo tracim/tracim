@@ -80,7 +80,15 @@
     "webpack-dev-server": "^3.10.3"
   },
   "standard": {
-    "globals": [],
+    "globals": [
+      "GLOBAL_dispatchEvent",
+      "localStorage",
+      "tinymce",
+      "fetch",
+      "Element",
+      "DOMParser",
+      "globalThis"
+    ],
     "parser": "babel-eslint",
     "ignore": []
   },

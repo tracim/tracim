@@ -13,7 +13,7 @@ class PopinFixedRightPart extends React.Component {
 
   handleChangeRightChildren = (newCurrentChildren) => {
     const { props } = this
-    if (props.rightPartOpen) props.toggleRightPart()
+    if (props.rightPartOpen) props.handleToggleRightPart()
 
     this.setState({ currentChildren: newCurrentChildren })
   }
@@ -25,14 +25,15 @@ class PopinFixedRightPart extends React.Component {
       <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`)}>
         <div
           className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')}
-          onClick={props.toggleRightPart}
+          onClick={props.handleToggleRightPart}
         >
           {props.menuItemList.map(menuItem => {
             const isMenuActive = menuItem.id === state.currentChildren
 
             return (
               <button
-                className={classnames('wsContentGeneric__content__right__header__icon nav-item', { 'active': isMenuActive })}
+                key={menuItem.id}
+                className={classnames('wsContentGeneric__content__right__header__icon nav-item', { active: isMenuActive })}
                 title={menuItem.label}
                 onClick={() => this.handleChangeRightChildren(menuItem.id)}
                 style={{ borderColor: isMenuActive ? props.customColor : 'transparent' }}
@@ -45,7 +46,7 @@ class PopinFixedRightPart extends React.Component {
 
           <div
             className='wsContentGeneric__content__right__header__icon__close'
-            title={props.rightPartOpen ? props.t('Close') : props.t('Open')}
+            title={props.rightPartOpen ? props.t('Hide') : props.t('Show')}
           >
             <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>
@@ -65,7 +66,7 @@ PopinFixedRightPart.propTypes = {
       return new Error(`PropType Error: ${componentName} must have at least 1 children.`)
     }
   }).isRequired,
-  toggleRightPart: PropTypes.func.isRequired,
+  handleToggleRightPart: PropTypes.func.isRequired,
   rightPartOpen: PropTypes.bool.isRequired,
   customClass: PropTypes.string
 }

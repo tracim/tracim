@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import InvalidUsernameFormat
+from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
@@ -67,4 +70,12 @@ class SystemApi(object):
 
     def get_username_availability(self, username: str) -> bool:
         uapi = UserApi(None, session=self._session, config=self._config)
-        return not uapi.check_username_already_in_db(username)
+        try:
+            uapi.check_username(username)
+            return True
+        except (InvalidUsernameFormat, UsernameAlreadyExists, ReservedUsernameError):
+            return False
+
+    def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
+        uapi = UserApi(None, session=self._session, config=self._config)
+        return uapi.get_reserved_usernames()

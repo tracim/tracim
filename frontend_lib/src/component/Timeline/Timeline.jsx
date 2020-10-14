@@ -6,10 +6,11 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import DisplayState from '../DisplayState/DisplayState.jsx'
-import { ROLE, CONTENT_TYPE, TIMELINE_TYPE } from '../../helper.js'
+import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../helper.js'
+import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
+import CommentTextArea from './CommentTextArea.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -88,18 +89,17 @@ export class Timeline extends React.Component {
         {props.showTitle &&
           <div className='timeline__title'>
             {props.t('Timeline')}
-          </div>
-        }
+          </div>}
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deprecated')}
               icon={props.deprecatedStatus.faIcon}
             />
           )}
 
           {props.isArchived && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is archived')}
               btnType='button'
               icon='archive'
@@ -109,7 +109,7 @@ export class Timeline extends React.Component {
           )}
 
           {props.isDeleted && (
-            <DisplayState
+            <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
               icon='trash'
@@ -128,7 +128,7 @@ export class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     author={content.author.public_name}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
@@ -141,7 +141,7 @@ export class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     revisionType={content.revision_type}
-                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     number={content.number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}
@@ -164,12 +164,14 @@ export class Timeline extends React.Component {
                 'timeline__texteditor__textinput'
               )}
             >
-              <textarea
+              <CommentTextArea
                 id='wysiwygTimelineComment'
-                placeholder={props.t('Your message...')}
-                value={props.newComment}
-                onChange={props.onChangeNewComment}
-                disabled={props.disableComment}
+                onChangeNewComment={props.onChangeNewComment}
+                newComment={props.newComment}
+                disableComment={props.disableComment}
+                wysiwyg={props.wysiwyg}
+                searchForMentionInQuery={props.searchForMentionInQuery}
+                onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
 
@@ -182,7 +184,7 @@ export class Timeline extends React.Component {
                   )}
                   onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
-                  key={'timeline__comment__advancedtext'}
+                  key='timeline__comment__advancedtext'
                 >
                   {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 </button>
@@ -201,11 +203,12 @@ export class Timeline extends React.Component {
                       backgroundColor: color(props.customColor).darken(0.15).hex()
                     }
                   }}
-                  key={'timeline__comment__send'}
+                  key='timeline__comment__send'
                 >
                   {props.t('Send')}
                   <div
-                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}>
+                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
+                  >
                     <i className='fa fa-paper-plane-o' />
                   </div>
                 </button>
@@ -240,7 +243,8 @@ Timeline.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func,
-  showTitle: PropTypes.bool
+  showTitle: PropTypes.bool,
+  searchForMentionInQuery: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -262,5 +266,6 @@ Timeline.defaultProps = {
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
-  showTitle: true
+  showTitle: true,
+  searchForMentionInQuery: () => {}
 }

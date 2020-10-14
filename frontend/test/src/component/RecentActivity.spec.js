@@ -8,7 +8,7 @@ import { ROLE } from 'tracim_frontend_lib'
 
 describe('<RecentActivity />', () => {
   const onClickSeeMoreCallBack = sinon.spy()
-  const onClickEverythingAsReadCallBack = sinon.spy()
+  const onClickMarkAllAsReadCallBack = sinon.spy()
 
   const props = {
     recentActivityList: [{
@@ -29,7 +29,7 @@ describe('<RecentActivity />', () => {
     workspaceId: 1,
     roleIdForLoggedUser: 8,
     readByUserList: [2],
-    onClickEverythingAsRead: onClickEverythingAsReadCallBack
+    onClickMarkAllAsRead: onClickMarkAllAsReadCallBack
   }
 
   const wrapper = shallow(
@@ -62,9 +62,9 @@ describe('<RecentActivity />', () => {
   })
 
   describe('handlers', () => {
-    it('onClickEverythingAsReadCallBack should be called when the button is clicked', () => {
+    it('onClickMarkAllAsReadCallBack should be called when the button is clicked', () => {
       wrapper.find('button.recentactivity__header__allread').simulate('click')
-      expect(onClickEverythingAsReadCallBack.called).to.equal(true)
+      expect(onClickMarkAllAsReadCallBack.called).to.equal(true)
     })
 
     it('onClickSeeMoreCallBack should be called when the see more button is clicked', () => {

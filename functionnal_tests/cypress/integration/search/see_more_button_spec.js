@@ -11,6 +11,11 @@ const htmlDocTitle7 = 'HtmlDocForSearch7'
 const htmlDocTitle8 = 'HtmlDocForSearch8'
 const htmlDocTitle9 = 'HtmlDocForSearch9'
 const htmlDocTitle10 = 'HtmlDocForSearch10'
+const htmlDocTitle11 = 'HtmlDocForSearch11'
+const htmlDocTitle12 = 'HtmlDocForSearch12'
+const htmlDocTitle13 = 'HtmlDocForSearch13'
+const htmlDocTitle14 = 'HtmlDocForSearch14'
+const htmlDocTitle15 = 'HtmlDocForSearch15'
 
 const searchInput = '[data-cy=search__text]'
 const seeMoreButton = '.searchResult__btnSeeMore button'
@@ -35,6 +40,11 @@ describe('Searching keywords', () => {
       cy.createHtmlDocument(htmlDocTitle8, workspaceId)
       cy.createHtmlDocument(htmlDocTitle9, workspaceId)
       cy.createHtmlDocument(htmlDocTitle10, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle11, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle12, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle13, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle14, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle15, workspaceId)
     })
   })
 
@@ -43,21 +53,23 @@ describe('Searching keywords', () => {
     cy.visitPage({ pageName: PAGES.HOME })
   })
 
-  describe('that match more than 10 contents', () => {
-    it('Should display maximum 10 results in the page and the See more button', () => {
+  describe('that match more than 15 contents', () => {
+    it('Should display maximum 15 results in the page and the See more button', () => {
       cy.get(searchInput).type(htmlDocTitle).type('{enter}')
+      cy.get('.tracim__content-scrollview').scrollTo('bottom')
 
-      cy.get('[data-cy=content__item]').its('length').should('eq', 10)
+      cy.get('[data-cy=content__item]').its('length').should('eq', 15)
 
       cy.get(seeMoreButton).should('be.visible')
     })
 
     it('Should display more results when clicking in the See more button', () => {
       cy.get(searchInput).type(htmlDocTitle).type('{enter}')
+      cy.get('.tracim__content-scrollview').scrollTo('bottom')
 
       cy.get(seeMoreButton).should('be.visible').click().then(test => {
         cy.wait(500)
-        cy.get('[data-cy=content__item]').its('length').should('gt', 10)
+        cy.get('[data-cy=content__item]').its('length').should('gt', 15)
       })
     })
     describe('with a search with 5 results per page by changing it in the url', () => {

@@ -26,38 +26,46 @@
     # https://github.com/tracim/tracim/issues/3320
     SetEnv proxy-sendcl
 
+    # Setting Destination header from https to http in proxy
+    # is needed for working move/copy in webdav
+    # Can't be added in Location https://httpd.apache.org/docs/2.4/en/mod/mod_headers.html
+    RequestHeader edit Destination ^https http early
+
     # Proxying Webdav
-    <Location /webdav>
-        # Setting Destination header from https to http in proxy
-        # is needed for working move/copy in webdav
-        RequestHeader edit Destination ^https http early
-        # Preserving host is needed for working move/copy in webdav
-        ProxyPreserveHost On
-        #ProxyPass http://127.0.0.1:3030/webdav
-        #ProxyPassReverse http://127.0.0.1:3030/webdav
-    </Location>
+    # Define START_WEBDAV
+    <IfDefine START_WEBDAV>
+        <Location /webdav>
+            # Preserving host is needed for working move/copy in webdav
+            ProxyPreserveHost On
+            ProxyPass http://127.0.0.1:3030/webdav
+            ProxyPassReverse http://127.0.0.1:3030/webdav
+        </Location>
+    </IfDefine>
 
     # Proxying Caldav
-    #ProxyPass /agenda http://127.0.0.1:8080/agenda
-    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda
+    # Define START_CALDAV
+    <IfDefine START_CALDAV>
+        ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
+        ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
+    </IfDefine>
 
     # Proxying Frontend
-    ProxyPass /ui http://127.0.0.1:8080/ui
-    ProxyPassReverse /ui http://127.0.0.1:8080/ui
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /ui uwsgi://127.0.0.1:8081/
 
     # Proxying Tracim Live Message to Pushpin
-    ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
-    ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    # NOTE: no reverse as ProxyPassMatchReverse does not exist...
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     # Proxying Backend API
-    ProxyPass /api http://127.0.0.1:8080/api
-    ProxyPassReverse /api http://127.0.0.1:8080/api
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /api uwsgi://127.0.0.1:8081/
 
-    ProxyPass /custom_toolbox-assets http://127.0.0.1:8080/custom_toolbox-assets
-    ProxyPassReverse /custom_toolbox-assets http://127.0.0.1:8080/custom_toolbox-assets
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081/
 
-    ProxyPassMatch ^/$ http://localhost:8080
-    ProxyPassReverse ^/$ http://127.0.0.1:8080
+    ProxyPassMatch ^/$ uwsgi://localhost:8081/
+    ProxyPassReverse / uwsgi://127.0.0.1:8081/
 
     CustomLog /var/tracim/logs/apache2-access.log combined
     ErrorLog /var/tracim/logs/apache2-error.log

@@ -7,8 +7,9 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   findUserRoleIdInWorkspace,
-  sortWorkspaceContents,
-  SHARE_FOLDER_ID
+  sortContentList,
+  SHARE_FOLDER_ID,
+  ANCHOR_NAMESPACE
 } from '../util/helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ShareFolder from '../component/Workspace/ShareFolder.jsx'
@@ -54,7 +55,8 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -159,7 +161,7 @@ export class WorkspaceContent extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
-    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
+    // console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
     if (state.workspaceIdInUrl === null) return
 
@@ -221,11 +223,8 @@ export class WorkspaceContent extends React.Component {
   setHeadTitle = (filterName) => {
     const { props } = this
 
-    if (props.system.config.instance_name && props.currentWorkspace.label) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([filterName, props.currentWorkspace.label, props.system.config.instance_name]) }
-      })
+    if (props.currentWorkspace.label) {
+      props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label])))
     }
   }
 
@@ -239,9 +238,9 @@ export class WorkspaceContent extends React.Component {
         break
       case 400:
         props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage('Unknown shared space'))
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
 
@@ -332,7 +331,7 @@ export class WorkspaceContent extends React.Component {
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
-            props.dispatch(newFlashMessage(props.t('Workspace not found'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Space not found'), 'warning'))
             props.history.push('/ui')
             throw new Error(fetchContentList.json.message)
         }
@@ -639,12 +638,12 @@ export class WorkspaceContent extends React.Component {
     const { props } = this
 
     const creationAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
-      ? props.t('This shared space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
-      : props.t('This shared space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
+      ? props.t('This space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
+      : props.t('This space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
 
     const creationNotAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
-      ? props.t('This shared space has no content of that type yet')
-      : props.t('This shared space has no content yet')
+      ? props.t('This space has no content of that type yet')
+      : props.t('This space has no content yet')
 
     return (
       <div className='workspace__content__fileandfolder__empty'>
@@ -660,7 +659,8 @@ export class WorkspaceContent extends React.Component {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
       if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
     }
-    if (document.getElementById(contentToScrollTo)) document.getElementById(contentToScrollTo).scrollIntoView()
+    const idContentToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentToScrollTo}`
+    if (document.getElementById(idContentToScrollTo)) document.getElementById(idContentToScrollTo).scrollIntoView()
   }
 
   render () {
@@ -677,9 +677,10 @@ export class WorkspaceContent extends React.Component {
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
-    const rootContentList = filteredWorkspaceContentList
-      .filter(c => c.parentId === null)
-      .sort(sortWorkspaceContents)
+    const rootContentList = sortContentList(
+      filteredWorkspaceContentList.filter(c => c.parentId === null),
+      props.user.lang
+    )
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
 
@@ -747,7 +748,6 @@ export class WorkspaceContent extends React.Component {
             >
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
-                  parentClass='workspace__header__btnaddcontent'
                   folderId={null} // null because it is workspace root content
                   onClickCreateContent={this.handleClickCreateContent}
                   availableApp={createContentAvailableApp}
@@ -764,6 +764,7 @@ export class WorkspaceContent extends React.Component {
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
                     isOpen={state.shareFolder.isOpen}
+                    lang={props.user.lang}
                     getContentParentList={this.getContentParentList}
                     onDropMoveContentItem={this.handleDropMoveContent}
                     onClickFolder={this.handleClickFolder}
@@ -793,6 +794,7 @@ export class WorkspaceContent extends React.Component {
                       <Folder
                         availableApp={createContentAvailableApp}
                         folderData={content}
+                        lang={props.user.lang}
                         workspaceContentList={filteredWorkspaceContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
@@ -856,7 +858,6 @@ export class WorkspaceContent extends React.Component {
 
                 {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
-                    customClass='workspace__content__button'
                     folderId={null}
                     onClickCreateContent={this.handleClickCreateContent}
                     availableApp={createContentAvailableApp}

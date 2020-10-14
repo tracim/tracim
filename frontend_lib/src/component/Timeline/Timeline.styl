@@ -36,8 +36,24 @@
       padding-left 5px
       z-index 1
   &__texteditor
+    position relative
     flex 0 1 auto
     margin 20px
+    &__autocomplete
+      position absolute
+      width 100%
+      background-color offWhite
+      border-radius 5px
+      font-size 14px
+      &__delimiter
+        height 2px
+        margin 5px 20px
+        background-color grey
+      &__item
+        padding 1px 10px
+        cursor pointer
+        &__active
+          background-color grey-hover
     &__textinput
       width 100%
       & > textarea

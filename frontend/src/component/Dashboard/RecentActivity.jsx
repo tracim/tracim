@@ -16,10 +16,10 @@ export const RecentActivity = props =>
 
       <button
         className='recentactivity__header__allread btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-        onClick={props.onClickEverythingAsRead}
+        onClick={props.onClickMarkAllAsRead}
         disabled={props.recentActivityList.length === 0}
       >
-        {props.t('Mark everything as read')}
+        {props.t('Mark all as read')}
       </button>
     </div>
 

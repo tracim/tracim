@@ -76,7 +76,7 @@ from tracim_backend.models.tracim_session import TracimSession
 __author__ = "damien"
 
 
-# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content) -> int:
     """
     :param content1:
@@ -113,7 +113,7 @@ def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Co
             return 0
 
 
-# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 def compare_tree_items_for_sorting_by_type_and_name(
     item1: NodeTreeItem, item2: NodeTreeItem
 ) -> int:
@@ -158,7 +158,7 @@ class ContentApi(object):
         disable_user_workspaces_filter: bool = False,
         namespaces_filter: typing.Optional[typing.List[ContentNamespaces]] = None,
     ) -> None:
-        session.assert_event_mecanism()
+        session.assert_event_mechanism()
         self._session = session
         self._user = current_user
         self._config = config
@@ -220,7 +220,7 @@ class ContentApi(object):
             .options(contains_eager(Content.current_revision))
         )
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     @classmethod
     def sort_tree_items(cls, content_list: typing.List[NodeTreeItem]) -> typing.List[NodeTreeItem]:
         news = []
@@ -231,7 +231,7 @@ class ContentApi(object):
 
         return content_list
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     @classmethod
     def sort_content(cls, content_list: typing.List[Content]) -> typing.List[Content]:
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
@@ -324,7 +324,7 @@ class ContentApi(object):
     def get_base_query(self, workspace: typing.Optional[Workspace]) -> Query:
         return self._base_query(workspace)
 
-    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     # def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
     #     """
     #     This method returns child items (folders or items) for left bar treeview.
@@ -507,7 +507,7 @@ class ContentApi(object):
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
-        # can call here with None. Must update create_comment tu require the
+        # can call here with None. Must update create_comment to require the
         # workspace.
         if not workspace and parent:
             workspace = parent.workspace
@@ -567,7 +567,7 @@ class ContentApi(object):
         assert parent and parent.type != FOLDER_TYPE
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
-                "Can't create comment on content, you need to change his"
+                "Can't create comment on content, you need to change its"
                 "status or state (deleted/archived) before any change."
             )
 
@@ -594,7 +594,7 @@ class ContentApi(object):
 
     def execute_created_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -613,7 +613,7 @@ class ContentApi(object):
 
     def execute_update_content_actions(self, content: Content) -> None:
         """
-        WARNING ! This method Will be Deprecated soon, see
+        WARNING! This method will be deprecated soon, see
         https://github.com/tracim/tracim/issues/1589 and
         https://github.com/tracim/tracim/issues/1487
 
@@ -854,7 +854,7 @@ class ContentApi(object):
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
         self, path_labels: typing.List[str], workspace: Workspace
-    ) -> Content:
+    ) -> typing.Optional[Content]:
         """
         Return a Content folder for given relative path.
         TODO BS 20161124: Not safe if web interface allow folder duplicate names

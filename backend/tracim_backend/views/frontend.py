@@ -75,6 +75,7 @@ class FrontendController(Controller):
                 "website_title": app_config.WEBSITE__TITLE,
                 "custom_toolbox_files": self.custom_toolbox_files,
                 "cache_token": self.cache_token,
+                "excluded_notifications": app_config.WEB__NOTIFICATIONS__EXCLUDED,
             },
         )
 

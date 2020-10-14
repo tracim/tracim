@@ -58,35 +58,32 @@ _install_backend: &_install_backend
     - ls -R /tmp/test
   install:
     - cd $TRAVIS_BUILD_DIR/backend
-    - pip install --upgrade pip setuptools wheel
-
+    - pip install -r "requirements-build.txt"
     - pip install -r "requirements.txt"
+    - pip install -r "requirements-test.txt"
     # postgresql
     - |
       if [ "${DB}" == "postgres" ]; then
-        docker pull postgres:9.3
-        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.3
-        pip install -e ".[postgresql,testing]"
+        docker pull postgres:9.6
+        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.6
+        pip install -r "requirements-db-postgres.txt"
       fi
     # mysql 8+
     - |
       if [ "${DB}" == "mysql" ]; then
         docker pull mysql:8.0
-        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql:8.0
-        pip install -e ".[mysql,testing]"
+        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true --tmpfs /var/lib/mysql mysql:8.0
+        pip install -r "requirements-db-mysql.txt"
       fi
     # mariadb 10.3
     - |
       if [ "${DB}" == "mariadb" ]; then
         docker pull mariadb/server:10.3
         docker run -d -p 3306:3306 --name mariadbd -e MARIADB_DATABASE=tracim_test -e MARIADB_USER=user -e MARIADB_PASSWORD=secret -e MARIADB_RANDOM_ROOT_PASSWORD=true mariadb/server:10.3
-        pip install -e ".[mysql,testing]"
+        pip install -r "requirements-db-mysql.txt"
       fi
-    # sqlite
-    - |
-      if [ "${DB}" == "sqlite" ]; then
-        pip install -e ".[testing]"
-      fi
+    # sqlite : do nothing
+    - pip install -e "."
     - cd $TRAVIS_BUILD_DIR
   before_script:
     - docker pull mailhog/mailhog
@@ -145,7 +142,7 @@ jobs:
     #    before_install:
     #      - cd backend
     #    install:
-    #      - pip install --upgrade pip setuptools wheel
+    #      - pip install -r "requirements-build.txt"
     #      - pip install pip-tools
     #    before_script:
     #      - mv requirements.txt requirements_from_source.txt
@@ -158,21 +155,21 @@ jobs:
     - stage: static-tests
       name: black
       install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
       script:
         - black --version
         - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
     - stage: static-tests
       name: isort
       install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
       script:
         - echo -n "isort " & isort --version-number
         - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
     - stage: static-tests
       name: flake8
       install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-static-tests.txt
+        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
       script:
         - flake8 --version
         - flake8 $TRAVIS_BUILD_DIR/backend/tracim_backend

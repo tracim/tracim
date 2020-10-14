@@ -32,7 +32,10 @@ export const serializeContentProps = {
   sub_content_types: 'subContentTypeList',
   isOpen: 'isOpen',
   actives_shares: 'activedShares',
-  created: 'created'
+  created: 'created',
+  parent_content_type: 'parentContentType',
+  parent_label: 'parentLabel',
+  current_revision_type: 'currentRevisionType'
 }
 
 const defaultWorkspaceContentList = {

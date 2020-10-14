@@ -20,7 +20,7 @@ export const UserStatus = props => {
 
         <div
           className='userstatus__role__text'
-          title={props.t('Your role in the shared space')}
+          title={props.t('Your role in the space')}
           style={{ color: myRole.hexcolor }}
         >
           {props.t(myRole.label)}

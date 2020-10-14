@@ -22,6 +22,7 @@ import {
   REMOVE,
   SET,
   USER,
+  USER_CONFIGURATION,
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER
 } from '../../../src/action-creator.sync'
@@ -32,8 +33,10 @@ import {
   mockGetConfig200,
   mockGetContentType200,
   mockGetMyselfWorkspaceList200,
+  mockGetUserConfig200,
   mockGetWorkspaceMemberList200
 } from '../../apiMock'
+import { notificationPage } from '../../fixture/notification/notificationPage.js'
 
 describe('<Tracim />', () => {
   const newFlashMessageWarningCallBack = sinon.spy()
@@ -46,6 +49,7 @@ describe('<Tracim />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
   const appendBreadcrumbsCallBack = sinon.spy()
   const setWorkspaceListMemberListCallBack = sinon.spy()
+  const setUserConfigurationCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -63,6 +67,9 @@ describe('<Tracim />', () => {
         break
       case `${SET}/${USER}/Connected`:
         setUserConnectedCallBack()
+        break
+      case `${SET}/${USER_CONFIGURATION}`:
+        setUserConfigurationCallBack()
         break
       case `${SET}/${WORKSPACE_LIST}`:
         setWorkspaceListCallBack()
@@ -103,11 +110,13 @@ describe('<Tracim />', () => {
       workspaceListLoaded: true,
       config: {
         email_notification_activated: true
-      }
+      },
+      headTitle: 'Home · Tracim'
     },
     currentWorkspace: {
       id: 1
     },
+    notificationPage: notificationPage,
     flashMessage: [],
     registerCustomEventHandlerList: () => {},
     dispatch: dispatchCallBack
@@ -115,32 +124,43 @@ describe('<Tracim />', () => {
 
   const ComponentWithHOC1 = withRouterMock(translateMock()(TracimWithoutHOC))
 
-  const ComponentWithHOC2 = () => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
+  const ComponentWithHOC2 = (props) => <Provider store={store}><ComponentWithHOC1 {...props} /></Provider>
 
   const wrapper = mount(<ComponentWithHOC2 {...props} />)
 
-  const wrapperInstance = wrapper.find(TracimWithoutHOC)
+  const wrapperInstance = wrapper.find(TracimWithoutHOC).instance()
+
+  global.document.title = props.system.headTitle
 
   describe('intern function', () => {
     describe('loadAppConfig', () => {
       it('setConfigCallBack should be called when loadAppConfig() is called', (done) => {
         mockGetConfig200(FETCH_CONFIG.apiUrl)
-        wrapperInstance.instance().loadAppConfig().then(() => {
+        wrapperInstance.loadAppConfig().then(() => {
           expect(setConfigCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setAppListCallBack should be called when loadAppConfig() is called', (done) => {
         mockGetAppList200(FETCH_CONFIG.apiUrl, appList)
-        wrapperInstance.instance().loadAppConfig().then(() => {
+        wrapperInstance.loadAppConfig().then(() => {
           expect(setAppListCallBack.called).to.equal(true)
         }).then(done, done)
       })
 
       it('setContentTypeListCallBack should be called when loadAppConfig() is called', (done) => {
         mockGetContentType200(FETCH_CONFIG.apiUrl, contentType)
-        wrapperInstance.instance().loadAppConfig().then(() => {
+        wrapperInstance.loadAppConfig().then(() => {
           expect(setContentTypeListCallBack.called).to.equal(true)
+        }).then(done, done)
+      })
+    })
+
+    describe('loadUserConfiguration', () => {
+      it('should call setUserConfiguration', (done) => {
+        mockGetUserConfig200(FETCH_CONFIG.apiUrl, user.userId)
+        wrapperInstance.loadUserConfiguration(user.userId).then(() => {
+          expect(setUserConfigurationCallBack.called).to.equal(true)
         }).then(done, done)
       })
     })
@@ -148,7 +168,7 @@ describe('<Tracim />', () => {
     describe('loadWorkspaceList', () => {
       it('setWorkspaceListCallBack should be called when loadWorkspaceList() is called', (done) => {
         mockGetMyselfWorkspaceList200(FETCH_CONFIG.apiUrl, false, workspaceList.workspaceList)
-        wrapperInstance.instance().loadWorkspaceList().then(() => {
+        wrapperInstance.loadWorkspaceList().then(() => {
           expect(setWorkspaceListCallBack.called).to.equal(true)
         }).then(done, done)
       })
@@ -157,9 +177,153 @@ describe('<Tracim />', () => {
     describe('loadWorkspaceListMemberList', () => {
       it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
         workspaceList.workspaceList.map(ws => mockGetWorkspaceMemberList200(FETCH_CONFIG.apiUrl, ws.id, ws.memberList))
-        wrapperInstance.instance().loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
+        wrapperInstance.loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
           expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
+      })
+    })
+
+    describe('handleHeadTitleAndFavicon (through componentDidUpdate)', () => {
+      const initialDocument = global.document
+      const getContextSpy = sinon.spy()
+      const dummyElement = {
+        href: 'testUrl',
+        getAttribute: () => 'randomAttributeValue',
+        removeAttribute: () => {},
+        sizes: ['64x64'],
+        getContext: getContextSpy
+      }
+
+      before(() => {
+        global.document = {
+          getElementsByClassName: () => [dummyElement],
+          createElement: () => dummyElement
+        }
+      })
+
+      after(() => {
+        global.document = initialDocument
+      })
+
+      describe('The headTitle has been updated', () => {
+        afterEach(() => {
+          wrapper.setProps({ system: props.system })
+        })
+
+        describe('The new headTitle is different', () => {
+          const newHeadTitle = 'NewTitle'
+
+          before(() => {
+            wrapper.setProps({ system: { ...props.system, headTitle: newHeadTitle } })
+          })
+
+          it('should set the new document title', () => {
+            expect(global.document.title).to.equal(newHeadTitle)
+          })
+        })
+
+        describe('The new headTitle is identical', () => {
+          const newHeadTitle = props.system.headTitle
+
+          before(() => {
+            wrapper.setProps({ system: { ...props.system, headTitle: newHeadTitle } })
+          })
+
+          it('should keep the same headTitle', () => {
+            expect(global.document.title).to.equal(newHeadTitle)
+          })
+        })
+
+        describe('The new headTitle is an empty string ""', () => {
+          const newHeadTitle = ''
+
+          before(() => {
+            wrapper.setProps({ system: { ...props.system, headTitle: newHeadTitle } })
+          })
+
+          it('should keep the same headTitle', () => {
+            expect(global.document.title).to.equal(props.system.headTitle)
+          })
+        })
+      })
+
+      describe('The notificationNotReadCount has been updated', () => {
+        describe('prevNotificationNotReadCount = 0 && notificationNotReadCount = 5', () => {
+          const newNotificationNotReadCount = 5
+
+          before(() => {
+            wrapper.setProps({
+              notificationPage: {
+                ...props.notificationPage,
+                notificationNotReadCount: newNotificationNotReadCount
+              }
+            })
+          })
+
+          after(() => {
+            getContextSpy.resetHistory()
+          })
+
+          it('should set the new document title', () => {
+            expect(global.document.title).to.equal(`(${newNotificationNotReadCount}) ${props.system.headTitle}`)
+          })
+
+          it('should draw on favicon by calling canvas.getContext()', () => {
+            expect(getContextSpy.calledOnce).to.equal(true)
+          })
+        })
+
+        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 101', () => {
+          const newNotificationNotReadCount = 101
+
+          before(() => {
+            wrapper.setProps({
+              notificationPage: {
+                ...props.notificationPage,
+                notificationNotReadCount: newNotificationNotReadCount
+              }
+            })
+          })
+
+          after(() => {
+            getContextSpy.resetHistory()
+          })
+
+          it('should set the new document title', () => {
+            expect(dummyElement.href).to.not.equal(dummyElement.getAttribute())
+            expect(global.document.title).to.equal(`(99+) ${props.system.headTitle}`)
+          })
+
+          it('should draw on favicon by calling canvas.getContext()', () => {
+            expect(getContextSpy.calledOnce).to.equal(false)
+          })
+        })
+
+        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 0', () => {
+          const newNotificationNotReadCount = 0
+
+          before(() => {
+            wrapper.setProps({
+              notificationPage: {
+                ...props.notificationPage,
+                notificationNotReadCount: newNotificationNotReadCount
+              }
+            })
+          })
+
+          after(() => {
+            getContextSpy.resetHistory()
+          })
+
+          it('should set the new document title', () => {
+            expect(global.document.title).to.equal(props.system.headTitle)
+          })
+
+          it('should draw on favicon by calling canvas.getContext()', () => {
+            expect(dummyElement.href).to.equal(dummyElement.getAttribute())
+            expect(getContextSpy.calledOnce).to.equal(false)
+          })
+        })
       })
     })
   })

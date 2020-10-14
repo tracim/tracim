@@ -42,11 +42,7 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         thread = DummyApp(
-            label="Threads",
-            slug="contents/thread",
-            fa_icon="comments-o",
-            config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=thread",
+            label="Threads", slug="contents/thread", fa_icon="comments-o", config={}, main_route="",
         )
         content_type = TracimContentType(
             slug="thread",
@@ -68,7 +64,7 @@ class TestApplicationApi(object):
             slug="contents/markdownpluspage",
             fa_icon="file-code-o",
             config={},
-            main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
+            main_route="",
         )
         content_type = TracimContentType(
             slug="markdownpage",
@@ -91,10 +87,9 @@ class TestApplicationApi(object):
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )
-        assert len(default_workspace_menu_entry) == 3
+        assert len(default_workspace_menu_entry) == 2
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == thread.label
 
     def test_get_default_workspace_menu_entry__ok__folder_case(self):
         """

@@ -14,8 +14,10 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
+
 | <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
-|---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
+| ------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
@@ -26,19 +28,19 @@ The priority order is (from less to more priority):
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
-|TRACIM_SESSION__TYPE                                                       |session.type                                                    |SESSION__TYPE                                                       |
-|TRACIM_SESSION__URL                                                        |session.url                                                     |SESSION__URL                                                        |
-|TRACIM_SESSION__DATA_DIR                                                   |session.data_dir                                                |SESSION__DATA_DIR                                                   |
-|TRACIM_SESSION__LOCK_DIR                                                   |session.lock_dir                                                |SESSION__LOCK_DIR                                                   |
+| TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
+| TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
+| TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
+| TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
 | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |
 | TRACIM_DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               | default_anonymized_user_display_name                           | DEFAULT_ANONYMIZED_USER_DISPLAY_NAME                               |
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
-| TRACIM_USER__RESET_PASSWORD__VALIDITY                                     | user.reset_password.validity                                   | USER__RESET_PASSWORD__VALIDITY                                     |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_WORKSPACE__ALLOWED_ACCESS_TYPES                                    | workspace.allowed_access_types                                 | WORKSPACE__ALLOWED_ACCESS_TYPES                                    |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
 | TRACIM_DEBUG                                                              | debug                                                          | DEBUG                                                              |
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
@@ -54,9 +56,14 @@ The priority order is (from less to more priority):
 | TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE                               | limitation.content_length_file_size                            | LIMITATION__CONTENT_LENGTH_FILE_SIZE                               |
 | TRACIM_LIMITATION__WORKSPACE_SIZE                                         | limitation.workspace_size                                      | LIMITATION__WORKSPACE_SIZE                                         |
 | TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             | limitation.user_default_allowed_space                          | LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             |
+| TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
+| TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
+| TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
+| TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
+| TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
+| TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
 | TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
 | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
-| TRACIM_EMAIL__NOTIFICATION__FROM                                          | email.notification.from                                        | EMAIL__NOTIFICATION__FROM                                          |
 | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
 | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
 | TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL                             | email.notification.references.email                            | EMAIL__NOTIFICATION__REFERENCES__EMAIL                             |
@@ -85,14 +92,10 @@ The priority order is (from less to more priority):
 | TRACIM_EMAIL__REPLY__USE_HTML_PARSING                                     | email.reply.use_html_parsing                                   | EMAIL__REPLY__USE_HTML_PARSING                                     |
 | TRACIM_EMAIL__REPLY__USE_TXT_PARSING                                      | email.reply.use_txt_parsing                                    | EMAIL__REPLY__USE_TXT_PARSING                                      |
 | TRACIM_EMAIL__REPLY__LOCKFILE_PATH                                        | email.reply.lockfile_path                                      | EMAIL__REPLY__LOCKFILE_PATH                                        |
-| TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
-| TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
-| TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
-| TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
 | TRACIM_NEW_USER__INVITATION__DO_NOTIFY                                    | new_user.invitation.do_notify                                  | NEW_USER__INVITATION__DO_NOTIFY                                    |
 | TRACIM_NEW_USER__INVITATION__MINIMAL_PROFILE                              | new_user.invitation.minimal_profile                            | NEW_USER__INVITATION__MINIMAL_PROFILE                              |
+| TRACIM_EMAIL__REQUIRED                                                    | email.required                                                 | EMAIL__REQUIRED                                                    |
 | TRACIM_LDAP_URL                                                           | ldap_url                                                       | LDAP_URL                                                           |
-| TRACIM_LDAP_BASE_URL                                                      | ldap_base_url                                                  | LDAP_BASE_URL                                                      |
 | TRACIM_LDAP_BIND_DN                                                       | ldap_bind_dn                                                   | LDAP_BIND_DN                                                       |
 | TRACIM_LDAP_BIND_PASS                                                     | ldap_bind_pass                                                 | LDAP_BIND_PASS                                                     |
 | TRACIM_LDAP_TLS                                                           | ldap_tls                                                       | LDAP_TLS                                                           |
@@ -131,6 +134,8 @@ The priority order is (from less to more priority):
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
+| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
+
 
 ### Parameters Only Working in the Configuration File
 
@@ -345,8 +350,8 @@ Listen 6544
     # RequestHeader set X-Remote-User %{REMOTE_USER}s
 
     ProxyPreserveHost On
-    ProxyPassMatch /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
-    ProxyPassReverse /api/users/(.*/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+    ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     ProxyPass / http://127.0.0.1:6543/
     ProxyPassReverse / http://127.0.0.1:6543/
@@ -398,7 +403,7 @@ However, if you rely mostly on external authentication, disabling it is better.
 Configure how to handle invitation of non-existent users in Tracim with these parameters:
 
 | email.notification.activated | new_user.invitation.do_notify | behaviour                                                         |
-|------------------------------|-------------------------------|-------------------------------------------------------------------|
+| ---------------------------- | ----------------------------- | ----------------------------------------------------------------- |
 | True                         | True                          | create **account with autogenerated password** send by **email**. |
 | True                         | False                         | create **account without password** and do not send email         |
 | False                        | True                          | **account invitation disabled**                                   |

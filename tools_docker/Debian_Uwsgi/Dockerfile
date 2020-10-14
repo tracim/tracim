@@ -49,10 +49,11 @@ RUN \
 # Go in backend folder
     cd /tracim/backend \
 # Install backend
-    && python3 -m pip install -U pip setuptools wheel \
+    && python3 -m pip install -r requirements-build.txt \
     && python3 -m pip install -r requirements.txt \
-    && python3 -m pip install -e ".[postgresql]" \
-    && python3 -m pip install -e ".[mysql]" \
+    && python3 -m pip install -r requirements-db-postgres.txt \
+    && python3 -m pip install -r requirements-db-mysql.txt \
+    && python3 -m pip install -e "." \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
 
@@ -85,13 +86,25 @@ ENV LC_ALL C.UTF-8
 
 RUN \
     apt install -qy \
+        apt-transport-https \
+        software-properties-common \
+        gnupg2 \
+        # NOTE - S.G. - 2020-08-10 - Installing zurl before adding pushpin repository
+        # as the zurl package in it cannot be installed on stretch.
+        zurl \
+    && echo deb https://dl.bintray.com/fanout/debian fanout-stretch main \
+        | tee /etc/apt/sources.list.d/fanout.list \
+    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
+        --recv-keys 379CE192D401AB61 \
+    && apt update \
+    && apt install -qy \
         apache2 \
         ffmpeg \
         ghostscript \
         gnupg \
         imagemagick \
         inkscape \
-        libapache2-mod-wsgi-py3 \
+        libapache2-mod-proxy-uwsgi \
         libreoffice \
         poppler-utils \
         postgresql-client \

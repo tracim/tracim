@@ -31,8 +31,8 @@ class PopupCreateContent extends React.Component {
           customStyle={props.customStyle}
         >
           <div className='createcontent'>
-            <div className='createcontent__contentname mb-4'>
-              <div className='createcontent__contentname__icon ml-1 mr-3'>
+            <div className='createcontent__contentname'>
+              <div className='createcontent__contentname__icon'>
                 <i className={`fa fa-${props.faIcon}`} style={{ color: props.customColor }} />
               </div>
 
@@ -55,8 +55,7 @@ class PopupCreateContent extends React.Component {
                     onKeyDown={this.handleInputKeyDown}
                     autoFocus
                   />
-                )
-              }
+                )}
               <div className='createcontent__form__button'>
                 <button
                   type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page

@@ -34,13 +34,17 @@ class TracimSession(Session):
     def get_allowed_revision_deletion(self) -> bool:
         return self._allow_revision_deletion
 
-    def assert_event_mecanism(self) -> None:
+    def assert_event_mechanism(self) -> None:
         assert self.info["crud_hook_caller"], (
             "Entity crud hook caller not registered, "
             "session must be created through create_dbsession_for_context()"
         )
         assert self.context.plugin_manager.has_plugin("EventBuilder"), (
-            "event builder not registered, you must register EventBuider()"
+            "event builder not registered, you must register EventBuilder()"
+            "on session's context plugin_manager"
+        )
+        assert self.context.plugin_manager.has_plugin("EventPublisher"), (
+            "event publisher not registered, you must register EventPublisher()"
             "on session's context plugin_manager"
         )
 

@@ -1,9 +1,6 @@
 import { PROFILE } from 'tracim_frontend_lib'
 
-export const MAXIMUM_CHARACTERS_USERNAME = 255
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const MINIMUM_CHARACTERS_USERNAME = 3
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
 
 export const getUserProfile = (profileObj, slug) => Object.keys(profileObj).map(p => profileObj[p]).find(p => slug === p.slug) || {}
 

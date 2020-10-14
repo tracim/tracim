@@ -186,6 +186,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class InvalidWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
+
+
 class ImmutableAttribute(TracimException):
     pass
 
@@ -206,7 +210,7 @@ class WrongSharePassword(TracimException):
     error_code = ErrorCode.WRONG_SHARE_PASSWORD
 
 
-class UnvalidResetPasswordToken(TracimException):
+class InvalidResetPasswordToken(TracimException):
     error_code = ErrorCode.INVALID_RESET_PASSWORD_TOKEN
     pass
 
@@ -241,6 +245,10 @@ class ContentTypeNotExist(TracimError):
 
 class UserDoesNotExist(TracimException):
     error_code = ErrorCode.USER_NOT_FOUND
+
+
+class MessageDoesNotExist(TracimException):
+    error_code = ErrorCode.MESSAGE_NOT_FOUND
 
 
 class UserNotFoundInTracimRequest(TracimException):
@@ -315,6 +323,10 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
+class DisallowedWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.DISALLOWED_WORKSPACE_ACCESS_TYPE
+
+
 class UserNotAllowedToCreateMoreWorkspace(TracimException):
     error_code = ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
@@ -379,8 +391,12 @@ class UserCantDeleteHimself(TracimException):
     error_code = ErrorCode.USER_CANT_DELETE_HIMSELF
 
 
-class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
-    error_code = ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+class UserNotMemberOfWorkspace(TracimException):
+    error_code = ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
+
+
+class LastWorkspaceManagerRoleCantBeModified(TracimException):
+    error_code = ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
 
 
 class UserCantChangeIsOwnProfile(TracimException):
@@ -404,6 +420,10 @@ class RoleDoesNotExist(TracimException):
 
 
 class ProfileDoesNotExist(TracimException):
+    pass
+
+
+class SubcriptionDoesNotExist(TracimException):
     pass
 
 
@@ -460,6 +480,11 @@ class UnallowedSubContent(TracimException):
 
 
 class TooShortAutocompleteString(TracimException):
+    error_code = ErrorCode.ACP_STRING_TOO_SHORT
+    pass
+
+
+class CannotUseBothIncludeAndExcludeWorkspaceUsers(TracimException):
     pass
 
 
@@ -471,12 +496,12 @@ class AppDoesNotExist(TracimException):
     pass
 
 
-class EmailAlreadyExistInDb(TracimException):
-    error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+class EmailAlreadyExists(TracimException):
+    error_code = ErrorCode.EMAIL_ALREADY_EXISTS
 
 
-class UsernameAlreadyExistInDb(TracimException):
-    error_code = ErrorCode.USERNAME_ALREADY_EXIST_IN_DB
+class UsernameAlreadyExists(TracimException):
+    error_code = ErrorCode.USERNAME_ALREADY_EXISTS
 
 
 class UnavailablePreview(TracimException):
@@ -553,3 +578,7 @@ class ConflictingMoveInChild(TracimException):
 
 class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
     pass
+
+
+class ReservedUsernameError(TracimException):
+    error_code = ErrorCode.RESERVED_USERNAME

@@ -3,10 +3,17 @@ import i18n from './i18n.js'
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
+  NUMBER_RESULTS_BY_PAGE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
-  displayDistanceDate
+  displayDistanceDate,
+  sortTimelineByDate
 } from './helper.js'
+import {
+  addClassToMentionsOfUser,
+  handleMentionsBeforeSave,
+  getMatchingGroupMentionList
+} from './mention.js'
 import {
   putEditContent,
   postNewComment,
@@ -14,7 +21,8 @@ import {
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
-  putContentRestoreDelete
+  putContentRestoreDelete,
+  getMyselfKnownMember
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -31,7 +39,7 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    setApiUrl = url => this.apiUrl = url
+    setApiUrl = url => { this.apiUrl = url }
 
     sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -49,7 +57,7 @@ export function appContentFactory (WrappedComponent) {
         return
       }
       setState({ isVisible: true })
-      buildBreadcrumbs()
+      buildBreadcrumbs(content)
     }
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
@@ -80,10 +88,9 @@ export function appContentFactory (WrappedComponent) {
     }
 
     // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
-    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline, buildBreadcrumbs) => {
+    appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline) => {
       await loadContent()
       loadTimeline()
-      buildBreadcrumbs()
     }
 
     // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
@@ -137,15 +144,24 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug) => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
       this.checkApiUrl()
 
-      // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg ? newComment : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      const newCommentForApi = isCommentWysiwyg
+        ? tinymce.activeEditor.getContent()
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername)
+      } catch (e) {
+        return Promise.reject(e)
+      }
 
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApi)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
       )
 
       switch (response.apiResponse.status) {
@@ -159,17 +175,21 @@ export function appContentFactory (WrappedComponent) {
           break
         case 400:
           switch (response.body.code) {
+            case 2067:
+              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving new comment'))
+              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving new comment')); break
+        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response
@@ -194,7 +214,7 @@ export function appContentFactory (WrappedComponent) {
     appContentArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentArchived(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -221,7 +241,7 @@ export function appContentFactory (WrappedComponent) {
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentDeleted(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -238,7 +258,7 @@ export function appContentFactory (WrappedComponent) {
               delay: undefined
             }
           })
-        break
+          break
       }
 
       return response
@@ -247,7 +267,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreArchive = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreArchive(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -272,7 +292,7 @@ export function appContentFactory (WrappedComponent) {
     appContentRestoreDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
-      const response = await await handleFetchResult(
+      const response = await handleFetchResult(
         await putContentRestoreDelete(this.apiUrl, content.workspace_id, content.content_id)
       )
 
@@ -290,26 +310,60 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, userLang) => {
+    appContentNotifyAll = (content, setState, appSlug) => {
+      const notifyAllComment = i18n.t('@all please notice that I did an important update on this content.')
+
+      this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
+    }
+
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
       const resCommentWithProperDate = commentList.map(c => ({
         ...c,
         created_raw: c.created,
-        created: displayDistanceDate(c.created, userLang)
+        created: displayDistanceDate(c.created, loggedUser.lang),
+        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
       }))
 
       return revisionList
         .map((revision, i) => ({
           ...revision,
           created_raw: revision.created,
-          created: displayDistanceDate(revision.created, userLang),
+          created: displayDistanceDate(revision.created, loggedUser.lang),
           timelineType: 'revision',
           commentList: revision.comment_ids.map(ci => ({
             timelineType: 'comment',
             ...resCommentWithProperDate.find(c => c.content_id === ci)
           })),
-          number: i + 1
+          number: i + 1,
+          hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
+    }
+
+    searchForMentionInQuery = async (query, workspaceId) => {
+      const mentionList = getMatchingGroupMentionList(query)
+
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+
+      switch (fetchUserKnownMemberList.apiResponse.status) {
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+      }
+      return mentionList
+    }
+
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
+      return sortTimelineByDate([
+        ...timeline,
+        {
+          ...comment,
+          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
+          created_raw: comment.created,
+          created: displayDistanceDate(comment.created, loggedUser.lang),
+          timelineType: comment.content_type,
+          hasBeenRead: hasBeenRead
+        }
+      ])
     }
 
     render () {
@@ -328,9 +382,12 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
           appContentDelete={this.appContentDelete}
+          appContentNotifyAll={this.appContentNotifyAll}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          searchForMentionInQuery={this.searchForMentionInQuery}
+          addCommentToTimeline={this.addCommentToTimeline}
         />
       )
     }

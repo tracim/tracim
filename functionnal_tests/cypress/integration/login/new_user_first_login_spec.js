@@ -16,6 +16,7 @@ describe('First login with a new user', function () {
   })
 
   it('should redirect to the homepage', function () {
+    this.skip() // FIXME - GB - 2020-09-03 - this tests is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
     cy.visitPage({ pageName: p.ADMIN_USER })
     cy.get('.adminUser__adduser__button').click()
     cy.get('[data-cy=adduser_name]').type('name')

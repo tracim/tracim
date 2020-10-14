@@ -7,13 +7,11 @@ import {
   CUSTOM_EVENT,
   addAllResourceI18n,
   buildHeadTitle,
+  getFileContent,
+  getWorkspaceDetail,
   ROLE
 } from 'tracim_frontend_lib'
-import {
-  getWOPIToken,
-  getFileContent,
-  getWorkspaceDetail
-} from '../action.async.js'
+import { getWOPIToken } from '../action.async.js'
 
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
@@ -69,14 +67,10 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   setHeadTitle = async (contentName, workspaceLabel) => {
-    const { state } = this
-
-    if (state.config && state.config.system && state.config.system.config) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([contentName, workspaceLabel, state.config.system.config.instance_name]) }
-      })
-    }
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.SET_HEAD_TITLE,
+      data: { title: buildHeadTitle([contentName, workspaceLabel]) }
+    })
   }
 
   handleIframeIsClosing (event) {
@@ -142,7 +136,7 @@ export class CollaborativeEditionFrame extends React.Component {
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
-            this.sendGlobalFlashMessage(props.t('Workspace not found'))
+            this.sendGlobalFlashMessage(props.t('Space not found'))
             this.redirectTo()
             throw new Error(responseContent.body.message)
         }

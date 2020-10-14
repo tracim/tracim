@@ -1063,6 +1063,22 @@ class TestHtmlDocuments(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
+
+        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
+        # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
+    def test_api__update_html_document__err_400__mention_user_not_member(
+        self, web_testapp, html_with_nasty_mention
+    ) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "", "raw_content": html_with_nasty_mention}
+
         res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
         assert res.json_body
@@ -4129,6 +4145,20 @@ class TestThreads(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
+    def test_api__update_thread__err_400__nasty_mentions(
+        self, web_testapp, html_with_nasty_mention
+    ) -> None:
+        """
+        Update(put) thread
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "Hello", "raw_content": html_with_nasty_mention}
+        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=400)
+        # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
 
     def test_api__get_thread_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """

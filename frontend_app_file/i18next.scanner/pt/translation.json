@@ -1,7 +1,9 @@
 {
+  "click here!": "clique aqui!",
   "Last version": "Última versão",
   "Restore": "Restaurar",
   "Error while creating file": "Erro ao criar o ficheiro",
+  "Error while saving the comment": "Erro ao salvar o comentário",
   "Cancel": "Anular",
   "Validate": "Validar",
   "Download file": "Download ficheiro",
@@ -47,7 +49,7 @@
   "Validate and create": "Validar e criar",
   "Number of shares:": "Quantidade de partilhas:",
   "The file is larger than the maximum file size allowed": "O ficheiro é maior que o tamanho máximo permitido",
-  "Error, the shared space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
+  "Error, the space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
   "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Some file(s) couldn't be uploaded": "Algum(ns) ficheiro(s) não pode(m) ser subido(s)",
   "Files already uploaded:": "Ficheiros já subidos:",
@@ -57,10 +59,9 @@
   "Play video": "Reproduzir vídeo",
   "In that case, you can download the video and try opening it manually.": "Nesse caso, você pode descarregar o vídeo e tentar abri-lo manualmente.",
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descarregar o vídeo, saia do modo ecrã inteiro e clique no botão de download {{icon}}.",
+  "To notify all members of the space of your modification": "Para notificar a todos os membros do espaço da sua modificação",
   "Note: Your browser might not be able to read this file.": "Nota: O seu browser pode não conseguir ler este ficheiro.",
-  "File has been updated": "O ficheiro foi actualizado",
-  "File has been deleted": "O ficheiro foi eliminado",
-  "File has been restored": "O ficheiro foi restaurado",
   "The file has been updated, it can't be edited anymore": "O ficheiro foi actualizado, já não pode ser editado",
-  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}"
+  "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
+  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador"
 }

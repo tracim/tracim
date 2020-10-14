@@ -1,11 +1,33 @@
+import { PAGES } from '../../support/urls_commands'
+
+let workspaceId
+let threadId
+const createdThreadTitle = 'createdThread'
+const firstThreadTitle = 'firstThread'
+const threadPopup = '.cardPopup__container .createcontent .createcontent__contentname'
+const threadPopupInput = '.cardPopup__container .createcontent .createcontent__form__input'
+
 describe('delete a thread content', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      workspaceId = workspace.workspace_id
+
+      cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
+
+      cy.createThread(firstThreadTitle, workspaceId)
+      cy.createThread(createdThreadTitle, workspaceId).then(thread => threadId = thread.content_id)
+    })
   })
 
   beforeEach(function () {
     cy.loginAs('administrators')
+    cy.visitPage({
+      pageName: PAGES.CONTENT_OPEN,
+      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+    })
   })
 
   afterEach(() => {
@@ -13,38 +35,22 @@ describe('delete a thread content', function () {
   })
 
   it('should show the content as deleted and remove it from the content list', function () {
-    // TODO - GB - 2020-06-02 - This test fails because of a refactor that has not yet been done, but which is scheduled in ticket
-    // https://github.com/tracim/tracim/issues/3109
-    this.skip()
-    cy.visit('/ui/workspaces/1/dashboard')
-    cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments-o').click()
-    var titre1 = 'createthread'
-    cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
-    cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
-    cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
-    cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'value', titre1)
-    cy.get('.cardPopup__container .createcontent button.createcontent__form__button').click()
-    cy.get('.cardPopup__container .createcontent  .createcontent__contentname').should('not.be.visible')
-    cy.get('.thread.visible').should('be.visible')
-    cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
+    cy.get('.thread.visible .wsContentGeneric__header__title').contains(createdThreadTitle)
     cy.get('.thread.visible .thread__contentpage__header__close').click()
-    cy.get('.thread.visible').should('not.be.visible')
+    cy.get('.thread.visible').should('not.exist')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
 
-    titre1 = 'createthread'
     cy.get('.content__name').each(($elm) => {
       cy.wrap($elm).invoke('text').then((text) => {
-        if (text === titre1) {
-          cy.get('.content__name').contains(titre1).click()
+        if (text === createdThreadTitle) {
+          cy.get('.content__name').contains(createdThreadTitle).click()
           cy.get('.thread.visible').should('be.visible')
-          cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
+          cy.get('.thread.visible .wsContentGeneric__header__title').contains(createdThreadTitle)
           cy.get('.wsContentGeneric__option__menu__action[data-cy="delete__button"]').click()
-          cy.get('.timeline__warning > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
-          cy.get('.thread.visible .thread__contentpage__header__close').click()
-          cy.get('.thread.visible').should('not.be.visible')
-          cy.get('.content__name').contains(titre1).should('not.exist')
+          cy.get('.timeline__warning > [data-cy="promptMessage"] .promptMessage__btn').should('be.visible')
+          cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
+          cy.contains('.content__name', firstThreadTitle).should('be.visible')
+          cy.contains('.content__name', createdThreadTitle).should('not.exist')
         }
       })
     })

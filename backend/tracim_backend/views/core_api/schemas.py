@@ -10,17 +10,18 @@ from marshmallow.validate import OneOf
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
-from tracim_backend.app_models.validator import acp_validator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
 from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
+from tracim_backend.app_models.validator import page_token_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.app_models.validator import user_config_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
 from tracim_backend.app_models.validator import user_password_validator
@@ -30,7 +31,11 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
+from tracim_backend.app_models.validator import workspace_access_type_validator
+from tracim_backend.app_models.validator import workspace_subscription_state_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -44,7 +49,8 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
-from tracim_backend.models.context_models import KnownMemberQuery
+from tracim_backend.models.context_models import KnownMembersQuery
+from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -64,6 +70,7 @@ from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -74,9 +81,12 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
+from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.roles import WorkspaceRoles
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
@@ -89,6 +99,28 @@ class StrippedString(String):
         if value:
             value = value.strip()
         return value.strip()
+
+
+class EventTypeListField(StrippedString):
+    def _deserialize(self, value, attr, data, **kwargs):
+        result = []
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            values = value.split(",")
+            for item in values:
+                result.append(EventTypeDatabaseParameters.from_event_type(item.strip()))
+            return result
+        return None
+
+
+ExcludeAuthorIdsField = StrippedString(
+    required=False,
+    default=None,
+    allow_none=True,
+    validate=regex_string_as_list_of_int,
+    example="1,5",
+    description="comma separated list of excluded authors",
+)
 
 
 class RFCEmail(ValidatedField, String):
@@ -237,7 +269,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     class Meta:
@@ -246,6 +278,23 @@ class UserSchema(UserDigestSchema):
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
     loggedin_user_password = String(required=True, validate=user_password_validator)
+
+
+class SetConfigSchema(marshmallow.Schema):
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True,
+        example={"param1": "value1"},
+        validate=user_config_validator,
+        description="A simple json dictionary. "
+        'Valid keys only contain characters in "0-9a-zA-Z-_." and are not empty. '
+        'You can use "." to create a hierarchy in the configuration parameters. '
+        "Valid values only allow primitive types: numbers, bool, null, and do not accept "
+        "complex types such dictionaries or lists.",
+    )
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
@@ -331,7 +380,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
     )
 
     @post_load
@@ -388,7 +437,7 @@ class UserCreationSchema(marshmallow.Schema):
         allow_none=True,
         required=False,
         description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reach, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
     )
 
     @marshmallow.validates_schema(pass_original=True)
@@ -415,13 +464,64 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class EventIdPathSchema(marshmallow.Schema):
+    event_id = marshmallow.fields.Int(
+        example=5,
+        required=True,
+        description="id of a valid event",
+        validate=strictly_positive_int_validator,
+    )
+
+
+class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return MessageIdsPath(**data)
+
+
+class WorkspaceFilterQuery(object):
+    def __init__(self, parent_ids: str = None):
+        self.parent_ids = string_to_list(parent_ids, ",", int)
+
+
 class UserWorkspaceFilterQuery(object):
-    def __init__(self, show_owned_workspace: int = 1, show_workspace_with_role: int = 1):
+    def __init__(
+        self,
+        show_owned_workspace: int = 1,
+        show_workspace_with_role: int = 1,
+        parent_ids: str = None,
+    ):
         self.show_owned_workspace = bool(show_owned_workspace)
         self.show_workspace_with_role = bool(show_workspace_with_role)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
 
 
-class UserWorkspaceFilterQuerySchema(marshmallow.Schema):
+class MessageIdsPath(object):
+    def __init__(self, event_id: int, user_id: int):
+        self.event_id = event_id
+        self.user_id = user_id
+
+
+class WorkspaceFilterQuerySchema(marshmallow.Schema):
+    parent_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="0,4,5",
+        description="comma separated list of parent ids,"
+        " parent_id allow to filter workspaces."
+        " If not parent_ids at all, then return all workspaces."
+        " If one parent_id to 0, then return root workspaces."
+        " If set to another value, return all direct subworkspaces"
+        " If multiple value of parent_ids separated by comma,"
+        " return mix of all workspaces of all theses parent_ids",
+        default="0",
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return WorkspaceFilterQuery(**data)
+
+
+class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_owned_workspace = marshmallow.fields.Int(
         example=1,
         default=1,
@@ -461,7 +561,7 @@ class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
         return WorkspaceMemberFilterQuery(**data)
 
 
-class WorkspaceIdPathSchema(marshmallow.Schema):
+class WorkspaceIdSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
         required=True,
@@ -469,6 +569,8 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
         validate=strictly_positive_int_validator,
     )
 
+
+class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
@@ -593,25 +695,37 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         return CommentPath(**data)
 
 
-class KnownMemberQuerySchema(marshmallow.Schema):
-    acp = StrippedString(
-        example="test", description="search text to query", validate=acp_validator, required=True
-    )
+class KnownMembersQuerySchema(marshmallow.Schema):
+    acp = StrippedString(example="test", description="search text to query", required=True)
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description="comma separated list of excluded user",
+        description="comma separated list of excluded users",
     )
+
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of excluded workspace: user of this workspace are excluded from result",
+        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result; cannot be used with include_workspace_ids",
+    )
+
+    include_workspace_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
+    )
+
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=0,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
-        return KnownMemberQuery(**data)
+        return KnownMembersQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
@@ -642,7 +756,6 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="0,4,5",
@@ -734,7 +847,6 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
-
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
@@ -892,6 +1004,14 @@ class WorkspaceModifySchema(marshmallow.Schema):
         default=None,
         allow_none=True,
     )
+    default_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        description="default role for new users in this workspace",
+        validate=user_role_validator,
+        required=False,
+        allow_none=True,
+        default=None,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -906,6 +1026,17 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     agenda_enabled = marshmallow.fields.Bool(
         required=False, description="has workspace has an associated agenda ?", default=True
     )
+    access_type = StrippedString(
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        validate=workspace_access_type_validator,
+        required=True,
+    )
+    default_user_role = StrippedString(
+        description="default role for new users in this workspace",
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
+        required=True,
+    )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
         description="is workspace allowing manager to give access external user"
@@ -917,6 +1048,14 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
         default=True,
+    )
+    parent_id = marshmallow.fields.Int(
+        example=42,
+        description="id of the parent workspace id.",
+        allow_none=True,
+        default=None,
+        required=False,
+        validate=positive_int_validator,
     )
 
     @post_load
@@ -935,7 +1074,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     slug = StrippedString(example="markdown-pages")
     label = StrippedString(example="Markdown Documents")
     route = StrippedString(
-        example="/workspace/{workspace_id}/contents/?type=mardown-page",
+        example="/ui/workspaces/{workspace_id}/agenda",
         description="the route is the frontend route. "
         "It may include workspace_id "
         "which must be replaced on backend size "
@@ -951,13 +1090,29 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         description = "Entry element of a workspace menu"
 
 
-class WorkspaceMinimalSchema(marshmallow.Schema):
+class WorkspaceDigestSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
 
 
-class WorkspaceDigestSchema(WorkspaceMinimalSchema):
+class WorkspaceSchema(WorkspaceDigestSchema):
+    access_type = StrippedString(
+        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        validate=workspace_access_type_validator,
+        required=True,
+    )
+    default_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
+        required=True,
+        description="default role for new users in this workspace",
+    )
+    description = StrippedString(example="All intranet data.")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Workspace creation date"
+    )
+    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
@@ -971,20 +1126,22 @@ class WorkspaceDigestSchema(WorkspaceMinimalSchema):
         "to some file into it ?",
         default=True,
     )
-
-    class Meta:
-        description = "Digest of workspace informations"
-
-
-class WorkspaceSchema(WorkspaceDigestSchema):
-    description = StrippedString(example="All intranet data.")
-    created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Workspace creation date"
+    parent_id = marshmallow.fields.Int(
+        example=42,
+        description="id of the parent workspace id.",
+        allow_none=True,
+        required=True,
+        validate=positive_int_validator,
     )
-    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
 
     class Meta:
-        description = "Full workspace informations"
+        description = "Full workspace information"
+
+
+class UserConfigSchema(marshmallow.Schema):
+    parameters = marshmallow.fields.Dict(
+        description="parameters present in the user's configuration."
+    )
 
 
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
@@ -999,9 +1156,7 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
         "if limit is reach, no file can be created/updated "
         "in any user owned workspaces. 0 mean no limit."
     )
-    workspace = marshmallow.fields.Nested(
-        WorkspaceMinimalSchema(), attribute="workspace_in_context"
-    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
 class WorkspaceMemberDigestSchema(marshmallow.Schema):
@@ -1039,6 +1194,10 @@ class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example="Europe/London")
 
 
+class WorkspaceAccessTypeSchema(marshmallow.Schema):
+    items = marshmallow.fields.List(String(example="confidential"), required=True)
+
+
 class GetUsernameAvailability(marshmallow.Schema):
     username = StrippedString(example="The-powerUser_42", required=True)
 
@@ -1056,6 +1215,10 @@ class AboutSchema(marshmallow.Schema):
     )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL()
+
+
+class ReservedUsernamesSchema(marshmallow.Schema):
+    items = marshmallow.fields.List(String(example="all"), required=True)
 
 
 class ErrorCodeSchema(marshmallow.Schema):
@@ -1109,8 +1272,8 @@ class ContentTypeSchema(marshmallow.Schema):
         example="#FF0000",
         description="HTML encoded color associated to the application. Example:#FF0000 for red",
     )
-    label = StrippedString(example="Text Documents")
-    creation_label = StrippedString(example="Write a document")
+    label = StrippedString(example="Notes")
+    creation_label = StrippedString(example="Write a note")
     available_statuses = marshmallow.fields.Nested(StatusSchema, many=True)
 
 
@@ -1303,6 +1466,8 @@ class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
@@ -1412,18 +1577,49 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
+class LiveMessageSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
+    items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
+
+
 class GetLiveMessageQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages endpoint."""
 
-    read_status = marshmallow.fields.String(
-        missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=strictly_positive_int_validator,
+        missing=DEFAULT_NB_ITEM_PAGINATION,
+        default=DEFAULT_NB_ITEM_PAGINATION,
+        allow_none=False,
     )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first" "elements",
+        validate=page_token_validator,
+    )
+    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    include_event_types = EventTypeListField()
+    exclude_event_types = EventTypeListField()
+    exclude_author_ids = ExcludeAuthorIdsField
+
+    @post_load
+    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
+        return LiveMessageQuery(**data)
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
     accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+
+
+class TracimLiveEventQuerySchema(marshmallow.Schema):
+    after_event_id = marshmallow.fields.Int(
+        required=False, missing=0, example=42, validator=positive_int_validator
+    )
 
 
 # INFO - G.M - 2020-05-19 - This is only used for documentation
@@ -1434,3 +1630,38 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
+    """Possible query parameters for the GET messages summary endpoint."""
+
+    exclude_event_types = EventTypeListField()
+    include_event_types = EventTypeListField()
+    exclude_author_ids = ExcludeAuthorIdsField
+
+    @post_load
+    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+        return UserMessagesSummaryQuery(**data)
+
+
+class UserMessagesSummarySchema(marshmallow.Schema):
+    messages_count = marshmallow.fields.Int(example=42)
+    read_messages_count = marshmallow.fields.Int(example=30)
+    unread_messages_count = marshmallow.fields.Int(example=12)
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
+
+
+class WorkspaceSubscriptionSchema(marshmallow.Schema):
+    state = StrippedString(
+        example="pending", validate=workspace_subscription_state_validator, attribute="state_slug"
+    )
+    created_date = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="subscription creation date"
+    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
+    author = marshmallow.fields.Nested(UserDigestSchema())
+    evaluation_date = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="evaluation date", allow_none=True
+    )
+    evaluator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)

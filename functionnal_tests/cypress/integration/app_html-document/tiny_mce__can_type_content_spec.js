@@ -18,10 +18,10 @@ describe('Known users as a workspace-manager', function () {
 
   it.only('Check TinyMCE is active if document is empty when opening', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
-    cy.contains('Write a document').click()
+    cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
-    cy.get('.wsContentGeneric__header__close').click()
+    cy.get('.html-document__header__close[data-cy=popinFixed__header__button__close]').click()
     cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: DOCUMENT_TITLE } }).click()
 
     cy.waitForTinyMCELoaded().then(() => {
@@ -45,7 +45,7 @@ describe('Known users as a workspace-manager', function () {
 
   it('Type into tiny mce and save', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
-    cy.contains('Write a document').click()
+    cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
@@ -59,7 +59,7 @@ describe('Known users as a workspace-manager', function () {
 
   it('Check if TinyMCE open content of the document', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
-    cy.contains('Write a document').click()
+    cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
@@ -74,14 +74,14 @@ describe('Known users as a workspace-manager', function () {
 
   it('Check TinyMCE is not active when opening if document has been modified', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
-    cy.contains('Write a document').click()
+    cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
     cy.waitForTinyMCELoaded().then(() => {
       cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
       cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-      cy.get('[data-cy=popinFixed__header__button__close]').click()
+      cy.get('.html-document__header__close[data-cy=popinFixed__header__button__close]').click()
       cy.get('[data-cy=popinFixed]').should('not.exist')
 
       cy.contains(DOCUMENT_TITLE).click()

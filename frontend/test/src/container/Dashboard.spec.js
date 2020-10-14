@@ -85,10 +85,12 @@ describe('<Dashboard />', () => {
   describe('TLM handlers', () => {
     describe('eventType workspace', () => {
       const tlmData = {
-        workspace: {
-          ...firstWorkspaceFromApi,
-          label: 'another label',
-          slug: 'another-slug'
+        fields: {
+          workspace: {
+            ...firstWorkspaceFromApi,
+            label: 'another label',
+            slug: 'another-slug'
+          }
         }
       }
 
@@ -109,8 +111,10 @@ describe('<Dashboard />', () => {
           })
 
           const tlmDataWithOtherWorkspaceId = {
-            ...tlmData,
-            workspace: { ...tlmData.workspace, workspace_id: 999 }
+            fields: {
+              ...tlmData.fields,
+              workspace: { ...tlmData.workspace, workspace_id: 999 }
+            }
           }
           dashboardInstance.handleWorkspaceModified(tlmDataWithOtherWorkspaceId)
 

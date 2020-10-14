@@ -1,29 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import debounce from 'lodash/debounce'
 import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+
 import {
-  ALLOWED_CHARACTERS_USERNAME,
   COOKIE_FRONTEND,
-  MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME,
-  workspaceConfig
+  workspaceConfig,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
-  buildHeadTitle,
   CUSTOM_EVENT,
   CardPopup,
-  hasNotAllowedCharacters,
-  hasSpaces,
-  TracimComponent
+  TracimComponent,
+  checkUsernameValidity,
+  ALLOWED_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import {
-  getUsernameAvailability,
   putUserUsername
 } from '../action-creator.async.js'
-import { newFlashMessage } from '../action-creator.sync.js'
+import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -65,23 +66,22 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.checkUsername()
+    this.setUsernamePopupVisibility()
     this.setHeadTitle()
+  }
+
+  componentWillUnmount () {
+    this.debouncedCheckUsernameValidity.cancel()
   }
 
   setHeadTitle = () => {
     const { props } = this
 
-    if (props.system.config.instance_name) {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('Home'), props.system.config.instance_name]) }
-      })
-    }
+    props.dispatch(setHeadTitle(props.t('Home')))
   }
 
-  checkUsername = () => {
-    if (!(Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP) || this.props.user.username)) {
+  setUsernamePopupVisibility () {
+    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
       this.setState({ usernamePopup: true })
     }
   }
@@ -137,57 +137,25 @@ export class Home extends React.Component {
   }
 
   handleChangeNewUsername = async e => {
-    const { props } = this
-
-    this.setState({ newUsername: e.target.value })
     const username = e.target.value
+    this.setState({ newUsername: username })
+    this.debouncedCheckUsernameValidity(username)
+  }
 
-    if (username.length > 0 && username.length < MINIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
-      })
+  checkUsernameValidity = async (username) => {
+    if (!username) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
       return
     }
-
-    if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    if (hasSpaces(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t("Username can't contain any whitespace")
-      })
-      return
-    }
-
-    if (hasNotAllowedCharacters(username)) {
-      this.setState({
-        isUsernameValid: false,
-        usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
-      })
-      return
-    }
-
-    const fetchUsernameAvailability = await props.dispatch(getUsernameAvailability(username))
-
-    switch (fetchUsernameAvailability.status) {
-      case 200:
-        this.setState({
-          isUsernameValid: fetchUsernameAvailability.json.available,
-          usernameInvalidMsg: props.t('This username is not available')
-        })
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while checking username availability'), 'warning'))
-        break
+    const { props } = this
+    try {
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, this.state.newUsername, props))
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
     }
   }
+
+  debouncedCheckUsernameValidity = debounce(checkUsernameValidity, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   handleChangePassword = e => this.setState({ password: e.target.value })
 

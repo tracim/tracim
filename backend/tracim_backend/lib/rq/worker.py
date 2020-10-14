@@ -7,7 +7,7 @@ from rq.local import LocalStack
 import transaction
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.daemon import initialize_config_from_environment
 from tracim_backend.models.setup_models import create_dbsession_for_context
@@ -24,11 +24,7 @@ class RqWorkerTracimContext(TracimContext):
         super().__init__()
         self._app_config = config
         self._dbsession = None
-        self._plugin_manager = create_plugin_manager()
-
-        from tracim_backend.lib.core.event import EventBuilder
-
-        self._plugin_manager.register(EventBuilder(config))
+        self._plugin_manager = init_plugin_manager(config)
 
     @property
     def app_config(self) -> CFG:

@@ -1,9 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
+import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -121,11 +122,11 @@ const WORKSPACE_MANAGER = {
   faIcon: 'gavel',
   hexcolor: '#ed0007',
   tradKey: [
-    i18n.t('Shared space manager'),
-    i18n.t('Content manager + add members and edit shared spaces')
+    i18n.t('Space manager'),
+    i18n.t('Content manager + add members and edit spaces')
   ], // trad key allow the parser to generate an entry in the json file
-  label: 'Shared space manager', // label must be used in components
-  description: 'Content manager + add members and edit shared spaces'
+  label: 'Space manager', // label must be used in components
+  description: 'Content manager + add members and edit spaces'
 }
 const CONTENT_MANAGER = {
   id: 4,
@@ -190,10 +191,10 @@ const MANAGER = {
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Trusted user'),
-    i18n.t('User + create shared spaces, add members in shared spaces')
+    i18n.t('User + create spaces, add members in spaces')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'Trusted user', // label must be used in components
-  description: 'User + create shared spaces, add members in shared spaces'
+  description: 'User + create spaces, add members in spaces'
 }
 const USER = {
   id: 1,
@@ -202,10 +203,10 @@ const USER = {
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
-    i18n.t('Access to shared spaces where user is member')
+    i18n.t('Access to spaces where user is member')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'User', // label must be used in components
-  description: 'Access to shared spaces where user is member'
+  description: 'Access to spaces where user is member'
 }
 export const PROFILE = {
   administrator: ADMINISTRATOR,
@@ -214,25 +215,86 @@ export const PROFILE = {
 }
 export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 
+const OPEN = {
+  id: 2,
+  slug: 'open',
+  faIcon: 'sun-o',
+  tradKey: [
+    i18n.t('Open'),
+    i18n.t('Any user will be able to see, join and open this space.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Open',
+  description: 'Any user will be able to see, join and open this space.'
+}
+const ON_REQUEST = {
+  id: 3,
+  slug: 'on_request',
+  faIcon: 'handshake-o',
+  tradKey: [
+    i18n.t('On request'),
+    i18n.t('Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'On request',
+  description: 'Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.'
+}
+const CONFIDENTIAL = {
+  id: 4,
+  slug: 'confidential',
+  faIcon: 'user-secret',
+  tradKey: [
+    i18n.t('Confidential'),
+    i18n.t('Only invited users will be able to see and open this space, invitation is sent by space managers.')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Confidential',
+  description: 'Only invited users will be able to see and open this space, invitation is sent by space managers.'
+}
+export const SPACE_TYPE = {
+  open: OPEN,
+  onRequest: ON_REQUEST,
+  confidential: CONFIDENTIAL
+}
+export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+
 export const APP_FEATURE_MODE = {
   VIEW: 'view',
   EDIT: 'edit',
   REVISION: 'revision'
 }
 
+export const updateTLMAuthor = author => {
+  return author
+    ? { ...author, is_from_system_admin: false }
+    : {
+      allowed_space: 0,
+      auth_type: 'internal',
+      avatar_url: null,
+      created: '',
+      email: '',
+      is_active: true,
+      is_deleted: false,
+      is_from_system_admin: true,
+      lang: 'en',
+      profile: 'administrators',
+      public_name: i18n.t('System Administrator'),
+      timezone: '',
+      user_id: 0,
+      username: ''
+    }
+}
+
 // INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
-  let password = []
-  let charCode = String.fromCharCode
-  let randomNumber = Math.random
+  const password = []
+  const charCode = String.fromCharCode
+  const randomNumber = Math.random
   let random, i
 
   for (i = 0; i < 10; i++) { // password with a size 10
     random = 0 | randomNumber() * 62 // generate upper OR lower OR number
     password.push(charCode(48 + random + (random > 9 ? 7 : 0) + (random > 35 ? 6 : 0)))
   }
-  let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
+  const randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
 
   return randomPassword
 }
@@ -248,14 +310,14 @@ export const getOrCreateSessionClientToken = () => {
 }
 
 export const COMMON_REQUEST_HEADERS = {
-  'Accept': 'application/json',
+  Accept: 'application/json',
   'X-Tracim-ClientToken': getOrCreateSessionClientToken()
 }
 
 export const FETCH_CONFIG = {
   headers: {
     ...COMMON_REQUEST_HEADERS,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 
@@ -331,7 +393,7 @@ export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
 }
 
-export const addRevisionFromTLM = (data, timeline, lang) => {
+export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
   // INFO - GB - 2020-05-29 In the filter below we use the names from the TLM message so they are not in camelCase and it is necessary to ignore the eslint rule.
   const {
     actives_shares, // eslint-disable-line camelcase
@@ -343,7 +405,7 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
     ...revisionObject
   } = data.content
 
-  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision' ).length
+  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
 
   return [
     ...timeline,
@@ -361,7 +423,8 @@ export const addRevisionFromTLM = (data, timeline, lang) => {
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision'
+      timelineType: 'revision',
+      hasBeenRead: isTokenClient
     }
   ]
 }
@@ -374,9 +437,6 @@ export const removeAtInUsername = (username) => {
   return trimmedUsername
 }
 
-// INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-export const hasNotAllowedCharacters = name => !(/^[A-Za-z0-9_-]*$/.test(name))
-
 export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
@@ -387,4 +447,104 @@ export const serialize = (objectToSerialize, propertyMap) => {
       .map(([key, value]) => [propertyMap[key], value])
       .filter(([key, value]) => key !== undefined)
   )
+}
+
+export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
+  if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
+  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+}
+
+export const MINIMUM_CHARACTERS_USERNAME = 3
+export const MAXIMUM_CHARACTERS_USERNAME = 255
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
+
+export const NUMBER_RESULTS_BY_PAGE = 15
+
+// Check that the given username is valid.
+// Return an object:
+// {isUsernameValid: false, usernameInvalidMsg: 'Username invalid'}
+// The message is translated using the given props.t.
+export const checkUsernameValidity = async (apiUrl, username, props) => {
+  if (username.length < MINIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at least {{minimumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (username.length > MAXIMUM_CHARACTERS_USERNAME) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Username must be at maximum {{maximumCharactersUsername}} characters long', { maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME })
+    }
+  }
+
+  if (hasSpaces(username)) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t("Username can't contain any whitespace")
+    }
+  }
+
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
+  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
+    }
+  }
+
+  const fetchReservedUsernames = await getReservedUsernames(apiUrl)
+  if (fetchReservedUsernames.status !== 200 || !fetchReservedUsernames.json.items) {
+    throw new Error(props.t('Error while checking reserved usernames'))
+  }
+  if (fetchReservedUsernames.json.items.indexOf(username) >= 0) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This word is reserved for group mentions')
+    }
+  }
+
+  const fetchUsernameAvailability = await getUsernameAvailability(apiUrl, username)
+  if (fetchUsernameAvailability.status !== 200) {
+    throw new Error(props.t('Error while checking username availability'))
+  }
+  if (!fetchUsernameAvailability.json.available) {
+    return {
+      isUsernameValid: false,
+      usernameInvalidMsg: props.t('This username is not available')
+    }
+  }
+
+  return {
+    isUsernameValid: true,
+    usernameInvalidMsg: ''
+  }
+}
+
+export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+
+// Equality test done as numbers with the following rules:
+// - strings are converted to numbers before comparing
+// - undefined and null are converted to 0 before comparing
+export const permissiveNumberEqual = (var1, var2) => {
+  return Number(var1 || 0) === Number(var2 || 0)
+}
+
+export const createSpaceTree = spaceList => {
+  const spaceListWithChildren = spaceList.map(space => ({ ...space, children: space.children || [] }))
+  const spaceById = {}
+  const newSpaceList = []
+  for (const space of spaceListWithChildren) {
+    spaceById[space.workspace_id] = space
+  }
+  for (const space of spaceListWithChildren) {
+    if (space.parent_id && spaceById[space.parent_id]) {
+      spaceById[space.parent_id].children.push(space)
+    } else {
+      newSpaceList.push(space)
+    }
+  }
+  return newSpaceList
 }

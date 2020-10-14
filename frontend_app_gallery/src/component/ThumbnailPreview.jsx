@@ -24,6 +24,10 @@ class ThumbnailPreview extends React.Component {
     })
   }
 
+  componentDidUpdate (prevProps) {
+    if (prevProps.previewSrc !== this.props.previewSrc) this.setState({ imageLoaded: IMG_LOAD_STATE.LOADING })
+  }
+
   render () {
     const { props, state } = this
 
@@ -44,6 +48,7 @@ class ThumbnailPreview extends React.Component {
               onLoad={this.handleImageLoad}
               onError={this.handleImageError}
               alt={props.fileName}
+              style={{ visibility: state.imageLoaded === IMG_LOAD_STATE.LOADING ? 'hidden' : 'visible' }}
             />
           )
         )}

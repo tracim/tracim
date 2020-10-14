@@ -2,12 +2,14 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { File } from '../../src/container/File.jsx'
 import { expect } from 'chai'
+import sinon from 'sinon'
 import {
   mockGetFileContent200,
   mockPutMyselfFileRead200,
   mockGetFileComment200,
   mockGetShareLinksList200,
-  mockGetFileRevision200
+  mockGetFileRevision200,
+  mockPutUserConfiguration204
 } from '../apiMock.js'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
@@ -18,12 +20,15 @@ describe('<File />', () => {
   const props = {
     setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     registerLiveMessageHandlerList: () => { },
     registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
     t: key => key
   }
+  const buildBreadcrumbsSpy = sinon.spy()
+  const setHeadTitleSpy = sinon.spy()
 
   mockGetFileContent200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.file)
   mockPutMyselfFileRead200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id)
@@ -32,37 +37,46 @@ describe('<File />', () => {
   mockGetFileRevision200(debug.config.apiUrl, contentFile.file.workspace_id, contentFile.file.content_id, contentFile.revisionList).persist()
 
   const wrapper = shallow(<File {...props} />)
+  wrapper.instance().buildBreadcrumbs = buildBreadcrumbsSpy
+  wrapper.instance().setHeadTitle = setHeadTitleSpy
+
+  const resetSpiesHistory = () => {
+    buildBreadcrumbsSpy.resetHistory()
+    setHeadTitleSpy.resetHistory()
+  }
 
   describe('TLM Handlers', () => {
     describe('eventType content', () => {
       describe('handleContentCreated', () => {
         describe('Create a new comment', () => {
-          it('should have the new comment in the Timeline', () => {
+          it('should call addCommentToTimeline', () => {
             const tlmData = {
-              author: {
-                avatar_url: null,
-                public_name: 'Global manager',
-                user_id: 1
-              },
-              content: {
-                ...commentTlm,
-                parent_id: contentFile.file.content_id,
-                content_id: 9
+              fields: {
+                author: {
+                  avatar_url: null,
+                  public_name: 'Global manager',
+                  user_id: 1
+                },
+                content: {
+                  ...commentTlm,
+                  parent_id: contentFile.file.content_id,
+                  content_id: 9
+                }
               }
             }
             wrapper.instance().handleContentCommentCreated(tlmData)
-
-            const hasComment = !!(wrapper.state('timeline').find(content => content.content_id === tlmData.content.content_id))
-            expect(hasComment).to.equal(true)
+            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
           })
         })
 
         describe('Create a comment not related to the current file', () => {
           const tlmData = {
-            content: {
-              ...commentTlm,
-              parent_id: contentFile.file.content_id + 1,
-              content_id: 12
+            fields: {
+              content: {
+                ...commentTlm,
+                parent_id: contentFile.file.content_id + 1,
+                content_id: 12
+              }
             }
           }
           let oldTimelineLength = 0
@@ -80,32 +94,48 @@ describe('<File />', () => {
       describe('handleContentModified', () => {
         describe('Modify the fileName of the current content', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              filename: 'newName.jpeg'
-            },
-            author: contentFile.file.author
+            fields: {
+              content: {
+                ...contentFile.file,
+                filename: 'newName.jpeg'
+              },
+              author: contentFile.file.author,
+              client_token: wrapper.state('config').apiHeader['X-Tracim-ClientToken']
+            }
           }
 
           before(() => {
+            resetSpiesHistory()
             wrapper.instance().handleContentModified(tlmData)
           })
 
+          after(() => {
+            resetSpiesHistory()
+          })
+
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.fields.content.filename)
           })
           it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.fields.content.filename)
+          })
+          it('should have called buildBreadcrumbs()', () => {
+            expect(buildBreadcrumbsSpy.calledOnce).to.equal(true)
+          })
+          it('should have called setHeadTitle() with the right args', () => {
+            expect(setHeadTitleSpy.calledOnce).to.equal(true)
           })
         })
 
         describe('Modify the description of the current content', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              raw_content: 'new random description'
-            },
-            author: contentFile.file.author
+            fields: {
+              content: {
+                ...contentFile.file,
+                raw_content: 'new random description'
+              },
+              author: contentFile.file.author
+            }
           }
 
           before(() => {
@@ -113,30 +143,32 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.fields.content.raw_content)
           })
           it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.content.raw_content)
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.fields.content.raw_content)
           })
         })
 
         describe('Upload a new file to the current content', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              size: 42,
-              filename: 'New File.jpeg',
-              current_revision_id: contentFile.file.current_revision_id + 1,
-              file_extension: '.jpeg',
-              label: 'New File',
-              slug: 'newFile',
-              created: '2020-05-20T12:15:57Z',
-              page_nb: 3,
-              modified: '2020-05-20T12:15:57Z',
-              mimetype: 'image/jpeg'
-            },
-            user: contentFile.file.author,
-            author: contentFile.file.author
+            fields: {
+              content: {
+                ...contentFile.file,
+                size: 42,
+                filename: 'New File.jpeg',
+                current_revision_id: contentFile.file.current_revision_id + 1,
+                file_extension: '.jpeg',
+                label: 'New File',
+                slug: 'newFile',
+                created: '2020-05-20T12:15:57Z',
+                page_nb: 3,
+                modified: '2020-05-20T12:15:57Z',
+                mimetype: 'image/jpeg'
+              },
+              user: contentFile.file.author,
+              author: contentFile.file.author
+            }
           }
 
           before(() => {
@@ -144,16 +176,16 @@ describe('<File />', () => {
           })
 
           it('should have the new filename', () => {
-            expect(wrapper.state('newContent').filename).to.equal(tlmData.content.filename)
+            expect(wrapper.state('newContent').filename).to.equal(tlmData.fields.content.filename)
           })
           it('should have the new size', () => {
-            expect(wrapper.state('newContent').size).to.equal(tlmData.content.size)
+            expect(wrapper.state('newContent').size).to.equal(tlmData.fields.content.size)
           })
           it('should have the new created date', () => {
-            expect(wrapper.state('newContent').created).to.equal(tlmData.content.created)
+            expect(wrapper.state('newContent').created).to.equal(tlmData.fields.content.created)
           })
           it('should have the new page_nb', () => {
-            expect(wrapper.state('newContent').page_nb).to.equal(tlmData.content.page_nb)
+            expect(wrapper.state('newContent').page_nb).to.equal(tlmData.fields.content.page_nb)
           })
           it('should have build the new previewUrl', () => {
             expect(wrapper.state('newContent').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
@@ -165,10 +197,12 @@ describe('<File />', () => {
 
         describe('Modify a content not related to the current file', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              filename: 'WrongName.jpeg',
-              content_id: contentFile.file.content_id + 1
+            fields: {
+              content: {
+                ...contentFile.file,
+                filename: 'WrongName.jpeg',
+                content_id: contentFile.file.content_id + 1
+              }
             }
           }
 
@@ -177,18 +211,20 @@ describe('<File />', () => {
           })
 
           it('should not be updated when the modification do not concern the current file', () => {
-            expect(wrapper.state('content').filename).to.not.equal(tlmData.content.filename)
+            expect(wrapper.state('content').filename).to.not.equal(tlmData.fields.content.filename)
           })
         })
       })
       describe('handleContentDeletedOrRestored', () => {
         describe('Delete the current content', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              is_deleted: true
-            },
-            author: contentFile.file.author
+            fields: {
+              content: {
+                ...contentFile.file,
+                is_deleted: true
+              },
+              author: contentFile.file.author
+            }
           }
 
           before(() => {
@@ -209,10 +245,12 @@ describe('<File />', () => {
 
         describe('Delete a content which is not the current one', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              content_id: contentFile.file.content_id + 1,
-              is_deleted: true
+            fields: {
+              content: {
+                ...contentFile.file,
+                content_id: contentFile.file.content_id + 1,
+                is_deleted: true
+              }
             }
           }
 
@@ -227,11 +265,13 @@ describe('<File />', () => {
 
         describe('Restore the current content', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              is_deleted: false
-            },
-            author: contentFile.file.author
+            fields: {
+              content: {
+                ...contentFile.file,
+                is_deleted: false
+              },
+              author: contentFile.file.author
+            }
           }
 
           before(() => {
@@ -253,10 +293,12 @@ describe('<File />', () => {
 
         describe('Restore a content which is not the current one', () => {
           const tlmData = {
-            content: {
-              ...contentFile.file,
-              content_id: contentFile.file.content_id + 1,
-              is_deleted: false
+            fields: {
+              content: {
+                ...contentFile.file,
+                content_id: contentFile.file.content_id + 1,
+                is_deleted: false
+              }
             }
           }
 
@@ -276,13 +318,13 @@ describe('<File />', () => {
       describe('handleUserModified', () => {
         describe('If the user is the author of a revision or comment', () => {
           it('should update the timeline with the data of the user', () => {
-            const tlmData = { user: { ...user, public_name: 'newName' } }
+            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
             wrapper.instance().handleUserModified(tlmData)
 
             const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.user.user_id)
+              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
               .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.user.public_name)
+            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
             expect(isNewName).to.be.equal(true)
           })
         })
@@ -303,6 +345,116 @@ describe('<File />', () => {
       })
       it('should be in view mode', () => {
         expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.VIEW)
+      })
+    })
+
+    describe('shouldDisplayNotifyAllMessage', () => {
+      it("should return false if loggedUser don't have config", () => {
+        wrapper.setState(prev => ({ loggedUser: { ...prev.loggedUser, config: null } }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content.current_revision_type is creation', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'creation'
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user and there in no newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          },
+          newContent: {}
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if content last modifier is not the logged user at the newContent', () => {
+        wrapper.setState(prev => ({
+          loggedUser: { ...prev.loggedUser, config: { param: 'value' } },
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              user_id: prev.loggedUser.userId + 1
+            }
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return false if user configuration content_id.notify_all_members_message is false', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.file.content_id}.notify_all_members_message`] = false
+        wrapper.setState(prev => ({
+          ...prev,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(false)
+      })
+
+      it('should return true if user configuration content_id.notify_all_members_message is true', () => {
+        const newConfig = { ...wrapper.state('loggedUser').config }
+        newConfig[`content.${props.content.file.content_id}.notify_all_members_message`] = true
+        wrapper.setState(prev => ({
+          ...prev,
+          newContent: {
+            ...prev.newContent,
+            last_modifier: {
+              ...prev.newContent.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          content: {
+            ...prev.content,
+            current_revision_type: 'edition',
+            last_modifier: {
+              ...prev.content.last_modifier,
+              user_id: prev.loggedUser.userId
+            }
+          },
+          loggedUser: {
+            ...prev.loggedUser,
+            config: newConfig
+          }
+        }))
+        expect(wrapper.instance().shouldDisplayNotifyAllMessage()).to.equal(true)
+      })
+    })
+
+    describe('handleCloseNotifyAllMessage', () => {
+      it('should set content_id.notify_all_members_message as false', () => {
+        mockPutUserConfiguration204(debug.config.apiUrl, debug.loggedUser.userId)
+        wrapper.instance().handleCloseNotifyAllMessage()
+        expect(wrapper.state('loggedUser').config[`content.${props.content.file.content_id}.notify_all_members_message`]).to.equal(false)
       })
     })
   })

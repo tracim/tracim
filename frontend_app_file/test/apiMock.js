@@ -30,10 +30,17 @@ const mockGetFileContent200 = (apiUrl, workspaceId, contentId, content) => {
     .reply(200, content)
 }
 
+const mockPutUserConfiguration204 = (apiUrl, userId) => {
+  return nock(apiUrl)
+    .put(`/users/${userId}/config`)
+    .reply(204)
+}
+
 export {
   mockGetFileContent200,
   mockGetFileComment200,
   mockGetShareLinksList200,
   mockGetFileRevision200,
-  mockPutMyselfFileRead200
+  mockPutMyselfFileRead200,
+  mockPutUserConfiguration204
 }

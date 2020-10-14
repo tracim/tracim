@@ -63,7 +63,7 @@ class AppContextCommand(Command):
                         self.take_app_action(parsed_args, app_context)
         except Exception as exc:
             logger.exception(self, exc)
-            print("Something goes wrong during command")
+            print("Something goes wrong during command: {}".format(exc))
             raise exc
 
     def _setup_logging(self, parsed_args: Namespace) -> None:

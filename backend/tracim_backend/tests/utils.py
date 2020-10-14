@@ -5,6 +5,7 @@ import subprocess
 import typing
 from typing import Any
 from typing import Optional
+from unittest import mock
 
 from PIL import Image
 import plaster
@@ -23,17 +24,22 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.event import EventBuilder
+from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import Event
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -136,6 +142,20 @@ class RoleApiFactory(object):
         )
 
 
+class SubscriptionLibFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> SubscriptionLib:
+        return SubscriptionLib(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
 class WedavEnvironFactory(object):
     def __init__(self, provider: Provider, session: Session, app_config: CFG, admin_user: User):
         self.provider = provider
@@ -147,13 +167,13 @@ class WedavEnvironFactory(object):
     def get(self, user: typing.Optional[User] = None) -> typing.Dict[str, typing.Any]:
 
         environ = {
-            "http_authenticator.username": user.email_address,
+            "http_authenticator.username": user.email_address if user else None,
             "http_authenticator.realm": "/",
             "wsgidav.provider": self.provider,
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager
+            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager,
         )
         tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
@@ -169,7 +189,7 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes
+    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT
@@ -263,7 +283,47 @@ class DockerCompose:
         self.execute("down")
 
     def execute(self, *arguments: str, env: dict = None) -> None:
-        subprocess.run(self.command + list(arguments), env=env, check=True)
+        if env:
+            env.update(os.environ)
+        subprocess.run(
+            self.command + list(arguments), env=env, check=True, stdout=subprocess.DEVNULL,
+        )
+
+
+class TracimTestContext(TracimContext):
+    def __init__(
+        self, app_config: CFG, session_factory, user: typing.Optional[User] = None,
+    ) -> None:
+        super().__init__()
+        self._app_config = app_config
+        self._plugin_manager = create_plugin_manager()
+        event_builder = EventBuilder(app_config)
+        event_publisher = EventPublisher(app_config)
+        # mock event publishing to avoid requiring a working
+        # pushpin instance for every test
+        EventPublisher._publish_pending_events_of_context = mock.Mock()
+
+        self._plugin_manager.register(event_builder)
+        self._plugin_manager.register(event_publisher)
+        self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
+        self._dbsession.set_context(self)
+        self._current_user = user
+
+    @property
+    def dbsession(self):
+        return self._dbsession
+
+    @property
+    def plugin_manager(self):
+        return self._plugin_manager
+
+    @property
+    def current_user(self):
+        return self._current_user
+
+    @property
+    def app_config(self):
+        return self._app_config
 
 
 def eq_(a: Any, b: Any, msg: Optional[str] = None) -> None:
@@ -293,7 +353,7 @@ def set_html_document_slug_to_legacy(session_factory: sessionmaker) -> None:
     assert content_query.count() > 0
 
 
-def create_1000px_png_test_image() -> None:
+def create_1000px_png_test_image() -> BytesIO:
     file = BytesIO()
     image = Image.new("RGBA", size=(1000, 1000), color=(0, 0, 0))
     image.save(file, "png")

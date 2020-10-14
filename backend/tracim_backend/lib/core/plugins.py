@@ -80,7 +80,7 @@ def _load_plugins(plugin_manager: pluggy.PluginManager,) -> typing.Dict[str, typ
 
 
 def _register_all(
-    plugin_manager: pluggy.PluginManager, plugins: typing.Dict[str, types.ModuleType],
+    plugin_manager: pluggy.PluginManager, plugins: typing.Dict[str, types.ModuleType]
 ):
     # INFO - G.M - 2019-12-02 - sort plugins by name here to have predictable
     # order for plugin registration according to plugin_name.
@@ -110,9 +110,18 @@ def create_plugin_manager() -> pluggy.PluginManager:
 def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     plugin_manager = create_plugin_manager()
 
+    # Static plugins, imported here to avoid circular reference with hookimpl
+    from tracim_backend.lib.core.event import EventBuilder
+    from tracim_backend.lib.core.event import EventPublisher
+    import tracim_backend.lib.core.mention as mention
+
+    plugin_manager.register(EventBuilder(app_config))
+    plugin_manager.register(EventPublisher(app_config))
+    mention.register_tracim_plugin(plugin_manager)
+
     # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
     plugin_path = app_config.PLUGIN__FOLDER_PATH
-    plugins = {}
+    plugins = {}  # type: typing.Dict[str, types.ModuleType]
     if plugin_path and plugin_path not in sys.path:
         sys.path.append(plugin_path)
         try:

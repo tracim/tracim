@@ -18,6 +18,7 @@ describe('<Home />', () => {
         instance_name: 'instanceTest'
       }
     },
+    dispatch: () => { },
     canCreateWorkspace: true,
     renderAppPopupCreation: renderAppPopupCreationCallBack,
     registerCustomEventHandlerList: () => { }
@@ -47,35 +48,35 @@ describe('<Home />', () => {
   })
 
   describe('its internal functions', () => {
-    describe('handleChangeNewUsername', () => {
+    describe('checkUsernameValidity', () => {
       afterEach(() => {
         wrapper.instance().setState({
           isUsernameValid: true
         })
       })
 
-      it('should have the isUsernameValid state as true if username is not set yet', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: '' } })
+      it('should have the isUsernameValid state as true if username is not set yet', async () => {
+        await wrapper.instance().checkUsernameValidity('')
         expect(wrapper.state('isUsernameValid')).to.equal(true)
       })
 
-      it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: 'aa' } })
+      it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', async () => {
+        await wrapper.instance().checkUsernameValidity('aa')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
-      it('should have the isUsernameValid state as false if username has a space', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: 'user name' } })
+      it('should have the isUsernameValid state as false if username has a space', async () => {
+        await wrapper.instance().checkUsernameValidity('user name')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
-      it('should have the isUsernameValid state as false if username has a not allowed character', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: 'usern@me!' } })
+      it('should have the isUsernameValid state as false if username has a not allowed character', async () => {
+        await wrapper.instance().checkUsernameValidity('usern@me!')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
-      it('should have the isUsernameValid state as false if username start with @', () => {
-        wrapper.instance().handleChangeNewUsername({ target: { value: '@username' } })
+      it('should have the isUsernameValid state as false if username start with @', async () => {
+        await wrapper.instance().checkUsernameValidity('@username')
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
     })

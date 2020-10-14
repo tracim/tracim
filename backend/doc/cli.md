@@ -28,6 +28,12 @@ This will drop the entire database, be careful!
 
     tracimcli db delete --force
 
+### Update naming conventions for database coming from Tracim V1 (only works with PostgreSQL)
+
+Useful to migrate old databases, to run before applying v3.0.0 migration scripts with alembic:
+
+    tracimcli db update-naming-conventions
+
 ## User ##
 
 ### add a user

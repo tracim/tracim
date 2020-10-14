@@ -30,8 +30,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
+from tracim_backend.exceptions import InvalidResetPasswordToken
 from tracim_backend.exceptions import ProfileDoesNotExist
-from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.models.meta import DeclarativeBase
 
 if TYPE_CHECKING:
@@ -279,13 +279,13 @@ class User(DeclarativeBase):
 
     def validate_reset_password_token(self, token, validity_seconds) -> bool:
         if not self.reset_password_token_created:
-            raise UnvalidResetPasswordToken(
+            raise InvalidResetPasswordToken(
                 "reset password token is unvalid due to unknown creation date"
             )
         if not self._validate_date(self.reset_password_token_created, validity_seconds):
             raise ExpiredResetPasswordToken("reset password token has expired")
         if not self._validate_hash(self.reset_password_token_hash, token):
-            raise UnvalidResetPasswordToken("reset password token is unvalid")
+            raise InvalidResetPasswordToken("reset password token is unvalid")
         return True
 
     # Auth Token #

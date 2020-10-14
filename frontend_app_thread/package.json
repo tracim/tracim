@@ -56,6 +56,7 @@
     "mocha": "^7.1.1",
     "nock": "^12.0.3",
     "pnp-webpack-plugin": "^1.6.4",
+    "sinon": "^7.4.1",
     "standard": "^14.3.3",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",

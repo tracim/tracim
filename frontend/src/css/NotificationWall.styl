@@ -1,0 +1,87 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.notification
+  position fixed
+  top headerHeight
+  right 0
+  width 40%
+  height "calc(100% - %s)" % headerHeight
+  border 1px solid grey
+  background-color offWhite
+  box-shadow shadow-right
+  z-index 26
+  display flex
+  flex-direction column
+  max-width 600px
+  overflow hidden
+  transition 0.5s
+  &__header
+    border-bottom 1px solid grey
+    & div
+      color fontColor
+    &__close i
+      color fontColor
+  &__list
+    flex-grow 2
+    overflow auto
+    &__item
+      flex-direction row
+      display flex
+      color fontColor
+      font-weight normal
+      background-color veryLightGrey
+      padding 5px
+      min-height listItemHeight
+      align-items center
+      & > .fa:first-child
+        font-size 23px
+        margin 10px
+      &__text
+        display flex
+        padding-left 5px
+        padding-right 10px
+        font-size fontSizeSmall
+      &__circle
+        margin-left auto
+        margin-right 5px
+        font-size 8px
+        color lightBlue
+      &.itemRead
+        color lightDarkGrey
+        background-color offWhite
+        opacity 0.8
+      &:hover
+        background-color grey-hover
+        color inherit
+  &__wallClose
+    height 0
+    top 0
+  &__footer
+    border-top 1px solid grey
+    padding 5px
+    justify-content center
+    width 100%
+    display flex
+
+.contentTitle
+  &__highlight
+    text-decoration underline
+.documentTitle
+  &__highlight
+    font-weight bold
+
+@media (min-width: min-md) and (max-width: max-md)
+  .notification
+    width 50%
+
+@media (max-width: max-sm)
+  .notification
+    width 100%
+
+@media (max-width: max-lg)
+  .notification
+    & .btn
+      & > .genericButton__label
+        display none
+      & > .genericButton__icon
+        margin 0px

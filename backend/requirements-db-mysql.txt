@@ -1,0 +1,2 @@
+# mysql specific dependencies
+PyMySQL[rsa]==0.9.3

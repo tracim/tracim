@@ -18,7 +18,7 @@ class RadioBtn extends React.Component {
       <div
         className={'radio_btn_group__btn ' + (isChecked ? 'radio_btn_group__btn__checked' : '')}
         onClick={this.handleClick.bind(this)}
-        onKeyDown={this.props.onKeyDown ? this.props.onKeyDown : () => {}}
+        onKeyDown={this.props.onKeyDown || (() => {})}
         data-value={value}
         tabIndex='0'
       >
@@ -71,11 +71,11 @@ class RadioBtnWithImage extends React.Component {
           borderColor: customColor
         }}
         onClick={this.handleClick.bind(this)}
-        onKeyDown={this.props.onKeyDown ? this.props.onKeyDown : () => {}}
+        onKeyDown={this.props.onKeyDown || (() => {})}
         tabIndex='0'
       >
-        <img className={'radio_btn_group__btn__img__img'} src={img.src} alt={img.alt} height={img.height} width={img.width} />
-        <div className={'radio_btn_group__btn__img__label'}>{text}</div>
+        <img className='radio_btn_group__btn__img__img' src={img.src} alt={img.alt} height={img.height} width={img.width} />
+        <div className='radio_btn_group__btn__img__label'>{text}</div>
       </div>
     )
   }
@@ -112,7 +112,7 @@ export class RadioBtnGroup extends React.Component {
     }
   }
 
-  toggleRadioBtn (index) {
+  handleRadioBtnToggle = (index) => {
     const selectedValue = this.props.options[index]
     this.setState({
       selectedIndex: index,
@@ -124,32 +124,20 @@ export class RadioBtnGroup extends React.Component {
   buildButtons () {
     const { options, customColor } = this.props
     return options.map((option, i) => {
-      if (option.img) {
-        return (
-          <RadioBtnWithImage
-            key={i}
-            isChecked={(this.state.selectedIndex === i)}
-            img={option.img}
-            text={option.text}
-            value={option.value}
-            index={i}
-            customColor={customColor}
-            onClick={this.toggleRadioBtn.bind(this)}
-            handleKeyDown={this.props.onKeyDown}
-
-          />
-        )
+      const radioProps = {
+        key: i,
+        isChecked: this.state.selectedIndex === i,
+        text: option.text,
+        value: option.value,
+        index: i,
+        onClick: this.handleRadioBtnToggle,
+        onKeyDown: this.props.onKeyDown
       }
+
       return (
-        <RadioBtn
-          key={i}
-          isChecked={(this.state.selectedIndex === i)}
-          text={option.text}
-          value={option.value}
-          index={i}
-          onClick={this.toggleRadioBtn.bind(this)}
-          handleKeyDown={this.props.onKeyDown}
-        />
+        option.img
+          ? <RadioBtnWithImage {...radioProps} img={option.img} customColor={customColor} />
+          : <RadioBtn {...radioProps} />
       )
     })
   }

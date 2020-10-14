@@ -6,6 +6,7 @@ from typing import List
 from typing import Optional
 
 from slugify import slugify
+from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
@@ -31,6 +32,9 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
+from tracim_backend.models.event import EventTypeDatabaseParameters
+from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -390,17 +394,24 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
-class KnownMemberQuery(object):
+class KnownMembersQuery(object):
     """
     Autocomplete query model
     """
 
     def __init__(
-        self, acp: str, exclude_user_ids: str = None, exclude_workspace_ids: str = None
+        self,
+        acp: str,
+        exclude_user_ids: str = None,
+        exclude_workspace_ids: str = None,
+        include_workspace_ids: str = None,
+        limit: int = None,
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
+        self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
 
 
 class AgendaFilterQuery(object):
@@ -481,7 +492,7 @@ class RoleUpdate(object):
     """
 
     def __init__(self, role: str) -> None:
-        self.role = role
+        self.role = WorkspaceRoles.get_role_from_slug(role)
 
 
 class WorkspaceMemberInvitation(object):
@@ -511,6 +522,7 @@ class WorkspaceUpdate(object):
         self,
         label: Optional[str] = None,
         description: Optional[str] = None,
+        default_user_role: Optional[str] = None,
         agenda_enabled: Optional[bool] = None,
         public_upload_enabled: Optional[bool] = None,
         public_download_enabled: Optional[bool] = None,
@@ -520,26 +532,35 @@ class WorkspaceUpdate(object):
         self.agenda_enabled = agenda_enabled
         self.public_upload_enabled = public_upload_enabled
         self.public_download_enabled = public_download_enabled
+        self.default_user_role = None
+        if default_user_role:
+            self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
 
 
 class WorkspaceCreate(object):
     """
-    Update workspace
+    Create workspace
     """
 
     def __init__(
         self,
         label: str,
         description: str,
+        access_type: str,
+        default_user_role: str,
         agenda_enabled: bool = True,
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
+        parent_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
         self.public_upload_enabled = public_upload_enabled
         self.public_download_enabled = public_download_enabled
+        self.access_type = WorkspaceAccessType(access_type)
+        self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.parent_id = parent_id
 
 
 class ContentCreation(object):
@@ -579,6 +600,44 @@ class TextBasedContentUpdate(object):
     def __init__(self, label: str, raw_content: str) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class LiveMessageQuery(object):
+    """
+    Live Message query model
+    """
+
+    def __init__(
+        self,
+        read_status: str,
+        count: int,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        page_token: Optional[str] = None,
+        exclude_author_ids: str = "",
+    ) -> None:
+        self.read_status = ReadStatus(read_status)
+        self.count = count
+        self.page_token = page_token
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
+        self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
+
+
+class UserMessagesSummaryQuery(object):
+    """
+    Message summary query model
+    """
+
+    def __init__(
+        self,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_author_ids: str = "",
+    ) -> None:
+        self.include_event_types = include_event_types
+        self.exclude_event_types = exclude_event_types
+        self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
 
 
 class FolderContentUpdate(object):
@@ -710,6 +769,16 @@ class WorkspaceInContext(object):
         return self.workspace.workspace_id
 
     @property
+    def access_type(self) -> str:
+        """access type of the workspace"""
+        return self.workspace.access_type.value
+
+    @property
+    def default_user_role(self) -> str:
+        """default user role of the workspace"""
+        return self.workspace.default_user_role.slug
+
+    @property
     def id(self) -> int:
         """
         alias of workspace_id
@@ -804,6 +873,10 @@ class WorkspaceInContext(object):
     @property
     def allowed_space(self) -> int:
         return self.config.LIMITATION__WORKSPACE_SIZE
+
+    @property
+    def parent_id(self) -> int:
+        return self.workspace.parent_id
 
 
 class UserRoleWorkspaceInContext(object):
@@ -945,6 +1018,20 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_content_in_context(self.content.parent)
+        return None
+
+    @property
+    def parent_content_type(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.content_type
+        return None
+
+    @property
+    def parent_label(self) -> Optional[str]:
+        p = self.parent
+        if p:
+            return p.label
         return None
 
     @property
@@ -1526,3 +1613,25 @@ class RevisionInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.revision.file_name)
+
+
+class PaginatedObject(object):
+    def __init__(self, page: Page) -> None:
+        self.previous_page_token = page.paging.bookmark_previous
+        self.next_page_token = page.paging.bookmark_next
+        self.has_previous = page.paging.has_previous
+        self.has_next = page.paging.has_next
+        self.per_page = page.paging.per_page
+        self.items = page
+
+
+class UserMessagesSummary(object):
+    def __init__(self, user: UserInContext, read_messages_count: int, unread_messages_count: int):
+        self.read_messages_count = read_messages_count
+        self.unread_messages_count = unread_messages_count
+        self.messages_count = self.unread_messages_count + self.read_messages_count
+        self.user = user
+
+    @property
+    def user_id(self) -> int:
+        return self.user.user_id

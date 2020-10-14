@@ -1,4 +1,6 @@
 # coding=utf-8
+import typing
+
 from hapic.data import HapicData
 from pyramid.config import Configurator
 
@@ -19,8 +21,10 @@ from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import GetUsernameAvailability
+from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
+from tracim_backend.views.core_api.schemas import WorkspaceAccessTypeSchema
 
 SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
@@ -58,6 +62,20 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
+    @hapic.output_body(WorkspaceAccessTypeSchema())
+    def workspace_access_types(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get List of allowed workspace access types
+        """
+        return {
+            "items": [
+                access_type.value
+                for access_type in request.app_config.WORKSPACE__ALLOWED_ACCESS_TYPES
+            ]
+        }
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
     @hapic.output_body(TimezoneSchema(many=True))
     def timezones_list(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -79,6 +97,17 @@ class SystemController(Controller):
             "username": hapic_data.query["username"],
             "available": system_api.get_username_availability(hapic_data.query["username"]),
         }
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(ReservedUsernamesSchema())
+    def reserved_usernames(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.Dict[str, typing.List[str]]:
+        """Return the list of reserved usernames (used for group mentions)."""
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        system_api = SystemApi(app_config, request.dbsession)
+        return {"items": system_api.get_reserved_usernames()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -139,7 +168,13 @@ class SystemController(Controller):
         configurator.add_route("content_types", "/system/content_types", request_method="GET")
         configurator.add_view(self.content_types, route_name="content_types")
 
-        # Content_types
+        # Allowed Workspace access types
+        configurator.add_route(
+            "workspace_access_type", "/system/workspace_access_types", request_method="GET"
+        )
+        configurator.add_view(self.workspace_access_types, route_name="workspace_access_type")
+
+        # Timezones
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
         configurator.add_view(self.timezones_list, route_name="timezones_list")
 
@@ -148,3 +183,9 @@ class SystemController(Controller):
             "username_availability", "/system/username-availability", request_method="GET"
         )
         configurator.add_view(self.username_availability, route_name="username_availability")
+
+        # reserved usernames
+        configurator.add_route(
+            "reserved_usernames", "/system/reserved-usernames", request_method="GET"
+        )
+        configurator.add_view(self.reserved_usernames, route_name="reserved_usernames")

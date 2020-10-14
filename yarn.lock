@@ -1197,7 +1197,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.10.2
   resolution: "@babel/runtime@npm:7.10.2"
   dependencies:
@@ -1763,6 +1763,15 @@ __metadata:
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
   checksum: 9f9236a3cc7f56c167be3aa81c77fcab2e08dfb8047b7861b91440f20b299b9442255856bdbe9d408d7e96a0b64a36e1c27384251126962490b4eee841b533e0
+  languageName: node
+  linkType: hard
+
+"abort-controller@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "abort-controller@npm:3.0.0"
+  dependencies:
+    event-target-shim: ^5.0.0
+  checksum: cc53ad8df9a6de3f55d4f804fca5106908f855e47b572fb5ab3cdd723b76374686dcefa557a2f87d4396db77e31bc0e6ce9d48637388cef6d884c29ad2691448
   languageName: node
   linkType: hard
 
@@ -2535,6 +2544,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"big-integer@npm:^1.6.16":
+  version: 1.6.48
+  resolution: "big-integer@npm:1.6.48"
+  checksum: 311f86a45e28513ddb12415082c5f437b868d80914bff71689a99e16f597beee5c0f12b0c9e65713b70b0516e6ed27f4006e256ea5393bfcf68bb18dc453f976
+  languageName: node
+  linkType: hard
+
 "big.js@npm:^5.2.2":
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
@@ -2689,6 +2705,21 @@ __metadata:
   dependencies:
     fill-range: ^7.0.1
   checksum: f3493181c3e91a1333d3c9afc9b3263a3f62f4ced0b033c372efc1373b48a7699557f4e04026b232a8556e043ca5360a9d3008c33852350138d4b0ea57558b8d
+  languageName: node
+  linkType: hard
+
+"broadcast-channel@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "broadcast-channel@npm:3.1.0"
+  dependencies:
+    "@babel/runtime": ^7.7.2
+    detect-node: ^2.0.4
+    js-sha3: 0.8.0
+    microseconds: 0.2.0
+    nano-time: 1.0.0
+    rimraf: 3.0.2
+    unload: 2.2.0
+  checksum: 55bdea7ebf5039c35a0bb920ea5d25fd57d95f9302c9e8803cfdaf2fded2a282158b63082737f6b612d17e52d6d9d74c8065f3aa58249b14cf6aebf6af088664
   languageName: node
   linkType: hard
 
@@ -5163,6 +5194,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"event-target-shim@npm:^5.0.0":
+  version: 5.0.1
+  resolution: "event-target-shim@npm:5.0.1"
+  checksum: d176477a31adf328ff50148886e46cef3f61ff8bdc1d6db161f6b3ead2501085d5652a81fab8dddc59aed93727231c0b5c8a0948de77ae401b2d977a3d18329e
+  languageName: node
+  linkType: hard
+
 "eventemitter2@npm:4.1.2":
   version: 4.1.2
   resolution: "eventemitter2@npm:4.1.2"
@@ -7365,6 +7403,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"js-sha3@npm:0.8.0":
+  version: 0.8.0
+  resolution: "js-sha3@npm:0.8.0"
+  checksum: 21d7129a634d7e9072a00fa0c037a3f7192d9a2d85377ecbbc7a614fbf523d31cc7489c74adfa84d606d58eb5bffb9dbfbe53bb618ec371942e63070559f3719
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -8450,6 +8495,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"microseconds@npm:0.2.0":
+  version: 0.2.0
+  resolution: "microseconds@npm:0.2.0"
+  checksum: eec9a89f0eaa6c68fb90bc8cf3171924fbfd752d90df22b80660b1b31657817e123658e8a3f5522cf05ac3d3801bdd65a830ef17f7ceed94b4ed9f2467ee7c60
+  languageName: node
+  linkType: hard
+
 "miller-rabin@npm:^4.0.0":
   version: 4.0.1
   resolution: "miller-rabin@npm:4.0.1"
@@ -8784,6 +8836,15 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"nano-time@npm:1.0.0":
+  version: 1.0.0
+  resolution: "nano-time@npm:1.0.0"
+  dependencies:
+    big-integer: ^1.6.16
+  checksum: 1389727cb8b6043e11212d2bdb65368050d7423eab95fc70fbc5276c1bf5417d725eb541c4ba4c1ef535c1d26f2e665c389fc4fc2f7a3f7bd05d88f0a9014d5c
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^2.1.0":
   version: 2.1.11
   resolution: "nanoid@npm:2.1.11"
@@ -8941,6 +9002,13 @@ fsevents@^1.2.7:
     encoding: ^0.1.11
     is-stream: ^1.0.1
   checksum: d04afb2e328ffb974a5ac4800fe5714d7419243d72f089a6a2383d3b93368c61ae88954a4866c476c0d7f95d7af414c1b9a885e051971061efe4054d526e23ed
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^2.6.0":
+  version: 2.6.0
+  resolution: "node-fetch@npm:2.6.0"
+  checksum: dd9f586a9f7ddb7dd94d2aba9cb693d32f5001e9850098512fbc8a4cbdd56838afa08ed0a6725b9fce9b01ec12b713e622cbfc16d92762d8b937b238330a632a
   languageName: node
   linkType: hard
 
@@ -11233,6 +11301,17 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"rimraf@npm:3.0.2":
+  version: 3.0.2
+  resolution: "rimraf@npm:3.0.2"
+  dependencies:
+    glob: ^7.1.3
+  bin:
+    rimraf: bin.js
+  checksum: f0de3e445581e64a8a077af476cc30708e659f5779ec2ca2a161556d0792aa318a685923798ae22055b4ecd02b9aff444ef619578f7af53cf8e0e248031e3dee
+  languageName: node
+  linkType: hard
+
 "rimraf@npm:^2.5.4, rimraf@npm:^2.6.3":
   version: 2.7.1
   resolution: "rimraf@npm:2.7.1"
@@ -12685,8 +12764,10 @@ fsevents@^1.2.7:
     "@babel/preset-env": ^7.9.5
     "@babel/preset-react": ^7.0.0
     "@babel/register": ^7.9.0
+    abort-controller: ^3.0.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.1.0
+    broadcast-channel: ^3.1.0
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
@@ -12710,6 +12791,7 @@ fsevents@^1.2.7:
     lodash: ^4.17.11
     mocha: ^7.1.1
     nock: ^10.0.6
+    node-fetch: ^2.6.0
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     query-string: ^6.8.1
@@ -12790,6 +12872,7 @@ fsevents@^1.2.7:
     react-router: ^5.1.2
     react-router-dom: ^5.1.2
     regenerator-runtime: ^0.13.2
+    sinon: ^7.4.1
     standard: ^14.3.3
     standard-loader: ^7.0.0
     style-loader: ^0.23.1
@@ -13174,6 +13257,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     regenerator-runtime: ^0.13.2
+    sinon: ^7.4.1
     standard: ^14.3.3
     standard-loader: ^7.0.0
     style-loader: ^0.23.1
@@ -13280,6 +13364,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     regenerator-runtime: ^0.13.2
+    sinon: ^7.4.1
     standard: ^14.3.3
     standard-loader: ^7.0.0
     style-loader: ^0.23.1
@@ -13713,6 +13798,16 @@ fsevents@^1.2.7:
   version: 0.1.2
   resolution: "universalify@npm:0.1.2"
   checksum: 420fc6547357782c700d53e9a92506a8e95345b13e97684c8f9ab75237912ec2ebb6af8ac10d4f7406b7b6bd21c58f6c5c0811414fb0b4091b78b4743fa6806e
+  languageName: node
+  linkType: hard
+
+"unload@npm:2.2.0":
+  version: 2.2.0
+  resolution: "unload@npm:2.2.0"
+  dependencies:
+    "@babel/runtime": ^7.6.2
+    detect-node: ^2.0.4
+  checksum: 618ba99792546b1cef7abe8e8a100a6ed0a34d3a5a64908857b065eabc427c80e2e70eaf5d70d36842efe9654682423719b1e8c3de72dbe720b1a0a074cfe0ae
   languageName: node
   linkType: hard
 

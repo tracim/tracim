@@ -165,21 +165,19 @@ describe('In <Account />', () => {
       })
     })
 
-    describe('handleChangeUsername', () => {
+    describe('changeUsername', () => {
       afterEach(() => {
         accountWrapper.setState({
           isUsernameValid: true
         })
       })
-      it("should set isUsernameValid state to false if username isn't long enough", (done) => {
-        accountInstance.handleChangeUsername('A').then(() => {
-          expect(accountWrapper.state().isUsernameValid).to.equal(false)
-        }).then(done, done)
+      it("should set isUsernameValid state to false if username isn't long enough", async () => {
+        await accountInstance.changeUsername('A')
+        expect(accountWrapper.state().isUsernameValid).to.equal(false)
       })
-      it("should set isUsernameValid state to false if username has a '@' in it", (done) => {
-        accountInstance.handleChangeUsername('@newUsername').then(() => {
-          expect(accountWrapper.state().isUsernameValid).to.equal(false)
-        }).then(done, done)
+      it("should set isUsernameValid state to false if username has a '@' in it", async () => {
+        await accountInstance.changeUsername('@newUsername')
+        expect(accountWrapper.state().isUsernameValid).to.equal(false)
       })
     })
   })

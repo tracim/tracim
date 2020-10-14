@@ -16,7 +16,8 @@ import {
   convertBackslashNToBr,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  getContentComment
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -25,7 +26,6 @@ import {
 } from '../helper.js'
 import {
   getCustomFormContent,
-  getCustomFormComment,
   getCustomFormRevision,
   postCustomFormNewComment,
   putCustomFormContent,
@@ -139,7 +139,7 @@ class CustomForm extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<CustomForm> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.log('%c<CustomForm> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
@@ -227,7 +227,7 @@ class CustomForm extends React.Component {
     const { loggedUser, content, config, appName } = this.state
 
     const fetchResultCustomForm = getCustomFormContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getCustomFormComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getContentComment(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultRevision = getCustomFormRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     const [resCustomForm, resComment, resRevision] = await Promise.all([
