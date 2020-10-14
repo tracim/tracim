@@ -1141,6 +1141,42 @@ class TestCommands(object):
         )
         assert result == 0
 
+    def test_func__delete_user__ok__dry_run(self, session, user_api_factory,) -> None:
+        """
+        Non-regression test for an error that occured with dry-run and user config.
+        """
+        uapi = user_api_factory.get()
+        uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=Profile.TRUSTED_USER,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "user",
+                "delete",
+                "--force",
+                "--dry-run",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "test@test.test",
+            ]
+        )
+        assert result == 0
+
     def test_func__anonymize_user__ok__nominal_case(
         self,
         session,
