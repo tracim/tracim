@@ -11,7 +11,8 @@
     "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "build-translation": "node i18next.scanner.js",
     "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
-    "test": "echo 'Nothing to test' && exit 0"
+    "test": "yarn run lint && yarn run test:quick",
+    "test:quick": "echo 'Nothing to test' && exit 0"
   },
   "author": "",
   "license": "ISC",

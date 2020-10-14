@@ -3,7 +3,7 @@ import { defaultDebug } from 'tracim_frontend_lib'
 export const debug = {
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
+    apiUrl: 'http://unit.test:6543/api',
     slug: 'collaborative_document_edition',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
