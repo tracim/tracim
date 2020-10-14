@@ -57,14 +57,12 @@ module.exports = {
 
   module: {
     rules: [
-      isProduction
-        ? {}
-        : {
-          test: /\.jsx?$/,
-          enforce: 'pre',
-          use: 'standard-loader',
-          exclude: [/node_modules/]
-        }, {
+      {
+        test: /\.jsx?$/,
+        enforce: 'pre',
+        use: 'standard-loader',
+        exclude: [/node_modules/]
+      }, {
         test: [/\.js$/, /\.jsx$/],
         loader: 'babel-loader',
         options: {
@@ -91,7 +89,8 @@ module.exports = {
         //   options: {
         //     limit: 25000
         //   }
-      }]
+      }
+    ]
   },
   resolve: {
     plugins: [

@@ -6,7 +6,7 @@ CONFIG=webpack.config.js
 
 while [ "$1" != "" ]; do
     case "$1" in
-        tracim)
+        optimized)
             CONFIG=webpack.optimized.config.js
         ;;
 
@@ -14,7 +14,7 @@ while [ "$1" != "" ]; do
             PRODUCTION=false
         ;;
 
-        buildoptimized-dev)
+        optimized-dev)
             PRODUCTION=false
         ;;
 
@@ -33,7 +33,7 @@ else
     NODE_ENV=development webpack-cli --config "$CONFIG" || exit 1
 fi
 
-if [ "$CONFIG" = "webpack.tracim.config.js" ]; then
+if [ "$CONFIG" = "webpack.optimized.config.js" ]; then
     for i in lib style; do
         cp "./dist/tracim_frontend_lib.tracim.$i$devext.js" "../frontend/dist/app/tracim_frontend_lib.$i.js" || exit 1
     done

@@ -5,13 +5,13 @@
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development SERVDEV=true webpack-dev-server --config webpack.optimized.config.js --watch --colors --inline --hot --progress",
-    "buildtracimlib": "build && buildoptimized",
-    "buildtracimlib-dev": "build-dev && buildoptimized-dev",
+    "buildtracimlib": "yarn run build && yarn run buildoptimized",
+    "buildtracimlib-dev": "yarn run build-dev && yarn run buildoptimized-dev",
     "build-translation": "node i18next.scanner.js",
     "build": "./build-script.sh",
     "build-dev": "./build-script.sh dev",
-    "buildoptimized": "./build-script.sh tracim",
-    "buildoptimized-dev": "./build-script.sh tracim dev",
+    "buildoptimized": "./build-script.sh optimized",
+    "buildoptimized-dev": "./build-script.sh optimized dev",
     "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
