@@ -19,7 +19,7 @@ export class NewShareDownload extends React.Component {
     }
   }
 
-  handleTogglePopoverMultipleEmails = () => {
+  togglePopoverMultipleEmails = () => {
     this.setState(prevState => ({
       popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
     }))
@@ -77,7 +77,7 @@ export class NewShareDownload extends React.Component {
             placement='bottom'
             isOpen={state.popoverMultipleEmailsOpen}
             target='popoverMultipleEmails'
-            toggle={this.handleTogglePopoverMultipleEmails}
+            toggle={this.togglePopoverMultipleEmails}
             trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
@@ -135,8 +135,7 @@ export class NewShareDownload extends React.Component {
                 {props.t('Protect by password')}
               </span>
             </div>
-          )
-        }
+          )}
 
         <div className='d-flex mt-3'>
           <button

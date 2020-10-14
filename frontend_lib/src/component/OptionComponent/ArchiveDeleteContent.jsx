@@ -37,7 +37,7 @@ const ArchiveDeleteContent = props => {
         disabled={props.disabled}
         title={props.t('Delete')}
         style={styleColorBtn}
-        key={'archiveDeleteContent__delete'}
+        key='archiveDeleteContent__delete'
         data-cy='delete__button'
       >
         <i className='fa fa-fw fa-trash' />

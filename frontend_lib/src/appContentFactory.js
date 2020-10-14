@@ -1,6 +1,5 @@
 import React from 'react'
 import i18n from './i18n.js'
-import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
@@ -40,7 +39,7 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    setApiUrl = url => this.apiUrl = url
+    setApiUrl = url => { this.apiUrl = url }
 
     sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -259,7 +258,7 @@ export function appContentFactory (WrappedComponent) {
               delay: undefined
             }
           })
-        break
+          break
       }
 
       return response

@@ -52,13 +52,13 @@ class ShareDownloadManagement extends React.Component {
             >
               {props.t('New')}
               <i className='fa fa-fw fa-plus-circle' />
-            </button>
-          }
+            </button>}
         </div>
 
         {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= ROLE.contributor.id &&
           shareLinkList.map(shareLink =>
             <ShareLink
+              key={shareLink.share_id}
               email={shareLink.email}
               link={shareLink.url}
               id={shareLink.share_id}
@@ -67,12 +67,10 @@ class ShareDownloadManagement extends React.Component {
               hexcolor={props.hexcolor}
               userRoleIdInWorkspace={props.userRoleIdInWorkspace}
             />
-          )
-        }
+          )}
 
         {shareLinkList.length <= 0 &&
-          <div className='m-auto'>{props.t('No share link has been created yet')}</div>
-        }
+          <div className='m-auto'>{props.t('No share link has been created yet')}</div>}
       </>
     )
   }

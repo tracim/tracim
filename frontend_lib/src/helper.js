@@ -285,16 +285,16 @@ export const updateTLMAuthor = author => {
 // INFO - GB - 2019-07-05 - This password generator function was based on
 // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
 export const generateRandomPassword = () => {
-  let password = []
-  let charCode = String.fromCharCode
-  let randomNumber = Math.random
+  const password = []
+  const charCode = String.fromCharCode
+  const randomNumber = Math.random
   let random, i
 
   for (i = 0; i < 10; i++) { // password with a size 10
     random = 0 | randomNumber() * 62 // generate upper OR lower OR number
     password.push(charCode(48 + random + (random > 9 ? 7 : 0) + (random > 35 ? 6 : 0)))
   }
-  let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
+  const randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
 
   return randomPassword
 }
@@ -310,14 +310,14 @@ export const getOrCreateSessionClientToken = () => {
 }
 
 export const COMMON_REQUEST_HEADERS = {
-  'Accept': 'application/json',
+  Accept: 'application/json',
   'X-Tracim-ClientToken': getOrCreateSessionClientToken()
 }
 
 export const FETCH_CONFIG = {
   headers: {
     ...COMMON_REQUEST_HEADERS,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 

@@ -82,6 +82,8 @@
   },
   "standard": {
     "globals": [
+      "GLOBAL_dispatchEvent",
+      "localStorage",
       "tinymce",
       "fetch",
       "Element",

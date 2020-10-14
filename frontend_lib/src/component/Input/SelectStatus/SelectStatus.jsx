@@ -14,11 +14,11 @@ export const SelectStatus = props => {
         buttonDisabled={props.disabled}
         buttonOpts={
           <span style={{ color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent' }}>
-            <span className={classnames('selectStatus__dropdownbtn__label', { 'selectStatus__mobileVersion': props.mobileVersion })} >
+            <span className={classnames('selectStatus__dropdownbtn__label', { selectStatus__mobileVersion: props.mobileVersion })}>
               {props.t('Status')}:
             </span>
 
-            <span className={classnames({ 'selectStatus__mobileVersion': props.mobileVersion })}>
+            <span className={classnames({ selectStatus__mobileVersion: props.mobileVersion })}>
               {props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
             </span>
 
@@ -33,20 +33,20 @@ export const SelectStatus = props => {
         isButton
       >
         {props.availableStatus.map(s =>
-            <button
-              className='selectStatus__submenu__item transparentButton current'
-              onClick={() => props.onChangeStatus(s.slug)}
-              key={`status_${s.slug}`}
-              childrenKey={`status_${s.slug}`}
-              style={{ ':hover': { backgroundColor: s.customColor } }}
-            >
-              {props.t(s.label)}
-              <i
-                className={`fa fa-fw fa-${s.faIcon}`}
-                style={{ color: s.hexcolor }}
-              />
-            </button>
-          )}
+          <button
+            className='selectStatus__submenu__item transparentButton current'
+            onClick={() => props.onChangeStatus(s.slug)}
+            key={`status_${s.slug}`}
+            childrenKey={`status_${s.slug}`}
+            style={{ ':hover': { backgroundColor: s.customColor } }}
+          >
+            {props.t(s.label)}
+            <i
+              className={`fa fa-fw fa-${s.faIcon}`}
+              style={{ color: s.hexcolor }}
+            />
+          </button>
+        )}
       </DropdownMenu>
     </div>
   )
