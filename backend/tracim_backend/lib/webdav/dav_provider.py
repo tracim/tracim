@@ -38,7 +38,7 @@ class ProcessedWebdavPath(object):
     Processor for Webdav Path:
     - get the workspace hierarchy from path
     - get the content hierarchy from path
-    - provide useful properties to handle the WebDAV request 
+    - provide useful properties to handle the WebDAV request
     """
 
     def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
@@ -56,39 +56,40 @@ class ProcessedWebdavPath(object):
         # - distinction between invalid path, proper destination path (for move) and root is not so
         # clear.
         # - We do add None value into both self.contents and self.workspaces list.
-        if len(path_parts) >= 1:
-            root_workspace_filemanager_filename = webdav_convert_file_name_to_bdd(path_parts[0])
+        path_parts = self._path_splitter(self.path)
+        if not path_parts:
+            self.workspaces.append(None)
+            return
+        workspace_found = True
+        current_part_index = 0
+        # Build space hierarchy
+        while workspace_found:
             try:
-                root_workspace = self.workspace_api.get_one_by_filemanager_filename(
-                    root_workspace_filemanager_filename
+                part = path_parts[current_part_index]
+                filemanager_filename = webdav_convert_file_name_to_bdd(part)
+                parent = self.workspaces[-1] if self.workspaces else None
+                self.workspaces.append(
+                    self.workspace_api.get_one_by_filemanager_filename(
+                        filemanager_filename, parent=parent
+                    )
                 )
-            except WorkspaceNotFound:
-                root_workspace = None
-            self.workspaces.append(root_workspace)
-            # INFO - G.M - 2020-10-07 - Get all workspace tree + content_tree
-            if root_workspace:
-                search_sub_workspace = True
-                for path_part in path_parts[1:]:
-                    section = webdav_convert_file_name_to_bdd(path_part)
-                    if search_sub_workspace:
-                        try:
-                            workspace = self.workspace_api.get_one_by_filemanager_filename(
-                                section, parent=self.workspaces[-1]
-                            )
-                            self.workspaces.append(workspace)
-                            continue
-                        except WorkspaceNotFound:
-                            search_sub_workspace = False
-                            pass
-                    try:
-                        content = self.content_api.get_one_by_filename(
-                            filename=section,
-                            workspace=self.workspaces[-1],
-                            parent=self.contents[-1] if self.contents else None,
-                        )
-                    except ContentNotFound:
-                        content = None
-                    self.contents.append(content)
+                current_part_index += 1
+            except (IndexError, WorkspaceNotFound):
+                workspace_found = False
+
+        # Build content hierarchy
+        if self.workspaces:
+            for part in path_parts[current_part_index:]:
+                try:
+                    filemanager_filename = webdav_convert_file_name_to_bdd(part)
+                    workspace = self.workspaces[-1]
+                    parent = self.contents[-1] if self.contents else None
+                    content = self.content_api.get_one_by_filename(
+                        filename=filemanager_filename, workspace=workspace, parent=parent,
+                    )
+                except ContentNotFound:
+                    content = None
+                self.contents.append(content)
 
     def _path_splitter(self, path: str) -> typing.List[str]:
         path_parts = path.split("/")
