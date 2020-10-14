@@ -64,12 +64,11 @@ export class HtmlDocument extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       externalTranslationList: [
-        props.t('Text Document'),
-        props.t('Text Documents'),
-        props.t('Text document'),
-        props.t('text document'),
-        props.t('text documents'),
-        props.t('Write a document')
+        props.t('Note'),
+        props.t('Notes'),
+        props.t('note'),
+        props.t('notes'),
+        props.t('Write a note')
       ],
       rawContentBeforeEdit: '',
       timeline: [],
@@ -538,7 +537,7 @@ export class HtmlDocument extends React.Component {
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
             break
           case 2044:
-            this.sendGlobalFlashMessage(props.t('You must change the status or restore this document before any change'))
+            this.sendGlobalFlashMessage(props.t('You must change the status or restore this note before any change'))
             break
           default:
             this.sendGlobalFlashMessage(props.t('Error while saving the new version'))

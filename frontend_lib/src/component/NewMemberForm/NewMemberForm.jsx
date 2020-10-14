@@ -4,6 +4,7 @@ import Avatar from '../Avatar/Avatar.jsx'
 import { ROLE } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
+import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -133,41 +134,11 @@ export const NewMemberForm = props => {
           {props.t('Choose the role of the member')}
         </div>
 
-        <ul className='memberlist__form__role__list'>
-          {props.roleList.map(r =>
-            <li key={r.slug}>
-              <label className='memberlist__form__role__list__item' htmlFor={`${r.slug}_${radioHash}`}>
-                <div className='item__radiobtn mr-2'>
-                  <input
-                    id={`${r.slug}_${radioHash}`}
-                    type='radio'
-                    // bellow is to have a unique name for radio in case this component is displayed twice on the same page
-                    name={`role_${radioHash}`}
-                    value={r.slug}
-                    checked={r.slug === props.role}
-                    onChange={() => props.onChangeRole(r.slug)}
-                  />
-                </div>
-
-                <div className='item__text'>
-                  <div className='item__text__icon mr-1' style={{ color: r.hexcolor }}>
-                    <i className={`fa fa-fw fa-${r.faIcon}`} />
-                  </div>
-
-                  <div className='item__text__content'>
-                    <div className='item__text__content__name'>
-                      {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
-                    </div>
-
-                    <div className='item__text__content__description'>
-                      {props.t(r.description) /* this trad key comes from frontend/helper.js, object ROLE */}
-                    </div>
-                  </div>
-                </div>
-              </label>
-            </li>
-          )}
-        </ul>
+        <SingleChoiceList
+          list={props.roleList}
+          onChange={props.onChangeRole}
+          currentValue={props.role}
+        />
       </div>
 
       <div className='memberlist__form__submitbtn'>

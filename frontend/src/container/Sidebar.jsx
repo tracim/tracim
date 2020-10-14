@@ -167,7 +167,7 @@ export class Sidebar extends React.Component {
                     onClick={this.handleClickNewWorkspace}
                     data-cy='sidebarCreateWorkspaceBtn'
                   >
-                    {props.t('Create a space')}
+                    <i className='fa fa-plus' /> {props.t('Create a space')}
                   </button>
                 </div>
               )}

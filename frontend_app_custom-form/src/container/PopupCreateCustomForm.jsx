@@ -16,7 +16,7 @@ const debug = { // outdated
     slug: 'custom-form',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
-    creationLabel: 'Write a document',
+    creationLabel: 'Write a note',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api',
     apiHeader: {

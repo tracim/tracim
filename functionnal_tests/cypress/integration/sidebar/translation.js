@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-describe('content :: home_page', function () {
+describe('The sidebar', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -9,18 +9,18 @@ describe('content :: home_page', function () {
   })
 
   it('should have translations', () => {
-    cy.get('.sidebar__content__navigation__workspace__item').click()
-    cy.get('.sidebar__content__navigation__workspace__item__menu').click()
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Text Documents').should('be.visible')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('All Contents').should('be.visible')
 
     cy.changeLanguage('fr')
-    cy.get('.sidebar__content__navigation__workspace__item').click()
-    cy.get('.sidebar__content__navigation__workspace__item__menu').click()
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documents texte').should('be.visible')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('Tous les contenus').should('be.visible')
 
     cy.changeLanguage('pt')
-    cy.get('.sidebar__content__navigation__workspace__item').click()
-    cy.get('.sidebar__content__navigation__workspace__item__menu').click()
-    cy.get('[data-cy="sidebar_subdropdown-contents/html-document"]').contains('Documentos de texto').should('be.visible')
+    cy.get('.sidebar__content__navigation__workspace__item').should('be.visible').click()
+    cy.get('.sidebar__content__navigation__workspace__item__menu').should('be.visible').click()
+    cy.get('li').contains('Todos os conteúdos').should('be.visible')
   })
 })

@@ -12,7 +12,7 @@ const AdminWorkspace = props =>
     <PageTitle
       parentClass='adminWorkspace'
       title={props.t('Space management')}
-      icon='bank'
+      icon='users'
       breadcrumbsList={props.breadcrumbsList}
     />
 
