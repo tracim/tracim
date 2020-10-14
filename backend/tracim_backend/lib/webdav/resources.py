@@ -278,8 +278,8 @@ class ContentOnlyContainer(WebdavContainer):
         """
         Some rules:
         - if content given is None, return workspace root contents
-        - if content given is correct, return subcontent of this content
-         add user known workspaces without any user known parent to the list.
+        - if the given content is correct, return the subcontent of this content
+         and user-known workspaces without any user-known parent to the list.
          - in case of content collision, only the first named content (sorted by content_id
          from lower to higher) will be returned.
         """
