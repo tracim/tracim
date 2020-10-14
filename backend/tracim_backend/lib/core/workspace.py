@@ -222,8 +222,10 @@ class WorkspaceApi(object):
         self, filemanager_filename: str, parent: typing.Optional[Workspace] = None
     ) -> Workspace:
         """
-        get workspace according to label given, if multiple workspace have
-        same label, return first one found.
+        get workspace according to filemanager_filename given and parent, if multiple workspace have
+        same filemanager_filename, return first one found.
+
+        filemanager_filename is filename like version of workspace with specific extension '.space'
         """
         if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
             raise WorkspaceNotFound(
