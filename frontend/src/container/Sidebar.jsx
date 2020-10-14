@@ -23,6 +23,7 @@ import {
   createSpaceTree,
   CUSTOM_EVENT,
   ROLE_LIST,
+  sortWorkspaceList,
   PROFILE,
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -157,7 +158,7 @@ export class Sidebar extends React.Component {
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  {this.displaySpace(0, createSpaceTree(props.workspaceList))}
+                  {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
               </nav>
 
