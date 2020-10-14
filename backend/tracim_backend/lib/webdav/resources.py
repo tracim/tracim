@@ -153,10 +153,10 @@ class WorkspaceOnlyContainer(WebdavContainer):
     ) -> None:
         """
         Some rules:
-        - if workspace given is None, return workspaces with no parent
-        - if workspace given is correct, return
+        - if the given workspace is None, return workspaces with no parent
+        - if the given workspace is correct, return children workspaces of this workspace
         - if list_orphan_workspaces is True, it
-         add user known workspaces without any user known parent to the list.
+         adds user-known workspaces without any user-known parent to the list.
          - in case of workspace collision, only the first named workspace (sorted by workspace_id
          from lower to higher) will be returned
         """
