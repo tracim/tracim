@@ -22,9 +22,11 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
+from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
 class TestCommandsList(object):
@@ -1107,13 +1109,17 @@ class TestCommands(object):
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True, current_user=test_user
         )
-        content_api.create(
+        content = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=test_workspace,
             label="Test file",
             do_save=True,
             do_notify=False,
         )
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
         workspace_api.delete(test_workspace)
         transaction.commit()
 
