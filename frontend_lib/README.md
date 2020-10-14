@@ -66,8 +66,14 @@ Using the tracim_frontend_lib build which does not include the shared vendors do
 In the code of your app, use `import ... from tracim_fontend_lib` to import the library (or `require('tracim_fontend_lib')`).
 
 In its webpack configuration, either use the bundle, which is the default entry point of `tracim_fontend_lib`, or use the browser library:
- - declare `tracim_fontend_lib` in the `externals` field of the Webpack configuration of the app.
- - also import `externals.json` from `tracim_frontend_vendors` into this field
- - add include `tracim_fontend_lib` and `tracim_fontend_vendors` in the HTML pages where the app is used.
+
+ - declare `tracim_fontend_lib` and the optimized vendors in the `externals` field of the Webpack configuration of the app.
+   See [../frontend_app_file/webpack.optimized.config.js](../frontend_app_file/webpack.optimized.config.js) for an example.
+ - include `tracim_fontend_lib` and `tracim_fontend_vendors` in the HTML pages where the app is used:
+
+    ```html
+    <script src='./app/tracim_frontend_vendors.js'></script>
+    <script src='./app/tracim_frontend_lib.lib.js'></script>
+    ```
 
 Apps in the Tracim project need to support both methods, using separate Webpack configurations.
