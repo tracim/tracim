@@ -4,7 +4,7 @@ import { shallow } from 'enzyme'
 import { Gallery } from '../../src/container/Gallery.jsx'
 import { defaultDebug } from 'tracim_frontend_lib'
 import pictures from '../fixture/content/pictures.js'
-import { cloneDeep } from "lodash"
+import { cloneDeep } from 'lodash'
 
 describe('<Gallery />', () => {
   const folderId = 1
@@ -176,7 +176,7 @@ describe('<Gallery />', () => {
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
-          const sortedImagesPreviews = [... wrapper.state().imagePreviewList]
+          const sortedImagesPreviews = [...wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
         })

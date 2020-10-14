@@ -405,11 +405,16 @@ describe('helper.js', () => {
       const intialArray = [{ workspace_id: 1 }, { parent_id: 1, workspace_id: 2 }, { parent_id: 2, workspace_id: 3 }, { parent_id: 3 }]
       const finalArray = [
         {
-          workspace_id: 1, children: [
+          workspace_id: 1,
+          children: [
             {
-              parent_id: 1, workspace_id: 2, children: [
+              parent_id: 1,
+              workspace_id: 2,
+              children: [
                 {
-                  parent_id: 2, workspace_id: 3, children: [
+                  parent_id: 2,
+                  workspace_id: 3,
+                  children: [
                     { parent_id: 3, children: [] }
                   ]
                 }
@@ -425,7 +430,8 @@ describe('helper.js', () => {
       const intialArray = [{ workspace_id: 1 }, { parent_id: 1, workspace_id: 2 }, { parent_id: 1, workspace_id: 3 }, { parent_id: 3 }]
       const finalArray = [
         {
-          workspace_id: 1, children: [
+          workspace_id: 1,
+          children: [
             { parent_id: 1, workspace_id: 2, children: [] },
             { parent_id: 1, workspace_id: 3, children: [{ parent_id: 3, children: [] }] }
           ]

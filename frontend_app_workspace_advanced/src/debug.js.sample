@@ -53,7 +53,7 @@ export const debug = {
   content: {
     ...defaultDebug.content,
     agendaEnabled: true,
-    agendaUrl: ``,
+    agendaUrl: '',
     contentReadStatusList: [],
     description: '',
     id: workspaceId,

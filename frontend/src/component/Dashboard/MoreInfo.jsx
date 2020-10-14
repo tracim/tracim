@@ -25,7 +25,7 @@ export const MoreInfo = props =>
           </div>
 
           <div className='moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
-          http://algoo.trac.im/webdav/
+            http://algoo.trac.im/webdav/
           </div>
         </div>
       )}

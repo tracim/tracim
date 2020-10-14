@@ -210,15 +210,10 @@ describe('<Thread />', () => {
 
         describe('Delete the current content', () => {
           const tlmData = {
-<<<<<<< HEAD
-            ...baseRevisionTlm,
-            content: { ...baseRevisionTlm.content, is_deleted: true }
-=======
             fields: {
               ...baseRevisionTlm,
               content: { ...baseRevisionTlm.content, is_deleted: true }
             }
->>>>>>> origin/develop
           }
 
           before(() => {
