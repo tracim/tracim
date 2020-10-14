@@ -63,9 +63,12 @@ class WorkspaceListItem extends React.Component {
             <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__workspace__item__dragNdrop`} />
           )}
 
-          {props.level > 0 && (
-            <div style={{ marginLeft: `${(props.level - 1) * 20 + 10}px` }}>&#8735;</div>
-          )}
+          {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
+            // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
+            props.level > 0 && (
+              <div style={{ marginLeft: `${(props.level - 1) * 20 + 10}px` }}>&#8735;</div>
+            )
+          }
 
           <div
             className={classnames(
