@@ -117,22 +117,27 @@ class WebdavContainer(ABC):
 
     @abstractmethod
     def createEmptyResource(self, file_name: str):
+        """ Create a empty non-collection sub-resource of the current resource, for example a file on a directory"""
         pass
 
     @abstractmethod
     def createCollection(self, label: str) -> "FolderResource":
+        """ Create a collection sub-resource of the current resource, for example a dir on a directory or workspace"""
         pass
 
     @abstractmethod
     def getMemberNames(self) -> typing.List[str]:
+        """Get the list of subresources of the current resource"""
         pass
 
     @abstractmethod
     def getMember(self, label: str) -> _DAVResource:
+        """Get one member name subresource according to label (same as filename)"""
         pass
 
     @abstractmethod
     def getMemberList(self) -> [_DAVResource]:
+        """Get list of all sub-resources of the current resource"""
         pass
 
 
@@ -153,8 +158,8 @@ class WorkspaceOnlyContainer(WebdavContainer):
     ) -> None:
         """
         Some rules:
-        - if the given workspace is None, return workspaces with no parent
-        - if the given workspace is correct, return children workspaces of this workspace
+        - if workspace given is None, return workspaces with no parent
+        - if workspace given is correct, return children workspaces of this workspace
         - if list_orphan_workspaces is True, it
          adds user-known workspaces without any user-known parent to the list.
          - in case of workspace collision, only the first named workspace (sorted by workspace_id
@@ -223,9 +228,8 @@ class WorkspaceOnlyContainer(WebdavContainer):
     def getMemberNames(self) -> List[str]:
         """
         This method returns the names (here workspace's labels) of all its children
-
-        Though for perfomance issue, we're not using this function anymore
         """
+        # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
         members_names = []  # type: List[str]
         for workspace in self._get_members():
             members_names.append(
@@ -407,6 +411,7 @@ class ContentOnlyContainer(WebdavContainer):
         """
         Access to the list of content names for current workspace/folder
         """
+        # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
         retlist = []
         for content in self._get_members():
             retlist.append(webdav_convert_file_name_to_display(content.file_name))
@@ -482,6 +487,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
         return self.content_container.createCollection(label=label)
 
     def getMemberNames(self) -> [str]:
+        # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
         workspace_names = self.workspace_container.getMemberNames()
         content_names = self.content_container.getMemberNames()
         members_names = list(workspace_names)

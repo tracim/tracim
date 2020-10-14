@@ -236,12 +236,9 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            workspace_ids = []
             rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
-            workspace_ids.extend(
-                rapi.get_user_workspaces_ids(
-                    user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
-                )
+            workspace_ids = rapi.get_user_workspaces_ids(
+                user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
             )
             query = query.filter(
                 or_(

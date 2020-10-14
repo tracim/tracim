@@ -159,7 +159,7 @@ class Workspace(DeclarativeBase):
             return self.children
 
     @property
-    def filemanager_filename(self):
+    def filemanager_filename(self) -> str:
         """
         unambigous filename for file_manager
         """
@@ -167,7 +167,7 @@ class Workspace(DeclarativeBase):
         # show a workspace in a context where it's not possible to show 2 same name file, the goal of
         # this is to easiest the usage of sub-workspace and avoid collision between file and workspace
         # in context file-like like webdav
-        virtual_extension = ".space"
+        virtual_extension = Workspace.FILEMANAGER_EXTENSION
         return "{}{}".format(self.label, virtual_extension)
 
     @hybrid_property
