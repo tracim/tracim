@@ -36,9 +36,9 @@ class ResourceType(enum.Enum):
 class ProcessedWebdavPath(object):
     """
     Processor for Webdav Path:
-    - get all workspaces hierarchy from path
-    - get all content hierarchy from path
-    - provide useful properties to handle Webdav Request
+    - get the workspace hierarchy from path
+    - get the content hierarchy from path
+    - provide useful properties to handle the WebDAV request 
     """
 
     def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
