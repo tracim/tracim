@@ -12,7 +12,8 @@
     "build-dev": "./build-script.sh dev",
     "buildoptimized": "./build-script.sh optimized",
     "buildoptimized-dev": "./build-script.sh optimized dev",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",

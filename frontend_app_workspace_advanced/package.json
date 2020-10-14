@@ -10,7 +10,8 @@
     "build-dev": "NODE_ENV=development webpack-cli",
     "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "build-translation": "node i18next.scanner.js",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js"
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",

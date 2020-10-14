@@ -14,7 +14,7 @@ module.exports = {
     libraryTarget: 'var'
   },
   module: {
-    rules: [{
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',

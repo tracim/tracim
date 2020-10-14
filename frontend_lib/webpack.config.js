@@ -57,7 +57,7 @@ module.exports = {
 
   module: {
     rules: [
-      {
+      isProduction ? {} : {
         test: /\.jsx?$/,
         enforce: 'pre',
         use: 'standard-loader',

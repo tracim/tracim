@@ -10,7 +10,8 @@
     "build-dev": "NODE_ENV=development webpack-cli",
     "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "build-translation": "node i18next.scanner.js",
-    "test": "echo \"No test specified\" && exit 0"
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "echo 'Nothing to test' && exit 0"
   },
   "author": "",
   "license": "ISC",

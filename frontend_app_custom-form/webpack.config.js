@@ -38,7 +38,7 @@ module.exports = {
   },
   // exclure la lib des json
   module: {
-    rules: [{
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
