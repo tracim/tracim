@@ -44,9 +44,9 @@ describe('<PopupCreateWorkspace />', () => {
     })
 
     describe('handleChangeParentSpace', () => {
-      it('should update newParentSpaceId state with the chosen space id', () => {
+      it('should update newParentSpace state with the chosen space', () => {
         wrapper.instance().handleChangeParentSpace({ spaceId: 4, parentId: null })
-        expect(wrapper.state('newParentSpaceId')).to.equal(4)
+        expect(wrapper.state('newParentSpace')).to.deep.equal({ spaceId: 4, parentId: null })
       })
 
       it('should update showWarningMessage state to true if parentId is not null', () => {
