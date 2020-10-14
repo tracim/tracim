@@ -17,7 +17,6 @@ describe('<WorkspaceListItem />', () => {
     label: firstWorkspace.label,
     allowedAppList: firstWorkspace.sidebarEntry,
     onClickTitle: () => {},
-    isOpenInSidebar: true,
     activeIdWorkspace: 1
   }
 

@@ -88,7 +88,6 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             &::after
               display none
           &__dragNdrop
-            color offWhite
             margin-left 5px
           &__wrapper
             display flex
@@ -99,8 +98,10 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             cursor pointer
             background-color sidebarColor
             border-color darkGrey
+            color offWhite
             &:hover
               background-color sidebarColorDarken
+              color offWhite
           &__number
             display flex
             width 50px
@@ -114,7 +115,6 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             padding 10px
             width 100%
             font-size 20px
-            color offWhite
             white-space nowrap
             overflow hidden
             text-overflow ellipsis

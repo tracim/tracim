@@ -17,7 +17,6 @@ export const firstWorkspaceFromApi = {
 
 export const firstWorkspace = {
   ...serializeWorkspace(firstWorkspaceFromApi),
-  isOpenInSidebar: false,
   sidebarEntryList: appListAsSidebarEntry(1),
   memberList: [globalManagerAsMember],
   contentReadStatusList: []

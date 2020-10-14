@@ -9,6 +9,7 @@ import {
   SingleChoiceList,
   handleFetchResult,
   ROLE_LIST,
+  sortWorkspaceList,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -139,7 +140,7 @@ export class PopupCreateWorkspace extends React.Component {
             })
           }
 
-          addSpacesToList(0, createSpaceTree(fetchGetUserSpaces.body))
+          addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
 
           this.setState({ parentOptions: spaceList, isFirstStep: false })
           break

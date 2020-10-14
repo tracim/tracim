@@ -6,6 +6,7 @@ import {
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
+  naturalCompareLabels,
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
@@ -44,6 +45,7 @@ import {
   checkUsernameValidity,
   formatAbsoluteDate,
   permissiveNumberEqual,
+  sortWorkspaceList,
   updateTLMAuthor
 } from './helper.js'
 import {
@@ -174,6 +176,8 @@ export {
   addRevisionFromTLM,
   createSpaceTree,
   DropdownMenu,
+  naturalCompareLabels,
+  sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
