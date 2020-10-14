@@ -45,7 +45,7 @@ class PopinFixedRightPart extends React.Component {
 
           <div
             className='wsContentGeneric__content__right__header__icon__close'
-            title={props.rightPartOpen ? props.t('Close') : props.t('Open')}
+            title={props.rightPartOpen ? props.t('Hide') : props.t('Show')}
           >
             <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>

@@ -1,8 +1,19 @@
 {
-  "Validate and create": "Validate and create",
+  "Back": "Back",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.",
+  "Create": "Create",
+  "Default role:": "Default role:",
+  "Error while getting user spaces": "Error while getting user spaces",
   "Space's name": "Space's name",
   "New space": "New space",
   "A space with that name already exists": "A space with that name already exists",
   "Error while saving new space": "Error while saving new space",
+  "None": "None",
+  "Next": "Next",
+  "Parent space:": "Parent space:",
+  "Some input are invalid": "Some input are invalid",
+  "Space's name:": "Space's name:",
+  "Space's type:": "Space's type:",
+  "This is the role that members will have by default when they join your space.": "This is the role that members will have by default when they join your space.",
   "You cannot create anymore space": "You cannot create anymore space"
 }

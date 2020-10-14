@@ -1,2 +1,69 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
+.newSpace
+  top 15%
+  max-height 80%
+  &__menu
+    width 100%
+  & .cardPopup
+    &__container
+      width 32rem
+      overflow hidden
+    &__body
+      max-height calc(100% - 32px)
+      overflow auto
+      align-items baseline
+  &__title
+    display flex
+    align-items baseline
+    margin-bottom 1.5rem
+    &__icon
+      font-size 30px
+      margin-left 0.25rem
+      margin-right 1rem
+    &__name
+      font-size 20px
+  &__input
+    width 100%
+    border 1px solid grey
+    border-radius 5px
+    min-height 38px
+    &[type='text']
+      padding-left 10px
+    &>div
+      margin 0
+      border none
+      cursor text
+    &:focus
+      border 1px solid lightBlue
+      outline none
+  &__label
+    font-weight bold
+    margin 10px 0
+    display flex
+    &__info
+      margin-left 5px
+      color grey
+      padding 0
+  &__button
+    display flex
+    justify-content flex-end
+    margin-top 20px
+    &__back
+      margin-right auto
+  &__icon
+    &__right
+      margin-left 5px
+    &__left
+      margin-right 5px
+  &__warningMessage
+    font-size fontSizeSmall
+    margin 5px 0
+
+@media (max-width: max-xs)
+  .newSpace
+    top "calc(5px + %s)" % headerHeight
+    max-height "calc(100% - %s)" % headerHeight
+    & .cardPopup
+      &__container
+        width 100%

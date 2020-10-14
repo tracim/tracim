@@ -12,7 +12,7 @@ const CarouselArrow = (props) => {
         props.direction === DIRECTION.RIGHT ? 'arrownext' : 'arrowprev'
       )}
       onClick={props.onClick}
-      title={props.direction === DIRECTION.RIGHT ? props.t('Next') : props.t('Previous')}
+      title={props.direction === DIRECTION.RIGHT ? props.t('{picture}Next') : props.t('Previous')}
     >
       <i className={classnames('fa', props.direction === DIRECTION.RIGHT ? 'fa-chevron-right' : 'fa-chevron-left')} />
     </div>

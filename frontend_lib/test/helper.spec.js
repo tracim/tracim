@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import {
+  createSpaceTree,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
@@ -372,5 +373,65 @@ describe('helper.js', () => {
         expect(result).to.be.equal(expectedResult)
       })
     }
+  })
+
+  describe('createSpaceTree', () => {
+    it('should return a empty array if spaceList is empty', () => {
+      expect(createSpaceTree([])).to.be.deep.equal([])
+    })
+
+    it('should return a the same array if spaceList is an array with only one element that already has children', () => {
+      const array = [{ children: [{ label: 'a' }, { label: 'b' }] }]
+      expect(createSpaceTree(array)).to.be.deep.equal(array)
+    })
+
+    it('should return a the array added by a children prop if spaceList is an array with only one element', () => {
+      expect(createSpaceTree([{ label: 'a' }])).to.be.deep.equal([{ label: 'a', children: [] }])
+    })
+
+    it('should return a array the respective arborescence given for spaceList', () => {
+      const intialArray = [{ workspace_id: 1 }, { parent_id: 1 }]
+      const finalArray = [{ workspace_id: 1, children: [{ parent_id: 1, children: [] }] }]
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
+    })
+
+    it('should return a array the respective arborescence given for spaceList even if the parent already has children', () => {
+      const intialArray = [{ workspace_id: 1, children: [{ label: 'a' }] }, { parent_id: 1 }]
+      const finalArray = [{ workspace_id: 1, children: [{ label: 'a' }, { parent_id: 1, children: [] }] }]
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
+    })
+
+    it('should return a array the respective arborescence given for spaceList even if its bigger than 2 levels', () => {
+      const intialArray = [{ workspace_id: 1 }, { parent_id: 1, workspace_id: 2 }, { parent_id: 2, workspace_id: 3 }, { parent_id: 3 }]
+      const finalArray = [
+        {
+          workspace_id: 1, children: [
+            {
+              parent_id: 1, workspace_id: 2, children: [
+                {
+                  parent_id: 2, workspace_id: 3, children: [
+                    { parent_id: 3, children: [] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
+    })
+
+    it('should return a array the respective arborescence given for spaceList even if it has more than one child', () => {
+      const intialArray = [{ workspace_id: 1 }, { parent_id: 1, workspace_id: 2 }, { parent_id: 1, workspace_id: 3 }, { parent_id: 3 }]
+      const finalArray = [
+        {
+          workspace_id: 1, children: [
+            { parent_id: 1, workspace_id: 2, children: [] },
+            { parent_id: 1, workspace_id: 3, children: [{ parent_id: 3, children: [] }] }
+          ]
+        }
+      ]
+      expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
+    })
   })
 })

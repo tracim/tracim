@@ -412,7 +412,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'bank',
+          faIcon: 'users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },

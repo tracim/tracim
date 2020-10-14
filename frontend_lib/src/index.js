@@ -2,6 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -15,6 +16,8 @@ import {
   ROLE_LIST,
   PROFILE,
   PROFILE_LIST,
+  SPACE_TYPE,
+  SPACE_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -75,6 +78,7 @@ import Timeline from './component/Timeline/Timeline.jsx'
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
+import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
 import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
@@ -168,6 +172,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export {
   appContentFactory,
   addRevisionFromTLM,
+  createSpaceTree,
   DropdownMenu,
   TracimComponent,
   addAllResourceI18n,
@@ -217,6 +222,8 @@ export {
   ROLE_LIST,
   PROFILE,
   PROFILE_LIST,
+  SPACE_TYPE,
+  SPACE_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -283,5 +290,6 @@ export {
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  SingleChoiceList
 }

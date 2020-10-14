@@ -1,12 +1,15 @@
 import { baseFetch } from 'tracim_frontend_lib'
 
-export const postWorkspace = (apiUrl, newWorkspaceName) =>
+export const getUserSpaces = (apiUrl, userId) => baseFetch('GET', `${apiUrl}/users/${userId}/workspaces`)
+
+export const postSpace = (apiUrl, newDefaultRole, newParentSpace, newName, newType) =>
   baseFetch('POST', `${apiUrl}/workspaces`, {
-    label: newWorkspaceName,
+    access_type: newType,
+    default_user_role: newDefaultRole,
     description: '',
-    // FIXME 2020-09-15 S.G. - replace these parameters by the one got from the user
-    // during https://github.com/tracim/tracim/issues/3577
-    access_type: 'confidential',
-    default_user_role: 'reader',
-    parent_id: null
+    label: newName,
+    parent_id: newParentSpace
   })
+
+export const getAllowedSpaceTypes = (apiUrl) =>
+  baseFetch('GET', `${apiUrl}/system/workspace_access_types`)
