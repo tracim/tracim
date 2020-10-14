@@ -50,7 +50,7 @@ describe('<Carousel />', () => {
       it('should call the props callback', () => {
         const newPosition = 1
         wrapper.instance().onPositionChange(newPosition)
-        expect(onCarouselPositionChange.called).to.be.true
+        expect(onCarouselPositionChange.called).to.be.true // eslint-disable-line no-unused-expressions
       })
     })
   })

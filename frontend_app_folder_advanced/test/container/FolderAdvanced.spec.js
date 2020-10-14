@@ -70,7 +70,7 @@ describe('<FolderAdvanced />', () => {
           expect(wrapper.state('newContent')).to.not.equal(tlmData.content)
         })
         it('should NOT update the head title', () => {
-          expect(dispatchEventSpy.called).to.be.false
+          expect(dispatchEventSpy.called).to.be.false // eslint-disable-line no-unused-expressions
         })
       })
     })

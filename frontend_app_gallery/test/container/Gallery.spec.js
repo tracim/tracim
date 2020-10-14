@@ -2,14 +2,11 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Gallery } from '../../src/container/Gallery.jsx'
-import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
-import pictures from '../fixture/content/pictures.js'
-import { debug } from '../../src/debug.js'
 import { defaultDebug } from 'tracim_frontend_lib'
+import pictures from '../fixture/content/pictures.js'
 
 describe('<Gallery />', () => {
   const folderId = 1
-  const folderName = 'folderTest'
 
   const props = {
     i18n: {},
@@ -32,7 +29,7 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
-        translation :''
+        translation: ''
       },
       loggedUser: {
         ...defaultDebug.loggedUser
@@ -62,14 +59,14 @@ describe('<Gallery />', () => {
       describe('after deleting a picture', () => {
         it('should not be in the picture list anymore', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
           expect(wrapper.state().imagePreviewList.every(image => image.contentId !== pictures[1].content_id))
           expect(wrapper.state().imagePreviewList.length).to.equal(stateMock.imagePreviewList.length - 1)
         })
 
         it('should go to the next picture when the current picture is deleted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentDeleted({content: pictures[1]})
+          wrapper.instance().handleContentDeleted({ content: pictures[1] })
           expect(wrapper.state().displayedPictureIndex).to.equal(1)
         })
 
@@ -111,7 +108,7 @@ describe('<Gallery />', () => {
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ content: { ...pictures[1], label: 'betterversion' } })
-          let sortedImagesPreviews = [... wrapper.state().imagePreviewList]
+          const sortedImagesPreviews = [...wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
         })

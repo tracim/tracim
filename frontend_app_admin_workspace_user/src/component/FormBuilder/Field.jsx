@@ -32,7 +32,7 @@ class Field extends React.Component {
   }
 
   onLabelChange () {
-    let newLabel = prompt('Please enter a new label', this.props.properties.label)
+    const newLabel = prompt('Please enter a new label', this.props.properties.label)
     if (newLabel !== null && newLabel !== '') {
       if (this.props.onPropertiesChange(this.props.position, 'label', newLabel, this.props.properties.label) === false) {
         alert('Invalid Label')
@@ -53,11 +53,13 @@ class Field extends React.Component {
           <button onClick={() => removeField(position, properties.label)}>Delete</button>
           <button onClick={() => this.setState({
             editMode: !this.state.editMode
-          })}>Edit</button>
+          })}
+          >Edit
+          </button>
           {name}
         </div>
         {this.state.editMode && (
-          <div className={'fieldInfo'}>
+          <div className='fieldInfo'>
             <div>
               Titre<br />
               <input type='text' name='title' onChange={this.handleChange.bind(this)} value={properties.title || ''} />
@@ -119,7 +121,8 @@ class Field extends React.Component {
                   width: '100%',
                   height: '200px',
                   border: '2px dashed gray'
-                }}>
+                }}
+                >
                   <FieldsList
                     schema={properties}
                     onChange={(schema) => {
@@ -146,7 +149,8 @@ class Field extends React.Component {
                   width: '100%',
                   height: '200px',
                   border: '2px dashed gray'
-                }}>
+                }}
+                >
                   <FieldsList
                     schema={properties}
                     onChange={(schema) => {
