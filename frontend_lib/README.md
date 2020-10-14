@@ -1,6 +1,6 @@
 # Tracim lib
 
-This library groups the components shared across the Tracim frontend and the Tracim frontend apps.
+This library groups the components shared across Tracim frontend and the Tracim frontend apps.
 
 It can be built in two different ways:
 
