@@ -4,28 +4,18 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../util/helper.js'
+import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID, PAGE } from '../../util/helper.js'
 import { ROLE, DropdownMenu } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')
-const color = require('color')
 
 class WorkspaceListItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showDropdownMenuButton: false
+      showDropdownMenuButton: isMobile
     }
-  }
-
-  shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
-    if (workspaceId !== activeWorkspaceId) return false
-
-    const filterType = qs.parse(location.search).type
-
-    return filterType
-      ? app.slug === `contents/${filterType}`
-      : location.pathname.includes(app.route)
   }
 
   buildLink = (route, search, workspaceId, activeWorkspaceId) => {
@@ -45,20 +35,14 @@ class WorkspaceListItem extends React.Component {
   getIcon = () => {
     const { props } = this
 
-    const isDropActive = props.canDrop && props.isOver
+    const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
+    const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
-    if (isDropActive) {
-      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
-      const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
-
-      if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />
-      return <i className='fa fa-times-circle' />
-    }
-
-    return props.label.substring(0, 2).toUpperCase()
+    if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return 'fa-arrow-circle-down'
+    return 'fa-times-circle'
   }
 
-  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: !prev.showDropdownMenuButton }))
+  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : !prev.showDropdownMenuButton }))
 
   render () {
     const { props, state } = this
@@ -71,21 +55,32 @@ class WorkspaceListItem extends React.Component {
         onMouseEnter={this.handleItemHover}
         onMouseLeave={this.handleItemHover}
       >
-        <div
+        <Link
           className='sidebar__content__navigation__workspace__item__wrapper'
-          onClick={props.onClickTitle}
+          to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
-          <div
-            className='sidebar__content__navigation__workspace__item__number'
-            style={{
-              backgroundColor: GLOBAL_primaryColor,
-              color: color(GLOBAL_primaryColor).isLight() ? '#333333' : '#fdfdfd'
-            }}
-          >
-            {this.getIcon()}
-          </div>
+          {(props.canDrop && props.isOver) && (
+            <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__workspace__item__dragNdrop`} />
+          )}
 
-          <div className='sidebar__content__navigation__workspace__item__name' title={props.label}>
+          {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
+            // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
+            props.level > 0 && (
+              <div style={{ marginLeft: `${(props.level - 1) * 20 + 10}px` }}>&#8735;</div>
+            )
+          }
+
+          <div
+            className={classnames(
+              'sidebar__content__navigation__workspace__item__name',
+              {
+                sidebar__content__navigation__workspace__item__current: props.location.pathname.includes(
+                  `${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`
+                )
+              }
+            )}
+            title={props.label}
+          >
             {props.label}
           </div>
 
@@ -102,13 +97,13 @@ class WorkspaceListItem extends React.Component {
                   key={allowedApp.slug}
                   childrenKey={allowedApp.slug}
                 >
-                  <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
+                  <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
                   {props.t(allowedApp.label)}
                 </Link>
               )}
             </DropdownMenu>
           )}
-        </div>
+        </Link>
       </li>
     )
   }
@@ -134,18 +129,16 @@ WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
-  onClickTitle: PropTypes.func,
   onClickAllContent: PropTypes.func,
-  isOpenInSidebar: PropTypes.bool,
-  activeFilterList: PropTypes.array,
-  activeWorkspaceId: PropTypes.number
+  activeWorkspaceId: PropTypes.number,
+  level: PropTypes.number,
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
   allowedAppList: [],
-  onClickTitle: () => { },
   onClickAllContent: () => { },
-  isOpenInSidebar: false,
-  activeFilterList: [],
-  activeWorkspaceId: -1
+  activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+  level: 0,
+  userRoleIdInWorkspace: ROLE.reader.id
 }

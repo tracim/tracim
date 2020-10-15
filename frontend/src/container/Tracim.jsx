@@ -251,18 +251,15 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceList = async (openInSidebarId = undefined) => {
+  loadWorkspaceList = async () => {
     const { props } = this
 
-    const idWsToOpen = openInSidebarId || props.currentWorkspace.id || undefined
     const showOwnedWorkspace = false
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
     if (fetchGetWorkspaceList.status === 200) {
-      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({ ...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen }))
-
-      props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
       this.setState({ workspaceListLoaded: true })
 

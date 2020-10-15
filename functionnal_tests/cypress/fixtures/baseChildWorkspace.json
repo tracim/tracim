@@ -1,0 +1,8 @@
+{
+  "description": "Another super description of my space.",
+  "label": "My child space",
+  "access_type": "confidential",
+  "default_user_role": "reader",
+  "workspace_id": 2,
+  "parent_id": 1
+}
