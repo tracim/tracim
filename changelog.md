@@ -5,7 +5,7 @@
 
 - New spaces hierarchy and new sidebar view (a space can be child of another)
 - New access types for spaces (on request, open)
-- Automatic test can be done for Tracim docker image (feature for developer)
+- Automatic test can be done for Tracim docker image (feature for developers)
 
 ### Fixed Issues
 
