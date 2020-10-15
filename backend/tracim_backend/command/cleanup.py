@@ -109,6 +109,7 @@ class DeleteUserCommand(AppContextCommand):
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no changes will be applied.")
+            app_context["request"].tm.doom()
         if parsed_args.force:
             print("(!) Running in force mode")
         if parsed_args.best_effort:
@@ -127,7 +128,6 @@ class DeleteUserCommand(AppContextCommand):
         print("")
         deleted_user_ids = set()  # typing.Set[int]
         deleted_workspace_ids = set()  # typing.Set[int]
-
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
                 config=self._app_config,
@@ -342,6 +342,7 @@ class AnonymizeUserCommand(AppContextCommand):
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, not change will be applied.")
+            app_context["request"].tm.doom()
 
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
