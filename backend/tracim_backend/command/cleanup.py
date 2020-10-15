@@ -280,8 +280,11 @@ class DeleteUserCommand(AppContextCommand):
             print('all user "{}" revisions deleted'.format(user.user_id))
 
         if should_anonymize.need_anonymization and not force_delete_all_associated_data:
-            cleanup_lib.safe_delete(user.config)
+            # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
+            # delete_user_associated_data() in dry-run mode doesn't work
+            user_config = user.config
             cleanup_lib.delete_user_associated_data(user)
+            cleanup_lib.safe_delete(user_config)
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
             )
@@ -292,8 +295,11 @@ class DeleteUserCommand(AppContextCommand):
             )
         else:
             print('delete user "{}"'.format(user.user_id))
-            cleanup_lib.safe_delete(user.config)
+            # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
+            # delete_user_associated_data() in dry-run mode doesn't work
+            user_config = user.config
             cleanup_lib.delete_user_associated_data(user)
+            cleanup_lib.safe_delete(user_config)
             cleanup_lib.safe_delete(user)
             print('user "{}" deleted'.format(user.user_id))
 
