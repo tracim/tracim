@@ -30,6 +30,12 @@ docker run --name dns_docker_solver --hostname dns.mageddo --restart=unless-stop
 defreitas/dns-proxy-server
 ```
 
+- create the dedicated docker network:
+
+```sh
+docker network create -d bridge tracim-test-net
+```
+
 ## Example of quick start on fresh install
 
 ```sh
@@ -49,6 +55,8 @@ docker run --name dns_docker_solver --hostname dns.mageddo --restart=unless-stop
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /etc/resolv.conf:/etc/resolv.conf \
 defreitas/dns-proxy-server
+# create network
+docker network create -d bridge tracim-test-net
 # run tests
 cd tool_docker/
 pytest test_docker  
