@@ -616,7 +616,7 @@ We do not support other collaborative edition online service for now but we do s
 note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
 
 
-    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2
+    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.2.6.2
 
 :warning: Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
 
