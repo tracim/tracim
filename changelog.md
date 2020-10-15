@@ -24,7 +24,7 @@
 - Renaming `Shared space` to `Space` (issue [#3582](https://github.com/tracim/tracim/issues/3582))
 - Webdav (issue [#3625](https://github.com/tracim/tracim/issues/3625)):
   - It is no longer possible to show two spaces with the same name in webdav. If this case exist on Tracim, webdav show the first space id.
-  - It is no more possible to create/modify space from webdav access
+  - It is no longer possible to create/modify a space from webdav access
 
 
 ## 3.1.4 / 2020-10-07
