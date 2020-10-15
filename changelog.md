@@ -1,3 +1,32 @@
+
+## 3.2.0 / 2020-10-16
+
+### New Features
+
+- New spaces hierarchy and new sidebar view (a space can be child of another)
+- New access types for spaces (on request, open)
+- Automatic test can be done for Tracim docker image (feature for developer)
+
+### Fixed Issues
+
+- Frontend: [#3596](https://github.com/tracim/tracim/issues/3596)
+- Backend: [#3545](https://github.com/tracim/tracim/issues/3545),
+[#3660](https://github.com/tracim/tracim/issues/3660)
+
+## Known Issues
+
+- Its not possible to close sidebar by clicking around icon (issue [#3693](https://github.com/tracim/tracim/issues/3693))
+- Scroll bar on sidebar is not correctly integrated (issue [#3694](https://github.com/tracim/tracim/issues/3694))
+
+### Breaking/Important change
+
+- Renaming `Text document` app to `Note` (issue [#3621](https://github.com/tracim/tracim/issues/3621))
+- Renaming `Shared space` app to `Space` (issue [#3582](https://github.com/tracim/tracim/issues/3582))
+- Webdav (issue [#3625](https://github.com/tracim/tracim/issues/3625)):
+  - It is no more possible to show two space with same name in webdav. If this case exist on Tracim, webdav show the first shared space id.
+  - It is no more possible to create/modify space from webdav access
+
+
 ## 3.1.4 / 2020-10-07
 
 ### Fixed Issues
