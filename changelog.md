@@ -1,3 +1,9 @@
+## 3.1.4 / 2020-10-07
+
+### Fixed Issues
+
+- TLM: [#3547](https://github.com/tracim/tracim/issues/3547)
+
 
 ## 3.1.3 / 2020-09-28
 
@@ -36,7 +42,7 @@
 [#3580](https://github.com/tracim/tracim/issues/3580)
 - TLM: [#3485](https://github.com/tracim/tracim/issues/3485), 
 [#3524](https://github.com/tracim/tracim/issues/3524), 
-[#3547](https://github.com/tracim/tracim/issues/3547)
+[~~#3547~~](https://github.com/tracim/tracim/issues/3547) (Issue number added here by mistake. Issue available in 3.1.4)
 - Frontend: [#3518](https://github.com/tracim/tracim/issues/3518), 
 [#3526](https://github.com/tracim/tracim/issues/3526), 
 [#3562](https://github.com/tracim/tracim/issues/3562), 
