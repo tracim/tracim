@@ -15,7 +15,7 @@
 
 ## Known Issues
 
-- Its not possible to close sidebar by clicking around icon (issue [#3693](https://github.com/tracim/tracim/issues/3693))
+- It's not possible to close the sidebar by clicking around the icon (issue [#3693](https://github.com/tracim/tracim/issues/3693))
 - Scroll bar on sidebar is not correctly integrated (issue [#3694](https://github.com/tracim/tracim/issues/3694))
 
 ### Breaking/Important change
