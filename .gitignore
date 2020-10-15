@@ -26,3 +26,6 @@ node_modules
 # vscode and mypy
 .vscode/
 .mypy_cache/
+
+/tools_docker/test_docker/tracim.env
+/tools_docker/test_docker/test_config.env
