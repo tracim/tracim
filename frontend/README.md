@@ -20,8 +20,6 @@ Install all dependencies
 Start development server (webpack dev server)
 `$ yarn run servdev`
 
-Alternatively, you can use `$ yarn run servdev-dashboard` to use webpack-dashboard to have a better server interface.
-
 Start mockapi server
 `$ yarn run mockapi`
 
