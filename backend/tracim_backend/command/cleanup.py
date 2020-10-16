@@ -109,6 +109,7 @@ class DeleteUserCommand(AppContextCommand):
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no changes will be applied.")
+            app_context["request"].tm.doom()
         if parsed_args.force:
             print("(!) Running in force mode")
         if parsed_args.best_effort:
@@ -127,7 +128,6 @@ class DeleteUserCommand(AppContextCommand):
         print("")
         deleted_user_ids = set()  # typing.Set[int]
         deleted_workspace_ids = set()  # typing.Set[int]
-
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(
                 config=self._app_config,
@@ -280,8 +280,11 @@ class DeleteUserCommand(AppContextCommand):
             print('all user "{}" revisions deleted'.format(user.user_id))
 
         if should_anonymize.need_anonymization and not force_delete_all_associated_data:
+            # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
+            # delete_user_associated_data() in dry-run mode doesn't work
+            user_config = user.config
             cleanup_lib.delete_user_associated_data(user)
-            cleanup_lib.safe_delete(user.config)
+            cleanup_lib.safe_delete(user_config)
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
             )
@@ -292,8 +295,11 @@ class DeleteUserCommand(AppContextCommand):
             )
         else:
             print('delete user "{}"'.format(user.user_id))
+            # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
+            # delete_user_associated_data() in dry-run mode doesn't work
+            user_config = user.config
             cleanup_lib.delete_user_associated_data(user)
-            cleanup_lib.safe_delete(user.config)
+            cleanup_lib.safe_delete(user_config)
             cleanup_lib.safe_delete(user)
             print('user "{}" deleted'.format(user.user_id))
 
@@ -336,6 +342,7 @@ class AnonymizeUserCommand(AppContextCommand):
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, not change will be applied.")
+            app_context["request"].tm.doom()
 
         with unprotected_content_revision(self._session) as session:
             uapi = UserApi(

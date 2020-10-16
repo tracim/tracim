@@ -5,14 +5,15 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
 from tracim_backend.exceptions import RoleAlreadyExistError
-from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -113,6 +114,14 @@ class RoleApi(object):
         :param save_now: database flush
         :return: updated role
         """
+        if role.role == WorkspaceRoles.WORKSPACE_MANAGER.level and self._is_last_workspace_manager(
+            role.user_id, role.workspace_id
+        ):
+            raise LastWorkspaceManagerRoleCantBeModified(
+                "last workspace manager {} can't change is own role in workspace".format(
+                    role.user_id
+                )
+            )
         role.role = role_level
         if with_notif is not None:
             role.do_notify = with_notif
@@ -147,33 +156,60 @@ class RoleApi(object):
         return role
 
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
-        if self._user and self._user.user_id == user_id:
-            raise UserCantRemoveHisOwnRoleInWorkspace(
-                "user {} can't remove is own role in workspace".format(user_id)
+        if self._is_last_workspace_manager(user_id, workspace_id):
+            raise LastWorkspaceManagerRoleCantBeModified(
+                "last workspace manager {} can't remove is own role in workspace".format(user_id)
             )
         role = self.get_one(user_id, workspace_id)
         self._session.delete(role)
         if flush:
             self._session.flush()
 
-    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+    def _is_last_workspace_manager(self, user_id: int, workspace_id: int) -> bool:
+        # INFO - G.M - 2020-17-09 - check if user is workspace_manager of workspace
+        try:
+            self.get_all_for_workspace_query(workspace_id).filter(
+                UserRoleInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level
+            ).filter(UserRoleInWorkspace.user_id == user_id).one()
+        except NoResultFound:
+            return False
+
+        # INFO - G.M - 2020-17-09 - check other potential workspace_manager of workspace
+        return (
+            self.get_all_for_workspace_query(workspace_id)
+            .filter(UserRoleInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level)
+            .filter(UserRoleInWorkspace.user_id != user_id)
+            .count()
+            == 0
+        )
+
+    def get_all_for_workspace_query(self, workspace_id: int) -> Query:
         query = (
             self._base_query()
-            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
+            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
             .order_by(UserRoleInWorkspace.user_id)
         )
-        return query.all()
+        return query
 
-    def get_workspace_members(self, workspace_id: int) -> typing.List[User]:
+    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+        return self.get_all_for_workspace_query(workspace.workspace_id).all()
+
+    def get_workspace_members(
+        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
+    ) -> typing.List[User]:
         query = self._apply_base_filters(
             self._session.query(User)
             .join(UserRoleInWorkspace)
             .filter(UserRoleInWorkspace.workspace_id == workspace_id)
         )
+        if min_role:
+            query = query.filter(UserRoleInWorkspace.role >= min_role.level)
         return query.all()
 
-    def get_workspace_member_ids(self, workspace_id: int) -> typing.List[int]:
-        return [user.user_id for user in self.get_workspace_members(workspace_id)]
+    def get_workspace_member_ids(
+        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
+    ) -> typing.List[int]:
+        return [user.user_id for user in self.get_workspace_members(workspace_id, min_role)]
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()

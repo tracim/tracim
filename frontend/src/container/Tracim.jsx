@@ -24,6 +24,7 @@ import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageMana
 import {
   CUSTOM_EVENT,
   PROFILE,
+  NUMBER_RESULTS_BY_PAGE,
   serialize,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -32,7 +33,6 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  NUMBER_RESULTS_BY_PAGE,
   toggleFavicon
 } from '../util/helper.js'
 import {
@@ -111,11 +111,12 @@ export class Tracim extends React.Component {
 
   handleDisconnectedFromApi = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.DISCONNECTED_FROM_API, data)
-    this.liveMessageManager.closeLiveMessageConnection()
-    if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
+    this.handleUserDisconnected(data)
+    if (!document.location.pathname.includes('/login')) document.location.href = `${PAGE.LOGIN}?dc=1`
   }
 
   handleUserConnected = data => {
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.USER_CONNECTED, data)
     this.liveMessageManager.openLiveMessageConnection(data.user_id)
   }
 
@@ -250,18 +251,15 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceList = async (openInSidebarId = undefined) => {
+  loadWorkspaceList = async () => {
     const { props } = this
 
-    const idWsToOpen = openInSidebarId || props.currentWorkspace.id || undefined
     const showOwnedWorkspace = false
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
     if (fetchGetWorkspaceList.status === 200) {
-      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({ ...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen }))
-
-      props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
       this.setState({ workspaceListLoaded: true })
 

@@ -8,10 +8,10 @@ import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   addWorkspaceList,
-  addWorkspaceMember,
-  setWorkspaceListIsOpenInSidebar
+  addWorkspaceMember
 } from '../action-creator.sync.js'
 import {
+  NO_ACTIVE_SPACE_ID,
   PAGE,
   workspaceConfig,
   getUserProfile,
@@ -20,8 +20,10 @@ import {
   TRACIM_APP_VERSION
 } from '../util/helper.js'
 import {
+  createSpaceTree,
   CUSTOM_EVENT,
   ROLE_LIST,
+  sortWorkspaceList,
   PROFILE,
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -33,6 +35,7 @@ export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       sidebarClose: isMobile
     }
 
@@ -67,7 +70,6 @@ export class Sidebar extends React.Component {
       // the clientToken is to avoid redirecting the eventually opened other browser's tabs
       const clientToken = getOrCreateSessionClientToken()
       if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.fields.client_token) {
-        props.dispatch(setWorkspaceListIsOpenInSidebar(tlmWorkspace.workspace_id, true))
         if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
           document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
         }
@@ -76,19 +78,35 @@ export class Sidebar extends React.Component {
     }
   }
 
+  displaySpace = (spaceLevel, spaceList) => {
+    const { props, state } = this
+
+    return spaceList.map(space =>
+      <span key={space.id}>
+        <WorkspaceListItem
+          activeWorkspaceId={state.activeWorkspaceId}
+          allowedAppList={space.sidebarEntryList}
+          label={space.label}
+          level={spaceLevel}
+          onClickAllContent={this.handleClickAllContent}
+          userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
+          workspaceId={space.id}
+        />
+        {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
+      </span>
+    )
+  }
+
   componentDidMount () {
     const { props } = this
     if (!this.shouldDisplaySidebar(props)) return
 
-    if (
-      props.match.params &&
-      props.match.params.idws &&
-      props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
-    ) {
-      const workspaceIdInUrl = parseInt(props.match.params.idws)
+    if (props.location.pathname.includes(PAGE.WORKSPACE.ROOT)) {
+      const urlElements = props.location.pathname.split('/')
+      const spaceIdInUrl = parseInt(urlElements[urlElements.indexOf('workspaces') + 1])
 
-      if (props.workspaceList.find(ws => ws.id === workspaceIdInUrl) !== undefined) {
-        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true))
+      if (props.workspaceList.find(space => space.id === spaceIdInUrl) !== undefined) {
+        this.setState({ activeWorkspaceId: spaceIdInUrl })
       }
     }
   }
@@ -105,8 +123,6 @@ export class Sidebar extends React.Component {
       .some(url => props.location.pathname.startsWith(url))
   }
 
-  handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
-
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
   handleClickToggleSidebar = () => this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
@@ -116,19 +132,18 @@ export class Sidebar extends React.Component {
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
-    const { sidebarClose } = this.state
-    const { user, workspaceList, t } = this.props
+    const { props, state } = this
 
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
       <div className='sidebar'>
-        <div className={classnames('sidebar__expand', { sidebarclose: sidebarClose })} onClick={this.handleClickToggleSidebar}>
-          {sidebarClose
-            ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />}
+        <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
+          {state.sidebarClose
+            ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { sidebarclose: sidebarClose })}>
+        <div className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
@@ -141,32 +156,20 @@ export class Sidebar extends React.Component {
             <div className='sidebar__content'>
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-              <nav className={classnames('sidebar__content__navigation', { sidebarclose: sidebarClose })}>
+              <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
                 <ul className='sidebar__content__navigation__workspace'>
-                  {workspaceList.map(ws =>
-                    <WorkspaceListItem
-                      workspaceId={ws.id}
-                      userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.userId, ws.memberList, ROLE_LIST)}
-                      label={ws.label}
-                      allowedAppList={ws.sidebarEntryList}
-                      activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
-                      isOpenInSidebar={ws.isOpenInSidebar}
-                      onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
-                      onClickAllContent={this.handleClickAllContent}
-                      key={ws.id}
-                    />
-                  )}
+                  {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
               </nav>
 
-              {getUserProfile(user.profile).id >= PROFILE.manager.id && (
+              {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
                 <div className='sidebar__content__btnnewworkspace'>
                   <button
                     className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickNewWorkspace}
                     data-cy='sidebarCreateWorkspaceBtn'
                   >
-                    {t('Create a shared space')}
+                    <i className='fa fa-plus' /> {props.t('Create a space')}
                   </button>
                 </div>
               )}

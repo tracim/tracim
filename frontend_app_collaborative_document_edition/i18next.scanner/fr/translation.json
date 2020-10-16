@@ -10,12 +10,11 @@
   "Draw": "Graphique",
   "Create an office document": "Créer un doc. bureautique",
   "Content not found": "Contenu non trouvé",
-  "Workspace not found": "Espace partagé non trouvé",
+  "Space not found": "Espace non trouvé",
   "You cannot edit this type of file online": "Vous ne pouvez pas éditer ce type de fichier en ligne",
   "Unknown error": "Erreur inconnue",
   "Unknown url": "URL inconnue",
   "Edit online": "Modifier en ligne",
   "View online": "Visualiser en ligne",
-  "New Office document": "Nouveau document bureautique",
-  "Error while loading shared space detail": "Erreur lors du chargement des détails de l'espace partagé"
+  "New Office document": "Nouveau document bureautique"
 }

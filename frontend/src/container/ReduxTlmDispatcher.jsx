@@ -23,6 +23,8 @@ import {
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
+const EXCLUDED_NOTIFICATIONS = GLOBAL_excludedNotifications.split(',')
+
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can use the TracimComponent
 // HOC like apps would do. It also allow using connect() from redux which adds the props dispatch().
 export class ReduxTlmDispatcher extends React.Component {
@@ -35,7 +37,6 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.UNDELETED, handler: this.handleUserChanged },
-      { entityType: TLM_ET.USER_INVITATION, coreEntityType: TLM_CET.CREATED, handler: this.handleUserChanged },
 
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
@@ -79,7 +80,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
-    if (this.props.user.userId !== data.fields.author.user_id) {
+    if (this.props.user.userId !== data.fields.author.user_id && !EXCLUDED_NOTIFICATIONS.some(type => data.event_type.startsWith(type))) {
       this.props.dispatch(addNotification(data))
     }
   }

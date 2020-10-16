@@ -11,19 +11,24 @@ from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUse
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UsernameAlreadyExists
+from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -37,6 +42,8 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
+from tracim_backend.models.context_models import WorkspaceInContext
+from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
@@ -69,13 +76,16 @@ from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -109,13 +119,17 @@ SWAGGER_TAG__USER_CONFIG_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 )
 
+SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
+)
+
 
 class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True))
+    @hapic.output_body(WorkspaceSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -131,8 +145,31 @@ class UserController(Controller):
             request.candidate_user,
             include_owned=hapic_data.query.show_owned_workspace,
             include_with_role=hapic_data.query.show_workspace_with_role,
+            parents_ids=hapic_data.query.parent_ids,
         )
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(WorkspaceIdSchema())
+    @hapic.output_body(WorkspaceSchema())
+    def join_workspace(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Join a workspace.
+        Only possible for OPEN workspaces.
+        Subscribing to a ON_REQUEST workspace is done through /api/users/<user_id>/workspace_subscriptions.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        workspace = wapi.add_current_user_as_member(workspace_id=hapic_data.body["workspace_id"])
+        return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -183,6 +220,7 @@ class UserController(Controller):
     @hapic.input_query(KnownMembersQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
     @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
         Get known users list
@@ -199,6 +237,7 @@ class UserController(Controller):
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
             include_workspace_ids=hapic_data.query.include_workspace_ids,
+            limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
@@ -624,7 +663,8 @@ class UserController(Controller):
                 page_token=hapic_data.query.page_token,
                 count=hapic_data.query.count,
                 exclude_author_ids=hapic_data.query.exclude_author_ids,
-                event_types=hapic_data.query.event_types,
+                include_event_types=hapic_data.query.include_event_types,
+                exclude_event_types=hapic_data.query.exclude_event_types,
             )
         )
 
@@ -647,13 +687,15 @@ class UserController(Controller):
         unread_messages_count = event_api.get_messages_count(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.UNREAD,
-            event_types=hapic_data.query.event_types,
+            include_event_types=hapic_data.query.include_event_types,
+            exclude_event_types=hapic_data.query.exclude_event_types,
             exclude_author_ids=hapic_data.query.exclude_author_ids,
         )
         read_messages_count = event_api.get_messages_count(
             user_id=candidate_user.user_id,
             read_status=ReadStatus.READ,
-            event_types=hapic_data.query.event_types,
+            include_event_types=hapic_data.query.include_event_types,
+            exclude_event_types=hapic_data.query.exclude_event_types,
             exclude_author_ids=hapic_data.query.exclude_author_ids,
         )
         return UserMessagesSummary(
@@ -780,6 +822,56 @@ class UserController(Controller):
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(WorkspaceSchema(many=True))
+    def get_accessible_workspaces(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceInContext]:
+        """
+        Return the list of accessible workspaces by the given user id.
+        An accessible workspace is:
+          - a workspace the user is not member of (`workspaces` API returns them)
+          - has an OPEN or ON_REQUEST access type
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user, session=request.dbsession, config=app_config,
+        )
+
+        workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
+        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(WorkspaceSubscriptionSchema(many=True))
+    def user_subscriptions(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        return subscription_lib.get_user_subscription(request.candidate_user.user_id)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(InvalidWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(WorkspaceIdSchema())
+    @hapic.output_body(WorkspaceSubscriptionSchema())
+    def submit_subscription(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.List[WorkspaceSubscription]:
+        workspace = WorkspaceApi(
+            current_user=None, session=request.dbsession, config=request.app_config
+        ).get_one(hapic_data.body["workspace_id"])
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        return subscription_lib.submit_subscription(workspace=workspace)
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -788,9 +880,17 @@ class UserController(Controller):
 
         # user workspace
         configurator.add_route(
-            "user_workspace", "/users/{user_id:\d+}/workspaces", request_method="GET"  # noqa: W605
+            "get_user_workspace",
+            "/users/{user_id:\d+}/workspaces",
+            request_method="GET",  # noqa: W605
         )
-        configurator.add_view(self.user_workspace, route_name="user_workspace")
+        configurator.add_view(self.user_workspace, route_name="get_user_workspace")
+        configurator.add_route(
+            "post_user_workspace",
+            "/users/{user_id:\d+}/workspaces",
+            request_method="POST",  # noqa: W605
+        )
+        configurator.add_view(self.join_workspace, route_name="post_user_workspace")
 
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
@@ -993,3 +1093,28 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User accessible workspaces (not member of, but can see information about them to subscribe)
+        configurator.add_route(
+            "get_accessible_workspaces",
+            "/users/{user_id:\d+}/accessible_workspaces",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(
+            self.get_accessible_workspaces, route_name="get_accessible_workspaces"
+        )
+
+        # User subscriptions
+        configurator.add_route(
+            "subscriptions_get",
+            "/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.user_subscriptions, route_name="subscriptions_get")
+
+        configurator.add_route(
+            "subscriptions_put",
+            "/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.submit_subscription, route_name="subscriptions_put")

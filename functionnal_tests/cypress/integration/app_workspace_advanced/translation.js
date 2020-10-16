@@ -11,12 +11,12 @@ describe('App Workspace Advanced', function () {
   })
 
   it('should have translations', () => {
-    cy.get('.adminWorkspace__workspaceTable').contains('Shared space')
+    cy.get('.adminWorkspace__workspaceTable').contains('Space')
 
     cy.changeLanguage('fr')
-    cy.get('.adminWorkspace__workspaceTable').contains('Espace partagé')
+    cy.get('.adminWorkspace__workspaceTable').contains('Espace')
 
     cy.changeLanguage('pt')
-    cy.get('.adminWorkspace__workspaceTable').contains('Espaço partilhado')
+    cy.get('.adminWorkspace__workspaceTable').contains('Espaço')
   })
 })

@@ -20,6 +20,8 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import WorkspaceAccessType
+from tracim_backend.models.data import WorkspaceSubscriptionState
 
 
 class TracimValidator(object):
@@ -87,9 +89,12 @@ regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))  # n
 # string matching list of string (without',') separated by ','
 regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))  # noqa: W605
 
-acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)
 action_description_validator = OneOf(ActionDescription.allowed_values())
+workspace_access_type_validator = OneOf([access_type.value for access_type in WorkspaceAccessType])
+workspace_subscription_state_validator = OneOf(
+    [subscription_state.value for subscription_state in WorkspaceSubscriptionState]
+)
 content_global_status_validator = OneOf([status.value for status in GlobalStatus])
 content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile.get_all_valid_slugs())

@@ -50,7 +50,8 @@ describe('<NotificationWall />', () => {
     dispatch: dispatchCallBack,
     notificationPage: {
       list: [{
-        id: 1
+        id: 1,
+        type: ''
       }]
     },
     t: tradKey => tradKey,
@@ -75,8 +76,8 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon: 'fa-comments-o',
-            text: '{{author}} commented on {{content}} in {{workspace}}',
+            icon: 'comments-o',
+            text: '{{author}} commented on {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
           })
       })
@@ -87,8 +88,8 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fa-magic',
-            text: '{{author}} created {{content}} in {{workspace}}',
+            icon: 'magic',
+            text: '{{author}} created {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -99,8 +100,8 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fa-history',
-            text: '{{author}} updated a new version of {{content}} in {{workspace}}',
+            icon: 'history',
+            text: '{{author}} updated {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -112,8 +113,8 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'fa-user-o',
-            text: '{{author}} added you to {{workspace}}',
+            icon: 'user-o+plus',
+            text: '{{author}} added you to {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })
       })
@@ -152,7 +153,7 @@ describe('<NotificationWall />', () => {
     describe('handleClickNotification', () => {
       it('should call onCloseNotificationWallCallBack()', (done) => {
         mockPutNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
-        NotificationWallInstance.handleClickNotification(1).then(() => {
+        NotificationWallInstance.handleClickNotification({}, 1, { url: '/ui' }).then(() => {
           expect(onCloseNotificationWallCallBack.called).to.equal(true)
         }).then(done, done)
       })

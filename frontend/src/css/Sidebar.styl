@@ -4,16 +4,7 @@ sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
 sidebarColor = #333
-sidebarColorLighten = lighten(sidebarColor, 15%)
 sidebarColorDarken = darken(sidebarColor, 15%)
-
-.sidebarSticky
-  position sticky
-  top 87px
-  display flex
-  flex-direction column
-  justify-content space-between
-  height 100%
 
 .sidebar
   &__expand
@@ -23,13 +14,13 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     z-index 10
     justify-content center
     align-items center
-    border 1px solid #333
+    border 1px solid sidebarColor
     border-bottom-right-radius 15px
     padding 8px 15px
     cursor pointer
-    color white
+    color offWhite
     transition all sidebar-animate-speed
-    background-color sidebarColor // #1168
+    background-color sidebarColor
     &.sidebarclose
       left 0
   &__frame
@@ -37,20 +28,20 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     transition all sidebar-animate-speed
     width sidebar-width
     height "calc(100vh - %s)" % headerHeight
-    overflow hidden
-    background-image url('../img/applat.png')
-    background-repeat repeat
     z-index 10
-    box-shadow -1px 2px 2px 1px #333
-    background-color sidebarColor // #1168
+    box-shadow -1px 2px 2px 1px sidebarColor
+    background-color sidebarColor
     &.sidebarclose
       width 0
+      overflow hidden
   &__scrollview
     width "calc(%s + 20px)" % sidebar-width
     height 100%
-    overflow-y scroll
+    overflow-y auto
     display flex
     flex-direction column
+    &::-webkit-scrollbar
+      display none
   &__scrollup
     position fixed
     bottom 0
@@ -58,13 +49,13 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     display flex
     justify-content center
     align-items center
-    border 1px solid #333
+    border 1px solid sidebarColor
     border-top-right-radius 15px
     padding 8px 12px
     cursor pointer
-    color white
+    color offWhite
     transition all sidebar-animate-speed
-    background-color sidebarColor // #1168
+    background-color sidebarColor
     ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
@@ -82,13 +73,22 @@ sidebarColorDarken = darken(sidebarColor, 15%)
       padding 0
       width sidebar-width
       transition all sidebar-animate-speed
-      overflow hidden
       &.sidebarclose
         width 0
       &__workspace
         padding-left 0
         list-style none
         &__item
+          &__menu
+            color offWhite
+            &:hover
+              color offWhtite
+            &:focus
+              outline none
+            &::after
+              display none
+          &__dragNdrop
+            margin-left 5px
           &__wrapper
             display flex
             align-items center
@@ -96,10 +96,12 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             width 100%
             height 100%
             cursor pointer
-            background-color sidebarColor // #1168
-            border-color sidebarColor
+            background-color sidebarColor
+            border-color darkGrey
+            color offWhite
             &:hover
-              background-color sidebarColorDarken // #1168
+              background-color sidebarColorDarken
+              color offWhite
           &__number
             display flex
             width 50px
@@ -111,53 +113,14 @@ sidebarColorDarken = darken(sidebarColor, 15%)
               font-size 26px
           &__name
             padding 10px
-            width 224px
+            width 100%
             font-size 20px
-            color offWhite
             white-space nowrap
             overflow hidden
             text-overflow ellipsis
-          &__icon
-            display flex
-            align-items center
-            width 26px
-            height 50px
-            color white
-          &__submenu
-            margin 0
-            padding 0
-            width 100%
-            overflow hidden
-            & > li
-              display block
-            &__dropdown
-              display flex
-              align-items center
-              border-bottom 1px solid
-              cursor pointer
-              background-color sidebarColorLighten // #1168
-              border-color sidebarColorDarken // #1168
-              transition background-color 150ms
-              &:hover
-                background-color sidebarColor // #1168
-                opacity 0.80
-              &.activeFilter
-                background-color #777
-              &__showdropdown
-                padding 0 10px
-                width 100%
-              .dropdown__icon
-                padding 10px 15px
-                min-width 50px
-                height 100%
-                font-size 18px
-                opacity 0.95
-                color fontColor
-              .dropdown__title
-                white-space nowrap
-                overflow hidden
-                text-overflow ellipsis
-                color offWhite
+          &__current
+            text-decoration underline
+            font-weight bold
   &__footer
     margin-top auto
     &__text

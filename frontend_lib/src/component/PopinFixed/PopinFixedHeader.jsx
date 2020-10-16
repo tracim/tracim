@@ -17,7 +17,7 @@ class PopinFixedHeader extends React.Component {
     if (prevProps.rawTitle !== this.props.rawTitle) this.setState({ editTitleValue: this.props.rawTitle })
   }
 
-  onChangeTitle = e => {
+  handleChangeTitle = e => {
     const newTitle = e.target.value
     this.setState({ editTitleValue: newTitle })
   }
@@ -65,15 +65,16 @@ class PopinFixedHeader extends React.Component {
           title={rawTitle}
         >
           {state.editTitle
-            ? <input
-              className='wsContentGeneric__header__title__editiontitle editiontitle'
-              value={state.editTitleValue}
-              onChange={this.onChangeTitle}
-              onKeyDown={this.handleInputKeyPress}
-              autoFocus
-            />
-            : componentTitle
-          }
+            ? (
+              <input
+                className='wsContentGeneric__header__title__editiontitle editiontitle'
+                value={state.editTitleValue}
+                onChange={this.handleChangeTitle}
+                onKeyDown={this.handleInputKeyPress}
+                autoFocus
+              />
+            )
+            : componentTitle}
         </div>
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
@@ -83,8 +84,7 @@ class PopinFixedHeader extends React.Component {
             disabled={disableChangeTitle}
           >
             <i className='fa fa-undo' title={t('Undo change in title')} />
-          </button>
-        }
+          </button>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton &&
           <button
@@ -94,10 +94,8 @@ class PopinFixedHeader extends React.Component {
           >
             {state.editTitle
               ? <i className='fa fa-check' title={t('Validate the title')} />
-              : <i className='fa fa-pencil' title={t('Edit title')} />
-            }
-          </button>
-        }
+              : <i className='fa fa-pencil' title={t('Edit title')} />}
+          </button>}
 
         {this.props.children}
 

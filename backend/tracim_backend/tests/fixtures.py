@@ -31,7 +31,7 @@ from tracim_backend.lib.core.event import RQ_QUEUE_NAME
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -47,6 +47,7 @@ from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
+from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
@@ -317,6 +318,11 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
     return ApplicationApiFactory(app_list)
 
 
+@pytest.fixture
+def subscription_lib_factory(session, app_config, admin_user) -> ApplicationApiFactory:
+    return SubscriptionLibFactory(session, app_config, admin_user)
+
+
 @pytest.fixture()
 def admin_user(session: Session) -> User:
     return session.query(User).filter(User.email == "admin@admin.admin").one()
@@ -338,14 +344,12 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return Provider(
-        show_archived=False, show_deleted=False, show_history=False, app_config=app_config,
-    )
+    return TracimDavProvider(app_config=app_config,)
 
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: Provider, session: Session, admin_user: User, app_config: CFG
+    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
         provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,

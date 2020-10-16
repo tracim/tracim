@@ -46,16 +46,22 @@ describe('TinyMce text editor', function () {
 
       it('the autocompletion should find @johndoe when typing it', function () {
         cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@')
-          cy.inputInTinyMCE('john')
+          cy.inputInTinyMCE('@john')
+          cy.get('.autocomplete').contains('@johndoe')
+        })
+      })
+
+      it('the autocompletion should find @johndoe when typing it, even with a space', function () {
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE(' ')
+          cy.inputInTinyMCE('@john')
           cy.get('.autocomplete').contains('@johndoe')
         })
       })
 
       it('the autocompletion should add the item submitted', function () {
         cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@')
-          cy.inputInTinyMCE('john')
+          cy.inputInTinyMCE('@john')
           cy.get('.autocomplete').contains('@johndoe').click()
           cy.assertTinyMCEContent('@johndoe')
         })
@@ -72,13 +78,11 @@ describe('TinyMce text editor', function () {
 
       it('the autocompletion should handle 2 mentions inserted with the autocomplete popup', function () {
         cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@')
-          cy.inputInTinyMCE('jo')
+          cy.inputInTinyMCE('@jo')
           cy.get('.autocomplete').should('be.visible')
           cy.inputInTinyMCE(' ')
           cy.get('.autocomplete').should('be.not.visible')
-          cy.inputInTinyMCE('@')
-          cy.inputInTinyMCE('john')
+          cy.inputInTinyMCE('@john')
           cy.get('.autocomplete').contains('@johndoe').click()
           cy.assertTinyMCEContent('<p>@jo&nbsp;@johndoe&nbsp;</p>')
         })

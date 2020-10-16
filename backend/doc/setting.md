@@ -14,7 +14,7 @@ The priority order is (from less to more priority):
 - configuration file
 - environnement variables
 
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}|{config_name: <68}|"  with all apps enabled to update this list properly --->
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
 
 | <env_var_name>                                                            | <config_file_name>                                             | <config_name>                                                      |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -40,6 +40,7 @@ The priority order is (from less to more priority):
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_WORKSPACE__ALLOWED_ACCESS_TYPES                                    | workspace.allowed_access_types                                 | WORKSPACE__ALLOWED_ACCESS_TYPES                                    |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
 | TRACIM_DEBUG                                                              | debug                                                          | DEBUG                                                              |
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
@@ -133,6 +134,7 @@ The priority order is (from less to more priority):
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
+| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 
 
 ### Parameters Only Working in the Configuration File
@@ -614,7 +616,7 @@ We do not support other collaborative edition online service for now but we do s
 note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
 
 
-    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.0.5.2
+    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.2.6.2
 
 :warning: Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
 

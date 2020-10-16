@@ -64,7 +64,7 @@ export class Account extends React.Component {
     }, {
       name: 'notification',
       active: false,
-      label: props.t('Shared spaces and notifications'),
+      label: props.t('Spaces and notifications'),
       display: props.system.config.email_notification_activated
     }, {
       name: 'password',

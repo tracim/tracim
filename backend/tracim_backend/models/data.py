@@ -51,10 +51,18 @@ from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.roles import WorkspaceRoles
 
 
+class WorkspaceAccessType(enum.Enum):
+    """Workspace access Types"""
+
+    CONFIDENTIAL = "confidential"
+    ON_REQUEST = "on_request"
+    OPEN = "open"
+
+
 class Workspace(DeclarativeBase):
+    FILEMANAGER_EXTENSION = ".space"
 
     __tablename__ = "workspaces"
-
     workspace_id = Column(
         Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
     )
@@ -74,7 +82,6 @@ class Workspace(DeclarativeBase):
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
-
     revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
     public_upload_enabled = Column(
@@ -93,6 +100,75 @@ class Workspace(DeclarativeBase):
     )
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     owner = relationship("User", remote_side=[User.user_id])
+    access_type = Column(
+        Enum(WorkspaceAccessType),
+        nullable=False,
+        server_default=WorkspaceAccessType.CONFIDENTIAL.name,
+    )
+    default_user_role = Column(
+        Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
+    )
+    parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
+    children = relationship(
+        "Workspace",
+        backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+        order_by="Workspace.workspace_id",
+    )
+
+    @property
+    def recursive_children(self) -> List["Workspace"]:
+        """
+        :return: list of children Workspace
+        """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
+        statement = text(
+            """
+            with RECURSIVE children_id as (
+                select workspaces.workspace_id as id from workspaces
+                where workspaces.parent_id = :workspace_id
+                union all
+                select workspaces.workspace_id as id from workspaces
+                join children_id c on c.id = workspaces.parent_id
+            )
+            select children_id.id as workspace_id from children_id;
+            """
+        )
+        children_ids = [
+            elem[0]
+            for elem in object_session(self)
+            .execute(statement, {"workspace_id": self.workspace_id})
+            .fetchall()
+        ]
+        if children_ids:
+            return (
+                object_session(self)
+                .query(Workspace)
+                .filter(Workspace.workspace_id.in_(children_ids))
+                .order_by(Workspace.workspace_id)
+            ).all()
+        return []
+
+    def get_children(self, recursively: bool = False) -> List["Workspace"]:
+        """
+        Get all children of workspace recursively or not (including children of children...)
+        """
+        if recursively:
+            return self.recursive_children
+        else:
+            return self.children
+
+    @property
+    def filemanager_filename(self) -> str:
+        """
+        unambigous filename for file_manager
+        """
+        # INFO - G.M - The virtual extension of workspace is the extension of file to use when needed to
+        # show a workspace in a context where it's not possible to show 2 same name file, the goal of
+        # this is to easiest the usage of sub-workspace and avoid collision between file and workspace
+        # in context file-like like webdav
+        virtual_extension = Workspace.FILEMANAGER_EXTENSION
+        return "{}{}".format(self.label, virtual_extension)
 
     @hybrid_property
     def contents(self) -> List["Content"]:
@@ -144,6 +220,9 @@ class Workspace(DeclarativeBase):
             ):
                 if not content_types or child.type in content_types:
                     yield child
+
+
+Index("idx__workspaces__parent_id", Workspace.parent_id)
 
 
 class UserRoleInWorkspace(DeclarativeBase):
@@ -236,6 +315,46 @@ class UserRoleInWorkspace(DeclarativeBase):
         # and get_all_role_values are both used for API, this method should
         # return item in the same order as get_all_role_values
         return [role.slug for role in WorkspaceRoles.get_all_valid_role()]
+
+
+class WorkspaceSubscriptionState(enum.Enum):
+    """Workspace subscription state Types"""
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+
+class WorkspaceSubscription(DeclarativeBase):
+    __tablename__ = "workspace_subscriptions"
+
+    state = Column(
+        Enum(WorkspaceSubscriptionState),
+        nullable=False,
+        server_default=WorkspaceSubscriptionState.PENDING.name,
+    )
+    created_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    workspace_id = Column(
+        Integer,
+        ForeignKey("workspaces.workspace_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
+    )
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    evaluation_date = Column(DateTime, nullable=True)
+    evaluator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True, default=None)
+    workspace = relationship(
+        "Workspace", remote_side=[Workspace.workspace_id], backref="subscriptions"
+    )
+    author = relationship("User", foreign_keys=[author_id], backref="workspace_subscriptions")
+    evaluator = relationship(
+        "User", foreign_keys=[evaluator_id], backref="workspace_evaluated_subscriptions"
+    )
+
+    @property
+    def state_slug(self):
+        return self.state.value
 
 
 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
@@ -1243,6 +1362,8 @@ class Content(DeclarativeBase):
         :return: list of children Content
         :rtype Content
         """
+        # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
+        # see https://github.com/tracim/tracim/issues/3670
         statement = text(
             """
     with RECURSIVE children_id as (
@@ -1452,6 +1573,7 @@ class Content(DeclarativeBase):
                     )
         return types
 
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
         for comment in self.get_comments():
@@ -1542,6 +1664,7 @@ class RevisionReadStatus(DeclarativeBase):
     user = relationship("User")
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class NodeTreeItem(object):
     """
         This class implements a model that allow to simply represents
@@ -1555,6 +1678,7 @@ class NodeTreeItem(object):
         self.is_selected = is_selected
 
 
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class VirtualEvent(object):
     @classmethod
     def create_from(cls, object):

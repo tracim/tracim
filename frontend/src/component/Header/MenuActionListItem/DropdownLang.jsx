@@ -1,39 +1,33 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { DropdownMenu } from 'tracim_frontend_lib'
 
 require('./DropdownLang.styl')
 
 const DropdownLang = props => {
-  const activeLang = props.langList.find(l => l.id === props.langActiveId)
+  const activeLang = props.langList.find(lang => lang.id === props.langActiveId)
   return (
     <li className='dropdownlang'>
-      <div className='dropdownlang__dropdown dropdown'>
-        <button
-          type='button'
-          className='dropdownlang__dropdown__btnlanguage btn outlineTextBtn nohover primaryColorBorder dropdown-toggle'
-          id='headerDropdownMenuButton'
-          data-toggle='dropdown'
-          aria-haspopup='true'
-          aria-expanded='false'
-        >
-          <img className='dropdownlang__dropdown__btnlanguage__imgselected' src={activeLang.icon} />
-          {activeLang.label}
-        </button>
-
-        <div className='dropdownlang__dropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
-          {props.langList.filter(l => l.id !== props.langActiveId).map(l =>
-            <div
-              className='dropdownlang__dropdown__subdropdown__link primaryColorBgActive dropdown-item'
-              data-cy={l.id}
-              onClick={() => props.onChangeLang(l.id)}
-              key={l.id}
-            >
-              <img className='dropdownlang__dropdown__subdropdown__link__flag' src={l.icon} />
-              {l.label}
-            </div>
-          )}
-        </div>
-      </div>
+      <DropdownMenu
+        buttonImage={activeLang.icon}
+        buttonLabel={activeLang.label}
+        buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn'
+        menuCustomClass='dropdownlang__dropdown__subdropdown'
+        isButton
+      >
+        {props.langList.filter(lang => lang.id !== props.langActiveId).map(lang =>
+          <button
+            className='transparentButton'
+            data-cy={lang.id}
+            onClick={() => props.onChangeLang(lang.id)}
+            key={lang.id}
+            childrenKey={lang.id}
+          >
+            <img className='dropdownlang__dropdown__subdropdown__link__flag' src={lang.icon} />
+            {lang.label}
+          </button>
+        )}
+      </DropdownMenu>
     </li>
   )
 }

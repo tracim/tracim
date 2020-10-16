@@ -186,6 +186,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class InvalidWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
+
+
 class ImmutableAttribute(TracimException):
     pass
 
@@ -319,6 +323,10 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
+class DisallowedWorkspaceAccessType(TracimException):
+    error_code = ErrorCode.DISALLOWED_WORKSPACE_ACCESS_TYPE
+
+
 class UserNotAllowedToCreateMoreWorkspace(TracimException):
     error_code = ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
 
@@ -387,8 +395,8 @@ class UserNotMemberOfWorkspace(TracimException):
     error_code = ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
 
 
-class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
-    error_code = ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+class LastWorkspaceManagerRoleCantBeModified(TracimException):
+    error_code = ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
 
 
 class UserCantChangeIsOwnProfile(TracimException):
@@ -412,6 +420,10 @@ class RoleDoesNotExist(TracimException):
 
 
 class ProfileDoesNotExist(TracimException):
+    pass
+
+
+class SubcriptionDoesNotExist(TracimException):
     pass
 
 
@@ -468,6 +480,7 @@ class UnallowedSubContent(TracimException):
 
 
 class TooShortAutocompleteString(TracimException):
+    error_code = ErrorCode.ACP_STRING_TOO_SHORT
     pass
 
 

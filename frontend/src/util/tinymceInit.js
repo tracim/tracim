@@ -109,13 +109,12 @@ import { uniqueId } from 'lodash'
           const nodeOffset = selectionNode.offset()
           const nodeHeight = selectionNode.height()
           const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
-          const position = {
+          return {
             top: (isFullscreen ? $editor.getContainer().offsetTop + nodePosition.top : nodePosition.top) + toolbarPosition.height(),
             isSelectionToTheTop: nodePosition.top === 0,
             selectionHeight: (nodeOffset.top * 2) + nodeHeight,
             isFullscreen
           }
-          handleTinyMceInput(e, position)
         }
 
         if (handleOnChange) {
@@ -126,11 +125,11 @@ import { uniqueId } from 'lodash'
 
         if (handleTinyMceKeyDown) $editor.on('keydown', handleTinyMceKeyDown)
         if (handleTinyMceKeyUp) $editor.on('keyup', handleTinyMceKeyUp)
-        if (handleTinyMceInput) $editor.on('input', getPosition)
+        if (handleTinyMceInput) $editor.on('input', (e) => { handleTinyMceInput(e, getPosition()) })
 
         if (handleTinyMceSelectionChange) {
           $editor.on('selectionchange', function (e) {
-            handleTinyMceSelectionChange($editor.selection.getNode().id)
+            handleTinyMceSelectionChange($editor.selection.getNode().id, getPosition())
           })
         }
 

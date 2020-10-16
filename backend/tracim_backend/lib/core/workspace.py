@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from operator import or_
 import typing
 
 from sqlalchemy import func
@@ -10,6 +11,7 @@ from tracim_backend import app_list
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -26,6 +28,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -56,12 +60,20 @@ class WorkspaceApi(object):
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     def _base_query_without_roles(self):
+        """
+        Prepare query that would return all not deleted workspaces.
+        """
         query = self._session.query(Workspace)
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
+        """
+        Prepare query that would return all not deleted workspaces where the current user:
+          - is a member
+          - OR has an admin profile
+        """
         if not self._user:
             return self._base_query_without_roles()
 
@@ -99,13 +111,19 @@ class WorkspaceApi(object):
         agenda_enabled: bool = True,
         public_download_enabled: bool = True,
         public_upload_enabled: bool = True,
+        access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
+        default_user_role: WorkspaceRoles = WorkspaceRoles.READER,
+        parent: Workspace = None,
         save_now: bool = False,
     ) -> Workspace:
         if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
             raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-
+        if access_type not in self._config.WORKSPACE__ALLOWED_ACCESS_TYPES:
+            raise DisallowedWorkspaceAccessType(
+                'Access type "{}" is not allowed for this workspace'.format(access_type.name)
+            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -115,6 +133,9 @@ class WorkspaceApi(object):
         workspace.created = datetime.utcnow()
         workspace.updated = datetime.utcnow()
         workspace.owner = self._user
+        workspace.access_type = access_type
+        workspace.default_user_role = default_user_role
+        workspace.parent = parent
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -139,6 +160,7 @@ class WorkspaceApi(object):
         agenda_enabled: typing.Optional[bool] = None,
         public_upload_enabled: typing.Optional[bool] = None,
         public_download_enabled: typing.Optional[bool] = None,
+        default_user_role: typing.Optional[WorkspaceRoles] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -160,46 +182,73 @@ class WorkspaceApi(object):
             workspace.public_upload_enabled = public_upload_enabled
         if public_download_enabled is not None:
             workspace.public_download_enabled = public_download_enabled
+        if default_user_role:
+            workspace.default_user_role = default_user_role
         workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)
 
         return workspace
 
-    def get_one(self, id):
+    def add_current_user_as_member(self, workspace_id: int) -> Workspace:
+        """
+        Adds the current user as a member of the given workspace id.
+        Only works for OPEN workspaces.
+
+        Role is set to the workspace default role.
+        """
+        query = self._base_query_without_roles().filter(Workspace.workspace_id == workspace_id)
+        query = query.filter(Workspace.access_type == WorkspaceAccessType.OPEN)
         try:
-            return self._base_query().filter(Workspace.workspace_id == id).one()
+            workspace = query.one()
         except NoResultFound as exc:
             raise WorkspaceNotFound(
-                "workspace {} does not exist or not visible for user".format(id)
+                "workspace {} does not exist or not visible for user".format(workspace_id)
+            ) from exc
+        rapi = RoleApi(current_user=self._user, session=self._session, config=self._config,)
+        rapi.create_one(self._user, workspace, workspace.default_user_role.level, with_notif=True)
+        return workspace
+
+    def get_one(self, workspace_id: int) -> Workspace:
+        query = self._base_query().filter(Workspace.workspace_id == workspace_id)
+        try:
+            return query.one()
+        except NoResultFound as exc:
+            raise WorkspaceNotFound(
+                "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
 
-    def get_one_by_label(self, label: str) -> Workspace:
+    def get_one_by_filemanager_filename(
+        self, filemanager_filename: str, parent: typing.Optional[Workspace] = None
+    ) -> Workspace:
         """
-        Get one workspace by label, handle both direct
-        and "~~{workspace_id}" end form, to allow getting a specific workspace when
-        workspace_name is ambiguous (multiple workspace with same label)
-        :param label: label of workspace or "label~~{workspace_name} form.
-        :return: workspace found according to label given
-        """
-        splitted_label = label.split("~~", maxsplit=1)
-        # INFO - G.M - 2019-10-10 - unambiguous form with workspace id
-        if len(splitted_label) == 2 and splitted_label[1].isdecimal():
-            return self.get_one(splitted_label[1])
-        # INFO - G.M - 2019-10-10 - Ambiguous form with workspace label
-        else:
-            return self._get_one_by_label(label)
+        get workspace according to filemanager_filename given and parent, if multiple workspace have
+        same filemanager_filename, return first one found.
 
-    def _get_one_by_label(self, label: str) -> Workspace:
+        filemanager_filename is filename like version of workspace with specific extension '.space'
         """
-        get workspace according to label given, if multiple workspace have
-        same label, return first one found.
-        """
-        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
-        # to unsure working
-        result = self.default_order_workspace(
-            self._base_query().filter(Workspace.label == label)
-        ).all()
+        if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
+            raise WorkspaceNotFound(
+                'Invalid Workspace name. Filemanager_filename should end with "{}"'.format(
+                    Workspace.FILEMANAGER_EXTENSION
+                )
+            )
+        label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
+        query = self._base_query().filter(Workspace.label == label)
+        if parent:
+            query = query.filter(Workspace.parent_id == parent.workspace_id)
+        else:
+            rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+            workspace_ids = rapi.get_user_workspaces_ids(
+                user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
+            )
+            query = query.filter(
+                or_(
+                    Workspace.parent_id == None,  # noqa: E711
+                    Workspace.parent_id.notin_(workspace_ids),
+                )
+            )
+        result = self.default_order_workspace(query).all()
         if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
@@ -214,8 +263,37 @@ class WorkspaceApi(object):
         """
         return query.order_by(Workspace.workspace_id)
 
-    def get_all(self):
+    def _parent_id_filter(self, query: Query, parent_ids: typing.List[int]) -> Query:
+        """ Filtering result by parent ids"""
+        if parent_ids == 0:
+            return query.filter(Workspace.parent_id == None)  # noqa: E711
+        if parent_ids is None or parent_ids == []:
+            return query
+
+        if parent_ids:
+            allowed_parent_ids = []
+            allow_root = False
+            for parent_id in parent_ids:
+                if parent_id == 0:
+                    allow_root = True
+                else:
+                    allowed_parent_ids.append(parent_id)
+            if allow_root:
+                query = query.filter(
+                    or_(
+                        Workspace.parent_id.in_(allowed_parent_ids), Workspace.parent_id == None
+                    )  # noqa: E711
+                )
+            else:
+                query = query.filter(Workspace.parent_id.in_(allowed_parent_ids))
+        return query
+
+    def get_all(self) -> typing.List[Workspace]:
         return self.default_order_workspace(self._base_query()).all()
+
+    def get_all_children(self, parent_ids: typing.List[int]) -> typing.List[Workspace]:
+        workspaces = self._parent_id_filter(parent_ids=parent_ids, query=self._base_query())
+        return self.default_order_workspace(workspaces).all()
 
     def get_user_used_space(self, user: User) -> int:
         workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
@@ -228,7 +306,11 @@ class WorkspaceApi(object):
         return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
 
     def get_all_for_user(
-        self, user: User, include_owned: bool = True, include_with_role: bool = True
+        self,
+        user: User,
+        include_owned: bool = True,
+        include_with_role: bool = True,
+        parents_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[Workspace]:
         """
         Get all workspaces of user
@@ -250,8 +332,41 @@ class WorkspaceApi(object):
             owned_workspaces = self._get_workspaces_owned_by_user(user.user_id)
             workspace_ids.extend([workspace.workspace_id for workspace in owned_workspaces])
 
+        query = self._parent_id_filter(query, parent_ids=parents_ids)
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
+        return query.all()
+
+    def get_user_orphan_workspaces(self, user: User):
+        """Get all user workspaces where the users is not member of the parent and parent exists"""
+        query = self._base_query()
+        workspace_ids = []
+        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        workspace_ids.extend(
+            rapi.get_user_workspaces_ids(user_id=user.user_id, min_role=UserRoleInWorkspace.READER)
+        )
+        query = query.filter(Workspace.workspace_id.in_(workspace_ids))
+        query = query.filter(Workspace.parent_id.isnot(None))
+        query = query.filter(Workspace.parent_id.notin_(workspace_ids))
+        return self.default_order_workspace(query).all()
+
+    def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
+        """
+        Return workspaces accessible by user.
+        Accessible workspaces:
+          - are of type OPEN or ON_REQUEST
+          - do not have user as a member
+        """
+        query = self._base_query_without_roles().filter(
+            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+        )
+        query = query.filter(
+            Workspace.workspace_id.notin_(
+                self._session.query(UserRoleInWorkspace.workspace_id).filter(
+                    UserRoleInWorkspace.user_id == user.user_id
+                )
+            )
+        )
         return query.all()
 
     def get_all_manageable(self) -> typing.List[Workspace]:
@@ -416,7 +531,7 @@ class WorkspaceApi(object):
         """
         _ = self.translator.get_translation
         query = self._base_query_without_roles().filter(
-            Workspace.label.ilike("{0}%".format(_("Workspace")))
+            Workspace.label.ilike("{0}%".format(_("Space")))
         )
 
-        return _("Workspace {}").format(query.count() + 1)
+        return _("Space {}").format(query.count() + 1)

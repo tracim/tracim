@@ -10,6 +10,7 @@ import {
   PopinFixedContent,
   addAllResourceI18n,
   handleFetchResult,
+  getContentTypeList,
   CUSTOM_EVENT,
   checkEmailValidity,
   parserStringToList,
@@ -20,8 +21,7 @@ import { debug } from '../debug.js'
 import {
   getImportAuthorizationsList,
   deleteImportAuthorization,
-  postImportAuthorizationsList,
-  getContentTypeList
+  postImportAuthorizationsList
 } from '../action.async.js'
 
 export class ShareFolderAdvanced extends React.Component {

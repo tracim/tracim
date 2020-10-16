@@ -7,7 +7,7 @@ const Footer = ({ t }) => {
   return (
     <footer className='footer text-right'>
       <div className='footer__text'>
-        {t('Create your own collaborative shared space on trac.im')} - {t('Copyright 2013 - 2017')}
+        {t('Create your own collaborative space on trac.im')} - {t('Copyright 2013 - 2017')}
       </div>
       <img className='footer__logo' src={logoFooter} />
     </footer>

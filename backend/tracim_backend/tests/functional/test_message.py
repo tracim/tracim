@@ -53,8 +53,7 @@ def create_events_and_messages(session, unread: bool = False) -> typing.List[tra
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestMessages(object):
     """
-    Tests for /api/users/{user_id}/messages
-    endpoint
+    Tests for /api/users/{user_id}/messages endpoint
     """
 
     @pytest.mark.parametrize("read_status", ["all", "read", "unread"])
@@ -89,7 +88,7 @@ class TestMessages(object):
         self, session, web_testapp
     ) -> None:
         """
-        Get messages through the classic HTTP endpoint. Filter by event_type
+        Get messages through the classic HTTP endpoint. Filter by author_ids
         """
         messages = create_events_and_messages(session)
 
@@ -125,7 +124,7 @@ class TestMessages(object):
         )
 
     @pytest.mark.parametrize("event_type", ["user.created", "user.modified", ""])
-    def test_api__get_messages__ok_200__event_type_filter(
+    def test_api__get_messages__ok_200__include_event_type_filter(
         self, session, web_testapp, event_type: str
     ) -> None:
         """
@@ -138,7 +137,7 @@ class TestMessages(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         result = web_testapp.get(
-            "/api/users/1/messages?event_types={}".format(event_type), status=200,
+            "/api/users/1/messages?include_event_types={}".format(event_type), status=200,
         ).json_body
         message_dicts = result.get("items")
         assert len(messages) == len(message_dicts)
@@ -168,7 +167,14 @@ class TestMessages(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         result = web_testapp.get(
-            "/api/users/1/messages?event_types={}".format(event_type), status=400,
+            "/api/users/1/messages?include_event_types={}".format(event_type), status=400,
+        ).json_body
+        assert result["code"] == 2001
+        assert result["message"] == "Validation error of input data"
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.get(
+            "/api/users/1/messages?exclude_event_types={}".format(event_type), status=400,
         ).json_body
         assert result["code"] == 2001
         assert result["message"] == "Validation error of input data"
@@ -416,15 +422,24 @@ class TestMessages(object):
         assert message_dicts["user"]["username"] == "TheAdmin"
 
     @pytest.mark.parametrize(
-        "event_types,read_messages_count,unread_messages_count",
+        "include_exclude,event_types,read_messages_count,unread_messages_count",
         [
-            (["user.created", "user.modified"], 1, 2),
-            (["user.created"], 1, 0),
-            (["user.modified"], 0, 2),
+            ("include", ["user.created", "user.modified"], 1, 2),
+            ("include", ["user.created"], 1, 0),
+            ("include", ["user.modified"], 0, 2),
+            ("exclude", ["user.created", "user.modified"], 0, 0),
+            ("exclude", ["user.created"], 0, 2),
+            ("exclude", ["user.modified"], 1, 0),
         ],
     )
-    def test_api__messages_summary__ok_200__filter_all(
-        self, session, web_testapp, event_types, read_messages_count, unread_messages_count
+    def test_api__messages_summary__ok_200__filer_event_types_all(
+        self,
+        session,
+        web_testapp,
+        include_exclude,
+        event_types,
+        read_messages_count,
+        unread_messages_count,
     ) -> None:
         """
         check summary of messages
@@ -434,7 +449,10 @@ class TestMessages(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         event_type_filter = ",".join(event_types)
         message_dicts = web_testapp.get(
-            "/api/users/1/messages/summary?event_types={}".format(event_type_filter), status=200,
+            "/api/users/1/messages/summary?{}_event_types={}".format(
+                include_exclude, event_type_filter
+            ),
+            status=200,
         ).json_body
         assert message_dicts["user_id"] == 1
         assert message_dicts["unread_messages_count"] == unread_messages_count
@@ -452,7 +470,14 @@ class TestMessages(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         result = web_testapp.get(
-            "/api/users/1/messages/summary?event_types=unknown", status=400,
+            "/api/users/1/messages/summary?include_event_types=unknown", status=400,
+        ).json_body
+        assert result["code"] == 2001
+        assert result["message"] == "Validation error of input data"
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?exclude_event_types=unknown", status=400,
         ).json_body
         assert result["code"] == 2001
         assert result["message"] == "Validation error of input data"

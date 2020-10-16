@@ -4,6 +4,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceSubscription
 
 
 class DatabaseCrudHookSpec:
@@ -70,4 +71,22 @@ class DatabaseCrudHookSpec:
 
     @hookspec
     def on_content_revision_created(self, content: Content, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_workspace_subscription_created(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        ...
+
+    @hookspec
+    def on_workspace_subscription_modified(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
+        ...
+
+    @hookspec
+    def on_workspace_subscription_deleted(
+        self, subscription: WorkspaceSubscription, context: TracimContext
+    ) -> None:
         ...

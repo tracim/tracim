@@ -2,9 +2,11 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
+  naturalCompareLabels,
   revisionTypeList,
   generateLocalStorageContentId,
   generateRandomPassword,
@@ -15,6 +17,8 @@ import {
   ROLE_LIST,
   PROFILE,
   PROFILE_LIST,
+  SPACE_TYPE,
+  SPACE_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -37,9 +41,11 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
+  NUMBER_RESULTS_BY_PAGE,
   checkUsernameValidity,
   formatAbsoluteDate,
   permissiveNumberEqual,
+  sortWorkspaceList,
   updateTLMAuthor
 } from './helper.js'
 import {
@@ -74,6 +80,7 @@ import Timeline from './component/Timeline/Timeline.jsx'
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
+import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
 import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
@@ -84,6 +91,8 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
+
+import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
 
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -117,11 +126,36 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan
+  tinymceAutoCompleteHandleSelectionChange
 } from './tinymceAutoCompleteHelper.js'
 
-import { getContentComment } from './action.async.js'
+import {
+  baseFetch,
+  putEditContent,
+  postNewComment,
+  putEditStatus,
+  putContentArchived,
+  putContentDeleted,
+  putContentRestoreArchive,
+  putContentRestoreDelete,
+  getMyselfKnownMember,
+  getUsernameAvailability,
+  getReservedUsernames,
+  getWorkspaceDetail,
+  getWorkspaceMemberList,
+  deleteWorkspace,
+  getContentTypeList,
+  putUserConfiguration,
+  getFolderContentList,
+  getFolderDetail,
+  getFileContent,
+  getWorkspaceContentList,
+  putFileIsDeleted,
+  getFileRevision,
+  putFileContent,
+  putMyselfFileRead,
+  getContentComment
+} from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -140,6 +174,10 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export {
   appContentFactory,
   addRevisionFromTLM,
+  createSpaceTree,
+  DropdownMenu,
+  naturalCompareLabels,
+  sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,
@@ -188,6 +226,8 @@ export {
   ROLE_LIST,
   PROFILE,
   PROFILE_LIST,
+  SPACE_TYPE,
+  SPACE_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -217,6 +257,7 @@ export {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
+  NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
   MentionAutoComplete,
@@ -225,10 +266,34 @@ export {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemoveAllAutocompleteSpan,
   updateTLMAuthor,
+  baseFetch,
+  putEditContent,
+  postNewComment,
+  putEditStatus,
+  putContentArchived,
+  putContentDeleted,
+  putContentRestoreArchive,
+  putContentRestoreDelete,
+  getMyselfKnownMember,
+  getUsernameAvailability,
+  getReservedUsernames,
+  getWorkspaceDetail,
+  getWorkspaceMemberList,
+  deleteWorkspace,
+  getContentTypeList,
+  putUserConfiguration,
+  getFolderContentList,
+  getFolderDetail,
+  getFileContent,
+  getWorkspaceContentList,
+  putFileIsDeleted,
+  getFileRevision,
+  putFileContent,
+  putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  SingleChoiceList
 }

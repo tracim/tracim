@@ -3,16 +3,24 @@ import transaction
 
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
+from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import SubscriptionLibFactory
+from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -310,3 +318,148 @@ class TestEventReceiver:
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
         assert admin_user.user_id not in receivers_ids
+
+    def test_unit__get_receiver_ids_workspace_subscription_event__subscription(
+        self,
+        session: TracimSession,
+        user_api_factory: UserApiFactory,
+        subscription_lib_factory: SubscriptionLibFactory,
+        admin_user: User,
+        workspace_api_factory: WorkspaceApiFactory,
+        role_api_factory: RoleApiFactory,
+    ):
+        user_api = user_api_factory.get()
+        profile = Profile.USER
+        subscriber = user_api.create_user(
+            "initiator@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_content_manager = user_api.create_user(
+            "workspace_content_manager@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_manager = user_api.create_user(
+            "workspace_manager@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        other_user = user_api.create_user(
+            "other_user@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        my_workspace = workspace_api.create_workspace(
+            "test workspace", save_now=True, access_type=WorkspaceAccessType.ON_REQUEST
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
+        subscription_lib = subscription_lib_factory.get(current_user=subscriber)
+        rapi = role_api_factory.get(current_user=subscriber)
+        rapi.create_one(
+            workspace_content_manager, my_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
+        )
+        rapi.create_one(
+            workspace_manager, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        subscription = subscription_lib.submit_subscription(my_workspace)
+        transaction.commit()
+        fields = {
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(subscriber)).data,
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema().dump(subscription).data,
+        }
+        event = Event(
+            entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=OperationType.CREATED,
+            fields=fields,
+        )
+
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        assert subscriber.user_id in receivers_ids
+        assert workspace_manager.user_id in receivers_ids
+        assert admin_user.user_id in receivers_ids
+        assert workspace_content_manager.user_id not in receivers_ids
+        assert other_user.user_id not in receivers_ids
+
+    def test_unit__get_receiver_ids_workspace_subscription_event__reject_subscription(
+        self,
+        session: TracimSession,
+        user_api_factory: UserApiFactory,
+        subscription_lib_factory: SubscriptionLibFactory,
+        admin_user: User,
+        workspace_api_factory: WorkspaceApiFactory,
+        role_api_factory: RoleApiFactory,
+    ):
+        user_api = user_api_factory.get()
+        profile = Profile.USER
+        subscriber = user_api.create_user(
+            "initiator@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_content_manager = user_api.create_user(
+            "workspace_content_manager@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_manager = user_api.create_user(
+            "workspace_manager@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        other_user = user_api.create_user(
+            "other_user@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        my_workspace = workspace_api.create_workspace(
+            "test workspace", save_now=True, access_type=WorkspaceAccessType.ON_REQUEST
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
+        subscription_lib = subscription_lib_factory.get(current_user=subscriber)
+        rapi = role_api_factory.get(current_user=subscriber)
+        rapi.create_one(
+            workspace_content_manager, my_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
+        )
+        rapi.create_one(
+            workspace_manager, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        )
+        subscription = subscription_lib.submit_subscription(my_workspace)
+        subscription_lib.reject_subscription(subscription)
+        transaction.commit()
+        fields = {
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(admin_user)).data,
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema().dump(subscription).data,
+        }
+        event = Event(
+            entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+        )
+
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        assert subscriber.user_id in receivers_ids
+        assert workspace_manager.user_id in receivers_ids
+        assert admin_user.user_id in receivers_ids
+        assert workspace_content_manager.user_id not in receivers_ids
+        assert other_user.user_id not in receivers_ids

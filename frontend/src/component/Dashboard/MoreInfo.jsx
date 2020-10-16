@@ -42,7 +42,7 @@ export const MoreInfo = props =>
           </div>
 
           <div className='moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text d-flex align-self-center'>
-            {props.t('Shared space calendar')}
+            {props.t('Space calendar')}
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@ export const MoreInfo = props =>
         {props.displayCalendarBtn === true &&
         <div className='moreinfo__calendar__information genericBtnInfoDashboard__info'>
           <div className='moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-            {props.t('Each shared space has its own calendar.')}
+            {props.t('Each space has its own calendar.')}
           </div>
 
           <div className='moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>

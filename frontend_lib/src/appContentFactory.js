@@ -1,9 +1,9 @@
 import React from 'react'
 import i18n from './i18n.js'
-import { v4 as uuidv4 } from 'uuid';
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
+  NUMBER_RESULTS_BY_PAGE,
   generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
@@ -26,7 +26,6 @@ import {
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
-import { tinymceRemoveAllAutocompleteSpan } from './tinymceAutoCompleteHelper.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -40,7 +39,7 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    setApiUrl = url => this.apiUrl = url
+    setApiUrl = url => { this.apiUrl = url }
 
     sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.ADD_FLASH_MSG,
@@ -151,7 +150,7 @@ export function appContentFactory (WrappedComponent) {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
-        ? tinymceRemoveAllAutocompleteSpan()
+        ? tinymce.activeEditor.getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
 
       let newCommentForApiWithMention
@@ -176,13 +175,15 @@ export function appContentFactory (WrappedComponent) {
           break
         case 400:
           switch (response.body.code) {
-            case 1001:
+            case 2067:
               this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
             case 2003:
               this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
               this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
             default:
               this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
@@ -257,7 +258,7 @@ export function appContentFactory (WrappedComponent) {
               delay: undefined
             }
           })
-        break
+          break
       }
 
       return response
@@ -342,12 +343,10 @@ export function appContentFactory (WrappedComponent) {
     searchForMentionInQuery = async (query, workspaceId) => {
       const mentionList = getMatchingGroupMentionList(query)
 
-      if (query.length < 2) return mentionList
-
-      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId))
+      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
-        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
         default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
       }
       return mentionList

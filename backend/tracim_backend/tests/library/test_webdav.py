@@ -5,9 +5,11 @@ import pytest
 
 from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.notifications import DummyNotifier
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import TracimDomainController
+from tracim_backend.lib.webdav.resources import FolderResource
 from tracim_backend.lib.webdav.resources import RootResource
+from tracim_backend.lib.webdav.resources import WorkspaceResource
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -36,7 +38,7 @@ class TestWebdavFactory(object):
         assert len(config["middleware_stack"]) == 6
         assert "provider_mapping" in config
         assert "/" in config["provider_mapping"]
-        assert isinstance(config["provider_mapping"]["/"], Provider)
+        assert isinstance(config["provider_mapping"]["/"], TracimDavProvider)
         assert "domaincontroller" in config
         assert isinstance(config["domaincontroller"], TracimDomainController)
 
@@ -73,10 +75,10 @@ class TestWebDav(object):
         )
 
         workspaces_names = [w.name for w in children]
-        assert "Recipes" in workspaces_names, "Recipes should be in names ({0})".format(
+        assert "Recipes.space" in workspaces_names, "Recipes should be in names ({0})".format(
             workspaces_names
         )
-        assert "Others" in workspaces_names, "Others should be in names ({0})".format(
+        assert "Others.space" in workspaces_names, "Others should be in names ({0})".format(
             workspaces_names
         )
 
@@ -90,7 +92,7 @@ class TestWebDav(object):
                 user_api_factory.get().get_one_by_email("admin@admin.admin")
             ),
         )
-        assert root, "Path / should return a RootResource instance"
+        assert root, "Path / a RootResource should return instance"
         assert isinstance(root, RootResource), "Path / should return a RootResource instance"
 
         children = root.getMemberList()
@@ -101,10 +103,10 @@ class TestWebDav(object):
         )
 
         workspaces_names = [w.name for w in children]
-        assert "Recipes" in workspaces_names, "Recipes should be in names ({0})".format(
+        assert "Recipes.space" in workspaces_names, "Recipes should be in names ({0})".format(
             workspaces_names
         )
-        assert "Business" in workspaces_names, "Business should be in names ({0})".format(
+        assert "Business.space" in workspaces_names, "Business should be in names ({0})".format(
             workspaces_names
         )
 
@@ -113,10 +115,12 @@ class TestWebDav(object):
     ):
 
         Recipes = webdav_provider.getResourceInst(
-            "/Recipes/",
+            "/Recipes.space/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
-        assert Recipes, "Path /Recipes should return a Wrkspace instance"
+        assert isinstance(
+            Recipes, WorkspaceResource
+        ), "Path /Recipes should return a Wrkspace instance"
 
         children = Recipes.getMemberList()
         eq_(2, len(children), msg="Recipes should list 2 folders instead {0}".format(len(children)))
@@ -130,14 +134,15 @@ class TestWebDav(object):
     def test_unit__list_content__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        Salads = webdav_provider.getResourceInst(
-            "/Recipes/Desserts",
+        Desserts_dir = webdav_provider.getResourceInst(
+            "/Recipes.space/Desserts",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
-        assert Salads, "Path /Salads should return a Wrkspace instance"
-
-        children = Salads.getMemberList()
-        eq_(5, len(children), msg="Salads should list 5 Files instead {0}".format(len(children)))
+        assert isinstance(
+            Desserts_dir, FolderResource
+        ), "Path /Desserts should return a Folder instance"
+        children = Desserts_dir.getMemberList()
+        eq_(5, len(children), msg="Dessert should list 5 Files instead {0}".format(len(children)))
 
         content_names = [c.name for c in children]
         assert (
@@ -163,7 +168,7 @@ class TestWebDav(object):
         self, app_config, user_api_factory, webdav_provider, webdav_environ_factory, session
     ):
         pie = webdav_provider.getResourceInst(
-            "/Recipes/Desserts/Apple_Pie.txt",
+            "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
 
@@ -174,7 +179,7 @@ class TestWebDav(object):
         self, app_config, user_api_factory, webdav_provider, webdav_environ_factory, session
     ):
         pie = webdav_provider.getResourceInst(
-            "/Recipes/Desserts/Apple_Pie.txt",
+            "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
 
@@ -196,7 +201,7 @@ class TestWebDav(object):
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
 
         result = webdav_provider.getResourceInst(
-            "/Recipes/Desserts/Apple_Pie.txt",
+            "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
         eq_(None, result, msg="Result should be None instead {0}".format(result))
@@ -208,12 +213,12 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
-        result = webdav_provider.getResourceInst("/Recipes/Salads/greek_salad.txt", environ)
+        result = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
 
         eq_(None, result, msg="Result should be None instead {0}".format(result))
 
         result = webdav_put_new_test_file_helper(
-            webdav_provider, environ, "/Recipes/Salads/greek_salad.txt", b"Greek Salad\n"
+            webdav_provider, environ, "/Recipes.space/Salads/greek_salad.txt", b"Greek Salad\n"
         )
 
         assert result, "Result should not be None instead {0}".format(result)
@@ -232,13 +237,13 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
-        new_file = webdav_provider.getResourceInst("/Recipes/Salads/greek_salad.txt", environ)
+        new_file = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
 
         eq_(None, new_file, msg="Result should be None instead {0}".format(new_file))
 
         # create it
         new_file = webdav_put_new_test_file_helper(
-            webdav_provider, environ, "/Recipes/Salads/greek_salad.txt", b"Greek Salad\n"
+            webdav_provider, environ, "/Recipes.space/Salads/greek_salad.txt", b"Greek Salad\n"
         )
         assert new_file, "Result should not be None instead {0}".format(new_file)
 
@@ -261,14 +266,14 @@ class TestWebDav(object):
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
 
         result = webdav_provider.getResourceInst(
-            "/Recipes/Salads/greek_salad.txt",
+            "/Recipes.space/Salads/greek_salad.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
         eq_(None, result, msg="Result should be None instead {0}".format(result))
 
         # Then create it again
         new_file = webdav_put_new_test_file_helper(
-            webdav_provider, environ, "/Recipes/Salads/greek_salad.txt", b"greek_salad\n"
+            webdav_provider, environ, "/Recipes.space/Salads/greek_salad.txt", b"greek_salad\n"
         )
         assert new_file, "Result should not be None instead {0}".format(new_file)
 
@@ -302,7 +307,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -310,7 +315,7 @@ class TestWebDav(object):
         assert content_pie, "Apple_Pie should be exist"
         content_pie_id = content_pie.content_id
 
-        pie.moveRecursive("/Recipes/Desserts/Apple_Pie_RENAMED.txt")
+        pie.moveRecursive("/Recipes.space/Desserts/Apple_Pie_RENAMED.txt")
 
         # Database content is renamed
         content_pie = (
@@ -332,7 +337,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -342,7 +347,7 @@ class TestWebDav(object):
         content_pie_parent = content_pie.parent
         eq_(content_pie_parent.label, "Desserts", msg="field parent should be Desserts")
 
-        pie.moveRecursive("/Recipes/Salads/Apple_Pie.txt")  # move in f2
+        pie.moveRecursive("/Recipes.space/Salads/Apple_Pie.txt")  # move in f2
 
         # Database content is moved
         content_pie = (
@@ -363,7 +368,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -373,7 +378,7 @@ class TestWebDav(object):
         content_pie_parent = content_pie.parent
         eq_(content_pie_parent.label, "Desserts", msg="field parent should be Desserts")
 
-        pie.moveRecursive("/Business/Menus/Apple_Pie_RENAMED.txt")
+        pie.moveRecursive("/Business.space/Menus/Apple_Pie_RENAMED.txt")
         content_pie = (
             session.query(ContentRevisionRO)
             .filter(ContentRevisionRO.content_id == content_pie_id)
@@ -397,7 +402,7 @@ class TestWebDav(object):
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
         content_to_move_res = webdav_provider.getResourceInst(
-            "/Recipes/Desserts/Apple_Pie.txt", environ
+            "/Recipes.space/Desserts/Apple_Pie.txt", environ
         )
 
         content_to_move = (
@@ -408,7 +413,9 @@ class TestWebDav(object):
         content_to_move_parent = content_to_move.parent
         eq_(content_to_move_parent.label, "Desserts", msg="field parent should be Desserts")
 
-        content_to_move_res.moveRecursive("/Business/Menus/Apple_Pie.txt")  # move in Business, f1
+        content_to_move_res.moveRecursive(
+            "/Business.space/Menus/Apple_Pie.txt"
+        )  # move in Business, f1
 
         # Database content is moved
         content_to_move = (
@@ -431,12 +438,12 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        result = webdav_provider.getResourceInst("/Recipes/Salads/greek_salad.txt", environ)
+        result = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
 
         eq_(None, result, msg="Result should be None instead {0}".format(result))
 
         result = webdav_put_new_test_file_helper(
-            webdav_provider, environ, "/Recipes/Salads/greek_salad.txt", b"hello\n"
+            webdav_provider, environ, "/Recipes.space/Salads/greek_salad.txt", b"hello\n"
         )
 
         assert result, "Result should not be None instead {0}".format(result)

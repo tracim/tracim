@@ -3,37 +3,19 @@
 .menuprofil
   &__dropdown
     &__name
-      &.outlineTextBtn
-        border 0
-        padding 0 5px
-      &::after //bootstrap overrides
-        vertical-align middle
-        color darkGrey
-      &__imgprofil
+      font-size fontSizeSmall
+      padding 0 5px 0 0
+      & > *
+        margin-right 5px
         display inline-block
-        margin-right 10px
-        width 40px
-        height 40px
-      &__text
-        display inline-block
-        margin-right 10px
-        font-size 14px
     &__sub
       color darkGrey
       cursor pointer
       &:focus
         box-shadow none
     &__setting
-      padding 0
       left inherit
       right 0
-      width 100%
-      cursor pointer
-      &__link
-        padding 10px
-        font-size 14px
-        &:hover:not(:active)
-          background-color grey-hover
 
 @media (min-width: min-xs) and (max-width: max-lg)
   .menuprofil

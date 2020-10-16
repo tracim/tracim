@@ -42,19 +42,19 @@ import {
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
   getContentComment,
+  getFileContent,
+  getFileRevision,
+  putFileContent,
+  putMyselfFileRead,
+  putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
-  getFileContent,
-  getFileRevision,
   getShareLinksList,
-  postShareLinksList,
-  putFileContent,
-  putMyselfFileRead,
-  putUserConfiguration
+  postShareLinksList
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
@@ -593,7 +593,7 @@ export class File extends React.Component {
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
               case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
               case 6004: this.sendGlobalFlashMessage(props.t('You have reach your storage limit, you cannot add new files')); break
               default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }

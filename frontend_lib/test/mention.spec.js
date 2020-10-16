@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import {
   wrapMentionsInSpanTags,
   addClassToMentionsOfUser,
-  removeClassFromMentionsOfUser,
+  removeMentionMeClass,
   handleMentionsBeforeSave,
   MENTION_ID_PREFIX,
   MENTION_ME_CLASS
@@ -12,20 +12,22 @@ describe('mention.js', () => {
   describe('function wrapMentionsInSpanTags', () => {
     const parser = new global.DOMParser()
 
+    function getWrappedDocument (html) {
+      const doc = parser.parseFromString(html, 'text/html')
+      return wrapMentionsInSpanTags(doc.body, doc)
+    }
+
     describe('with a source without any mention', () => {
       const textWithoutMention = 'This is a text without any mention'
-      const document = parser.parseFromString(textWithoutMention, 'text/html')
-      wrapMentionsInSpanTags(document)
-      it('should not modify the source', () => expect(textWithoutMention).to.equal(document.body.innerHTML))
+      const docBody = getWrappedDocument(textWithoutMention)
+      it('should not modify the source', () => expect(textWithoutMention).to.equal(docBody.innerHTML))
     })
 
     describe('with only one mention in the source', () => {
       describe('with source as simple text', () => {
         describe('with the mention at the middle of a sentence', () => {
-          const textWithMentionAtMiddle = 'This is a text with a mention @admin that should be wrapped'
-          const document = parser.parseFromString(textWithMentionAtMiddle, 'text/html')
-          wrapMentionsInSpanTags(document)
-          const addedSpanList = document.getElementsByTagName('span')
+          const docBody = getWrappedDocument('This is a text with a mention @admin that should be wrapped')
+          const addedSpanList = docBody.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
@@ -37,10 +39,8 @@ describe('mention.js', () => {
         })
 
         describe('with the mention at the beginning of a sentence', () => {
-          const textWithMentionAtBeginning = '@admin'
-          const document = parser.parseFromString(textWithMentionAtBeginning, 'text/html')
-          wrapMentionsInSpanTags(document)
-          const addedSpanList = document.getElementsByTagName('span')
+          const docBody = getWrappedDocument('@admin')
+          const addedSpanList = docBody.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
@@ -54,10 +54,8 @@ describe('mention.js', () => {
 
       describe('with source as HTML text', () => {
         describe('with the mention at the middle of a sentence', () => {
-          const htmlTextWithMentionAtMiddle = '<div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>'
-          const document = parser.parseFromString(htmlTextWithMentionAtMiddle, 'text/html')
-          wrapMentionsInSpanTags(document)
-          const addedSpanList = document.getElementsByTagName('span')
+          const docBody = getWrappedDocument('<div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>')
+          const addedSpanList = docBody.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
@@ -69,10 +67,8 @@ describe('mention.js', () => {
         })
 
         describe('with the mention at the beginning of a sentence', () => {
-          const htmlTextWithMentionAtBeginning = '<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>'
-          const document = parser.parseFromString(htmlTextWithMentionAtBeginning, 'text/html')
-          wrapMentionsInSpanTags(document)
-          const addedSpanList = document.getElementsByTagName('span')
+          const docBody = getWrappedDocument('<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>')
+          const addedSpanList = docBody.getElementsByTagName('span')
           const addedSpanListId = addedSpanList[0].id
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
@@ -87,10 +83,8 @@ describe('mention.js', () => {
 
     describe('with 3 mentions in the source', () => {
       describe('with source as simple text', () => {
-        const textWithMultipleMentions = 'This is a text @user1 with 3 mention @admin that should be @user2 wrapped'
-        const document = parser.parseFromString(textWithMultipleMentions, 'text/html')
-        wrapMentionsInSpanTags(document)
-        const addedSpanList = document.getElementsByTagName('span')
+        const docBody = getWrappedDocument('This is a text @user1 with 3 mention @admin that should be @user2 wrapped')
+        const addedSpanList = docBody.getElementsByTagName('span')
 
         it('should have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
         it('should contain the username in each span tag', () => {
@@ -106,10 +100,8 @@ describe('mention.js', () => {
       })
 
       describe('with source as HTML text', () => {
-        const htmlTextWithMention = '<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>'
-        const document = parser.parseFromString(htmlTextWithMention, 'text/html')
-        wrapMentionsInSpanTags(document)
-        const addedSpanList = document.getElementsByTagName('span')
+        const docBody = getWrappedDocument('<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>')
+        const addedSpanList = docBody.getElementsByTagName('span')
 
         it('should only have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
         it('should contain the username in the span tag', () => {
@@ -126,14 +118,21 @@ describe('mention.js', () => {
     })
 
     describe('with an @ in the source but without a space before', () => {
-      const textWithAtWithoutPreSpace = 'This is a text with a mention@admin that should NOT be wrapped'
-      const document = parser.parseFromString(textWithAtWithoutPreSpace, 'text/html')
-      wrapMentionsInSpanTags(document)
-      const addedSpanList = document.getElementsByTagName('span')
+      const docBody = getWrappedDocument('This is a text with a mention@admin that should NOT be wrapped')
+      const addedSpanList = docBody.getElementsByTagName('span')
 
       it('should not have any span tag', () => {
         expect(addedSpanList).to.have.lengthOf(0)
       })
+    })
+
+    it('should handle a document containing only a mention correctly', () => {
+      expect(getWrappedDocument('@mention').querySelector('span')).to.be.an.instanceof(Element)
+    })
+
+    it('should not add text between mentions', () => {
+      expect(getWrappedDocument('@mention').textContent).to.equal('@mention')
+      expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
     })
   })
 
@@ -162,6 +161,12 @@ describe('mention.js', () => {
         expectedContent: `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`,
         username: 'bar',
         description: 'user who is not mentioned'
+      },
+      {
+        content: mentionForFoo,
+        expectedContent: `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`,
+        username: 'fo',
+        description: 'user who is not mentioned, bis'
       },
       {
         content: '<span>plop</span>',
@@ -205,7 +210,7 @@ describe('mention.js', () => {
         const { content, expectedContent, username, description } = testCase
         const expectedRemoveResult = content === expectedContent ? 'not change class' : 'remove class'
         const document = parser.parseFromString(expectedContent, 'text/html')
-        removeClassFromMentionsOfUser(document, username)
+        removeMentionMeClass(document, username)
         describe(`for a ${description}`, () => {
           it(`should ${expectedRemoveResult}`, () => {
             expect(document.body.innerHTML).to.equal(content)

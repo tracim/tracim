@@ -10,9 +10,21 @@ import {
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
 
+const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
+
+const seekUsernameEnd = (text, offset) => {
+  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
+    offset++
+  }
+
+  return offset
+}
+
 export class CommentTextArea extends React.Component {
   constructor (props) {
     super(props)
+
+    this.commentCursorPos = -1 // RJ - 2020-25-09 - HACK - this should be put in the component state
 
     this.state = {
       isAutoCompleteActivated: false,
@@ -59,10 +71,9 @@ export class CommentTextArea extends React.Component {
     return undefined
   }
 
-  handleInputKeyPress = e => {
+  handleInputKeyDown = e => {
+    if (this.props.wysiwyg || !this.state.isAutoCompleteActivated) return
     const { state } = this
-
-    if (!this.state.isAutoCompleteActivated) return
 
     switch (e.key) {
       case ' ': this.setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] }); break
@@ -89,28 +100,60 @@ export class CommentTextArea extends React.Component {
         e.preventDefault()
         break
       }
+      case 'Escape': {
+        this.setState({ isAutoCompleteActivated: false })
+        e.preventDefault()
+        break
+      }
     }
   }
 
-  handleClickAutoCompleteItem = (autoCompleteItem) => {
-    const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
-    const atIndex = this.props.newComment.lastIndexOf('@')
-    if (atIndex === -1) return
-    const newComment = this.props.newComment.split('')
-    const mentionSize = lastCharBeforeCursorIndex - atIndex
-    newComment.splice(atIndex + 1, mentionSize, autoCompleteItem.mention + ' ')
+  // RJ - 2020-09-25 - FIXME
+  // Duplicate code with tinymceAutoCompleteHelper.js
+  // See https://github.com/tracim/tracim/issues/3639
 
-    this.props.onChangeNewComment({ target: { value: newComment.join('') } })
+  handleClickAutoCompleteItem = (autoCompleteItem) => {
+    if (!autoCompleteItem.mention) {
+      console.log('Error: this member does not have a username')
+      return
+    }
+
+    const cursorPos = this.textAreaRef.selectionStart
+    const spaceAfterMention = ' '
+
+    const charAtCursor = cursorPos - 1
+    const text = this.props.newComment
+    const posAt = text.lastIndexOf('@', charAtCursor)
+    let textBegin, textEnd
+
+    if (posAt > -1) {
+      const end = seekUsernameEnd(text, cursorPos)
+      textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+      textEnd = text.substring(end)
+    } else {
+      console.log('Error: mention autocomplete: did not find "@"')
+      textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
+      textEnd = ''
+    }
+
+    this.commentCursorPos = textBegin.length
+
+    this.props.onChangeNewComment({ target: { value: textBegin + textEnd } })
 
     this.setState({
       isAutoCompleteActivated: false,
       autoCompleteItemList: [],
-      autoCompleteCursorPosition: atIndex + autoCompleteItem.mention.length + 2
+      autoCompleteCursorPosition: textBegin.length
     })
   }
 
   handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(e, position, this.setState.bind(this), this.props.searchForMentionInQuery, this.state.isAutoCompleteActivated)
+    tinymceAutoCompleteHandleInput(
+      e,
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.props.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   handleTinyMceKeyDown = event => {
@@ -126,7 +169,7 @@ export class CommentTextArea extends React.Component {
     )
   }
 
-  handleTinyMceKeyUp = event => {
+  handleTinyMceKeyUp = (event) => {
     const { state } = this
 
     tinymceAutoCompleteHandleKeyUp(
@@ -137,8 +180,12 @@ export class CommentTextArea extends React.Component {
     )
   }
 
-  handleTinyMceSelectionChange = selectionId => {
-    tinymceAutoCompleteHandleSelectionChange(selectionId, this.setState.bind(this), this.state.isAutoCompleteActivated)
+  handleTinyMceSelectionChange = (e, position) => {
+    tinymceAutoCompleteHandleSelectionChange(
+      (state) => { this.setState({ ...state, tinymcePosition: position }) },
+      this.props.searchForMentionInQuery,
+      this.state.isAutoCompleteActivated
+    )
   }
 
   render () {
@@ -170,10 +217,17 @@ export class CommentTextArea extends React.Component {
           className={props.customClass}
           placeholder={props.t('Your message...')}
           value={props.newComment}
-          onChange={!props.wysiwyg ? props.onChangeNewComment : () => {}}
+          onChange={props.wysiwyg ? () => {} : props.onChangeNewComment}
           disabled={props.disableComment}
-          onKeyDown={!props.wysiwyg ? this.handleInputKeyPress : () => {}}
-          ref={ref => { this.textAreaRef = ref }}
+          onKeyDown={this.handleInputKeyDown}
+          ref={ref => {
+            this.textAreaRef = ref
+            if (ref && this.commentCursorPos > -1) {
+              ref.selectionStart = ref.selectionEnd = this.commentCursorPos
+              ref.focus()
+              this.commentCursorPos = -1
+            }
+          }}
         />
       </>
     )

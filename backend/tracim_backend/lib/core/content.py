@@ -11,7 +11,6 @@ from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
-from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
@@ -76,7 +75,7 @@ from tracim_backend.models.tracim_session import TracimSession
 __author__ = "damien"
 
 
-# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content) -> int:
     """
     :param content1:
@@ -113,7 +112,7 @@ def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Co
             return 0
 
 
-# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 def compare_tree_items_for_sorting_by_type_and_name(
     item1: NodeTreeItem, item2: NodeTreeItem
 ) -> int:
@@ -220,7 +219,7 @@ class ContentApi(object):
             .options(contains_eager(Content.current_revision))
         )
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     @classmethod
     def sort_tree_items(cls, content_list: typing.List[NodeTreeItem]) -> typing.List[NodeTreeItem]:
         news = []
@@ -231,7 +230,7 @@ class ContentApi(object):
 
         return content_list
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     @classmethod
     def sort_content(cls, content_list: typing.List[Content]) -> typing.List[Content]:
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
@@ -324,7 +323,7 @@ class ContentApi(object):
     def get_base_query(self, workspace: typing.Optional[Workspace]) -> Query:
         return self._base_query(workspace)
 
-    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
+    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     # def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
     #     """
     #     This method returns child items (folders or items) for left bar treeview.
@@ -804,109 +803,27 @@ class ContentApi(object):
                 'Content "{}" not found in database'.format(content_label)
             ) from exc
 
-    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
-    def get_one_by_filename_and_parent_labels(
-        self,
-        content_label: str,
-        workspace: Workspace,
-        content_parent_labels: typing.List[str] = None,
+    def get_one_by_filename(
+        self, filename: str, workspace: Workspace, parent: typing.Optional[Content] = None,
     ):
-        """
-        Return content with it's label, workspace and parents labels (optional)
-        :param content_label: label of content (label or file_name)
-        :param workspace: workspace containing all of this
-        :param content_parent_labels: Ordered list of labels representing path
-            of folder (without workspace label).
-        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
-        :return: Found Content
-        """
         query = self._base_query(workspace)
-        parent_folder = None
-
-        # Grab content parent folder if parent path given
-        if content_parent_labels:
-            parent_folder = self.get_folder_with_workspace_path_labels(
-                content_parent_labels, workspace
-            )
-
-        # Build query for found content by label
-        content_query = self.filter_query_for_content_label_as_path(
-            query=query, filename=content_label
-        )
-
-        # Modify query to apply parent folder filter if any
-        if parent_folder:
-            content_query = content_query.filter(Content.parent_id == parent_folder.content_id)
+        query = query.filter((Content.label + Content.file_extension) == filename)
+        if parent:
+            query = query.filter(Content.parent_id == parent.content_id)
         else:
-            content_query = content_query.filter(Content.parent_id == None)  # noqa: E711
-
-        # Filter with workspace
-        content_query = content_query.filter(Content.workspace_id == workspace.workspace_id)
-
-        # Return the content
+            query = query.filter(Content.parent_id == None)  # noqa: E711
         try:
-            return content_query.order_by(Content.cached_revision_id.desc()).one()
+            return query.order_by(Content.cached_revision_id.desc()).one()
         except NoResultFound as exc:
-            raise ContentNotFound(
-                'Content "{}" not found in database'.format(content_label)
-            ) from exc
-
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def get_folder_with_workspace_path_labels(
-        self, path_labels: typing.List[str], workspace: Workspace
-    ) -> typing.Optional[Content]:
-        """
-        Return a Content folder for given relative path.
-        TODO BS 20161124: Not safe if web interface allow folder duplicate names
-        :param path_labels: List of labels representing path of folder
-        (without workspace label).
-        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
-        :param workspace: workspace of folders
-        :return: Content folder
-        """
-        query = self._base_query(workspace)
-        folder = None
-
-        for label in path_labels:
-            # Filter query on label
-            folder_query = query.filter(
-                Content.type == content_type_list.Folder.slug,
-                Content.label == label,
-                Content.workspace_id == workspace.workspace_id,
-            )
-
-            # Search into parent folder (if already deep)
-            if folder:
-                folder_query = folder_query.filter(Content.parent_id == folder.content_id)
+            if parent:
+                parent_string = "with parent {}".format(parent.content_id)
             else:
-                folder_query = folder_query.filter(Content.parent_id == None)  # noqa: E711
-
-            # Get thirst corresponding folder
-            try:
-                folder = folder_query.order_by(Content.cached_revision_id.desc()).one()
-            except NoResultFound:
-                raise ContentNotFound("Folder not found")
-
-        return folder
-
-    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
-    def filter_query_for_content_label_as_path(
-        self, query: Query, filename: str, is_case_sensitive: bool = False
-    ) -> Query:
-        """
-        Apply normalised filters to found Content corresponding as given label.
-        :param query: query to modify
-        :param filename: label in this
-        FILE version, use Content.file_name.
-        :param is_case_sensitive: Take care about case or not
-        :return: modified query
-        """
-
-        if is_case_sensitive:
-            return query.filter((Content.label + Content.file_extension) == filename)
-        return query.filter(
-            func.lower(Content.label + Content.file_extension) == func.lower(filename)
-        )
+                parent_string = "at workspace root"
+            raise ContentNotFound(
+                'Content with filename "{}" {} in workspace "{}" not found'.format(
+                    filename, parent_string, workspace.workspace_id
+                )
+            ) from exc
 
     def get_pdf_preview_path(
         self, content_id: int, revision_id: int, page_number: int, file_extension: str

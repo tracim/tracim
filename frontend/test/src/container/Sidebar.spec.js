@@ -39,4 +39,12 @@ describe('<Sidebar />', () => {
       wrapper.setState({ sidebarClose: false })
     })
   })
+
+  describe('it internal functions', () => {
+    describe('displaySpace', () => {
+      it('should return an empty array if spaceList is empty', () => {
+        expect(wrapper.instance().displaySpace(0, [])).to.deep.equal([])
+      })
+    })
+  })
 })

@@ -3,4 +3,4 @@
 # Test requirements
 -r requirements-test.txt
 # Devtools
--r requirements-devtools.txt
+-r requirements-devtool.txt

@@ -11,8 +11,8 @@ const AdminWorkspace = props =>
   <PageWrapper customClass='adminWorkspace'>
     <PageTitle
       parentClass='adminWorkspace'
-      title={props.t('Shared space management')}
-      icon='bank'
+      title={props.t('Space management')}
+      icon='users'
       breadcrumbsList={props.breadcrumbsList}
     />
 
@@ -22,12 +22,12 @@ const AdminWorkspace = props =>
           className='adminWorkspace__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
           onClick={props.onClickNewWorkspace}
         >
-          {props.t('Create a shared space')}
+          {props.t('Create a space')}
         </button>
       </div>
 
       <div className='adminWorkspace__description'>
-        {props.t('List of every shared spaces')}
+        {props.t('List of every spaces')}
       </div>
 
       <Delimiter customClass='adminWorkspace__delimiter' />
@@ -38,7 +38,7 @@ const AdminWorkspace = props =>
           <thead>
             <tr>
               <th className='table__id' scope='col'>Id</th>
-              <th className='table__sharedSpace' scope='col'>{props.t('Shared space')}</th>
+              <th className='table__sharedSpace' scope='col'>{props.t('Space')}</th>
               <th className='table__description' scope='col'>{props.t('Description')}</th>
               <th className='table__memberCount' scope='col'>{props.t('Members')}</th>
               {/* <th scope='col'>Calendar</th> */}
@@ -83,7 +83,7 @@ const AdminWorkspace = props =>
               : (
                 <tr>
                   <td />
-                  <td>{props.t('There is no shared space yet')}</td>
+                  <td>{props.t('There is no space yet')}</td>
                   <td />
                   <td />
                   <td />

@@ -17,7 +17,7 @@
   .cardPopup__container
     border 0
     border-radius 10px
-    width 420px
+    width popupWidth
     background lightGrey
     box-shadow shadow-all
   &__header
@@ -51,9 +51,15 @@
         &:disabled
           cursor not-allowed
 
+.createcontent
+  &__contentname
+    margin-bottom 1.5rem
+    &__icon
+      margin-right 1rem
+      margin-left 0.25rem
+
 // MEDIAQUERIES
 
 @media (max-width: max-xs)
-
   .popupCreateContent
     padding 15px

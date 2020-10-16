@@ -1,83 +1,13 @@
-import { FETCH_CONFIG } from 'tracim_frontend_lib'
-
-export const getFileContent = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const getFileRevision = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT',
-    body: JSON.stringify({
-      label: label,
-      raw_content: newContent
-    })
-  })
-
-export const putMyselfFileRead = (apiUrl, workspaceId, contentId) => {
-  return fetch(`${apiUrl}/users/me/workspaces/${workspaceId}/contents/${contentId}/read`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'PUT'
-  })
-}
-
-export const putUserConfiguration = (apiUrl, userId, config) =>
-  fetch(`${apiUrl}/users/${userId}/config`, {
-    credentials: 'include',
-    headers: FETCH_CONFIG.headers,
-    method: 'PUT',
-    body: JSON.stringify({
-      parameters: config
-    })
-  })
+import { baseFetch } from 'tracim_frontend_lib'
 
 export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`)
 
 export const postShareLinksList = (apiUrl, workspaceId, contentId, shareEmailsList, sharePassword) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      emails: shareEmailsList,
-      password: sharePassword
-    })
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares`, {
+    emails: shareEmailsList,
+    password: sharePassword
   })
 
 export const deleteShareLink = (apiUrl, workspaceId, contentId, shareId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'DELETE'
-  })
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/shares/${shareId}`)

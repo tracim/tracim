@@ -27,12 +27,13 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
@@ -141,8 +142,24 @@ class RoleApiFactory(object):
         )
 
 
+class SubscriptionLibFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> SubscriptionLib:
+        return SubscriptionLib(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
 class WedavEnvironFactory(object):
-    def __init__(self, provider: Provider, session: Session, app_config: CFG, admin_user: User):
+    def __init__(
+        self, provider: TracimDavProvider, session: Session, app_config: CFG, admin_user: User
+    ):
         self.provider = provider
         self.session = session
         self.app_config = app_config
@@ -174,7 +191,10 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
+    provider: TracimDavProvider,
+    environ: typing.Dict[str, typing.Any],
+    file_path: str,
+    file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT

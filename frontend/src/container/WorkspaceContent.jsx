@@ -238,9 +238,9 @@ export class WorkspaceContent extends React.Component {
         break
       case 400:
         props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown shared space')))
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
 
@@ -331,7 +331,7 @@ export class WorkspaceContent extends React.Component {
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
-            props.dispatch(newFlashMessage(props.t('Workspace not found'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Space not found'), 'warning'))
             props.history.push('/ui')
             throw new Error(fetchContentList.json.message)
         }
@@ -638,12 +638,12 @@ export class WorkspaceContent extends React.Component {
     const { props } = this
 
     const creationAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
-      ? props.t('This shared space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
-      : props.t('This shared space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
+      ? props.t('This space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
+      : props.t('This space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
 
     const creationNotAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
-      ? props.t('This shared space has no content of that type yet')
-      : props.t('This shared space has no content yet')
+      ? props.t('This space has no content of that type yet')
+      : props.t('This space has no content yet')
 
     return (
       <div className='workspace__content__fileandfolder__empty'>
@@ -748,7 +748,6 @@ export class WorkspaceContent extends React.Component {
             >
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
-                  parentClass='workspace__header__btnaddcontent'
                   folderId={null} // null because it is workspace root content
                   onClickCreateContent={this.handleClickCreateContent}
                   availableApp={createContentAvailableApp}
@@ -859,7 +858,6 @@ export class WorkspaceContent extends React.Component {
 
                 {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
-                    customClass='workspace__content__button'
                     folderId={null}
                     onClickCreateContent={this.handleClickCreateContent}
                     availableApp={createContentAvailableApp}

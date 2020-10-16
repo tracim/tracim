@@ -212,7 +212,7 @@ class GuestUpload extends React.Component {
             switch (jsonResult400.code) {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
               case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t('Error, the shared space exceed its maximum size')); break
+              case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
               case 6004: this.sendGlobalFlashMessage(props.t('Upload impossible, the destination storage capacity has been reached')); break
               default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }

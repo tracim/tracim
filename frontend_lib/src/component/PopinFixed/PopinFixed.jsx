@@ -10,7 +10,7 @@ import PopinFixedContent from './PopinFixedContent.jsx'
 const PopinFixed = props => {
   return (
     <div
-      className={classnames('wsContentGeneric', props.customClass, { 'visible': props.visible })}
+      className={classnames('wsContentGeneric', props.customClass, { visible: props.visible })}
       style={props.style}
       data-cy='popinFixed'
     >

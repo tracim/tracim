@@ -11,5 +11,6 @@
   "Restore": "Restore",
   "This folder is archived": "This folder is archived",
   "This folder is deleted": "This folder is deleted",
-  "Error while loading Tracim's content type list": "Error while loading Tracim's content type list"
+  "Error while loading Tracim's content type list": "Error while loading Tracim's content type list",
+  "The content has been modified by {{author}}": "The content has been modified by {{author}}"
 }

@@ -1,5 +1,9 @@
 import i18n, { getBrowserLang } from './i18n.js'
-import { PROFILE_LIST, ROLE, FETCH_CONFIG as LIB_FETCH_CONFIG } from 'tracim_frontend_lib'
+import {
+  naturalCompareLabels,
+  PROFILE_LIST, ROLE,
+  FETCH_CONFIG as LIB_FETCH_CONFIG
+} from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
@@ -7,7 +11,7 @@ const versionFile = require('../version.json')
 export const TRACIM_APP_VERSION = versionFile.tracim_app_version
 export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
-export const NUMBER_RESULTS_BY_PAGE = 15
+export const NO_ACTIVE_SPACE_ID = -1
 
 export const history = require('history').createBrowserHistory()
 
@@ -27,9 +31,9 @@ export const ANCHOR_NAMESPACE = {
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
-  faIcon: 'bank',
+  faIcon: 'users',
   hexcolor: GLOBAL_primaryColor,
-  creationLabel: i18n.t('Create a shared space'),
+  creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
 }
 
@@ -110,11 +114,6 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
 
-const naturalCompareLabels = (itemA, itemB, lang) => {
-  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
-}
-
 export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1
   if (b.type === 'folder' && a.type !== 'folder') return 1
@@ -124,10 +123,6 @@ export const compareContents = (a, b, lang) => {
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
   UPLOAD: 'upload'
-}
-
-export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
 }
 
 export const sortContentList = (workspaceContents, lang) => {

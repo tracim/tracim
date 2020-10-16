@@ -1,13 +1,25 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import Select from 'react-select'
 import {
-  CardPopupCreateContent,
-  handleFetchResult,
   addAllResourceI18n,
+  CardPopup,
+  createSpaceTree,
   CUSTOM_EVENT,
+  SingleChoiceList,
+  handleFetchResult,
+  ROLE_LIST,
+  sortWorkspaceList,
+  SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { postWorkspace } from '../action.async.js'
+import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
+import {
+  getAllowedSpaceTypes,
+  getUserSpaces,
+  postSpace
+} from '../action.async.js'
 import i18n from '../i18n.js'
 
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
@@ -15,9 +27,9 @@ import i18n from '../i18n.js'
 const debug = {
   config: {
     slug: 'workspace',
-    faIcon: 'bank',
+    faIcon: 'users',
     hexcolor: '#7d4e24',
-    creationLabel: 'Create a shared space',
+    creationLabel: 'Create a space',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543',
     apiHeader: {
@@ -26,15 +38,16 @@ const debug = {
     },
     translation: {
       en: {},
-      fr: {}
+      fr: {},
+      pt: {}
     }
   },
   loggedUser: {
     userId: 5,
-    username: 'Smoi',
-    firstname: 'Côme',
-    lastname: 'Stoilenom',
-    email: 'osef@algoo.fr',
+    username: '',
+    firstname: '',
+    lastname: '',
+    email: '',
     avatar: ''
   },
   workspaceId: 1,
@@ -46,9 +59,17 @@ export class PopupCreateWorkspace extends React.Component {
     super(props)
     this.state = {
       appName: 'workspace',
+      allowedTypes: [],
       config: props.data ? props.data.config : debug.config,
+      isFirstStep: true,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      newWorkspaceName: ''
+      newDefaultRole: '',
+      newParentSpace: { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null },
+      newType: '',
+      newName: '',
+      parentOptions: [],
+      popoverDefaultRoleInfoOpen: false,
+      showWarningMessage: false
     }
 
     // i18n has been init, add resources from frontend
@@ -81,7 +102,53 @@ export class PopupCreateWorkspace extends React.Component {
     }
   })
 
-  handleChangeNewWorkspaceName = e => this.setState({ newWorkspaceName: e.target.value })
+  componentDidMount () {
+    this.getTypeList()
+  }
+
+  handleChangeNewName = e => this.setState({ newName: e.target.value })
+
+  handleChangeNewDefaultRole = newRole => this.setState({ newDefaultRole: newRole })
+
+  handleChangeSpacesType = newType => this.setState({ newType: newType })
+
+  handleChangeParentSpace = newParentSpace => this.setState({
+    newParentSpace: newParentSpace,
+    showWarningMessage: newParentSpace.parentId !== null
+  })
+
+  handleClickNextOrBack = async () => {
+    const { props, state } = this
+
+    if (state.isFirstStep) {
+      const fetchGetUserSpaces = await handleFetchResult(await getUserSpaces(state.config.apiUrl, state.loggedUser.userId))
+
+      switch (fetchGetUserSpaces.apiResponse.status) {
+        case 200: {
+          const spaceList = [{ value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null }] // INFO - GB - 2020-10-07 - Root
+
+          const addSpacesToList = (level, initialList) => {
+            initialList.forEach(space => {
+              const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
+              const spaceLabel = (
+                <span title={space.label}>
+                  {'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}
+                </span>
+              )
+              spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
+              if (space.children.length !== 0) addSpacesToList(level + 1, space.children)
+            })
+          }
+
+          addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
+
+          this.setState({ parentOptions: spaceList, isFirstStep: false })
+          break
+        }
+        default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
+      }
+    } else this.setState({ isFirstStep: true })
+  }
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
@@ -93,35 +160,174 @@ export class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName))
+    const fetchPostSpace = await handleFetchResult(await postSpace(
+      state.config.apiUrl,
+      state.newDefaultRole,
+      state.newParentSpace.spaceId,
+      state.newName,
+      state.newType
+    ))
 
-    switch (fetchSaveNewWorkspace.apiResponse.status) {
+    switch (fetchPostSpace.apiResponse.status) {
       case 200: this.handleClose(); break
       case 400:
-        switch (fetchSaveNewWorkspace.body.code) {
-          case 3007: this.sendGlobalFlashMessage(props.t('A shared space with that name already exists')); break
-          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore shared space')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+        switch (fetchPostSpace.body.code) {
+          case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break
+          case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
+          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
+    }
+  }
+
+  handleTogglePopoverDefaultRoleInfo = () => {
+    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
+  }
+
+  getTypeList = async () => {
+    const fetchGetAllowedSpaceTypes = await handleFetchResult(await getAllowedSpaceTypes(this.state.config.apiUrl))
+
+    switch (fetchGetAllowedSpaceTypes.apiResponse.status) {
+      case 200: {
+        const apiTypeList = fetchGetAllowedSpaceTypes.body.items
+        this.setState({ allowedTypes: SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug)) })
+        break
+      }
+      default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
     }
   }
 
   render () {
     const { props, state } = this
+    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
     return (
-      <CardPopupCreateContent
+      <CardPopup
+        customClass='newSpace'
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
-        onValidate={this.handleValidate}
-        label={props.t('New shared space')}
-        faIcon={state.config.faIcon}
-        contentName={state.newWorkspaceName}
-        onChangeContentName={this.handleChangeNewWorkspaceName}
-        btnValidateLabel={props.t('Validate and create')}
-        inputPlaceholder={props.t("Shared space's name")}
-      />
+      >
+        <div className='newSpace__menu'>
+          <div className='newSpace__title'>
+            <div className='newSpace__title__icon'>
+              <i
+                className={`fa fa-${state.config.faIcon}`}
+                style={{ color: state.config.hexcolor }}
+                title={props.t('New space')}
+              />
+            </div>
+            <div className='newSpace__title__name' style={{ color: state.config.hexcolor }}>
+              {props.t('New space')}
+            </div>
+          </div>
+
+          {state.isFirstStep
+            ? (
+              <>
+                <div className='newSpace__label'> {props.t("Space's name:")} </div>
+                <input
+                  type='text'
+                  className='newSpace__input'
+                  placeholder={props.t("Space's name")}
+                  value={state.newName}
+                  onChange={this.handleChangeNewName}
+                  onKeyDown={this.handleInputKeyDown}
+                  autoFocus
+                />
+
+                <div className='newSpace__label'> {props.t("Space's type:")} </div>
+                <SingleChoiceList
+                  list={state.allowedTypes}
+                  onChange={this.handleChangeSpacesType}
+                  currentValue={state.newType}
+                />
+
+                <div className='newSpace__button'>
+                  <button
+                    className={buttonStyleCallToAction}
+                    disabled={!state.newName || !state.newType}
+                    onClick={this.handleClickNextOrBack}
+                    title={props.t('Next')}
+                    type='button'
+                  >
+                    {props.t('Next')} <i className='fa fa-arrow-right newSpace__icon__right' />
+                  </button>
+                </div>
+              </>
+            )
+            : (
+              <>
+                <div className='newSpace__label'> {props.t('Parent space:')} </div>
+                <Select
+                  className='newSpace__input'
+                  isSearchable
+                  onChange={this.handleChangeParentSpace}
+                  options={state.parentOptions}
+                  defaultValue={state.newParentSpace}
+                />
+                {state.showWarningMessage && (
+                  <div className='newSpace__warningMessage'>
+                    <i className='fa fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
+                    {props.t('Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.')}
+                  </div>
+                )}
+
+                <div className='newSpace__label'>
+                  {props.t('Default role:')}
+                  <button
+                    type='button'
+                    className='btn transparentButton newSpace__label__info'
+                    id='popoverDefaultRoleInfo'
+                  >
+                    <i className='fa fa-fw fa-question-circle' />
+                  </button>
+
+                  <Popover
+                    placement='bottom'
+                    isOpen={state.popoverDefaultRoleInfoOpen}
+                    target='popoverDefaultRoleInfo'
+                    // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                    toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
+                    trigger={isMobile ? 'focus' : 'hover'}
+                  >
+                    <PopoverBody>
+                      {props.t('This is the role that members will have by default when they join your space.')}
+                    </PopoverBody>
+                  </Popover>
+                </div>
+
+                <SingleChoiceList
+                  list={ROLE_LIST}
+                  onChange={this.handleChangeNewDefaultRole}
+                  currentValue={state.newDefaultRole}
+                />
+
+                <div className='newSpace__button'>
+                  <button
+                    className='btn primaryColorBorder outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover newSpace__button__back'
+                    disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
+                    onClick={this.handleClickNextOrBack}
+                    title={props.t('Back')}
+                    type='button'
+                  >
+                    <i className='fa fa-arrow-left newSpace__icon__left' /> {props.t('Back')}
+                  </button>
+
+                  <button
+                    className={buttonStyleCallToAction}
+                    disabled={!state.newDefaultRole}
+                    onClick={this.handleValidate}
+                    title={props.t('Create')}
+                    type='button'
+                  >
+                    {props.t('Create')} <i className='fa fa-check newSpace__icon__right' />
+                  </button>
+                </div>
+              </>
+            )}
+        </div>
+      </CardPopup>
     )
   }
 }

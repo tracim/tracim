@@ -611,6 +611,29 @@ class TestUserApi(object):
         users = api2.get_known_users("name", include_workspace_ids=[workspace_2.workspace_id])
         assert set(users) == set([u2, u4])
 
+    def test_unit__get_known_users__include_workspace_ids_short_acp_limit_ok(
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+    ):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
+        wapi = workspace_api_factory.get()
+        workspace = wapi.create_workspace("test workspace n°1", save_now=True)
+
+        u1 = None
+        for i in range(20):
+            u1 = api.create_user(
+                email="email{}@email".format(i),
+                name="name{}".format(i),
+                do_notify=False,
+                do_save=True,
+            )
+            role_api = role_api_factory.get()
+            role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+
+        apiu1 = UserApi(current_user=u1, session=session, config=app_config)
+        users = apiu1.get_known_users("", include_workspace_ids=[workspace.workspace_id], limit=10)
+
+        assert len(users) == 10
+
     def test_unit__get_known_users__distinct_workspaces_users_by_name__exclude_workspace_and_name(
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):

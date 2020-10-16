@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
 import { PAGE, SHARE_FOLDER_ID } from '../../util/helper.js'
-import { ROLE } from 'tracim_frontend_lib'
+import { ROLE, DropdownMenu } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -67,37 +67,20 @@ class ShareFolder extends React.Component {
           <div className='folder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <div
-                  className='extandedaction dropdown'
-                  data-cy='extended_action'
+                <DropdownMenu
+                  buttonIcon='fa-ellipsis-h'
+                  buttonCustomClass='extandedaction outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                  buttonDataCy='extended_action'
+                  isButton
                 >
                   <button
-                    className='extandedaction__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
-                    type='button'
-                    id='dropdownMenuButton'
-                    data-toggle='dropdown'
-                    aria-haspopup='true'
-                    aria-expanded='false'
-                    onClick={e => e.stopPropagation()}
+                    className='transparentButton'
+                    onClick={this.handleClickOpenShareFolderApp}
                   >
-                    <i className='fa fa-fw fa-ellipsis-h' />
+                    <i className='fa fa-fw fa-pencil' />
+                    {props.t('Manage')}
                   </button>
-
-                  <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div
-                      className='subdropdown__item dropdown-item d-flex align-items-center'
-                      onClick={this.handleClickOpenShareFolderApp}
-                    >
-                      <div className='subdropdown__item__icon mr-3'>
-                        <i className='fa fa-fw fa-pencil' />
-                      </div>
-
-                      <div className='subdropdown__item__text'>
-                        {props.t('Manage')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </DropdownMenu>
               )}
             </div>
           </div>

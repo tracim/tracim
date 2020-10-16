@@ -128,7 +128,7 @@ _backend_quick_test: &_backend_quick_test
 _backend_test: &_backend_test
   <<: *_install_backend
   script:
-    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --cov backend; else pytest backend; fi"
+    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest backend --cov=backend; else pytest backend; fi"
 
 
 jobs:

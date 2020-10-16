@@ -70,7 +70,7 @@ export class FileComponent extends React.Component {
       <div
         className={classnames(
           'file__contentpage__statewrapper',
-          { promptMessage: props.isArchived || props.isDeleted || props.isDeprecated }
+          { promptMessageWrapper: props.isArchived || props.isDeleted || props.isDeprecated }
         )}
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
@@ -78,7 +78,7 @@ export class FileComponent extends React.Component {
         {props.displayNotifyAllMessage && (
           <PromptMessage
             msg={
-              <span>{props.t('To notify all members of the shared space of your modification')},
+              <span>{props.t('To notify all members of the space of your modification')},
                 <button
                   className='btn buttonLink'
                   onClick={props.onClickNotifyAll}

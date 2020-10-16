@@ -11,6 +11,8 @@ from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
+from transaction._transaction import Status as TransactionStatus
+from transaction.interfaces import NoTransaction
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
@@ -89,9 +91,28 @@ class TracimPyramidContext(PyramidContext):
             # For example if a handler is an object method the first argument
             # will be the controller object, not the request object.
             request = next(arg for arg in args if isinstance(arg, Request))
-            request.tm.doom()
+            transaction_status = request.tm.get().status
+            # INFO - 2020-10-01 - G.M : In some specific case: we do arrive in situation
+            # where transaction is not active anymore, in such situation, it's not possible
+            # to doom the request and we do get " ValueError('non-doomable')" Exception.
+            # to handle this case in a more clear way, we do Doom only active Transaction.
+            if transaction_status == TransactionStatus.ACTIVE:
+                request.tm.doom()
+            else:
+                # INFO - 2020-10-01 - G.M : debug unattended transaction status
+                # for troubleshooting future issues
+                logger.debug(
+                    self,
+                    'Transaction not active, status : "{}", cannot be doomed'.format(
+                        transaction_status
+                    ),
+                )
         except StopIteration:
             logger.error(self, "Cannot find request object in arguments")
+        except NoTransaction:
+            # INFO - 2020-10-01 - G.M - In some very specific case like PageNotFound case, pyramid
+            # doesn't provide a true transaction, so doom it will raise a NoTransaction exception.
+            logger.debug(self, "Transaction not initialized, cannot be doomed")
 
     global_exception_caught = doom_request_transaction
     local_exception_caught = doom_request_transaction

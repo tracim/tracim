@@ -8,7 +8,7 @@ from wsgidav.xml_tools import useLxml
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.webdav.authentification import TracimDomainController
-from tracim_backend.lib.webdav.dav_provider import Provider
+from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
 from tracim_backend.lib.webdav.middlewares import TracimEnforceHTTPS
 from tracim_backend.lib.webdav.middlewares import TracimEnv
 from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter
@@ -47,12 +47,8 @@ class WebdavAppFactory(object):
             )
 
         config["provider_mapping"] = {
-            app_config.WEBDAV__ROOT_PATH: Provider(
-                show_history=app_config.WEBDAV_SHOW_ARCHIVED,
-                show_archived=app_config.WEBDAV_SHOW_DELETED,
-                show_deleted=app_config.WEBDAV_SHOW_HISTORY,
-                manage_locks=app_config.WEBDAV_MANAGE_LOCK,
-                app_config=app_config,
+            app_config.WEBDAV__ROOT_PATH: TracimDavProvider(
+                manage_locks=app_config.WEBDAV_MANAGE_LOCK, app_config=app_config,
             )
         }
         config["block_size"] = app_config.WEBDAV__BLOCK_SIZE

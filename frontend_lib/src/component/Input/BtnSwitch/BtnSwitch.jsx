@@ -6,15 +6,17 @@ import PropTypes from 'prop-types'
 
 export const BtnSwitch = props =>
   <div
-    className={classnames('btnswitch', { 'disabled': props.disabled })}
+    className={classnames('btnswitch', { disabled: props.disabled })}
     title={props.checked ? props.activeLabel : props.inactiveLabel}
   >
-    <label className='switch nomarginlabel' onClick={e => {
-      e.preventDefault()
-      e.stopPropagation()
-      if (props.disabled) return
-      props.onChange(e)
-    }}>
+    <label
+      className='switch nomarginlabel' onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (props.disabled) return
+        props.onChange(e)
+      }}
+    >
       <input
         type='checkbox'
         checked={props.checked}
@@ -26,10 +28,10 @@ export const BtnSwitch = props =>
         }}
         disabled={props.disabled}
       />
-      <span className={classnames('slider round', { 'primaryColorBg': props.checked && !props.disabled, 'defaultBg': !props.checked || props.disabled })} />
+      <span className={classnames('slider round', { primaryColorBg: props.checked && !props.disabled, defaultBg: !props.checked || props.disabled })} />
     </label>
     <div className='btnswitch__text'>
-      { props.checked ? props.activeLabel : props.inactiveLabel }
+      {props.checked ? props.activeLabel : props.inactiveLabel}
     </div>
   </div>
 

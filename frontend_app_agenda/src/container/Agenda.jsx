@@ -5,6 +5,8 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
+  getWorkspaceDetail,
+  getWorkspaceMemberList,
   PageContent,
   PageTitle,
   PageWrapper,
@@ -16,11 +18,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
-import {
-  getAgendaList,
-  getWorkspaceDetail,
-  getWorkspaceMemberList
-} from '../action.async.js'
+import { getAgendaList } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {
@@ -173,10 +171,10 @@ export class Agenda extends React.Component {
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
-          default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+          default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+      default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
     }
   }
 
@@ -286,7 +284,7 @@ export class Agenda extends React.Component {
           href: a.agenda_url,
           hrefLabel: a.agenda_type === 'private'
             ? props.t('User')
-            : state.userWorkspaceList.length > 1 ? props.t('Shared spaces') : props.t('Shared space'),
+            : state.userWorkspaceList.length > 1 ? props.t('Spaces') : props.t('Space'),
           settingsAccount: a.agenda_type === 'private',
           withCredentials: a.with_credentials,
           loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
@@ -305,7 +303,7 @@ export class Agenda extends React.Component {
         <div
           dangerouslySetInnerHTML={{
             __html: props.t(
-              'Agenda of shared space {{workspaceLabel}}', {
+              'Agenda of space {{workspaceLabel}}', {
                 workspaceLabel: state.content.workspaceLabel,
                 interpolation: { escapeValue: false }
               }

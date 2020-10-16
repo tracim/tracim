@@ -10,12 +10,13 @@ from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
@@ -24,11 +25,13 @@ from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
 from tracim_backend.lib.utils.authorization import can_delete_workspace
+from tracim_backend.lib.utils.authorization import can_leave_workspace
 from tracim_backend.lib.utils.authorization import can_modify_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import can_see_workspace_information
@@ -46,6 +49,7 @@ from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views import BASE_API
@@ -61,6 +65,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchem
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDiskSpaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
@@ -68,6 +73,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
+from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -79,10 +85,14 @@ except ImportError:
     from http import client as HTTPStatus
 
 SWAGGER_TAG__WORKSPACE_MEMBERS_SECTION = "Members"
+SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_SECTION = "Subscriptions"
 
 SWAGGER_TAG__WORKSPACE_ENDPOINTS = "Workspaces"
 SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__WORKSPACE_MEMBERS_SECTION
+)
+SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_SECTION
 )
 SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
@@ -128,22 +138,25 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @check_right(is_administrator)
+    @hapic.input_query(WorkspaceFilterQuerySchema())
     @hapic.output_body(WorkspaceSchema(many=True))
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns the list of all workspaces. This route is for admin only.
         Standard users must use their own route: /api/users/me/workspaces
+        Filtering by parent_ids is possible through this endpoint
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        workspaces = wapi.get_all()
+        workspaces = wapi.get_all_children(parent_ids=hapic_data.query.parent_ids)
         return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(DisallowedWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
@@ -164,6 +177,7 @@ class WorkspaceController(Controller):
             agenda_enabled=hapic_data.body.agenda_enabled,
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
+            default_user_role=hapic_data.body.default_user_role,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -171,6 +185,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(DisallowedWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotAllowedToCreateMoreWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
@@ -183,13 +198,19 @@ class WorkspaceController(Controller):
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        parent = None
+        if hapic_data.body.parent_id:
+            parent = wapi.get_one(workspace_id=hapic_data.body.parent_id)
         workspace = wapi.create_workspace(
             label=hapic_data.body.label,
             description=hapic_data.body.description,
+            access_type=hapic_data.body.access_type,
             save_now=True,
             agenda_enabled=hapic_data.body.agenda_enabled,
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
+            default_user_role=hapic_data.body.default_user_role,
+            parent=parent,
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
@@ -276,6 +297,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -294,14 +316,13 @@ class WorkspaceController(Controller):
         role = rapi.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        workspace_role = WorkspaceRoles.get_role_from_slug(hapic_data.body.role)
-        role = rapi.update_role(role, role_level=workspace_role.level)
+        role = rapi.update_role(role, role_level=hapic_data.body.role.level)
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
-    @check_right(can_modify_workspace)
+    @check_right(can_leave_workspace)
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_workspaces_members_role(
@@ -321,7 +342,6 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(EmailValidationFailed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
@@ -397,6 +417,52 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(
             role, newly_created=newly_created, email_sent=email_sent
         )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
+    @check_right(can_modify_workspace)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(WorkspaceSubscriptionSchema(many=True))
+    def workspace_subscriptions(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        return subscription_lib.get_workspace_subscriptions(request.current_workspace.workspace_id)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
+    @check_right(can_modify_workspace)
+    @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(WorkspaceAndUserIdPathSchema())
+    @hapic.input_body(RoleUpdateSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def accept_subscription(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        subscription = subscription_lib.get_one(
+            author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
+        )
+        subscription_lib.accept_subscription(
+            subscription=subscription, user_role=hapic_data.body.role
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
+    @check_right(can_modify_workspace)
+    @hapic.input_path(WorkspaceAndUserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def reject_subscription(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[WorkspaceSubscription]:
+        subscription_lib = SubscriptionLib(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+        )
+        subscription = subscription_lib.get_one(
+            author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
+        )
+        subscription_lib.reject_subscription(subscription=subscription)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_reader)
@@ -794,3 +860,24 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.unarchive_content, route_name="unarchive_content")
+
+        # Subscriptions
+        configurator.add_route(
+            "workspace_subscriptions",
+            "/workspaces/{workspace_id}/subscriptions",
+            request_method="GET",
+        )
+        configurator.add_view(self.workspace_subscriptions, route_name="workspace_subscriptions")
+        configurator.add_route(
+            "accept_subscription",
+            "/workspaces/{workspace_id}/subscriptions/{user_id}/accept",
+            request_method="PUT",
+        )
+        configurator.add_view(self.accept_subscription, route_name="accept_subscription")
+
+        configurator.add_route(
+            "reject_subscription",
+            "/workspaces/{workspace_id}/subscriptions/{user_id}/reject",
+            request_method="PUT",
+        )
+        configurator.add_view(self.reject_subscription, route_name="reject_subscription")

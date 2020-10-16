@@ -11,13 +11,13 @@ import {
   FileUploadList,
   FILE_PREVIEW_STATE,
   TracimComponent,
-  setupCommonRequestHeaders
+  setupCommonRequestHeaders,
+  putMyselfFileRead
 } from 'tracim_frontend_lib'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
 import { debug } from '../debug.js'
-import { putMyselfFileRead } from '../action.async'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {
@@ -229,7 +229,7 @@ class PopupCreateFile extends React.Component {
             errorMessage = props.t('The file is larger than the maximum file size allowed')
             break
           case 6003:
-            errorMessage = props.t('Error, the shared space exceed its maximum size')
+            errorMessage = props.t('Error, the space exceed its maximum size')
             break
           case 6004:
             errorMessage = props.t('You have reach your storage limit, you cannot add new files')
