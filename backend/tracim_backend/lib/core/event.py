@@ -476,7 +476,9 @@ class EventBuilder:
         content_schema = EventApi.get_content_schema_for_type(content.type)
         content_dict = content_schema.dump(content_in_context).data
 
-        workspace_api = WorkspaceApi(context.dbsession, current_user, self._config)
+        workspace_api = WorkspaceApi(
+            context.dbsession, current_user, self._config, show_deleted=True
+        )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )

@@ -1,3 +1,11 @@
+
+## 3.1.5 / 2020-10-16
+
+### Fixed Issues
+
+- Backend: [#3685](https://github.com/tracim/tracim/issues/3685)
+
+
 ## 3.1.4 / 2020-10-07
 
 ### Fixed Issues

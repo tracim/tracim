@@ -1209,7 +1209,7 @@ class ContentInContext(object):
         """
         :return: page_nb of content if available, None if unavailable
         """
-        if self.content.depot_file:
+        if self.content.depot_file and self.content.cached_revision_id is not None:
             from tracim_backend.lib.core.content import ContentApi
 
             content_api = ContentApi(
@@ -1258,7 +1258,7 @@ class ContentInContext(object):
         """
         :return: bool about if pdf version of content is available
         """
-        if not self.content.depot_file:
+        if not self.content.depot_file or self.content.cached_revision_id is None:
             return False
 
         from tracim_backend.lib.core.content import ContentApi
@@ -1281,7 +1281,7 @@ class ContentInContext(object):
         """
         :return: bool about if jpeg version of content is available
         """
-        if not self.content.depot_file:
+        if not self.content.depot_file or self.content.cached_revision_id is None:
             return False
 
         from tracim_backend.lib.core.content import ContentApi
