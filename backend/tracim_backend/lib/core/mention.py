@@ -140,10 +140,7 @@ class MentionBuilder:
         if not mentions:
             return
 
-        try:
-            old_mentions = parser.get_mentions(content.revisions[-2])
-        except IndexError:
-            old_mentions = set()
+        old_mentions = parser.get_mentions(content.revisions[-2])
         new_mentions = set(mentions) - set(old_mentions)
 
         if not new_mentions:
@@ -187,7 +184,7 @@ class MentionBuilder:
                     "This user is not a member of this workspace: {}".format(mention.recipient)
                 )
 
-        current_user = context.safe_current_user()
+        current_user = context.current_user
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
         content_in_context = content_api.get_content_in_context(content)
         workspace_api = WorkspaceApi(context.dbsession, current_user, context.app_config)
@@ -201,7 +198,7 @@ class MentionBuilder:
             Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
         }
 
-        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api = EventApi(context.current_user, context.dbsession, context.app_config)
         for mention in mentions:
             fields = {cls.MENTION_FIELD: {"recipient": mention.recipient, "id": mention.id}}
             fields.update(common_fields)
