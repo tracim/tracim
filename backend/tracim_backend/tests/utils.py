@@ -33,7 +33,7 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
@@ -157,7 +157,9 @@ class SubscriptionLibFactory(object):
 
 
 class WedavEnvironFactory(object):
-    def __init__(self, provider: Provider, session: Session, app_config: CFG, admin_user: User):
+    def __init__(
+        self, provider: TracimDavProvider, session: Session, app_config: CFG, admin_user: User
+    ):
         self.provider = provider
         self.session = session
         self.app_config = app_config
@@ -189,7 +191,10 @@ class ApplicationApiFactory(object):
 
 
 def webdav_put_new_test_file_helper(
-    provider: Provider, environ: typing.Dict[str, typing.Any], file_path: str, file_content: bytes,
+    provider: TracimDavProvider,
+    environ: typing.Dict[str, typing.Any],
+    file_path: str,
+    file_content: bytes,
 ) -> _DAVResource:
     # This part id a reproduction of
     # wsgidav.request_server.RequestServer#doPUT

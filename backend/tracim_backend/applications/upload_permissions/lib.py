@@ -271,8 +271,8 @@ class UploadPermissionLib(object):
                 content_namespace=ContentNamespaces.UPLOAD,
             )
         except ContentFilenameAlreadyUsedInFolder:
-            upload_folder = content_api.get_one_by_filename_and_parent_labels(
-                content_label=folder_label, workspace=upload_permission.workspace
+            upload_folder = content_api.get_one_by_filename(
+                filename=folder_label, workspace=upload_permission.workspace
             )
 
         created_contents = []
