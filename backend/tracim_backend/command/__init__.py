@@ -11,6 +11,7 @@ from cliff.command import Command
 from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
+import transaction
 
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
@@ -61,6 +62,9 @@ class AppContextCommand(Command):
                 with bootstrap(parsed_args.config_file) as app_context:
                     with app_context["request"].tm:
                         self.take_app_action(parsed_args, app_context)
+        except transaction.interfaces.DoomedTransaction:
+            # The code willingly doomed the transaction, do not display an error
+            pass
         except Exception as exc:
             logger.exception(self, exc)
             print("Something goes wrong during command: {}".format(exc))
