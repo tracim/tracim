@@ -30,3 +30,5 @@ node_modules
 #ignore dev.js files
 /frontend*/dist/*.dev.js
 
+/tools_docker/test_docker/tracim.env
+/tools_docker/test_docker/test_config.env

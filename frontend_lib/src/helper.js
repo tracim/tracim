@@ -537,14 +537,28 @@ export const createSpaceTree = spaceList => {
   const spaceById = {}
   const newSpaceList = []
   for (const space of spaceListWithChildren) {
-    spaceById[space.workspace_id] = space
+    // INFO - GB - 2020-10-14 - The check made below is to ensure that the same function can be used by serialized lists (like for frontend) or not (like for frontend_app_workspace)
+    space.workspace_id
+    ? spaceById[space.workspace_id] = space
+    : spaceById[space.id] = space
   }
   for (const space of spaceListWithChildren) {
     if (space.parent_id && spaceById[space.parent_id]) {
       spaceById[space.parent_id].children.push(space)
+    } else if (space.parentId && spaceById[space.parentId]) {
+      spaceById[space.parentId].children.push(space)
     } else {
       newSpaceList.push(space)
     }
   }
   return newSpaceList
+}
+
+export const naturalCompareLabels = (itemA, itemB, lang) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
+}
+
+export const sortWorkspaceList = (workspaceList, lang) => {
+  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
 }

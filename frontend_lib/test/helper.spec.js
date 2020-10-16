@@ -12,6 +12,7 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
+  sortWorkspaceList,
   addRevisionFromTLM,
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
@@ -438,6 +439,65 @@ describe('helper.js', () => {
         }
       ]
       expect(createSpaceTree(intialArray)).to.be.deep.equal(finalArray)
+    })
+  })
+
+  describe('Function sortWorkspaceList()', () => {
+    it('should naturally sort the array of workspace', () => {
+      const workspaceList = [
+        { id: 1, label: 'content 0' },
+        { id: 3, label: 'content 1' },
+        { id: 21, label: 'content 10' },
+        { id: 23, label: 'content 11' },
+        { id: 25, label: 'content 12' },
+        { id: 27, label: 'content 13' },
+        { id: 29, label: 'content 14' },
+        { id: 31, label: 'content 15' },
+        { id: 33, label: 'content 16' },
+        { id: 35, label: 'content 17' },
+        { id: 37, label: 'content 18' },
+        { id: 39, label: 'content 19' },
+        { id: 5, label: 'content 2' },
+        { id: 41, label: 'content 20' },
+        { id: 7, label: 'content 3' },
+        { id: 9, label: 'content 4' },
+        { id: 11, label: 'content 5' },
+        { id: 13, label: 'content 6' },
+        { id: 15, label: 'content 7' },
+        { id: 17, label: 'content 8' },
+        { id: 19, label: 'content 9' },
+        { id: 36, label: 'content 9b' },
+        { id: 43, label: 'content 9a' }
+      ]
+
+      const workspaceListSortedByFolderAndNaturally = [
+        { id: 1, label: 'content 0' },
+        { id: 3, label: 'content 1' },
+        { id: 5, label: 'content 2' },
+        { id: 7, label: 'content 3' },
+        { id: 9, label: 'content 4' },
+        { id: 11, label: 'content 5' },
+        { id: 13, label: 'content 6' },
+        { id: 15, label: 'content 7' },
+        { id: 17, label: 'content 8' },
+        { id: 19, label: 'content 9' },
+        { id: 43, label: 'content 9a' },
+        { id: 36, label: 'content 9b' },
+        { id: 21, label: 'content 10' },
+        { id: 23, label: 'content 11' },
+        { id: 25, label: 'content 12' },
+        { id: 27, label: 'content 13' },
+        { id: 29, label: 'content 14' },
+        { id: 31, label: 'content 15' },
+        { id: 33, label: 'content 16' },
+        { id: 35, label: 'content 17' },
+        { id: 37, label: 'content 18' },
+        { id: 39, label: 'content 19' },
+        { id: 41, label: 'content 20' }
+      ]
+
+      sortWorkspaceList(workspaceList, 'en')
+      expect(workspaceList).to.deep.equal(workspaceListSortedByFolderAndNaturally)
     })
   })
 })

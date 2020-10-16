@@ -3,5 +3,6 @@
   "label": "My space",
   "access_type": "confidential",
   "default_user_role": "reader",
-  "workspace_id": 1
+  "workspace_id": 1,
+  "parent_id": null
 }

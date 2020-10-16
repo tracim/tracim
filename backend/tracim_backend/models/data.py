@@ -60,9 +60,9 @@ class WorkspaceAccessType(enum.Enum):
 
 
 class Workspace(DeclarativeBase):
+    FILEMANAGER_EXTENSION = ".space"
 
     __tablename__ = "workspaces"
-
     workspace_id = Column(
         Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
     )
@@ -157,6 +157,18 @@ class Workspace(DeclarativeBase):
             return self.recursive_children
         else:
             return self.children
+
+    @property
+    def filemanager_filename(self) -> str:
+        """
+        unambigous filename for file_manager
+        """
+        # INFO - G.M - The virtual extension of workspace is the extension of file to use when needed to
+        # show a workspace in a context where it's not possible to show 2 same name file, the goal of
+        # this is to easiest the usage of sub-workspace and avoid collision between file and workspace
+        # in context file-like like webdav
+        virtual_extension = Workspace.FILEMANAGER_EXTENSION
+        return "{}{}".format(self.label, virtual_extension)
 
     @hybrid_property
     def contents(self) -> List["Content"]:

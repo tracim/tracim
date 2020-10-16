@@ -218,16 +218,37 @@ class WorkspaceApi(object):
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
 
-    def get_one_by_label(self, label: str) -> Workspace:
+    def get_one_by_filemanager_filename(
+        self, filemanager_filename: str, parent: typing.Optional[Workspace] = None
+    ) -> Workspace:
         """
-        get workspace according to label given, if multiple workspace have
-        same label, return first one found.
+        get workspace according to filemanager_filename given and parent, if multiple workspace have
+        same filemanager_filename, return first one found.
+
+        filemanager_filename is filename like version of workspace with specific extension '.space'
         """
-        # INFO - G.M - 2019-10-10 - result should be ordered same way as get_all() method,
-        # to unsure working
-        result = self.default_order_workspace(
-            self._base_query().filter(Workspace.label == label)
-        ).all()
+        if not filemanager_filename.endswith(Workspace.FILEMANAGER_EXTENSION):
+            raise WorkspaceNotFound(
+                'Invalid Workspace name. Filemanager_filename should end with "{}"'.format(
+                    Workspace.FILEMANAGER_EXTENSION
+                )
+            )
+        label = filemanager_filename[: -len(Workspace.FILEMANAGER_EXTENSION)]
+        query = self._base_query().filter(Workspace.label == label)
+        if parent:
+            query = query.filter(Workspace.parent_id == parent.workspace_id)
+        else:
+            rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+            workspace_ids = rapi.get_user_workspaces_ids(
+                user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
+            )
+            query = query.filter(
+                or_(
+                    Workspace.parent_id == None,  # noqa: E711
+                    Workspace.parent_id.notin_(workspace_ids),
+                )
+            )
+        result = self.default_order_workspace(query).all()
         if len(result) == 0:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
@@ -298,7 +319,6 @@ class WorkspaceApi(object):
         :param include_with_role: include workspace where user has a role
         :return: list of workspaces found
         """
-
         query = self._base_query()
         workspace_ids = []
         rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -316,6 +336,19 @@ class WorkspaceApi(object):
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.order_by(Workspace.label)
         return query.all()
+
+    def get_user_orphan_workspaces(self, user: User):
+        """Get all user workspaces where the users is not member of the parent and parent exists"""
+        query = self._base_query()
+        workspace_ids = []
+        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        workspace_ids.extend(
+            rapi.get_user_workspaces_ids(user_id=user.user_id, min_role=UserRoleInWorkspace.READER)
+        )
+        query = query.filter(Workspace.workspace_id.in_(workspace_ids))
+        query = query.filter(Workspace.parent_id.isnot(None))
+        query = query.filter(Workspace.parent_id.notin_(workspace_ids))
+        return self.default_order_workspace(query).all()
 
     def get_all_accessible_by_user(self, user: User) -> typing.List[Workspace]:
         """

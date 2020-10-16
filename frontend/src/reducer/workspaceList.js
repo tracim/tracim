@@ -9,15 +9,14 @@ import {
   WORKSPACE_MEMBER,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
-import { serialize } from 'tracim_frontend_lib'
+import { serialize, sortWorkspaceList } from 'tracim_frontend_lib'
 import { serializeSidebarEntryProps, serializeMember } from './currentWorkspace.js'
-import { sortWorkspaceList } from '../util/helper'
 
 export const serializeWorkspaceListProps = {
   agenda_enabled: 'agendaEnabled',
-  isOpenInSidebar: 'isOpenInSidebar',
   is_deleted: 'isDeleted',
   label: 'label',
+  parent_id: 'parentId',
   public_download_enabled: 'downloadEnabled',
   public_upload_enabled: 'uploadEnabled',
   sidebar_entries: 'sidebarEntryList',
@@ -50,9 +49,6 @@ export function workspaceList (state = [], action, lang) {
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
       return state.filter(ws => ws.id !== action.workspace.workspace_id)
-
-    case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
-      return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))
 
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({
