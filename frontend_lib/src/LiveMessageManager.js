@@ -1,5 +1,5 @@
 import { FETCH_CONFIG } from './helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from './customEvent.js'
 import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 
 export const LIVE_MESSAGE_STATUS = {
