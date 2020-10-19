@@ -28,7 +28,8 @@ import {
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  IconButton
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -131,6 +132,8 @@ export class Sidebar extends React.Component {
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
+  handleClickJoinWorkspace = () => {}
+
   render () {
     const { props, state } = this
 
@@ -162,17 +165,25 @@ export class Sidebar extends React.Component {
                 </ul>
               </nav>
 
-              {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
-                <div className='sidebar__content__btnnewworkspace'>
-                  <button
-                    className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+              <div className='sidebar__content__buttons'>
+                {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
+                  <IconButton
                     onClick={this.handleClickNewWorkspace}
-                    data-cy='sidebarCreateWorkspaceBtn'
-                  >
-                    <i className='fa fa-plus' /> {props.t('Create a space')}
-                  </button>
-                </div>
-              )}
+                    dataCy='sidebarCreateWorkspaceBtn'
+                    icon='plus'
+                    text={props.t('Create a space')}
+                    mode='light'
+                  />
+                )}
+                <IconButton
+                  onClick={this.handleClickJoinWorkspace}
+                  dataCy='sidebarJoinWorkspaceBtn'
+                  icon='users'
+                  text={props.t('Join a space')}
+                  intent='primary'
+                  mode='light'
+                />
+              </div>
             </div>
 
             <div className='sidebar__footer mb-2'>

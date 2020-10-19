@@ -46,7 +46,9 @@ import {
   formatAbsoluteDate,
   permissiveNumberEqual,
   sortWorkspaceList,
-  updateTLMAuthor
+  updateTLMAuthor,
+  darkenColor,
+  lightenColor
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -295,5 +297,7 @@ export {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
   permissiveNumberEqual,
-  SingleChoiceList
+  SingleChoiceList,
+  darkenColor,
+  lightenColor
 }

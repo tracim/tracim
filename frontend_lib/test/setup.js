@@ -26,6 +26,7 @@ if (!global.window && !global.document) {
   global.document = window.document
   global.navigator = window.navigator
   global.DOMParser = window.DOMParser
+  global.GLOBAL_primaryColor = '#aaaaaa'
 }
 
 Enzyme.configure({ adapter: new Adapter() })

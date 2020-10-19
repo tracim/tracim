@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
+import color from 'color'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
@@ -562,3 +563,6 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 export const sortWorkspaceList = (workspaceList, lang) => {
   return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
 }
+
+export const darkenColor = (c) => color(c).darken(0.15).hex()
+export const lightenColor = (c) => color(c).lighten(0.15).hex()
