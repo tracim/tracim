@@ -34,7 +34,8 @@ import {
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  toggleFavicon
+  toggleFavicon,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   getAppList,
@@ -118,7 +119,7 @@ export class Tracim extends React.Component {
 
   handleUserConnected = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.USER_CONNECTED, data)
-    this.liveMessageManager.openLiveMessageConnection(data.user_id)
+    this.liveMessageManager.openLiveMessageConnection(data.user_id, FETCH_CONFIG.apiUrl)
   }
 
   handleUserDisconnected = data => {
@@ -198,7 +199,7 @@ export class Tracim extends React.Component {
         this.loadNotificationList(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
-        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id)
+        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
