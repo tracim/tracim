@@ -276,6 +276,11 @@
   "{{author}} modified the space {{space}}": "{{author}} modificou o espaço {{space}}",
   "{{author}} deleted the space {{space}}": "{{author}} eliminou o espaço {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} restaurou o espaço {{space}}",
+  "{{author}} requested access to {{space}}": "{{author}} solicitou acesso a {{space}}",
+  "{{author}} granted you access to {{space}}": "{{author}} concedeu-lhe acesso a {{space}}",
+  "{{author}} rejected your access to {{space}}": "{{author}} rejeitou-lhe o acesso a {{space}}",
+  "{{author}} granted access to {{space}} for {{user}}": "{{author}} concedeu acesso a  {{space}} para {{user}}",
+  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a rejecté l'accès à {{space}} para {{user}}",
   "Only an administrator can see this user's profile": "Este perfil só pode ser visto pelo administrador",
   "This notification has no associated content": "Esta notificação não tem nehum conteúdo associado"
 }

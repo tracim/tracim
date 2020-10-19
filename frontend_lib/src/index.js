@@ -54,11 +54,6 @@ import {
 } from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
-import {
-  TLM_ENTITY_TYPE,
-  TLM_CORE_EVENT_TYPE,
-  TLM_SUB_TYPE
-} from './tracimLiveMessage.js'
 
 import { appContentFactory } from './appContentFactory.js'
 
@@ -171,6 +166,8 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
+export * from './tracimLiveMessage.js'
+
 export {
   appContentFactory,
   addRevisionFromTLM,
@@ -218,9 +215,6 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   CUSTOM_EVENT,
-  TLM_ENTITY_TYPE,
-  TLM_CORE_EVENT_TYPE,
-  TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
   ROLE,
   ROLE_LIST,
