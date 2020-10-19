@@ -39,7 +39,7 @@ export class LiveMessageManager {
 
   openLiveMessageConnection (userId, host = null) {
     this.userId = userId
-    this.host = host
+    this.host = host || FETCH_CONFIG.apiUrl
 
     this.setStatus(LIVE_MESSAGE_STATUS.PENDING)
     this.openBroadcastChannel()
@@ -72,7 +72,7 @@ export class LiveMessageManager {
   }
 
   openEventSourceConnection () {
-    const url = this.host || FETCH_CONFIG.apiUrl
+    const url = this.host
 
     this.closeEventSourceConnection()
 
@@ -82,7 +82,8 @@ export class LiveMessageManager {
     }
 
     this.eventSource = new EventSource(
-      `${url}/users/${this.userId}/live_messages${afterEventFilter}`
+      `${url}/users/${this.userId}/live_messages${afterEventFilter}`,
+      { withCredentials: true }
     )
 
     this.broadcastStatus(LIVE_MESSAGE_STATUS.PENDING)
@@ -193,7 +194,7 @@ export class LiveMessageManager {
         const fetchTimeoutId = setTimeout(() => {
           controller.abort()
         }, this.reconnectionIntervalMs)
-        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`, { signal: controller.signal })
+        const response = await fetch(`${this.host}/auth/whoami`, { signal: controller.signal })
         clearTimeout(fetchTimeoutId)
         if (response.status === 401) {
           this.reconnectionTimerId = 0

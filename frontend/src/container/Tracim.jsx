@@ -20,13 +20,14 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageManager.js'
 import {
   CUSTOM_EVENT,
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
   serialize,
-  TracimComponent
+  TracimComponent,
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS
 } from 'tracim_frontend_lib'
 import {
   PAGE,
