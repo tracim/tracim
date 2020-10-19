@@ -1,5 +1,8 @@
 import { baseFetch } from 'tracim_frontend_lib'
 
+export const getSubscriptionsRequests = (apiUrl, spaceId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${spaceId}/subscriptions`)
+
 export const getWorkspaceMember = (apiUrl, workspaceId, showDisabledUser = false) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
 

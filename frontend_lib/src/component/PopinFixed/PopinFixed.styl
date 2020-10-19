@@ -101,6 +101,13 @@
       transition width 0.4s ease
       width 25%
       height 100%
+      &__content
+        width calc(100% - 65px) // 65px is the width of the rightPart header
+        overflow-y auto
+        &__title
+          margin 10px 15px
+          padding 10px
+          font-size 20px
       &__header
         display flex
         flex-direction column

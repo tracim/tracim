@@ -18,7 +18,7 @@
   "Space's description": "Space's description",
   "Delete space": "Delete space",
   "Delete": "Delete",
-  "Are you sure ?": "Are you sure ?",
+  "Are you sure?": "Are you sure?",
   "Cancel": "Cancel",
   "Unknown user": "Unknown user",
   "Error while deleting space": "Error while deleting space",
@@ -41,5 +41,6 @@
   "Error while activating download": "Error while activating download",
   "Error while deactivating download": "Error while deactivating download",
   "Members List": "Members List",
-  "Optional Functionalities": "Optional Functionalities"
+  "Optional Functionalities": "Optional Functionalities",
+  "Requests to join the space": "Requests to join the space"
 }

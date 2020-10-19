@@ -11,10 +11,6 @@ export const WorkspaceMembersList = props => {
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember === false && (
         <div>
-          <div className='formBlock__title workspace_advanced__userlist__title'>
-            {props.t('Members list')}
-          </div>
-
           <div
             className='formBlock__bottom workspace_advanced__userlist__adduser'
             onClick={props.onClickToggleFormNewMember}

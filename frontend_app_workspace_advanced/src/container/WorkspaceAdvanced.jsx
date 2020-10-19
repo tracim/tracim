@@ -18,10 +18,12 @@ import {
   removeAtInUsername,
   getWorkspaceDetail,
   deleteWorkspace,
-  getMyselfKnownMember
+  getMyselfKnownMember,
+  PopinFixedRightPartContent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
+  getSubscriptionsRequests,
   getWorkspaceMember,
   putLabel,
   putDescription,
@@ -36,6 +38,7 @@ import {
 import Radium from 'radium'
 import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
 import OptionalFeatures from '../component/OptionalFeatures.jsx'
+import SpaceSubscriptionsRequests from '../component/SpaceSubscriptionsRequests.jsx'
 
 export class WorkspaceAdvanced extends React.Component {
   constructor (props) {
@@ -48,6 +51,7 @@ export class WorkspaceAdvanced extends React.Component {
       appName: 'workspace_advanced',
       isVisible: true,
       config: param.config,
+      currentSubscriptionsRequests: [],
       loggedUser: param.loggedUser,
       content: param.content,
       displayFormNewMember: false,
@@ -62,7 +66,8 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
-      displayPopupValidateDeleteWorkspace: false
+      displayPopupValidateDeleteWorkspace: false,
+      resolvedSubscriptionsRequests: []
     }
 
     // i18n has been init, add resources from frontend
@@ -187,6 +192,7 @@ export class WorkspaceAdvanced extends React.Component {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
+    this.loadSubscriptionsRequests()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -242,6 +248,17 @@ export class WorkspaceAdvanced extends React.Component {
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     })
+  }
+
+  loadSubscriptionsRequests = async () => {
+    const { props, state } = this
+
+    const fetchSubscriptionsRequests = await handleFetchResult(await getSubscriptionsRequests(state.config.apiUrl, state.content.workspace_id))
+
+    switch (fetchSubscriptionsRequests.apiResponse.status) {
+      case 200: this.setState({ subscriptionsRequests: fetchSubscriptionsRequests.body }); break
+      default: this.sendGlobalFlashMessage(props.t('Error while loading space requests', 'warning'))
+    }
   }
 
   handleClickBtnCloseApp = () => {
@@ -500,7 +517,7 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -548,52 +565,74 @@ export class WorkspaceAdvanced extends React.Component {
             menuItemList={[
               {
                 id: 'members_list',
-                label: this.props.t('Members List'),
+                label: props.t('Members List'),
                 icon: 'fa-users',
                 children: (
-                  <WorkspaceMembersList
-                    displayFormNewMember={state.displayFormNewMember}
-                    memberList={state.content.memberList}
-                    roleList={state.config.roleList}
-                    onClickNewRole={this.handleClickNewRole}
-                    loggedUser={state.loggedUser}
-                    onClickDeleteMember={this.handleClickDeleteMember}
-                    onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                    newMemberName={state.newMember.publicName}
-                    isEmail={state.newMember.isEmail}
-                    onChangeNewMemberName={this.handleChangeNewMemberName}
-                    searchedKnownMemberList={state.searchedKnownMemberList}
-                    onClickKnownMember={this.handleClickKnownMember}
-                    newMemberRole={state.newMember.role}
-                    onClickNewMemberRole={this.handleClickNewMemberRole}
-                    onClickValidateNewMember={this.handleClickValidateNewMember}
-                    autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                    emailNotifActivated={state.config.system.config.email_notification_activated}
-                    canSendInviteNewUser={
-                      [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-                    }
-                    userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                    autoCompleteClicked={state.autoCompleteClicked}
-                    onClickAutoComplete={this.handleClickAutoComplete}
-                  />
+                  <PopinFixedRightPartContent
+                    label={props.t('Members List')}
+                  >
+                    <WorkspaceMembersList
+                      displayFormNewMember={state.displayFormNewMember}
+                      memberList={state.content.memberList}
+                      roleList={state.config.roleList}
+                      onClickNewRole={this.handleClickNewRole}
+                      loggedUser={state.loggedUser}
+                      onClickDeleteMember={this.handleClickDeleteMember}
+                      onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                      newMemberName={state.newMember.publicName}
+                      isEmail={state.newMember.isEmail}
+                      onChangeNewMemberName={this.handleChangeNewMemberName}
+                      searchedKnownMemberList={state.searchedKnownMemberList}
+                      onClickKnownMember={this.handleClickKnownMember}
+                      newMemberRole={state.newMember.role}
+                      onClickNewMemberRole={this.handleClickNewMemberRole}
+                      onClickValidateNewMember={this.handleClickValidateNewMember}
+                      autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                      emailNotifActivated={state.config.system.config.email_notification_activated}
+                      canSendInviteNewUser={
+                        [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+                      }
+                      userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                      autoCompleteClicked={state.autoCompleteClicked}
+                      onClickAutoComplete={this.handleClickAutoComplete}
+                    />
+                  </PopinFixedRightPartContent>
+                )
+              },
+              {
+                id: 'subscriptions_requests',
+                label: props.t('Requests to join the space'),
+                icon: 'fa-sign-in',
+                children: (
+                  <PopinFixedRightPartContent
+                    label={props.t('Requests to join the space')}
+                  >
+                    <SpaceSubscriptionsRequests
+                      subscriptionsRequests={state.subscriptionsRequests}
+                    />
+                  </PopinFixedRightPartContent>
                 )
               },
               {
                 id: 'optional_functionalities',
-                label: this.props.t('Optional Functionalities'),
+                label: props.t('Optional Functionalities'),
                 icon: 'fa-cog',
                 children: (
-                  <OptionalFeatures
-                    appAgendaAvailable={state.content.appAgendaAvailable}
-                    agendaEnabled={state.content.agenda_enabled}
-                    onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-                    downloadEnabled={state.content.public_download_enabled}
-                    appDownloadAvailable={state.content.appDownloadAvailable}
-                    onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-                    uploadEnabled={state.content.public_upload_enabled}
-                    appUploadAvailable={state.content.appUploadAvailable}
-                    onToggleUploadEnabled={this.handleToggleUploadEnabled}
-                  />
+                  <PopinFixedRightPartContent
+                    label={props.t('Optional Functionalities')}
+                  >
+                    <OptionalFeatures
+                      appAgendaAvailable={state.content.appAgendaAvailable}
+                      agendaEnabled={state.content.agenda_enabled}
+                      onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+                      downloadEnabled={state.content.public_download_enabled}
+                      appDownloadAvailable={state.content.appDownloadAvailable}
+                      onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                      uploadEnabled={state.content.public_upload_enabled}
+                      appUploadAvailable={state.content.appUploadAvailable}
+                      onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                    />
+                  </PopinFixedRightPartContent>
                 )
               }
             ]}
