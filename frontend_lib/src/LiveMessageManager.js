@@ -1,4 +1,3 @@
-import { FETCH_CONFIG } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 
@@ -37,9 +36,9 @@ export class LiveMessageManager {
     this.lastEventId = 0
   }
 
-  openLiveMessageConnection (userId, host = null) {
+  openLiveMessageConnection (userId, host) {
     this.userId = userId
-    this.host = host || FETCH_CONFIG.apiUrl
+    this.host = host
 
     this.setStatus(LIVE_MESSAGE_STATUS.PENDING)
     this.openBroadcastChannel()
