@@ -276,6 +276,11 @@
   "{{author}} modified the space {{space}}": "{{author}} modified the space {{space}}",
   "{{author}} deleted the space {{space}}": "{{author}} deleted the space {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} restored the space {{space}}",
+  "{{author}} requested access to {{space}}": "{{author}} requested access to {{space}}",
+  "{{author}} granted you access to {{space}}": "{{author}} granted you access to {{space}}",
+  "{{author}} rejected your access to {{space}}": "{{author}} rejected your access to {{space}}",
+  "{{author}} granted access to {{space}} for {{user}}": "{{author}} granted access to {{space}} for {{user}}",
+  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} rejected access to {{space}} for {{user}}",
   "Only an administrator can see this user's profile": "Only an administrator can see this user's profile",
   "This notification has no associated content": "This notification has no associated content"
 }
