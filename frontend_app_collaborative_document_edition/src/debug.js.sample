@@ -1,9 +1,9 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
 export const debug = {
+  ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
     slug: 'collaborative_document_edition',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
@@ -29,9 +29,6 @@ export const debug = {
     content_id: 0,
     content_type: 'file',
     workspace_id: 0
-  },
-  loggedUser: {
-    ...defaultDebug.loggedUser
   },
   folderId: 0
 }

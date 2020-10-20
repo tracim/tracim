@@ -1,12 +1,12 @@
 import { expect } from 'chai'
-import { mockGetWhoami, mockGetWhoamiWithDelay, mockGetWhoamiFailure } from '../apiMock'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
-import { FETCH_CONFIG } from '../../src/util/helper.js'
+import { mockGetWhoami, mockGetWhoamiWithDelay, mockGetWhoamiFailure } from './apiMock.js'
+import { CUSTOM_EVENT } from '../src/customEvent.js'
+import { FETCH_CONFIG } from '../src/helper.js'
 
 import {
   LiveMessageManager,
   LIVE_MESSAGE_STATUS
-} from '../../src/util/LiveMessageManager.js'
+} from '../src/LiveMessageManager.js'
 
 import { enforceOptions } from 'broadcast-channel'
 
@@ -14,7 +14,7 @@ import { enforceOptions } from 'broadcast-channel'
 // See https://github.com/pubkey/broadcast-channel#enforce-a-options-globally
 enforceOptions({ type: 'simulate' })
 
-const apiUrl = FETCH_CONFIG.apiUrl
+const apiUrl = 'http://localhost/api'
 const userId = 1
 
 // RJ - 2020-09-13 - NOTE: The next two methods are used to track status changes
@@ -212,13 +212,14 @@ describe('LiveMessageManager class', () => {
     it('should redirect to the login page (by sending a custom event)', async () => {
       mockGetWhoami(apiUrl, 401)
       const manager = openedManager(30000, 10)
-      global.lastCustomEventTypes = new Set()
+      global.GLOBAL_dispatchEvent.resetHistory()
       const promiseStatus1 = manager.onStatusChange()
       const promiseStatus2 = manager.onStatusChange()
       manager.eventSource.emitError()
       expect(await promiseStatus1).to.be.equal(LIVE_MESSAGE_STATUS.ERROR)
       expect(await promiseStatus2).to.be.equal(LIVE_MESSAGE_STATUS.CLOSED)
-      expect(global.lastCustomEventTypes.has(CUSTOM_EVENT.DISCONNECTED_FROM_API)).to.be.equal(true)
+      const customEventTypes = global.GLOBAL_dispatchEvent.args.map(args => args[0].type)
+      expect(customEventTypes.includes(CUSTOM_EVENT.DISCONNECTED_FROM_API)).to.be.equal(true)
 
       manager.closeLiveMessageConnection()
     })
@@ -250,12 +251,12 @@ describe('LiveMessageManager class', () => {
       const manager = createManager(30000, 0)
       manager.openLiveMessageConnection(userId, apiUrl)
 
-      global.lastCustomEventTypes = new Set()
+      document.dispatchEvent.resetHistory()
       manager.dispatchLiveMessage({ event_id: 42 })
-      expect(global.lastCustomEventTypes.size).to.equal(1)
-      global.lastCustomEventTypes = new Set()
+      expect(document.dispatchEvent.callCount).to.equal(1)
+      document.dispatchEvent.resetHistory()
       manager.dispatchLiveMessage({ event_id: 42 })
-      expect(global.lastCustomEventTypes.size).to.equal(0)
+      expect(document.dispatchEvent.callCount).to.equal(0)
 
       manager.closeLiveMessageConnection()
     })
