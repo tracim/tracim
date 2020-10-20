@@ -1,18 +1,19 @@
-import { PROFILE } from 'tracim_frontend_lib'
+import { PROFILE, defaultDebug } from 'tracim_frontend_lib'
 
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 
 export const getUserProfile = (profileObj, slug) => Object.keys(profileObj).map(p => profileObj[p]).find(p => slug === p.slug) || {}
 
 export const debug = {
+  ...defaultDebug,
   config: {
+    ...defaultDebug.config,
     label: 'Admin workspace user',
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
     type: 'user', // 'user' or 'workspace'
     translation: { en: {}, fr: {} },
-    apiUrl: 'http://localhost:6543/api',
     apiHeader: {
       Accept: 'application/json',
       'Content-Type': 'application/json'

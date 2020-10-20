@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom'
 import Gallery from './container/Gallery.jsx'
 import { debug } from './debug.js'
 import { Router } from 'react-router'
-import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 
 export const history = require('history').createBrowserHistory()
