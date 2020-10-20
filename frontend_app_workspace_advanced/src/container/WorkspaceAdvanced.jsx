@@ -29,6 +29,8 @@ import {
   putDescription,
   putAgendaEnabled,
   putDownloadEnabled,
+  putSubscriptionAccept,
+  putSubscriptionReject,
   putUploadEnabled,
   putMemberRole,
   deleteMember,
@@ -51,7 +53,6 @@ export class WorkspaceAdvanced extends React.Component {
       appName: 'workspace_advanced',
       isVisible: true,
       config: param.config,
-      currentSubscriptionsRequests: [],
       loggedUser: param.loggedUser,
       content: param.content,
       displayFormNewMember: false,
@@ -67,7 +68,7 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false,
-      resolvedSubscriptionsRequests: []
+      subscriptionsRequests: []
     }
 
     // i18n has been init, add resources from frontend
@@ -256,7 +257,7 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchSubscriptionsRequests = await handleFetchResult(await getSubscriptionsRequests(state.config.apiUrl, state.content.workspace_id))
 
     switch (fetchSubscriptionsRequests.apiResponse.status) {
-      case 200: this.setState({ subscriptionsRequests: fetchSubscriptionsRequests.body }); break
+      case 200: this.setState({ subscriptionsRequests: fetchSubscriptionsRequests.body.reverse() }); break
       default: this.sendGlobalFlashMessage(props.t('Error while loading space requests', 'warning'))
     }
   }
@@ -499,6 +500,39 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  // TODO Atualizar essa função (mensagens de  erro) e updatear a lista quando aceitar
+  handleClickAcceptRequest = async userId => {
+    const { props, state } = this
+    const fetchPutSubscriptionAccept = await putSubscriptionAccept(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      userId,
+      state.content.default_user_role
+    )
+    switch (fetchPutSubscriptionAccept.status) {
+      case 204:
+        this.sendGlobalFlashMessage('Accept')
+        break
+      case 400: // {"message": "Role already exist for user 1 in workspace 1.", "details": {"error_detail": {}}, "code": 3008}
+      default: this.sendGlobalFlashMessage(props.t('Error while accepting member'), 'warning')
+    }
+  }
+
+  handleClickRejectRequest = async userId => {
+    const { props, state } = this
+    const fetchPutSubscriptionReject = await putSubscriptionReject(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      userId
+    )
+    switch (fetchPutSubscriptionReject.status) {
+      case 204:
+        this.sendGlobalFlashMessage('Reject')
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while rejecting user'), 'warning')
+    }
+  }
+
   handleClickDeleteWorkspaceBtn = () => this.setState({ displayPopupValidateDeleteWorkspace: true })
 
   handleClickClosePopupDeleteWorkspace = () => this.setState({ displayPopupValidateDeleteWorkspace: false })
@@ -570,6 +604,7 @@ export class WorkspaceAdvanced extends React.Component {
                 children: (
                   <PopinFixedRightPartContent
                     label={props.t('Members List')}
+                    showTitle={!state.displayFormNewMember}
                   >
                     <WorkspaceMembersList
                       displayFormNewMember={state.displayFormNewMember}
@@ -609,6 +644,8 @@ export class WorkspaceAdvanced extends React.Component {
                   >
                     <SpaceSubscriptionsRequests
                       subscriptionsRequests={state.subscriptionsRequests}
+                      onClickAcceptRequest={this.handleClickAcceptRequest}
+                      onClickRejectRequest={this.handleClickRejectRequest}
                     />
                   </PopinFixedRightPartContent>
                 )

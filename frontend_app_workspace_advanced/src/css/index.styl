@@ -34,7 +34,6 @@
       display flex
       justify-content end
   &__userlist
-    overflow-y auto
     &__list
       margin 0
       padding 0
@@ -120,6 +119,15 @@
       padding 7px 15px 17px
     &__content
       padding-left 20px
+  &__subscriptionsRequest
+    & .dropdown
+      width 180px
+    &__info
+      max-width 170px
+      flex 1
+    &__button
+      &:hover
+        color offWhite
 
 .workspace_advanced__popup
   .cardPopup__container

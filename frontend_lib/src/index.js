@@ -123,6 +123,8 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
+import UserInfo from './component/UserInfo/UserInfo.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -299,5 +301,6 @@ export {
   handleMentionsBeforeSave,
   NoHoverListItem,
   permissiveNumberEqual,
-  SingleChoiceList
+  SingleChoiceList,
+  UserInfo
 }

@@ -1,7 +1,8 @@
 {
+  "Accept request": "Accept request",
+  "by {{author}}": "by {{author}}",
   "Description": "Description",
   "Validate": "Validate",
-  "Members list": "Members list",
   "Add a member": "Add a member",
   "Error while loading members list": "Error while loading members list",
   "Save successful": "Save successful",
@@ -35,12 +36,16 @@
   "Upload deactivated": "Upload deactivated",
   "Error while activating agenda": "Error while activating agenda",
   "Error while deactivating agenda": "Error while deactivating agenda",
-  "Optional functionalities": "Optional functionalities",
   "Error while activating upload": "Error while activating upload",
   "Error while deactivating upload": "Error while deactivating upload",
   "Error while activating download": "Error while activating download",
   "Error while deactivating download": "Error while deactivating download",
   "Members List": "Members List",
   "Optional Functionalities": "Optional Functionalities",
-  "Requests to join the space": "Requests to join the space"
+  "Requests to join the space": "Requests to join the space",
+  "Error while loading space requests": "Error while loading space requests",
+  "Manage request": "Manage request",
+  "Reject request": "Reject request",
+  "Request accepted": "Request accepted",
+  "Request rejected": "Request rejected"
 }

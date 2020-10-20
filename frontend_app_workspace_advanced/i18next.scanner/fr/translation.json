@@ -1,7 +1,8 @@
 {
+  "Accept request": "Accepter la demande",
+  "by {{author}}": "par {{author}}",
   "Description": "Description",
   "Validate": "Valider",
-  "Members list": "Liste des membres",
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
@@ -18,7 +19,7 @@
   "Space's description": "Description de l'espace",
   "Delete space": "Supprimer l'espace",
   "Delete": "Supprimer",
-  "Are you sure ?": "Êtes-vous sûr ?",
+  "Are you sure?": "Êtes-vous sûr ?",
   "Cancel": "Annuler",
   "Unknown user": "Utilisateur inconnu",
   "Error while deleting space": "Erreur lors de la suppression de l'espace",
@@ -35,12 +36,16 @@
   "Upload deactivated": "Téléversement désactivé",
   "Error while activating agenda": "Erreur lors de l'activation de l'agenda",
   "Error while deactivating agenda": "Erreur lors de la désactivation de l'agenda",
-  "Optional functionalities": "Fonctionnalités optionnelles",
   "Error while activating upload": "Erreur lors de l'activation du téléversement",
   "Error while deactivating upload": "Erreur lors de la désactivation du téléversement",
   "Error while activating download": "Erreur lors de l'activation du téléchargement",
   "Error while deactivating download": "Erreur lors de la désactivation du téléchargement",
   "Members List": "Liste des membres",
   "Optional Functionalities": "Fonctionnalités optionnelles",
-  "Requests to join the space": "Demandes à rejoindre l'espace"
+  "Requests to join the space": "Demandes à rejoindre l'espace",
+  "Error while loading space requests": "Erreur lors du chargement des demandes d'espace",
+  "Manage request": "Gérer la demande",
+  "Reject request": "Refuser la demande",
+  "Request accepted": "Demande acceptée",
+  "Request rejected": "Demande refusée"
 }

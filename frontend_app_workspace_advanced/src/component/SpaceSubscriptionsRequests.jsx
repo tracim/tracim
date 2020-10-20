@@ -10,56 +10,82 @@ import {
 const SpaceSubscriptionsRequests = props => {
   console.log('AAAAAAAAAAAAAAAA', props) // todo if empty warning msg
   return (
-    <div>
-      {props.subscriptionsRequests.map(request =>
-        <NoHoverListItem>
-          <UserInfo
-            publicName='a'
-            username='b'
-          />
-
-          {request.status === 'pending' && (
-            <DropdownMenu
-              buttonLabel={props.t('Manage request')}
-              buttonTooltip={props.t('Manage request')}
-              buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-              isButton
+    props.subscriptionsRequests.length
+      ? (
+        <span className='workspace_advanced__subscriptionsRequest'>
+          {props.subscriptionsRequests.map(request =>
+            <NoHoverListItem
+              key={`${request.author.user_id}_${request.created_date}`}
             >
-              <button>
-                <i className='fa fa-fw fa-check' />
-                {props.t('Accept request')}
-              </button>
-              <button>
-                <i className='fa fa-fw fa-times' />
-                {props.t('Reject request')}
-              </button>
-            </DropdownMenu>
-          )}
+              <UserInfo
+                publicName={request.author.public_name}
+                username={request.author.username}
+              />
 
-          {request && (
-            <div>
-              <i className='fa fa-fw fa-check' />
-              {props.t('Request accepted')}
-            </div>
-          )}
+              {request.state === 'pending' && (
+                <DropdownMenu
+                  buttonLabel={props.t('Manage request')}
+                  buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover workspace_advanced__subscriptionsRequest__button'
+                  isButton
+                >
+                  <div
+                    onClick={() => props.onClickAcceptRequest(request.author.user_id)}
+                  >
+                    <i className='fa fa-fw fa-check' />
+                    {props.t('Accept request')}
+                  </div>
 
-          {request && (
-            <div>
-              <i className='fa fa-fw fa-times' />
-              {props.t('Request rejected')}
-            </div>
+                  <div
+                    onClick={() => props.onClickRejectRequest(request.author.user_id)}
+                  >
+                    <i className='fa fa-fw fa-times' />
+                    {props.t('Reject request')}
+                  </div>
+                </DropdownMenu>
+              )}
+
+              {request.state === 'accepted' && (
+                <div
+                  className='workspace_advanced__subscriptionsRequest__info'
+                  title={props.t('by {{author}}', {
+                    author: request.evaluator.public_name,
+                    interpolation: { escapeValue: false }
+                  })}
+                >
+                  <i className='fa fa-fw fa-check' />
+                  {props.t('Request accepted')}
+                </div>
+              )}
+
+              {request.state === 'rejected' && (
+                <div
+                  className='workspace_advanced__subscriptionsRequest__info'
+                  title={props.t('by {{author}}', {
+                    author: request.evaluator.public_name,
+                    interpolation: { escapeValue: false }
+                  })}
+                >
+                  <i className='fa fa-fw fa-times' />
+                  {props.t('Request rejected')}
+                </div>
+              )}
+            </NoHoverListItem>
           )}
-        </NoHoverListItem>
-      )}
-    </div>
+        </span>
+      )
+      : <span> Você não tem novas demandas </span> // TODO update essa mensagem com tradução
   )
 }
 
 export default translate()(SpaceSubscriptionsRequests)
 
 SpaceSubscriptionsRequests.propTypes = {
-  subscriptionsRequests: PropTypes.array.isRequired
+  subscriptionsRequests: PropTypes.array.isRequired,
+  onClickAcceptRequest: PropTypes.func,
+  onClickRejectRequest: PropTypes.func
 }
 
 SpaceSubscriptionsRequests.defaultProps = {
+  onClickAcceptRequest: () => { },
+  onClickRejectRequest: () => { }
 }

@@ -56,7 +56,7 @@ export const WorkspaceMembersList = props => {
                       <DropdownMenu
                         buttonOpts={<i className={`fa fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
                         buttonLabel={props.t(role.label)}
-                        buttonCustomClass='btndropdown transparentButton'
+                        buttonCustomClass='nohover btndropdown transparentButton'
                         isButton
                       >
                         {props.roleList.map(r =>

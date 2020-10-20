@@ -4,7 +4,7 @@ import classnames from 'classnames'
 
 const NoHoverListItem = props => {
   return (
-    <div>
+    <div className='noHoverListItem'>
       {props.children}
     </div>
   )
@@ -13,17 +13,7 @@ const NoHoverListItem = props => {
 export default NoHoverListItem
 
 NoHoverListItem.propTypes = {
-  customClass: PropTypes.string,
-  label: PropTypes.string,
-  isLast: PropTypes.bool,
-  read: PropTypes.bool,
-  id: PropTypes.number
 }
 
 NoHoverListItem.defaultProps = {
-  label: '',
-  customClass: '',
-  isLast: false,
-  read: false,
-  id: 0
 }
