@@ -38,6 +38,7 @@ module.exports = {
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
+    proxy: { '/api': 'http://127.0.0.1:7999' },
     port: 8070,
     hot: true,
     noInfo: true,

@@ -1,13 +1,14 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
 export const debug = {
+  ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    apiUrl: '',
     slug: 'gallery',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
     label: 'Gallery',
+    history: { location: { search: '' } },
     appConfig: {
       forceShowSidebar: false,
       workspaceId: '1'
@@ -18,8 +19,5 @@ export const debug = {
     content_type: 'file',
     workspace_id: 0,
     workspaceLabel: ''
-  },
-  loggedUser: {
-    ...defaultDebug.loggedUser
   }
 }

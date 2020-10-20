@@ -51,6 +51,7 @@
     "webpack": "^4.42.1"
   },
   "devDependencies": {
+    "abort-controller": "^3.0.0",
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
@@ -58,6 +59,7 @@
     "enzyme-adapter-react-16": "^1.15.2",
     "es6-promise": "^4.2.8",
     "eslint": "^6.8.0",
+    "eventsourcemock": "^2.0.0",
     "file-loader": "^6.0.0",
     "i18next-scanner": "^2.10.2",
     "ignore-styles": "^5.0.1",
