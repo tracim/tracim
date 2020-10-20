@@ -15,6 +15,8 @@ import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentHtmlDocument from '../fixture/content/contentHtmlDocument.js'
 import { debug } from '../../src/debug.js'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
