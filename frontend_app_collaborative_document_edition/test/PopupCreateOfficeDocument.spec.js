@@ -17,6 +17,8 @@ import {
 } from './apiMock.js'
 import { debug } from '../src/debug.js'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<PopupCreateOfficeDocument />', () => {
   const props = {
     setApiUrl: () => {},
