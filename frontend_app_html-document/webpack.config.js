@@ -5,7 +5,7 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: './src/index.js'
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'html-document.app.js' : 'html-document.app.dev.js',
