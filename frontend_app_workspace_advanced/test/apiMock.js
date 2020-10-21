@@ -18,8 +18,15 @@ const mockGetWorkspaceMember200 = (apiUrl, workspaceId, showDisabledUser, worksp
     .reply(200, workspaceMember)
 }
 
+const mockGetSubscriptionsRequests200 = (apiUrl, spaceId, subscriptions) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${spaceId}/subscriptions`)
+    .reply(200, subscriptions)
+}
+
 export {
   mockGetAppList200,
+  mockGetSubscriptionsRequests200,
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMember200
 }

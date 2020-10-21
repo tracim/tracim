@@ -11,9 +11,3 @@ const NoHoverListItem = props => {
 }
 
 export default NoHoverListItem
-
-NoHoverListItem.propTypes = {
-}
-
-NoHoverListItem.defaultProps = {
-}

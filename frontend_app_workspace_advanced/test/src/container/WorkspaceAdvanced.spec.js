@@ -5,6 +5,7 @@ import { author, user, workspace } from 'tracim_frontend_lib/dist/tracim_fronten
 import { WorkspaceAdvanced } from '../../../src/container/WorkspaceAdvanced.jsx'
 import {
   mockGetAppList200,
+  mockGetSubscriptionsRequests200,
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMember200
 } from '../../apiMock.js'
@@ -26,6 +27,24 @@ describe('<WorkspaceAdvanced />', () => {
   mockGetWorkspaceMember200(debug.config.apiUrl, workspace.workspace_id, false, [])
 
   const wrapper = shallow(<WorkspaceAdvanced {...props} />)
+
+  describe('its internal functions', () => {
+    describe('loadSubscriptionsRequests', () => {
+      it('should update subscriptionsRequests state', (done) => {
+        mockGetSubscriptionsRequests200(debug.config.apiUrl, workspace.workspace_id, [
+          { author: author },
+          { workspace: workspace, author: { ...author, user_id: 9 } }
+        ])
+        wrapper.instance().loadSubscriptionsRequests().then(() => {
+          expect(wrapper.state().subscriptionsRequests)
+            .to.deep.equal([
+              { workspace: workspace, author: { ...author, user_id: 9 } },
+              { author: author }
+            ])
+        }).then(done, done)
+      })
+    })
+  })
 
   describe('TLM handlers', () => {
     describe('eventType sharedspace', () => {
@@ -109,6 +128,49 @@ describe('<WorkspaceAdvanced />', () => {
           wrapper.instance().handleUserModified(tlmData)
           const stateMember = wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id)
           expect(stateMember.user.username).to.equal(tlmData.fields.user.username)
+        })
+      })
+    })
+
+    describe('eventType sharedspace subscription', () => {
+      describe('handleSubscriptionCreated', () => {
+        it('should add a new subscription request', () => {
+          const tlmData = {
+            fields: {
+              author: author,
+              user: user,
+              subscription: {
+                author: author
+              },
+              workspace: workspace
+            }
+          }
+          wrapper.instance().handleSubscriptionCreated(tlmData)
+          const hasRequest = !!(wrapper.state().subscriptionsRequests
+            .find(request => request.author.user_id === tlmData.fields.subscription.author.user_id))
+          expect(hasRequest).to.equal(true)
+        })
+      })
+
+      describe('handleSubscriptionModified', () => {
+        it('should modified the request', () => {
+          wrapper.setState({ subscriptionsRequests: [{ author: author, state: 'PENDING' }]})
+          const tlmData = {
+            fields: {
+              author: author,
+              user: user,
+              subscription: {
+                author: author,
+                state: 'ACCEPTED'
+              },
+              workspace: workspace
+            }
+          }
+          wrapper.instance().handleSubscriptionModified(tlmData)
+
+          const request = wrapper.state().subscriptionsRequests
+            .find(request => request.author.user_id === tlmData.fields.subscription.author.user_id)
+          expect(request).to.deep.equal(tlmData.fields.subscription)
         })
       })
     })

@@ -8,7 +8,7 @@ import {
   UserInfo
 } from 'tracim_frontend_lib'
 
-const SpaceSubscriptionsRequests = props => {
+export const SpaceSubscriptionsRequests = props => {
   return (
     props.subscriptionsRequests.length
       ? (

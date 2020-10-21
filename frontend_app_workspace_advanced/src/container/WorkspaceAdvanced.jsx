@@ -197,10 +197,10 @@ export class WorkspaceAdvanced extends React.Component {
     )) return
 
     this.setState(prev => ({
-      subscriptionsRequests: {
+      subscriptionsRequests: [
         ...prev.subscriptionsRequests,
-        ...data.fields.subscription
-      }
+        data.fields.subscription
+      ]
     }))
   }
 
