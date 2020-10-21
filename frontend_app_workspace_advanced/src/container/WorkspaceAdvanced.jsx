@@ -89,7 +89,9 @@ export class WorkspaceAdvanced extends React.Component {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleMemberCreated },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleMemberDeleted },
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleSubscriptionCreated },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSubscriptionModified }
     ])
   }
 
@@ -186,6 +188,29 @@ export class WorkspaceAdvanced extends React.Component {
           : m
         )
       }
+    }))
+  }
+
+  handleSubscriptionCreated = data => {
+    if (this.state.subscriptionsRequests.some(request =>
+      request.author.user_id === data.fields.subscription.author.user_id
+    )) return
+
+    this.setState(prev => ({
+      subscriptionsRequests: {
+        ...prev.subscriptionsRequests,
+        ...data.fields.subscription
+      }
+    }))
+  }
+
+  handleSubscriptionModified = data => {
+    this.setState(prev => ({
+      subscriptionsRequests: prev.subscriptionsRequests.map(request =>
+        request.author.user_id === data.fields.subscription.author.user_id
+          ? data.fields.subscription
+          : request
+      )
     }))
   }
 
@@ -496,11 +521,10 @@ export class WorkspaceAdvanced extends React.Component {
           default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space'), 'warning')
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space'), 'warning')
     }
   }
 
-  // TODO Atualizar essa função (mensagens de  erro) e updatear a lista quando aceitar
   handleClickAcceptRequest = async userId => {
     const { props, state } = this
     const fetchPutSubscriptionAccept = await putSubscriptionAccept(
@@ -510,11 +534,14 @@ export class WorkspaceAdvanced extends React.Component {
       state.content.default_user_role
     )
     switch (fetchPutSubscriptionAccept.status) {
-      case 204:
-        this.sendGlobalFlashMessage('Accept')
+      case 204: break
+      case 400:
+        switch (fetchPutSubscriptionAccept.body.code) {
+          case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the space'), 'warning'); break
+          default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space'), 'warning')
+        }
         break
-      case 400: // {"message": "Role already exist for user 1 in workspace 1.", "details": {"error_detail": {}}, "code": 3008}
-      default: this.sendGlobalFlashMessage(props.t('Error while accepting member'), 'warning')
+      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the space'), 'warning')
     }
   }
 
@@ -525,11 +552,8 @@ export class WorkspaceAdvanced extends React.Component {
       state.content.workspace_id,
       userId
     )
-    switch (fetchPutSubscriptionReject.status) {
-      case 204:
-        this.sendGlobalFlashMessage('Reject')
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while rejecting user'), 'warning')
+    if (fetchPutSubscriptionReject.status !== 204) {
+      this.sendGlobalFlashMessage(props.t('Error while rejecting user'), 'warning')
     }
   }
 

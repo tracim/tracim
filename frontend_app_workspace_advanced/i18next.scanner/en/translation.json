@@ -47,5 +47,6 @@
   "Manage request": "Manage request",
   "Reject request": "Reject request",
   "Request accepted": "Request accepted",
-  "Request rejected": "Request rejected"
+  "Request rejected": "Request rejected",
+  "There are no requests yet.": "There are no requests yet."
 }

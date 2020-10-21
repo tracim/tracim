@@ -8,7 +8,6 @@ import {
 } from 'tracim_frontend_lib'
 
 const SpaceSubscriptionsRequests = props => {
-  console.log('AAAAAAAAAAAAAAAA', props) // todo if empty warning msg
   return (
     props.subscriptionsRequests.length
       ? (
@@ -73,7 +72,7 @@ const SpaceSubscriptionsRequests = props => {
           )}
         </span>
       )
-      : <span> Você não tem novas demandas </span> // TODO update essa mensagem com tradução
+      : <span className='workspace_advanced__subscriptionsRequest__empty'>{props.t('There are no requests yet.')}</span>
   )
 }
 

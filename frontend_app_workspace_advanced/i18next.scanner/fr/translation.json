@@ -47,5 +47,6 @@
   "Manage request": "Gérer la demande",
   "Reject request": "Refuser la demande",
   "Request accepted": "Demande acceptée",
-  "Request rejected": "Demande refusée"
+  "Request rejected": "Demande refusée",
+  "There are no requests yet.": "Vous n'avez pas encore de demande."
 }

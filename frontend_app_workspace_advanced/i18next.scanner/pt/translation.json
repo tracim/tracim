@@ -47,5 +47,6 @@
   "Manage request": "Gerir pedido",
   "Reject request": "Rejeiar pedido",
   "Request accepted": "Pedido aceito",
-  "Request rejected": "Pedido rejeitado"
+  "Request rejected": "Pedido rejeitado",
+  "There are no requests yet.": "Ainda não tem pedidos."
 }
