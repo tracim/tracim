@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-import Notification from '../component/Account/Notification.jsx'
+import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
   Delimiter,
@@ -57,11 +57,11 @@ export class Account extends React.Component {
       translationKey: props.t('My profile'),
       display: true
     }, {
-      name: 'notification',
+      name: 'spacesConfig',
       active: false,
-      label: 'Spaces and notifications',
-      translationKey: props.t('Spaces and notifications'),
-      display: props.system.config.email_notification_activated
+      label: 'Spaces',
+      translationKey: props.t('Spaces'),
+      display: true
     }, {
       name: 'password',
       active: false,
@@ -327,12 +327,13 @@ export class Account extends React.Component {
                           />
                         )
 
-                      case 'notification':
+                      case 'spacesConfig':
                         return (
-                          <Notification
+                          <UserSpacesConfig
                             userLoggedId={props.user.userId}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            admin={false}
                           />
                         )
 

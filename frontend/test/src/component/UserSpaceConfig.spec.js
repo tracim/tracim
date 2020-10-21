@@ -2,9 +2,9 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import sinon from 'sinon'
-import { Notification as NotificationWithoutHOC } from '../../../src/component/Account/Notification.jsx'
+import { UserSpacesConfig as UserSpacesConfigWithoutHOC } from '../../../src/component/Account/UserSpacesConfig.jsx'
 
-describe('<Notification />', () => {
+describe('<UserSpacesConfig />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.spy()
 
   const props = {
@@ -33,16 +33,16 @@ describe('<Notification />', () => {
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
   }
 
-  const wrapper = shallow(<NotificationWithoutHOC {...props} t={key => key} />)
+  const wrapper = shallow(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it(`should display ${props.workspaceList.length} workspace`, () => {
-      expect(wrapper.find('div.notification__table__role').length).to.equal(props.workspaceList.length)
+    it(`should display ${props.workspaceList.length} space`, () => {
+      expect(wrapper.find('div.spaceconfig__table__role').length).to.equal(props.workspaceList.length)
     })
 
-    it('should display labels of workspaces', () => {
+    it('should display labels of spaces', () => {
       for (let i = 0; i < props.workspaceList.length; i++) {
-        expect(wrapper.find('div.notification__table__wksname').at(i)).to.text().equal(props.workspaceList[i].label)
+        expect(wrapper.find('div.spaceconfig__table__spacename').at(i)).to.text().equal(props.workspaceList[i].label)
       }
     })
   })
