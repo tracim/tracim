@@ -7,6 +7,8 @@ import { mockGetContentTypeList200, mockGetImportAuthorizationsList200 } from '.
 import { debug } from '../../src/debug.js'
 import { CONTENT_TYPE } from 'tracim_frontend_lib'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<ShareFolderAdvanced />', () => {
   const appContentCustomEventHandlerAllAppChangeLanguageSpy = sinon.spy()
   const appContentCustomEventHandlerShowAppSpy = sinon.spy()
