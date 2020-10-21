@@ -20,7 +20,6 @@ class HookImpl:
         """
         Set all new user as members on all OPEN workspace as workspace default_user_role
         """
-        print('##################')
         open_workspaces = WorkspaceApi(
             session=context.dbsession,
             config=context.app_config,
