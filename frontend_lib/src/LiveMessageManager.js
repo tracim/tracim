@@ -1,5 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from './customEvent.js'
 import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 
 export const LIVE_MESSAGE_STATUS = {
@@ -37,7 +36,7 @@ export class LiveMessageManager {
     this.lastEventId = 0
   }
 
-  openLiveMessageConnection (userId, host = null) {
+  openLiveMessageConnection (userId, host) {
     this.userId = userId
     this.host = host
 
@@ -72,7 +71,7 @@ export class LiveMessageManager {
   }
 
   openEventSourceConnection () {
-    const url = this.host || FETCH_CONFIG.apiUrl
+    const url = this.host
 
     this.closeEventSourceConnection()
 
@@ -82,7 +81,8 @@ export class LiveMessageManager {
     }
 
     this.eventSource = new EventSource(
-      `${url}/users/${this.userId}/live_messages${afterEventFilter}`
+      `${url}/users/${this.userId}/live_messages${afterEventFilter}`,
+      { withCredentials: true }
     )
 
     this.broadcastStatus(LIVE_MESSAGE_STATUS.PENDING)
@@ -193,7 +193,7 @@ export class LiveMessageManager {
         const fetchTimeoutId = setTimeout(() => {
           controller.abort()
         }, this.reconnectionIntervalMs)
-        const response = await fetch(`${FETCH_CONFIG.apiUrl}/auth/whoami`, { signal: controller.signal })
+        const response = await fetch(`${this.host}/auth/whoami`, { signal: controller.signal })
         clearTimeout(fetchTimeoutId)
         if (response.status === 401) {
           this.reconnectionTimerId = 0

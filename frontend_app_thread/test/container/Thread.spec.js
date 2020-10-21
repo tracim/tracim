@@ -13,6 +13,8 @@ import { contentThread } from '../fixture/contentThread.js'
 import { commentTlm, author, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { debug } from '../../src/debug.js'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<Thread />', () => {
   const props = {
     setApiUrl: () => {},

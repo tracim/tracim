@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   DropdownMenu,
+  formatAbsoluteDate,
   NoHoverListItem,
   UserInfo
 } from 'tracim_frontend_lib'
@@ -46,8 +47,9 @@ const SpaceSubscriptionsRequests = props => {
               {request.state === 'accepted' && (
                 <div
                   className='workspace_advanced__subscriptionsRequest__info'
-                  title={props.t('by {{author}}', {
+                  title={props.t('by {{author}} at {{date}}', {
                     author: request.evaluator.public_name,
+                    date: formatAbsoluteDate(request.evaluation_date),
                     interpolation: { escapeValue: false }
                   })}
                 >
@@ -59,8 +61,9 @@ const SpaceSubscriptionsRequests = props => {
               {request.state === 'rejected' && (
                 <div
                   className='workspace_advanced__subscriptionsRequest__info'
-                  title={props.t('by {{author}}', {
+                  title={props.t('by {{author}} at {{date}}', {
                     author: request.evaluator.public_name,
+                    date: formatAbsoluteDate(request.evaluation_date),
                     interpolation: { escapeValue: false }
                   })}
                 >

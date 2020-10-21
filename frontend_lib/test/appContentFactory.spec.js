@@ -20,7 +20,6 @@ import { generateLocalStorageContentId } from '../src/helper.js'
 
 describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.spy()
-  global.GLOBAL_dispatchEvent = sinon.spy()
   global.localStorage = {
     getItem: sinon.spy(),
     setItem: sinon.spy(),

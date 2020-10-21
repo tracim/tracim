@@ -1,6 +1,6 @@
 {
   "Accept request": "Aceitar pedido",
-  "by {{author}}": "por {{author}}",
+  "by {{author}} at {{date}}": "por {{author}} no {{date}}",
   "Description": "Descrição",
   "Validate": "Validar",
   "Add a member": "Acrescentar um membro",

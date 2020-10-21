@@ -60,6 +60,11 @@ import {
   TLM_SUB_TYPE
 } from './tracimLiveMessage.js'
 
+import {
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS
+} from './LiveMessageManager.js'
+
 import { appContentFactory } from './appContentFactory.js'
 
 import { defaultDebug } from './debug.js'
@@ -302,5 +307,7 @@ export {
   NoHoverListItem,
   permissiveNumberEqual,
   SingleChoiceList,
-  UserInfo
+  UserInfo,
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS
 }

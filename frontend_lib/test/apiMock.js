@@ -86,6 +86,25 @@ const mockGetUsernameAvailability500 = (apiUrl, username) => {
     .reply(500, {})
 }
 
+const mockGetWhoami = (apiUrl, status) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .reply(status, '')
+}
+
+const mockGetWhoamiWithDelay = (apiUrl, status, delay) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .delayConnection(delay)
+    .reply(status, '')
+}
+
+const mockGetWhoamiFailure = (apiUrl) => {
+  return nock(apiUrl)
+    .get('/auth/whoami')
+    .replyWithError('Error foobar')
+}
+
 export {
   mockPutContent200,
   mockPostContentComment200,
@@ -97,5 +116,8 @@ export {
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
   mockGetReservedUsernames500,
-  mockGetUsernameAvailability500
+  mockGetUsernameAvailability500,
+  mockGetWhoami,
+  mockGetWhoamiWithDelay,
+  mockGetWhoamiFailure
 }

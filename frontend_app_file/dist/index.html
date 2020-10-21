@@ -1,82 +1,134 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8' />
-    <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <title>File App Tracim</title>
-    <link rel='shortcut icon' href='favicon.ico'>
 
-    <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
-    <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
+<head>
+  <meta charset='utf-8' />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <title>File App Tracim</title>
+  <link rel='shortcut icon' href='favicon.ico'>
 
-    <style>
-      .primaryColorFont { color: #7d4e24; }
-      .primaryColorFontDarken { color: #522c00; }
-      .primaryColorFontLighten { color: #a37346; }
+  <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
 
-      .primaryColorFontHover:hover { color: #7d4e24; }
-      .primaryColorFontDarkenHover:hover { color: #522c00; }
-      .primaryColorFontLightenHover:hover { color: #a37346; }
+  <style>
+    .primaryColorFont {
+      color: #7d4e24;
+    }
+
+    .primaryColorFontDarken {
+      color: #522c00;
+    }
+
+    .primaryColorFontLighten {
+      color: #a37346;
+    }
+
+    .primaryColorFontHover:hover {
+      color: #7d4e24;
+    }
+
+    .primaryColorFontDarkenHover:hover {
+      color: #522c00;
+    }
+
+    .primaryColorFontLightenHover:hover {
+      color: #a37346;
+    }
 
 
-      .primaryColorBg { background-color: #7d4e24; }
-      .primaryColorBgDarken { background-color: #522c00; }
-      .primaryColorBgLighten { background-color: #a37346; }
+    .primaryColorBg {
+      background-color: #7d4e24;
+    }
 
-      .primaryColorBgHover:hover { background-color: #7d4e24; }
-      .primaryColorBgDarkenHover:hover { background-color: #522c00; }
-      .primaryColorBgLightenHover:hover { background-color: #a37346; }
+    .primaryColorBgDarken {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLighten {
+      background-color: #a37346;
+    }
+
+    .primaryColorBgHover:hover {
+      background-color: #7d4e24;
+    }
+
+    .primaryColorBgDarkenHover:hover {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLightenHover:hover {
+      background-color: #a37346;
+    }
 
 
-      .primaryColorBorder { border-color: #7d4e24; }
-      .primaryColorBorderDarken { border-color: #522c00; }
-      .primaryColorBorderLighten { border-color: #a37346; }
+    .primaryColorBorder {
+      border-color: #7d4e24;
+    }
 
-      .primaryColorBorderHover:hover { border-color: #7d4e24; }
-      .primaryColorBorderDarkenHover:hover { border-color: #522c00; }
-      .primaryColorBorderLightenHover:hover { border-color: #a37346; }
-    </style>
+    .primaryColorBorderDarken {
+      border-color: #522c00;
+    }
 
-    <style>
-      @font-face {
-        font-family: 'Quicksand';
-        src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
-      }
-      @font-face {
-        font-family: 'Quicksand';
-        src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
-        font-weight: bold;
-      }
+    .primaryColorBorderLighten {
+      border-color: #a37346;
+    }
 
-      body {
-        font-family: 'Quicksand';
-      }
-    </style>
+    .primaryColorBorderHover:hover {
+      border-color: #7d4e24;
+    }
 
-    <script type='text/javascript'>
-      GLOBAL_primaryColor = '#7d4e24'
-      GLOBAL_dispatchEvent = () => {}
-      tinymce = {
-        remove: () => {}
-      }
-      wysiwyg = () => {}
-    </script>
-  </head>
-  <body>
-    <script src="./assets/bootstrap/jquery-3.2.1.js"></script>
-    <script src="./assets/bootstrap/popper-1.12.3.js"></script>
-    <script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+    .primaryColorBorderDarkenHover:hover {
+      border-color: #522c00;
+    }
 
-    <div id='content'></div>
+    .primaryColorBorderLightenHover:hover {
+      border-color: #a37346;
+    }
+  </style>
 
-    <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
-    <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
+  <style>
+    @font-face {
+      font-family: 'Quicksand';
+      src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
+    }
 
-    <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+    @font-face {
+      font-family: 'Quicksand';
+      src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
+      font-weight: bold;
+    }
 
-    <script src='./file.app.dev.js'></script>
+    body {
+      font-family: 'Quicksand';
+    }
+  </style>
 
-    <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
-    <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
-  </body>
+  <script type='text/javascript'>
+    GLOBAL_primaryColor = '#7d4e24'
+    GLOBAL_dispatchEvent = () => { }
+    tinymce = {
+      remove: () => { }
+    }
+    wysiwyg = () => { }
+  </script>
+</head>
+
+<body>
+  <script src="./assets/bootstrap/jquery-3.2.1.js"></script>
+  <script src="./assets/bootstrap/popper-1.12.3.js"></script>
+  <script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+
+  <div id='content'></div>
+
+  <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
+  <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
+
+  <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+
+  <script src='./file.app.dev.js'></script>
+
+  <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
+  <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
+</body>
+
 </html>
