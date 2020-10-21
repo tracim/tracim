@@ -31,6 +31,8 @@ export class JoinWorkspace extends React.Component {
   constructor (props) {
     super(props)
 
+    this.state = { filter: () => true }
+
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
@@ -123,8 +125,14 @@ export class JoinWorkspace extends React.Component {
     return spaceType ? spaceType.faIcon : 'question'
   }
 
+  handleWorkspaceFilter (filter) {
+    const re = new RegExp(filter, 'i')
+    const filterFunc = workspace => workspace.label.search(re) >= 0 || workspace.description.search(re) >= 0
+    this.setState({ filter: filterFunc })
+  }
+
   render () {
-    const { props } = this
+    const { props, state } = this
     const className = 'joinWorkspace'
     return (
       <PageWrapper customClass={`${className}__wrapper`}>
@@ -136,14 +144,17 @@ export class JoinWorkspace extends React.Component {
         />
 
         <PageContent parentClass={`${className}__content`}>
-          <b>{props.t('Type')}</b><b>{props.t('Title and description')}</b><b>{props.t('Access request')}</b>
-          {props.accessibleWorkspaceList.map(workspace =>
-            <>
-              <i class={`fa fa-fw fa-2x fa-${this.getFaIconForAccessType(workspace.accessType)}`} />
-              <div><span>{workspace.label}</span><span>{workspace.description}</span></div>
-              {this.createRequestComponent(workspace)}
-            </>
-          )}
+          <input className={`${className}__content__filter`} type='text' onChange={e => this.handleWorkspaceFilter(e.target.value)} />
+          <div className={`${className}__content__workspaceList`}>
+            <b>{props.t('Type')}</b><b>{props.t('Title and description')}</b><b>{props.t('Access request')}</b>
+            {props.accessibleWorkspaceList.filter(state.filter).map(workspace =>
+              <>
+                <i class={`fa fa-fw fa-2x fa-${this.getFaIconForAccessType(workspace.accessType)}`} />
+                <div><span>{workspace.label}</span><span>{workspace.description}</span></div>
+                {this.createRequestComponent(workspace)}
+              </>
+            )}
+          </div>
         </PageContent>
       </PageWrapper>
     )
