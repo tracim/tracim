@@ -46,8 +46,8 @@ class FieldsList extends React.Component {
   }
 
   getFieldsFromArray () {
-    let schema = Object.assign({}, this.props.schema)
-    let uiSchema = Object.assign({}, this.props.uiSchema)
+    const schema = Object.assign({}, this.props.schema)
+    const uiSchema = Object.assign({}, this.props.uiSchema)
     if (schema.items === undefined) return []
     if (schema.items.type && schema.items.type === 'object') {
       if (schema.items.order) {
@@ -60,12 +60,12 @@ class FieldsList extends React.Component {
       }
       this.props.addOrderTab(this.props.position)
     }
-    return [{...schema.items, label: 'unique'}]
+    return [{ ...schema.items, label: 'unique' }]
   }
 
   getFieldsFromObject () {
-    let schema = Object.assign({}, this.props.schema)
-    let uiSchema = Object.assign({}, this.props.uiSchema)
+    const schema = Object.assign({}, this.props.schema)
+    const uiSchema = Object.assign({}, this.props.uiSchema)
     if (schema.properties === undefined) return []
     if (schema.order) {
       return schema.order.map(p => ({

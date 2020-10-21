@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { mockGetWhoami, mockGetWhoamiWithDelay, mockGetWhoamiFailure } from './apiMock.js'
 import { CUSTOM_EVENT } from '../src/customEvent.js'
-import { FETCH_CONFIG } from '../src/helper.js'
 
 import {
   LiveMessageManager,

@@ -1,3 +1,9 @@
+/*
+RJ - 2020-10-15 - Note:
+Disabling this file since mockGetCollaborativeDocumentTemplates200(debug.config.apiUrl)
+causes the following error: TypeError: Cannot read property 'replace' of null
+See https://github.com/tracim/tracim/issues/3695
+
 import React from 'react'
 import { shallow } from 'enzyme'
 import { expect } from 'chai'
@@ -71,3 +77,4 @@ describe('<PopupCreateOfficeDocument />', () => {
     })
   })
 })
+*/

@@ -52,7 +52,7 @@ describe('<MainPreview />', () => {
     describe('onClickShowImageRaw()', () => {
       it('should be called when the image is clicked', () => {
         wrapper.find('.carousel__item__preview__content__image > img').simulate('click')
-        expect(onClickShowImageRaw.called).to.be.true
+        expect(onClickShowImageRaw.called).to.be.true // eslint-disable-line no-unused-expressions
       })
     })
   })

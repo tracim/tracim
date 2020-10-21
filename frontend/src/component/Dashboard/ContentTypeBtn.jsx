@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
 import classnames from 'classnames'
+const color = require('color')
 
 require('./ContentTypeBtn.styl')
-const color = require('color')
 
 export const ContentTypeBtn = props =>
   <div
