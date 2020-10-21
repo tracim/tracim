@@ -255,6 +255,7 @@ export const SPACE_TYPE = {
   confidential: CONFIDENTIAL
 }
 export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 
 const SUBSCRIPTION_PENDING = {
   id: 1,

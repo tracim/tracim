@@ -6,6 +6,7 @@ const CONTENT = 'content'
 const MENTION = 'mention'
 const SHAREDSPACE = 'workspace'
 const SHAREDSPACE_MEMBER = 'workspace_member'
+const SHAREDSPACE_SUBSCRIPTION = 'workspace_subscription'
 
 // TLM Core Event Type List
 const CREATED = 'created'
@@ -20,7 +21,8 @@ export const TLM_ENTITY_TYPE = {
   CONTENT,
   MENTION,
   SHAREDSPACE,
-  SHAREDSPACE_MEMBER
+  SHAREDSPACE_MEMBER,
+  SHAREDSPACE_SUBSCRIPTION,
 }
 export const TLM_CORE_EVENT_TYPE = {
   CREATED,

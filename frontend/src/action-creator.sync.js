@@ -181,6 +181,12 @@ export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NE
 export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
 
 export const ACCESSIBLE_WORKSPACE_LIST = `${WORKSPACE}/AccessibleList`
+export const ACCESSIBLE_WORKSPACE = `${WORKSPACE}/Accessible`
 export const setAccessibleWorkspaceList = workspaceList => ({ type: `${SET}/${ACCESSIBLE_WORKSPACE_LIST}`, workspaceList })
+export const addAccessibleWorkspace = workspace => ({ type: `${ADD}/${ACCESSIBLE_WORKSPACE}`, workspace })
+export const removeAccessibleWorkspace = workspace => ({ type: `${REMOVE}/${ACCESSIBLE_WORKSPACE}`, workspace })
 export const WORKSPACE_SUBSCRIPTION_LIST = `${WORKSPACE}/SubscriptionList`
+export const WORKSPACE_SUBSCRIPTION = `${WORKSPACE}/Subscription`
 export const setWorkspaceSubscriptionList = subscriptionList => ({ type: `${SET}/${WORKSPACE_SUBSCRIPTION_LIST}`, subscriptionList })
+export const addWorkspaceSubscription = subscription => ({ type: `${ADD}/${WORKSPACE_SUBSCRIPTION}`, subscription })
+export const removeWorkspaceSubscription = subscription => ({ type: `${REMOVE}/${WORKSPACE_SUBSCRIPTION}`, subscription })

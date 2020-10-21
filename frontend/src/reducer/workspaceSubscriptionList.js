@@ -1,5 +1,6 @@
 import {
   WORKSPACE_SUBSCRIPTION_LIST,
+  WORKSPACE_SUBSCRIPTION,
   ADD,
   REMOVE,
   SET
@@ -19,12 +20,12 @@ const workspaceSubscriptionList = (state = [], action) => {
   switch (action.type) {
     case `${SET}/${WORKSPACE_SUBSCRIPTION_LIST}`:
       return action.subscriptionList.map(ws => serialize(ws, serializeWorkspaceSubscriptionListProps))
-    case `${ADD}/${WORKSPACE_SUBSCRIPTION_LIST}`:
+    case `${ADD}/${WORKSPACE_SUBSCRIPTION}`:
       return [
         ...state,
         action.subscription
       ]
-    case `${REMOVE}/${WORKSPACE_SUBSCRIPTION_LIST}`:
+    case `${REMOVE}/${WORKSPACE_SUBSCRIPTION}`:
       return state.filter(subscription => subscription.workspace.workspace_id !== action.subscription.workspace_id)
     default:
       return state

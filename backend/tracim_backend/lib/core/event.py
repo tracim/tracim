@@ -619,10 +619,13 @@ class EventBuilder:
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     user_api = UserApi(current_user=event.user, session=session, config=config)
     receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    if event.user:
+    try:
         receiver_ids.append(event.user["user_id"])
         same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(event.user["user_id"])
         receiver_ids = set(receiver_ids + same_workspaces_user_ids)
+    except AttributeError:
+        # no user in event
+        pass
     return receiver_ids
 
 
@@ -633,7 +636,13 @@ def _get_workspace_event_receiver_ids(
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
-    return set(administrators + workspace_members)
+    receiver_ids = set(administrators + workspace_members)
+    try:
+        receiver_ids.add(event.user["user_id"])
+    except AttributeError:
+        # no user in event
+        pass
+    return receiver_ids
 
 
 def _get_workspace_subscription_event_receiver_ids(

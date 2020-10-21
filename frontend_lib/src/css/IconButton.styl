@@ -6,6 +6,8 @@
   margin 0 auto
   cursor pointer
   border-radius: 5px
+  border-width: 0px
+  height: min-content
 
   &:disabled
     opacity: 0.65
@@ -14,21 +16,20 @@
   &:hover
     color offWhite
 
-  &&__dark
+  &__dark
     color fontColor
   &__light
     color offWhite
 
   &__primary
     background-color: var(--primaryColor)
-    border: none
   &__primary:hover
     background-color: var(--primaryDarkColor)
 
   &__secondary
     background-color: transparent
   &__secondary:hover
-    background-color: rgba(0,0,0, 0.15)
+    background-color: rgba(0, 0, 0, 0.15)
 
   &__secondary_light
     border-color: offWhite

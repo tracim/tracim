@@ -1,5 +1,6 @@
 import {
   ACCESSIBLE_WORKSPACE_LIST,
+  ACCESSIBLE_WORKSPACE,
   ADD,
   REMOVE,
   SET
@@ -11,15 +12,15 @@ const accessibleWorkspaceList = (state = [], action) => {
   switch (action.type) {
     case `${SET}/${ACCESSIBLE_WORKSPACE_LIST}`:
       return sortWorkspaceList(action.workspaceList.map(ws => serialize(ws, serializeWorkspaceListProps)))
-    case `${ADD}/${ACCESSIBLE_WORKSPACE_LIST}`:
+    case `${ADD}/${ACCESSIBLE_WORKSPACE}`:
       return sortWorkspaceList(
         [
           ...state,
-          action.workspace
+          serialize(action.workspace, serializeWorkspaceListProps)
         ]
       )
-    case `${REMOVE}/${ACCESSIBLE_WORKSPACE_LIST}`:
-      return state.filter(workspace => workspace.id !== action.workspace.id)
+    case `${REMOVE}/${ACCESSIBLE_WORKSPACE}`:
+      return state.filter(workspace => workspace.id !== action.workspace.workspace_id)
     default:
       return state
   }

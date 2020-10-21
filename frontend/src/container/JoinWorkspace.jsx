@@ -104,14 +104,14 @@ export class JoinWorkspace extends React.Component {
           <IconButton
             icon='share'
             text={props.t('Request access')}
-            onClick={() => props.dispatch(subscribeToWorkspace(workspace.workspace_id, props.user.userId))}
+            onClick={() => props.dispatch(subscribeToWorkspace(workspace.id, props.user.userId))}
           />)
       case SPACE_TYPE.open.slug:
         return (
           <IconButton
             icon='sign-in'
             text={props.t('Join the space')}
-            onClick={() => this.joinWorkspace(workspace.workspace_id)}
+            onClick={() => this.joinWorkspace(workspace.id)}
           />)
       default:
         return 'Unknown space access type'
@@ -127,7 +127,7 @@ export class JoinWorkspace extends React.Component {
     const { props } = this
     const className = 'joinWorkspace'
     return (
-      <PageWrapper customClass={className}>
+      <PageWrapper customClass={`${className}__wrapper`}>
         <PageTitle
           parentClass={className}
           title={props.t('Join a space')}
@@ -135,17 +135,15 @@ export class JoinWorkspace extends React.Component {
           breadcrumbsList={props.breadcrumbs}
         />
 
-        <PageContent parentClass={className}>
-          <div>
-            <div><span>{props.t('Type')}</span><span>{props.t('Title and description')}</span><span>{props.t('Access request')}</span></div>
-            {props.accessibleWorkspaceList.map(workspace => (
-              <div key={workspace.id}>
-                <i class={`fa fa-${this.getFaIconForAccessType(workspace.accessType)}`} />
-                <div><span>{workspace.label}</span><span>{workspace.description}</span></div>
-                {this.createRequestComponent(workspace)}
-              </div>
-            ))}
-          </div>
+        <PageContent parentClass={`${className}__content`}>
+          <b>{props.t('Type')}</b><b>{props.t('Title and description')}</b><b>{props.t('Access request')}</b>
+          {props.accessibleWorkspaceList.map(workspace =>
+            <>
+              <i class={`fa fa-fw fa-2x fa-${this.getFaIconForAccessType(workspace.accessType)}`} />
+              <div><span>{workspace.label}</span><span>{workspace.description}</span></div>
+              {this.createRequestComponent(workspace)}
+            </>
+          )}
         </PageContent>
       </PageWrapper>
     )
