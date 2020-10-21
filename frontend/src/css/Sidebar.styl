@@ -65,12 +65,11 @@ sidebarColorDarken = darken(sidebarColor, 15%)
       color fontColor
       display: flex
       flex-direction: column
-      &__btn
-        display block
-        margin 0 auto
-        padding 10px 20px
-        &:hover
-          color offWhite
+      align-items: stretch
+      & button
+        margin-top 10px
+      & button:first-child
+        margin-top 0px
     &__navigation
       padding 0
       width sidebar-width

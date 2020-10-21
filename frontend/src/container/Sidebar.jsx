@@ -132,7 +132,7 @@ export class Sidebar extends React.Component {
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
-  handleClickJoinWorkspace = () => {}
+  handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
   render () {
     const { props, state } = this

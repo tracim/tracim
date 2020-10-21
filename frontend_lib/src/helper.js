@@ -256,6 +256,22 @@ export const SPACE_TYPE = {
 }
 export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
 
+const SUBSCRIPTION_PENDING = {
+  id: 1,
+  slug: 'pending',
+  faIcon: 'check'
+}
+const SUBSCRIPTION_REJECTED = {
+  id: 2,
+  slug: 'rejected',
+  faIcon: 'times'
+}
+export const SUBSCRIPTION_TYPE = {
+  pending: SUBSCRIPTION_PENDING,
+  rejected: SUBSCRIPTION_REJECTED
+}
+export const SUBSCRIPTION_TYPE_LIST = [SUBSCRIPTION_PENDING, SUBSCRIPTION_REJECTED]
+
 export const APP_FEATURE_MODE = {
   VIEW: 'view',
   EDIT: 'edit',

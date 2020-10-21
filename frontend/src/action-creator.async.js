@@ -49,7 +49,9 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
   WORKSPACE_READ_STATUS,
-  WORKSPACE_RECENT_ACTIVITY
+  WORKSPACE_RECENT_ACTIVITY,
+  ACCESSIBLE_WORKSPACE_LIST,
+  WORKSPACE_SUBSCRIPTION_LIST
 } from './action-creator.sync.js'
 import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
 
@@ -911,6 +913,72 @@ export const getUserMessagesSummary = userId => dispatch => {
       method: 'GET'
     },
     actionName: NOTIFICATION_NOT_READ_COUNT,
+    dispatch
+  })
+}
+
+export const getAccessibleWorkspaces = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/accessible_workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: ACCESSIBLE_WORKSPACE_LIST,
+    dispatch
+  })
+}
+
+export const getWorkspaceSubscriptions = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspace_subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_SUBSCRIPTION_LIST,
+    dispatch
+  })
+}
+
+export const joinWorkspace = (workspaceId, userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        workspace_id: workspaceId
+      })
+    },
+    actionName: WORKSPACE_LIST,
+    dispatch
+  })
+}
+
+export const subscribeToWorkspace = (workspaceId, userId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspace_subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        workspace_id: workspaceId
+      })
+    },
+    actionName: WORKSPACE_SUBSCRIPTION_LIST,
     dispatch
   })
 }

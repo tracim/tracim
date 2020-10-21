@@ -179,3 +179,8 @@ export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATI
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
+
+export const ACCESSIBLE_WORKSPACE_LIST = `${WORKSPACE}/AccessibleList`
+export const setAccessibleWorkspaceList = workspaceList => ({ type: `${SET}/${ACCESSIBLE_WORKSPACE_LIST}`, workspaceList })
+export const WORKSPACE_SUBSCRIPTION_LIST = `${WORKSPACE}/SubscriptionList`
+export const setWorkspaceSubscriptionList = subscriptionList => ({ type: `${SET}/${WORKSPACE_SUBSCRIPTION_LIST}`, subscriptionList })
