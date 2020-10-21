@@ -1,5 +1,5 @@
 # Auto-Invite Plugin
 
 This internal plugin:
-- add all new user to open space
-- add all user to new created open space
+- adds every new user to all open spaces
+- adds all users to every created open space
