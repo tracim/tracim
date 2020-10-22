@@ -9,7 +9,6 @@ import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const NewMemberForm = props => {
-  const radioHash = Math.random().toString(36).substring(7)
   return (
     <div className='memberlist__form'>
       <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>

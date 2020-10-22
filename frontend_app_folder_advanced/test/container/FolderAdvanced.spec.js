@@ -9,6 +9,8 @@ import {
 } from '../apiMock.js'
 import { debug } from '../../src/debug.js'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<FolderAdvanced />', () => {
   const dispatchEventSpy = sinon.spy()
   global.GLOBAL_dispatchEvent = dispatchEventSpy
@@ -98,7 +100,7 @@ describe('<FolderAdvanced />', () => {
           expect(wrapper.state('newContent')).to.not.equal(tlmData.fields.content)
         })
         it('should NOT update the head title', () => {
-          expect(dispatchEventSpy.called).to.be.false
+          expect(dispatchEventSpy.called).to.be.false // eslint-disable-line no-unused-expressions
         })
       })
     })

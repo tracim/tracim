@@ -4,6 +4,7 @@
     "frontend_app_*",
     "frontend",
     "frontend_lib",
+    "frontend_vendors",
     "functionnal_tests"
   ],
   "devDependencies": {

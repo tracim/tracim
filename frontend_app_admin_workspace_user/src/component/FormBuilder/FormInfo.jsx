@@ -9,7 +9,7 @@ class FormInfo extends React.Component {
   render () {
     return (
       <form>
-        <div className={'formInfo'}>
+        <div className='formInfo'>
           <span>Label</span>
           <input type='text' name='label' onChange={this.handleChange.bind(this)} />
 

@@ -1,8 +1,11 @@
 import { JSDOM } from 'jsdom'
 import chai from 'chai'
+import sinon from 'sinon'
 import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import EventSource from 'eventsourcemock'
+import AbortController from 'abort-controller'
 
 require('es6-promise').polyfill()
 require('isomorphic-fetch')
@@ -22,11 +25,16 @@ if (!global.window && !global.document) {
 
   global.CustomEvent = window.CustomEvent
   global.Element = window.Element
+  global.EventSource = EventSource
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
   global.DOMParser = window.DOMParser
   global.GLOBAL_primaryColor = '#aaaaaa'
+  global.AbortController = AbortController
+  global.lastCustomEventTypes = new Set()
+  global.GLOBAL_dispatchEvent = sinon.spy()
+  document.dispatchEvent = sinon.spy()
 }
 
 Enzyme.configure({ adapter: new Adapter() })

@@ -38,7 +38,8 @@ const SYSTEM_CONFIG = {
     new_user_invitation_do_notify: true,
     search_enabled: true,
     webdav_enabled: true,
-    webdav_url: 'http://localhost:3030/'
+    webdav_url: 'http://localhost:3030/',
+    apiUrl: '/api'
   },
   contentTypeListLoaded: true,
   redirectLogin: '',
@@ -50,7 +51,7 @@ const DOM_CONTAINER = 'appFeatureContainer'
 export const defaultDebug = {
   config: {
     apiHeader: FETCH_CONFIG.headers,
-    apiUrl: '',
+    apiUrl: '/api',
     availableStatuses: STATUSES,
     profileObject: PROFILE,
     roleList: ROLE_LIST,

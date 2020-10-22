@@ -1,33 +1,21 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isProduction : ', isProduction)
-
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: isProduction
-    ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['./src/index.dev.js'],
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'admin_workspace_user.app.js' : 'admin_workspace_user.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appAdminWorkspaceUser' : undefined,
+    library: 'appAdminWorkspaceUser',
     libraryTarget: isProduction ? 'var' : undefined
   },
-  externals: {},
-  // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
-  //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-  //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
-  //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-  //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-  //   tracim_frontend_lib: {commonjs: 'tracim_frontend_lib', commonjs2: 'tracim_frontend_lib', amd: 'tracim_frontend_lib', root: '_'}
-  // }
-  // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
+    proxy: { '/api': 'http://127.0.0.1:7999' },
     host: '0.0.0.0',
     port: 8073,
     hot: true,
@@ -41,12 +29,12 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-module-source-map',
+  devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
   },
   module: {
-    rules: [{
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
@@ -82,7 +70,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -92,8 +80,8 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
   plugins: [
     ...[], // generic plugins always present

@@ -19,6 +19,6 @@ For this command the configuration file debug.js is used which follows the templ
  - label: string
  - memberList: array of objects
  - recentActivityList: array of objects
- - apiUrl: string composed of http://MACHINE_ADRESS:6543/api
+ - apiUrl: /api (this can be a full URL)
  - slug: string
 Another needed configuration is made in the backend/development.ini, where you need to add http://MACHINE_ADRESS:8076 in to the variable cors.access-control-allowed-origin
