@@ -10,14 +10,14 @@ class JsonFormEditor extends React.Component {
     const schema = { ...props.schema }
     delete schema.change
     return (
-      <div style={{marginTop: '2%'}}>
+      <div style={{ marginTop: '2%' }}>
         <div>
           <p>schema :</p>
           <JSONInput
             id='schema'
             locale={locale}
             height='550px'
-            width={'100%'}
+            width='100%'
             placeholder={props.schema}
             onChange={(data) => props.onSchemaChange(data.jsObject)}
           />
@@ -30,7 +30,7 @@ class JsonFormEditor extends React.Component {
             id='uischema'
             locale={locale}
             height='250px'
-            width={'100%'}
+            width='100%'
             placeholder={props.uiSchema}
             onChange={props.onUiSchemaChange}
           />

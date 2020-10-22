@@ -87,6 +87,8 @@
   <body>
     <div id='content'></div>
 
+    <script type='text/javascript' src='/app/tracim_frontend_vendors.js?token=${cache_token}'></script>
+    <script type='text/javascript' src='/app/tracim_frontend_lib.lib.js?token=${cache_token}'></script>
     <script type='text/javascript' src='/app/tracim_frontend_lib.style.js?token=${cache_token}'></script>
 
     % for custom_toolbox_file in custom_toolbox_files:

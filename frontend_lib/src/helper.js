@@ -539,8 +539,8 @@ export const createSpaceTree = spaceList => {
   for (const space of spaceListWithChildren) {
     // INFO - GB - 2020-10-14 - The check made below is to ensure that the same function can be used by serialized lists (like for frontend) or not (like for frontend_app_workspace)
     space.workspace_id
-    ? spaceById[space.workspace_id] = space
-    : spaceById[space.id] = space
+      ? spaceById[space.workspace_id] = space
+      : spaceById[space.id] = space
   }
   for (const space of spaceListWithChildren) {
     if (space.parent_id && spaceById[space.parent_id]) {

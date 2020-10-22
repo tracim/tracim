@@ -26,8 +26,10 @@ export DEFAULTDIR
 echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
 for project in "$DEFAULTDIR/frontend_lib" "$DEFAULTDIR/frontend" "$DEFAULTDIR"/frontend_app*; do
-    cd "$project" || exit 1
-    yarn run test && loggood "success" || (logerror "some error in $project" && STATUS=1)
+    if ! [ -f "$project/.disabled-app" ]; then
+        cd "$project" || exit 1
+        yarn run test && loggood "success" || { logerror "Unit tests failed in $project"; STATUS=1; }
+    fi
 done
 
 exit "$STATUS"
