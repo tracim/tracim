@@ -120,7 +120,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["owner"]
         assert workspace["parent_id"] is None
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
-        (workspace_created, user_role_created) = event_helper.last_events(2)
+        (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == author
@@ -697,7 +697,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
-        (workspace_created, user_role_created) = event_helper.last_events(2)
+        (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == author
