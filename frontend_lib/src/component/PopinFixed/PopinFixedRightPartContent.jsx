@@ -17,7 +17,7 @@ export default PopinFixedRightPartContent
 
 PopinFixedRightPartContent.propTypes = {
   label: PropTypes.string,
-  showTitle: PropTypes.string
+  showTitle: PropTypes.bool
 }
 
 PopinFixedRightPartContent.defaultProps = {

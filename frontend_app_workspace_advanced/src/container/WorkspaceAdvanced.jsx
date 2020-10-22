@@ -23,7 +23,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
-  getSubscriptionsRequests,
+  getSubscriptionRequestList,
   getWorkspaceMember,
   putLabel,
   putDescription,
@@ -68,7 +68,7 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false,
-      subscriptionsRequests: []
+      subscriptionRequestList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -192,13 +192,13 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleSubscriptionCreated = data => {
-    if (this.state.subscriptionsRequests.some(request =>
+    if (this.state.subscriptionRequestList.some(request =>
       request.author.user_id === data.fields.subscription.author.user_id
     )) return
 
     this.setState(prev => ({
-      subscriptionsRequests: [
-        ...prev.subscriptionsRequests,
+      subscriptionRequestList: [
+        ...prev.subscriptionRequestList,
         data.fields.subscription
       ]
     }))
@@ -206,7 +206,7 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleSubscriptionModified = data => {
     this.setState(prev => ({
-      subscriptionsRequests: prev.subscriptionsRequests.map(request =>
+      subscriptionRequestList: prev.subscriptionRequestList.map(request =>
         request.author.user_id === data.fields.subscription.author.user_id
           ? data.fields.subscription
           : request
@@ -218,7 +218,7 @@ export class WorkspaceAdvanced extends React.Component {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
-    this.loadSubscriptionsRequests()
+    this.loadSubscriptionRequestList()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -276,13 +276,13 @@ export class WorkspaceAdvanced extends React.Component {
     })
   }
 
-  loadSubscriptionsRequests = async () => {
+  loadSubscriptionRequestList = async () => {
     const { props, state } = this
 
-    const fetchSubscriptionsRequests = await handleFetchResult(await getSubscriptionsRequests(state.config.apiUrl, state.content.workspace_id))
+    const fetchSubscriptionRequestList = await handleFetchResult(await getSubscriptionRequestList(state.config.apiUrl, state.content.workspace_id))
 
-    switch (fetchSubscriptionsRequests.apiResponse.status) {
-      case 200: this.setState({ subscriptionsRequests: fetchSubscriptionsRequests.body.reverse() }); break
+    switch (fetchSubscriptionRequestList.apiResponse.status) {
+      case 200: this.setState({ subscriptionRequestList: fetchSubscriptionRequestList.body.reverse() }); break
       default: this.sendGlobalFlashMessage(props.t('Error while loading space requests', 'warning'))
     }
   }
@@ -527,12 +527,12 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickAcceptRequest = async userId => {
     const { props, state } = this
-    const fetchPutSubscriptionAccept = await putSubscriptionAccept(
+    const fetchPutSubscriptionAccept = await handleFetchResult(await putSubscriptionAccept(
       state.config.apiUrl,
       state.content.workspace_id,
       userId,
       state.content.default_user_role
-    )
+    ))
     switch (fetchPutSubscriptionAccept.status) {
       case 204: break
       case 400:
@@ -547,11 +547,11 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickRejectRequest = async userId => {
     const { props, state } = this
-    const fetchPutSubscriptionReject = await putSubscriptionReject(
+    const fetchPutSubscriptionReject = await handleFetchResult(await putSubscriptionReject(
       state.config.apiUrl,
       state.content.workspace_id,
       userId
-    )
+    ))
     if (fetchPutSubscriptionReject.status !== 204) {
       this.sendGlobalFlashMessage(props.t('Error while rejecting user'), 'warning')
     }
@@ -667,7 +667,7 @@ export class WorkspaceAdvanced extends React.Component {
                     label={props.t('Requests to join the space')}
                   >
                     <SpaceSubscriptionsRequests
-                      subscriptionsRequests={state.subscriptionsRequests}
+                      subscriptionRequestList={state.subscriptionRequestList}
                       onClickAcceptRequest={this.handleClickAcceptRequest}
                       onClickRejectRequest={this.handleClickRejectRequest}
                     />

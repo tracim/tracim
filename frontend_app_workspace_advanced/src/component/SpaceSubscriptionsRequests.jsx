@@ -10,10 +10,10 @@ import {
 
 export const SpaceSubscriptionsRequests = props => {
   return (
-    props.subscriptionsRequests.length
+    props.subscriptionRequestList.length
       ? (
-        <span className='workspace_advanced__subscriptionsRequest'>
-          {props.subscriptionsRequests.map(request =>
+        <span className='workspace_advanced__subscriptionRequests'>
+          {props.subscriptionRequestList.map(request =>
             <NoHoverListItem
               key={`${request.author.user_id}_${request.created_date}`}
             >
@@ -25,7 +25,7 @@ export const SpaceSubscriptionsRequests = props => {
               {request.state === 'pending' && (
                 <DropdownMenu
                   buttonLabel={props.t('Manage request')}
-                  buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover workspace_advanced__subscriptionsRequest__button'
+                  buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover workspace_advanced__subscriptionRequests__button'
                   isButton
                 >
                   <div
@@ -46,7 +46,7 @@ export const SpaceSubscriptionsRequests = props => {
 
               {request.state === 'accepted' && (
                 <div
-                  className='workspace_advanced__subscriptionsRequest__info'
+                  className='workspace_advanced__subscriptionRequests__info'
                   title={props.t('by {{author}} at {{date}}', {
                     author: request.evaluator.public_name,
                     date: formatAbsoluteDate(request.evaluation_date),
@@ -60,7 +60,7 @@ export const SpaceSubscriptionsRequests = props => {
 
               {request.state === 'rejected' && (
                 <div
-                  className='workspace_advanced__subscriptionsRequest__info'
+                  className='workspace_advanced__subscriptionRequests__info'
                   title={props.t('by {{author}} at {{date}}', {
                     author: request.evaluator.public_name,
                     date: formatAbsoluteDate(request.evaluation_date),
@@ -75,14 +75,14 @@ export const SpaceSubscriptionsRequests = props => {
           )}
         </span>
       )
-      : <span className='workspace_advanced__subscriptionsRequest__empty'>{props.t('There are no requests yet.')}</span>
+      : <span className='workspace_advanced__subscriptionRequests__empty'>{props.t('There are no requests yet.')}</span>
   )
 }
 
 export default translate()(SpaceSubscriptionsRequests)
 
 SpaceSubscriptionsRequests.propTypes = {
-  subscriptionsRequests: PropTypes.array.isRequired,
+  subscriptionRequestList: PropTypes.array.isRequired,
   onClickAcceptRequest: PropTypes.func,
   onClickRejectRequest: PropTypes.func
 }

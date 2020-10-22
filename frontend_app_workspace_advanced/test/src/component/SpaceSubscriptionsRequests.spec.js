@@ -5,14 +5,14 @@ import { SpaceSubscriptionsRequests } from '../../../src/component/SpaceSubscrip
 
 describe('<SpaceSubscriptionsRequests />', () => {
   const props = {
-    subscriptionsRequests: []
+    subcriptionRequestList: []
   }
 
   const wrapper = shallow(<SpaceSubscriptionsRequests {...props} t={key => key} />)
 
   describe('static design', () => {
-    it('if subscriptionsRequests is empty should show a message', () => {
-      expect(wrapper.find('.workspace_advanced__subscriptionsRequest__empty')).to.contain(
+    it('if subcriptionRequestList is empty should show a message', () => {
+      expect(wrapper.find('.workspace_advanced__subscriptionRequests__empty')).to.contain(
         'There are no requests yet.'
       )
     })

@@ -5,7 +5,7 @@ import { author, user, workspace } from 'tracim_frontend_lib/dist/tracim_fronten
 import { WorkspaceAdvanced } from '../../../src/container/WorkspaceAdvanced.jsx'
 import {
   mockGetAppList200,
-  mockGetSubscriptionsRequests200,
+  mockGetSubscriptionRequestList200,
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMember200
 } from '../../apiMock.js'
@@ -29,14 +29,14 @@ describe('<WorkspaceAdvanced />', () => {
   const wrapper = shallow(<WorkspaceAdvanced {...props} />)
 
   describe('its internal functions', () => {
-    describe('loadSubscriptionsRequests', () => {
-      it('should update subscriptionsRequests state', (done) => {
-        mockGetSubscriptionsRequests200(debug.config.apiUrl, workspace.workspace_id, [
+    describe('loadSubscriptionRequestList', () => {
+      it('should update subscriptionRequestList state', (done) => {
+        mockGetSubscriptionRequestList200(debug.config.apiUrl, workspace.workspace_id, [
           { author: author },
           { workspace: workspace, author: { ...author, user_id: 9 } }
         ])
-        wrapper.instance().loadSubscriptionsRequests().then(() => {
-          expect(wrapper.state().subscriptionsRequests)
+        wrapper.instance().loadSubscriptionRequestList().then(() => {
+          expect(wrapper.state().subscriptionRequestList)
             .to.deep.equal([
               { workspace: workspace, author: { ...author, user_id: 9 } },
               { author: author }
@@ -146,7 +146,7 @@ describe('<WorkspaceAdvanced />', () => {
             }
           }
           wrapper.instance().handleSubscriptionCreated(tlmData)
-          const hasRequest = !!(wrapper.state().subscriptionsRequests
+          const hasRequest = !!(wrapper.state().subscriptionRequestList
             .find(request => request.author.user_id === tlmData.fields.subscription.author.user_id))
           expect(hasRequest).to.equal(true)
         })
@@ -154,7 +154,7 @@ describe('<WorkspaceAdvanced />', () => {
 
       describe('handleSubscriptionModified', () => {
         it('should modified the request', () => {
-          wrapper.setState({ subscriptionsRequests: [{ author: author, state: 'PENDING' }]})
+          wrapper.setState({ subscriptionRequestList: [{ author: author, state: 'PENDING' }] })
           const tlmData = {
             fields: {
               author: author,
@@ -168,7 +168,7 @@ describe('<WorkspaceAdvanced />', () => {
           }
           wrapper.instance().handleSubscriptionModified(tlmData)
 
-          const request = wrapper.state().subscriptionsRequests
+          const request = wrapper.state().subscriptionRequestList
             .find(request => request.author.user_id === tlmData.fields.subscription.author.user_id)
           expect(request).to.deep.equal(tlmData.fields.subscription)
         })
