@@ -471,7 +471,7 @@ export class Account extends React.Component {
                       case 'spacesConfig':
                         return (
                           <UserSpacesConfig
-                            userLoggedId={parseInt(state.userToEditId)}
+                            userToEditId={Number(state.userToEditId)}
                             workspaceList={state.userToEditWorkspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                             admin

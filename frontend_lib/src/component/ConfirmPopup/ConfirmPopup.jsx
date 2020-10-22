@@ -1,13 +1,18 @@
-import { CardPopup } from '../CardPopup/CardPopup'
+// require('./ConfirmPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
-export const ConfirmPopup = (props) => (
+import React from 'react'
+import PropTypes from 'prop-types'
+import CardPopup from '../CardPopup/CardPopup.jsx'
+import { translate } from 'react-i18next'
+
+const ConfirmPopup = (props) => (
   <CardPopup
     customClass='confirm_popup'
     customHeaderClass='primaryColorBg'
     onClose={props.onCancel}
   >
     <div className='confirm_popup__body'>
-      <div className='confirm_popup__body__msg'>{props.msg || props.t('Are you sure ?')}</div>
+      <div className='confirm_popup__body__msg'>{props.msg || props.t('Are you sure?')}</div>
       <div className='confirm_popup__body__btn'>
         <button
           type='button'
@@ -27,3 +32,19 @@ export const ConfirmPopup = (props) => (
     </div>
   </CardPopup>
 )
+
+ConfirmPopup.propType = {
+  confirmLabel: PropTypes.string,
+  onConfirm: PropTypes.func,
+  onCancel: PropTypes.func,
+  msg: PropTypes.string
+}
+
+ConfirmPopup.defaultProps = {
+  confirmLabel: '',
+  onConfirm: null,
+  onCancel: null,
+  msg: ''
+}
+
+export default translate()(ConfirmPopup)

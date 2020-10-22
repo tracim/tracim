@@ -99,5 +99,6 @@
   "Error while checking username availability": "Erro ao verificar a disponibilidade do identificador",
   "This username is not available": "Este identificador não está disponível",
   "You are trying to mention an invalid user": "Está a tentar mencionar um utilizador inválido",
+  "Are you sure?": "Tem certeza?",
   "all": "todos"
 }

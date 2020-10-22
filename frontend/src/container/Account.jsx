@@ -330,7 +330,7 @@ export class Account extends React.Component {
                       case 'spacesConfig':
                         return (
                           <UserSpacesConfig
-                            userLoggedId={props.user.userId}
+                            userToEditId={props.user.userId}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                             admin={false}
