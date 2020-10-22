@@ -28,19 +28,21 @@ export const SpaceSubscriptionsRequests = props => {
                   buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover workspace_advanced__subscriptionRequests__button'
                   isButton
                 >
-                  <div
+                  <button
+                    className='transparentButton'
                     onClick={() => props.onClickAcceptRequest(request.author.user_id)}
                   >
                     <i className='fa fa-fw fa-check' />
                     {props.t('Accept request')}
-                  </div>
+                  </button>
 
-                  <div
+                  <button
+                    className='transparentButton'
                     onClick={() => props.onClickRejectRequest(request.author.user_id)}
                   >
                     <i className='fa fa-fw fa-times' />
                     {props.t('Reject request')}
-                  </div>
+                  </button>
                 </DropdownMenu>
               )}
 
