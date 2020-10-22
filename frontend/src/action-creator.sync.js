@@ -185,6 +185,7 @@ export const ACCESSIBLE_WORKSPACE = `${WORKSPACE}/Accessible`
 export const setAccessibleWorkspaceList = workspaceList => ({ type: `${SET}/${ACCESSIBLE_WORKSPACE_LIST}`, workspaceList })
 export const addAccessibleWorkspace = workspace => ({ type: `${ADD}/${ACCESSIBLE_WORKSPACE}`, workspace })
 export const removeAccessibleWorkspace = workspace => ({ type: `${REMOVE}/${ACCESSIBLE_WORKSPACE}`, workspace })
+export const updateAccessibleWorkspace = workspace => ({ type: `${UPDATE}/${ACCESSIBLE_WORKSPACE}`, workspace })
 export const WORKSPACE_SUBSCRIPTION_LIST = `${WORKSPACE}/SubscriptionList`
 export const WORKSPACE_SUBSCRIPTION = `${WORKSPACE}/Subscription`
 export const setWorkspaceSubscriptionList = subscriptionList => ({ type: `${SET}/${WORKSPACE_SUBSCRIPTION_LIST}`, subscriptionList })

@@ -3,6 +3,7 @@ import {
   ACCESSIBLE_WORKSPACE,
   ADD,
   REMOVE,
+  UPDATE,
   SET
 } from '../action-creator.sync.js'
 import { serializeWorkspaceListProps } from './workspaceList.js'
@@ -16,6 +17,13 @@ const accessibleWorkspaceList = (state = [], action) => {
       return sortWorkspaceList(
         [
           ...state,
+          serialize(action.workspace, serializeWorkspaceListProps)
+        ]
+      )
+    case `${UPDATE}/${ACCESSIBLE_WORKSPACE}`:
+      return sortWorkspaceList(
+        [
+          ...state.filter(workspace => workspace.id !== action.workspace.workspace_id),
           serialize(action.workspace, serializeWorkspaceListProps)
         ]
       )

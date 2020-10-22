@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import escapeRegExp from 'lodash/escapeRegExp'
 
 import {
   PageWrapper,
@@ -13,7 +14,8 @@ import {
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   SUBSCRIPTION_TYPE,
-  IconButton
+  IconButton,
+  TextInput
 } from 'tracim_frontend_lib'
 
 import {
@@ -126,7 +128,7 @@ export class JoinWorkspace extends React.Component {
   }
 
   handleWorkspaceFilter (filter) {
-    const re = new RegExp(filter, 'i')
+    const re = new RegExp(escapeRegExp(filter), 'i')
     const filterFunc = workspace => workspace.label.search(re) >= 0 || workspace.description.search(re) >= 0
     this.setState({ filter: filterFunc })
   }
@@ -144,15 +146,27 @@ export class JoinWorkspace extends React.Component {
         />
 
         <PageContent parentClass={`${className}__content`}>
-          <input className={`${className}__content__filter`} type='text' onChange={e => this.handleWorkspaceFilter(e.target.value)} />
+          <TextInput
+            customClass={`${className}__content__filter form-control`}
+            onChange={e => this.handleWorkspaceFilter(e.target.value)}
+            placeholder={props.t('Filter spaces')}
+            icon='search'
+          />
           <div className={`${className}__content__workspaceList`}>
-            <b>{props.t('Type')}</b><b>{props.t('Title and description')}</b><b>{props.t('Access request')}</b>
-            {props.accessibleWorkspaceList.filter(state.filter).map(workspace =>
-              <>
+            <div className={`${className}__content__workspaceList__item`}>
+              <b>{props.t('Type')}</b>
+              <b>{props.t('Title and description')}</b>
+              <b>{props.t('Access request')}</b>
+            </div>
+            {props.accessibleWorkspaceList.filter(state.filter).map((workspace, index, array) =>
+              <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                 <i class={`fa fa-fw fa-2x fa-${this.getFaIconForAccessType(workspace.accessType)}`} />
-                <div><span>{workspace.label}</span><span>{workspace.description}</span></div>
+                <div class={`${className}__content__workspaceList__item__title_description`}>
+                  <span>{workspace.label}</span>
+                  <span class={`${className}__content__workspaceList__item__description`}>{workspace.description}</span>
+                </div>
                 {this.createRequestComponent(workspace)}
-              </>
+              </div>
             )}
           </div>
         </PageContent>

@@ -23,6 +23,7 @@ import {
   addWorkspaceReadStatus,
   removeAccessibleWorkspace,
   addAccessibleWorkspace,
+  updateAccessibleWorkspace,
   addWorkspaceSubscription,
   removeWorkspaceSubscription
 } from '../action-creator.sync.js'
@@ -97,12 +98,16 @@ export class ReduxTlmDispatcher extends React.Component {
   handleWorkspaceDeleted = data => {
     const { props } = this
     props.dispatch(removeWorkspace(data.fields.workspace))
+    props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
     this.handleNotification(data)
   }
 
   handleWorkspaceModified = data => {
     const { props } = this
     props.dispatch(updateWorkspaceDetail(data.fields.workspace))
+    if (ACCESSIBLE_SPACE_TYPE_LIST.find(s => s.slug === data.fields.workspace.access_type) !== undefined) {
+      props.dispatch(updateAccessibleWorkspace(data.fields.workspace))
+    }
     this.handleNotification(data)
   }
 
