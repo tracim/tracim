@@ -8,9 +8,11 @@ const UserInfo = props => {
       <Avatar width='40px' publicName={props.publicName} />
       <div className='userInfo__name'>
         {props.publicName}
-        <div className='userInfo__username'>
-          @{props.username}
-        </div>
+        {props.username.length && (
+          <div className='userInfo__username'>
+            @{props.username}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -20,10 +22,9 @@ export default UserInfo
 
 UserInfo.propTypes = {
   publicName: PropTypes.string.isRequired,
-  username:PropTypes.string
+  username: PropTypes.string
 }
 
 UserInfo.defaultProps = {
   username: ''
 }
-

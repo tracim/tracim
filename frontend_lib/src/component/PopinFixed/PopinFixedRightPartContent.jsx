@@ -4,12 +4,11 @@ import PropTypes from 'prop-types'
 const PopinFixedRightPartContent = props => {
   return (
     <div className='wsContentGeneric__content__right__content'>
-      {props.showTitle &&
+      {props.showTitle && (
         <div className='wsContentGeneric__content__right__content__title'>
           {props.label}
         </div>
-      }
-
+      )}
       {props.children}
     </div>
   )
