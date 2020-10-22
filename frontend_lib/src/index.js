@@ -131,6 +131,8 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
+import TextInput from './component/Input/TextInput.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -310,7 +312,8 @@ export {
   permissiveNumberEqual,
   SingleChoiceList,
   darkenColor,
-  lightenColor
+  lightenColor,
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  TextInput
 }
