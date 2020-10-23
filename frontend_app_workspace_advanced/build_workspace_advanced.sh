@@ -20,22 +20,20 @@ function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
 }
 
-windoz=""
-if [[ $1 = "-w" || $2 = "-w" ]]; then
-    windoz="windoz"
-fi
 
 dev=""
-if [[ $1 = "-d" || $2 = "-d" ]]; then
+devext=""
+if [ "$1" = "-d" ]; then
     dev="-dev"
+    devext=".dev"
 fi
 
 log "creating debug file"
 cp src/debug.js.sample src/debug.js
 log "building frontend_app_workspace_advanced"
-yarn run build$dev$windoz && loggood "success" || logerror "some error"
+yarn run buildoptimized$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/workspace_advanced.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
+cp dist/workspace_advanced.app$devext.js ../frontend/dist/app/workspace_advanced.app.js && loggood "success" || logerror "some error"
 log "copying en translation.json"
 cp i18next.scanner/en/translation.json ../frontend/dist/app/workspace_advanced_en_translation.json && loggood "success" || logerror "some error"
 log "copying fr translation.json"

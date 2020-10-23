@@ -1,8 +1,6 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isPoduction: ', isProduction)
-
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
@@ -37,19 +35,19 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'eval-source-map ',
+  devtool: isProduction ? false : 'eval-cheap-mobule-source-map ',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
-    fs: "empty"
+    fs: 'empty'
   },
   performance: {
     hints: false
   },
   module: {
-    rules: [{
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
-      use: 'standard-loader',
+      use: 'standard-loader'
     }, {
       test: [/\.js$/, /\.jsx$/],
       exclude: [/node_modules/],
@@ -83,7 +81,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -93,10 +91,10 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
-  plugins:[
+  plugins: [
     ...[], // generic plugins always present
     ...(isProduction
       ? [] // production specific plugins

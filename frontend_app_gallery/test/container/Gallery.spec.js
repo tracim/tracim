@@ -2,15 +2,12 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Gallery } from '../../src/container/Gallery.jsx'
-import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
-import pictures from '../fixture/content/pictures.js'
-import { debug } from '../../src/debug.js'
 import { defaultDebug } from 'tracim_frontend_lib'
-import { cloneDeep } from "lodash"
+import pictures from '../fixture/content/pictures.js'
+import { cloneDeep } from 'lodash'
 
 describe('<Gallery />', () => {
   const folderId = 1
-  const folderName = 'folderTest'
 
   const props = {
     i18n: {},
@@ -33,7 +30,7 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
-        translation :''
+        translation: ''
       },
       loggedUser: {
         ...defaultDebug.loggedUser
@@ -179,7 +176,7 @@ describe('<Gallery />', () => {
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
           wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
-          const sortedImagesPreviews = [... wrapper.state().imagePreviewList]
+          const sortedImagesPreviews = [...wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
         })

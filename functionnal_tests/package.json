@@ -5,6 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "lint": "echo 'Functional tests are not linted yet (see issue #3688)'",
     "precypress-run": "yarn run reset-db",
     "cypress-run": "yarn precypress-run && cypress run",
     "precypress-open": "yarn run reset-db",

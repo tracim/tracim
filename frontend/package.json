@@ -5,15 +5,14 @@
   "main": "index.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdevwindoz": "webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9890 -- webpack-dev-server --watch --colors --inline --hot --progress",
-    "build": "NODE_ENV=production webpack-cli -p",
-    "build-dev": "NODE_ENV=production webpack-cli",
-    "buildwindoz": "set NODE_ENV=production&& webpack-cli -p",
-    "build-devwindoz": "set NODE_ENV=production&& webpack-cli",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.config.js --watch --colors --inline --hot --progress",
+    "build": "NODE_ENV=production webpack-cli",
+    "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
+    "build-dev": "NODE_ENV=development webpack-cli",
+    "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "build-translation": "node i18next.scanner.js",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
+    "lint": "cd src && yarn standard --parser babel-eslint --plugin react && cd ../test && yarn standard --env mocha --parser babel-eslint --plugin react",
+    "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
@@ -90,8 +89,7 @@
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
-    "webpack-dev-server": "^3.10.3",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-dev-server": "^3.10.3"
   },
   "standard": {
     "globals": [

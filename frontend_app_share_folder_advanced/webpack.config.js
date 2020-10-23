@@ -1,23 +1,18 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log('isProduction : ', isProduction)
-
 const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: isProduction
-    ? './src/index.js'
-    : ['./src/index.dev.js'],
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'share_folder.app.js' : 'share_folder.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appShareFolderAdvanced' : undefined,
+    library: 'appShareFolderAdvanced',
     libraryTarget: isProduction ? 'var' : undefined
   },
-  externals: {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     proxy: { '/api': 'http://127.0.0.1:7999' },
@@ -31,12 +26,12 @@ module.exports = {
     },
     historyApiFallback: true
   },
-  devtool: isProduction ? false : 'cheap-module-source-map',
+  devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
   },
   module: {
-    rules: [{
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
@@ -72,7 +67,7 @@ module.exports = {
   },
   resolve: {
     plugins: [
-      PnpWebpackPlugin,
+      PnpWebpackPlugin
     ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
@@ -82,14 +77,14 @@ module.exports = {
   },
   resolveLoader: {
     plugins: [
-      PnpWebpackPlugin.moduleLoader(module),
-    ],
+      PnpWebpackPlugin.moduleLoader(module)
+    ]
   },
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-        ? [] // production specific plugins
-        : [] // development specific plugins
+      ? [] // production specific plugins
+      : [] // development specific plugins
     )
   ]
 }
