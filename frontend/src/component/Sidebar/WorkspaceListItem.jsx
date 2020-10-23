@@ -55,7 +55,8 @@ class WorkspaceListItem extends React.Component {
     dropdownMenuIsActive: false,
     showDropdownMenuButton:
       !(prev.dropdownMenuIsActive &&
-      !e.path.some(p => p.className && p.className.includes('dropdownMenuItem'))) &&
+        e.path &&
+        !e.path.some(p => p.className && p.className.includes('dropdownMenuItem'))) &&
       prev.showDropdownMenuButton
   }))
 
@@ -70,20 +71,20 @@ class WorkspaceListItem extends React.Component {
     return (
       <li
         id={props.workspaceId}
-        className='sidebar__content__navigation__workspace__item'
+        className={classnames(
+          'sidebar__content__navigation__workspace__item',
+          {
+            'sidebar__content__navigation__workspace__item__current primaryColorBorder':
+              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`)
+          }
+        )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
       >
         <Link
-          className={classnames(
-            'sidebar__content__navigation__workspace__item__wrapper',
-            {
-              'sidebar__content__navigation__workspace__item__current primaryColorBorder':
-                props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`)
-            }
-          )}
+          className='sidebar__content__navigation__workspace__item__wrapper'
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
@@ -110,28 +111,28 @@ class WorkspaceListItem extends React.Component {
           >
             {props.label}
           </div>
-
-          {state.showDropdownMenuButton && (
-            <DropdownMenu
-              buttonIcon='fa-ellipsis-v'
-              buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
-              buttonTooltip={props.t('Actions')}
-              buttonClick={this.activeDropdownMenu}
-            >
-              {props.allowedAppList.map(allowedApp =>
-                <Link
-                  to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
-                  data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
-                  key={allowedApp.slug}
-                  childkey={allowedApp.slug}
-                >
-                  <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
-                  {props.t(allowedApp.label)}
-                </Link>
-              )}
-            </DropdownMenu>
-          )}
         </Link>
+
+        {state.showDropdownMenuButton && (
+          <DropdownMenu
+            buttonIcon='fa-ellipsis-v'
+            buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
+            buttonTooltip={props.t('Actions')}
+            buttonClick={this.activeDropdownMenu}
+          >
+            {props.allowedAppList.map(allowedApp =>
+              <Link
+                to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
+                data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
+                key={allowedApp.slug}
+                childkey={allowedApp.slug}
+              >
+                <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
+                {props.t(allowedApp.label)}
+              </Link>
+            )}
+          </DropdownMenu>
+        )}
       </li>
     )
   }
