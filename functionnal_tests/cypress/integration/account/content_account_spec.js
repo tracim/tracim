@@ -247,5 +247,25 @@ describe('Account page', () => {
       })
     })
 
+    describe('Space management', () => {
+      it('Allows leaving a space', () => {
+        cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
+          .click()
+        cy.get('[data-cy=spaceconfig__table__leave_space_cell] .primaryColorBgHover')
+          .click()
+
+        cy.get('.confirm_popup').should('be.visible')
+        cy.get('[data-cy=confirm_popup__button_cancel]').click()
+        cy.contains('.spaceconfig__table__spacename', 'My space')
+
+        cy.get('[data-cy=spaceconfig__table__leave_space_cell] .primaryColorBgHover')
+          .click()
+
+        cy.get('.confirm_popup').should('be.visible')
+        cy.get('[data-cy=confirm_popup__button_confirm]').click()
+        cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
+      })
+    })
+
   })
 })

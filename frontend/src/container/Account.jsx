@@ -24,13 +24,11 @@ import {
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setWorkspaceListMemberList,
   updateUserAgendaUrl,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
 import {
-  getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
   putUserUsername,
@@ -48,7 +46,7 @@ import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {
   constructor (props) {
-    super(props)
+    super()
 
     const builtSubComponentMenu = [{
       name: 'personalData',
@@ -96,7 +94,6 @@ export class Account extends React.Component {
   componentDidMount () {
     const { props } = this
     this.setHeadTitle()
-    if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
   }
@@ -125,26 +122,6 @@ export class Account extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
     }
-  }
-
-  loadWorkspaceListMemberList = async () => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      props.workspaceList.map(async ws => ({
-        workspaceId: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(wsMemberList => ({
-      workspaceId: wsMemberList.workspaceId,
-      memberList: wsMemberList.fetchMemberList.status === 200
-        ? wsMemberList.fetchMemberList.json
-        : [] // handle error ?
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   buildBreadcrumbs = () => {
@@ -331,7 +308,6 @@ export class Account extends React.Component {
                         return (
                           <UserSpacesConfig
                             userToEditId={props.user.userId}
-                            workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                             admin={false}
                           />
@@ -362,7 +338,7 @@ export class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
-  breadcrumbs, user, workspaceList, timezone, system, appList
+const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList }) => ({
+  breadcrumbs, user, timezone, system, appList
 })
 export default connect(mapStateToProps)(translate()(TracimComponent(Account)))

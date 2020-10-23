@@ -8,7 +8,7 @@ describe('<UserSpacesConfig />', () => {
   const onChangeSubscriptionNotifCallBack = sinon.spy()
 
   const props = {
-    userLoggedId: 0,
+    userToEditId: 0,
     workspaceList: [{
       memberList: [{
         id: 0,

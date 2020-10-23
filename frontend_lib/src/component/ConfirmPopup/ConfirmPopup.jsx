@@ -17,6 +17,7 @@ const ConfirmPopup = (props) => (
         <button
           type='button'
           className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
+          data-cy='confirm_popup__button_cancel'
           onClick={props.onCancel}
         >
           {props.t('Cancel')}
@@ -24,6 +25,7 @@ const ConfirmPopup = (props) => (
         <button
           type='button'
           className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
+          data-cy='confirm_popup__button_confirm'
           onClick={props.onConfirm}
         >
           {props.confirmLabel || props.t('Confirm')}
