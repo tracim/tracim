@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import escapeRegExp from 'lodash/escapeRegExp'
 
 import {
   PageWrapper,
@@ -33,7 +32,7 @@ export class JoinWorkspace extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = { filter: () => true }
+    this.state = { filter: '' }
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
@@ -87,8 +86,8 @@ export class JoinWorkspace extends React.Component {
     const subscription = props.workspaceSubscriptionList.find(s => s.workspace.workspace_id === workspace.id)
 
     if (subscription !== undefined) {
-      var text = 'Unknown request state'
-      var icon = 'question'
+      let text = 'Unknown request state'
+      let icon = 'question'
       switch (subscription.state) {
         case SUBSCRIPTION_TYPE.pending.slug:
           text = props.t('Request sent')
@@ -118,7 +117,7 @@ export class JoinWorkspace extends React.Component {
             onClick={() => this.joinWorkspace(workspace.id)}
           />)
       default:
-        return 'Unknown space access type'
+        return <span>Unknown space access type</span>
     }
   }
 
@@ -130,9 +129,14 @@ export class JoinWorkspace extends React.Component {
   }
 
   handleWorkspaceFilter (filter) {
-    const re = new RegExp(escapeRegExp(filter), 'i')
-    const filterFunc = workspace => workspace.label.search(re) >= 0 || workspace.description.search(re) >= 0
-    this.setState({ filter: filterFunc })
+    this.setState({ filter: filter.toLowerCase() })
+  }
+
+  filterWorkspaces (workspace) {
+    return (
+      workspace.label.toLowerCase().includes(this.state.filter) ||
+      workspace.description.toLowerCase().includes(this.state.filter)
+    )
   }
 
   render () {
@@ -160,7 +164,7 @@ export class JoinWorkspace extends React.Component {
               <b>{props.t('Title and description')}</b>
               <b>{props.t('Access request')}</b>
             </div>
-            {props.accessibleWorkspaceList.filter(state.filter).map((workspace, index, array) =>
+            {props.accessibleWorkspaceList.filter(this.filterWorkspaces).map((workspace, index, array) =>
               <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                 {this.createIconForAccessType(workspace.accessType)}
                 <div class={`${className}__content__workspaceList__item__title_description`}>

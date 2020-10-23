@@ -5,11 +5,11 @@ import { IconButton } from 'tracim_frontend_lib'
 
 require('./Home.styl')
 
-const getWorkspaceMessage = (canCreate, canJoin) => {
-  if (canCreate && canJoin) return 'You can join an existing space or create your first space'
-  if (canCreate && !canJoin) return 'You can create your first space'
-  if (!canCreate && canJoin) return 'You can join an existing space'
-  return 'Please ask access to spaces to an administrator or space manager'
+const getWorkspaceMessage = (canCreate, canJoin, t) => {
+  if (canCreate && canJoin) return t('You can join an existing space or create your first space')
+  if (canCreate && !canJoin) return t('You can create your first space')
+  if (!canCreate && canJoin) return t('You can join an existing space')
+  return t('Please ask access to spaces to an administrator or space manager')
 }
 
 export const HomeNoWorkspace = props =>
@@ -28,7 +28,7 @@ export const HomeNoWorkspace = props =>
       <div className='homepagecard__text__user__top'>
         {props.t("You aren't member of any space yet")}
       </div>
-      {props.t(getWorkspaceMessage(props.canCreateWorkspace, props.canJoinWorkspace))}
+      {getWorkspaceMessage(props.canCreateWorkspace, props.canJoinWorkspace, props.t)}
     </div>
     <span class='homepagecard__buttons'>
       {props.canCreateWorkspace && (

@@ -97,7 +97,7 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceCreated = data => {
     const { props } = this
-    if (ACCESSIBLE_SPACE_TYPE_LIST.find(s => s.slug === data.fields.workspace.access_type) !== undefined) {
+    if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
       props.dispatch(addAccessibleWorkspace(data.fields.workspace))
     }
     this.handleNotification(data)
@@ -113,7 +113,7 @@ export class ReduxTlmDispatcher extends React.Component {
   handleWorkspaceModified = data => {
     const { props } = this
     props.dispatch(updateWorkspaceDetail(data.fields.workspace))
-    if (ACCESSIBLE_SPACE_TYPE_LIST.find(s => s.slug === data.fields.workspace.access_type) !== undefined) {
+    if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
       props.dispatch(updateAccessibleWorkspace(data.fields.workspace))
     }
     this.handleNotification(data)

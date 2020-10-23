@@ -7,12 +7,12 @@ const prepareTest = () => {
   cy.createWorkspace('baseWorkspace')
   cy.createWorkspace('openWorkspace')
   cy.createWorkspace('onRequestWorkspace')
-  cy.loginAs('users')
 }
 
 describe('Join space page', () => {
   before(() => prepareTest())
   beforeEach(() => {
+    cy.loginAs('users')
     cy.visitPage({
       pageName: p.JOIN_WORKSPACE
     })
@@ -30,24 +30,27 @@ describe('Join space page', () => {
   testCases.forEach(testCase => {
     describe(`The ${testCase.name} space item`, () => {
       it(`should contain "${testCase.title}" and have a "${testCase.button}" button`, () => {
-        cy.get('.joinWorkspace__content__workspaceList__item').eq(testCase.index + 1)
-          .contains(testCase.title)
-          .get('button')
+        cy.contains('.joinWorkspace__content__workspaceList__item', testCase.title)
+          .find('button')
           .contains(testCase.button)
       })
     })
   })
 
   describe('Clicking on a "Request access" button', () => {
-    it('should change the button to a "Request sent label"', () => {
-      cy.get('.joinWorkspace__content__workspaceList__item > button').eq(0).click()
-      cy.get('.joinWorkspace__content__workspaceList__item').contains('Request sent')
+    it('should change the button to a "Request sent" label', () => {
+      cy.contains('.joinWorkspace__content__workspaceList__item', 'ON REQUEST')
+        .find('button')
+        .click()
+      cy.contains('.joinWorkspace__content__workspaceList__item', 'ON REQUEST').should('contain.text', 'Request sent')
     })
   })
 
   describe('Clicking on a "Join the space" button', () => {
     it("should redirect to the space's page", () => {
-      cy.get('.joinWorkspace__content__workspaceList__item > button').eq(1).click()
+      cy.contains('.joinWorkspace__content__workspaceList__item', 'OPEN')
+        .find('button')
+        .click()
       cy.location('pathname').should('contain', '/ui/workspaces/')
     })
   })

@@ -61,7 +61,7 @@ describe('<JoinWorkspace />', () => {
     const workspace = { id: 1, accessType: SPACE_TYPE.onRequest.slug }
     const workspaceSubscriptionList = [{ workspace: { workspace_id: 1 }, state: testCase.subscriptionState }]
     describe(`its createRequestComponent() function with a subscription state '${testCase.subscriptionState}'`, () => {
-      const wrapper = shallow(<JoinWorkspaceWithoutHOC {...{ ...props, workspaceSubscriptionList: workspaceSubscriptionList }} />)
+      const wrapper = shallow(<JoinWorkspaceWithoutHOC workspaceSubscriptionList={workspaceSubscriptionList} {...props} />)
       const joinWorkspaceInstance = wrapper.instance()
       const component = joinWorkspaceInstance.createRequestComponent(workspace)
       it(`should return an icon '${testCase.expectedIcon}' with text '${testCase.expectedText}'`, () => {
