@@ -14,8 +14,17 @@ class WorkspaceListItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showDropdownMenuButton: isMobile
+      showDropdownMenuButton: isMobile,
+      dropdownMenuIsActive: isMobile
     }
+  }
+
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutsideDropdownMenu)
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('mousedown', this.handleClickOutsideDropdownMenu)
   }
 
   buildLink = (route, search, workspaceId, activeWorkspaceId) => {
@@ -42,7 +51,19 @@ class WorkspaceListItem extends React.Component {
     return 'fa-times-circle'
   }
 
-  handleItemHover = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : !prev.showDropdownMenuButton }))
+  handleClickOutsideDropdownMenu = e => this.setState(prev => ({
+    dropdownMenuIsActive: false,
+    showDropdownMenuButton:
+      !(prev.dropdownMenuIsActive &&
+      !e.path.some(p => p.className && p.className.includes('dropdownMenuItem'))) &&
+      prev.showDropdownMenuButton
+  }))
+
+  activeDropdownMenu = () => this.setState({ dropdownMenuIsActive: true })
+
+  handleMouseEnterItem = () => this.setState({ showDropdownMenuButton: true })
+
+  handleMouseLeaveItem = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : prev.dropdownMenuIsActive }))
 
   render () {
     const { props, state } = this
@@ -52,11 +73,17 @@ class WorkspaceListItem extends React.Component {
         className='sidebar__content__navigation__workspace__item'
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
-        onMouseEnter={this.handleItemHover}
-        onMouseLeave={this.handleItemHover}
+        onMouseEnter={this.handleMouseEnterItem}
+        onMouseLeave={this.handleMouseLeaveItem}
       >
         <Link
-          className='sidebar__content__navigation__workspace__item__wrapper'
+          className={classnames(
+            'sidebar__content__navigation__workspace__item__wrapper',
+            {
+              'sidebar__content__navigation__workspace__item__current primaryColorBorder':
+                props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`)
+            }
+          )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
@@ -74,7 +101,7 @@ class WorkspaceListItem extends React.Component {
             className={classnames(
               'sidebar__content__navigation__workspace__item__name',
               {
-                sidebar__content__navigation__workspace__item__current: props.location.pathname.includes(
+                sidebar__content__navigation__workspace__item__current__name: props.location.pathname.includes(
                   `${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`
                 )
               }
@@ -89,13 +116,14 @@ class WorkspaceListItem extends React.Component {
               buttonIcon='fa-ellipsis-v'
               buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
               buttonTooltip={props.t('Actions')}
+              buttonClick={this.activeDropdownMenu}
             >
               {props.allowedAppList.map(allowedApp =>
                 <Link
                   to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
                   data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                   key={allowedApp.slug}
-                  childrenKey={allowedApp.slug}
+                  childkey={allowedApp.slug}
                 >
                   <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
                   {props.t(allowedApp.label)}

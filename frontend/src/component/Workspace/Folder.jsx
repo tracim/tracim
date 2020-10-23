@@ -130,7 +130,7 @@ class Folder extends React.Component {
                         props.onClickCreateContent(e, props.folderData.id, app.slug)
                       }}
                       key={app.slug}
-                      childrenKey={app.slug}
+                      childkey={app.slug}
                     >
                       <i
                         className={`fa fa-fw fa-${app.faIcon}`}

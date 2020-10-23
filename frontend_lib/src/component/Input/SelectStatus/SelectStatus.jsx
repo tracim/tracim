@@ -37,7 +37,7 @@ export const SelectStatus = props => {
             className='selectStatus__submenu__item transparentButton current'
             onClick={() => props.onChangeStatus(s.slug)}
             key={`status_${s.slug}`}
-            childrenKey={`status_${s.slug}`}
+            childkey={`status_${s.slug}`}
             style={{ ':hover': { backgroundColor: s.customColor } }}
           >
             {props.t(s.label)}

@@ -27,7 +27,7 @@ export const MenuProfil = props => {
         <Link
           to={PAGE.ACCOUNT}
           data-cy='menuprofil__dropdown__account__link'
-          childrenKey='menuprofil__dropdown__account__link'
+          childkey='menuprofil__dropdown__account__link'
         >
           <i className='fa fa-fw fa-user-o' />
           {props.t('My Account')}
@@ -37,7 +37,7 @@ export const MenuProfil = props => {
           className='transparentButton'
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
-          childrenKey='menuprofil__dropdown__logout__link'
+          childkey='menuprofil__dropdown__logout__link'
         >
           <i className='fa fa-fw fa-sign-out' />
           {props.t('Logout')}

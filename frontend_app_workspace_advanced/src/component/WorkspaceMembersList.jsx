@@ -68,7 +68,7 @@ export const WorkspaceMembersList = props => {
                             className='transparentButton'
                             onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                             key={`role_${r.id}`}
-                            childrenKey={`role_${r.id}`}
+                            childkey={`role_${r.id}`}
                           >
                             <i className={`fa fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
                             {props.t(r.label)}
