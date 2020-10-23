@@ -16,7 +16,7 @@ export class TextInput extends React.Component {
     return <div class='textinput__box'>
       <input
         type='text'
-        class='textinput__text form-control primaryColorBorderLighten'
+        class='textinput__text form-control primaryColorBorder'
         onChange={props.onChange}
         disabled={props.disabled}
         placeholder={props.placeholder}

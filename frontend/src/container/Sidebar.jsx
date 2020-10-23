@@ -175,14 +175,16 @@ export class Sidebar extends React.Component {
                     mode='light'
                   />
                 )}
-                <IconButton
-                  onClick={this.handleClickJoinWorkspace}
-                  dataCy='sidebarJoinWorkspaceBtn'
-                  icon='users'
-                  text={props.t('Join a space')}
-                  intent='primary'
-                  mode='light'
-                />
+                {props.accessibleWorkspaceList.length > 0 && (
+                  <IconButton
+                    onClick={this.handleClickJoinWorkspace}
+                    dataCy='sidebarJoinWorkspaceBtn'
+                    icon='users'
+                    text={props.t('Join a space')}
+                    intent='primary'
+                    mode='light'
+                  />
+                )}
               </div>
             </div>
 
@@ -204,5 +206,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
+const mapStateToProps = ({ user, workspaceList, system, accessibleWorkspaceList }) => ({ user, workspaceList, system, accessibleWorkspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))
