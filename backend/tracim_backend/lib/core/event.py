@@ -53,6 +53,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
@@ -633,15 +634,21 @@ def _get_workspace_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
     user_api = UserApi(current_user=None, session=session, config=config)
-    administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
-    receiver_ids = set(administrators + workspace_members)
-    try:
-        receiver_ids.add(event.user["user_id"])
-    except AttributeError:
-        # no user in event
-        pass
+
+    # Two cases: if workspace is accessible every user should get a message
+    # If not, only administrators + members + user subject of the action (for user role events)
+    if WorkspaceAccessType(event.workspace["access_type"]) in Workspace.ACCESSIBLE_TYPES:
+        receiver_ids = set(user.user_id for user in user_api.get_all())
+    else:
+        administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
+        role_api = RoleApi(current_user=None, session=session, config=config)
+        workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+        receiver_ids = set(administrators + workspace_members)
+        try:
+            receiver_ids.add(event.user["user_id"])
+        except AttributeError:
+            # no user in event
+            pass
     return receiver_ids
 
 

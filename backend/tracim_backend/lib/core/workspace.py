@@ -358,7 +358,7 @@ class WorkspaceApi(object):
           - do not have user as a member
         """
         query = self._base_query_without_roles().filter(
-            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+            Workspace.access_type.in_(Workspace.ACCESSIBLE_TYPES)
         )
         query = query.filter(
             Workspace.workspace_id.notin_(
