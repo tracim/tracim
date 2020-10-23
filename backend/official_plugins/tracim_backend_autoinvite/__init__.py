@@ -1,5 +1,6 @@
 from pluggy import PluginManager
 
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -46,13 +47,16 @@ class HookImpl:
             rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
             for user in all_users:
                 if user != workspace.owner:
-                    rapi.create_one(
-                        user=user,
-                        workspace=workspace,
-                        role_level=workspace.default_user_role.level,
-                        with_notif=True,
-                        flush=False,
-                    )
+                    try:
+                        rapi.create_one(
+                            user=user,
+                            workspace=workspace,
+                            role_level=workspace.default_user_role.level,
+                            with_notif=True,
+                            flush=False,
+                        )
+                    except RoleAlreadyExistError:
+                        pass
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
