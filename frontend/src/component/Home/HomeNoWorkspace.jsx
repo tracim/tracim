@@ -9,7 +9,7 @@ const getWorkspaceMessage = (canCreate, canJoin) => {
   if (canCreate && canJoin) return 'You can join an existing space or create your first space'
   if (canCreate && !canJoin) return 'You can create your first space'
   if (!canCreate && canJoin) return 'You can join an existing space'
-  return 'Please contact an administrator or space manager to get access'
+  return 'Please ask access to spaces to an administrator or space manager'
 }
 
 export const HomeNoWorkspace = props =>
@@ -33,7 +33,7 @@ export const HomeNoWorkspace = props =>
     <span class='homepagecard__buttons'>
       {props.canCreateWorkspace && (
         <IconButton
-          data-cy='homepagecard__btn'
+          dataCy='homepagecard__create_btn'
           onClick={props.onClickCreateWorkspace}
           text={props.t('Create a space')}
           icon='plus'
@@ -42,8 +42,7 @@ export const HomeNoWorkspace = props =>
 
       {props.canJoinWorkspace && (
         <IconButton
-          className='homepagecard__btn'
-          data-cy='homepagecard__join_btn'
+          dataCy='homepagecard__join_btn'
           onClick={props.onClickJoinWorkspace}
           icon='users'
           text={props.t('Join a space')}

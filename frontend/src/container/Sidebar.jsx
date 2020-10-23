@@ -164,8 +164,10 @@ export class Sidebar extends React.Component {
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
               </nav>
+            </div>
 
-              <div className='sidebar__content__buttons'>
+            <div className='sidebar__footer mb-2'>
+              <div className='sidebar__footer__buttons'>
                 {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
                   <IconButton
                     onClick={this.handleClickNewWorkspace}
@@ -186,9 +188,6 @@ export class Sidebar extends React.Component {
                   />
                 )}
               </div>
-            </div>
-
-            <div className='sidebar__footer mb-2'>
               <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
                 {TRACIM_APP_VERSION}
               </div>

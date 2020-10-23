@@ -59,13 +59,6 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
-    &__buttons
-      padding 50px 0
-      overflow hidden
-      color fontColor
-      display: flex
-      flex-direction: column
-      gap 10px
     &__navigation
       padding 0
       width sidebar-width
@@ -120,6 +113,17 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             font-weight bold
   &__footer
     margin-top auto
+    &__buttons
+      width: 75%
+      margin-left: 12.5%
+      overflow hidden
+      display: flex
+      flex-direction: column
+      justify-content: center
+      gap 10px
+      margin-bottom: 10px
+      & > *
+        width: 100%
     &__text
       color offWhite
       font-size 14px

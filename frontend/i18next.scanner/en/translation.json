@@ -265,7 +265,6 @@
   "Error loading unread notification number": "Error loading unread notification number",
   "{{author}} added {{user}} to {{space}}": "{{author}} added {{user}} to {{space}}",
   "Unknown shared space": "Unknown shared space",
-  "Error loading unread notification number": "Error loading unread notification number",
   "{{author}} deleted {{content}} from {{space}}": "{{author}} deleted {{content}} from {{space}}",
   "{{author}} restored {{content}} in {{space}}": "{{author}} restored {{content}} in {{space}}",
   "{{author}} created {{user}}'s profile": "{{author}} created {{user}}'s profile",
@@ -277,5 +276,16 @@
   "{{author}} deleted the space {{space}}": "{{author}} deleted the space {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} restored the space {{space}}",
   "Only an administrator can see this user's profile": "Only an administrator can see this user's profile",
-  "This notification has no associated content": "This notification has no associated content"
+  "This notification has no associated content": "This notification has no associated content",
+  "Join a space": "Join a space",
+  "Title and description": "Title and description",
+  "Access request": "Access request",
+  "Request access": "Request access",
+  "Request sent": "Request sent",
+  "Join the space": "Join the space",
+  "Filter spaces": "Filter spaces",
+  "You can join an existing space or create your first space": "You can join an existing space or create your first space",
+  "You can create your first space": "You can create your first space",
+  "You can join an existing space": "You can join an existing space",
+  "Please ask access to your spaces to an administrator or space manager": "Please ask access to your spaces to an administrator or space manager"
 }

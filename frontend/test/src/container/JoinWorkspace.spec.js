@@ -1,44 +1,22 @@
 import React from 'react'
 import { expect } from 'chai'
-import sinon from 'sinon'
 import { shallow } from 'enzyme'
 
 import { SPACE_TYPE, SUBSCRIPTION_TYPE } from 'tracim_frontend_lib'
 import { JoinWorkspace as JoinWorkspaceWithoutHOC } from '../../../src/container/JoinWorkspace.jsx'
 import { user } from '../../hocMock/redux/user/user.js'
-import {
-  SET,
-  USER,
-  USER_DISCONNECTED
-} from '../../../src/action-creator.sync.js'
 
 describe('<JoinWorkspace />', () => {
-  const setUserDisconnectedCallBack = sinon.spy()
-  const setUserLangCallBack = sinon.spy()
-
-  const dispatchMock = (params) => {
-    if (isFunction(params)) return params(dispatchMock)
-
-    const { type } = params
-    switch (type) {
-      case `${SET}/${USER_DISCONNECTED}`: setUserDisconnectedCallBack(); break
-      case `${SET}/${USER}/Lang`: setUserLangCallBack(); break
-    }
-    return params
-  }
-
   const props = {
     user: user,
     history: {
       push: () => {}
     },
     t: key => key,
-    dispatchCustomEvent: dispatchMock,
-    dispatch: dispatchMock,
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
     accessibleWorkspaceList: [],
-    workspaceSubscriptionList: [],
+    workspaceSubscriptionList: []
   }
 
   const createRequestComponentTestCases = [
