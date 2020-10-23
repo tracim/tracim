@@ -53,6 +53,7 @@ from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+from tracim_backend.tests.utils import tracim_plugin_loader
 
 
 @pytest.fixture
@@ -219,9 +220,22 @@ def migration_engine(engine):
     engine.execute(sql)
 
 
+@pytest.fixture()
+def load_auto_invite_plugin(test_context):
+    official_plugin_folder = dirname(dirname(dirname(__file__))) + "/official_plugins"
+    pluggy_manager = test_context.plugin_manager
+    plugin_name = "tracim_backend_autoinvite"
+    return tracim_plugin_loader(plugin_name, pluggy_manager, official_plugin_folder)
+
+
 @pytest.fixture
-def session(request, engine, session_factory, app_config, test_logger):
-    context = TracimTestContext(app_config, session_factory=session_factory)
+def test_context(app_config, session_factory):
+    yield TracimTestContext(app_config, session_factory=session_factory)
+
+
+@pytest.fixture
+def session(request, engine, session_factory, app_config, test_logger, test_context):
+    context = test_context
 
     with transaction.manager:
         try:
