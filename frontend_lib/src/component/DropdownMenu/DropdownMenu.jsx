@@ -18,7 +18,7 @@ const DropdownMenu = props => {
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         id='dropdownMenuButton'
-        onClick={e => {e.stopPropagation(); props.buttonClick()}}
+        onClick={e => { e.stopPropagation(); props.buttonClick() }}
         title={props.buttonTooltip ? props.buttonTooltip : props.buttonLabel}
         type='button'
       >
@@ -58,7 +58,7 @@ DropdownMenu.propTypes = {
 }
 
 DropdownMenu.defaultProps = {
-  buttonClick: () => {},
+  buttonClick: () => { },
   buttonCustomClass: '',
   buttonDataCy: '',
   buttonDisabled: false,
