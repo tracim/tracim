@@ -1,5 +1,5 @@
 # Parent Access Plugin
 
-This internal plugin:
-- adds new members of space into all parent (recursively) of this space
+This plugin:
+- recursively adds new members of space to its parents
 with default user role of each space
