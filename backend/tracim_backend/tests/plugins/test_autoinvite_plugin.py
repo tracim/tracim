@@ -39,7 +39,7 @@ class TestAutoInvitePlugin(object):
         load_auto_invite_plugin,
     ):
         """
-        Test if new users are correctly added to open workspace with auto_invite_plugin enabled
+        Test if new users are correctly added to open workspaces with auto_invite_plugin enabled
         """
         with load_auto_invite_plugin:
             wapi = workspace_api_factory.get()
@@ -91,7 +91,7 @@ class TestAutoInvitePlugin(object):
         load_auto_invite_plugin,
     ):
         """
-        Test if existing users are correctly added to new open workspace with auto_invite_plugin enabled
+        Test if existing users are correctly added to new open workspaces with auto_invite_plugin enabled
         """
         with load_auto_invite_plugin:
             uapi = user_api_factory.get()

@@ -37,7 +37,7 @@ class HookImpl:
     @hookimpl
     def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
         """
-        Set all user as members of new open workspace as default workspace default_user_role
+        Set all users as members of new open workspaces using the default workspace role
         """
         if workspace.access_type == WorkspaceAccessType.OPEN:
             all_users = UserApi(
