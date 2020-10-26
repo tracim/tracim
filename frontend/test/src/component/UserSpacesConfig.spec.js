@@ -59,16 +59,13 @@ describe('<UserSpacesConfig />', () => {
         const tlmData = {
           fields: {
             author: userFromApi,
-            user: userFromApi,
+            user: { ...userFromApi, user_id: 0 },
             member: { role: 'workspace-manager', do_notify: false },
             workspace: { ...firstWorkspaceFromApi, workspace_id: 2 }
           }
         }
         wrapper.instance().handleMemberModified(tlmData)
 
-        console.error(wrapper.state().workspaceList.find(
-          space => space.workspace_id === tlmData.fields.workspace.workspace_id
-        ).memberList, tlmData.fields.user.user_id, 'LOOL')
         const member = wrapper.state().workspaceList.find(
           space => space.workspace_id === tlmData.fields.workspace.workspace_id
         ).memberList.find(m => m.user_id === tlmData.fields.user.user_id)

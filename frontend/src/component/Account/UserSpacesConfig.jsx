@@ -34,17 +34,16 @@ export class UserSpacesConfig extends React.Component {
 
   handleMemberModified = data => {
     const { props } = this
-    console.error("handleMemberModified", Number(props.userToEditId), data.fields.user.user_id)
     if (Number(props.userToEditId) !== data.fields.user.user_id) return
     this.setState(prev => ({
       workspaceList: prev.workspaceList.map(space =>
         space.workspace_id === data.fields.workspace.workspace_id
           ? {
             ...space,
-            memberList: space.memberList.map(member => (console.error("MAP", member, props.userToEditId), member.user_id === Number(props.userToEditId)
+            memberList: space.memberList.map(member => member.user_id === Number(props.userToEditId)
               ? { ...member, do_notify: data.fields.member.do_notify }
               : member
-            ))
+            )
           }
           : space
       )
