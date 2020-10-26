@@ -4,10 +4,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import {
-  BtnSwitch,
-  IconButton,
   ConfirmPopup,
-  ROLE_LIST,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
@@ -15,6 +12,8 @@ import {
 
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } from '../../action-creator.async.js'
+
+import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
 export class UserSpacesConfig extends React.Component {
   constructor (props) {
@@ -110,6 +109,10 @@ export class UserSpacesConfig extends React.Component {
     }
   }
 
+  handleLeaveSpace = (spaceBeingDeleted) => {
+    this.setState({ spaceBeingDeleted })
+  }
+
   componentDidMount = this.getWorkspaceList
 
   componentDidUpdate (prevProps) {
@@ -121,48 +124,24 @@ export class UserSpacesConfig extends React.Component {
   render () {
     const { props } = this
 
-    const entries = this.state.workspaceList.map(space => {
+    const entries = this.state.workspaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
         const member = space.memberList.find(u => u.user_id === props.userToEditId)
-        if (!member) return
-        const memberRole = ROLE_LIST.find(r => r.slug === member.role)
-        return (
-          <tr key={space.workspace_id}>
-            <td>
-              <div className='spaceconfig__table__spacename'>
-                {space.label}
-              </div>
-            </td>
-
-            <td>
-              <div className='spaceconfig__table__role'>
-                <div className='spaceconfig__table__role__icon'>
-                  <i className={`fa fa-fw fa-${memberRole.faIcon}`} style={{ color: memberRole.hexcolor }} />
-                </div>
-                <div className='spaceconfig__table__role__text d-none d-sm-flex'>
-                  {props.t(memberRole.label)}
-                </div>
-              </div>
-            </td>
-
-            <td>
-              <BtnSwitch
-                checked={member.do_notify}
-                onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
-              />
-            </td>
-            <td data-cy='spaceconfig__table__leave_space_cell'>
-              <IconButton
-                className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                onClick={() => this.setState({ spaceBeingDeleted: space.workspace_id })}
-                icon='sign-out'
-                text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
-              />
-            </td>
-          </tr>
-        )
+        if (member) {
+          res.push(
+            <UserSpacesConfigLine
+              space={space}
+              member={member}
+              key={space.workspace_id}
+              onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+              onLeaveSpace={this.handleLeaveSpace}
+              admin={props.admin}
+            />
+          )
+        }
+        return res
       }
-    }).filter(entry => entry)
+    }, [])
 
     return (
       <div className='account__userpreference__setting__spacename'>
