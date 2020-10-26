@@ -118,7 +118,7 @@ export class UserSpacesConfig extends React.Component {
     }
   }
 
-  render = () => {
+  render () {
     const { props } = this
 
     const entries = this.state.workspaceList.map(space => {
