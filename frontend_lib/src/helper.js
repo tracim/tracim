@@ -532,7 +532,7 @@ export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
 
-// INFO - GB - 2020-10-14 - useful to ensure that the same functions can be used with serialized lists (like for frontend)
+// INFO - RJ - 2020-10-26 - useful to ensure that the same functions can be used with serialized lists (like for frontend)
 // or not (like for frontend_app_workspace)
 const getSpaceId = (space) => space.workspace_id || space.id
 
