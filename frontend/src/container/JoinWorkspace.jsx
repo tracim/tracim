@@ -28,6 +28,8 @@ import {
 } from '../util/helper.js'
 import { getWorkspaceSubscriptions, joinWorkspace, subscribeToWorkspace } from '../action-creator.async.js'
 
+require('../css/JoinWorkspace.styl')
+
 export class JoinWorkspace extends React.Component {
   constructor (props) {
     super(props)

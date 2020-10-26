@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 require('./TextInput.styl')
 
+// NOTE - S.G - 2020-10-26
 // A thin-layer around <input type='text'> that sets the Tracim style and behaviour
 // Also provide a onValidate handler which is called when Enter is pressed by the user.
 export class TextInput extends React.Component {
