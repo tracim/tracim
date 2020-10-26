@@ -113,7 +113,9 @@ export class UserSpacesConfig extends React.Component {
     this.setState({ spaceBeingDeleted })
   }
 
-  componentDidMount = this.getWorkspaceList
+  componentDidMount () {
+    this.getWorkspaceList()
+  }
 
   componentDidUpdate (prevProps) {
     if (prevProps.userToEditId !== this.props.userToEditId) {
