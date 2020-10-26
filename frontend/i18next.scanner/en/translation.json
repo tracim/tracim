@@ -64,7 +64,7 @@
   "Role": "Role",
   "Notification": "Notification",
   "You are not a member of any space yet": "You are not a member of any space yet",
-  "This user is not a member of any space yet": "This member is not a member of any space yet",
+  "This user is not a member of any space yet": "This user is not a member of any space yet",
   "Password cannot exceed 512 characters": "Password cannot exceed 512 characters",
   "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
   "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
