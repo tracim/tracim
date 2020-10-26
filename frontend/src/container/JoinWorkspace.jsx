@@ -140,7 +140,7 @@ export class JoinWorkspace extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
     const className = 'joinWorkspace'
     return (
       <PageWrapper customClass={`${className}__wrapper`}>
@@ -164,7 +164,7 @@ export class JoinWorkspace extends React.Component {
               <b>{props.t('Title and description')}</b>
               <b>{props.t('Access request')}</b>
             </div>
-            {props.accessibleWorkspaceList.filter(this.filterWorkspaces).map((workspace, index, array) =>
+            {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace, index, array) =>
               <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                 {this.createIconForAccessType(workspace.accessType)}
                 <div class={`${className}__content__workspaceList__item__title_description`}>
