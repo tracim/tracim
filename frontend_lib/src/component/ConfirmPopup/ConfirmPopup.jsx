@@ -35,7 +35,7 @@ const ConfirmPopup = (props) => (
   </CardPopup>
 )
 
-ConfirmPopup.propType = {
+ConfirmPopup.propTypes = {
   confirmLabel: PropTypes.string,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
