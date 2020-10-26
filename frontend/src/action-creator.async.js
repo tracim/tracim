@@ -947,7 +947,7 @@ export const getWorkspaceSubscriptions = userId => dispatch => {
   })
 }
 
-export const joinWorkspace = (workspaceId, userId) => dispatch => {
+export const postUserWorkspace = (workspaceId, userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
     param: {
@@ -965,7 +965,7 @@ export const joinWorkspace = (workspaceId, userId) => dispatch => {
   })
 }
 
-export const subscribeToWorkspace = (workspaceId, userId) => dispatch => {
+export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspace_subscriptions`,
     param: {

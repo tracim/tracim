@@ -26,7 +26,7 @@ import {
 import {
   PAGE
 } from '../util/helper.js'
-import { getWorkspaceSubscriptions, joinWorkspace, subscribeToWorkspace } from '../action-creator.async.js'
+import { getWorkspaceSubscriptions, postUserWorkspace, putUserWorkspaceSubscription } from '../action-creator.async.js'
 
 require('../css/JoinWorkspace.styl')
 
@@ -78,7 +78,7 @@ export class JoinWorkspace extends React.Component {
 
   async joinWorkspace (workspaceId) {
     const { props } = this
-    await props.dispatch(joinWorkspace(workspaceId, props.user.userId))
+    await props.dispatch(postUserWorkspace(workspaceId, props.user.userId))
     props.history.push(PAGE.WORKSPACE.DASHBOARD(workspaceId))
   }
 
@@ -109,7 +109,7 @@ export class JoinWorkspace extends React.Component {
           <IconButton
             icon='share'
             text={props.t('Request access')}
-            onClick={() => props.dispatch(subscribeToWorkspace(workspace.id, props.user.userId))}
+            onClick={() => props.dispatch(putUserWorkspaceSubscription(workspace.id, props.user.userId))}
           />)
       case SPACE_TYPE.open.slug:
         return (
