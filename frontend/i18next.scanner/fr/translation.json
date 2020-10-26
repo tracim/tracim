@@ -276,7 +276,7 @@
   "{{author}} modified the space {{space}}": "{{author}} a mis à jour l'espace {{space}}",
   "{{author}} deleted the space {{space}}": "{{author}} a supprimé l'espace {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} a restauré l'espace {{space}}",
-  "Only an administrator can see this user's profile": "Seule un administrateur peut consulter ce profil utilisateur",
+  "Only an administrator can see this user's profile": "Seul un administrateur peut consulter ce profil utilisateur",
   "Leave space": "Quitter l'espace",
   "Are you sure you want to leave the space?": "Voulez-vous vraiment quitter cet espace ?",
   "Remove from space": "Retirer de l'espace",
