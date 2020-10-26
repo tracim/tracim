@@ -280,6 +280,6 @@
   "Leave space": "Quitter l'espace",
   "Are you sure you want to leave the space?": "Voulez-vous vraiment quitter cet espace ?",
   "Remove from space": "Retirer de l'espace",
-  "Error while leaving the space": "Error while leaving the space",
+  "Error while leaving the space": "Une erreur est survenue au moment de quitter l'espace",
   "This notification has no associated content": "Cette notification n'a pas de contenu associé"
 }
