@@ -18,7 +18,7 @@ import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } f
 
 export class UserSpacesConfig extends React.Component {
   constructor (props) {
-    super()
+    super(props)
 
     this.state = {
       workspaceList: [],
