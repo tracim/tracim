@@ -37,15 +37,13 @@ const ConfirmPopup = (props) => (
 
 ConfirmPopup.propTypes = {
   confirmLabel: PropTypes.string,
-  onConfirm: PropTypes.func,
-  onCancel: PropTypes.func,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
   msg: PropTypes.string
 }
 
 ConfirmPopup.defaultProps = {
   confirmLabel: '',
-  onConfirm: null,
-  onCancel: null,
   msg: ''
 }
 
