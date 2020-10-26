@@ -46,7 +46,7 @@ import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {
   constructor (props) {
-    super()
+    super(props)
 
     const builtSubComponentMenu = [{
       name: 'personalData',
