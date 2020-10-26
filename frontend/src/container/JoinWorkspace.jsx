@@ -87,17 +87,13 @@ export class JoinWorkspace extends React.Component {
 
     const subscription = props.workspaceSubscriptionList.find(s => s.workspace.workspace_id === workspace.id)
 
-    if (subscription !== undefined) {
+    if (subscription !== undefined && subscription.state !== SUBSCRIPTION_TYPE.rejected.slug) {
       let text = 'Unknown request state'
       let icon = 'question'
       switch (subscription.state) {
         case SUBSCRIPTION_TYPE.pending.slug:
           text = props.t('Request sent')
           icon = SUBSCRIPTION_TYPE.pending.faIcon
-          break
-        case SUBSCRIPTION_TYPE.rejected.slug:
-          text = props.t('Request rejected')
-          icon = SUBSCRIPTION_TYPE.rejected.faIcon
           break
       }
       return <div><i class={`fa fa-${icon}`} /> {text}</div>
@@ -171,7 +167,7 @@ export class JoinWorkspace extends React.Component {
                 {this.createIconForAccessType(workspace.accessType)}
                 <div class={`${className}__content__workspaceList__item__title_description`}>
                   <span>{workspace.label}</span>
-                  <span class={`${className}__content__workspaceList__item__description`}>{workspace.description}</span>
+                  <span class={`${className}__content__workspaceList__item__description`} title={workspace.description}>{workspace.description}</span>
                 </div>
                 {this.createRequestComponent(workspace)}
               </div>

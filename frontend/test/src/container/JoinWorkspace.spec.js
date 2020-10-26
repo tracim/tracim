@@ -56,11 +56,6 @@ describe('<JoinWorkspace />', () => {
       subscriptionState: SUBSCRIPTION_TYPE.pending.slug,
       expectedIcon: SUBSCRIPTION_TYPE.pending.faIcon,
       expectedText: 'Request sent'
-    },
-    {
-      subscriptionState: SUBSCRIPTION_TYPE.rejected.slug,
-      expectedIcon: SUBSCRIPTION_TYPE.rejected.faIcon,
-      expectedText: 'Request rejected'
     }
   ]
 

@@ -3,7 +3,8 @@
 .joinWorkspace
   &__wrapper
     width: 100%
-    overflow: auto
+    overflow-x: hidden
+    overflow-y: scroll
   &__content__workspaceList
     display: flex
     flex-direction: column
@@ -33,7 +34,7 @@
 
       // buttons "column"
       & > *:last-child
-        flex: 0 0 200px
+        flex: 0 0 220px
         margin-right: 10px
         text-align: center
 
@@ -50,3 +51,6 @@
 
       &__description
         font-size: fontSizeSmall
+        text-overflow: ellipsis
+        overflow: hidden
+        white-space: nowrap
