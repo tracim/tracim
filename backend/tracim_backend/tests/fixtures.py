@@ -221,8 +221,19 @@ def migration_engine(engine):
 
 
 @pytest.fixture()
-def load_auto_invite_plugin(test_context):
-    official_plugin_folder = dirname(dirname(dirname(__file__))) + "/official_plugins"
+def official_plugin_folder():
+    return dirname(dirname(dirname(__file__))) + "/official_plugins"
+
+
+@pytest.fixture()
+def load_parent_access_plugin(test_context, official_plugin_folder):
+    pluggy_manager = test_context.plugin_manager
+    plugin_name = "tracim_backend_parent_access"
+    return tracim_plugin_loader(plugin_name, pluggy_manager, official_plugin_folder)
+
+
+@pytest.fixture()
+def load_auto_invite_plugin(test_context, official_plugin_folder):
     pluggy_manager = test_context.plugin_manager
     plugin_name = "tracim_backend_autoinvite"
     return tracim_plugin_loader(plugin_name, pluggy_manager, official_plugin_folder)
