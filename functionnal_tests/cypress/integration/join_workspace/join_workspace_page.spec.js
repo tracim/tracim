@@ -38,11 +38,10 @@ describe('Join space page', () => {
   })
 
   describe('Clicking on a "Request access" button', () => {
-    it('should change the button to a "Request sent" label', () => {
+    it('should be possible', () => {
       cy.contains('.joinWorkspace__content__workspaceList__item', 'ON REQUEST')
         .find('button')
         .click()
-      cy.contains('.joinWorkspace__content__workspaceList__item', 'ON REQUEST').should('contain.text', 'Request sent')
     })
   })
 
