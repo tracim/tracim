@@ -172,42 +172,44 @@ export class UserSpacesConfig extends React.Component {
 
         <div className='spaceconfig__text ml-2 ml-sm-0' />
 
-        {(entries.length ? (
-          <div className='spaceconfig__table'>
-            <table className='table'>
-              <thead>
-                <tr>
-                  <th>{props.t('Space')}</th>
-                  <th>{props.t('Role')}</th>
-                  <th>{props.t('Email notifications')}</th>
-                  <th />
-                </tr>
-              </thead>
+        {(entries.length
+          ? (
+            <div className='spaceconfig__table'>
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>{props.t('Space')}</th>
+                    <th>{props.t('Role')}</th>
+                    <th>{props.t('Email notifications')}</th>
+                    <th />
+                  </tr>
+                </thead>
 
-              <tbody>{entries}</tbody>
-            </table>
-            {(this.state.spaceBeingDeleted && (
-              <ConfirmPopup
-                onConfirm={this.handleConfirmDeleteSpace}
-                onCancel={() => this.setState({ spaceBeingDeleted: null })}
-                msg={
-                  props.admin
-                    ? props.t('Are you sure you want to remove this member from the space?')
-                    : props.t('Are you sure you want to leave the space?')
-                }
-                confirmLabel={
-                  props.admin
-                    ? props.t('Remove from space')
-                    : props.t('Leave space')
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          props.admin
-            ? props.t('This user is not a member of any space yet')
-            : props.t('You are not a member of any space yet')
-        ))}
+                <tbody>{entries}</tbody>
+              </table>
+              {(this.state.spaceBeingDeleted && (
+                <ConfirmPopup
+                  onConfirm={this.handleConfirmDeleteSpace}
+                  onCancel={() => this.setState({ spaceBeingDeleted: null })}
+                  msg={
+                    props.admin
+                      ? props.t('Are you sure you want to remove this member from the space?')
+                      : props.t('Are you sure you want to leave the space?')
+                  }
+                  confirmLabel={
+                    props.admin
+                      ? props.t('Remove from space')
+                      : props.t('Leave space')
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            props.admin
+              ? props.t('This user is not a member of any space yet')
+              : props.t('You are not a member of any space yet')
+          )
+        )}
       </div>
     )
   }
@@ -216,9 +218,9 @@ export class UserSpacesConfig extends React.Component {
 export default connect()(translate()(TracimComponent(UserSpacesConfig)))
 
 UserSpacesConfig.propTypes = {
-  userToEditId: PropTypes.number,
+  userToEditId: PropTypes.number.isRequired,
   onChangeSubscriptionNotif: PropTypes.func,
-  admin: PropTypes.bool
+  admin: PropTypes.bool.isRequired
 }
 
 UserSpacesConfig.defaultProps = {
