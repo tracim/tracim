@@ -45,7 +45,7 @@ IconButton.propTypes = {
 IconButton.defaultProps = {
   onClick: undefined,
   disabled: false,
-  color: GLOBAL_primaryColor,
+  color: GLOBAL_primaryColor, // eslint-disable-line no-undef
   intent: 'secondary',
   customClass: '',
   mode: 'dark',
