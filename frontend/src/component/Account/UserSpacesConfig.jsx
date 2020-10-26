@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import {
+  sortWorkspaceList,
   ConfirmPopup,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -66,9 +67,7 @@ export class UserSpacesConfig extends React.Component {
     const newSpace = await this.fillMemberList(data.fields.workspace)
 
     this.setState(prev => ({
-      workspaceList: [...prev.workspaceList, newSpace].sort(
-        (space1, space2) => space1.workspace_id - space2.workspace_id
-      )
+      workspaceList: sortWorkspaceList([...prev.workspaceList, newSpace])
     }))
   }
 
