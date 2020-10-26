@@ -53,8 +53,8 @@ export class UserSpacesConfig extends React.Component {
     const { props } = this
     if (Number(props.userToEditId) !== data.fields.user.user_id) return
     this.setState(prev => ({
-      workspaceList: prev.workspaceList.filter(ws =>
-        ws.workspace_id !== data.fields.workspace.workspace_id
+      workspaceList: prev.workspaceList.filter(space =>
+        space.workspace_id !== data.fields.workspace.workspace_id
       )
     }))
   }
@@ -92,8 +92,8 @@ export class UserSpacesConfig extends React.Component {
     }
   }
 
-  getUserWorkspaceListMemberList = async (wsList) => {
-    const workspaceList = await Promise.all(wsList.map(this.fillMemberList))
+  getUserWorkspaceListMemberList = async (spaceList) => {
+    const workspaceList = await Promise.all(spaceList.map(this.fillMemberList))
     this.setState({ workspaceList })
   }
 
