@@ -38,7 +38,6 @@ IconButton.propTypes = {
   color: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  title: PropTypes.string,
   intent: PropTypes.oneOf(['primary', 'secondary']),
   mode: PropTypes.oneOf(['dark', 'light']),
   customClass: PropTypes.string,

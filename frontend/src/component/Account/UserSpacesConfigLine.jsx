@@ -37,7 +37,8 @@ class UserSpacesConfigLine extends React.Component {
         </td>
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
-            mode='light'
+            mode='dark'
+            intent='secondary'
             disabled={props.onlyManager}
             onClick={(() => props.onLeaveSpace(space.workspace_id))}
             icon='sign-out'
