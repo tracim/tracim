@@ -24,6 +24,7 @@ if (!global.window && !global.document) {
   global.localStorage = {
     getItem: () => {}
   }
+  global.GLOBAL_primaryColor = '#aaaaaa'
   global.wysiwyg = () => {}
   global.GLOBAL_dispatchEvent = () => {}
   const nodeCrypto = require('crypto')

@@ -65,7 +65,8 @@ export const PAGE = {
   },
   SEARCH_RESULT: '/ui/search-result',
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
-  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`
+  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
+  JOIN_WORKSPACE: '/ui/join-workspace'
 }
 
 export const unLoggedAllowedPageList = [

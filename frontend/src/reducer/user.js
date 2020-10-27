@@ -63,7 +63,11 @@ export default function user (state = defaultUser, action) {
 
     case `${UPDATE}/${USER}`:
       if (action.newUser.user_id !== state.userId) return state
-      return { ...state, ...serialize(action.newUser, serializeUserProps) }
+      return {
+        ...state,
+        ...serialize(action.newUser, serializeUserProps),
+        lang: action.newUser.lang || state.lang
+      }
 
     case `${SET}/${USER_AGENDA_URL}`:
       return { ...state, agendaUrl: action.newAgendaUrl }
