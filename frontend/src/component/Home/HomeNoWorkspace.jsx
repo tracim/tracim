@@ -1,10 +1,19 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 
+import { IconButton } from 'tracim_frontend_lib'
+
 require('./Home.styl')
 
+const getWorkspaceMessage = (canCreate, canJoin, t) => {
+  if (canCreate && canJoin) return t('You can join an existing space or create your first space')
+  if (canCreate && !canJoin) return t('You can create your first space')
+  if (!canCreate && canJoin) return t('You can join an existing space')
+  return t('Please ask access to spaces to an administrator or space manager')
+}
+
 export const HomeNoWorkspace = props =>
-  <div>
+  <>
     <div className='homepagecard__title primaryColorFont'>
       {props.t('Welcome to Tracim')}
     </div>
@@ -16,32 +25,36 @@ export const HomeNoWorkspace = props =>
     <div className='homepagecard__delimiter delimiter primaryColorBg' />
 
     <div className='homepagecard__text'>
-      {(props.canCreateWorkspace
-        ? props.t('You will create your first space')
-        : (
-          <div className='homepagecard__text__user'>
-            <div className='homepagecard__text__user__top'>
-              {props.t("You aren't member of any space yet")}
-            </div>
-            <div>{props.t('Please refer to an administrator or a trusted user')}</div>
-          </div>
-        )
-      )}
+      <div className='homepagecard__text__user__top'>
+        {props.t("You aren't member of any space yet")}
+      </div>
+      {getWorkspaceMessage(props.canCreateWorkspace, props.canJoinWorkspace, props.t)}
     </div>
+    <span class='homepagecard__buttons'>
+      {props.canCreateWorkspace && (
+        <IconButton
+          dataCy='homepagecard__create_btn'
+          onClick={props.onClickCreateWorkspace}
+          text={props.t('Create a space')}
+          icon='plus'
+        />
+      )}
 
-    {props.canCreateWorkspace && (
-      <button
-        className='homepagecard__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
-        data-cy='homepagecard__btn'
-        onClick={props.onClickCreateWorkspace}
-      >
-        {props.t('Create a space')}
-      </button>
-    )}
+      {props.canJoinWorkspace && (
+        <IconButton
+          dataCy='homepagecard__join_btn'
+          onClick={props.onClickJoinWorkspace}
+          icon='users'
+          text={props.t('Join a space')}
+          intent='primary'
+          mode='light'
+        />
+      )}
+    </span>
 
     <div className='homepagecard__endtext'>
       {props.t('Have a good day!')}
     </div>
-  </div>
+  </>
 
 export default translate()(HomeNoWorkspace)

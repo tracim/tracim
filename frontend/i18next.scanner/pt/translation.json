@@ -103,7 +103,6 @@
   "Logout": "Terminar sessão",
   "Welcome to Tracim": "Bem-vindo ao Tracim",
   "You aren't member of any space yet": " Você ainda não é membro de nenhum espaço",
-  "Please refer to an administrator or a trusted user": "Consulte um administrador ou um utilizador confiável",
   "Please select a space in the left sidebar by clicking on it": "Escolha um espaço na barra lateral esquerda clicando nele",
   "Forgot password": "Palavra-passe esquecida",
   "Reset password": "Reiniciar a palavra-passe",
@@ -277,5 +276,16 @@
   "{{author}} deleted the space {{space}}": "{{author}} eliminou o espaço {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} restaurou o espaço {{space}}",
   "Only an administrator can see this user's profile": "Este perfil só pode ser visto pelo administrador",
-  "This notification has no associated content": "Esta notificação não tem nehum conteúdo associado"
+  "This notification has no associated content": "Esta notificação não tem nehum conteúdo associado",
+  "Join a space": "Junte-se a um espaço",
+  "Title and description": "Título e descrição",
+  "Access request": "Pedido de acesso",
+  "Request access": "Pedir acesso",
+  "Request sent": "Pedido enviado",
+  "Join the space": "Junte-se ao espaço",
+  "Filter spaces": "Filtrar espaços",
+  "You can join an existing space or create your first space": "Você pode juntar-se a um espaço existente ou criar o seu primeiro espaço",
+  "You can create your first space": "Você pode criar o seu primeiro espaço",
+  "You can join an existing space": "Você pode juntar-se a um espaço já existente",
+  "Please ask access to your spaces to an administrator or space manager": "Por favor peça acesso aos seus espaços a um administrador ou gestor de espaço"
 }

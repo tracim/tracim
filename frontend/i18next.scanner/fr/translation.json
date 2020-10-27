@@ -106,7 +106,6 @@
   "Each space has its own calendar.": "Chaque espace a son propre calendrier",
   "Welcome to Tracim": "Bienvenue sur Tracim",
   "You aren't member of any space yet": "Vous n'êtes pas encore membre d'un espace",
-  "Please refer to an administrator or a trusted user": "Veuillez vous référer à un administrateur ou à un utilisateur de confiance",
   "Have a good day!": "Bonne journée !",
   "Please select a space in the left sidebar by clicking on it": "Veuillez sélectionner un espace présent dans la barre latérale en cliquant dessus",
   "Forgot password": "Mot de passe oublié",
@@ -276,5 +275,16 @@
   "{{author}} deleted the space {{space}}": "{{author}} a supprimé l'espace {{space}}",
   "{{author}} restored the space {{space}}": "{{author}} a restauré l'espace {{space}}",
   "Only an administrator can see this user's profile": "Seule un administrateur peut consulter ce profil utilisateur",
-  "This notification has no associated content": "Cette notification n'a pas de contenu associé"
+  "This notification has no associated content": "Cette notification n'a pas de contenu associé",
+  "Join a space": "Rejoindre un espace",
+  "Title and description": "Titre et description",
+  "Access request": "Demande d'accès",
+  "Request access": "Demander l'accès",
+  "Request sent": "Demande envoyée",
+  "Join the space": "Rejoindre l'espace",
+  "Filter spaces": "Filtrer les espaces",
+  "You can join an existing space or create your first space": "Vous pouvez rejoindre un espace existant ou créer votre premier espace",
+  "You can create your first space": "Vous pouvez créer votre premier espace",
+  "You can join an existing space": "Vous pouvez rejoindre un espace existant",
+  "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace"
 }

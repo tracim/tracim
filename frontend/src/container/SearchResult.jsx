@@ -273,7 +273,6 @@ export class SearchResult extends React.Component {
                 {(this.hasMoreResults()
                   ? (
                     <IconButton
-                      className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                       onClick={this.handleClickSeeMore}
                       icon='chevron-down'
                       text={props.t('See more')}
