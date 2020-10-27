@@ -11,7 +11,7 @@ const DropdownLang = props => {
       <DropdownMenu
         buttonImage={activeLang.icon}
         buttonLabel={activeLang.label}
-        buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn'
+        buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn nohover'
         menuCustomClass='dropdownlang__dropdown__subdropdown'
         isButton
       >

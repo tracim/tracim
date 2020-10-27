@@ -34,8 +34,6 @@
       display flex
       justify-content end
   &__userlist
-    width calc(100% - 65px) // 65px is the width of the rightPart header
-    overflow-y auto
     &__list
       margin 0
       padding 0
@@ -116,13 +114,24 @@
     &__title
       padding 17px 15px
   &__optionalfunctionalities
-    width calc(100% - 65px)  // 65px is the width of the rightPart header
     padding-top 10px
     &__title
       padding 7px 15px 17px
     &__content
       padding-left 20px
-
+  &__subscriptionRequests
+    & .dropdown
+      width 180px
+    &__info
+      max-width 170px
+      flex 1
+    &__button
+      &:hover
+        color offWhite
+    &__empty
+      margin 25px
+    &__userInfo
+      width calc(100% - 180px)
 .workspace_advanced__popup
   .cardPopup__container
     width 400px

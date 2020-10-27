@@ -11,7 +11,7 @@ const DropdownMenu = props => {
         aria-haspopup='true'
         className={classnames(
           'btn dropdown-toggle',
-          props.isButton ? 'nohover primaryColorBorder' : 'transparentButton',
+          props.isButton ? 'primaryColorBorder' : 'transparentButton',
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}
