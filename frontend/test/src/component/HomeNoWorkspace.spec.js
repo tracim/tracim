@@ -24,7 +24,7 @@ describe('<HomeNoWorkspace />', () => {
         wrapper.setProps({ canCreateWorkspace: true, canJoinWorkspace: false })
         expect(wrapper.find('div.homepagecard__text')).to.text().contain('You can create your first space')
       })
-      it('should display a button to create a new Workspace' + wrapper.debug(), () => {
+      it('should display a button to create a new Workspace', () => {
         wrapper.setProps({ canCreateWorkspace: true, canJoinWorkspace: false })
         expect(wrapper.find(IconButton).length).to.equal(1)
       })
