@@ -19,7 +19,6 @@ class UserSpacesConfigLine extends React.Component {
             {space.label}
           </div>
         </td>
-
         <td>
           <div className='spaceconfig__table__role'>
             <div className='spaceconfig__table__role__icon'>
@@ -30,7 +29,6 @@ class UserSpacesConfigLine extends React.Component {
             </div>
           </div>
         </td>
-
         <td>
           <BtnSwitch
             checked={member.do_notify}
@@ -39,7 +37,7 @@ class UserSpacesConfigLine extends React.Component {
         </td>
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
-            className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            mode='light'
             onClick={(() => props.onLeaveSpace(space.workspace_id))}
             icon='sign-out'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
