@@ -260,18 +260,24 @@ export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'check'
+  faIcon: 'sign-in'
 }
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
   faIcon: 'times'
 }
+const SUBSCRIPTION_ACCEPTED = {
+  id: 3,
+  slug: 'accepted',
+  faIcon: 'check'
+}
 export const SUBSCRIPTION_TYPE = {
   pending: SUBSCRIPTION_PENDING,
-  rejected: SUBSCRIPTION_REJECTED
+  rejected: SUBSCRIPTION_REJECTED,
+  accepted: SUBSCRIPTION_ACCEPTED
 }
-export const SUBSCRIPTION_TYPE_LIST = [SUBSCRIPTION_PENDING, SUBSCRIPTION_REJECTED]
+export const SUBSCRIPTION_TYPE_LIST = [SUBSCRIPTION_PENDING, SUBSCRIPTION_REJECTED, SUBSCRIPTION_ACCEPTED]
 
 export const APP_FEATURE_MODE = {
   VIEW: 'view',

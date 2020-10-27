@@ -23,7 +23,7 @@ const workspaceSubscriptionList = (state = [], action) => {
     case `${ADD}/${WORKSPACE_SUBSCRIPTION}`:
       return [
         ...state,
-        action.subscription
+        serialize(action.subscription, serializeWorkspaceSubscriptionListProps)
       ]
     case `${REMOVE}/${WORKSPACE_SUBSCRIPTION}`:
       return state.filter(s => s.workspace.workspace_id !== action.subscription.workspace.workspace_id)

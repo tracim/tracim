@@ -1,10 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .joinWorkspace
-  &__wrapper
-    width: 100%
-    overflow-x: hidden
-    overflow-y: scroll
   &__content__workspaceList
     display: flex
     flex-direction: column
@@ -27,6 +23,7 @@
       align-items: center
       line-height: 1.5
       height: 60px
+      width: 100%
 
       & > *
         margin-left: 10px
@@ -45,12 +42,12 @@
       &__title_description
         display: flex
         flex-direction: column
-        text-overflow: ellipsis
         overflow: hidden
-        white-space: nowrap
+
+        & span
+          overflow: hidden
+          white-space: nowrap
+          text-overflow: ellipsis
 
       &__description
         font-size: fontSizeSmall
-        text-overflow: ellipsis
-        overflow: hidden
-        white-space: nowrap

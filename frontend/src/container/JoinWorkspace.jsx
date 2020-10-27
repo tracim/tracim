@@ -95,6 +95,10 @@ export class JoinWorkspace extends React.Component {
           text = props.t('Request sent')
           icon = SUBSCRIPTION_TYPE.pending.faIcon
           break
+        case SUBSCRIPTION_TYPE.accepted.slug:
+          text = props.t('Request accepted')
+          icon = SUBSCRIPTION_TYPE.pending.faIcon
+          break
       }
       return <div><i class={`fa fa-${icon}`} /> {text}</div>
     }
@@ -141,40 +145,49 @@ export class JoinWorkspace extends React.Component {
     const { props } = this
     const className = 'joinWorkspace'
     return (
-      <PageWrapper customClass={`${className}__wrapper`}>
-        <PageTitle
-          parentClass={className}
-          title={props.t('Join a space')}
-          icon='users'
-          breadcrumbsList={props.breadcrumbs}
-        />
+      <div className='tracim__content fullWidthFullHeight'>
+        <div className='tracim__content-scrollview'>
+          <PageWrapper customClass={`${className}__wrapper`}>
+            <PageTitle
+              parentClass={className}
+              title={props.t('Join a space')}
+              icon='users'
+              breadcrumbsList={props.breadcrumbs}
+            />
 
-        <PageContent parentClass={`${className}__content`}>
-          <TextInput
-            customClass={`${className}__content__filter form-control`}
-            onChange={e => this.handleWorkspaceFilter(e.target.value)}
-            placeholder={props.t('Filter spaces')}
-            icon='search'
-          />
-          <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
-            <div className={`${className}__content__workspaceList__item`}>
-              <b>{props.t('Type')}</b>
-              <b>{props.t('Title and description')}</b>
-              <b>{props.t('Access request')}</b>
-            </div>
-            {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace, index, array) =>
-              <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
-                {this.createIconForAccessType(workspace.accessType)}
-                <div class={`${className}__content__workspaceList__item__title_description`}>
-                  <span>{workspace.label}</span>
-                  <span class={`${className}__content__workspaceList__item__description`} title={workspace.description}>{workspace.description}</span>
+            <PageContent parentClass={`${className}__content`}>
+              <TextInput
+                customClass={`${className}__content__filter form-control`}
+                onChange={e => this.handleWorkspaceFilter(e.target.value)}
+                placeholder={props.t('Filter spaces')}
+                icon='search'
+              />
+              <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
+                <div className={`${className}__content__workspaceList__item`}>
+                  <b>{props.t('Type')}</b>
+                  <b>{props.t('Title and description')}</b>
+                  <b>{props.t('Access request')}</b>
                 </div>
-                {this.createRequestComponent(workspace)}
+                {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) =>
+                  <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
+                    {this.createIconForAccessType(workspace.accessType)}
+                    <div class={`${className}__content__workspaceList__item__title_description`}>
+                      <span>{workspace.label}</span>
+                      <span
+                        className={`${className}__content__workspaceList__item__description`}
+                        title={workspace.description}
+                      >
+                        {workspace.description}
+                      </span>
+                    </div>
+                    {this.createRequestComponent(workspace)}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </PageContent>
-      </PageWrapper>
+            </PageContent>
+          </PageWrapper>
+        </div>
+      </div>
     )
   }
 }

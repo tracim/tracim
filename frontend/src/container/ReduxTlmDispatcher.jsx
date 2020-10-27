@@ -141,7 +141,7 @@ export class ReduxTlmDispatcher extends React.Component {
     props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
     if (props.user.userId === data.fields.user.user_id) {
       props.dispatch(removeWorkspace(data.fields.workspace))
-      if (ACCESSIBLE_SPACE_TYPE_LIST.find(s => s.slug === data.fields.workspace.access_type) !== undefined) {
+      if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
         props.dispatch(addAccessibleWorkspace(data.fields.workspace))
       }
     }
