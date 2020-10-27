@@ -25,7 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
-  TLM_STATE,
+  SUBSCRIPTION_TYPE,
   NUMBER_RESULTS_BY_PAGE,
   TracimComponent,
   Avatar,
@@ -263,12 +263,12 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE_SUBSCRIPTION) {
       // RJ - 2020-10-19 - NOTE - DELETED and UNDELETED events do not make sense for subscriptions
 
-      if (props.user.userId === notification.user.userId) {
+      if (props.user.userId === notification.subscription.author.userId) {
         // RJ - 2020-10-19 - NOTE
         // TLM_EVENT.CREATED notifications should not be shown, or even received
         // assuming that the author of a subscription is always the concerned user
         if (eventType === TLM_EVENT.MODIFIED) {
-          if (notification.state === TLM_STATE.ACCEPTED) {
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
             return {
               icon: 'check',
               text: props.t('{{author}} granted you access to {{space}}', i18nOpts),
@@ -276,11 +276,13 @@ export class NotificationWall extends React.Component {
             }
           }
 
-          return {
-            icon: 'times',
-            text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
-            url: subscriptionPageURL,
-            emptyUrlMsg: defaultEmptyUrlMsg
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
+            return {
+              icon: 'times',
+              text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
+              url: subscriptionPageURL,
+              emptyUrlMsg: defaultEmptyUrlMsg
+            }
           }
         }
       } else {
@@ -291,7 +293,7 @@ export class NotificationWall extends React.Component {
             url: dashboardUrl
           }
           case TLM_EVENT.MODIFIED: {
-            if (notification.state === TLM_STATE.ACCEPTED) {
+            if (notification.state === SUBSCRIPTION_TYPE.accepted.slug) {
               return {
                 icon: 'check',
                 text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
@@ -299,10 +301,12 @@ export class NotificationWall extends React.Component {
               }
             }
 
-            return {
-              icon: 'times',
-              text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
-              url: defaultEmptyUrlMsg
+            if (notification.state === SUBSCRIPTION_TYPE.rejected.slug) {
+              return {
+                icon: 'times',
+                text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
+                url: defaultEmptyUrlMsg
+              }
             }
           }
         }
@@ -360,8 +364,8 @@ export class NotificationWall extends React.Component {
             const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
-                ? <i className={`fa fa-fw fa-${icons[0]} notification__list__item__icon`} />
-                : <ComposedIcon mainIconCustomClass='notification__list__item__icon' mainIcon={icons[0]} smallIcon={icons[1]} />
+                ? <i className={`fa fa-fw fa-${icons[0]}`} />
+                : <ComposedIcon mainIcon={icons[0]} smallIcon={icons[1]} />
             )
 
             return (
@@ -379,7 +383,7 @@ export class NotificationWall extends React.Component {
                   }
                   key={notification.id}
                 >
-                  {icon}
+                  <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
                     <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
