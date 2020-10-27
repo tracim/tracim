@@ -61,7 +61,7 @@ const WorkspaceAdvancedConfiguration = props => {
             onClose={props.onClickClosePopupDeleteWorkspace}
           >
             <div className='workspace_advanced__popup__body'>
-              <div className='workspace_advanced__popup__body__msg'>{props.t('Are you sure ?')}</div>
+              <div className='workspace_advanced__popup__body__msg'>{props.t('Are you sure?')}</div>
               <div className='workspace_advanced__popup__body__btn'>
                 <button
                   type='button'

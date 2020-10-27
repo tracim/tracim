@@ -629,7 +629,7 @@ export class AdminWorkspaceUser extends React.Component {
             onClose={this.handleClosePopupDeleteWorkspace}
           >
             <div className='adminworkspaceuser__popup__body'>
-              <div className='adminworkspaceuser__popup__body__msg'>{props.t('Are you sure ?')}</div>
+              <div className='adminworkspaceuser__popup__body__msg'>{props.t('Are you sure?')}</div>
               <div className='adminworkspaceuser__popup__body__btn'>
                 <button
                   type='button'

@@ -1,7 +1,8 @@
 {
+  "Accept request": "Aceitar pedido",
+  "by {{author}} at {{date}}": "por {{author}} no {{date}}",
   "Description": "Descrição",
   "Validate": "Validar",
-  "Members list": "Lista de Membros",
   "Add a member": "Acrescentar um membro",
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
@@ -34,12 +35,18 @@
   "Upload deactivated": "Upload desativado",
   "Error while activating agenda": "Erro ao ativar a agenda",
   "Error while deactivating agenda": "Erro ao desativar a agenda",
-  "Optional functionalities": "Funcionalidades opcionais",
   "Error while activating upload": "Erro ao ativar o upload",
   "Error while deactivating upload": "Erro ao desativar o upload",
   "Error while activating download": "Erro ao ativar o download",
   "Error while deactivating download": "Erro ao desativar o download",
   "Members List": "Lista dos Membros",
   "Optional Functionalities": "Funcionalidades Opcionais",
-  "Are you sure ?": "Tem certeza?"
+  "Are you sure?": "Tem certeza?",
+  "Requests to join the space": "Pedidos de acesso ao espaço",
+  "Error while loading space requests": "Erro ao carregar os pedidos de acesso ao espaço",
+  "Manage request": "Gerir pedido",
+  "Reject request": "Rejeiar pedido",
+  "Request accepted": "Pedido aceito",
+  "Request rejected": "Pedido rejeitado",
+  "There are no requests yet.": "Ainda não tem pedidos."
 }

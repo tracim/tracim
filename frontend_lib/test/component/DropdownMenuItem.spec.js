@@ -11,14 +11,14 @@ describe('<DropdownMenuItem />', () => {
   )
 
   describe('Static design', () => {
-    it('should primaryColorBgActive classNmae', () => {
-      expect(wrapper.find('div.dropdown-item').prop('className')).to.include('primaryColorBgActive')
+    it('should primaryColorBgActive className', () => {
+      expect(wrapper.find('button.dropdown-item').prop('className')).to.include('primaryColorBgActive')
     })
 
     it('if it has a customClass prop, the dropdown item should have this class', () => {
       const className = 'class'
       wrapper.setProps({ customClass: className })
-      expect(wrapper.find('div.dropdown-item').prop('className')).to.include(className)
+      expect(wrapper.find('button.dropdown-item').prop('className')).to.include(className)
     })
   })
 })

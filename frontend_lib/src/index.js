@@ -76,6 +76,7 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
+import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
@@ -107,7 +108,8 @@ import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarn
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
-import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
+import ListItemWrapper from './component/Lists/ListItemWrapper/ListItemWrapper.jsx'
+import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
@@ -125,6 +127,8 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
+import UserInfo from './component/UserInfo/UserInfo.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -204,6 +208,7 @@ export {
   PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
+  PopinFixedRightPartContent,
   Avatar,
   Badge,
   Timeline,
@@ -299,8 +304,10 @@ export {
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
+  NoHoverListItem,
   permissiveNumberEqual,
   SingleChoiceList,
+  UserInfo,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS
 }

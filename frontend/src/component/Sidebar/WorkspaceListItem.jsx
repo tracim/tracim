@@ -102,8 +102,8 @@ class WorkspaceListItem extends React.Component {
             className={classnames(
               'sidebar__content__navigation__workspace__item__name',
               {
-                sidebar__content__navigation__workspace__item__current__name: props.location.pathname.includes(
-                  `${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`
+                sidebar__content__navigation__workspace__item__current: props.location.pathname.includes(
+                  `${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`
                 )
               }
             )}
