@@ -280,7 +280,7 @@
   "{{author}} granted access to {{space}} for {{user}}": "{{author}} a permis l'accès à {{space}} pour {{user}}",
   "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a rejecté l'accès à {{space}} pour {{user}}",
   "Only an administrator can see this user's profile": "Seul un administrateur peut consulter ce profil utilisateur",
-  "This notification has no associated content": "Cette notification n'a pas de contenu associé"
+  "This notification has no associated content": "Cette notification n'a pas de contenu associé",
   "Join a space": "Rejoindre un espace",
   "Title and description": "Titre et description",
   "Access request": "Demande d'accès",

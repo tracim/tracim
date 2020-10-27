@@ -316,12 +316,9 @@ export {
   NoHoverListItem,
   permissiveNumberEqual,
   SingleChoiceList,
-<<<<<<< HEAD
   UserInfo,
-=======
   darkenColor,
   lightenColor,
->>>>>>> origin/develop
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   TextInput
