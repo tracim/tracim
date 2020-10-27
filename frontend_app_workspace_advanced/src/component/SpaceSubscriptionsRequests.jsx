@@ -17,10 +17,12 @@ export const SpaceSubscriptionsRequests = props => {
             <NoHoverListItem
               key={`${request.author.user_id}_${request.created_date}`}
             >
-              <UserInfo
-                publicName={request.author.public_name}
-                username={request.author.username}
-              />
+              <span className='workspace_advanced__subscriptionRequests__userInfo'>
+                <UserInfo
+                  publicName={request.author.public_name}
+                  username={request.author.username}
+                />
+              </span>
 
               {request.state === 'pending' && (
                 <DropdownMenu

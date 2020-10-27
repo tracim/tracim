@@ -6,10 +6,10 @@ const UserInfo = props => {
   return (
     <div className='userInfo'>
       <Avatar width='40px' publicName={props.publicName} />
-      <div className='userInfo__name'>
+      <div className='userInfo__name' title={props.publicName}>
         {props.publicName}
         {props.username.length && (
-          <div className='userInfo__username'>
+          <div className='userInfo__username' title={`@${props.username}`}>
             @{props.username}
           </div>
         )}

@@ -19,6 +19,7 @@ import {
   getWorkspaceDetail,
   deleteWorkspace,
   getMyselfKnownMember,
+  SPACE_TYPE,
   PopinFixedRightPartContent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -574,6 +575,91 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  getMenuItemList = () => {
+    const { props, state } = this
+    const memberlistObject = {
+      id: 'members_list',
+      label: props.t('Members List'),
+      icon: 'fa-users',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Members List')}
+          showTitle={!state.displayFormNewMember}
+        >
+          <WorkspaceMembersList
+            displayFormNewMember={state.displayFormNewMember}
+            memberList={state.content.memberList}
+            roleList={state.config.roleList}
+            onClickNewRole={this.handleClickNewRole}
+            loggedUser={state.loggedUser}
+            onClickDeleteMember={this.handleClickDeleteMember}
+            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+            newMemberName={state.newMember.publicName}
+            isEmail={state.newMember.isEmail}
+            onChangeNewMemberName={this.handleChangeNewMemberName}
+            searchedKnownMemberList={state.searchedKnownMemberList}
+            onClickKnownMember={this.handleClickKnownMember}
+            newMemberRole={state.newMember.role}
+            onClickNewMemberRole={this.handleClickNewMemberRole}
+            onClickValidateNewMember={this.handleClickValidateNewMember}
+            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
+            canSendInviteNewUser={
+              [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+            }
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            autoCompleteClicked={state.autoCompleteClicked}
+            onClickAutoComplete={this.handleClickAutoComplete}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const subscriptionObject = {
+      id: 'subscriptions_requests',
+      label: props.t('Requests to join the space'),
+      icon: 'fa-sign-in',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Requests to join the space')}
+        >
+          <SpaceSubscriptionsRequests
+            subscriptionRequestList={state.subscriptionRequestList}
+            onClickAcceptRequest={this.handleClickAcceptRequest}
+            onClickRejectRequest={this.handleClickRejectRequest}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const functionalitesObject = {
+      id: 'optional_functionalities',
+      label: props.t('Optional Functionalities'),
+      icon: 'fa-cog',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Optional Functionalities')}
+        >
+          <OptionalFeatures
+            appAgendaAvailable={state.content.appAgendaAvailable}
+            agendaEnabled={state.content.agenda_enabled}
+            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+            downloadEnabled={state.content.public_download_enabled}
+            appDownloadAvailable={state.content.appDownloadAvailable}
+            onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+            uploadEnabled={state.content.public_upload_enabled}
+            appUploadAvailable={state.content.appUploadAvailable}
+            onToggleUploadEnabled={this.handleToggleUploadEnabled}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+
+    if (state.content.access_type === SPACE_TYPE.onRequest.slug) {
+      return [memberlistObject, subscriptionObject, functionalitesObject]
+    } else {
+      return [memberlistObject, functionalitesObject]
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -620,83 +706,7 @@ export class WorkspaceAdvanced extends React.Component {
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            menuItemList={[
-              {
-                id: 'members_list',
-                label: props.t('Members List'),
-                icon: 'fa-users',
-                children: (
-                  <PopinFixedRightPartContent
-                    label={props.t('Members List')}
-                    showTitle={!state.displayFormNewMember}
-                  >
-                    <WorkspaceMembersList
-                      displayFormNewMember={state.displayFormNewMember}
-                      memberList={state.content.memberList}
-                      roleList={state.config.roleList}
-                      onClickNewRole={this.handleClickNewRole}
-                      loggedUser={state.loggedUser}
-                      onClickDeleteMember={this.handleClickDeleteMember}
-                      onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-                      newMemberName={state.newMember.publicName}
-                      isEmail={state.newMember.isEmail}
-                      onChangeNewMemberName={this.handleChangeNewMemberName}
-                      searchedKnownMemberList={state.searchedKnownMemberList}
-                      onClickKnownMember={this.handleClickKnownMember}
-                      newMemberRole={state.newMember.role}
-                      onClickNewMemberRole={this.handleClickNewMemberRole}
-                      onClickValidateNewMember={this.handleClickValidateNewMember}
-                      autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                      emailNotifActivated={state.config.system.config.email_notification_activated}
-                      canSendInviteNewUser={
-                        [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-                      }
-                      userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                      autoCompleteClicked={state.autoCompleteClicked}
-                      onClickAutoComplete={this.handleClickAutoComplete}
-                    />
-                  </PopinFixedRightPartContent>
-                )
-              },
-              {
-                id: 'subscriptions_requests',
-                label: props.t('Requests to join the space'),
-                icon: 'fa-sign-in',
-                children: (
-                  <PopinFixedRightPartContent
-                    label={props.t('Requests to join the space')}
-                  >
-                    <SpaceSubscriptionsRequests
-                      subscriptionRequestList={state.subscriptionRequestList}
-                      onClickAcceptRequest={this.handleClickAcceptRequest}
-                      onClickRejectRequest={this.handleClickRejectRequest}
-                    />
-                  </PopinFixedRightPartContent>
-                )
-              },
-              {
-                id: 'optional_functionalities',
-                label: props.t('Optional Functionalities'),
-                icon: 'fa-cog',
-                children: (
-                  <PopinFixedRightPartContent
-                    label={props.t('Optional Functionalities')}
-                  >
-                    <OptionalFeatures
-                      appAgendaAvailable={state.content.appAgendaAvailable}
-                      agendaEnabled={state.content.agenda_enabled}
-                      onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-                      downloadEnabled={state.content.public_download_enabled}
-                      appDownloadAvailable={state.content.appDownloadAvailable}
-                      onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-                      uploadEnabled={state.content.public_upload_enabled}
-                      appUploadAvailable={state.content.appUploadAvailable}
-                      onToggleUploadEnabled={this.handleToggleUploadEnabled}
-                    />
-                  </PopinFixedRightPartContent>
-                )
-              }
-            ]}
+            menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
       </PopinFixed>
