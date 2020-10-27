@@ -1,7 +1,10 @@
+import contextlib
+import importlib
 from io import BytesIO
 import multiprocessing
 import os
 import subprocess
+import sys
 import typing
 from typing import Any
 from typing import Optional
@@ -369,3 +372,16 @@ def create_1000px_png_test_image() -> BytesIO:
 
 TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
 TEST_PUSHPIN_FILE_PATH = os.environ.get("TEST_PUSHPIN_FILE_PATH")
+
+
+@contextlib.contextmanager
+def tracim_plugin_loader(plugin_name, pluggy_manager, plugin_root_folder):
+    sys.path.append(plugin_root_folder)
+    plugin_module = importlib.import_module(plugin_name)
+    sys.path.remove(plugin_root_folder)
+    plugins = pluggy_manager.get_plugins()
+    plugin_module.register_tracim_plugin(pluggy_manager)
+    loaded_plugins = [p for p in pluggy_manager.get_plugins() if p not in plugins]
+    yield None
+    for p in loaded_plugins:
+        pluggy_manager.unregister(p)

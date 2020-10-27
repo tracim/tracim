@@ -147,7 +147,7 @@ class RoleApi(object):
                 )
             )
         role = UserRoleInWorkspace()
-        role.user_id = user.user_id
+        role.user = user
         role.workspace = workspace
         role.role = role_level
         role.do_notify = with_notif
