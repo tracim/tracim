@@ -661,7 +661,7 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { state } = this
 
     if (!state.isVisible) return null
 
