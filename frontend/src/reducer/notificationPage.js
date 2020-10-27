@@ -36,7 +36,6 @@ export const serializeNotification = notification => {
     created: notification.created,
     id: notification.event_id,
     read: notification.read,
-    state: notification.state,
     type: notification.event_type,
     workspace: notification.fields.workspace ? serialize(notification.fields.workspace, serializeWorkspaceListProps) : null
   }
