@@ -3,7 +3,8 @@ import {
   WORKSPACE_SUBSCRIPTION,
   ADD,
   REMOVE,
-  SET
+  SET,
+  UPDATE
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
 
@@ -27,6 +28,11 @@ const workspaceSubscriptionList = (state = [], action) => {
       ]
     case `${REMOVE}/${WORKSPACE_SUBSCRIPTION}`:
       return state.filter(s => s.workspace.workspace_id !== action.subscription.workspace.workspace_id)
+    case `${UPDATE}/${WORKSPACE_SUBSCRIPTION}`:
+      return [
+        ...state.filter(s => s.workspace.workspace_id !== action.subscription.workspace.workspace_id),
+        serialize(action.subscription, serializeWorkspaceSubscriptionListProps)
+      ]
     default:
       return state
   }

@@ -25,7 +25,8 @@ import {
   addAccessibleWorkspace,
   updateAccessibleWorkspace,
   addWorkspaceSubscription,
-  removeWorkspaceSubscription
+  removeWorkspaceSubscription,
+  updateWorkspaceSubscription
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -61,6 +62,7 @@ export class ReduxTlmDispatcher extends React.Component {
       // Workspace subscription
       { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceSubscriptionCreated },
       { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceSubscriptionDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceSubscriptionModified },
 
       // Content created
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
@@ -217,6 +219,10 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceSubscriptionDeleted = data => {
     this.props.dispatch(removeWorkspaceSubscription(data.fields.subscription))
+  }
+
+  handleWorkspaceSubscriptionModified = data => {
+    this.props.dispatch(updateWorkspaceSubscription(data.fields.subscription))
   }
 
   render () {

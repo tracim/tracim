@@ -191,3 +191,4 @@ export const WORKSPACE_SUBSCRIPTION = `${WORKSPACE}/Subscription`
 export const setWorkspaceSubscriptionList = subscriptionList => ({ type: `${SET}/${WORKSPACE_SUBSCRIPTION_LIST}`, subscriptionList })
 export const addWorkspaceSubscription = subscription => ({ type: `${ADD}/${WORKSPACE_SUBSCRIPTION}`, subscription })
 export const removeWorkspaceSubscription = subscription => ({ type: `${REMOVE}/${WORKSPACE_SUBSCRIPTION}`, subscription })
+export const updateWorkspaceSubscription = subscription => ({ type: `${UPDATE}/${WORKSPACE_SUBSCRIPTION}`, subscription })
