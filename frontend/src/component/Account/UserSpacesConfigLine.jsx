@@ -38,9 +38,19 @@ class UserSpacesConfigLine extends React.Component {
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
             mode='light'
+            disabled={props.onlyManager}
             onClick={(() => props.onLeaveSpace(space.workspace_id))}
             icon='sign-out'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
+            title={
+              props.onlyManager
+                ? (
+                  props.admin
+                    ? props.t('You cannot remove this member because there are no other space managers.')
+                    : props.t('You cannot leave this space because there are no other space managers.')
+                )
+                : undefined
+            }
           />
         </td>
       </tr>

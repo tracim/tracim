@@ -7,6 +7,7 @@ import {
   sortWorkspaceList,
   ConfirmPopup,
   TracimComponent,
+  ROLE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
@@ -122,6 +123,14 @@ export class UserSpacesConfig extends React.Component {
     }
   }
 
+  onlyManager (member, memberList) {
+    const manager = ROLE.workspaceManager.slug
+    return (
+      member.role.slug !== manager ||
+      !memberList.some(u => u.user_id !== this.props.userToEditId && u.role.slug === manager)
+    )
+  }
+
   render () {
     const { props } = this
 
@@ -137,6 +146,7 @@ export class UserSpacesConfig extends React.Component {
               onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
               onLeaveSpace={this.handleLeaveSpace}
               admin={props.admin}
+              onlyManager={this.onlyManager(member, space.memberList)}
             />
           )
         }

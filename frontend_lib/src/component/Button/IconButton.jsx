@@ -7,6 +7,7 @@ const IconButton = props =>
     onClick={props.onClick}
     disabled={props.disabled}
     style={props.style}
+    title={props.title}
   >
     <i className={`fa fa-fw fa-${props.icon}`} /> {props.text}
   </button>
@@ -17,6 +18,7 @@ IconButton.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   text: PropTypes.string,
+  title: PropTypes.string,
   style: PropTypes.object
 }
 
@@ -25,6 +27,7 @@ IconButton.defaultProps = {
   onClick: () => {},
   disabled: false,
   text: '',
+  title: undefined,
   style: {}
 }
 

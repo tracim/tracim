@@ -280,6 +280,8 @@
   "Leave space": "Deixar espaço",
   "Are you sure you want to leave the space?": "Tem a certeza de que quer deixar o espaço?",
   "Remove from space": "Eliminar do espaço",
+  "You cannot leave this space because there are no other space managers.": "Não se pode deixar este espaço porque não há outro gestor de espaço.",
+  "You cannot remove this member because there are no other space managers.": "Não se pode remover este membro porque não há outro gestor de espaço.",
   "Error while leaving the space": "Erro ao deixar o espaço",
   "Only an administrator can see this user's profile": "Este perfil só pode ser visto pelo administrador",
   "This notification has no associated content": "Esta notificação não tem nehum conteúdo associado"
