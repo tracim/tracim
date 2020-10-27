@@ -61,6 +61,7 @@ class WorkspaceAccessType(enum.Enum):
 
 class Workspace(DeclarativeBase):
     FILEMANAGER_EXTENSION = ".space"
+    ACCESSIBLE_TYPES = [WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST]
 
     __tablename__ = "workspaces"
     workspace_id = Column(
@@ -198,7 +199,7 @@ class Workspace(DeclarativeBase):
         for role in user.roles:
             if role.workspace.workspace_id == self.workspace_id:
                 return role.role
-        return UserRoleInWorkspace.NOT_APPLICABLE
+        return WorkspaceRoles.NOT_APPLICABLE.level
 
     def get_label(self):
         """ this method is for interoperability with Content class"""

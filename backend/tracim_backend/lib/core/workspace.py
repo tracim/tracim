@@ -43,6 +43,7 @@ class WorkspaceApi(object):
         config: CFG,
         force_role: bool = False,
         show_deleted: bool = False,
+        access_types_filter: typing.Optional[typing.List[WorkspaceAccessType]] = None,
     ):
         """
         :param current_user: Current user of context
@@ -54,6 +55,7 @@ class WorkspaceApi(object):
         self._config = config
         self._force_role = force_role
         self.show_deleted = show_deleted
+        self._access_types_filter = access_types_filter
         default_lang = None
         if self._user:
             default_lang = self._user.lang
@@ -66,6 +68,9 @@ class WorkspaceApi(object):
         query = self._session.query(Workspace)
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
+        if self._access_types_filter:
+            access_types_str = [access_type.name for access_type in self._access_types_filter]
+            query = query.filter(Workspace.access_type.in_(access_types_str))
         return query
 
     def _base_query(self):
@@ -358,7 +363,7 @@ class WorkspaceApi(object):
           - do not have user as a member
         """
         query = self._base_query_without_roles().filter(
-            Workspace.access_type.in_([WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST])
+            Workspace.access_type.in_(Workspace.ACCESSIBLE_TYPES)
         )
         query = query.filter(
             Workspace.workspace_id.notin_(

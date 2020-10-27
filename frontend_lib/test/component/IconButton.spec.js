@@ -9,13 +9,10 @@ describe('<IconButton />', () => {
 
   const props = {
     icon: 'test',
-    className: 'ramdom_class',
+    customClass: 'random_class',
     onClick: onClickCallBack,
     disabled: false,
-    text: 'randomText',
-    style: {
-      color: 'yellow'
-    }
+    text: 'randomText'
   }
 
   const wrapper = shallow(
@@ -27,19 +24,15 @@ describe('<IconButton />', () => {
   describe('Static design', () => {
     it(`should display "${props.text}"`, () =>
       // INFO - GM - 2019-08-06 - Is it normal to have a space before the text ?
-      expect(wrapper.find(`button.${props.className}.btn`)).to.have.text().equal(' ' + props.text)
+      expect(wrapper.find(`button.${props.customClass}`)).to.have.text().equal(' ' + props.text)
     )
 
-    it(`should have the class "${props.className}"`, () =>
-      expect(wrapper.find(`button.${props.className}.btn`)).to.have.lengthOf(1)
-    )
-
-    it(`should display its text in color ${props.style.color}`, () =>
-      expect(wrapper.find(`button.${props.className}.btn`).prop('style')).to.deep.equal(props.style)
+    it(`should have the class "${props.customClass}"`, () =>
+      expect(wrapper.find(`button.${props.customClass}`)).to.have.lengthOf(1)
     )
 
     it(`button disabled property should be set to: ${props.disabled}`, () =>
-      expect(wrapper.find(`button.${props.className}.btn`).prop('disabled')).to.equal(props.disabled)
+      expect(wrapper.find(`button.${props.customClass}`).prop('disabled')).to.equal(props.disabled)
     )
 
     it(`should have the icon: "${props.icon}"`, () =>
@@ -49,7 +42,7 @@ describe('<IconButton />', () => {
 
   describe('Handlers', () => {
     it('should call props.onClick when handler onClick is called', () => {
-      wrapper.find(`button.${props.className}.btn`).simulate('click')
+      wrapper.find(`button.${props.customClass}`).simulate('click')
       expect(onClickCallBack.called).to.equal(true)
     })
   })

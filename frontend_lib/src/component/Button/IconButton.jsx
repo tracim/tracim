@@ -1,34 +1,59 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const IconButton = props =>
-  <button
-    className={`btn ${props.className}`}
-    onClick={props.onClick}
-    disabled={props.disabled}
-    style={props.style}
-    title={props.title}
-  >
-    <i className={`fa fa-fw fa-${props.icon}`} /> {props.text}
-  </button>
+import { darkenColor } from '../../helper.js'
+
+require('../../css/IconButton.styl')
+
+const IconButton = props => {
+  const classes = ['iconbutton']
+  classes.push('iconbutton__' + props.mode)
+  classes.push('iconbutton__' + props.intent)
+  classes.push(`iconbutton__${props.intent}_${props.mode}`)
+  if (props.customClass) classes.push(props.customClass)
+  const className = classes.join(' ')
+
+  const style = {
+    '--primaryColor': props.color,
+    '--primaryDarkColor': darkenColor(props.color)
+  }
+  return (
+    <button
+      className={className}
+      style={style}
+      onClick={props.onClick}
+      disabled={props.disabled}
+      title={props.title}
+      data-cy={props.dataCy}
+    >
+      <i className={`fa fa-fw fa-${props.icon}`} /> {props.text}
+    </button>
+  )
+}
 
 IconButton.propTypes = {
   icon: PropTypes.string.isRequired,
-  className: PropTypes.string,
+  text: PropTypes.string.isRequired,
+  title: PropTypes.string,
+  color: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  text: PropTypes.string,
   title: PropTypes.string,
-  style: PropTypes.object
+  intent: PropTypes.oneOf(['primary', 'secondary']),
+  mode: PropTypes.oneOf(['dark', 'light']),
+  customClass: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 IconButton.defaultProps = {
-  className: '',
-  onClick: () => {},
+  onClick: undefined,
   disabled: false,
-  text: '',
   title: undefined,
-  style: {}
+  color: GLOBAL_primaryColor,
+  intent: 'secondary',
+  customClass: '',
+  mode: 'dark',
+  dataCy: undefined
 }
 
 export default IconButton

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
+import color from 'color'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
@@ -254,6 +255,29 @@ export const SPACE_TYPE = {
   confidential: CONFIDENTIAL
 }
 export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
+
+const SUBSCRIPTION_PENDING = {
+  id: 1,
+  slug: 'pending',
+  faIcon: 'sign-in'
+}
+const SUBSCRIPTION_REJECTED = {
+  id: 2,
+  slug: 'rejected',
+  faIcon: 'times'
+}
+const SUBSCRIPTION_ACCEPTED = {
+  id: 3,
+  slug: 'accepted',
+  faIcon: 'check'
+}
+export const SUBSCRIPTION_TYPE = {
+  pending: SUBSCRIPTION_PENDING,
+  rejected: SUBSCRIPTION_REJECTED,
+  accepted: SUBSCRIPTION_ACCEPTED
+}
+export const SUBSCRIPTION_TYPE_LIST = [SUBSCRIPTION_PENDING, SUBSCRIPTION_REJECTED, SUBSCRIPTION_ACCEPTED]
 
 export const APP_FEATURE_MODE = {
   VIEW: 'view',
@@ -568,3 +592,6 @@ export const sortWorkspaceList = (workspaceList, lang) => {
     return res
   })
 }
+
+export const darkenColor = (c) => color(c).darken(0.15).hex()
+export const lightenColor = (c) => color(c).lighten(0.15).hex()
