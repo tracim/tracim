@@ -293,7 +293,7 @@ export class NotificationWall extends React.Component {
             url: dashboardUrl
           }
           case TLM_EVENT.MODIFIED: {
-            if (notification.state === SUBSCRIPTION_TYPE.accepted.slug) {
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
               return {
                 icon: 'check',
                 text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
@@ -301,11 +301,19 @@ export class NotificationWall extends React.Component {
               }
             }
 
-            if (notification.state === SUBSCRIPTION_TYPE.rejected.slug) {
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
                 icon: 'times',
                 text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
                 url: defaultEmptyUrlMsg
+              }
+            }
+
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
+              return {
+                icon: 'times',
+                text: props.t('{{author}} requested access to {{space}}', i18nOpts),
+                url: dashboardUrl
               }
             }
           }
