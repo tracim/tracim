@@ -61,16 +61,6 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
-    &__btnnewworkspace
-      padding 50px 0
-      overflow hidden
-      color fontColor
-      &__btn
-        display block
-        margin 0 auto
-        padding 10px 20px
-        &:hover
-          color offWhite
     &__navigation
       padding 0
       width sidebar-width
@@ -134,6 +124,18 @@ sidebarColorDarken = darken(sidebarColor, 15%)
               padding-left 5px
   &__footer
     margin-top auto
+    width: sidebar-width
+    &__buttons
+      width: 75%
+      margin-left: 12.5%
+      overflow hidden
+      display: flex
+      flex-direction: column
+      justify-content: center
+      margin-bottom: 10px
+      & > *
+        margin-bottom: 10px
+        width: 100%
     &__text
       color offWhite
       font-size 14px

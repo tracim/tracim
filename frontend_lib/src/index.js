@@ -19,6 +19,9 @@ import {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  ACCESSIBLE_SPACE_TYPE_LIST,
+  SUBSCRIPTION_TYPE,
+  SUBSCRIPTION_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -46,7 +49,9 @@ import {
   formatAbsoluteDate,
   permissiveNumberEqual,
   sortWorkspaceList,
-  updateTLMAuthor
+  updateTLMAuthor,
+  darkenColor,
+  lightenColor
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -129,6 +134,7 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
+import TextInput from './component/Input/TextInput.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -238,6 +244,9 @@ export {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  ACCESSIBLE_SPACE_TYPE_LIST,
+  SUBSCRIPTION_TYPE,
+  SUBSCRIPTION_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -307,7 +316,13 @@ export {
   NoHoverListItem,
   permissiveNumberEqual,
   SingleChoiceList,
+<<<<<<< HEAD
   UserInfo,
+=======
+  darkenColor,
+  lightenColor,
+>>>>>>> origin/develop
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  TextInput
 }

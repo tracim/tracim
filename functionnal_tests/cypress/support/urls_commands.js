@@ -11,7 +11,8 @@ const PAGES = {
   SHARE_FOLDER: 'share_folder',
   GALLERY: 'gallery',
   CONTENT_OPEN: 'contentOpen',
-  ACCOUNT: 'account'
+  ACCOUNT: 'account',
+  JOIN_WORKSPACE: 'join-workspace'
 }
 
 const URLS = {
@@ -27,7 +28,8 @@ const URLS = {
   [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace',
   [PAGES.ADMIN_USER]: ({ userId }) => `/ui/admin/user/${userId || ''}`,
   [PAGES.GALLERY]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/gallery` + (folderId ? `?folder_ids=${folderId}` : '/'),
-  [PAGES.ACCOUNT]: () => '/ui/account'
+  [PAGES.ACCOUNT]: () => '/ui/account',
+  [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace'
 }
 
 /**

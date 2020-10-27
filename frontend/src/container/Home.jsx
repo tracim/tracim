@@ -9,7 +9,8 @@ import appFactory from '../util/appFactory.js'
 import {
   COOKIE_FRONTEND,
   workspaceConfig,
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  PAGE
 } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
@@ -55,6 +56,10 @@ export class Home extends React.Component {
     e.preventDefault()
     const { props } = this
     props.renderAppPopupCreation(workspaceConfig, props.user, null, null)
+  }
+
+  handleClickJoinWorkspace = () => {
+    this.props.history.push(PAGE.JOIN_WORKSPACE)
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -192,7 +197,9 @@ export class Home extends React.Component {
                   : (
                     <HomeNoWorkspace
                       canCreateWorkspace={props.canCreateWorkspace}
+                      canJoinWorkspace={props.accessibleWorkspaceList.length > 0}
                       onClickCreateWorkspace={this.handleClickCreateWorkspace}
+                      onClickJoinWorkspace={this.handleClickJoinWorkspace}
                     />
                   )
                 )}
@@ -286,5 +293,5 @@ export class Home extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
+const mapStateToProps = ({ user, workspaceList, system, accessibleWorkspaceList }) => ({ user, workspaceList, system, accessibleWorkspaceList })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Home)))))

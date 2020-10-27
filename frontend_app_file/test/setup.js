@@ -25,6 +25,7 @@ if (!global.window && !global.document) {
   global.localStorage = {
     getItem: () => {}
   }
+  global.GLOBAL_primaryColor = '#aaaaaa'
   const nodeCrypto = require('crypto')
   global.crypto = {
     getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
