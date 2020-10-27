@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { HomeNoWorkspace as HomeNoWorkspaceWithoutHOC } from '../../../src/component/Home/HomeNoWorkspace.jsx'
 import sinon from 'sinon'
+import { IconButton } from 'tracim_frontend_lib'
 
 describe('<HomeNoWorkspace />', () => {
   const onClickCreateWorkspaceCallBack = sinon.spy()
@@ -25,7 +26,7 @@ describe('<HomeNoWorkspace />', () => {
       })
       it('should display a button to create a new Workspace' + wrapper.debug(), () => {
         wrapper.setProps({ canCreateWorkspace: true, canJoinWorkspace: false })
-        expect(wrapper.find('Ma').length).to.equal(1)
+        expect(wrapper.find(IconButton).length).to.equal(1)
       })
     })
 
@@ -36,7 +37,7 @@ describe('<HomeNoWorkspace />', () => {
       })
       it('should display a button to join a Workspace', () => {
         wrapper.setProps({ canCreateWorkspace: false, canJoinWorkspace: true })
-        expect(wrapper.find('Ma').length).to.equal(1)
+        expect(wrapper.find(IconButton).length).to.equal(1)
       })
     })
 
@@ -47,14 +48,14 @@ describe('<HomeNoWorkspace />', () => {
       })
       it('should display buttons to create or join a Workspace', () => {
         wrapper.setProps({ canCreateWorkspace: true, canJoinWorkspace: true })
-        expect(wrapper.find('Ma').length).to.equal(2)
+        expect(wrapper.find(IconButton).length).to.equal(2)
       })
     })
 
     describe('canCreateWorkspace and canJoinWorkspace are false', () => {
       it('should not display any button', () => {
         wrapper.setProps({ canCreateWorkspace: false, canJoinWorkspace: false })
-        expect(wrapper.find('Ma').length).to.equal(0)
+        expect(wrapper.find(IconButton).length).to.equal(0)
       })
       it('should contain a div with a message to contact administrator', () => {
         wrapper.setProps({ canCreateWorkspace: false, canJoinWorkspace: false })
