@@ -67,7 +67,7 @@ describe('<JoinWorkspace />', () => {
       const joinWorkspaceInstance = wrapper.instance()
       const component = joinWorkspaceInstance.createRequestComponent(workspace)
       it(`should return an icon '${testCase.expectedIcon}' with text '${testCase.expectedText}'`, () => {
-        expect(component.props.children[0].props.class).to.include(testCase.expectedIcon)
+        expect(component.props.children[0].props.className).to.include(testCase.expectedIcon)
         expect(component.props.children[2]).to.equal(testCase.expectedText)
       })
     })
