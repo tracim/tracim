@@ -39,7 +39,6 @@ import {
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
 
-const color = require('color')
 require('../css/index.styl')
 
 export class AdminWorkspaceUser extends React.Component {
