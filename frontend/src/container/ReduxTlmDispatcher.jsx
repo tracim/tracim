@@ -215,14 +215,17 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceSubscriptionCreated = data => {
     this.props.dispatch(addWorkspaceSubscription(data.fields.subscription))
+    this.handleNotification(data)
   }
 
   handleWorkspaceSubscriptionDeleted = data => {
     this.props.dispatch(removeWorkspaceSubscription(data.fields.subscription))
+    this.handleNotification(data)
   }
 
   handleWorkspaceSubscriptionModified = data => {
     this.props.dispatch(updateWorkspaceSubscription(data.fields.subscription))
+    this.handleNotification(data)
   }
 
   render () {

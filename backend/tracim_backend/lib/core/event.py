@@ -586,11 +586,14 @@ class EventBuilder:
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(subscription.workspace_id)
         )
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        subscription_author_in_context = user_api.get_user_with_context(subscription.author)
         fields = {
             Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
             Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
                 subscription
             ).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(subscription_author_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
