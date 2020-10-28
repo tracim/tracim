@@ -25,6 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
+  SUBSCRIPTION_TYPE,
   NUMBER_RESULTS_BY_PAGE,
   TracimComponent,
   Avatar,
@@ -255,11 +256,76 @@ export class NotificationWall extends React.Component {
       }
     }
 
+    const defaultEmptyUrlMsg = props.t('This notification has no associated content')
+
+    const subscriptionPageURL = '' // RJ - 2020-10-19 - FIXME: depends on https://github.com/tracim/tracim/issues/3594
+
+    if (entityType === TLM_ENTITY.SHAREDSPACE_SUBSCRIPTION) {
+      // RJ - 2020-10-19 - NOTE - DELETED and UNDELETED events do not make sense for subscriptions
+
+      if (props.user.userId === notification.subscription.author.userId) {
+        // RJ - 2020-10-19 - NOTE
+        // TLM_EVENT.CREATED notifications should not be shown, or even received
+        // assuming that the author of a subscription is always the concerned user
+        if (eventType === TLM_EVENT.MODIFIED) {
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
+            return {
+              icon: SUBSCRIPTION_TYPE.accepted.faIcon,
+              text: props.t('{{author}} granted you access to {{space}}', i18nOpts),
+              url: dashboardUrl
+            }
+          }
+
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
+            return {
+              icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+              text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
+              url: subscriptionPageURL,
+              emptyUrlMsg: defaultEmptyUrlMsg
+            }
+          }
+        }
+      } else {
+        switch (eventType) {
+          case TLM_EVENT.CREATED: return {
+            icon: SUBSCRIPTION_TYPE.pending.faIcon,
+            text: props.t('{{author}} requested access to {{space}}', i18nOpts),
+            url: dashboardUrl
+          }
+          case TLM_EVENT.MODIFIED: {
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.accepted.faIcon,
+                text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
+                url: dashboardUrl
+              }
+            }
+
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+                text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
+                url: defaultEmptyUrlMsg
+              }
+            }
+
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.pending.faIcon,
+                text: props.t('{{author}} requested access to {{space}}', i18nOpts),
+                url: dashboardUrl
+              }
+            }
+          }
+        }
+      }
+    }
+
     return {
       icon: 'bell',
       text: `${notification.author} ${notification.type}`,
       url: contentUrl,
-      emptyUrlMsg: props.t('This notification has no associated content'),
+      emptyUrlMsg: defaultEmptyUrlMsg,
       msgType: 'warning'
     }
   }
@@ -325,7 +391,7 @@ export class NotificationWall extends React.Component {
                   }
                   key={notification.id}
                 >
-                  {icon}
+                  <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
                     <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span
