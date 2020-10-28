@@ -100,7 +100,7 @@ export class JoinWorkspace extends React.Component {
           icon = SUBSCRIPTION_TYPE.pending.faIcon
           break
       }
-      return <div><i class={`fa fa-${icon}`} /> {text}</div>
+      return <div><i className={`fa fa-${icon}`} /> {text}</div>
     }
 
     switch (workspace.accessType) {
@@ -126,8 +126,8 @@ export class JoinWorkspace extends React.Component {
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i class={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={spaceType.label} />
-      : <i class='fa fa-fw fa-2x fa-search' title='Unknown space type' />
+      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={spaceType.label} />
+      : <i className='fa fa-fw fa-2x fa-search' title='Unknown space type' />
   }
 
   handleWorkspaceFilter (filter) {
@@ -171,7 +171,7 @@ export class JoinWorkspace extends React.Component {
                 {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) =>
                   <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                     {this.createIconForAccessType(workspace.accessType)}
-                    <div class={`${className}__content__workspaceList__item__title_description`}>
+                    <div className={`${className}__content__workspaceList__item__title_description`}>
                       <span>{workspace.label}</span>
                       <span
                         className={`${className}__content__workspaceList__item__description`}
