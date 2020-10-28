@@ -34,15 +34,13 @@ export class UserSpacesConfig extends React.Component {
   }
 
   handleMemberModified = data => {
-    const { props } = this
-    if (Number(props.userToEditId) !== data.fields.user.user_id) return
     this.setState(prev => ({
       workspaceList: prev.workspaceList.map(space =>
         space.workspace_id === data.fields.workspace.workspace_id
           ? {
             ...space,
-            memberList: space.memberList.map(member => member.user_id === Number(props.userToEditId)
-              ? { ...member, do_notify: data.fields.member.do_notify }
+            memberList: space.memberList.map(member => member.user_id === data.fields.user.user_id
+              ? { ...member, ...data.fields.member }
               : member
             )
           }
@@ -51,24 +49,41 @@ export class UserSpacesConfig extends React.Component {
     }))
   }
 
-  handleMemberDeleted = data => {
+  handleMemberDeleted = async data => {
     const { props } = this
-    if (Number(props.userToEditId) !== data.fields.user.user_id) return
-    this.setState(prev => ({
-      workspaceList: prev.workspaceList.filter(space =>
-        space.workspace_id !== data.fields.workspace.workspace_id
-      )
-    }))
+
+    if (Number(props.userToEditId) === data.fields.user.user_id) {
+      this.setState(prev => ({
+        workspaceList: prev.workspaceList.filter(space =>
+          space.workspace_id !== data.fields.workspace.workspace_id
+        )
+      }))
+    } else {
+      this.updateMemberList(data)
+    }
   }
 
   handleMemberCreated = async data => {
-    const { props } = this
-    if (Number(props.userToEditId) !== data.fields.user.user_id) return
+    this.updateMemberList(data)
+  }
 
-    const newSpace = await this.fillMemberList(data.fields.workspace)
+  updateMemberList = async (data) => {
+    // RJ - 2020-10-28 - FIXME - https://github.com/tracim/tracim/issues/3740
+    // We should update the member list with using information in data instead of re-fetching it
+
+    const { props } = this
+    const spaceIndex = this.state.workspaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
+
+    const space = await this.fillMemberList(data.fields.workspace)
+
+    if (spaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
 
     this.setState(prev => ({
-      workspaceList: sortWorkspaceList([...prev.workspaceList, newSpace])
+      workspaceList: (
+        spaceIndex === -1
+          ? sortWorkspaceList([...prev.workspaceList, space])
+          : [...prev.workspaceList.slice(0, spaceIndex), space, ...prev.workspaceList.slice(spaceIndex + 1)]
+      )
     }))
   }
 
