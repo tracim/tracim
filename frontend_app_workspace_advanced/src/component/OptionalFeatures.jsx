@@ -5,9 +5,6 @@ import { translate } from 'react-i18next'
 const OptionalFeatures = props => {
   return (
     <div className='formBlock workspace_advanced__optionalfunctionalities'>
-      <div className='formBlock__title workspace_advanced__optionalfunctionalities__title'>
-        {props.t('Optional functionalities')}
-      </div>
       {props.appAgendaAvailable && (
         <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='agenda_enabled'>
           <BtnSwitch

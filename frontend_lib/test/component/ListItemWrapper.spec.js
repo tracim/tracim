@@ -1,8 +1,8 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import ListItemWrapper from '../../src/component/ListItemWrapper/ListItemWrapper.jsx'
-require('../../src/component/ListItemWrapper/ListItemWrapper.styl')
+import ListItemWrapper from '../../src/component/Lists/ListItemWrapper/ListItemWrapper.jsx'
+require('../../src/component/Lists/ListItemWrapper/ListItemWrapper.styl')
 
 describe('<ListItemWrapper />', () => {
   const props = {

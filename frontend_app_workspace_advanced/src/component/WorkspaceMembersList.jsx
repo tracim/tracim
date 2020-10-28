@@ -11,10 +11,6 @@ export const WorkspaceMembersList = props => {
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember === false && (
         <div>
-          <div className='formBlock__title workspace_advanced__userlist__title'>
-            {props.t('Members list')}
-          </div>
-
           <div
             className='formBlock__bottom workspace_advanced__userlist__adduser'
             onClick={props.onClickToggleFormNewMember}
@@ -60,7 +56,7 @@ export const WorkspaceMembersList = props => {
                       <DropdownMenu
                         buttonOpts={<i className={`fa fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
                         buttonLabel={props.t(role.label)}
-                        buttonCustomClass='btndropdown transparentButton'
+                        buttonCustomClass='nohover btndropdown transparentButton'
                         isButton
                       >
                         {props.roleList.map(r =>
