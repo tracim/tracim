@@ -1,11 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-
 import {
   BtnSwitch,
   IconButton,
   ROLE_LIST
 } from 'tracim_frontend_lib'
+
+require('./UserSpacesConfigLine.styl')
 
 class UserSpacesConfigLine extends React.Component {
   render () {
@@ -39,6 +40,7 @@ class UserSpacesConfigLine extends React.Component {
         )}
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
+            customClass='spaceconfig__table__leave_space_cell'
             mode='dark'
             intent='secondary'
             disabled={props.onlyManager}
@@ -52,7 +54,7 @@ class UserSpacesConfigLine extends React.Component {
                     ? props.t('You cannot remove this member because there are no other space managers.')
                     : props.t('You cannot leave this space because there are no other space managers.')
                 )
-                : undefined
+                : props.admin ? props.t('Remove from space') : props.t('Leave space')
             }
           />
         </td>
