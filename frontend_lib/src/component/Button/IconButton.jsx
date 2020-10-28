@@ -23,7 +23,7 @@ const IconButton = props => {
       style={style}
       onClick={props.onClick}
       disabled={props.disabled}
-      title={props.title}
+      title={props.title || props.text}
       data-cy={props.dataCy}
     >
       <i className={`fa fa-fw fa-${props.icon}`} /> {props.text}
