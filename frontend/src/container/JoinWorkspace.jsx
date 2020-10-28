@@ -171,7 +171,7 @@ export class JoinWorkspace extends React.Component {
                 {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) =>
                   <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                     {this.createIconForAccessType(workspace.accessType)}
-                    <div class={`${className}__content__workspaceList__item__title_description`}>
+                    <div className={`${className}__content__workspaceList__item__title_description`}>
                       <span>{workspace.label}</span>
                       <span
                         className={`${className}__content__workspaceList__item__description`}
