@@ -29,12 +29,14 @@ class UserSpacesConfigLine extends React.Component {
             </div>
           </div>
         </td>
-        <td>
-          <BtnSwitch
-            checked={member.do_notify}
-            onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
-          />
-        </td>
+        {(props.system.config.email_notification_activated &&
+          <td>
+            <BtnSwitch
+              checked={member.do_notify}
+              onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
+            />
+          </td>
+        )}
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
             mode='dark'

@@ -54,12 +54,12 @@ describe('workspaceList reducer', () => {
 
       it('should return a workspace list with the workspace added', () => {
         expect(rez).to.deep.equal([
-          ...initialState,
           {
             ...serializedFirstWorkspaceFromApi,
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
             memberList: []
-          }
+          },
+          ...initialState
         ])
       })
     })

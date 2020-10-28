@@ -41,7 +41,7 @@ describe('<UserSpacesConfig />', () => {
   wrapper.setState({ workspaceList })
 
   describe('static design', () => {
-    it(`should display ${workspaceList.length} space`, () => {
+    it(`should display ${workspaceList.length} spaces`, () => {
       expect(wrapper.find('div.spaceconfig__table__role').length).to.equal(workspaceList.length)
     })
 
