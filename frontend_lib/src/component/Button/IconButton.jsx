@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { darkenColor } from '../../helper.js'
 
-require('../../css/IconButton.styl')
+require('./IconButton.styl')
 
 const IconButton = props => {
   const classes = ['iconbutton']
@@ -23,10 +23,10 @@ const IconButton = props => {
       style={style}
       onClick={props.onClick}
       disabled={props.disabled}
-      title={props.title}
+      title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      <i className={`fa fa-fw fa-${props.icon}`} /> {props.text}
+      <i className={`fa fa-fw fa-${props.icon}`} /> <span className='iconbutton__label'>{props.text}</span>
     </button>
   )
 }
