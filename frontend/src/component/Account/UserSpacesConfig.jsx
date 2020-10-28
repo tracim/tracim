@@ -148,6 +148,7 @@ export class UserSpacesConfig extends React.Component {
               onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
               onLeaveSpace={this.handleLeaveSpace}
               admin={props.admin}
+              system={props.system}
               onlyManager={this.onlyManager(member, space.memberList)}
             />
           )
@@ -172,7 +173,7 @@ export class UserSpacesConfig extends React.Component {
                   <tr>
                     <th>{props.t('Space')}</th>
                     <th>{props.t('Role')}</th>
-                    <th>{props.t('Email notifications')}</th>
+                    {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
                     <th />
                   </tr>
                 </thead>
@@ -207,7 +208,8 @@ export class UserSpacesConfig extends React.Component {
   }
 }
 
-export default connect()(translate()(TracimComponent(UserSpacesConfig)))
+const mapStateToProps = ({ system }) => ({ system })
+export default connect(mapStateToProps)(translate()(TracimComponent(UserSpacesConfig)))
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,
