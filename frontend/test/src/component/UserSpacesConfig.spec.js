@@ -12,7 +12,8 @@ describe('<UserSpacesConfig />', () => {
   const props = {
     registerLiveMessageHandlerList: () => {},
     userToEditId: 0,
-    onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack
+    onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack,
+    system: { config: {} }
   }
 
   const wrapper = shallow(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)
