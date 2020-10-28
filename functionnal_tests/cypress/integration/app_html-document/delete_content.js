@@ -1,3 +1,4 @@
+/* RJ - 2020-10-28 - unstable test (https://github.com/tracim/tracim/issues/3741)
 import { PAGES as p } from '../../support/urls_commands'
 const titre1 = 'createhtml-document'
 
@@ -45,3 +46,4 @@ describe('delete a html-document content', function () {
     cy.get('.content__name').contains(titre1).should('not.exist')
   })
 })
+*/
