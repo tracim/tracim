@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  CardPopup,
+  ConfirmPopup,
   BREADCRUMBS_TYPE,
   handleFetchResult,
   ROLE,
@@ -39,7 +39,6 @@ import {
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
 
-const color = require('color')
 require('../css/index.styl')
 
 export class AdminWorkspaceUser extends React.Component {
@@ -623,37 +622,11 @@ export class AdminWorkspaceUser extends React.Component {
         )}
 
         {state.popupDeleteWorkspaceDisplay && (
-          <CardPopup
-            customClass='adminworkspaceuser__popup'
-            customHeaderClass='primaryColorBg'
-            onClose={this.handleClosePopupDeleteWorkspace}
-          >
-            <div className='adminworkspaceuser__popup__body'>
-              <div className='adminworkspaceuser__popup__body__msg'>{props.t('Are you sure?')}</div>
-              <div className='adminworkspaceuser__popup__body__btn'>
-                <button
-                  type='button'
-                  className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
-                  onClick={this.handleClosePopupDeleteWorkspace}
-                >
-                  {props.t('Cancel')}
-                </button>
-
-                <button
-                  type='button'
-                  className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
-                  onClick={this.handleDeleteWorkspace}
-                  style={{
-                    ':hover': {
-                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hex()
-                    }
-                  }}
-                >
-                  {props.t('Delete')}
-                </button>
-              </div>
-            </div>
-          </CardPopup>
+          <ConfirmPopup
+            onCancel={this.handleClosePopupDeleteWorkspace}
+            onConfirm={this.handleDeleteWorkspace}
+            confirmLabel={props.t('Delete')}
+          />
         )}
       </div>
     )

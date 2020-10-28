@@ -556,21 +556,21 @@ export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
 
+// INFO - RJ - 2020-10-26 - useful to ensure that the same functions can be used with serialized lists (like for frontend)
+// or not (like for frontend_app_workspace)
+const getSpaceId = (space) => space.workspace_id || space.id
+
 export const createSpaceTree = spaceList => {
   const spaceListWithChildren = spaceList.map(space => ({ ...space, children: space.children || [] }))
   const spaceById = {}
   const newSpaceList = []
   for (const space of spaceListWithChildren) {
-    // INFO - GB - 2020-10-14 - The check made below is to ensure that the same function can be used by serialized lists (like for frontend) or not (like for frontend_app_workspace)
-    space.workspace_id
-      ? spaceById[space.workspace_id] = space
-      : spaceById[space.id] = space
+    spaceById[getSpaceId(space)] = space
   }
   for (const space of spaceListWithChildren) {
-    if (space.parent_id && spaceById[space.parent_id]) {
-      spaceById[space.parent_id].children.push(space)
-    } else if (space.parentId && spaceById[space.parentId]) {
-      spaceById[space.parentId].children.push(space)
+    const parentId = space.parent_id || space.parentId
+    if (parentId && spaceById[parentId]) {
+      spaceById[parentId].children.push(space)
     } else {
       newSpaceList.push(space)
     }
@@ -584,7 +584,13 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
+  return workspaceList.sort((a, b) => {
+    let res = naturalCompareLabels(a, b, lang)
+    if (!res) {
+      res = getSpaceId(a) - getSpaceId(b)
+    }
+    return res
+  })
 }
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()

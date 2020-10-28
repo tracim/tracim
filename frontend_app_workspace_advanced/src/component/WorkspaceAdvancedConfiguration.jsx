@@ -2,11 +2,9 @@ import React from 'react'
 import Radium from 'radium'
 import {
   BtnSwitch,
-  CardPopup
+  ConfirmPopup
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
-
-const color = require('color')
 
 const WorkspaceAdvancedConfiguration = props => {
   return (
@@ -55,33 +53,11 @@ const WorkspaceAdvancedConfiguration = props => {
         </div>
 
         {(props.displayPopupValidateDeleteWorkspace &&
-          <CardPopup
-            customClass='workspace_advanced__popup'
-            customHeaderClass='primaryColorBg'
-            onClose={props.onClickClosePopupDeleteWorkspace}
-          >
-            <div className='workspace_advanced__popup__body'>
-              <div className='workspace_advanced__popup__body__msg'>{props.t('Are you sure?')}</div>
-              <div className='workspace_advanced__popup__body__btn'>
-                <button
-                  type='button'
-                  className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
-                  onClick={props.onClickClosePopupDeleteWorkspace}
-                >
-                  {props.t('Cancel')}
-                </button>
-
-                <button
-                  type='button'
-                  className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
-                  onClick={props.onClickValidatePopupDeleteWorkspace}
-                  style={{ ':hover': { backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hex() } }}
-                >
-                  {props.t('Delete')}
-                </button>
-              </div>
-            </div>
-          </CardPopup>
+          <ConfirmPopup
+            onConfirm={props.onClickValidatePopupDeleteWorkspace}
+            onCancel={props.onClickClosePopupDeleteWorkspace}
+            confirmLabel={props.t('Delete')}
+          />
         )}
       </div>
 

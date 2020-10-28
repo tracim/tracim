@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-import Notification from '../component/Account/Notification.jsx'
+import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
   Delimiter,
@@ -33,8 +33,6 @@ import {
 } from '../action-creator.sync.js'
 import {
   getUser,
-  getUserWorkspaceList,
-  getWorkspaceMemberList,
   putUserPublicName,
   putUserEmail,
   putUserUsername,
@@ -50,7 +48,6 @@ import {
 } from '../util/helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
-import { serializeMember } from '../reducer/currentWorkspace.js'
 
 export class Account extends React.Component {
   constructor (props) {
@@ -62,10 +59,10 @@ export class Account extends React.Component {
       label: props.t('Profile'),
       display: true
     }, {
-      name: 'notification',
+      name: 'spacesConfig',
       active: false,
-      label: props.t('Spaces and notifications'),
-      display: props.system.config.email_notification_activated
+      label: props.t('Spaces'),
+      display: true
     }, {
       name: 'password',
       active: false,
@@ -88,7 +85,6 @@ export class Account extends React.Component {
         isUsernameValid: true,
         usernameInvalidMsg: ''
       },
-      userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
     }
 
@@ -97,7 +93,6 @@ export class Account extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
@@ -121,23 +116,6 @@ export class Account extends React.Component {
     if (state.userToEdit.profile !== data.fields.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.fields.user.profile } }))
   }
 
-  handleMemberModified = data => {
-    const { state } = this
-    if (Number(state.userToEditId) !== data.fields.user.user_id) return
-    this.setState(prev => ({
-      userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.id === data.fields.workspace.workspace_id
-        ? {
-          ...ws,
-          memberList: ws.memberList.map(member => member.id === Number(state.userToEditId)
-            ? { ...member, doNotify: data.fields.member.do_notify }
-            : member
-          )
-        }
-        : ws
-      )
-    }))
-  }
-
   // Custom Event Handler
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
@@ -147,7 +125,6 @@ export class Account extends React.Component {
   async componentDidMount () {
     await this.getUserDetail()
     this.setHeadTitle()
-    this.getUserWorkspaceList()
     if (this.props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
   }
@@ -210,18 +187,6 @@ export class Account extends React.Component {
     }
   }
 
-  getUserWorkspaceList = async () => {
-    const { props, state } = this
-    const showOwnedWorkspace = false
-
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.userToEditId, showOwnedWorkspace))
-
-    switch (fetchGetUserWorkspaceList.status) {
-      case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
-    }
-  }
-
   buildBreadcrumbs = () => {
     const { props, state } = this
 
@@ -243,34 +208,6 @@ export class Account extends React.Component {
       ),
       type: BREADCRUMBS_TYPE.CORE
     }]))
-  }
-
-  getUserWorkspaceListMemberList = async (wsList) => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      wsList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(wsMemberList => ({
-      workspaceId: wsMemberList.workspaceId,
-      memberList: wsMemberList.fetchMemberList.status === 200
-        ? wsMemberList.fetchMemberList.json
-        : [] // handle error ?
-    }))
-
-    this.setState({
-      userToEditWorkspaceList: wsList.map(ws => ({
-        ...ws,
-        id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList
-          .find(wsm => ws.workspace_id === wsm.workspaceId).memberList
-          .map(m => serializeMember(m))
-      }))
-    })
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
@@ -407,7 +344,6 @@ export class Account extends React.Component {
   // https://github.com/tracim/tracim/issues/1847
   setTitle () {
     const { props, state } = this
-
     return (
       <div
         dangerouslySetInnerHTML={{
@@ -468,12 +404,12 @@ export class Account extends React.Component {
                           />
                         )
 
-                      case 'notification':
+                      case 'spacesConfig':
                         return (
-                          <Notification
-                            userLoggedId={parseInt(state.userToEditId)}
-                            workspaceList={state.userToEditWorkspaceList}
+                          <UserSpacesConfig
+                            userToEditId={Number(state.userToEditId)}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            admin
                           />
                         )
 
@@ -502,7 +438,7 @@ export class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
-  breadcrumbs, user, workspaceList, timezone, system, appList
+const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList }) => ({
+  breadcrumbs, user, timezone, system, appList
 })
 export default withRouter(connect(mapStateToProps)(translate()(TracimComponent(Account))))

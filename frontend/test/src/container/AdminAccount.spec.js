@@ -28,11 +28,8 @@ import {
   mockGetUserCalendar200,
   mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
-  mockPutUserPassword403,
-  mockGetWorkspaceMemberList200
+  mockPutUserPassword403
 } from '../../apiMock'
-import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
-import { serializeMember } from '../../../src/reducer/currentWorkspace.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
   const newFlashMessageInfoCallBack = sinon.spy()
@@ -137,29 +134,6 @@ describe('In <Account /> at AdminAccount.jsx', () => {
         })
       })
     })
-
-    describe('eventType sharedspace member', () => {
-      describe('handleMemberModified', () => {
-        it("should update member's notifications", () => {
-          adminAccountWrapper.setState({ userToEditWorkspaceList: props.workspaceList })
-          const tlmData = {
-            fields: {
-              author: userFromApi,
-              user: userFromApi,
-              member: { role: 'workspace-manager', do_notify: false },
-              workspace: firstWorkspaceFromApi
-            }
-          }
-          adminAccountInstance.handleMemberModified(tlmData)
-
-          const memberAtWs = adminAccountWrapper.state().userToEditWorkspaceList.find(
-            ws => ws.id === tlmData.fields.workspace.workspace_id
-          ).memberList.find(m => m.id === tlmData.fields.user.user_id)
-
-          expect(memberAtWs.doNotify).to.equal(tlmData.fields.member.do_notify)
-        })
-      })
-    })
   })
 
   describe('its internal function', () => {
@@ -258,25 +232,6 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       it("should set isUsernameValid state to false if username has a '@' in it", async () => {
         await adminAccountInstance.changeUsername('@newUsername')
         expect(adminAccountWrapper.state('userToEdit').isUsernameValid).to.equal(false)
-      })
-    })
-
-    describe('getUserWorkspaceListMemberList', () => {
-      it('should update userToEditWorkspaceList state with workspace details', async () => {
-        const member = {
-          do_notify: true,
-          user: { public_name: 'Global Manager', user_id: 1, username: 'TheAdmin' },
-          role: 'workspace-manager'
-        }
-        mockGetWorkspaceMemberList200(
-          FETCH_CONFIG.apiUrl,
-          firstWorkspaceFromApi.workspace_id,
-          [member]
-        )
-        await adminAccountInstance.getUserWorkspaceListMemberList([firstWorkspaceFromApi])
-        const workspaceMemberList = adminAccountWrapper.state('userToEditWorkspaceList')
-          .find(ws => ws.id === firstWorkspaceFromApi.workspace_id).memberList
-        expect(workspaceMemberList).to.deep.equal([serializeMember(member)])
       })
     })
   })

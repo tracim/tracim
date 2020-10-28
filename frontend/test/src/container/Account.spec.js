@@ -150,14 +150,6 @@ describe('In <Account />', () => {
       })
     })
 
-    describe('loadWorkspaceListMemberList', () => {
-      it('should call setWorkspaceListMemberListCallBack', (done) => {
-        accountInstance.loadWorkspaceListMemberList().then(() => {
-          expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
     describe('buildBreadcrumbs', () => {
       it('should call setBreadcrumbsCallBack', () => {
         accountInstance.buildBreadcrumbs()

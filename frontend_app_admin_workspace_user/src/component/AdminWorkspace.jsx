@@ -49,7 +49,7 @@ const AdminWorkspace = props =>
           <tbody>
             {(props.workspaceList.length > 0
               ? props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws => (
-                <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
+                <tr className='adminWorkspace__workspaceTable__tr' key={ws.workspace_id}>
                   <td className='table__id'>{ws.workspace_id}</td>
                   <td
                     className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
