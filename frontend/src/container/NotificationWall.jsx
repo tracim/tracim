@@ -270,7 +270,7 @@ export class NotificationWall extends React.Component {
         if (eventType === TLM_EVENT.MODIFIED) {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
             return {
-              icon: 'check',
+              icon: SUBSCRIPTION_TYPE.accepted.faIcon,
               text: props.t('{{author}} granted you access to {{space}}', i18nOpts),
               url: dashboardUrl
             }
@@ -278,7 +278,7 @@ export class NotificationWall extends React.Component {
 
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
-              icon: 'times',
+              icon: SUBSCRIPTION_TYPE.rejected.faIcon,
               text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
               url: subscriptionPageURL,
               emptyUrlMsg: defaultEmptyUrlMsg
@@ -288,14 +288,14 @@ export class NotificationWall extends React.Component {
       } else {
         switch (eventType) {
           case TLM_EVENT.CREATED: return {
-            icon: 'sign-in',
+            icon: SUBSCRIPTION_TYPE.pending.faIcon,
             text: props.t('{{author}} requested access to {{space}}', i18nOpts),
             url: dashboardUrl
           }
           case TLM_EVENT.MODIFIED: {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
               return {
-                icon: 'check',
+                icon: SUBSCRIPTION_TYPE.accepted.faIcon,
                 text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
                 url: dashboardUrl
               }
@@ -303,7 +303,7 @@ export class NotificationWall extends React.Component {
 
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
-                icon: 'times',
+                icon: SUBSCRIPTION_TYPE.rejected.faIcon,
                 text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
                 url: defaultEmptyUrlMsg
               }
@@ -311,7 +311,7 @@ export class NotificationWall extends React.Component {
 
             if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
               return {
-                icon: 'times',
+                icon: SUBSCRIPTION_TYPE.pending.faIcon,
                 text: props.t('{{author}} requested access to {{space}}', i18nOpts),
                 url: dashboardUrl
               }
