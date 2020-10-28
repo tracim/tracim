@@ -124,7 +124,6 @@ export class UserSpacesConfig extends React.Component {
   }
 
   onlyManager (member, memberList) {
-    console.log("onlyManager", member, memberList)
     const manager = ROLE.workspaceManager.slug
 
     if (member.role !== manager) {
