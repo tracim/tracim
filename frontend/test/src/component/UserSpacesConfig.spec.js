@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import sinon from 'sinon'
 import { UserSpacesConfig as UserSpacesConfigWithoutHOC } from '../../../src/component/Account/UserSpacesConfig.jsx'
 import { userFromApi } from '../../hocMock/redux/user/user.js'
@@ -13,37 +13,44 @@ describe('<UserSpacesConfig />', () => {
     registerLiveMessageHandlerList: () => {},
     userToEditId: 0,
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack,
-    system: { config: {} }
+    system: { config: {} },
+    admin: true
   }
 
-  const wrapper = shallow(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)
-  const workspaceList = [{
-    memberList: [{
-      user_id: 0,
-      role: 'content-manager',
-      do_notify: true
-    }],
-    workspace_id: 1,
-    label: 'randomLabel1'
-  }, {
-    memberList: [{
-      user_id: 1,
-      role: 'workspace-manager',
-      do_notify: true
+  const wrapper = mount(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)
+  const workspaceList = [
+    {
+      memberList: [
+        {
+          user_id: 0,
+          role: 'content-manager',
+          do_notify: true
+        }
+      ],
+      workspace_id: 1,
+      label: 'randomLabel1'
     }, {
-      user_id: 0,
-      role: 'content-manager',
-      do_notify: true
-    }],
-    workspace_id: 2,
-    label: 'randomLabel2'
-  }]
+      memberList: [
+        {
+          user_id: 1,
+          role: 'workspace-manager',
+          do_notify: true
+        }, {
+          user_id: 0,
+          role: 'content-manager',
+          do_notify: true
+        }
+      ],
+      workspace_id: 2,
+      label: 'randomLabel2'
+    }
+  ]
 
   wrapper.setState({ workspaceList })
 
   describe('static design', () => {
     it(`should display ${workspaceList.length} spaces`, () => {
-      expect(wrapper.find('div.spaceconfig__table__role').length).to.equal(workspaceList.length)
+      expect(wrapper.find('.spaceconfig__table__spacename')).to.have.length(workspaceList.length)
     })
 
     it('should display labels of spaces', () => {
