@@ -251,14 +251,14 @@ describe('Account page', () => {
       it('Allows leaving a space', () => {
         cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
           .click()
-        cy.get('[data-cy=spaceconfig__table__leave_space_cell] .primaryColorBgHover')
+        cy.get('[data-cy=spaceconfig__table__leave_space_cell] button')
           .click()
 
         cy.get('.confirm_popup').should('be.visible')
         cy.get('[data-cy=confirm_popup__button_cancel]').click()
         cy.contains('.spaceconfig__table__spacename', 'My space')
 
-        cy.get('[data-cy=spaceconfig__table__leave_space_cell] .primaryColorBgHover')
+        cy.get('[data-cy=spaceconfig__table__leave_space_cell] button')
           .click()
 
         cy.get('.confirm_popup').should('be.visible')
