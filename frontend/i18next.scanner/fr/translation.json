@@ -287,7 +287,6 @@
   "{{author}} rejected your access to {{space}}": "{{author}} vous a refusé l'accès à {{space}}",
   "{{author}} granted access to {{space}} for {{user}}": "{{author}} a permis l'accès à {{space}} pour {{user}}",
   "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a rejecté l'accès à {{space}} pour {{user}}",
-  "Only an administrator can see this user's profile": "Seul un administrateur peut consulter ce profil utilisateur",
   "This notification has no associated content": "Cette notification n'a pas de contenu associé",
   "Join a space": "Rejoindre un espace",
   "Title and description": "Titre et description",
@@ -299,5 +298,7 @@
   "You can join an existing space or create your first space": "Vous pouvez rejoindre un espace existant ou créer votre premier espace",
   "You can create your first space": "Vous pouvez créer votre premier espace",
   "You can join an existing space": "Vous pouvez rejoindre un espace existant",
-  "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace"
+  "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace",
+  "You joined this space": "Vous avez rejoint cet espace",
+  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Votre demande pour rejoindre {{space}} sera traitée par un responsable. Le résultat sera affiché sur le mur de notification."
 }
