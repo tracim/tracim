@@ -119,15 +119,15 @@ export class JoinWorkspace extends React.Component {
             onClick={() => this.joinWorkspace(workspace.id)}
           />)
       default:
-        return <span>Unknown space access type</span>
+        return <span>{props.t('Unknown space type')}</span>
     }
   }
 
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={spaceType.label} />
-      : <i className='fa fa-fw fa-2x fa-search' title='Unknown space type' />
+      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={spaceType.tradKey[0]} />
+      : <i className='fa fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
   }
 
   handleWorkspaceFilter (filter) {
