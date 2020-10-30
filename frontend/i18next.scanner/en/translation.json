@@ -286,6 +286,7 @@
   "Error while leaving the space": "Error while leaving the space",
   "You cannot leave this space because there are no other space managers.": "You cannot leave this space because there are no other space managers.",
   "You cannot remove this member because there are no other space managers.": "You cannot remove this member because there are no other space managers.",
+  "Are you sure you want to remove this member from the space?":"Are you sure you want to remove this member from the space?",
   "{{author}} requested access to {{space}}": "{{author}} requested access to {{space}}",
   "{{author}} granted you access to {{space}}": "{{author}} granted you access to {{space}}",
   "{{author}} rejected your access to {{space}}": "{{author}} rejected your access to {{space}}",

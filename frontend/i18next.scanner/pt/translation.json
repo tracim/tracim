@@ -10,6 +10,7 @@
   "{{author}} mentioned you in a comment in {{content}} in {{space}}": "{{author}} mencionou-o num comentário do {{content}} em {{space}}",
   "{{author}} updated {{content}} in {{space}}": "{{author}} actualizou {{content}} em {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} modificou o status de {{content}} em {{space}}",
+  "Are you sure you want to remove this member from the space?": "Tem a certeza de que quer remover este membro do espaço?",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Unknown space type": "Tipo de espaço desconhecido",
   "Create a space": "Criar um espaço",
