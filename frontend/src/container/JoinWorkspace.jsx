@@ -147,14 +147,15 @@ export class JoinWorkspace extends React.Component {
     const fetchPutUserSpaceSubscription = await props.dispatch(putUserWorkspaceSubscription(space.id, userId))
 
     switch (fetchPutUserSpaceSubscription.status) {
-      case 200: props.dispatch(newFlashMessage(props.t(
-        'Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.',
-        {
-          space: space.label,
-          interpolation: { escapeValue: false }
-        }
-      ), 'info'))
-      break
+      case 200:
+        props.dispatch(newFlashMessage(props.t(
+          'Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.',
+          {
+            space: space.label,
+            interpolation: { escapeValue: false }
+          }
+        ), 'info'))
+        break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
     }
   }
