@@ -113,7 +113,7 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'user-o+plus',
+            icon: 'user-plus',
             text: '{{author}} added you to {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })

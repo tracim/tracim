@@ -58,7 +58,7 @@ export class JoinWorkspace extends React.Component {
     props.dispatch(setWorkspaceSubscriptionList(fetchSubscriptionList.json))
   }
 
-  handleAllAppChangeLanguage () {
+  handleAllAppChangeLanguage = () => {
     const { props } = this
     this.buildBreadcrumbs()
     props.dispatch(setHeadTitle(props.t('Join a space')))
@@ -130,15 +130,19 @@ export class JoinWorkspace extends React.Component {
             onClick={() => this.joinWorkspace(workspace)}
           />)
       default:
-        return <span>Unknown space access type</span>
+        return <span>{props.t('Unknown space type')}</span>
     }
   }
 
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={spaceType.label} />
-      : <i className='fa fa-fw fa-2x fa-search' title='Unknown space type' />
+      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
+      : <i className='fa fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
+    // RJ - 2020-10-30 - NOTE
+    // This code uses props.t on a key that is translated in frontend_lib (spaceType.tradKey[0]).
+    // This works because translations are grouped during compilation.
+    // This may break in the future but there is a Cypress test to catch this
   }
 
   handleWorkspaceFilter (filter) {

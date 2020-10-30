@@ -208,7 +208,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'user-o+plus',
+          icon: 'user-plus',
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} added you to {{space}}', i18nOpts)
             : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
@@ -217,15 +217,15 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: return {
           icon: 'user-o+history',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+            ? props.t('{{author}} modified your role in {{space}}', i18nOpts)
+            : props.t("{{author}} modified {{user}}'s role in {{space}}", i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'user-o+times',
+          icon: 'user-times',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+            ? props.t('{{author}} removed you from {{space}}', i18nOpts)
+            : props.t('{{author}} removed {{user}} from {{space}}', i18nOpts),
           url: dashboardUrl
         }
       }
@@ -234,22 +234,22 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'university+plus',
+          icon: 'users+plus',
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'university+history',
+          icon: 'users+history',
           text: props.t('{{author}} modified the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'university+times',
+          icon: 'users+times',
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
-          icon: 'university+undo',
+          icon: 'users+undo',
           text: props.t('{{author}} restored the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
