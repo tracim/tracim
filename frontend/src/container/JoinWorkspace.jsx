@@ -76,10 +76,21 @@ export class JoinWorkspace extends React.Component {
     }]))
   }
 
-  async joinWorkspace (workspaceId) {
+  async joinWorkspace (workspace) {
     const { props } = this
-    await props.dispatch(postUserWorkspace(workspaceId, props.user.userId))
-    props.history.push(PAGE.WORKSPACE.DASHBOARD(workspaceId))
+
+    const fetchPutUserSpaceSubscription = await props.dispatch(postUserWorkspace(workspace.id, props.user.userId))
+
+    switch (fetchPutUserSpaceSubscription.status) {
+      case 200:
+        props.dispatch(newFlashMessage(props.t(
+          'You joined the space {{space}}',
+          { space: workspace.label }
+        ), 'info'))
+        props.history.push(PAGE.WORKSPACE.DASHBOARD(workspace.id))
+        break
+      default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+    }
   }
 
   createRequestComponent (workspace) {
@@ -109,14 +120,14 @@ export class JoinWorkspace extends React.Component {
           <IconButton
             icon='share'
             text={props.t('Request access')}
-            onClick={() => props.dispatch(putUserWorkspaceSubscription(workspace.id, props.user.userId))}
+            onClick={() => this.handleClickRequestAccess(workspace, props.user.userId)}
           />)
       case SPACE_TYPE.open.slug:
         return (
           <IconButton
             icon='sign-in'
             text={props.t('Join the space')}
-            onClick={() => this.joinWorkspace(workspace.id)}
+            onClick={() => this.joinWorkspace(workspace)}
           />)
       default:
         return <span>Unknown space access type</span>
@@ -132,6 +143,21 @@ export class JoinWorkspace extends React.Component {
 
   handleWorkspaceFilter (filter) {
     this.setState({ filter: filter.toLowerCase() })
+  }
+
+  async handleClickRequestAccess (space, userId) {
+    const { props } = this
+    const fetchPutUserSpaceSubscription = await props.dispatch(putUserWorkspaceSubscription(space.id, userId))
+
+    switch (fetchPutUserSpaceSubscription.status) {
+      case 200:
+        props.dispatch(newFlashMessage(props.t(
+          'Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.',
+          { space: space.label }
+        ), 'info'))
+        break
+      default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+    }
   }
 
   filterWorkspaces (workspace) {
@@ -168,6 +194,7 @@ export class JoinWorkspace extends React.Component {
                   <b>{props.t('Title and description')}</b>
                   <b>{props.t('Access request')}</b>
                 </div>
+
                 {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) =>
                   <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
                     {this.createIconForAccessType(workspace.accessType)}

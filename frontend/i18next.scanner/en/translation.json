@@ -298,5 +298,7 @@
   "You can join an existing space or create your first space": "You can join an existing space or create your first space",
   "You can create your first space": "You can create your first space",
   "You can join an existing space": "You can join an existing space",
-  "Please ask access to your spaces to an administrator or space manager": "Please ask access to your spaces to an administrator or space manager"
+  "Please ask access to your spaces to an administrator or space manager": "Please ask access to your spaces to an administrator or space manager",
+  "You joined the space {{space}}": "You joined the space {{space}}",
+  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall."
 }

@@ -299,5 +299,7 @@
   "You can join an existing space or create your first space": "Você pode juntar-se a um espaço existente ou criar o seu primeiro espaço",
   "You can create your first space": "Você pode criar o seu primeiro espaço",
   "You can join an existing space": "Você pode juntar-se a um espaço já existente",
-  "Please ask access to your spaces to an administrator or space manager": "Por favor peça acesso aos seus espaços a um administrador ou gestor de espaço"
+  "Please ask access to your spaces to an administrator or space manager": "Por favor peça acesso aos seus espaços a um administrador ou gestor de espaço",
+  "You joined the space {{space}}": "Você juntou-se ao espaço {{space}}",
+  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "O seu pedido de acesso ao {{space}} será processado por um gestor do espaço. O resultado será mostrado no muro de notificação."
 }
