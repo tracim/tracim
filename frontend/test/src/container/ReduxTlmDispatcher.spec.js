@@ -19,6 +19,7 @@ const createSubscription = (userId) => {
 }
 
 describe('<ReduxTlmDispatcher />', () => {
+  const myUser = { ...user }
   const props = {
     user: user,
     t: k => k,
@@ -88,7 +89,12 @@ describe('<ReduxTlmDispatcher />', () => {
     ]
     for (const testCase of testCases) {
       describe(`"${testCase.eventType}" from user ${testCase.subscription.author.user_id}`, () => {
-        beforeEach(() => props.dispatch.resetHistory())
+        beforeEach(() => {
+          props.dispatch.resetHistory()
+          // NOTE - SG - 2020/10/30 - This is needed as other unit tests mess up with our props
+          // But I do not see why
+          wrapper.setProps({ user: myUser })
+        })
 
         const tlm = {
           event_type: testCase.eventType,
