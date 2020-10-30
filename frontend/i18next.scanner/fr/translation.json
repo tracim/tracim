@@ -299,6 +299,6 @@
   "You can create your first space": "Vous pouvez créer votre premier espace",
   "You can join an existing space": "Vous pouvez rejoindre un espace existant",
   "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace",
-  "You joined this space": "Vous avez rejoint cet espace",
+  "You joined the space {{space}}": "Vous avez rejoint l'espace {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Votre demande pour rejoindre {{space}} sera traitée par un responsable. Le résultat sera affiché sur le mur de notification."
 }
