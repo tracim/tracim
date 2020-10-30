@@ -30,7 +30,6 @@ describe('<ReduxTlmDispatcher />', () => {
     <ReduxTlmDispatcherWithoutHOC {...props} />
   )
   describe('workspace subscription TLM handlers', () => {
-
     const testCases = [
       {
         handler: wrapper.instance().handleWorkspaceSubscriptionCreated,
