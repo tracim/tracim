@@ -208,7 +208,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'user-o+plus',
+          icon: 'user-plus',
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} added you to {{space}}', i18nOpts)
             : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
@@ -222,7 +222,7 @@ export class NotificationWall extends React.Component {
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'user-o+times',
+          icon: 'user-times',
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} removed you from {{space}}', i18nOpts)
             : props.t('{{author}} removed {{user}} from {{space}}', i18nOpts),
@@ -234,7 +234,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'users+plus',
+          icon: 'user-plus',
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
@@ -244,7 +244,7 @@ export class NotificationWall extends React.Component {
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'users+times',
+          icon: 'user-times',
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
