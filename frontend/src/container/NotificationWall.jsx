@@ -234,7 +234,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'user-plus',
+          icon: 'users+plus',
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
@@ -244,7 +244,7 @@ export class NotificationWall extends React.Component {
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'user-times',
+          icon: 'users+times',
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
