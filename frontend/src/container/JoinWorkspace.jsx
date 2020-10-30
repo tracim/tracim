@@ -83,10 +83,10 @@ export class JoinWorkspace extends React.Component {
 
     switch (fetchPutUserSpaceSubscription.status) {
       case 200:
-        props.dispatch(newFlashMessage(props.t('You joined the space {{space}}', {
-          space: workspace.label,
-          interpolation: { escapeValue: false }
-        }), 'info'))
+        props.dispatch(newFlashMessage(props.t(
+          'You joined the space {{space}}',
+          { space: workspace.label }
+        ), 'info'))
         props.history.push(PAGE.WORKSPACE.DASHBOARD(workspace.id))
         break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -153,10 +153,7 @@ export class JoinWorkspace extends React.Component {
       case 200:
         props.dispatch(newFlashMessage(props.t(
           'Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.',
-          {
-            space: space.label,
-            interpolation: { escapeValue: false }
-          }
+          { space: space.label }
         ), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
