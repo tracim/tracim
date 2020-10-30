@@ -55,7 +55,7 @@ describe('Join space page', () => {
   })
 
   describe('The icon tooltip', () => {
-    it("is translated", () => {
+    it('should be translated', () => {
       cy.get('.joinWorkspace__content__workspaceList__item i.fa').invoke('attr', 'title').then(title => expect(title).to.equal('On request'))
 
       cy.changeLanguage('fr')
