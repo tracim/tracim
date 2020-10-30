@@ -30,7 +30,7 @@ class HookImpl:
                     flush=False,
                 )
             except RoleAlreadyExistError:
-                break
+                pass
             current_workspace = current_workspace.parent
 
 
