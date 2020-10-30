@@ -27,13 +27,16 @@ class HookImpl:
         ).get_all()
         rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         for workspace in open_workspaces:
-            rapi.create_one(
-                user=user,
-                workspace=workspace,
-                role_level=workspace.default_user_role.level,
-                with_notif=True,
-                flush=False,
-            )
+            try:
+                rapi.create_one(
+                    user=user,
+                    workspace=workspace,
+                    role_level=workspace.default_user_role.level,
+                    with_notif=True,
+                    flush=False,
+                )
+            except RoleAlreadyExistError:
+                pass
 
     @hookimpl
     def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
