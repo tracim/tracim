@@ -53,9 +53,7 @@ class WorkspaceListItem extends React.Component {
 
   handleClickOutsideDropdownMenu = e => this.setState(prev => ({
     dropdownMenuIsActive: isMobile,
-    showDropdownMenuButton: isMobile
-      ? true
-      : !(prev.dropdownMenuIsActive &&
+    showDropdownMenuButton: isMobile || !(prev.dropdownMenuIsActive &&
         e.path &&
         !e.path.some(p => p.className && p.className.includes('dropdownMenuItem'))) &&
       prev.showDropdownMenuButton
