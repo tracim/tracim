@@ -52,12 +52,13 @@ class WorkspaceListItem extends React.Component {
   }
 
   handleClickOutsideDropdownMenu = e => this.setState(prev => ({
-    dropdownMenuIsActive: false,
-    showDropdownMenuButton:
+    dropdownMenuIsActive: isMobile,
+    showDropdownMenuButton: isMobile || (
       !(prev.dropdownMenuIsActive &&
         e.path &&
         !e.path.some(p => p.className && p.className.includes('dropdownMenuItem'))) &&
       prev.showDropdownMenuButton
+    )
   }))
 
   activeDropdownMenu = () => this.setState({ dropdownMenuIsActive: true })
@@ -75,7 +76,7 @@ class WorkspaceListItem extends React.Component {
           'sidebar__content__navigation__workspace__item',
           {
             'sidebar__content__navigation__workspace__item__current primaryColorBorder':
-              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}`)
+              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           }
         )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
