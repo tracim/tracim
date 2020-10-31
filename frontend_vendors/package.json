@@ -4,8 +4,9 @@
   "description": "",
   "main": "dist/tracim_frontend_vendors.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack-cli",
-    "build-dev": "NODE_ENV=development webpack-cli"
+    "build-list": "webpack-cli -p --config webpack.list.config.js",
+    "build": "NODE_ENV=production webpack-cli && yarn run build-list",
+    "build-dev": "NODE_ENV=development webpack-cli && yarn run build-list"
   },
   "author": "",
   "license": "ISC",
