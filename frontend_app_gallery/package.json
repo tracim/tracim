@@ -23,6 +23,7 @@
     "eslint-import-resolver-node": "^0.3.3",
     "i18next": "10.5.0",
     "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.11",
     "nock": "^11.7.2",
     "prop-types": "^15.7.2",
     "query-string": "^6.8.1",
