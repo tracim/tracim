@@ -16,14 +16,13 @@ This helps making Tracim faster to build, download and run.
 
 Building the frontend vendors bundle is done by:
 
- - Building `externals.json`, containing the line used in the `externals` Webpack property of each frontend component.
-   This line is an object containing a key:value pair for each package in the form:
+ - Building `dist/list.js`, containing the list used in the `externals` Webpack property of each frontend component. This tells Webpack to find the package in the `tracim_frontend_vendors` global object, which is added. See the `webpack.optimized.config.js` in a frontend app to see how it is used.
+ - Building `dist/tracim_frontend_vendors.js`, suitable for inclusion in a script tag, containing the vendors listed in `src/index.js`.
 
-     'require-string': 'tracim_frontend_vendors["require-string"]'
+Here is how the build process works:
 
-   This line tells Webpack to find the package in the `tracim_frontend_vendors` global object, which is added.
-   `externals.json is built by the script `src/build-externals-and-require-file.js` using `bundle.json`.
-   by importing `tracim_frontnend_vendors.js` in Tracim using a script tag.
+ - `./build_vendors.sh` runs `yarn run build`
+   - `build` compiles `dist/tracim_frontend_vendors.js` using the `libraryTarget: var` (suitable for inclusion with an HTML `<script>` tag) from `/src/index.js`, and then runs the `build-list` NPM script.
+     - `build-list` builds `dist/list.js` from `src/list.js` using the `webpack.list.config.js` Webpack config file. `src/list.js` does `Object.keys(require('./index.js'))`, which produces the list of dependencies from the keys of the vendors object defined in `./index.js` as a Common JS module.
 
- - Building `tracim_frontnend_vendors.js`,from `require-file.js`, itself also built by `src/build-externals-and-require-file.js`.
-   This script exports every packages listed  in `bundle.json`.
+ - `./build_vendors.sh` copies `tracim_frontend_vendors.js` in `frontend/`

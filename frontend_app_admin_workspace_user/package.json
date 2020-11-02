@@ -33,6 +33,7 @@
     "eslint-plugin-import": "^2.20.2",
     "file-loader": "^6.0.0",
     "i18next": "10.5.0",
+    "lodash": "^4.17.11",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",
     "react": "^16.13.1",
