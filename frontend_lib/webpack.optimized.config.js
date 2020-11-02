@@ -1,7 +1,7 @@
 module.exports = require('./webpack.config.js')
 
 const optimizedVendors = {}
-for (const dep of require('tracim_frontend_vendors/dist/list')) {
+for (const dep of require('tracim_frontend_vendors/dist/list.js')) {
     optimizedVendors[dep] = `tracim_frontend_vendors['${dep}']`
 }
 
