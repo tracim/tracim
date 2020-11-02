@@ -10,8 +10,10 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 
+from tracim_backend.lib.utils.logger import logger
 
-class HookImpl:
+
+class AutoInvitePlugin:
     """Needs a registration using 'register_tracim_plugin' function."""
 
     @hookimpl
@@ -28,6 +30,12 @@ class HookImpl:
         rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         for workspace in open_workspaces:
             try:
+                logger.debug(
+                    self,
+                    "Creating role for user {}, workspace {}".format(
+                        user.user_id, workspace.workspace_id
+                    ),
+                )
                 rapi.create_one(
                     user=user,
                     workspace=workspace,
@@ -63,4 +71,4 @@ class HookImpl:
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
-    plugin_manager.register(HookImpl())
+    plugin_manager.register(AutoInvitePlugin())
