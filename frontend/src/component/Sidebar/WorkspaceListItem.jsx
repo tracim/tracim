@@ -100,7 +100,13 @@ class WorkspaceListItem extends React.Component {
           }
 
           <div
-            className='sidebar__content__navigation__workspace__item__name'
+            className={classnames(
+              'sidebar__content__navigation__workspace__item__name',
+              {
+                sidebar__content__navigation__workspace__item__current__name:
+                  props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
+              }
+            )}
             title={props.label}
           >
             {props.label}
