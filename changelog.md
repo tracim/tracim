@@ -4,7 +4,8 @@
 
 ### New Features
 
-- Allow user to discover and join new spaces
+- Allow user to discover and join spaces
+- Full implementation of spaces access types: open, on request and confidential
 - Adds every new user to all open spaces and to every created open space with plugin `tracim_backend_autoinvite` available in `backend/official_plugins/`
 - Recursively adds new members of space to its parents with default user role of each space with plugin `tracim_backend_parent_access` available in `backend/official_plugins/`
 - Group vendor dependencies to make faster and smaller frontend builds
