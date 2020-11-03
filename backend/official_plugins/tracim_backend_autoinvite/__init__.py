@@ -11,7 +11,7 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 
 
-class HookImpl:
+class AutoInvitePlugin:
     """Needs a registration using 'register_tracim_plugin' function."""
 
     @hookimpl
@@ -27,13 +27,16 @@ class HookImpl:
         ).get_all()
         rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         for workspace in open_workspaces:
-            rapi.create_one(
-                user=user,
-                workspace=workspace,
-                role_level=workspace.default_user_role.level,
-                with_notif=True,
-                flush=False,
-            )
+            try:
+                rapi.create_one(
+                    user=user,
+                    workspace=workspace,
+                    role_level=workspace.default_user_role.level,
+                    with_notif=True,
+                    flush=False,
+                )
+            except RoleAlreadyExistError:
+                pass
 
     @hookimpl
     def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
@@ -60,4 +63,4 @@ class HookImpl:
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
-    plugin_manager.register(HookImpl())
+    plugin_manager.register(AutoInvitePlugin())
