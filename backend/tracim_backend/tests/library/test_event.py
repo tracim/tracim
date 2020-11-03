@@ -271,6 +271,48 @@ class TestEventReceiver:
         assert other_user.user_id not in receivers_ids
         assert admin_user.user_id in receivers_ids
 
+    def test_unit__get_receiver_ids_workspace_members_event__accessible_workspace(
+        self,
+        session,
+        accessible_workspace_and_users,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+    ):
+        (
+            my_workspace,
+            same_workspace_user,
+            role,
+            other_user,
+            event_initiator,
+        ) = accessible_workspace_and_users
+        workspace_api = workspace_api_factory.get()
+        workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
+        rapi = role_api_factory.get()
+        user_api = user_api_factory.get()
+        role_in_context = rapi.get_user_role_workspace_with_context(role)
+        fields = {
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.USER_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+        }
+        event = Event(
+            entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
+        )
+
+        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        assert event_initiator.user_id in receivers_ids
+        assert same_workspace_user.user_id in receivers_ids
+        assert other_user.user_id not in receivers_ids
+        assert admin_user.user_id in receivers_ids
+
     def test_unit__get_receiver_ids_content_event__nominal_case(
         self,
         session,

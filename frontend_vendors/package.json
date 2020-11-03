@@ -4,8 +4,9 @@
   "description": "",
   "main": "dist/tracim_frontend_vendors.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack-cli",
-    "build-dev": "NODE_ENV=development webpack-cli"
+    "build-list": "webpack-cli -p --config webpack.list.config.js",
+    "build": "NODE_ENV=production webpack-cli && yarn run build-list",
+    "build-dev": "NODE_ENV=development webpack-cli && yarn run build-list"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "core-js": "^3.6.4",
     "css-loader": "^3.5.1",
     "date-fns": "^1.30.1",
+    "lodash": "^4.17.11",
     "pnp-webpack-plugin": "^1.6.4",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",

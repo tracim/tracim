@@ -14,7 +14,8 @@ describe('<UserSpacesConfig />', () => {
     userToEditId: 0,
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack,
     system: { config: {} },
-    admin: true
+    admin: true,
+    dispatch: () => {}
   }
 
   const wrapper = mount(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)

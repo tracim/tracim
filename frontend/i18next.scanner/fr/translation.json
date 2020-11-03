@@ -1,11 +1,17 @@
 {
   "{{author}} added you to {{space}}": "{{author}} vous a ajouté dans {{space}}",
+  "{{author}} removed you from {{space}}": "{{author}} vous a retiré de {{space}}",
+  "{{author}} modified your role in {{space}}": "{{author}} a modifié votre rôle dans {{space}}",
+  "{{author}} modified {{user}}'s role in {{space}}": "{{author}} a modifié le rôle de {{user}} dans {{space}}",
+  "{{author}} removed {{user}} from {{space}}": "{{author}} a retiré {{user}} de {{space}}",
   "{{author}} commented on {{content}} in {{space}}": "{{author}} a commenté {{content}} dans {{space}}",
   "{{author}} mentioned you in {{content}} in {{space}}": "{{author}} vous a mentionné dans {{content}} em {{space}}",
   "{{author}} mentioned you in a comment in {{content}} in {{space}}": "{{author}} vous a mentionné dans un commentaire sur {{content}} dans {{space}}",
   "{{author}} updated {{content}} in {{space}}": "{{author}} a mis à jour {{content}} dans {{space}}",
   "{{author}} created {{content}} in {{space}}": "{{author}} a créé {{content}} dans {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} a changé le statut de {{content}} dans {{space}}",
+  "Are you sure you want to remove this member from the space?": "Voulez-vous vraiment retirer ce membre de l'espace ?",
+  "Unknown space type": "Type d'espace inconnu",
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Disconnection error": "Erreur de déconnexion",
@@ -286,8 +292,7 @@
   "{{author}} granted you access to {{space}}": "{{author}} vous a permis l'accès à {{space}}",
   "{{author}} rejected your access to {{space}}": "{{author}} vous a refusé l'accès à {{space}}",
   "{{author}} granted access to {{space}} for {{user}}": "{{author}} a permis l'accès à {{space}} pour {{user}}",
-  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a rejecté l'accès à {{space}} pour {{user}}",
-  "Only an administrator can see this user's profile": "Seul un administrateur peut consulter ce profil utilisateur",
+  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a rejeté l'accès à {{space}} pour {{user}}",
   "This notification has no associated content": "Cette notification n'a pas de contenu associé",
   "Join a space": "Rejoindre un espace",
   "Title and description": "Titre et description",
@@ -299,5 +304,7 @@
   "You can join an existing space or create your first space": "Vous pouvez rejoindre un espace existant ou créer votre premier espace",
   "You can create your first space": "Vous pouvez créer votre premier espace",
   "You can join an existing space": "Vous pouvez rejoindre un espace existant",
-  "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace"
+  "Please ask access to your spaces to an administrator or space manager": "Veuillez demander accès à vos espaces à un administrateur ou un gestionnaire d'espace",
+  "You joined the space {{space}}": "Vous avez rejoint l'espace {{space}}",
+  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Votre demande pour rejoindre {{space}} sera traitée par un responsable. Le résultat sera affiché sur le mur de notification."
 }
