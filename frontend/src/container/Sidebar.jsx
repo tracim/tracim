@@ -83,7 +83,7 @@ export class Sidebar extends React.Component {
     const { props, state } = this
 
     return spaceList.map(space =>
-      <span key={space.id}>
+      <React.Fragment key={space.id}>
         <WorkspaceListItem
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
@@ -94,7 +94,7 @@ export class Sidebar extends React.Component {
           workspaceId={space.id}
         />
         {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
-      </span>
+      </React.Fragment>
     )
   }
 
