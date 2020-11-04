@@ -14,16 +14,16 @@ WARNING: Those plugins are implemented using an experimental API that is planned
 
 This plugin:
 - adds every new user to all OPEN spaces
-- adds all users to every created OPEN space
+- adds all users to every newly created OPEN space
 
 ## Child Removal Plugin (tracim_backend_child_removal)
 
-This plugin recursively removes a user from child spaces when a user is removed from a space.
+When a user is removed from a space, this plugin recursively removes this user from the children of this space.
 
 NOTE: if you activate this plugin we recommend to also activate the Parent Access plugin to get a consistent behavior.
 
 ## Parent Access Plugin (tracim_backend_parent_access)
 
-This plugin recursively adds new members of a space to its parents with default user role of each space.
+This plugin recursively adds new members of a space to its parents with the default user role of each space.
 
 NOTE: if you activate this plugin we recommend to also activate the Child Removal plugin to get a consistent behavior.
