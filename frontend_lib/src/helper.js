@@ -255,7 +255,7 @@ export const SPACE_TYPE = {
   confidential: CONFIDENTIAL
 }
 
-// INFO - GB - 2020-11-04 - The order at SPACE_TYPE_LIST is important to PopupCreateWorkspace.jsx
+// INFO - GB - 2020-11-04 - The order of types in SPACE_TYPE_LIST is important to PopupCreateWorkspace.jsx. CONFIDENTIAL needs to be first.
 export const SPACE_TYPE_LIST = [CONFIDENTIAL, ON_REQUEST, OPEN]
 export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 
