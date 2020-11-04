@@ -8,7 +8,7 @@
 - Allow users to discover, join and leave spaces
 - New plugins available:
   - Adds every new user to all open spaces and to every newly created open space. You need to activate this plugin `tracim_backend_autoinvite` (documentation available [here](backend/official_plugins/README.md))
-  - Recursively adds new members of space to its parents with the default user role of each space. You need to activate this plugin `tracim_backend_parent_access` (documentation available [here](backend/official_plugins/README.md))
+  - Recursively adds new members of a space to its parents with the default user role of each space. You need to activate this plugin `tracim_backend_parent_access` (documentation available [here](backend/official_plugins/README.md))
   - When a user is removed from a space, this plugin recursively removes this user from the children of this space. You need to activate this plugin `tracim_backend_child_removal` (documentation available [here](backend/official_plugins/README.md))
 - Frontend dependencies are grouped, making Tracim faster to load on small connections and on older devices, and more lightweight on memory consumption. For developers and sysadmins, this also makes Tracim build faster.
 
