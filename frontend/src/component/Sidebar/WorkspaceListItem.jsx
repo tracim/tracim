@@ -69,6 +69,10 @@ class WorkspaceListItem extends React.Component {
 
   render () {
     const { props, state } = this
+    const INDENT_WIDTH = 20
+    const BASE_MARGIN = 10
+    const ACTIVE_BORDER_WIDTH = 5
+
     return (
       <li
         id={props.workspaceId}
@@ -99,8 +103,8 @@ class WorkspaceListItem extends React.Component {
               <div
                 style={{
                   marginLeft:
-                  `${(props.level - 1) * 20 + 10 -
-                    (props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) ? 5 : 0)
+                  `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN -
+                    (props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) ? ACTIVE_BORDER_WIDTH : 0)
                   }px`
                 }}
               >
