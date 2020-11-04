@@ -10,6 +10,7 @@ import {
   handleFetchResult,
   ROLE_LIST,
   sortWorkspaceList,
+  SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -192,7 +193,11 @@ export class PopupCreateWorkspace extends React.Component {
     switch (fetchGetAllowedSpaceTypes.apiResponse.status) {
       case 200: {
         const apiTypeList = fetchGetAllowedSpaceTypes.body.items
-        this.setState({ allowedTypes: SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug)) })
+        const allowedTypesList = SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug))
+        this.setState({
+          allowedTypes: allowedTypesList,
+          newType: (allowedTypesList.find(type => type.slug === SPACE_TYPE.confidential.slug) || allowedTypesList[0]).slug
+        })
         break
       }
       default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
@@ -236,12 +241,16 @@ export class PopupCreateWorkspace extends React.Component {
                   autoFocus
                 />
 
-                <div className='newSpace__label'> {props.t("Space's type:")} </div>
-                <SingleChoiceList
-                  list={state.allowedTypes}
-                  onChange={this.handleChangeSpacesType}
-                  currentValue={state.newType}
-                />
+                {state.allowedTypes.length > 1 && (
+                  <>
+                    <div className='newSpace__label'> {props.t("Space's type:")} </div>
+                    <SingleChoiceList
+                      list={state.allowedTypes}
+                      onChange={this.handleChangeSpacesType}
+                      currentValue={state.newType}
+                    />
+                  </>
+                )}
 
                 <div className='newSpace__button'>
                   <button
