@@ -44,7 +44,9 @@ class RoleApi(object):
         return self._apply_base_filters(self._session.query(UserRoleInWorkspace))
 
     def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
-        assert self._user.profile == Profile.ADMIN or self._user.user_id == user_id
+        assert (
+            not self._user or self._user.profile == Profile.ADMIN or self._user.user_id == user_id
+        )
         workspaces_ids_tuples = (
             self._base_query()
             .with_entities(UserRoleInWorkspace.workspace_id)
