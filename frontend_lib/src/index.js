@@ -19,6 +19,9 @@ import {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  ACCESSIBLE_SPACE_TYPE_LIST,
+  SUBSCRIPTION_TYPE,
+  SUBSCRIPTION_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -46,7 +49,9 @@ import {
   formatAbsoluteDate,
   permissiveNumberEqual,
   sortWorkspaceList,
-  updateTLMAuthor
+  updateTLMAuthor,
+  darkenColor,
+  lightenColor
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -60,6 +65,11 @@ import {
   TLM_SUB_TYPE
 } from './tracimLiveMessage.js'
 
+import {
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS
+} from './LiveMessageManager.js'
+
 import { appContentFactory } from './appContentFactory.js'
 
 import { defaultDebug } from './debug.js'
@@ -71,6 +81,7 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
+import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
@@ -102,7 +113,8 @@ import RefreshWarningMessage from './component/RefreshWarningMessage/RefreshWarn
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
-import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
+import ListItemWrapper from './component/Lists/ListItemWrapper/ListItemWrapper.jsx'
+import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
@@ -120,6 +132,9 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+
+import UserInfo from './component/UserInfo/UserInfo.jsx'
+import TextInput from './component/Input/TextInput.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -171,6 +186,8 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
+export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
+
 export {
   appContentFactory,
   addRevisionFromTLM,
@@ -199,6 +216,7 @@ export {
   PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
+  PopinFixedRightPartContent,
   Avatar,
   Badge,
   Timeline,
@@ -228,6 +246,9 @@ export {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  ACCESSIBLE_SPACE_TYPE_LIST,
+  SUBSCRIPTION_TYPE,
+  SUBSCRIPTION_TYPE_LIST,
   FETCH_CONFIG,
   APP_FEATURE_MODE,
   FILE_PREVIEW_STATE,
@@ -294,6 +315,13 @@ export {
   getContentComment,
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
+  NoHoverListItem,
   permissiveNumberEqual,
-  SingleChoiceList
+  SingleChoiceList,
+  UserInfo,
+  darkenColor,
+  lightenColor,
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS,
+  TextInput
 }

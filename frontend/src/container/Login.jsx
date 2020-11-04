@@ -31,7 +31,8 @@ import {
   setNotificationNotReadCounter,
   setNotificationList,
   setNextPage,
-  setHeadTitle
+  setHeadTitle,
+  setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
 import {
   getAppList,
@@ -43,7 +44,8 @@ import {
   getUserMessagesSummary,
   getWorkspaceMemberList,
   postUserLogin,
-  putUserLang
+  putUserLang,
+  getAccessibleWorkspaces
 } from '../action-creator.async.js'
 import {
   PAGE,
@@ -150,7 +152,7 @@ class Login extends React.Component {
 
         this.loadAppList()
         this.loadContentTypeList()
-        this.loadWorkspaceList()
+        this.loadWorkspaceLists()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
@@ -195,7 +197,7 @@ class Login extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceList = async () => {
+  loadWorkspaceLists = async () => {
     const { props } = this
     const showOwnedWorkspace = false
 
@@ -204,6 +206,10 @@ class Login extends React.Component {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
     }
+
+    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    if (fetchAccessibleWorkspaceList.status !== 200) return
+    props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
   }
 
   loadWorkspaceListMemberList = async workspaceList => {

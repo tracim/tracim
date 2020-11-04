@@ -4,7 +4,8 @@ import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST
+  TLM_SUB_TYPE as TLM_ST,
+  ACCESSIBLE_SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
 import {
   addNotification,
@@ -19,7 +20,13 @@ import {
   updateWorkspaceDetail,
   updateWorkspaceMember,
   removeWorkspace,
-  addWorkspaceReadStatus
+  addWorkspaceReadStatus,
+  removeAccessibleWorkspace,
+  addAccessibleWorkspace,
+  updateAccessibleWorkspace,
+  addWorkspaceSubscription,
+  removeWorkspaceSubscription,
+  updateWorkspaceSubscription
 } from '../action-creator.sync.js'
 import { getContent } from '../action-creator.async.js'
 
@@ -41,7 +48,7 @@ export class ReduxTlmDispatcher extends React.Component {
       // Workspace
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceChanged },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
       { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.UNDELETED, handler: this.handleWorkspaceChanged },
 
       // Role
@@ -51,6 +58,11 @@ export class ReduxTlmDispatcher extends React.Component {
 
       // Mention
       { entityType: TLM_ET.MENTION, coreEntityType: TLM_CET.CREATED, handler: this.handleMentionCreated },
+
+      // Workspace subscription
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceSubscriptionCreated },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceSubscriptionDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceSubscriptionModified },
 
       // Content created
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreated },
@@ -85,15 +97,27 @@ export class ReduxTlmDispatcher extends React.Component {
     }
   }
 
+  handleWorkspaceCreated = data => {
+    const { props } = this
+    if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
+      props.dispatch(addAccessibleWorkspace(data.fields.workspace))
+    }
+    this.handleNotification(data)
+  }
+
   handleWorkspaceDeleted = data => {
     const { props } = this
     props.dispatch(removeWorkspace(data.fields.workspace))
+    props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
     this.handleNotification(data)
   }
 
   handleWorkspaceModified = data => {
     const { props } = this
     props.dispatch(updateWorkspaceDetail(data.fields.workspace))
+    if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
+      props.dispatch(updateAccessibleWorkspace(data.fields.workspace))
+    }
     this.handleNotification(data)
   }
 
@@ -102,6 +126,9 @@ export class ReduxTlmDispatcher extends React.Component {
   handleMemberCreated = data => {
     const { props } = this
     props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+    }
     this.handleNotification(data)
   }
 
@@ -114,7 +141,12 @@ export class ReduxTlmDispatcher extends React.Component {
   handleMemberDeleted = data => {
     const { props } = this
     props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
-    if (props.user.userId === data.fields.user.user_id) props.dispatch(removeWorkspace(data.fields.workspace))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(removeWorkspace(data.fields.workspace))
+      if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {
+        props.dispatch(addAccessibleWorkspace(data.fields.workspace))
+      }
+    }
     this.handleNotification(data)
   }
 
@@ -179,6 +211,30 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleUserChanged = data => {
     this.props.dispatch(addNotification(data))
+  }
+
+  handleWorkspaceSubscriptionCreated = data => {
+    const { props } = this
+    if (data.fields.user.user_id === props.user.userId) {
+      props.dispatch(addWorkspaceSubscription(data.fields.subscription))
+    }
+    this.handleNotification(data)
+  }
+
+  handleWorkspaceSubscriptionDeleted = data => {
+    const { props } = this
+    if (data.fields.user.user_id === props.user.userId) {
+      props.dispatch(removeWorkspaceSubscription(data.fields.subscription))
+    }
+    this.handleNotification(data)
+  }
+
+  handleWorkspaceSubscriptionModified = data => {
+    const { props } = this
+    if (data.fields.user.user_id === props.user.userId) {
+      props.dispatch(updateWorkspaceSubscription(data.fields.subscription))
+    }
+    this.handleNotification(data)
   }
 
   render () {

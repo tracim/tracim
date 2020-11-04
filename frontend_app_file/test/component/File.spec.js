@@ -16,6 +16,8 @@ import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
 import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
+debug.config.apiUrl = 'http://unit.test:6543/api'
+
 describe('<File />', () => {
   const props = {
     setApiUrl: () => { },
@@ -188,7 +190,7 @@ describe('<File />', () => {
             expect(wrapper.state('newContent').page_nb).to.equal(tlmData.fields.content.page_nb)
           })
           it('should have build the new previewUrl', () => {
-            expect(wrapper.state('newContent').previewUrl).to.equal('http://localhost:1337/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
+            expect(wrapper.state('newContent').previewUrl).to.equal(debug.config.apiUrl + '/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
           })
           it('should have 3 preview pages', () => {
             expect(wrapper.state('newContent').lightboxUrlList.length).to.equal(3)

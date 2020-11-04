@@ -1,9 +1,9 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
 export const debug = {
+  ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    apiUrl: 'http://localhost',
     slug: 'thread',
     faIcon: 'comments-o',
     hexcolor: '#428BCA',
@@ -15,8 +15,5 @@ export const debug = {
     content_id: 1,
     content_type: 'thread',
     workspace_id: 1
-  },
-  loggedUser: {
-    ...defaultDebug.loggedUser
   }
 }

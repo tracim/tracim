@@ -25,6 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
+  SUBSCRIPTION_TYPE,
   NUMBER_RESULTS_BY_PAGE,
   TracimComponent,
   Avatar,
@@ -207,7 +208,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'user-o+plus',
+          icon: 'user-plus',
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} added you to {{space}}', i18nOpts)
             : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
@@ -216,15 +217,15 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: return {
           icon: 'user-o+history',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+            ? props.t('{{author}} modified your role in {{space}}', i18nOpts)
+            : props.t("{{author}} modified {{user}}'s role in {{space}}", i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'user-o+times',
+          icon: 'user-times',
           text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
+            ? props.t('{{author}} removed you from {{space}}', i18nOpts)
+            : props.t('{{author}} removed {{user}} from {{space}}', i18nOpts),
           url: dashboardUrl
         }
       }
@@ -233,24 +234,89 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'university+plus',
+          icon: 'users+plus',
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'university+history',
+          icon: 'users+history',
           text: props.t('{{author}} modified the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'university+times',
+          icon: 'users+times',
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
-          icon: 'university+undo',
+          icon: 'users+undo',
           text: props.t('{{author}} restored the space {{space}}', i18nOpts),
           url: dashboardUrl
+        }
+      }
+    }
+
+    const defaultEmptyUrlMsg = props.t('This notification has no associated content')
+
+    const subscriptionPageURL = '' // RJ - 2020-10-19 - FIXME: depends on https://github.com/tracim/tracim/issues/3594
+
+    if (entityType === TLM_ENTITY.SHAREDSPACE_SUBSCRIPTION) {
+      // RJ - 2020-10-19 - NOTE - DELETED and UNDELETED events do not make sense for subscriptions
+
+      if (props.user.userId === notification.subscription.author.userId) {
+        // RJ - 2020-10-19 - NOTE
+        // TLM_EVENT.CREATED notifications should not be shown, or even received
+        // assuming that the author of a subscription is always the concerned user
+        if (eventType === TLM_EVENT.MODIFIED) {
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
+            return {
+              icon: SUBSCRIPTION_TYPE.accepted.faIcon,
+              text: props.t('{{author}} granted you access to {{space}}', i18nOpts),
+              url: dashboardUrl
+            }
+          }
+
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
+            return {
+              icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+              text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
+              url: subscriptionPageURL,
+              emptyUrlMsg: defaultEmptyUrlMsg
+            }
+          }
+        }
+      } else {
+        switch (eventType) {
+          case TLM_EVENT.CREATED: return {
+            icon: SUBSCRIPTION_TYPE.pending.faIcon,
+            text: props.t('{{author}} requested access to {{space}}', i18nOpts),
+            url: dashboardUrl
+          }
+          case TLM_EVENT.MODIFIED: {
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.accepted.faIcon,
+                text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
+                url: dashboardUrl
+              }
+            }
+
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+                text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
+                url: defaultEmptyUrlMsg
+              }
+            }
+
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
+              return {
+                icon: SUBSCRIPTION_TYPE.pending.faIcon,
+                text: props.t('{{author}} requested access to {{space}}', i18nOpts),
+                url: dashboardUrl
+              }
+            }
+          }
         }
       }
     }
@@ -259,7 +325,7 @@ export class NotificationWall extends React.Component {
       icon: 'bell',
       text: `${notification.author} ${notification.type}`,
       url: contentUrl,
-      emptyUrlMsg: props.t('This notification has no associated content'),
+      emptyUrlMsg: defaultEmptyUrlMsg,
       msgType: 'warning'
     }
   }
@@ -325,7 +391,7 @@ export class NotificationWall extends React.Component {
                   }
                   key={notification.id}
                 >
-                  {icon}
+                  <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
                     <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
                     <span

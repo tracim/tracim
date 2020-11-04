@@ -20,20 +20,22 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import { LiveMessageManager, LIVE_MESSAGE_STATUS } from '../util/LiveMessageManager.js'
 import {
   CUSTOM_EVENT,
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
   serialize,
-  TracimComponent
+  TracimComponent,
+  LiveMessageManager,
+  LIVE_MESSAGE_STATUS
 } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
-  toggleFavicon
+  toggleFavicon,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   getAppList,
@@ -45,7 +47,8 @@ import {
   getUserIsConnected,
   putUserLang,
   getUserMessagesSummary,
-  getWorkspaceMemberList
+  getWorkspaceMemberList,
+  getAccessibleWorkspaces
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -62,7 +65,8 @@ import {
   appendBreadcrumbs,
   setWorkspaceListMemberList,
   setNotificationNotReadCounter,
-  setHeadTitle
+  setHeadTitle,
+  setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import SearchResult from './SearchResult.jsx'
@@ -70,6 +74,7 @@ import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
+import JoinWorkspace from './JoinWorkspace.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -117,7 +122,7 @@ export class Tracim extends React.Component {
 
   handleUserConnected = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.USER_CONNECTED, data)
-    this.liveMessageManager.openLiveMessageConnection(data.user_id)
+    this.liveMessageManager.openLiveMessageConnection(data.user_id, FETCH_CONFIG.apiUrl)
   }
 
   handleUserDisconnected = data => {
@@ -147,7 +152,7 @@ export class Tracim extends React.Component {
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-    await this.loadWorkspaceList()
+    await this.loadWorkspaceLists()
     this.props.history.push(data.url)
   }
 
@@ -192,12 +197,12 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
-        this.loadWorkspaceList()
+        this.loadWorkspaceLists()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadNotificationList(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
-        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id)
+        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
@@ -251,21 +256,26 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceList = async () => {
+  loadWorkspaceLists = async () => {
     const { props } = this
 
     const showOwnedWorkspace = false
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
-    if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-      this.setState({ workspaceListLoaded: true })
+    if (fetchGetWorkspaceList.status !== 200) return false
 
-      return true
-    }
-    return false
+    props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
+    this.setState({ workspaceListLoaded: true })
+
+    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+
+    if (fetchAccessibleWorkspaceList.status !== 200) return false
+
+    props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
+
+    return true
   }
 
   loadWorkspaceListMemberList = async workspaceList => {
@@ -488,8 +498,9 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
+          <Route path={PAGE.JOIN_WORKSPACE} component={JoinWorkspace} />
 
-          {/* the 3 divs bellow must stay here so that they always exist in the DOM regardless of the route */}
+          {/* the 3 divs below must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />

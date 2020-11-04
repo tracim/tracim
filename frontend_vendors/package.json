@@ -1,0 +1,54 @@
+{
+  "name": "tracim_frontend_vendors",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/tracim_frontend_vendors.js",
+  "scripts": {
+    "build-list": "webpack-cli -p --config webpack.list.config.js",
+    "build": "NODE_ENV=production webpack-cli && yarn run build-list",
+    "build-dev": "NODE_ENV=development webpack-cli && yarn run build-list"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "core-js": "^3.6.4",
+    "css-loader": "^3.5.1",
+    "date-fns": "^1.30.1",
+    "lodash": "^4.17.11",
+    "pnp-webpack-plugin": "^1.6.4",
+    "prop-types": "^15.7.2",
+    "radium": "^0.25.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-image-lightbox": "^5.1.0",
+    "react-router": "^5.0.1",
+    "regenerator-runtime": "^0.13.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "standard": "^14.3.3",
+    "standard-loader": "^7.0.0"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": []
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env",
+          "@babel/preset-react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+          "@babel/plugin-transform-object-assign"
+        ]
+      }
+    }
+  }
+}

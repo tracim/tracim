@@ -4,9 +4,12 @@
   <meta charset='utf-8' />
   <meta name='viewport' content='width=device-width, user-scalable=no'>
   <title>Tracim</title>
-  <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png">
-  <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png">
-  <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png">
+  <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64"
+    href="/assets/images/favicon/tracim_64x64.png">
+  <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32"
+    href="/assets/images/favicon/tracim_32x32.png">
+  <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16"
+    href="/assets/images/favicon/tracim_16x16.png">
 
   <link rel='manifest' href='/assets/manifest.json'>
 
@@ -14,35 +17,91 @@
   <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
 
   <style>
-    .primaryColorFont { color: #7d4e24; }
-    .primaryColorFontDarken { color: #522c00; }
-    .primaryColorFontLighten { color: #a37346; }
+    .primaryColorFont {
+      color: #7d4e24;
+    }
 
-    .primaryColorFontHover:hover { color: #7d4e24; }
-    .primaryColorFontDarkenHover:hover { color: #522c00; }
-    .primaryColorFontLightenHover:hover { color: #a37346; }
+    .primaryColorFontDarken {
+      color: #522c00;
+    }
+
+    .primaryColorFontLighten {
+      color: #a37346;
+    }
+
+    .primaryColorFontHover:hover {
+      color: #7d4e24;
+    }
+
+    .primaryColorFontDarkenHover:hover {
+      color: #522c00;
+    }
+
+    .primaryColorFontLightenHover:hover {
+      color: #a37346;
+    }
 
 
-    .primaryColorBg { background-color: #7d4e24; }
-    .primaryColorBgDarken { background-color: #522c00; }
-    .primaryColorBgLighten { background-color: #a37346; }
+    .primaryColorBg {
+      background-color: #7d4e24;
+    }
 
-    .primaryColorBgHover:hover { background-color: #7d4e24; }
-    .primaryColorBgDarkenHover:hover { background-color: #522c00; }
-    .primaryColorBgLightenHover:hover { background-color: #a37346; }
+    .primaryColorBgDarken {
+      background-color: #522c00;
+    }
 
-    .primaryColorBgActive:active { background-color: #7d4e24; }
-    .primaryColorBgDarkenActive:active { background-color: #522c00; }
-    .primaryColorBgLightenActive:active { background-color: #a37346; }
+    .primaryColorBgLighten {
+      background-color: #a37346;
+    }
+
+    .primaryColorBgHover:hover {
+      background-color: #7d4e24;
+    }
+
+    .primaryColorBgDarkenHover:hover {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLightenHover:hover {
+      background-color: #a37346;
+    }
+
+    .primaryColorBgActive:active {
+      background-color: #7d4e24;
+    }
+
+    .primaryColorBgDarkenActive:active {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLightenActive:active {
+      background-color: #a37346;
+    }
 
 
-    .primaryColorBorder { border-color: #7d4e24; }
-    .primaryColorBorderDarken { border-color: #522c00; }
-    .primaryColorBorderLighten { border-color: #a37346; }
+    .primaryColorBorder {
+      border-color: #7d4e24;
+    }
 
-    .primaryColorBorderHover:hover { border-color: #7d4e24; }
-    .primaryColorBorderDarkenHover:hover { border-color: #522c00; }
-    .primaryColorBorderLightenHover:hover { border-color: #a37346; }
+    .primaryColorBorderDarken {
+      border-color: #522c00;
+    }
+
+    .primaryColorBorderLighten {
+      border-color: #a37346;
+    }
+
+    .primaryColorBorderHover:hover {
+      border-color: #7d4e24;
+    }
+
+    .primaryColorBorderDarkenHover:hover {
+      border-color: #522c00;
+    }
+
+    .primaryColorBorderLightenHover:hover {
+      border-color: #a37346;
+    }
   </style>
 
   <style>
@@ -50,6 +109,7 @@
       font-family: 'Quicksand';
       src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
     }
+
     @font-face {
       font-family: 'Quicksand';
       src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
@@ -63,36 +123,40 @@
 
   <script type='text/javascript'>
     GLOBAL_primaryColor = '#7d4e24'
+    GLOBAL_excludedNotifications = ''
   </script>
 </head>
 
 <body>
-<div id='content'></div>
+  <div id='content'></div>
 
-<script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
+  <script type='text/javascript' src='/app/tracim_frontend_vendors.js'></script>
+  <script type='text/javascript' src='/app/tracim_frontend_lib.lib.js'></script>
+  <script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
 
-<script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
-<script type='text/javascript' src='/assets/tracim.app.js'></script>
+  <script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
+  <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
-<script type='text/javascript' src='/assets/custom_toolbox/customToolbox.js'></script>
+  <script type='text/javascript' src='/assets/custom_toolbox/customToolbox.js'></script>
 
-<script type='text/javascript' src='/app/html-document.app.js'></script>
-<script type='text/javascript' src='/app/collaborative_document_edition.app.js'></script>
-<script type='text/javascript' src='/app/file.app.js'></script>
-<script type='text/javascript' src='/app/thread.app.js'></script>
-<script type='text/javascript' src='/app/workspace.app.js'></script>
-<script type='text/javascript' src='/app/folder.app.js'></script>
-<script type='text/javascript' src='/app/share_folder.app.js'></script>
-<script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
-<script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
-<script type='text/javascript' src='/app/agenda.app.js'></script>
-<script type='text/javascript' src='/app/gallery.app.js'></script>
+  <script type='text/javascript' src='/app/html-document.app.js'></script>
+  <script type='text/javascript' src='/app/collaborative_document_edition.app.js'></script>
+  <script type='text/javascript' src='/app/file.app.js'></script>
+  <script type='text/javascript' src='/app/thread.app.js'></script>
+  <script type='text/javascript' src='/app/workspace.app.js'></script>
+  <script type='text/javascript' src='/app/folder.app.js'></script>
+  <script type='text/javascript' src='/app/share_folder.app.js'></script>
+  <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
+  <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
+  <script type='text/javascript' src='/app/agenda.app.js'></script>
+  <script type='text/javascript' src='/app/gallery.app.js'></script>
 
-<script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
-<script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
-<script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
+  <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
+  <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
+  <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
 
-<script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
-<script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
+  <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
+  <script type='text/javascript' src='/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
 </body>
+
 </html>

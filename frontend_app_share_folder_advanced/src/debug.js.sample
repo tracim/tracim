@@ -1,9 +1,9 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
 export const debug = {
+  ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    apiUrl: 'http://localhost',
     slug: 'share_folder',
     faIcon: 'share-alt',
     hexcolor: '#414548',
@@ -15,8 +15,5 @@ export const debug = {
     content_id: 0,
     content_type: 'folder',
     workspace_id: 0
-  },
-  loggedUser: {
-    ...defaultDebug.loggedUser
   }
 }

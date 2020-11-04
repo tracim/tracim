@@ -11,14 +11,14 @@ const DropdownMenu = props => {
         aria-haspopup='true'
         className={classnames(
           'btn dropdown-toggle',
-          props.isButton ? 'nohover primaryColorBorder' : 'transparentButton',
+          props.isButton ? 'primaryColorBorder' : 'transparentButton',
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         id='dropdownMenuButton'
-        onClick={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); props.buttonClick() }}
         title={props.buttonTooltip ? props.buttonTooltip : props.buttonLabel}
         type='button'
       >
@@ -44,6 +44,7 @@ const DropdownMenu = props => {
 export default DropdownMenu
 
 DropdownMenu.propTypes = {
+  buttonClick: PropTypes.func,
   buttonCustomClass: PropTypes.string,
   buttonDataCy: PropTypes.string,
   buttonDisabled: PropTypes.bool,
@@ -57,6 +58,7 @@ DropdownMenu.propTypes = {
 }
 
 DropdownMenu.defaultProps = {
+  buttonClick: () => { },
   buttonCustomClass: '',
   buttonDataCy: '',
   buttonDisabled: false,

@@ -22,6 +22,7 @@ if (!global.window && !global.document) {
   global.document = window.document
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
+  global.GLOBAL_primaryColor = '#aaaaaa'
   global.localStorage = {
     getItem: () => {}
   }

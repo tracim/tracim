@@ -42,12 +42,12 @@ export class AdminForm extends React.Component {
   }
 
   handleClickSaveButton () {
-    let form = this.state
+    const form = this.state
     delete form.editor
     console.log(form)
   }
 
-  onSchemaChange = (data) => {
+  handleSchemaChange = (data) => {
     if (data !== undefined) {
       this.setState({
         schema: data
@@ -55,7 +55,7 @@ export class AdminForm extends React.Component {
     }
   }
 
-  onUiSchemaChange = (data) => {
+  handleUiSchemaChange = (data) => {
     if (data.jsObject !== undefined) {
       this.setState({
         uischema: data.jsObject
@@ -64,11 +64,11 @@ export class AdminForm extends React.Component {
   }
 
   onInfoChange (name, value) {
-    this.setState({[name]: value})
+    this.setState({ [name]: value })
   }
 
   moveField (position, dragIndex, hoverIndex) {
-    this.setState({schema: moveField(this.state.schema, position, dragIndex, hoverIndex)})
+    this.setState({ schema: moveField(this.state.schema, position, dragIndex, hoverIndex) })
   }
 
   removeField (position, label) {
@@ -90,7 +90,7 @@ export class AdminForm extends React.Component {
     const schema = onPropertiesChange(this.state.schema, position, name, value, label)
     // Check if the onChange got errors, to notify the field
     if (schema === undefined) return false
-    this.setState({schema})
+    this.setState({ schema })
   }
 
   addOrderTab (position) {
@@ -109,8 +109,8 @@ export class AdminForm extends React.Component {
     return (
       <PageWrapper customClass='adminUser'>
         <PageTitle
-          parentClass={'adminUser'}
-          title={'Formulaires manager'}
+          parentClass='adminUser'
+          title='Formulaires manager'
           icon='users'
 
         />
@@ -124,7 +124,7 @@ export class AdminForm extends React.Component {
             <table className='table'>
               <thead>
                 <tr>
-                  <th scope='col'>{'Nom du formulaire'}</th>
+                  <th scope='col'>Nom du formulaire</th>
                 </tr>
               </thead>
             </table>
@@ -134,15 +134,15 @@ export class AdminForm extends React.Component {
 
             <br />
 
-            <button onClick={() => this.setState({editor: !this.state.editor})}>{this.state.editor ? 'Drag and drop' : 'Json editor'}</button>
+            <button onClick={() => this.setState({ editor: !this.state.editor })}>{this.state.editor ? 'Drag and drop' : 'Json editor'}</button>
             <div>
               <div className='adminUser__left'>
                 {this.state.editor
                   ? (
                     <JsonFormEditor
                       schema={this.state.schema}
-                      onSchemaChange={this.onSchemaChange}
-                      onUiSchemaChange={this.onUiSchemaChange}
+                      onSchemaChange={this.handleSchemaChange}
+                      onUiSchemaChange={this.handleUiSchemaChange}
                       uiSchema={this.state.uischema}
                     />
                   )
@@ -157,8 +157,7 @@ export class AdminForm extends React.Component {
                       addOrderTab={this.addOrderTab.bind(this)}
                       changeUiSchema={this.changeUiSchema.bind(this)}
                     />
-                  )
-                }
+                  )}
               </div>
 
               <div className='adminUser__right'>
@@ -168,9 +167,9 @@ export class AdminForm extends React.Component {
                       <JsonForm
                         isDisable={false}
                         id={1}
-                        customClass={'html-document__editionmode'}
+                        customClass='html-document__editionmode'
                         disableValidateBtn
-                        text={''}
+                        text=''
                         schema={this.state.schema}
                         uiSchema={this.state.uischema || {}}
                       />

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export const TimelineDebugData = [{
   is_deleted: false,
   is_archived: false,

@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
-    "build": "NODE_ENV=production webpack-cli -p",
-    "build-dev": "NODE_ENV=production webpack-cli",
-    "buildwindoz": "set NODE_ENV=production&& webpack-cli -p",
-    "build-devwindoz": "set NODE_ENV=production&& webpack-cli",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "build": "NODE_ENV=production webpack-cli",
+    "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
+    "build-dev": "NODE_ENV=development webpack-cli",
+    "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "build-translation": "node i18next.scanner.js",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js"
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "yarn run lint && yarn run test:quick",
+    "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -32,8 +33,7 @@
     "regenerator-runtime": "^0.13.2",
     "tracim_frontend_lib": "^1.1.9",
     "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-cli": "^3.3.11"
   },
   "peerDependencies": {
     "cheerio": "^1.0.0",

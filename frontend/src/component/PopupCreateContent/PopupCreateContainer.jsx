@@ -37,7 +37,7 @@ const PopupCreateContainer = props => {
   // )
   return (
     <CardPopup customClass='popupCreateContent' onClose={props.onClose}>
-      { FormCreateContent }
+      {FormCreateContent}
     </CardPopup>
   )
 }

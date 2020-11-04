@@ -41,9 +41,9 @@ const SIDEBAR = [{
 }]
 
 export const debug = {
+  ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    apiUrl: 'http://localhost',
     slug: 'workspace_advanced',
     faIcon: 'bank',
     hexcolor: '#7d4e24',
@@ -53,7 +53,7 @@ export const debug = {
   content: {
     ...defaultDebug.content,
     agendaEnabled: true,
-    agendaUrl: ``,
+    agendaUrl: '',
     contentReadStatusList: [],
     description: '',
     id: workspaceId,
@@ -81,8 +81,5 @@ export const debug = {
     sidebarEntryList: SIDEBAR,
     slug: '',
     workspace_id: workspaceId
-  },
-  loggedUser: {
-    ...defaultDebug.loggedUser
   }
 }

@@ -11,12 +11,13 @@ class FormBuilder extends React.Component {
   render () {
     const { schema, addField, removeField, moveField, onPropertiesChange, addOrderTab, uiSchema, changeUiSchema } = this.props
     return (
-      <div style={{marginTop: '2%'}}>
+      <div style={{ marginTop: '2%' }}>
         <div style={{
           float: 'left',
           width: '20%',
           textAlign: 'center'
-        }}>
+        }}
+        >
           <FieldType
             fieldType={FIELD_TYPE.STRING.fieldType}
             name={FIELD_TYPE.STRING.name}
@@ -66,7 +67,8 @@ class FormBuilder extends React.Component {
           float: 'right',
           height: '800px',
           border: '1px dashed gray'
-        }}>
+        }}
+        >
           <FieldList
             schema={schema}
             uiSchema={uiSchema}

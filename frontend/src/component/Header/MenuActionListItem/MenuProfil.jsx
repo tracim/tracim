@@ -20,7 +20,7 @@ export const MenuProfil = props => {
           />
         }
         buttonLabel={props.user.publicName}
-        buttonCustomClass='menuprofil__dropdown__name'
+        buttonCustomClass='menuprofil__dropdown__name nohover'
         menuCustomClass='menuprofil__dropdown__setting'
         buttonDataCy='menuprofil__dropdown__button'
       >

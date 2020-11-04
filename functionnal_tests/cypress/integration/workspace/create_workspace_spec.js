@@ -24,7 +24,7 @@ describe('Workspace', () => {
   it('should create a new space while no others are created', () => {
     const spaceTitle = 'Space Title'
 
-    cy.get('[data-cy=homepagecard__btn]').should('be.visible').click()
+    cy.get('[data-cy=homepagecard__create_btn]').should('be.visible').click()
     createOneSpace(cy, spaceTitle)
 
     cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: 1 } })
@@ -57,7 +57,7 @@ describe('Workspace', () => {
     it('should scroll to the new workspace in the sidebar', () => {
       cy.visitPage({ pageName: p.HOME })
       cy.get('.sidebar__scrollview').scrollTo('bottom')
-      cy.get('.sidebar__content__btnnewworkspace__btn').should('be.visible').click()
+      cy.get('[data-cy=sidebarCreateWorkspaceBtn]').should('be.visible').click()
       createOneSpace(cy, newSpaceName)
       getWorkspaceItemByName(cy, newSpaceName).should('be.visible')
     })

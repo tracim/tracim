@@ -4,16 +4,16 @@
   "main": "dist/tracim_frontend_lib.lib.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
-    "buildwindoz": "echo 'Only use npm run buildtracimlibwindoz'",
-    "build": "echo 'Only use npm run buildtracimlib'",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "buildtracimlib": "yarn run build && yarn run buildoptimized",
+    "buildtracimlib-dev": "yarn run build-dev && yarn run buildoptimized-dev",
     "build-translation": "node i18next.scanner.js",
-    "buildtracimlib": "NODE_ENV=production webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlib-dev": "NODE_ENV=production webpack-cli && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack-cli -p && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack-cli && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "test": "(standard --env mocha \"test/**/*.js\" || echo \"\nSome Linting error\") && NODE_ENV=test mocha --config test/.mocharc.js",
+    "build": "./build-script.sh",
+    "build-dev": "./build-script.sh dev",
+    "buildoptimized": "./build-script.sh optimized",
+    "buildoptimized-dev": "./build-script.sh optimized dev",
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
@@ -51,6 +51,7 @@
     "webpack": "^4.42.1"
   },
   "devDependencies": {
+    "abort-controller": "^3.0.0",
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
@@ -58,6 +59,7 @@
     "enzyme-adapter-react-16": "^1.15.2",
     "es6-promise": "^4.2.8",
     "eslint": "^6.8.0",
+    "eventsourcemock": "^2.0.0",
     "file-loader": "^6.0.0",
     "i18next-scanner": "^2.10.2",
     "ignore-styles": "^5.0.1",
@@ -77,8 +79,7 @@
     "url-loader": "^2.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
-    "whatwg-fetch": "^3.0.0"
+    "webpack-dev-server": "^3.10.3"
   },
   "standard": {
     "globals": [
@@ -87,8 +88,11 @@
       "tinymce",
       "fetch",
       "Element",
+      "EventSource",
+      "CustomEvent",
       "DOMParser",
-      "globalThis"
+      "globalThis",
+      "GLOBAL_primaryColor"
     ],
     "parser": "babel-eslint",
     "ignore": []

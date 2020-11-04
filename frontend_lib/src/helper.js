@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
+import color from 'color'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
@@ -253,7 +254,32 @@ export const SPACE_TYPE = {
   onRequest: ON_REQUEST,
   confidential: CONFIDENTIAL
 }
-export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+
+// INFO - GB - 2020-11-04 - The order of types in SPACE_TYPE_LIST is important to PopupCreateWorkspace.jsx. CONFIDENTIAL needs to be first.
+export const SPACE_TYPE_LIST = [CONFIDENTIAL, ON_REQUEST, OPEN]
+export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
+
+const SUBSCRIPTION_PENDING = {
+  id: 1,
+  slug: 'pending',
+  faIcon: 'sign-in'
+}
+const SUBSCRIPTION_REJECTED = {
+  id: 2,
+  slug: 'rejected',
+  faIcon: 'times'
+}
+const SUBSCRIPTION_ACCEPTED = {
+  id: 3,
+  slug: 'accepted',
+  faIcon: 'check'
+}
+export const SUBSCRIPTION_TYPE = {
+  pending: SUBSCRIPTION_PENDING,
+  rejected: SUBSCRIPTION_REJECTED,
+  accepted: SUBSCRIPTION_ACCEPTED
+}
+export const SUBSCRIPTION_TYPE_LIST = [SUBSCRIPTION_PENDING, SUBSCRIPTION_REJECTED, SUBSCRIPTION_ACCEPTED]
 
 export const APP_FEATURE_MODE = {
   VIEW: 'view',
@@ -532,21 +558,21 @@ export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
 
+// INFO - RJ - 2020-10-26 - useful to ensure that the same functions can be used with serialized lists (like for frontend)
+// or not (like for frontend_app_workspace)
+const getSpaceId = (space) => space.workspace_id || space.id
+
 export const createSpaceTree = spaceList => {
   const spaceListWithChildren = spaceList.map(space => ({ ...space, children: space.children || [] }))
   const spaceById = {}
   const newSpaceList = []
   for (const space of spaceListWithChildren) {
-    // INFO - GB - 2020-10-14 - The check made below is to ensure that the same function can be used by serialized lists (like for frontend) or not (like for frontend_app_workspace)
-    space.workspace_id
-    ? spaceById[space.workspace_id] = space
-    : spaceById[space.id] = space
+    spaceById[getSpaceId(space)] = space
   }
   for (const space of spaceListWithChildren) {
-    if (space.parent_id && spaceById[space.parent_id]) {
-      spaceById[space.parent_id].children.push(space)
-    } else if (space.parentId && spaceById[space.parentId]) {
-      spaceById[space.parentId].children.push(space)
+    const parentId = space.parent_id || space.parentId
+    if (parentId && spaceById[parentId]) {
+      spaceById[parentId].children.push(space)
     } else {
       newSpaceList.push(space)
     }
@@ -560,5 +586,14 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => naturalCompareLabels(a, b, lang))
+  return workspaceList.sort((a, b) => {
+    let res = naturalCompareLabels(a, b, lang)
+    if (!res) {
+      res = getSpaceId(a) - getSpaceId(b)
+    }
+    return res
+  })
 }
+
+export const darkenColor = (c) => color(c).darken(0.15).hex()
+export const lightenColor = (c) => color(c).lighten(0.15).hex()

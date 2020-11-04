@@ -28,7 +28,8 @@ import {
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  IconButton
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
@@ -82,7 +83,7 @@ export class Sidebar extends React.Component {
     const { props, state } = this
 
     return spaceList.map(space =>
-      <span key={space.id}>
+      <React.Fragment key={space.id}>
         <WorkspaceListItem
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
@@ -93,7 +94,7 @@ export class Sidebar extends React.Component {
           workspaceId={space.id}
         />
         {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
-      </span>
+      </React.Fragment>
     )
   }
 
@@ -131,6 +132,8 @@ export class Sidebar extends React.Component {
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
+  handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
+
   render () {
     const { props, state } = this
 
@@ -161,21 +164,30 @@ export class Sidebar extends React.Component {
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
               </nav>
-
-              {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
-                <div className='sidebar__content__btnnewworkspace'>
-                  <button
-                    className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickNewWorkspace}
-                    data-cy='sidebarCreateWorkspaceBtn'
-                  >
-                    <i className='fa fa-plus' /> {props.t('Create a space')}
-                  </button>
-                </div>
-              )}
             </div>
 
             <div className='sidebar__footer mb-2'>
+              <div className='sidebar__footer__buttons'>
+                {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
+                  <IconButton
+                    onClick={this.handleClickNewWorkspace}
+                    dataCy='sidebarCreateWorkspaceBtn'
+                    icon='plus'
+                    text={props.t('Create a space')}
+                    mode='light'
+                  />
+                )}
+                {props.accessibleWorkspaceList.length > 0 && (
+                  <IconButton
+                    onClick={this.handleClickJoinWorkspace}
+                    dataCy='sidebarJoinWorkspaceBtn'
+                    icon='users'
+                    text={props.t('Join a space')}
+                    intent='primary'
+                    mode='light'
+                  />
+                )}
+              </div>
               <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
                 {TRACIM_APP_VERSION}
               </div>
@@ -193,5 +205,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
+const mapStateToProps = ({ user, workspaceList, system, accessibleWorkspaceList }) => ({ user, workspaceList, system, accessibleWorkspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

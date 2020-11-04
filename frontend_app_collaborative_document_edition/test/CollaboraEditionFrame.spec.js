@@ -25,15 +25,15 @@ describe('<CollaborativeEditionFrame />', function () {
           config: {
             content_length_file_size_limit: 0,
             email_notification_activated: true,
-            instance_name: "Tracim",
+            instance_name: 'Tracim',
             new_user_invitation_do_notify: true,
             webdav_enabled: true,
-            webdav_url: "https://unit.test:6543/webdav",
+            webdav_url: 'https://unit.test:6543/webdav',
             workspace_size_limit: 0,
             workspaces_number_per_user_limit: 0
           },
           contentTypeListLoaded: true,
-          redirectLogin: "",
+          redirectLogin: '',
           workspaceListLoaded: true
         }
       }
@@ -42,7 +42,7 @@ describe('<CollaborativeEditionFrame />', function () {
   }
 
   const wrapper = shallow(
-    <CollaborativeEditionFrameWithoutHOC { ...props } />
+    <CollaborativeEditionFrameWithoutHOC {...props} />
   )
 
   describe('the function buildCompleteIframeUrl', () => {
@@ -140,7 +140,7 @@ describe('<CollaborativeEditionFrame />', function () {
         .reply(200, {})
 
       const wrapperWithUserAsReader = shallow(
-        <CollaborativeEditionFrameWithoutHOC { ...updatedProps } />
+        <CollaborativeEditionFrameWithoutHOC {...updatedProps} />
       )
 
       const expectedResult = 'http://unit.test:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http://localhost/api/collaborative-document-edition/wopi/files/1&access_token=123456789abc0&closebutton=1&lang=en&permission=readonly'

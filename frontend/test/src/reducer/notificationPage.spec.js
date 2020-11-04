@@ -41,6 +41,7 @@ const notification = {
   type: 'workspace_member.created',
   workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
   read: null,
+  subscription: null,
   user: serialize(globalManagerFromApi, serializeUserProps)
 }
 
