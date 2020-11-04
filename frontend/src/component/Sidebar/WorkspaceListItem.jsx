@@ -94,8 +94,18 @@ class WorkspaceListItem extends React.Component {
 
           {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
             // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
+            // If the space is active the border width (5px) is subtracted
             props.level > 0 && (
-              <div style={{ marginLeft: `${(props.level - 1) * 20 + 10}px` }}>&#8735;</div>
+              <div
+                style={{
+                  marginLeft:
+                  `${(props.level - 1) * 20 + 10 -
+                    (props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) ? 5 : 0)
+                  }px`
+                }}
+              >
+                &#8735;
+              </div>
             )
           }
 
@@ -104,6 +114,7 @@ class WorkspaceListItem extends React.Component {
               'sidebar__content__navigation__workspace__item__name',
               {
                 sidebar__content__navigation__workspace__item__current__name:
+                  props.level === 0 &&
                   props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
               }
             )}
