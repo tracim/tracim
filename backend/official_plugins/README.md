@@ -1,7 +1,7 @@
 # Official Backend Plugins
 
 This directory contains all official backend plugins.
-You can enable them by by creating a symlink from Tracim plugins folder (`plugin.folder_path` in `development.ini`) to the needed plugin:
+You can enable them by creating a symlink from Tracim plugins folder (`plugin.folder_path` in `development.ini`) to the needed plugin:
 ```shell
 # from backend directory, default configuration
 cd plugins
