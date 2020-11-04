@@ -21,13 +21,13 @@ To use the development server, you need to:
 - be logged in to the frontend with the global admin default user (so that the api doesn't return http status 401)
   - login: admin@admin.admin
   - password: admin@admin.admin
-  - (optional) if you need to be logged in with a different user, see bellow
-- update your `debug.js` file. See bellow
+  - (optional) if you need to be logged in with a different user, see below
+- update your `debug.js` file. See below
 - run `yarn run servdev`
 
 It will create a web server (webpack-dev-server) where you will see the app loaded with some default values.
 
-The configuration file `debug.js` will be used which follows the template of the file `debug.sample.js`.
+The configuration file `debug.js` will be used, following the `debug.sample.js` template file.
 
 ##### Update debug.js for servdev
 To adapt the configuration to your local database, you need to:
