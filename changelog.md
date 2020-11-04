@@ -5,7 +5,7 @@
 ### New Features
 
 - Full implementation of spaces access types: open, on request and confidential (spaces available in Tracim < 3.2.1 are considering like type confidential)
-- Allow user to discover and join spaces
+- Allow users to discover, join and leave spaces
 - New plugins available:
   - Adds every new user to all open spaces and to every newly created open space. You need to activate this plugin `tracim_backend_autoinvite` (documentation avialable [here](backend/official_plugins/README.md))
   - Recursively adds new members of space to its parents with the default user role of each space. You need to activate this plugin `tracim_backend_parent_access` (documentation avialable [here](backend/official_plugins/README.md))
