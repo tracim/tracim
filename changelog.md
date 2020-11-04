@@ -1,11 +1,35 @@
 
+
+## 3.2.1 / 2020-11-04
+
+### New Features
+
+- Full implementation of spaces access types: confidential, on request and open (the type of spaces created on Tracim < 3.2.1 is confidential and retain their current access behavior)
+- Allow users to discover, join and leave spaces
+- New plugins available:
+  - Adds every new user to all open spaces and to every newly created open space. You need to activate this plugin `tracim_backend_autoinvite` (documentation available [here](backend/official_plugins/README.md))
+  - Recursively adds new members of a space to its parents with the default user role of each space. You need to activate this plugin `tracim_backend_parent_access` (documentation available [here](backend/official_plugins/README.md))
+  - When a user is removed from a space, this plugin recursively removes this user from the children of this space. You need to activate this plugin `tracim_backend_child_removal` (documentation available [here](backend/official_plugins/README.md))
+- Frontend dependencies are grouped, making Tracim faster to load on small connections and on older devices, and more lightweight on memory consumption. For developers and sysadmins, this also makes Tracim build faster.
+
+### Fixed Issues
+
+- Frontend: [#3684](https://github.com/tracim/tracim/issues/3684),
+[#3693](https://github.com/tracim/tracim/issues/3693),
+[#3696](https://github.com/tracim/tracim/issues/3696),
+[#3706](https://github.com/tracim/tracim/issues/3706),
+[#3768](https://github.com/tracim/tracim/issues/3768)
+- Backend: [#3604](https://github.com/tracim/tracim/issues/3604)
+
+
 ## 3.2.0 / 2020-10-16
 
 ### New Features
 
-- New spaces hierarchy and new sidebar view (a space can be child of another)
+- Spaces now can have sub-spaces  (a space can be child of another)
+- The sidebar has been simplified and shows the new space hierarchy
 - New access types for spaces (on request, open)
-- Automatic test can be done for Tracim docker image (feature for developers)
+- Automatic tests can be done for the Tracim docker image (feature for developers)
 
 ### Fixed Issues
 
@@ -23,8 +47,8 @@
 - Renaming `Text document` app to `Note` (issue [#3621](https://github.com/tracim/tracim/issues/3621))
 - Renaming `Shared space` to `Space` (issue [#3582](https://github.com/tracim/tracim/issues/3582))
 - Webdav (issue [#3625](https://github.com/tracim/tracim/issues/3625)):
-  - It is no longer possible to show two spaces with the same name in webdav. If this case exist on Tracim, webdav show the first space id.
-  - It is no longer possible to create/modify a space from webdav access
+  - It is no longer possible to show two spaces with the same name in WebDAV. If two spaces at the same place have the same name, only the oldest space will be shown.
+  - It is no longer possible to create/modify a space from WebDAV
 
 
 ## 3.1.5 / 2020-10-16
