@@ -47,7 +47,7 @@
 - Renaming `Text document` app to `Note` (issue [#3621](https://github.com/tracim/tracim/issues/3621))
 - Renaming `Shared space` to `Space` (issue [#3582](https://github.com/tracim/tracim/issues/3582))
 - Webdav (issue [#3625](https://github.com/tracim/tracim/issues/3625)):
-  - It is no longer possible to show two spaces with the same name in WebDAV. If two spaces at the same place have the same, will only show the first oldest space.
+  - It is no longer possible to show two spaces with the same name in WebDAV. If two spaces at the same place have the same name, only the oldest space will be shown.
   - It is no longer possible to create/modify a space from WebDAV
 
 
