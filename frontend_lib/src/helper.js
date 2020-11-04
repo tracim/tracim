@@ -254,7 +254,9 @@ export const SPACE_TYPE = {
   onRequest: ON_REQUEST,
   confidential: CONFIDENTIAL
 }
-export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+
+// INFO - GB - 2020-11-04 - The order at SPACE_TYPE_LIST is important to PopupCreateWorkspace.jsx
+export const SPACE_TYPE_LIST = [CONFIDENTIAL, ON_REQUEST, OPEN]
 export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 
 const SUBSCRIPTION_PENDING = {
