@@ -1,6 +1,6 @@
 # The Tracim Frontend
 
-This project is the frontend part of Tracim.
+This folder is the frontend part of Tracim.
 
 ## Installation
 
@@ -14,21 +14,21 @@ Load `dist/index.html` in your webserver.
 
 ## Development
 
-Install all dependencies
+##### Install all dependencies
 `$ yarn install`
 
-Start development server (webpack dev server)
+##### Start development server
 `$ yarn run servdev`
 
-Start mockapi server
-`$ yarn run mockapi`
+The development server uses webpack-dev-server with hot module reloading.
 
+It uses a proxy for the api so that there is nothing more to configure.
 
 ## Apps
 
 Tracim is a skeleton that runs apps to do the actual work. (like managing Documents, Files, Threads ...)
 
-Apps are all independant React applications.
+Apps are all independent React applications.
 They can be freely added to or removed from Tracim without the need for a rebuild.
 They can be run outside of Tracim as well.
 In Tracim, they act as plugins.

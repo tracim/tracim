@@ -47,9 +47,6 @@ module.exports = {
       errors: true
     },
     historyApiFallback: true
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*'
-    // }
   },
 
   devtool: false,
