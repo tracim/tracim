@@ -144,11 +144,8 @@ class EventApi:
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
-            # GM - 2020-11-05 - HACK to reconvert int to str as int are not properly handled here for filtering
-            # this work with sqlite, need verification for mysql, mariadb and postgresql
-            # workspace_ids_str = [str(workspace) for workspace in workspace_ids]
             query = query.filter(
-                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].in_(workspace_ids)
+                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
             )
         if event_id:
             query = query.filter(Message.event_id == event_id)
