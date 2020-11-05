@@ -665,6 +665,7 @@ class UserController(Controller):
                 exclude_author_ids=hapic_data.query.exclude_author_ids,
                 include_event_types=hapic_data.query.include_event_types,
                 exclude_event_types=hapic_data.query.exclude_event_types,
+                workspace_ids=hapic_data.query.workspace_ids,
             )
         )
 
