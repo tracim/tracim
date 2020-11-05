@@ -146,9 +146,9 @@ class EventApi:
         if workspace_ids:
             # GM - 2020-11-05 - HACK to reconvert int to str as int are not properly handled here for filtering
             # this work with sqlite, need verification for mysql, mariadb and postgresql
-            workspace_ids_str = [str(workspace) for workspace in workspace_ids]
+            # workspace_ids_str = [str(workspace) for workspace in workspace_ids]
             query = query.filter(
-                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].in_(workspace_ids_str)
+                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].in_(workspace_ids)
             )
         if event_id:
             query = query.filter(Message.event_id == event_id)
