@@ -516,22 +516,9 @@ export class Dashboard extends React.Component {
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
-              subtitle=''
               icon='home'
               breadcrumbsList={props.breadcrumbs}
-            >
-              <div className='dashboard__header__advancedmode'>
-                {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
-                  <button
-                    type='button'
-                    className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickOpenAdvancedDashboard}
-                  >
-                    <i className='fa fa-fw fa-cog' />
-                    {props.t('Open advanced Dashboard')}
-                  </button>}
-              </div>
-            </PageTitle>
+            />
 
             <PageContent>
               <div className='dashboard__workspace'>
@@ -541,6 +528,18 @@ export class Dashboard extends React.Component {
                     data-cy='dashboardWorkspaceLabel'
                   >
                     {props.curWs.label}
+
+                    <div className='dashboard__header__advancedmode'>
+                      {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
+                        <button
+                          type='button'
+                          className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                          onClick={this.handleClickOpenAdvancedDashboard}
+                        >
+                          <i className='fa fa-fw fa-cog' />
+                          {props.t('Open advanced Dashboard')}
+                        </button>}
+                    </div>
                   </div>
 
                   <div

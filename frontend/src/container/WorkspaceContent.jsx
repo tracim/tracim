@@ -745,7 +745,9 @@ export class WorkspaceContent extends React.Component {
               title={this.getTitle(urlFilter)}
               icon={this.getIcon(urlFilter)}
               breadcrumbsList={breadcrumbs}
-            >
+            />
+
+            <PageContent parentClass='workspace__content'>
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
                   folderId={null} // null because it is workspace root content
@@ -753,9 +755,7 @@ export class WorkspaceContent extends React.Component {
                   availableApp={createContentAvailableApp}
                 />
               )}
-            </PageTitle>
 
-            <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 

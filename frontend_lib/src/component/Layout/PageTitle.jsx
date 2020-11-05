@@ -20,12 +20,16 @@ const PageTitle = props => {
       {props.breadcrumbsList.length > 0
         ? <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
         : <div />}
-      <div
-        className={classnames(`${props.parentClass}__subtitle`, 'pageTitleGeneric__subtitle')}
-        data-cy='layoutPageSubTitle'
-      >
-        {props.subtitle}
-      </div>
+
+      {props.subtitle.length > 0 && (
+        <div
+          className={classnames(`${props.parentClass}__subtitle`, 'pageTitleGeneric__subtitle')}
+          data-cy='layoutPageSubTitle'
+        >
+          {props.subtitle}
+        </div>
+      )}
+
       {props.children}
     </div>
   )
