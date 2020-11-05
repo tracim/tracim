@@ -75,7 +75,7 @@ class WorkspaceListItem extends React.Component {
 
     return (
       <li
-        id={props.workspaceId}
+        id={props.id}
         className={classnames(
           'sidebar__content__navigation__workspace__item',
           {

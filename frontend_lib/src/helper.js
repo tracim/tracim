@@ -593,5 +593,34 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
+  // RJ - 2020-11-05 - INFO
+  //
+  // This function scrolls to the elementToScrollTo DOM element, if not in view.
+  // If the element is visible, nothing will happen.
+  //
+  // fixedContainer needs to be a DOM element that contains elementToScrollTo
+  // and that which position does not change when scrolling to the element.
+  // A "scroll view" contained in fixedContainer and containing elementToScrollTo
+  // is not required but may be here.
+  // elementToScrollTo.scrollIntoView() is used to scoll to the element.
+  // inspired of the following non standard method:
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+
+  if (elementToScrollTo && fixedContainer) {
+    const fixedContainerBCR = fixedContainer.getBoundingClientRect()
+    const elementBcr = elementToScrollTo.getBoundingClientRect()
+
+    const notInView = (
+      (elementBcr.top < fixedContainerBCR.top) ||
+      (elementBcr.top + elementBcr.height >= fixedContainerBCR.top + fixedContainerBCR.height)
+    )
+
+    if (notInView) {
+      elementToScrollTo.scrollIntoView()
+    }
+  }
+}
+
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
