@@ -170,6 +170,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
+  id: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
