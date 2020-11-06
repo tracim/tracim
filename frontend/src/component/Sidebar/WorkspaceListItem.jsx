@@ -140,7 +140,6 @@ class WorkspaceListItem extends React.Component {
                 to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
-                childrenKey={allowedApp.slug}
               >
                 <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
                 {props.t(allowedApp.label)}

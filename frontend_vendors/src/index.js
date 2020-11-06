@@ -1,3 +1,5 @@
+/* eslint-disable quote-props */
+
 module.exports = {
   classnames: require('classnames'),
   'core-js/stable': require('core-js/stable'),
