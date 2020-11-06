@@ -169,7 +169,8 @@ import {
   getFileRevision,
   putFileContent,
   putMyselfFileRead,
-  getContentComment
+  getContentComment,
+  getContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -323,5 +324,6 @@ export {
   lightenColor,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
-  TextInput
+  TextInput,
+  getContent
 }

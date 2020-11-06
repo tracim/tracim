@@ -48,7 +48,7 @@ export function TracimComponent (WrappedComponent) {
 
     execRegisteredLiveMessageHandler = ({ detail: { type, data } }) => {
       const hasTypeHandler = Object.prototype.hasOwnProperty.call(this.registeredLiveMessageHandlerList, type)
-      const hasGlobalHandler = this.registerGlobalLiveMessageHandler.length > 0)
+      const hasGlobalHandler = (this.registerGlobalLiveMessageHandler.length > 0)
       if (hasTypeHandler || hasGlobalHandler) data.fields.author = updateTLMAuthor(data.fields.author)
       if (hasTypeHandler) this.registeredLiveMessageHandlerList[type](data)
       if (hasGlobalHandler) {
