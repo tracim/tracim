@@ -24,8 +24,7 @@ export const FETCH_CONFIG = {
 }
 
 export const ANCHOR_NAMESPACE = {
-  workspaceItem: 'workspaceItem',
-  notificationItem: 'notificationItem'
+  workspaceItem: 'workspaceItem'
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?

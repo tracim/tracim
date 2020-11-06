@@ -75,7 +75,7 @@ class WorkspaceListItem extends React.Component {
 
     return (
       <li
-        id={props.workspaceId}
+        id={props.id}
         className={classnames(
           'sidebar__content__navigation__workspace__item',
           {
@@ -140,7 +140,6 @@ class WorkspaceListItem extends React.Component {
                 to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
-                childrenKey={allowedApp.slug}
               >
                 <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
                 {props.t(allowedApp.label)}
@@ -170,6 +169,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
+  id: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,

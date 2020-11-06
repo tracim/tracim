@@ -5,7 +5,7 @@ import classnames from 'classnames'
 const DropdownMenuItem = props => {
   return (
     <span
-      className={classnames('transparentButton dropdownMenuItem primaryColorBgActive dropdown-item', props.customClass)}
+      className={classnames('dropdownMenuItem primaryColorBgActive dropdown-item', props.customClass)}
     >
       {props.children}
     </span>

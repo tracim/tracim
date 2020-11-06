@@ -13,6 +13,7 @@ describe('<Sidebar />', () => {
   const props = {
     user: user,
     workspaceList: workspaceList.workspaceList,
+    currentWorkspace: { id: 1 },
     system: {},
     dispatch: dispatchCallBack,
     match: {
