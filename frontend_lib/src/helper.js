@@ -613,7 +613,7 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 
     const notInView = (
       (elementBcr.top < fixedContainerBCR.top) ||
-      (elementBcr.top + elementBcr.height >= fixedContainerBCR.top + fixedContainerBCR.height)
+      (elementBcr.bottom >= fixedContainerBCR.bottom)
     )
 
     if (notInView) {
