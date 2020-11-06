@@ -19,11 +19,11 @@ import DropdownCreateButton from '../component/common/Input/DropdownCreateButton
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
 import OpenShareFolderApp from '../component/Workspace/OpenShareFolderApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
+import TabBar from '../component/TabBar/TabBar.jsx'
 import {
   ROLE,
   ROLE_LIST,
   PageWrapper,
-  PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -739,12 +739,9 @@ export class WorkspaceContent extends React.Component {
           )}
 
           <PageWrapper customClass='workspace'>
-            <PageTitle
-              parentClass='workspace__header'
-              customClass='justify-content-between align-items-center'
-              title={this.getTitle(urlFilter)}
-              icon={this.getIcon(urlFilter)}
-              breadcrumbsList={breadcrumbs}
+            <TabBar
+              currentSpace={props.currentWorkspace}
+              breadcrumbs={breadcrumbs}
             />
 
             <PageContent parentClass='workspace__content'>

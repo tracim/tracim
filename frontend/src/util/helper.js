@@ -42,6 +42,7 @@ export const PAGE = {
   WORKSPACE: {
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
+    FEED: (idws = ':idws') => `ui/workspaces/${idws}/feed`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
     AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,

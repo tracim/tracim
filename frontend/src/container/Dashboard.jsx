@@ -7,7 +7,6 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
-  PageTitle,
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
@@ -50,6 +49,7 @@ import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
+import TabBar from '../component/TabBar/TabBar.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
@@ -513,11 +513,9 @@ export class Dashboard extends React.Component {
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='dashboard'>
-            <PageTitle
-              parentClass='dashboard__header'
-              title={props.t('Dashboard')}
-              icon='home'
-              breadcrumbsList={props.breadcrumbs}
+            <TabBar
+              currentSpace={props.curWs}
+              breadcrumbs={props.breadcrumbs}
             />
 
             <PageContent>

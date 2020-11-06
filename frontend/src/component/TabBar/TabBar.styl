@@ -1,0 +1,46 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+tabWidth = 185 //185px
+
+.tabBar
+  display flex
+  background-color offWhite
+  & .pageTitleGeneric
+    width "calc(100% - %s)" % (3*tabWidth)px
+
+.tab
+  border-bottom 1px solid grey
+  width (tabWidth)px
+  display flex
+  align-items center
+  justify-content center
+  border-left 1px solid grey
+  color fontColor
+  &__active
+    border-top-width 5px
+    border-top-style solid
+    border-bottom none
+    background-color veryLightGrey
+  & .fa
+    margin-right 10px
+  &:hover
+    color fontColor
+    background-color veryLightGrey
+
+@media (max-width: max-md)
+  .tab
+    width 50px
+    & .fa
+      margin 0
+    &__label
+      display none
+  .tabBar
+    .breadcrumbs
+      display none
+    & .pageTitleGeneric
+      width "calc(100% - %s)" % (3*50)px
+
+@media (max-width: max-xs)
+  .tabBar
+    .pageTitleGeneric__title__icon
+      display none
