@@ -52,12 +52,10 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
 
   let content = first.fields.content
   if (content.content_type === TLM_ST.COMMENT) {
-    content = await handleFetchResult(await getContent(apiUrl, content.parent_id)).body
+    content = (await handleFetchResult(await getContent(apiUrl, content.parent_id))).body
   }
 
-  const foo = await getContentComment(apiUrl, content.workspace_id, content.content_id)
-  const comments = await handleFetchResult(foo)
-
+  const comments = (await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))).body
   return {
     id: activityId,
     entityType: first.event_type.split('.')[0],
@@ -81,11 +79,21 @@ const getActivityId = (message) => {
       break
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-      id = `${message.fields.workspace.workspace_id}-${message.fields.user.user_id}`
+      id = `w${message.fields.workspace.workspace_id}-u${message.fields.user.user_id}`
       break
   }
   if (id === null) return null
   return `${entityType}-${id}`
+}
+
+const createActivity = async (activityId, activityMessageList, apiUrl) => {
+  if (activityId.startsWith(TLM_ET.CONTENT)) {
+    return await createContentActivity(activityId, activityMessageList, apiUrl)
+  } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_MEMBER)) {
+    return createMemberActivity(activityId, activityMessageList)
+  } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_SUBSCRIPTION)) {
+    return createSubscriptionActivity(activityId, activityMessageList)
+  }
 }
 
 /**
@@ -93,7 +101,7 @@ const getActivityId = (message) => {
  * Activities are returned in newest to oldest order.
  * NOTE: this function assumes that the message list is already ordered from newest to oldest.
  */
-export const buildActivityList = async (messageList, apiUrl) => {
+export const createActivityList = async (messageList, apiUrl) => {
   const activityMap = new Map()
 
   // first regroup by activity
@@ -109,14 +117,37 @@ export const buildActivityList = async (messageList, apiUrl) => {
   // TODO: parallelize this(?)
   const activityList = []
   for (const [activityId, activityMessageList] of activityMap) {
-    if (activityId.startsWith(TLM_ET.CONTENT)) {
-      activityList.push(await createContentActivity(activityId, activityMessageList, apiUrl))
-    } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_MEMBER)) {
-      activityList.push(createMemberActivity(activityId, activityMessageList))
-    } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_SUBSCRIPTION)) {
-      activityList.push(createSubscriptionActivity(activityId, activityMessageList))
-    }
+    activityList.push(await createActivity(activityId, activityMessageList, apiUrl))
   }
 
   return activityList
+}
+
+/**
+ * Add a message to an existing activity list.
+ * If the message is not part of any activity, a new one will be created
+ * and added at the beginning of the list
+ * This WON't re-order the list if the message is part of an existing
+ * activity.
+ * @param {*} message
+ * @param {*} activityList
+ */
+export const addMessageToActivityList = async (message, activityList, apiUrl) => {
+  const activityId = getActivityId(message)
+  const activityIndex = activityList.findIndex(a => a.id === activityId)
+  if (activityIndex === -1) {
+    const activity = await createActivity(activityId, [message], apiUrl)
+    return [activity, ...activityList]
+  }
+  const oldActivity = activityList[activityIndex]
+  const updatedActivity = {
+    ...oldActivity,
+    eventList: [
+      createActivityEvent(message),
+      ...oldActivity.eventList
+    ]
+  }
+  const updatedActivityList = [...activityList]
+  updatedActivityList[activityIndex] = updatedActivity
+  return updatedActivityList
 }
