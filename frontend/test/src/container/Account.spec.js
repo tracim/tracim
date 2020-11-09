@@ -85,10 +85,19 @@ describe('In <Account />', () => {
     registerLiveMessageHandlerList: () => { }
   }
 
+  const tooltipDiv = document.createElement('div')
+  const innerTooltipDiv = document.createElement('div')
+
+  tooltipDiv.setAttribute('id', 'some-tooltip-id')
+  innerTooltipDiv.setAttribute('id', 'popoverSpaceTitle')
+
+  tooltipDiv.appendChild(innerTooltipDiv)
+  document.body.appendChild(tooltipDiv)
+
   const AccountWithHOC1 = withRouterMock(translateMock()(AccountWithoutHOC))
   const AccountWithHOC2 = () => <Provider store={store}><AccountWithHOC1 {...props} /></Provider>
 
-  const wrapper = mount(<AccountWithHOC2 {...props} />)
+  const wrapper = mount(<AccountWithHOC2 {...props} />, { attachTo: innerTooltipDiv })
   const accountWrapper = wrapper.find(AccountWithoutHOC)
   const accountInstance = accountWrapper.instance()
 

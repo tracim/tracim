@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
 class PageTitle extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       popoverSpaceTitleOpen: false
@@ -19,7 +19,7 @@ class PageTitle extends React.Component {
     }))
   }
 
-  render() {
+  render () {
     const { props } = this
 
     return (
@@ -32,7 +32,7 @@ class PageTitle extends React.Component {
             <i className={`fa fa-fw fa-${props.icon}`} />
           </div>
 
-          <div id='popoverSpaceTitle'>
+          <div className='pageTitleGeneric__title__label' id='popoverSpaceTitle'>
             {props.title}
           </div>
           <Popover

@@ -81,10 +81,19 @@ describe('In <Account /> at AdminAccount.jsx', () => {
     registerLiveMessageHandlerList: () => { }
   }
 
+  const tooltipDiv = document.createElement('div')
+  const innerTooltipDiv = document.createElement('div')
+
+  tooltipDiv.setAttribute('id', 'some-tooltip-id')
+  innerTooltipDiv.setAttribute('id', 'popoverSpaceTitle')
+
+  tooltipDiv.appendChild(innerTooltipDiv)
+  document.body.appendChild(tooltipDiv)
+
   const AdminAccountWithHOC1 = withRouterMock(translateMock()(AdminAccountWithoutHOC))
   const AdminAccountWithHOC2 = () => <Provider store={store}><AdminAccountWithHOC1 {...props} /></Provider>
 
-  const wrapper = mount(<AdminAccountWithHOC2 {...props} />)
+  const wrapper = mount(<AdminAccountWithHOC2 {...props} />, { attachTo: innerTooltipDiv })
   const adminAccountWrapper = wrapper.find(AdminAccountWithoutHOC)
   const adminAccountInstance = adminAccountWrapper.instance()
 

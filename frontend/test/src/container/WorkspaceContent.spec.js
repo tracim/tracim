@@ -51,7 +51,9 @@ describe('<WorkspaceContent />', () => {
         idcts: 1
       }
     },
-    location: {},
+    location: {
+      pathname: ''
+    },
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     t: tradKey => tradKey,

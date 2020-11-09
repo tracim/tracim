@@ -67,6 +67,9 @@ describe('<Dashboard />', () => {
     registerCustomEventHandlerList: () => {},
     registerLiveMessageHandlerList: () => {},
     // mock react router
+    location: {
+      pathname: ''
+    },
     match: {
       params: {
         idws: 1
@@ -74,12 +77,21 @@ describe('<Dashboard />', () => {
     }
   }
 
+  const tooltipDiv = document.createElement('div')
+  const innerTooltipDiv = document.createElement('div')
+
+  tooltipDiv.setAttribute('id', 'some-tooltip-id')
+  innerTooltipDiv.setAttribute('id', 'popoverSpaceTitle')
+
+  tooltipDiv.appendChild(innerTooltipDiv)
+  document.body.appendChild(tooltipDiv)
+
   const DashboardWithHOC1 = withRouterMock(translateMock()(DashboardWithoutHOC))
   const DashboardWithHOC2 = () => <Provider store={store}><DashboardWithHOC1 {...props} /></Provider>
 
   mockGetWorkspaceDetail200(FETCH_CONFIG.apiUrl, firstWorkspace.id, firstWorkspaceFromApi)
 
-  const wrapper = mount(<DashboardWithHOC2 {...props} />)
+  const wrapper = mount(<DashboardWithHOC2 {...props} />, { attachTo: innerTooltipDiv })
   const dashboardInstance = wrapper.find(DashboardWithoutHOC).instance()
 
   describe('TLM handlers', () => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
 
 export const Tab = props => {
@@ -8,7 +8,7 @@ export const Tab = props => {
     <Link
       className={classnames(
         'tab',
-        { 'tab__active primaryColorBorder': props.active }
+        { 'tab__active primaryColorBorder': props.location.pathname.includes(props.page) }
       )}
       title={props.label}
       to={props.page}
@@ -19,16 +19,14 @@ export const Tab = props => {
   )
 }
 
-export default Tab
+export default withRouter(Tab)
 
 Tab.propTypes = {
   label: PropTypes.string.isRequired,
   page: PropTypes.string.isRequired,
-  active: PropTypes.bool,
   icon: PropTypes.string
 }
 
 Tab.defaultProps = {
-  active: false,
   icon: ''
 }
