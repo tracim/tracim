@@ -23,10 +23,7 @@ const createMemberActivity = (activityId, messageList) => {
     entityType: message.event_type.split('.')[0],
     eventList: [createActivityEvent(message)],
     reactionList: [],
-    fields: {
-      user: message.fields.user,
-      member: message.fields.member
-    }
+    fields: message.fields
   }
 }
 
@@ -38,10 +35,7 @@ const createSubscriptionActivity = (activityId, messageList) => {
     entityType: message.event_type.split('.')[0],
     eventList: [createActivityEvent(message)],
     reactionList: [],
-    fields: {
-      user: message.fields.user,
-      subscription: message.fields.subscription
-    }
+    fields: message.fields
   }
 }
 
@@ -55,16 +49,14 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
     content = (await handleFetchResult(await getContent(apiUrl, content.parent_id))).body
   }
 
-  const comments = (await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))).body
+  const commentList = (await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))).body
   return {
     id: activityId,
     entityType: first.event_type.split('.')[0],
     eventList: messageList.map(createActivityEvent),
     reactionList: [],
-    fields: {
-      content: content,
-      comments: comments
-    }
+    commentList: commentList,
+    fields: first.fields
   }
 }
 
@@ -113,14 +105,12 @@ export const createActivityList = async (messageList, apiUrl) => {
     }
   }
 
-  // we now have a map of messages grouped by activity
-  // TODO: parallelize this(?)
-  const activityList = []
+  // we now have a map of messages grouped by activity, let's create activities
+  const activityCreationList = []
   for (const [activityId, activityMessageList] of activityMap) {
-    activityList.push(await createActivity(activityId, activityMessageList, apiUrl))
+    activityCreationList.push(createActivity(activityId, activityMessageList, apiUrl))
   }
-
-  return activityList
+  return await Promise.all(activityCreationList)
 }
 
 /**
@@ -145,7 +135,10 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
     eventList: [
       createActivityEvent(message),
       ...oldActivity.eventList
-    ]
+    ],
+    commentList: message.event_type.startsWith(TLM_ST.COMMENT)
+      ? [message.fields.content, ...oldActivity.commentList]
+      : oldActivity.commentList
   }
   const updatedActivityList = [...activityList]
   updatedActivityList[activityIndex] = updatedActivity

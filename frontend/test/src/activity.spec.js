@@ -79,9 +79,9 @@ describe('In activity.js module', () => {
       { author: foo, created: messageList[3].created, eventId: 3, eventType: messageList[3].event_type }
     ],
     reactionList: [],
+    commentList: [],
     fields: {
-      content: fileContent,
-      comments: []
+      content: fileContent
     }
   }
   const subscriptionActivity = {
@@ -142,9 +142,9 @@ describe('In activity.js module', () => {
           { author: foo, created: message.created, eventId: 7, eventType: message.event_type }
         ],
         reactionList: [],
+        commentList: [],
         fields: {
-          content: otherFileContent,
-          comments: []
+          content: otherFileContent
         }
       }
       const resultActivityList = await addMessageToActivityList(

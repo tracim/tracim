@@ -75,6 +75,7 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
+import ActivityFeed from './ActivityFeed.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -457,7 +458,7 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.DASHBOARD(':idws')}
+                  path={PAGE.WORKSPACE.DASHBOARD()}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Dashboard />
@@ -468,6 +469,15 @@ export class Tracim extends React.Component {
                 <Route
                   path={PAGE.WORKSPACE.AGENDA(':idws')}
                   render={() => <AppFullscreenRouter />}
+                />
+
+                <Route
+                  path={PAGE.WORKSPACE.ACTIVITY_FEED()}
+                  render={() => (
+                    <div className='tracim__content fullWidthFullHeight'>
+                      <ActivityFeed />
+                    </div>
+                  )}
                 />
               </>}
           />
