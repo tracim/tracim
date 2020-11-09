@@ -23,7 +23,7 @@ const createMemberActivity = (activityId, messageList) => {
     entityType: message.event_type.split('.')[0],
     eventList: [createActivityEvent(message)],
     reactionList: [],
-    fields: message.fields
+    newestMessage: message
   }
 }
 
@@ -35,7 +35,7 @@ const createSubscriptionActivity = (activityId, messageList) => {
     entityType: message.event_type.split('.')[0],
     eventList: [createActivityEvent(message)],
     reactionList: [],
-    fields: message.fields
+    newestMessage: message
   }
 }
 
@@ -56,7 +56,7 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
     eventList: messageList.map(createActivityEvent),
     reactionList: [],
     commentList: commentList,
-    fields: first.fields
+    newestMessage: first
   }
 }
 
@@ -71,7 +71,7 @@ const getActivityId = (message) => {
       break
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-      id = `w${message.fields.workspace.workspace_id}-u${message.fields.user.user_id}`
+      id = `e${message.event_id}`
       break
   }
   if (id === null) return null
@@ -88,15 +88,8 @@ const createActivity = async (activityId, activityMessageList, apiUrl) => {
   }
 }
 
-/**
- * Create an activity list from a message/TLM list
- * Activities are returned in newest to oldest order.
- * NOTE: this function assumes that the message list is already ordered from newest to oldest.
- */
-export const createActivityList = async (messageList, apiUrl) => {
+const groupMessageListByActivityId = (messageList) => {
   const activityMap = new Map()
-
-  // first regroup by activity
   for (const message of messageList) {
     const activityId = getActivityId(message)
     if (activityId !== null) {
@@ -105,12 +98,62 @@ export const createActivityList = async (messageList, apiUrl) => {
     }
   }
 
-  // we now have a map of messages grouped by activity, let's create activities
+  return activityMap
+}
+
+const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
   const activityCreationList = []
   for (const [activityId, activityMessageList] of activityMap) {
     activityCreationList.push(createActivity(activityId, activityMessageList, apiUrl))
   }
   return await Promise.all(activityCreationList)
+}
+
+/**
+ * Create an activity list from a message/TLM list
+ * Activities are returned in newest to oldest order.
+ * NOTE: this function assumes that the message list is already ordered from newest to oldest.
+ */
+export const createActivityList = async (messageList, apiUrl) => {
+  // first regroup by activity
+  const activityMap = groupMessageListByActivityId(messageList)
+
+  // we now have a map of messages grouped by activity, let's create activities
+  return await createActivityListFromActivityMap(activityMap, apiUrl)
+}
+
+/**
+ * Merge an activity list with message/TLM list
+ * Activities are returned in newest to oldest order.
+ */
+export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
+  const activityMap = groupMessageListByActivityId(messageList)
+
+  for (const activity of activityList) {
+    if (activityMap.has(activity.id)) {
+      activityMap.delete(activity.id)
+    }
+  }
+
+  const newActivityList = await createActivityListFromActivityMap(activityMap)
+  return [...messageList, ...newActivityList]
+}
+
+/**
+ * Sort an activity list from newest to oldest
+ */
+const newestMessageCreationOrder = (a, b) => {
+  const aCreatedDate = new Date(a.newestMessage.created)
+  const bCreatedDate = new Date(a.newestMessage.created)
+
+  if (aCreatedDate > bCreatedDate) return -1
+  if (aCreatedDate < bCreatedDate) return 1
+  return 0
+}
+export const sortActivityList = (activityList) => {
+  const sortedActivityList = [...activityList]
+  sortedActivityList.sort(newestMessageCreationOrder)
+  return sortedActivityList
 }
 
 /**
@@ -138,7 +181,8 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
     ],
     commentList: message.event_type.startsWith(TLM_ST.COMMENT)
       ? [message.fields.content, ...oldActivity.commentList]
-      : oldActivity.commentList
+      : oldActivity.commentList,
+    newestMessage: message
   }
   const updatedActivityList = [...activityList]
   updatedActivityList[activityIndex] = updatedActivity

@@ -66,10 +66,7 @@ describe('In activity.js module', () => {
       { author: foo, created: messageList[0].created, eventId: 6, eventType: messageList[0].event_type }
     ],
     reactionList: [],
-    fields: {
-      user: bar,
-      member: readerMember
-    }
+    newestMessage: messageList[0]
   }
   const contentActivity = {
     id: 'content-42',
@@ -80,9 +77,7 @@ describe('In activity.js module', () => {
     ],
     reactionList: [],
     commentList: [],
-    fields: {
-      content: fileContent
-    }
+    newestMessage: messageList[1]
   }
   const subscriptionActivity = {
     id: 'workspace_subscription-w23-u2',
@@ -91,10 +86,7 @@ describe('In activity.js module', () => {
       { author: bar, created: messageList[2].created, eventId: 4, eventType: messageList[2].event_type }
     ],
     reactionList: [],
-    fields: {
-      user: bar,
-      subscription: {}
-    }
+    newestMessage: messageList[2]
   }
 
   describe('createActivityList() function', () => {
@@ -117,7 +109,8 @@ describe('In activity.js module', () => {
         eventList: [
           { author: foo, created: message.created, eventId: 7, eventType: message.event_type },
           ...contentActivity.eventList
-        ]
+        ],
+        newestMessage: message
       }
       const resultActivityList = await addMessageToActivityList(
         message,
@@ -143,9 +136,7 @@ describe('In activity.js module', () => {
         ],
         reactionList: [],
         commentList: [],
-        fields: {
-          content: otherFileContent
-        }
+        newestMessage: message
       }
       const resultActivityList = await addMessageToActivityList(
         message,

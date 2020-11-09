@@ -63,7 +63,13 @@ export class NotificationWall extends React.Component {
   handleClickSeeMore = async () => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId, NUMBER_RESULTS_BY_PAGE, props.notificationPage.nextPageToken))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      props.user.userId,
+      {
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
+        nextPageToken: props.notificationPage.nextPageToken
+      }
+    ))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))

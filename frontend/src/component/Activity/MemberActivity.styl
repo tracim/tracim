@@ -1,0 +1,24 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+@import './Common.styl'
+  
+.member_activity
+  display flex
+  flex-direction row
+  align-items center
+  justify-content: space-between
+  &__left
+    display flex
+    flex-direction row
+    white-space nowrap
+    overflow hidden
+    align-items center
+    & > *
+      text-overflow ellipsis
+      overflow hidden
+  &__user
+    font-weight bold
+
+  &__right
+    font-size fontSizeSmall
+    text-align right
+    white-space nowrap

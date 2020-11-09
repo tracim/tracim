@@ -852,9 +852,13 @@ export const getGuestUploadInfo = token => dispatch => {
 
 const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
 
-export const getNotificationList = (userId, notificationsPerPage, nextPageToken = null) => async dispatch => {
+export const getNotificationList = (userId, { notificationsPerPage = 15, nextPageToken = null, workspaceId = null }) => async dispatch => {
+  const queryParameterList = [`exclude_author_ids=${userId}`]
+  if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
+  if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
+  if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)
   const fetchGetNotificationWall = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_ids=${userId}${eventTypesParam}&count=${notificationsPerPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?${queryParameterList.join('&')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,

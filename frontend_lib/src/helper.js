@@ -262,17 +262,29 @@ export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'sign-in'
+  faIcon: 'sign-in',
+  tradKey: [
+    i18n.t('pending')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'pending'
 }
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
-  faIcon: 'times'
+  faIcon: 'times',
+  tradKey: [
+    i18n.t('rejected')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'rejected'
 }
 const SUBSCRIPTION_ACCEPTED = {
   id: 3,
   slug: 'accepted',
-  faIcon: 'check'
+  faIcon: 'check',
+  tradKey: [
+    i18n.t('accepted')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'accepted'
 }
 export const SUBSCRIPTION_TYPE = {
   pending: SUBSCRIPTION_PENDING,

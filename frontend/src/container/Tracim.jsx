@@ -311,7 +311,7 @@ export class Tracim extends React.Component {
   loadNotificationList = async (userId) => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, { notificationsPerPage: NUMBER_RESULTS_BY_PAGE }))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
@@ -464,6 +464,11 @@ export class Tracim extends React.Component {
                       <Dashboard />
                     </div>
                   )}
+                />
+
+                <Route
+                  path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
+                  component={ActivityFeed}
                 />
 
                 <Route

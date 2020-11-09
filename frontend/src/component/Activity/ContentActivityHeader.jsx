@@ -17,7 +17,10 @@ import { PAGE } from '../../util/helper.js'
 require('./ContentActivityHeader.styl')
 
 export class ContentActivityHeader extends React.Component {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a27e0500 (FUCK)
   getDisplayOperation (eventType) {
     const { props } = this
     const [entityType, coreEventType] = eventType.split('.')
@@ -60,33 +63,43 @@ export class ContentActivityHeader extends React.Component {
       }
     ]
 
-    const newestEvent = props.eventList[0]
+    const newestMessage = props.newestMessage
+
+    const app = props.appList.find(a => a.slug === `contents/${contentType}`)
 
     return (
       <div className='content_activity_header'>
         <div className='content_activity_header__left'>
-          <div className='content_activity_header__left__label'>
-            <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>
+          <i
+            className={`content_activity_header__left__icon fa fa-${app.faIcon}`}
+            style={{ color: `${app.hexcolor}` }}
+            title={app.label}
+          />
+          <div>
+            <div className='content_activity_header__left__label'>
+              <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>
+            </div>
+            <Breadcrumbs breadcrumbsList={breadcrumbsList} />
           </div>
-          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
         </div>
         <div className='content_activity_header__right'>
           <div>
-            {`${this.getDisplayOperation(newestEvent.eventType)} `}
-            <DistanceDate absoluteDate={newestEvent.created} lang={props.user.lang} />
+            {`${this.getDisplayOperation(newestMessage.event_type)} `}
+            <DistanceDate absoluteDate={newestMessage.created} lang={props.user.lang} />
           </div>
-          <div>{props.t('by')} <span className='content_activity_header__author'>{newestEvent.author.publicName}</span></div>
+          <div>{props.t('by')} <span className='content_activity_header__author'>{newestMessage.fields.author.public_name}</span></div>
         </div>
       </div>
     )
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, appList }) => ({ user, appList })
 export default connect(mapStateToProps)(translate()(ContentActivityHeader))
 
 ContentActivityHeader.propTypes = {
   content: PropTypes.object.isRequired,
   workspace: PropTypes.object.isRequired,
-  eventList: PropTypes.array.isRequired
+  eventList: PropTypes.array.isRequired,
+  newestMessage: PropTypes.object.isRequired
 }

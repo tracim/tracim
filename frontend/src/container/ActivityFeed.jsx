@@ -8,54 +8,90 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 
+<<<<<<< HEAD
 import FileActivity from '../component/Activity/FileActivity.jsx'
+=======
+import {
+  createActivityList,
+  mergeWithActivityList
+} from '../util/activity.js'
+import {
+  FETCH_CONFIG
+} from '../util/helper.js'
+import {
+  getNotificationList
+} from '../action-creator.async'
+
+import FileActivity from '../component/Activity/FileActivity.jsx'
+import FolderActivity from '../component/Activity/FolderActivity.jsx'
+import MemberActivity from '../component/Activity/MemberActivity.jsx'
+import { setWorkspaceActivityList } from '../action-creator.sync.js'
+>>>>>>> 5a27e0500 (FUCK)
 
 require('../css/ActivityFeed.styl')
 
 export class ActivityFeed extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      activityList: [{
-        id: 'content-42',
-        entityType: TLM_ET.CONTENT,
-        eventList: [
-          { eventId: 1, eventType: 'content.modified.file', author: { userId: 2, publicName: 'Foo' }, created: '2020-08-24' }
-        ],
-        reactionList: [],
-        commentList: [],
-        fields: {
-          content: { content_id: 23, workspace_id: 42, label: 'Foo', content_type: 'file' },
-          workspace: { workspace_id: 42, label: 'Workspace' }
-        }
-      }]
-    }
+  componentDidMount () {
+    this.loadActivityList()
   }
 
-  renderContentComponent (activity) {
-    switch (activity.fields.content.content_type) {
-      case CONTENT_TYPE.FILE:
-        return <FileActivity activity={activity} key={activity.id} />
+  componentDidUpdate (prevProps) {
+    if (prevProps.currentWorkspace.id === this.props.currentWorkspace.id) return
+
+    this.loadActivityList()
+  }
+
+  async loadActivityList () {
+    const { props } = this
+    let messageListResponse = await props.dispatch(getNotificationList(
+      props.user.userId,
+      {
+        notificationsPerPage: 25,
+        workspaceId: props.currentWorkspace.id
+      }
+    ))
+    let activityList = await createActivityList(messageListResponse.json.items, FETCH_CONFIG.apiUrl)
+    while (activityList.length < 0 && messageListResponse.json.has_next) {
+      messageListResponse = await props.dispatch(getNotificationList(
+        props.user.userId,
+        {
+          nextPageToken: messageListResponse.json.next_page_token,
+          notificationsPerPage: 25,
+          workspaceId: props.currentWorkspace.id
+        }
+      ))
+      activityList = await mergeWithActivityList(messageListResponse.json.items, activityList, FETCH_CONFIG.apiUrl)
     }
+    props.dispatch(setWorkspaceActivityList(activityList))
   }
 
   renderActivityComponent (activity) {
+    let component = <span>Unknown activity type!</span>
     switch (activity.entityType) {
       case TLM_ET.CONTENT:
-        return this.renderContentComponent(activity)
+        component = activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
+          ? <FolderActivity activity={activity} key={activity.id} />
+          : <FileActivity activity={activity} key={activity.id} />
+        break
+      case TLM_ET.SHAREDSPACE_MEMBER:
+        //component = <MemberActivity activity={activity} key={activity.id} />
+        break
     }
+    return <div className='activity_feed__item'>{component}</div>
   }
 
   render () {
-    const { state } = this
+    const { props } = this
 
     return (
-      <div className='activity_feed__list'>
-        <div className='activity_feed__item'>{state.activityList.map(this.renderActivityComponent.bind(this))}</div>
+      <div className='activity_feed tracim__content fullWidthFullHeight'>
+        <div className='activity_feed__list'>
+          {props.workspaceActivityList.map(this.renderActivityComponent.bind(this))}
+        </div>
       </div>
     )
   }
 }
 
-const mapStateToProps = ({ lang, user, system }) => ({ lang, user, system })
+const mapStateToProps = ({ lang, user, workspaceActivityList, currentWorkspace }) => ({ lang, user, workspaceActivityList, currentWorkspace })
 export default connect(mapStateToProps)(translate()(TracimComponent(ActivityFeed)))

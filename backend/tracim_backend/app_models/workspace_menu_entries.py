@@ -25,3 +25,10 @@ all_content_menu_entry = WorkspaceMenuEntry(
     hexcolor="#bbbbbb",
     fa_icon="th",
 )
+activity_menu_entry = WorkspaceMenuEntry(
+    slug="activity",
+    label="Activity Feed",
+    route="/ui/workspaces/{workspace_id}/activity",
+    hexcolor="#bbbbbb",
+    fa_icon="th",
+)
