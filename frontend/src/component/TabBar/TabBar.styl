@@ -28,8 +28,9 @@ tabWidth = 185 //185px
     background-color veryLightGrey
 
 @media (max-width: max-md)
+  tabWidth = 50
   .tab
-    width 50px
+    width (tabWidth)px
     & .fa
       margin 0
     &__label
@@ -38,7 +39,7 @@ tabWidth = 185 //185px
     .breadcrumbs
       display none
     & .pageTitleGeneric
-      width "calc(100% - %s)" % (3*50)px
+      width "calc(100% - %s)" % (3*tabWidth)px
 
 @media (max-width: max-xs)
   .tabBar
