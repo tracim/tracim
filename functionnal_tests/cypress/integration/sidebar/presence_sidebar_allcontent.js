@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 describe('Sidebar', function () {
   before(() => {
     cy.resetDB()
@@ -6,7 +8,7 @@ describe('Sidebar', function () {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visit('/ui')
+    cy.visitPage({ pageName: PAGES.HOME })
     cy.get('.sidebar__content__navigation__workspace__item__name').click()
   })
   it('should have a link to All contents in the hidden menu', function () {
@@ -15,6 +17,6 @@ describe('Sidebar', function () {
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').should('be.visible')
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').click()
     cy.url().should('include', '/workspaces/1/contents')
-    cy.get('.workspace__header.pageTitleGeneric').should('be.visible')
+    cy.get('.workspace__content__fileandfolder').should('be.visible')
   })
 })

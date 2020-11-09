@@ -527,11 +527,11 @@ export class Dashboard extends React.Component {
                   >
                     {props.curWs.label}
 
-                    <div className='dashboard__header__advancedmode'>
+                    <div className='dashboard__workspace__detail__advancedmode'>
                       {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
                         <button
                           type='button'
-                          className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                          className='dashboard__workspace__detail__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                           onClick={this.handleClickOpenAdvancedDashboard}
                         >
                           <i className='fa fa-fw fa-cog' />

@@ -14,11 +14,6 @@
       width auto
       &__text
         margin 0
-    &__advancedmode__button
-      font-size 14px
-      margin-left 20px
-      & .fa
-        margin-right 8px
   &__workspace
     display flex
     flex-wrap wrap
@@ -26,6 +21,11 @@
     &__detail
       margin-right 20px
       width calc(70% - 20px) //20px => margin-right
+      &__advancedmode__button
+        font-size 14px
+        margin-left 20px
+        & .fa
+          margin-right 8px
       &__title
         margin 0 30px 20px 30px
         font-size 70px
@@ -70,9 +70,10 @@
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .dashboard
-    &__header
-      &__advancedmode
-        display none
+    &__workspace
+      &__detail
+        &__advancedmode
+          display none
     &__workspace
       width 100%
       &__detail
@@ -84,9 +85,10 @@
     margin 10px 0 0 0
 
   .dashboard
-    &__header
-      &__advancedmode
-        display none
+    &__workspace
+      &__detail
+        &__advancedmode
+          display none
     &__workspace-wrapper
       margin 0 15px
     &__workspace
