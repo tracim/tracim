@@ -28,13 +28,14 @@ import {
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  getOrCreateSessionClientToken,
+  scrollIntoViewIfNeeded,
   IconButton
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
+    this.frameRef = React.createRef()
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       sidebarClose: isMobile
@@ -58,26 +59,16 @@ export class Sidebar extends React.Component {
     const { props } = this
 
     const tlmUser = tlmFieldObject.fields.user
-    const tlmAuthor = tlmFieldObject.fields.author
     const tlmWorkspace = tlmFieldObject.fields.workspace
     const loggedUserId = props.user.userId
 
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
       props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.fields.member))
-
-      // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
-      // user created a new workspace
-      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
-      const clientToken = getOrCreateSessionClientToken()
-      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.fields.client_token) {
-        if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
-          document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
-        }
-        props.history.push(PAGE.WORKSPACE.DASHBOARD(tlmWorkspace.workspace_id))
-      }
     }
   }
+
+  spaceItemId = (id) => `sidebar-space-item-${id}`
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
@@ -92,6 +83,7 @@ export class Sidebar extends React.Component {
           onClickAllContent={this.handleClickAllContent}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
+          id={this.spaceItemId(space.id)}
         />
         {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
@@ -109,6 +101,13 @@ export class Sidebar extends React.Component {
       if (props.workspaceList.find(space => space.id === spaceIdInUrl) !== undefined) {
         this.setState({ activeWorkspaceId: spaceIdInUrl })
       }
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.currentWorkspace.id !== this.props.currentWorkspace.id) {
+      const spaceListItem = document.getElementById(this.spaceItemId(this.props.currentWorkspace.id))
+      scrollIntoViewIfNeeded(spaceListItem, this.frameRef.current)
     }
   }
 
@@ -146,7 +145,7 @@ export class Sidebar extends React.Component {
             ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
             : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
+        <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now

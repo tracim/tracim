@@ -26,7 +26,7 @@ ListItemWrapper.propTypes = {
   contentType: PropTypes.object,
   isLast: PropTypes.bool,
   read: PropTypes.bool,
-  id: PropTypes.number
+  id: PropTypes.string
 }
 
 ListItemWrapper.defaultProps = {
@@ -34,5 +34,5 @@ ListItemWrapper.defaultProps = {
   customClass: '',
   isLast: false,
   read: false,
-  id: 0
+  id: undefined
 }

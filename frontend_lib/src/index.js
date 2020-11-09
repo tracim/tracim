@@ -50,6 +50,7 @@ import {
   permissiveNumberEqual,
   sortWorkspaceList,
   updateTLMAuthor,
+  scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor
 } from './helper.js'
@@ -321,6 +322,7 @@ export {
   permissiveNumberEqual,
   SingleChoiceList,
   UserInfo,
+  scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
   LiveMessageManager,
