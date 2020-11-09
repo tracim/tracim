@@ -1,5 +1,5 @@
 import React from 'react'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 
 export const RouterMock = props => {
   const history = require('history').createBrowserHistory()

@@ -85,12 +85,12 @@ describe('In <Account />', () => {
     registerLiveMessageHandlerList: () => { }
   }
 
+  // INFO - GB - 2020-11-09 - The lines below are to fix the problem:
+  // Error: The target 'popoverSpaceTitle' could not be identified in the dom
+  // see https://github.com/reactstrap/reactstrap/issues/773
   const tooltipDiv = document.createElement('div')
   const innerTooltipDiv = document.createElement('div')
-
-  tooltipDiv.setAttribute('id', 'some-tooltip-id')
   innerTooltipDiv.setAttribute('id', 'popoverSpaceTitle')
-
   tooltipDiv.appendChild(innerTooltipDiv)
   document.body.appendChild(tooltipDiv)
 

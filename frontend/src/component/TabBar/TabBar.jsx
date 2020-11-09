@@ -30,11 +30,11 @@ export const TabBar = props => {
         label={props.t('Dashboard')}
       />
 
-      {/* <Tab
+      <Tab
         page={PAGE.WORKSPACE.FEED(props.currentSpace.id)}
         icon='newspaper-o'
         label={props.t('Activity feed')}
-      /> */}
+      />
 
       <Tab
         page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
