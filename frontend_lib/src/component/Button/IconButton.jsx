@@ -26,7 +26,7 @@ const IconButton = props => {
       title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      <i className={`fa fa-fw fa-${props.icon}`} /> <span className='iconbutton__label'>{props.text}</span>
+      <i className={`fa fa-fw fa-${props.icon}`} /><span className='iconbutton__text'>{props.text}</span>
     </button>
   )
 }
@@ -38,7 +38,7 @@ IconButton.propTypes = {
   color: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  intent: PropTypes.oneOf(['primary', 'secondary']),
+  intent: PropTypes.oneOf(['primary', 'secondary', 'link']),
   mode: PropTypes.oneOf(['dark', 'light']),
   customClass: PropTypes.string,
   dataCy: PropTypes.string
