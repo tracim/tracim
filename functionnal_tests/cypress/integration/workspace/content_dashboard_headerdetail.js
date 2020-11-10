@@ -32,12 +32,12 @@ describe('content :: workspace > dashbord', function () {
 
   it('dashboard__header__title', function () {
     cy.contains('.pageTitleGeneric', workspaceLabel).should('be.visible')
-    cy.get('.dashboard__header__advancedmode').should('be.visible')
-    cy.get('.dashboard__header__advancedmode__button').should('have.attr', 'type', 'button').should('be.visible')
   })
 
   it('dashboard__workspace > dashboard__workspace__detail', function () {
     cy.get('.pageContentGeneric .dashboard__workspace__detail__title').should('be.visible')
     cy.get('.pageContentGeneric .dashboard__workspace__detail__description').should('be.visible')
+    cy.get('.dashboard__workspace__detail__advancedmode').should('be.visible')
+    cy.get('.dashboard__workspace__detail__advancedmode__button').should('have.attr', 'type', 'button').should('be.visible')
   })
 })
