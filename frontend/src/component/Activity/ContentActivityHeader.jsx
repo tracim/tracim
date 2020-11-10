@@ -9,6 +9,7 @@ import {
   Breadcrumbs,
   CONTENT_TYPE,
   DistanceDate,
+  Icon,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 
@@ -17,14 +18,10 @@ import { PAGE } from '../../util/helper.js'
 require('./ContentActivityHeader.styl')
 
 export class ContentActivityHeader extends React.Component {
-<<<<<<< HEAD
-
-=======
->>>>>>> 5a27e0500 (FUCK)
   getDisplayOperation (eventType) {
     const { props } = this
-    const [entityType, coreEventType] = eventType.split('.')
-    if (CONTENT_TYPE.COMMENT === entityType) return props.t('commented')
+    const [, coreEventType, subEntityType] = eventType.split('.')
+    if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
     switch (coreEventType) {
       case TLM_CET.CREATED:
         return props.t('created')
@@ -33,7 +30,7 @@ export class ContentActivityHeader extends React.Component {
       case TLM_CET.DELETED:
         return props.t('deleted')
       case TLM_CET.UNDELETED:
-        return props.t('deleted')
+        return props.t('restored')
     }
   }
 
@@ -65,26 +62,30 @@ export class ContentActivityHeader extends React.Component {
 
     const newestMessage = props.newestMessage
 
-    const app = props.appList.find(a => a.slug === `contents/${contentType}`)
+    const app = (
+      props.appList.find(a => a.slug === `contents/${contentType}`) ||
+      { label: 'No App for content-type', faIcon: 'question' }
+    )
 
     return (
       <div className='content_activity_header'>
         <div className='content_activity_header__left'>
-          <i
-            className={`content_activity_header__left__icon fa fa-${app.faIcon}`}
-            style={{ color: `${app.hexcolor}` }}
+          <Icon
+            customClass='content_activity_header__left__icon'
+            color={app.hexcolor}
             title={app.label}
+            icon={app.faIcon}
           />
-          <div>
-            <div className='content_activity_header__left__label'>
-              <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>
-            </div>
+          <div className='content_activity_header__title'>
+            <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
+              <span className='content_activity_header__title__label'>{contentLabel}</span>
+            </Link>
             <Breadcrumbs breadcrumbsList={breadcrumbsList} />
           </div>
         </div>
         <div className='content_activity_header__right'>
           <div>
-            {`${this.getDisplayOperation(newestMessage.event_type)} `}
+            <span className='content_activity_header__operation'>{`${this.getDisplayOperation(newestMessage.event_type)} `}</span>
             <DistanceDate absoluteDate={newestMessage.created} lang={props.user.lang} />
           </div>
           <div>{props.t('by')} <span className='content_activity_header__author'>{newestMessage.fields.author.public_name}</span></div>

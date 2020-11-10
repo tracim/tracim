@@ -1,41 +1,46 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
-@import './Common.styl'
 
 .content_activity_header
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: center
-    width: 100%
+    display flex
+    flex-direction row
+    justify-content space-between
+    align-items center
 
     &__left
-        display: flex
-        flex-direction: row
-        align-items: center
-
+        display flex
+        flex-direction row
+        align-items center
+        flex 2 1 auto
         &__icon
-            font-size iconFontSize
+            font-size 32px
             margin-right 10px
 
-        &__label
-            font-size: 20px
-            text-decoration: underline black
-            color: black
-            white-space nowrap
-            overflow hidden
-            text-overflow ellipsis
-
-            & > a
-                color: black
-    &__right
-        font-size: fontSizeSmall
-        margin-left: 10px
-        text-align: right
+    &__title
         white-space nowrap
+        &__label
+            text-overflow ellipsis
+            color black
+            font-size 20px
+            text-decoration underline black
+
+    &__right
+        font-size fontSizeSmall
+        margin-left 10px
+        text-align right
+        white-space nowrap
+        flex 1 1 auto
     &__author
-        font-weight: bold
+        font-weight bold
+        text-overflow ellipsis
 
     & .breadcrumbs
-        position: relative
-        top: 0
-        left: 0
+        position relative
+        top 0
+        left 0
+
+@media (max-width max-sm)
+  .content_activity_header
+     & .breadcrumbs
+        display none
+     &__operation
+        display none

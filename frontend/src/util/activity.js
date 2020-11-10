@@ -46,17 +46,23 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
 
   let content = first.fields.content
   if (content.content_type === TLM_ST.COMMENT) {
-    content = (await handleFetchResult(await getContent(apiUrl, content.parent_id))).body
+    const response = await handleFetchResult(await getContent(apiUrl, content.parent_id))
+    if (response.apiResponse.status === 200) {
+      content = (await handleFetchResult(await getContent(apiUrl, content.parent_id))).body
+    }
   }
 
-  const commentList = (await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))).body
+  console.log(`Getting comments ${apiUrl} ${content.workspace_id} ${content.content_id}`)
+  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
+  const commentList = response.apiResponse.status === 200 ? response.body : []
   return {
     id: activityId,
     entityType: first.event_type.split('.')[0],
     eventList: messageList.map(createActivityEvent),
     reactionList: [],
     commentList: commentList,
-    newestMessage: first
+    newestMessage: first,
+    content: content
   }
 }
 
@@ -110,21 +116,10 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
 }
 
 /**
- * Create an activity list from a message/TLM list
+ * Merge an activity list with message/TLM list
+ * messages are assumed to be older.
  * Activities are returned in newest to oldest order.
  * NOTE: this function assumes that the message list is already ordered from newest to oldest.
- */
-export const createActivityList = async (messageList, apiUrl) => {
-  // first regroup by activity
-  const activityMap = groupMessageListByActivityId(messageList)
-
-  // we now have a map of messages grouped by activity, let's create activities
-  return await createActivityListFromActivityMap(activityMap, apiUrl)
-}
-
-/**
- * Merge an activity list with message/TLM list
- * Activities are returned in newest to oldest order.
  */
 export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
   const activityMap = groupMessageListByActivityId(messageList)
@@ -135,25 +130,21 @@ export const mergeWithActivityList = async (messageList, activityList, apiUrl) =
     }
   }
 
-  const newActivityList = await createActivityListFromActivityMap(activityMap)
-  return [...messageList, ...newActivityList]
+  const newActivityList = await createActivityListFromActivityMap(activityMap, apiUrl)
+  return [...activityList, ...newActivityList]
 }
 
-/**
- * Sort an activity list from newest to oldest
- */
 const newestMessageCreationOrder = (a, b) => {
   const aCreatedDate = new Date(a.newestMessage.created)
-  const bCreatedDate = new Date(a.newestMessage.created)
-
-  if (aCreatedDate > bCreatedDate) return -1
-  if (aCreatedDate < bCreatedDate) return 1
-  return 0
+  const bCreatedDate = new Date(b.newestMessage.created)
+  return bCreatedDate - aCreatedDate
 }
+/**
+ * Sort an activity list from newest to oldest
+ * Uses the newestMessage created attribute as the sort key.
+ */
 export const sortActivityList = (activityList) => {
-  const sortedActivityList = [...activityList]
-  sortedActivityList.sort(newestMessageCreationOrder)
-  return sortedActivityList
+  return [...activityList].sort(newestMessageCreationOrder)
 }
 
 /**
@@ -179,7 +170,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
       createActivityEvent(message),
       ...oldActivity.eventList
     ],
-    commentList: message.event_type.startsWith(TLM_ST.COMMENT)
+    commentList: message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
       ? [message.fields.content, ...oldActivity.commentList]
       : oldActivity.commentList,
     newestMessage: message

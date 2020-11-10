@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
@@ -11,10 +12,10 @@ require('./ContentActivityFooter.styl')
 export class ContentActivityFooter extends React.Component {
   handleCommentClicked () {
     const { props } = this
-    this.props.history.push(PAGE.WORKSPACE.CONTENT(
-      props.content.workspaceId,
-      props.content.contentType,
-      props.content.contentId
+    props.history.push(PAGE.WORKSPACE.CONTENT(
+      props.content.workspace_id,
+      props.content.content_type,
+      props.content.content_id
     ))
   }
 
@@ -28,7 +29,7 @@ export class ContentActivityFooter extends React.Component {
             icon='comment-o'
             text={props.t('Comment')}
             intent='link'
-            onClick={this.handleCommentClicked}
+            onClick={this.handleCommentClicked.bind(this)}
           />
         </div>
       </div>
@@ -36,7 +37,7 @@ export class ContentActivityFooter extends React.Component {
   }
 }
 
-export default translate()(ContentActivityFooter)
+export default withRouter(translate()(ContentActivityFooter))
 
 ContentActivityFooter.propTypes = {
   content: PropTypes.object.isRequired,

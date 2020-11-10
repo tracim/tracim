@@ -5,7 +5,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
-import { createActivityList, addMessageToActivityList } from '../../src/util/activity.js'
+import { mergeWithActivityList, addMessageToActivityList } from '../../src/util/activity.js'
 
 import { mockGetContentComments200 } from '../apiMock.js'
 
@@ -60,7 +60,7 @@ describe('In activity.js module', () => {
   ]
 
   const memberActivity = {
-    id: 'workspace_member-w23-u2',
+    id: 'workspace_member-e6',
     entityType: TLM_ET.SHAREDSPACE_MEMBER,
     eventList: [
       { author: foo, created: messageList[0].created, eventId: 6, eventType: messageList[0].event_type }
@@ -77,10 +77,11 @@ describe('In activity.js module', () => {
     ],
     reactionList: [],
     commentList: [],
-    newestMessage: messageList[1]
+    newestMessage: messageList[1],
+    content: fileContent
   }
   const subscriptionActivity = {
-    id: 'workspace_subscription-w23-u2',
+    id: 'workspace_subscription-e4',
     entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION,
     eventList: [
       { author: bar, created: messageList[2].created, eventId: 4, eventType: messageList[2].event_type }
@@ -89,10 +90,10 @@ describe('In activity.js module', () => {
     newestMessage: messageList[2]
   }
 
-  describe('createActivityList() function', () => {
+  describe('mergeWithActivityList() function', () => {
     it('should build an activity list', async () => {
       const mock = mockGetContentComments200(apiUrl, fileContent.workspace_id, fileContent.content_id, [])
-      const resultActivityList = await createActivityList(messageList, apiUrl)
+      const resultActivityList = await mergeWithActivityList(messageList, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal([memberActivity, contentActivity, subscriptionActivity])
     })

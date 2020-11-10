@@ -468,21 +468,12 @@ export class Tracim extends React.Component {
 
                 <Route
                   path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
-                  component={ActivityFeed}
+                  render={(routerProps) => <ActivityFeed workspaceId={routerProps.match.params.idws} />}
                 />
 
                 <Route
                   path={PAGE.WORKSPACE.AGENDA(':idws')}
                   render={() => <AppFullscreenRouter />}
-                />
-
-                <Route
-                  path={PAGE.WORKSPACE.ACTIVITY_FEED()}
-                  render={() => (
-                    <div className='tracim__content fullWidthFullHeight'>
-                      <ActivityFeed />
-                    </div>
-                  )}
                 />
               </>}
           />

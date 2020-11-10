@@ -8,13 +8,13 @@ export const FileActivity = props => {
   return (
     <div>
       <ContentActivityHeader
-        content={props.activity.newestMessage.fields.content}
+        content={props.activity.content}
         workspace={props.activity.newestMessage.fields.workspace}
         eventList={props.activity.eventList}
         newestMessage={props.activity.newestMessage}
       />
       <ContentActivityFooter
-        content={props.activity.newestMessage.fields.content}
+        content={props.activity.content}
         commentList={props.activity.commentList}
         reactionList={props.activity.reactionList}
       />
