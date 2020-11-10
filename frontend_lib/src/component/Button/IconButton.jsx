@@ -26,14 +26,14 @@ const IconButton = props => {
       title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      <i className={`fa fa-fw fa-${props.icon}`} /><span className='iconbutton__text'>{props.text}</span>
+      {props.icon && <i className={`fa fa-fw fa-${props.icon}`} />}<span className='iconbutton__text'>{props.text}</span>
     </button>
   )
 }
 
 IconButton.propTypes = {
-  icon: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   title: PropTypes.string,
   color: PropTypes.string,
   onClick: PropTypes.func,
@@ -45,6 +45,7 @@ IconButton.propTypes = {
 }
 
 IconButton.defaultProps = {
+  icon: undefined,
   onClick: undefined,
   disabled: false,
   title: undefined,

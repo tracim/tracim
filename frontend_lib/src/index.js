@@ -137,6 +137,7 @@ import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
+import Icon from './component/Icon/Icon.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -329,5 +330,6 @@ export {
   LIVE_MESSAGE_STATUS,
   TextInput,
   getContent,
-  DistanceDate
+  DistanceDate,
+  Icon
 }
