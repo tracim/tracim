@@ -19,6 +19,7 @@ describe('Switching between tabs', () => {
   describe('from Dashboard', () => {
     it('to All contents', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
+      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
       cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
       cy.contains('.tab', 'All contents').click()
       cy.contains('.breadcrumbs__item', 'All contents')
@@ -27,6 +28,7 @@ describe('Switching between tabs', () => {
 
     // it('to Activity feed', () => {
     //   cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
+    //   cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
     //   cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
     //   cy.contains('.tab', 'Activity feed').click()
     //   cy.contains('.breadcrumbs__item', 'Activity feed')
@@ -37,6 +39,7 @@ describe('Switching between tabs', () => {
   describe('from All contents', () => {
     it('to Dashboard', () => {
       cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
+      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
       cy.get('.workspace__content__fileandfolder').should('be.visible')
       cy.contains('.tab', 'Dashboard').click()
       cy.contains('.breadcrumbs__item', 'Dashboard')
@@ -45,6 +48,7 @@ describe('Switching between tabs', () => {
 
     // it('to Activity feed', () => {
     //   cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
+    //   cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
     //   cy.get('.workspace__content__fileandfolder').should('be.visible')
     //   cy.contains('.tab', 'Activity feed').click()
     //   cy.contains('.breadcrumbs__item', 'Activity feed')
@@ -56,7 +60,8 @@ describe('Switching between tabs', () => {
   describe('from Activity feed', () => {
     it('to Dashboard', () => {
       cy.visitPage({ pageName: p.FEED, params: { workspaceId: workspaceId } })
-      // cy.get('').should('be.visible') or cy.contains('', '')
+      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
+      cy.get('').should('be.visible') or cy.contains('', '')
       cy.contains('.tab', 'Dashboard').click()
       cy.contains('.breadcrumbs__item', 'Dashboard')
       cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
@@ -64,7 +69,8 @@ describe('Switching between tabs', () => {
 
     it('to All contents', () => {
       cy.visitPage({ pageName: p.FEED, params: { workspaceId: workspaceId } })
-      // cy.get('').should('be.visible') or cy.contains('', '')
+      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
+      cy.get('').should('be.visible') or cy.contains('', '')
       cy.contains('.tab', 'All contents').click()
       cy.contains('.breadcrumbs__item', 'All contents')
       cy.get('.workspace__content__fileandfolder').should('be.visible')
