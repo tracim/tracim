@@ -39,14 +39,19 @@ const createSubscriptionActivity = (activityId, messageList) => {
   }
 }
 
-// NOTE: this function assumes that the list is ordered from newest to oldest
+// INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
 const createContentActivity = async (activityId, messageList, apiUrl) => {
   if (!messageList.length) throw new Error('Must have at least one message to build a content activity')
   const first = messageList[0]
 
   let content = first.fields.content
   if (content.content_type === TLM_ST.COMMENT) {
-    const response = await handleFetchResult(await getWorkspaceContent(apiUrl, first.fields.workspace.workspace_id, content.parent_content_type + 's', content.parent_id))
+    const response = await handleFetchResult(await getWorkspaceContent(
+      apiUrl, 
+      first.fields.workspace.workspace_id, 
+      content.parent_content_type + 's', 
+      content.parent_id
+    ))
     if (response.apiResponse.status === 200) {
       content = response.body
     }
@@ -118,7 +123,7 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
  * Merge an activity list with message/TLM list
  * messages are assumed to be older.
  * Activities are returned in newest to oldest order.
- * NOTE: this function assumes that the message list is already ordered from newest to oldest.
+ * INFO - SB - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
  */
 export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
   const activityMap = groupMessageListByActivityId(messageList)
@@ -150,7 +155,7 @@ export const sortActivityList = (activityList) => {
  * Add a message to an existing activity list.
  * If the message is not part of any activity, a new one will be created
  * and added at the beginning of the list
- * This WON't re-order the list if the message is part of an existing
+ * This WON'T re-order the list if the message is part of an existing
  * activity.
  * @param {*} message
  * @param {*} activityList

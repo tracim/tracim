@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import ContentActivityHeader from './ContentActivityHeader.jsx'
 
-export const FolderActivity = props => {
+export const ContentWithoutPreviewActivity = props => {
   return (
     <ContentActivityHeader
       content={props.activity.newestMessage.fields.content}

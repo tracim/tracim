@@ -68,7 +68,7 @@ export class ContentActivityHeader extends React.Component {
     )
 
     return (
-      <div className='content_activity_header'>
+      <div className='contentActivityHeader'>
         <Icon
           customClass='content_activity_header__icon'
           color={app.hexcolor}

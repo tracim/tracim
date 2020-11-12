@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import ContentActivityHeader from './ContentActivityHeader.jsx'
 import ContentActivityFooter from './ContentActivityFooter.jsx'
 
-export const FileActivity = props => {
+export const ContentWithPreviewActivity = props => {
   return (
     <div>
       <ContentActivityHeader
