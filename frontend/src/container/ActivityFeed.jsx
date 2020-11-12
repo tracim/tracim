@@ -39,13 +39,13 @@ export class ActivityFeed extends React.Component {
   }
 
   componentDidMount () {
-    this.loadOneActivityPage()
+    this.loadActivities(ACTIVITY_COUNT_PER_PAGE)
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.workspaceId === this.props.workspaceId) return
 
-    this.loadOneActivityPage()
+    this.loadActivities(ACTIVITY_COUNT_PER_PAGE)
   }
 
   async updateActivityList (data) {
@@ -60,12 +60,12 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
   }
 
-  async loadOneActivityPage (activityList = []) {
+  async loadActivities (minActivityCount) {
     const { props } = this
-    const initialLength = activityList.length
+    let activityList = props.workspaceActivity.list
     let hasNextPage = props.workspaceActivity.hasNextPage
     let nextPageToken = props.workspaceActivity.nextPageToken
-    while (hasNextPage && activityList.length < initialLength + ACTIVITY_COUNT_PER_PAGE) {
+    while (hasNextPage && activityList.length < minActivityCount) {
       const messageListResponse = await props.dispatch(getNotificationList(
         props.user.userId,
         {
@@ -117,7 +117,7 @@ export class ActivityFeed extends React.Component {
             <IconButton
               text={props.t('See more')}
               icon='chevron-down'
-              onClick={() => this.loadOneActivityPage(props.workspaceActivity.list)}
+              onClick={() => this.loadActivities(props.workspaceActivity.list.length + ACTIVITY_COUNT_PER_PAGE)}
             />
           )}
         </div>

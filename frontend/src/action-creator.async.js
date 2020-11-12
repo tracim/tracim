@@ -852,8 +852,9 @@ export const getGuestUploadInfo = token => dispatch => {
 
 const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
 
-export const getNotificationList = (userId, { notificationsPerPage = 15, nextPageToken = null, workspaceId = null }) => async dispatch => {
-  const queryParameterList = [`exclude_author_ids=${userId}`]
+export const getNotificationList = (userId, { excludeAuthorId = null, notificationsPerPage = 15, nextPageToken = null, workspaceId = null }) => async dispatch => {
+  const queryParameterList = [eventTypesParam]
+  if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
   if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)

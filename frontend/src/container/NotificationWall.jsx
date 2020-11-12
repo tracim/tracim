@@ -66,6 +66,7 @@ export class NotificationWall extends React.Component {
     const fetchGetNotificationWall = await props.dispatch(getNotificationList(
       props.user.userId,
       {
+        excludeAuthorId: props.user.userId,
         notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
         nextPageToken: props.notificationPage.nextPageToken
       }
