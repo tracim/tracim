@@ -1521,6 +1521,9 @@ class Content(DeclarativeBase):
     def get_comments(self) -> List["Content"]:
         return self.get_valid_children(content_types=[content_type_list.Comment.slug])
 
+    def get_first_comment(self) -> "Content":
+        return self.get_comments().first()
+
     def get_last_comment_from(self, user: User) -> Optional["Content"]:
         # TODO - Make this more efficient
         last_comment_updated = None
