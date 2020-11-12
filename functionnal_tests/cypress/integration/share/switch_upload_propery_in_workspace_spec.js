@@ -24,7 +24,7 @@ describe('Workspace upload property', () => {
   describe("Disable the workspace's upload feature", () => {
     it('Upload folder should not be visible', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__advancedmode__button.btn')
+        .find('.dashboard__workspace__detail__right__button.btn')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -45,7 +45,7 @@ describe('Workspace upload property', () => {
   describe("Enable the workspace's upload feature", () => {
     it('Upload folder should be visible', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__advancedmode__button.btn')
+        .find('.dashboard__workspace__detail__right__button.btn')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })

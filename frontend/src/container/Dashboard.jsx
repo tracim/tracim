@@ -526,18 +526,6 @@ export class Dashboard extends React.Component {
                     data-cy='dashboardWorkspaceLabel'
                   >
                     {props.curWs.label}
-
-                    <div className='dashboard__workspace__detail__advancedmode'>
-                      {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
-                        <button
-                          type='button'
-                          className='dashboard__workspace__detail__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                          onClick={this.handleClickOpenAdvancedDashboard}
-                        >
-                          <i className='fa fa-fw fa-cog' />
-                          {props.t('Open advanced Dashboard')}
-                        </button>}
-                    </div>
                   </div>
 
                   <div
@@ -566,15 +554,28 @@ export class Dashboard extends React.Component {
                   </div>
                 </div>
 
-                <UserStatus
-                  user={props.user}
-                  curWs={props.curWs}
-                  displayNotifBtn={props.system.config.email_notification_activated}
-                  onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                  onClickAddNotify={this.handleClickAddNotification}
-                  onClickRemoveNotify={this.handleClickRemoveNotification}
-                  t={props.t}
-                />
+                <div className='dashboard__workspace__detail__right'>
+                  {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
+                    <button
+                      type='button'
+                      className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    >
+                      <i className='fa fa-fw fa-cog' />
+                      {props.t('Open advanced Dashboard')}
+                    </button>
+                  )}
+
+                  <UserStatus
+                    user={props.user}
+                    curWs={props.curWs}
+                    displayNotifBtn={props.system.config.email_notification_activated}
+                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                    onClickAddNotify={this.handleClickAddNotification}
+                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    t={props.t}
+                  />
+                </div>
               </div>
 
               <div className='dashboard__workspaceInfo'>
