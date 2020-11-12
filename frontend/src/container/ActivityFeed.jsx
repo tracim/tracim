@@ -7,7 +7,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   CONTENT_TYPE,
   IconButton,
-  TracimComponent
+  TracimComponent,
+  NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
 
 import {
@@ -22,15 +23,15 @@ import {
   getNotificationList
 } from '../action-creator.async'
 
-import FileActivity from '../component/Activity/FileActivity.jsx'
-import FolderActivity from '../component/Activity/FolderActivity.jsx'
+import ContentWithPreviewActivity from '../component/Activity/ContentWithPreviewActivity.jsx'
+import ContentWithoutPreviewActivity from '../component/Activity/ContentWithoutPreviewActivity.jsx'
 import MemberActivity from '../component/Activity/MemberActivity.jsx'
 import { setWorkspaceActivityList, setWorkspaceActivityNextPage } from '../action-creator.sync.js'
 
 require('../css/ActivityFeed.styl')
 
-const ACTIVITY_COUNT_PER_PAGE = 15
-const NOTIFICATION_COUNT_PER_REQUEST = 25
+const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
+const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
 
 export class ActivityFeed extends React.Component {
   constructor (props) {
@@ -88,14 +89,14 @@ export class ActivityFeed extends React.Component {
     switch (activity.entityType) {
       case TLM_ET.CONTENT:
         component = activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
-          ? <FolderActivity activity={activity} key={activity.id} />
-          : <FileActivity activity={activity} key={activity.id} />
+          ? <ContentWithoutPreviewActivity activity={activity} key={activity.id} />
+          : <ContentWithPreviewActivity activity={activity} key={activity.id} />
         break
       case TLM_ET.SHAREDSPACE_MEMBER:
         component = <MemberActivity activity={activity} key={activity.id} />
         break
     }
-    return <div className='activity_feed__item'>{component}</div>
+    return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
   }
 
   render () {
@@ -109,8 +110,9 @@ export class ActivityFeed extends React.Component {
             text={props.t('Refresh')}
             intent='link'
             onClick={this.sortActivityList.bind(this)}
+            dataCy='activity_feed__refresh'
           />
-          <div className='activity_feed__list'>
+          <div className='activity_feed__list' data-cy='activity_feed__list'>
             {props.workspaceActivity.list.map(this.renderActivityComponent.bind(this)) || props.t('No activity here')}
           </div>
           {props.workspaceActivity.hasNextPage && (
@@ -118,6 +120,7 @@ export class ActivityFeed extends React.Component {
               text={props.t('See more')}
               icon='chevron-down'
               onClick={() => this.loadActivities(props.workspaceActivity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+              dataCy='activity_feed__more'
             />
           )}
         </div>

@@ -13,8 +13,8 @@ export const ContentWithoutPreviewActivity = props => {
   )
 }
 
-export default FolderActivity
+export default ContentWithoutPreviewActivity
 
-FolderActivity.propTypes = {
+ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired
 }

@@ -22,8 +22,8 @@ export const ContentWithPreviewActivity = props => {
   )
 }
 
-export default FileActivity
+export default ContentWithPreviewActivity
 
-FileActivity.propTypes = {
+ContentWithPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired
 }

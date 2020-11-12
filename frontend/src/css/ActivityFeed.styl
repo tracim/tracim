@@ -1,5 +1,9 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
+feedWidth = 800px
+smallScreenFeedWidth = 400px
+spacingSize = 10px
+
 .activity_feed
   background-color lightGrey
   display flex
@@ -11,10 +15,10 @@
 
   &__content
     display flex
-    width: 800px
+    width: feedWidth
     align-items center
     flex-direction column
-    padding-bottom 10px
+    padding-bottom spacingSize
 
   &__refresh
     margin-right 0
@@ -28,10 +32,10 @@
     background-color offWhite
     border 1px solid grey
     border-radius 5px
-    padding 10px
-    margin-bottom 10px
+    padding spacingSize
+    margin-bottom spacingSize
 
 @media (max-width: max-sm)
   .activity_feed
     &__content
-      width 400px
+      width smallScreenFeedWidth

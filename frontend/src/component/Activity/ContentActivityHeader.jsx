@@ -10,6 +10,7 @@ import {
   CONTENT_TYPE,
   DistanceDate,
   Icon,
+  TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 
@@ -20,7 +21,8 @@ require('./ContentActivityHeader.styl')
 export class ContentActivityHeader extends React.Component {
   getDisplayOperation (eventType) {
     const { props } = this
-    const [, coreEventType, subEntityType] = eventType.split('.')
+    const [entityType, coreEventType, subEntityType] = eventType.split('.')
+    if (TLM_ET.MENTION === entityType) return props.t('mention made')
     if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
     switch (coreEventType) {
       case TLM_CET.CREATED:
@@ -32,6 +34,7 @@ export class ContentActivityHeader extends React.Component {
       case TLM_CET.UNDELETED:
         return props.t('restored')
     }
+    return props.t('unknown')
   }
 
   render () {
@@ -64,7 +67,7 @@ export class ContentActivityHeader extends React.Component {
 
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
-      { label: 'No App for content-type', faIcon: 'question' }
+      { label: props.t('No App for content-type'), faIcon: 'question', hexcolor: '#000000' }
     )
 
     return (

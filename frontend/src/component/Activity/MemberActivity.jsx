@@ -61,7 +61,7 @@ export class MemberActivity extends React.Component {
       case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
         return this.getSpaceSubscriptionText(coreEventType, i18nOpts)
     }
-    return <span>Unknown entity type</span>
+    return <span>{props.t('Unknown entity type')}</span>
   }
 
   render () {

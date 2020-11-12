@@ -4,7 +4,8 @@ import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
-  history
+  history,
+  NUMBER_RESULTS_BY_PAGE
 } from './util/helper.js'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
@@ -852,7 +853,14 @@ export const getGuestUploadInfo = token => dispatch => {
 
 const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
 
-export const getNotificationList = (userId, { excludeAuthorId = null, notificationsPerPage = 15, nextPageToken = null, workspaceId = null }) => async dispatch => {
+export const getNotificationList = (
+  userId,
+  {
+    excludeAuthorId = null,
+    notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
+    nextPageToken = null,
+    workspaceId = null
+  }) => async dispatch => {
   const queryParameterList = [eventTypesParam]
   if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)

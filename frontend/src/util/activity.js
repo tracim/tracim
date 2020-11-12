@@ -47,9 +47,9 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
   let content = first.fields.content
   if (content.content_type === TLM_ST.COMMENT) {
     const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl, 
-      first.fields.workspace.workspace_id, 
-      content.parent_content_type + 's', 
+      apiUrl,
+      first.fields.workspace.workspace_id,
+      content.parent_content_type + 's',
       content.parent_id
     ))
     if (response.apiResponse.status === 200) {
@@ -75,6 +75,7 @@ const getActivityId = (message) => {
   let id = null
   switch (entityType) {
     case TLM_ET.CONTENT:
+    case TLM_ET.MENTION:
       id = (subEntityType === TLM_ST.COMMENT)
         ? message.fields.content.parent_id
         : message.fields.content.content_id
@@ -123,7 +124,7 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
  * Merge an activity list with message/TLM list
  * messages are assumed to be older.
  * Activities are returned in newest to oldest order.
- * INFO - SB - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
+ * INFO - SG - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
  */
 export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
   const activityMap = groupMessageListByActivityId(messageList)

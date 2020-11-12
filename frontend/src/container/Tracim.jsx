@@ -464,7 +464,7 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.DASHBOARD()}
+                  path={PAGE.WORKSPACE.DASHBOARD(':idws')}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Dashboard />
