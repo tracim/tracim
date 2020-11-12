@@ -4,21 +4,18 @@
     display flex
     flex-direction row
     justify-content space-between
-    align-items center
 
-    &__left
-        display flex
-        flex-direction row
-        align-items center
-        flex 2 1 auto
-        &__icon
-            font-size 32px
-            margin-right 10px
+    &__icon
+        font-size 32px
+        margin-right 10px
 
     &__title
+        margin-right auto
         white-space nowrap
+        overflow hidden
+        align-self start
+        text-overflow ellipsis
         &__label
-            text-overflow ellipsis
             color black
             font-size 20px
             text-decoration underline black
@@ -28,7 +25,6 @@
         margin-left 10px
         text-align right
         white-space nowrap
-        flex 1 1 auto
     &__author
         font-weight bold
         text-overflow ellipsis

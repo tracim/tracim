@@ -69,19 +69,17 @@ export class ContentActivityHeader extends React.Component {
 
     return (
       <div className='content_activity_header'>
-        <div className='content_activity_header__left'>
-          <Icon
-            customClass='content_activity_header__left__icon'
-            color={app.hexcolor}
-            title={app.label}
-            icon={app.faIcon}
-          />
-          <div className='content_activity_header__title'>
-            <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
-              <span className='content_activity_header__title__label'>{contentLabel}</span>
-            </Link>
-            <Breadcrumbs breadcrumbsList={breadcrumbsList} />
-          </div>
+        <Icon
+          customClass='content_activity_header__icon'
+          color={app.hexcolor}
+          title={app.label}
+          icon={app.faIcon}
+        />
+        <div className='content_activity_header__title'>
+          <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
+            <span className='content_activity_header__title__label'>{contentLabel}</span>
+          </Link>
+          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
         </div>
         <div className='content_activity_header__right'>
           <div>
