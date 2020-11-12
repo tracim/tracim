@@ -3,7 +3,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getContent
+  getWorkspaceContent
 } from 'tracim_frontend_lib'
 
 const createActivityEvent = (message) => {
@@ -46,13 +46,12 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
 
   let content = first.fields.content
   if (content.content_type === TLM_ST.COMMENT) {
-    const response = await handleFetchResult(await getContent(apiUrl, content.parent_id))
+    const response = await handleFetchResult(await getWorkspaceContent(apiUrl, first.fields.workspace.workspace_id, content.parent_content_type + 's', content.parent_id))
     if (response.apiResponse.status === 200) {
-      content = (await handleFetchResult(await getContent(apiUrl, content.parent_id))).body
+      content = response.body
     }
   }
 
-  console.log(`Getting comments ${apiUrl} ${content.workspace_id} ${content.content_id}`)
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
   const commentList = response.apiResponse.status === 200 ? response.body : []
   return {

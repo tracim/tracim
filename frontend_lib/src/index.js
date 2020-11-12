@@ -173,7 +173,8 @@ import {
   putFileContent,
   putMyselfFileRead,
   getContentComment,
-  getContent
+  getContent,
+  getWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -331,5 +332,6 @@ export {
   TextInput,
   getContent,
   DistanceDate,
-  Icon
+  Icon,
+  getWorkspaceContent
 }
