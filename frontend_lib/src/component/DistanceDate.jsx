@@ -7,7 +7,7 @@ import { displayDistanceDate, formatAbsoluteDate } from '../helper.js'
 const DistanceDate = (props) => {
   const absoluteDate = formatAbsoluteDate(props.absoluteDate, props.lang)
   const distanceDate = displayDistanceDate(props.absoluteDate, props.lang)
-  return <span className='distancedate' title={absoluteDate}>{distanceDate}</span>
+  return <span className='distanceDate' title={absoluteDate}>{distanceDate}</span>
 }
 
 DistanceDate.propTypes = {

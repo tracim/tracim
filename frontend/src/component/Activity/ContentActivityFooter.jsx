@@ -23,7 +23,7 @@ export class ContentActivityFooter extends React.Component {
     const { props } = this
     return (
       <div>
-        <div className='content_activity_footer__right'>
+        <div className='contentActivityFooter__right'>
           {props.commentList.length}
           <IconButton
             icon='comment-o'
