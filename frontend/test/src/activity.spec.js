@@ -100,27 +100,50 @@ describe('In activity.js module', () => {
   })
 
   describe('addMessageToActivityList() function', () => {
-    it('should add the message in the right activity', async () => {
-      const message = createMessage(7, TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE, {
-        author: foo,
-        content: fileContent
-      })
-      const expectedContentActivity = {
-        ...contentActivity,
-        eventList: [
-          { author: foo, created: message.created, eventId: 7, eventType: message.event_type },
-          ...contentActivity.eventList
-        ],
-        newestMessage: message
-      }
-      const resultActivityList = await addMessageToActivityList(
-        message,
-        [memberActivity, contentActivity, subscriptionActivity],
-        apiUrl
-      )
-
-      expect(resultActivityList).to.be.deep.equal([memberActivity, expectedContentActivity, subscriptionActivity])
+    const modifiedMessage = createMessage(7, TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE, {
+      author: foo,
+      content: fileContent
     })
+    const commentedMessage = createMessage(7, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT, {
+      author: foo,
+      content: { label: 'Foo bar', parent_id: fileContent.content_id }
+    })
+    const messageTestCases = [
+      {
+        message: modifiedMessage,
+        expectedContentActivity: {
+          ...contentActivity,
+          eventList: [
+            { author: foo, created: modifiedMessage.created, eventId: 7, eventType: modifiedMessage.event_type },
+            ...contentActivity.eventList
+          ],
+          newestMessage: modifiedMessage
+        }
+      },
+      {
+        message: commentedMessage,
+        expectedContentActivity: {
+          ...contentActivity,
+          eventList: [
+            { author: foo, created: commentedMessage.created, eventId: 7, eventType: commentedMessage.event_type },
+            ...contentActivity.eventList
+          ],
+          commentList: [commentedMessage.fields.content],
+          newestMessage: commentedMessage
+        }
+      }
+    ]
+    for (const testCase of messageTestCases) {
+      const { message, expectedContentActivity } = testCase
+      it(`should add the message in the right activity (${message.event_type})`, async () => {
+        const resultActivityList = await addMessageToActivityList(
+          message,
+          [memberActivity, contentActivity, subscriptionActivity],
+          apiUrl
+        )
+        expect(resultActivityList).to.be.deep.equal([memberActivity, expectedContentActivity, subscriptionActivity])
+      })
+    }
 
     it('should create a new activity if the message is not part of any activity', async () => {
       const otherFileContent = { workspace_id: 54, content_id: 12 }
@@ -137,7 +160,8 @@ describe('In activity.js module', () => {
         ],
         reactionList: [],
         commentList: [],
-        newestMessage: message
+        newestMessage: message,
+        content: otherFileContent
       }
       const resultActivityList = await addMessageToActivityList(
         message,

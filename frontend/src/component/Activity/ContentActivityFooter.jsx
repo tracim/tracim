@@ -30,6 +30,7 @@ export class ContentActivityFooter extends React.Component {
             text={props.t('Comment')}
             intent='link'
             onClick={this.handleCommentClicked.bind(this)}
+            dataCy='contentActivityFooter__comment'
           />
         </div>
       </div>

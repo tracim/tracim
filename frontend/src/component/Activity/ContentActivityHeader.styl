@@ -1,6 +1,6 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-.content_activity_header
+.contentActivityHeader
   display flex
   flex-direction row
   justify-content space-between
@@ -8,16 +8,16 @@
   &__icon
     font-size bigIconSize
     margin-right 10px
-
   &__title
     margin-right auto
     white-space nowrap
     overflow hidden
+    align-self start
     text-overflow ellipsis
-      &__label
-        color fontColor
-        font-size 20px
-        text-decoration underline fontColor
+  &__label
+    color fontColor
+    font-size 20px
+    text-decoration underline fontColor
 
   &__right
     font-size fontSizeSmall

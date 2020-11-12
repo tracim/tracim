@@ -4,8 +4,7 @@ import {
   PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
-  history,
-  NUMBER_RESULTS_BY_PAGE
+  history
 } from './util/helper.js'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
@@ -54,7 +53,7 @@ import {
   ACCESSIBLE_WORKSPACE_LIST,
   WORKSPACE_SUBSCRIPTION_LIST
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
+import { ErrorFlashMessageTemplateHtml, updateTLMAuthor, NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)

@@ -67,29 +67,29 @@ export class ContentActivityHeader extends React.Component {
 
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
-      { label: props.t('No App for content-type'), faIcon: 'question', hexcolor: '#000000' }
+      { label: props.t(`No App for content-type ${contentType}`), faIcon: 'question', hexcolor: '#000000' }
     )
 
     return (
       <div className='contentActivityHeader'>
         <Icon
-          customClass='content_activity_header__icon'
+          customClass='contentActivityHeader__icon'
           color={app.hexcolor}
           title={app.label}
           icon={app.faIcon}
         />
-        <div className='content_activity_header__title'>
+        <div className='contentActivityHeader__title'>
           <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
-            <span className='content_activity_header__title__label'>{contentLabel}</span>
+            <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label'>{contentLabel}</span>
           </Link>
           <Breadcrumbs breadcrumbsList={breadcrumbsList} />
         </div>
-        <div className='content_activity_header__right'>
+        <div className='contentActivityHeader__right'>
           <div>
-            <span className='content_activity_header__operation'>{`${this.getDisplayOperation(newestMessage.event_type)} `}</span>
+            <span className='contentActivityHeader__operation'>{`${this.getDisplayOperation(newestMessage.event_type)} `}</span>
             <DistanceDate absoluteDate={newestMessage.created} lang={props.user.lang} />
           </div>
-          <div>{props.t('by')} <span className='content_activity_header__author'>{newestMessage.fields.author.public_name}</span></div>
+          <div>{props.t('by')} <span className='contentActivityHeader__author'>{newestMessage.fields.author.public_name}</span></div>
         </div>
       </div>
     )

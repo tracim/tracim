@@ -139,17 +139,32 @@ export const mergeWithActivityList = async (messageList, activityList, apiUrl) =
   return [...activityList, ...newActivityList]
 }
 
-const newestMessageCreationOrder = (a, b) => {
-  const aCreatedDate = new Date(a.newestMessage.created)
-  const bCreatedDate = new Date(b.newestMessage.created)
-  return bCreatedDate - aCreatedDate
-}
 /**
  * Sort an activity list from newest to oldest
- * Uses the newestMessage created attribute as the sort key.
+ * Uses the newestMessage event_id attribute as the sort key.
  */
 export const sortActivityList = (activityList) => {
-  return [...activityList].sort(newestMessageCreationOrder)
+  return [...activityList].sort((a, b) => b.newestMessage.event_id - a.newestMessage.event_id)
+}
+
+const updateActivity = (message, activity) => {
+  const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
+  // NOTE SG 2020-11-12: keep the existing content
+  // if the message is a comment as a comment cannot change anything
+  // on its parent
+  // And update the comment list of the activity if it is one.
+  return {
+    ...activity,
+    eventList: [
+      createActivityEvent(message),
+      ...activity.eventList
+    ],
+    commentList: isComment
+      ? [message.fields.content, ...activity.commentList]
+      : activity.commentList,
+    newestMessage: message,
+    content: isComment ? activity.content : message.fields.content
+  }
 }
 
 /**
@@ -169,17 +184,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
     return [activity, ...activityList]
   }
   const oldActivity = activityList[activityIndex]
-  const updatedActivity = {
-    ...oldActivity,
-    eventList: [
-      createActivityEvent(message),
-      ...oldActivity.eventList
-    ],
-    commentList: message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
-      ? [message.fields.content, ...oldActivity.commentList]
-      : oldActivity.commentList,
-    newestMessage: message
-  }
+  const updatedActivity = updateActivity(message, oldActivity)
   const updatedActivityList = [...activityList]
   updatedActivityList[activityIndex] = updatedActivity
   return updatedActivityList
