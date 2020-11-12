@@ -3,7 +3,7 @@ import { PAGES } from '../../support/urls_commands'
 let workspaceId
 let workspaceLabel
 
-describe('content :: workspace > dashbord', function () {
+describe('content :: workspace > dashboard', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()

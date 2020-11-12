@@ -8,7 +8,8 @@ describe('operation :: workspace > create_new > thread', function () {
     cy.loginAs('users')
     cy.visit('/ui/workspaces/1/dashboard')
   })
-  it('dashborad > button', function () {
+
+  it('dashboard > button', function () {
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-comments-o').click()
