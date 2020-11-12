@@ -193,6 +193,9 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 
+export { default as SCREEN_SIZE } from './screenSizes.json'
+export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
+
 export {
   appContentFactory,
   addRevisionFromTLM,

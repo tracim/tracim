@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import ContentActivityHeader from './ContentActivityHeader.jsx'
 import ContentActivityFooter from './ContentActivityFooter.jsx'
+import Preview from './Preview.jsx'
 
 export const ContentWithPreviewActivity = props => {
   return (
@@ -13,6 +14,7 @@ export const ContentWithPreviewActivity = props => {
         eventList={props.activity.eventList}
         newestMessage={props.activity.newestMessage}
       />
+      <Preview content={props.activity.content} />
       <ContentActivityFooter
         content={props.activity.content}
         commentList={props.activity.commentList}
