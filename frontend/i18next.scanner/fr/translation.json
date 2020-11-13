@@ -321,5 +321,6 @@
   "Please ask access to spaces to an administrator or space manager": "{{Veuillez demander l'accès aux espaces à un administrateur ou gestionnaire d'espace}}",
   "mention made": "mention créée",
   "unknown": "inconnue",
-  "Unknown entity type": "Type d'entité inconnu"
+  "Unknown entity type": "Type d'entité inconnu",
+  "Unknown activity type": "Type d'activité inconnu"
 }
