@@ -85,7 +85,8 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN \
-    apt install -qy \
+    printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
+    && apt install -qy \
         apt-transport-https \
         software-properties-common \
         gnupg2 \
