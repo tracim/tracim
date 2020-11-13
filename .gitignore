@@ -32,3 +32,4 @@ node_modules
 
 /tools_docker/test_docker/tracim.env
 /tools_docker/test_docker/test_config.env
+tools_docker/test_docker/__pycache__
