@@ -54,7 +54,7 @@ export class MemberActivity extends React.Component {
     const userPublicName = escapeHtml(props.activity.newestMessage.fields.user.public_name)
     const [entityType, coreEventType] = props.activity.newestMessage.event_type.split('.')
     const i18nOpts = {
-      user: `<span title='${userPublicName}' className='member_activity__user'>${userPublicName}</span>`,
+      user: `<span title='${userPublicName}' class='member_activity__user'>${userPublicName}</span>`,
       interpolation: { escapeValue: false }
     }
     switch (entityType) {

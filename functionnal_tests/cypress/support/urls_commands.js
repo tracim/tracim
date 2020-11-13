@@ -18,13 +18,12 @@ const PAGES = {
 }
 
 const URLS = {
-  [PAGES.FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/feed`,
   [PAGES.HOME]: () => '/ui',
   [PAGES.LOGIN]: ({ loginParam }) => `/ui/login${loginParam}`,
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.CONTENT_OPEN]: ({ workspaceId, contentType, contentId }) => `/ui/workspaces/${workspaceId}/contents/${contentType}/${contentId}`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
-  [PAGES.ACTIVITY_FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/activity/`,
+  [PAGES.ACTIVITY_FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/activity-feed/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
   [PAGES.SEARCH]: ({ searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes }) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,

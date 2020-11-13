@@ -1,8 +1,5 @@
 import { PAGES as p } from '../../support/urls_commands'
 
-// TODO - GB - 2020-11-09 - All tests related to the activity feed must be activated
-// and completed after the resolution of the issue https://github.com/tracim/tracim/issues/3600
-
 describe('Switching between tabs', () => {
   let workspaceId, workspaceLabel
 
@@ -16,65 +13,25 @@ describe('Switching between tabs', () => {
     })
   })
 
-  describe('from Dashboard', () => {
-    it('to All contents', () => {
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
+  afterEach(cy.cancelXHR)
+
+  const testCases = [
+    { from: 'Dashboard', to: 'All contents', fromPage: p.DASHBOARD, toPagePathEnd: 'contents' },
+    { from: 'Dashboard', to: 'Activity feed', fromPage: p.DASHBOARD, toPagePathEnd: 'activity-feed' },
+    { from: 'Activity feed', to: 'Dashboard', fromPage: p.ACTIVITY_FEED, toPagePathEnd: 'dashboard' },
+    { from: 'Activity feed', to: 'All contents', fromPage: p.ACTIVITY_FEED, toPagePathEnd: 'contents' },
+    { from: 'All contents', to: 'Dashboard', fromPage: p.CONTENTS, toPagePathEnd: 'dashboard' },
+    { from: 'All contents', to: 'Activity feed', fromPage: p.CONTENTS, toPagePathEnd: 'activity-feed' }
+  ]
+
+  for (const testCase of testCases) {
+    const { from, to, fromPage, toPagePathEnd } = testCase
+    it(`Should go from ${from} to ${to}`, () => {
+      cy.visitPage({ pageName: fromPage, params: { workspaceId: workspaceId } })
       cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
-      cy.contains('.tab', 'All contents').click()
-      cy.contains('.breadcrumbs__item', 'All contents')
-      cy.get('.workspace__content__fileandfolder').should('be.visible')
+      cy.contains('.tab', to).click()
+      cy.contains('.breadcrumbs__item', to)
+      cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/${toPagePathEnd}`)
     })
-
-    // it('to Activity feed', () => {
-    //   cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
-    //   cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-    //   cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
-    //   cy.contains('.tab', 'Activity feed').click()
-    //   cy.contains('.breadcrumbs__item', 'Activity feed')
-    //   cy.get('').should('be.visible') or cy.contains('', '')
-    // })
-  })
-
-  describe('from All contents', () => {
-    it('to Dashboard', () => {
-      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
-      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.get('.workspace__content__fileandfolder').should('be.visible')
-      cy.contains('.tab', 'Dashboard').click()
-      cy.contains('.breadcrumbs__item', 'Dashboard')
-      cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
-    })
-
-    // it('to Activity feed', () => {
-    //   cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
-    //   cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-    //   cy.get('.workspace__content__fileandfolder').should('be.visible')
-    //   cy.contains('.tab', 'Activity feed').click()
-    //   cy.contains('.breadcrumbs__item', 'Activity feed')
-    //   cy.get('').should('be.visible') or cy.contains('', '')
-    // })
-  })
-
-  /*
-  describe('from Activity feed', () => {
-    it('to Dashboard', () => {
-      cy.visitPage({ pageName: p.FEED, params: { workspaceId: workspaceId } })
-      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.get('').should('be.visible') or cy.contains('', '')
-      cy.contains('.tab', 'Dashboard').click()
-      cy.contains('.breadcrumbs__item', 'Dashboard')
-      cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
-    })
-
-    it('to All contents', () => {
-      cy.visitPage({ pageName: p.FEED, params: { workspaceId: workspaceId } })
-      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.get('').should('be.visible') or cy.contains('', '')
-      cy.contains('.tab', 'All contents').click()
-      cy.contains('.breadcrumbs__item', 'All contents')
-      cy.get('.workspace__content__fileandfolder').should('be.visible')
-    })
-  })
-  */
+  }
 })

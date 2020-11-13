@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
   TLM_ENTITY_TYPE as TLM_ET,
@@ -9,7 +10,9 @@ import {
   IconButton,
   TracimComponent,
   NUMBER_RESULTS_BY_PAGE,
-  SUBSCRIPTION_TYPE
+  SUBSCRIPTION_TYPE,
+  BREADCRUMBS_TYPE,
+  buildHeadTitle
 } from 'tracim_frontend_lib'
 
 import {
@@ -18,16 +21,26 @@ import {
   sortActivityList
 } from '../util/activity.js'
 import {
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  PAGE
 } from '../util/helper.js'
 import {
-  getNotificationList
-} from '../action-creator.async'
+  getNotificationList,
+  getWorkspaceDetail
+} from '../action-creator.async.js'
+import {
+  setWorkspaceActivityList,
+  setWorkspaceActivityNextPage,
+  setBreadcrumbs,
+  setHeadTitle,
+  newFlashMessage,
+  setWorkspaceDetail
+} from '../action-creator.sync.js'
 
+import TabBar from '../component/TabBar/TabBar.jsx'
 import ContentWithPreviewActivity from '../component/Activity/ContentWithPreviewActivity.jsx'
 import ContentWithoutPreviewActivity from '../component/Activity/ContentWithoutPreviewActivity.jsx'
 import MemberActivity from '../component/Activity/MemberActivity.jsx'
-import { setWorkspaceActivityList, setWorkspaceActivityNextPage } from '../action-creator.sync.js'
 
 require('../css/ActivityFeed.styl')
 
@@ -50,13 +63,18 @@ export class ActivityFeed extends React.Component {
   }
 
   componentDidMount () {
-    this.loadActivities(ACTIVITY_COUNT_PER_PAGE)
+    this.loadWorkspaceDetail()
+    this.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.workspaceId === this.props.workspaceId) return
-
-    this.loadActivities(ACTIVITY_COUNT_PER_PAGE)
+    this.loadWorkspaceDetail()
+    this.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
   }
 
   async updateActivityList (data) {
@@ -71,11 +89,11 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
   }
 
-  async loadActivities (minActivityCount) {
+  async loadActivities (minActivityCount, resetList = false) {
     const { props } = this
-    let activityList = props.workspaceActivity.list
-    let hasNextPage = props.workspaceActivity.hasNextPage
-    let nextPageToken = props.workspaceActivity.nextPageToken
+    let activityList = resetList ? [] : props.workspaceActivity.list
+    let hasNextPage = resetList ? true : props.workspaceActivity.hasNextPage
+    let nextPageToken = resetList ? '' : props.workspaceActivity.nextPageToken
     while (hasNextPage && activityList.length < minActivityCount) {
       const messageListResponse = await props.dispatch(getNotificationList(
         props.user.userId,
@@ -94,6 +112,23 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setWorkspaceActivityNextPage(hasNextPage, nextPageToken))
   }
 
+  async loadWorkspaceDetail () {
+    const { props } = this
+
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
+    switch (fetchWorkspaceDetail.status) {
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        this.setHeadTitle()
+        break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
+    }
+  }
+
   renderActivityComponent (activity) {
     const { props } = this
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
@@ -106,7 +141,45 @@ export class ActivityFeed extends React.Component {
   activityDisplayFilter (activity) {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
       (activity.entityType !== TLM_ET.SHAREDSPACE_SUBSCRIPTION ||
-       activity.newestMessage.fields.subscription.state === SUBSCRIPTION_TYPE.rejected.slug)
+       activity.newestMessage.fields.subscription.state !== SUBSCRIPTION_TYPE.accepted.slug)
+  }
+
+  buildBreadcrumbs () {
+    const { props } = this
+
+    const breadcrumbsList = [
+      {
+        link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+        type: BREADCRUMBS_TYPE.CORE
+      },
+      {
+        link: (
+          <Link to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}>
+            {props.currentWorkspace.label}
+          </Link>
+        ),
+        type: BREADCRUMBS_TYPE.CORE
+      },
+      {
+        link: (
+          <Link to={PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId)}>
+            {props.t('Activity feed')}
+          </Link>
+        ),
+        type: BREADCRUMBS_TYPE.CORE
+      }
+    ]
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
+  }
+
+  setHeadTitle () {
+    const { props } = this
+
+    const headTitle = buildHeadTitle(
+      [props.t('Dashboard'), props.currentWorkspace.label]
+    )
+    props.dispatch(setHeadTitle(headTitle))
   }
 
   render () {
@@ -114,6 +187,10 @@ export class ActivityFeed extends React.Component {
 
     return (
       <div className='activity_feed'>
+        <TabBar
+          currentSpace={props.currentWorkspace}
+          breadcrumbs={props.breadcrumbs}
+        />
         <div className='activity_feed__content'>
           <IconButton
             customClass='activity_feed__refresh'
@@ -146,5 +223,5 @@ ActivityFeed.propTypes = {
   workspaceId: PropTypes.string
 }
 
-const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace }) => ({ lang, user, workspaceActivity, currentWorkspace })
+const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs })
 export default connect(mapStateToProps)(translate()(TracimComponent(ActivityFeed)))

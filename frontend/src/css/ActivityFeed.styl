@@ -5,13 +5,17 @@ smallScreenFeedWidth = 400px
 spacingSize = 10px
 
 .activity_feed
-  background-color lightGrey
+  background-color veryLightGrey
   display flex
   flex-direction column
   align-items center
   width 100%
   overflow auto
   height "calc(100vh - %s)" % headerHeight
+
+  & .tabBar
+    margin-bottom 10px
+    width: 100%
 
   &__content
     display flex
