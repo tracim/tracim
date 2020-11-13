@@ -30,6 +30,7 @@ export class MemberActivity extends React.Component {
       case TLM_CET.MODIFIED:
         return props.t("{{user}}'s role has been changed to {{role}}", i18nOpts)
     }
+    return ''
   }
 
   getSpaceSubscriptionText (coreEventType, i18nOpts) {
@@ -45,6 +46,7 @@ export class MemberActivity extends React.Component {
       case TLM_CET.MODIFIED:
         return props.t("{{user}}'s request to join the space has been {{state}}", i18nOpts)
     }
+    return ''
   }
 
   getText () {

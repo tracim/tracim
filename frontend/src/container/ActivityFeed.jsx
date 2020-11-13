@@ -8,7 +8,8 @@ import {
   CONTENT_TYPE,
   IconButton,
   TracimComponent,
-  NUMBER_RESULTS_BY_PAGE
+  NUMBER_RESULTS_BY_PAGE,
+  SUBSCRIPTION_TYPE
 } from 'tracim_frontend_lib'
 
 import {
@@ -32,6 +33,15 @@ require('../css/ActivityFeed.styl')
 
 const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
+const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
+  [TLM_ET.CONTENT, (activity) => {
+    return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
+      ? <ContentWithoutPreviewActivity activity={activity} key={activity.id} />
+      : <ContentWithPreviewActivity activity={activity} key={activity.id} />
+  }],
+  [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
+  [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
+])
 
 export class ActivityFeed extends React.Component {
   constructor (props) {
@@ -85,18 +95,18 @@ export class ActivityFeed extends React.Component {
   }
 
   renderActivityComponent (activity) {
-    let component = <span>Unknown activity type!</span>
-    switch (activity.entityType) {
-      case TLM_ET.CONTENT:
-        component = activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
-          ? <ContentWithoutPreviewActivity activity={activity} key={activity.id} />
-          : <ContentWithPreviewActivity activity={activity} key={activity.id} />
-        break
-      case TLM_ET.SHAREDSPACE_MEMBER:
-        component = <MemberActivity activity={activity} key={activity.id} />
-        break
-    }
+    const { props } = this
+    const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
+    const component = componentConstructor
+      ? componentConstructor(activity)
+      : <span>{props.t('Unknown activity type')}</span>
     return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
+  }
+
+  activityDisplayFilter (activity) {
+    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
+      (activity.entityType !== TLM_ET.SHAREDSPACE_SUBSCRIPTION ||
+       activity.newestMessage.fields.subscription.state === SUBSCRIPTION_TYPE.rejected.slug)
   }
 
   render () {
@@ -113,7 +123,10 @@ export class ActivityFeed extends React.Component {
             dataCy='activity_feed__refresh'
           />
           <div className='activity_feed__list' data-cy='activity_feed__list'>
-            {props.workspaceActivity.list.map(this.renderActivityComponent.bind(this)) || props.t('No activity here')}
+            {props.workspaceActivity.list
+              .filter(this.activityDisplayFilter.bind(this))
+              .map(this.renderActivityComponent.bind(this)) ||
+             props.t('No activity here')}
           </div>
           {props.workspaceActivity.hasNextPage && (
             <IconButton
