@@ -120,6 +120,7 @@ export class ActivityFeed extends React.Component {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
         this.setHeadTitle()
+        this.buildBreadcrumbs()
         break
       case 400:
         props.history.push(PAGE.HOME)
