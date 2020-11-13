@@ -78,14 +78,14 @@ Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
     win.document.addEventListener(APP_CUSTOM_EVENT_LISTENER, (event) => {
       tlm.opened = (
         event.type === APP_CUSTOM_EVENT_LISTENER &&
-        event.detail.type === TRACIM_LIVE_MESSAGE_STATUS_CHANGED && 
+        event.detail.type === TRACIM_LIVE_MESSAGE_STATUS_CHANGED &&
+        event.detail.data &&
         event.detail.data.status === OPENED_LIVE_MESSAGE_STATUS
       )
-      console.log(event.type + ' ' + event.detail.data.status)
     })
   }
   cy.visit(url, {
-    onLoad: signalOpenedTlmConnection
+    onBeforeLoad: signalOpenedTlmConnection
   }).then(() => {
     return new Cypress.Promise((resolve, reject) => {
       const isTlmConnectionOpened = () => {
