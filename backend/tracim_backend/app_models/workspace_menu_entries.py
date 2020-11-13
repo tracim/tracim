@@ -30,5 +30,5 @@ activity_menu_entry = WorkspaceMenuEntry(
     label="Activity Feed",
     route="/ui/workspaces/{workspace_id}/activity",
     hexcolor="#bbbbbb",
-    fa_icon="th",
+    fa_icon="newspaper-o",
 )
