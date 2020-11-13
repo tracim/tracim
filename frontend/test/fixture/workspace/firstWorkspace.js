@@ -3,6 +3,7 @@ import { globalManagerAsMember } from '../user/globalManagerAsMember.js'
 import { serializeWorkspace } from '../../../src/reducer/currentWorkspace.js'
 
 export const firstWorkspaceFromApi = {
+  access_type: 'open',
   workspace_id: 1,
   label: 'First workspace',
   slug: 'first-workspace',

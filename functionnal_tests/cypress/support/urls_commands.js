@@ -1,4 +1,5 @@
 const PAGES = {
+  FEED: 'feed',
   HOME: 'home',
   LOGIN: 'login',
   CONTENTS: 'contents',
@@ -17,6 +18,7 @@ const PAGES = {
 }
 
 const URLS = {
+  [PAGES.FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/feed`,
   [PAGES.HOME]: () => '/ui',
   [PAGES.LOGIN]: ({ loginParam }) => `/ui/login${loginParam}`,
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,

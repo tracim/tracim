@@ -56,12 +56,12 @@ describe('Searching keywords', () => {
     })
 
     describe('the subtitle', () => {
-      const pageSubTitle = '[data-cy=layoutPageSubTitle]'
+      const pageSubTitle = '.pageContentGeneric'
 
       it('Should display the message with HtmlDocForSearch', () => {
         cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 
-        cy.get(pageSubTitle).contains(`best results for "${htmlDocTitle}"`).should('be.visible')
+        cy.contains(pageSubTitle, `best results for "${htmlDocTitle}"`).should('be.visible')
       })
 
       it('Should display the message with the same number as result contents', () => {
@@ -69,7 +69,7 @@ describe('Searching keywords', () => {
 
         // TODO - GB - 2019-06-04 - make this test variable for the number of results (don't put "2" as a constant), maybe using a table
         cy.get('[data-cy=content__item]').its('length').should('eq', 2)
-        cy.get(pageSubTitle).contains(`2 best results for "${htmlDocTitle}"`).should('be.visible')
+        cy.contains(pageSubTitle, `2 best results for "${htmlDocTitle}"`).should('be.visible')
       })
     })
   })
@@ -87,10 +87,10 @@ describe('Searching keywords', () => {
     })
 
     describe('the subtitle', () => {
-      const pageSubTitle = '[data-cy=layoutPageSubTitle]'
+      const pageSubTitle = '.pageContentGeneric'
 
       it('Should display the same searched keywords', () => {
-        cy.get(pageSubTitle).contains(`best results for "${htmlDocTitle}"`).should('be.visible')
+        cy.contains(pageSubTitle, `best results for "${htmlDocTitle}"`).should('be.visible')
       })
     })
   })

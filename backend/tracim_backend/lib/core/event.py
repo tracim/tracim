@@ -140,8 +140,13 @@ class EventApi:
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: Optional[List[int]] = None,
         after_event_id: int = 0,
+        workspace_ids: Optional[List[str]] = None,
     ) -> Query:
         query = self._session.query(Message).join(Event)
+        if workspace_ids:
+            query = query.filter(
+                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+            )
         if event_id:
             query = query.filter(Message.event_id == event_id)
         if user_id:
@@ -196,7 +201,6 @@ class EventApi:
 
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
-
         return query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
@@ -244,6 +248,7 @@ class EventApi:
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: Optional[int] = None,
+        workspace_ids: Optional[List[str]] = None,
     ) -> Page:
         query = self._base_query(
             user_id=user_id,
@@ -251,6 +256,7 @@ class EventApi:
             include_event_types=include_event_types,
             exclude_event_types=exclude_event_types,
             exclude_author_ids=exclude_author_ids,
+            workspace_ids=workspace_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
 
@@ -261,6 +267,7 @@ class EventApi:
         include_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: List[int] = None,
+        workspace_ids: Optional[List[str]] = None,
     ) -> int:
         return self._base_query(
             user_id=user_id,

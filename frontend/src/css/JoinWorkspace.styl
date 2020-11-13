@@ -2,28 +2,30 @@
 
 .joinWorkspace
   &__content__workspaceList
-    display: flex
-    flex-direction: column
-    margin-top: 10px
-    border-bottom: 1px solid grey
+    display flex
+    flex-direction column
+    margin-top 10px
+    border-bottom 1px solid grey
 
     & > *:first-child
-      border: none
+      border none
+      background-color transparent
 
       & > *:last-child
-        text-align: left
+        text-align left
 
     &__item
-      border: 1px solid grey
-      border-bottom: 0
-      display: flex
-      flex-direction: row
-      padding-top: 10px
-      padding-bottom: 10px
-      align-items: center
-      line-height: 1.5
-      height: 60px
-      width: 100%
+      border 1px solid grey
+      border-bottom 0
+      display flex
+      flex-direction row
+      padding-top 10px
+      padding-bottom 10px
+      align-items center
+      line-height 1.5
+      height 60px
+      width 100%
+      background-color offWhite
 
       &:nth-child(2n):not(:hover)
         background-color lightGrey
@@ -32,28 +34,28 @@
         background-color grey-hover
 
       & > *
-        margin-left: 10px
-        flex: auto
+        margin-left 10px
+        flex auto
 
       // buttons "column"
       & > *:last-child
-        flex: 0 0 220px
-        margin-right: 10px
-        text-align: center
+        flex 0 0 220px
+        margin-right 10px
+        text-align center
 
       // type "column"
       & > *:first-child
-        flex: 0 0 60px
+        flex 0 0 60px
 
       &__title_description
-        display: flex
-        flex-direction: column
-        overflow: hidden
+        display flex
+        flex-direction column
+        overflow hidden
 
         & span
-          overflow: hidden
-          white-space: nowrap
-          text-overflow: ellipsis
+          overflow hidden
+          white-space nowrap
+          text-overflow ellipsis
 
       &__description
-        font-size: fontSizeSmall
+        font-size fontSizeSmall

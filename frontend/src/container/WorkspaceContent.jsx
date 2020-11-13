@@ -19,11 +19,11 @@ import DropdownCreateButton from '../component/common/Input/DropdownCreateButton
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
 import OpenShareFolderApp from '../component/Workspace/OpenShareFolderApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
+import TabBar from '../component/TabBar/TabBar.jsx'
 import {
   ROLE,
   ROLE_LIST,
   PageWrapper,
-  PageTitle,
   PageContent,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -739,13 +739,12 @@ export class WorkspaceContent extends React.Component {
           )}
 
           <PageWrapper customClass='workspace'>
-            <PageTitle
-              parentClass='workspace__header'
-              customClass='justify-content-between align-items-center'
-              title={this.getTitle(urlFilter)}
-              icon={this.getIcon(urlFilter)}
-              breadcrumbsList={breadcrumbs}
-            >
+            <TabBar
+              currentSpace={props.currentWorkspace}
+              breadcrumbs={breadcrumbs}
+            />
+
+            <PageContent parentClass='workspace__content'>
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
                   folderId={null} // null because it is workspace root content
@@ -753,9 +752,7 @@ export class WorkspaceContent extends React.Component {
                   availableApp={createContentAvailableApp}
                 />
               )}
-            </PageTitle>
 
-            <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
 

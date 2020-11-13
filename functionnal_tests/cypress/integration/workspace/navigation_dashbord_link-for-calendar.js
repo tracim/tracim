@@ -1,6 +1,6 @@
 // Not implemented in Tracim_V2.0
 //
-// describe('navigation :: workspace > dashbord > link-for-calendar', function () {
+// describe('navigation :: workspace > dashboard > link-for-calendar', function () {
 //    before(function () {
 //        login (cy)
 //    })
