@@ -318,5 +318,8 @@
   "{{user}}'s role has been changed to {{role}}": "{{user}}'s role has been changed to {{role}}",
   "{{user}} wants to join the space": "{{user}} wants to join the space",
   "{{user}}'s request to join the space has been {{state}}": "{{user}}'s request to join the space has been {{state}}",
-  "Please ask access to spaces to an administrator or space manager": "Please ask access to spaces to an administrator or space manager"
+  "Please ask access to spaces to an administrator or space manager": "Please ask access to spaces to an administrator or space manager",
+  "mention made": "mention made",
+  "unknown": "unknown",
+  "Unknown entity type": "Unknown entity type"
 }
