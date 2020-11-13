@@ -10,6 +10,7 @@
   "{{author}} updated {{content}} in {{space}}": "{{author}} a mis à jour {{content}} dans {{space}}",
   "{{author}} created {{content}} in {{space}}": "{{author}} a créé {{content}} dans {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} a changé le statut de {{content}} dans {{space}}",
+  "Activity feed": "Fil d'actualité",
   "Are you sure you want to remove this member from the space?": "Voulez-vous vraiment retirer ce membre de l'espace ?",
   "Unknown space type": "Type d'espace inconnu",
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",

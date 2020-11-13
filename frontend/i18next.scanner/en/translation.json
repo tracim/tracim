@@ -10,6 +10,7 @@
   "{{author}} mentioned you in a comment in {{content}} in {{space}}": "{{author}} mentioned you in a comment in {{content}} in {{space}}",
   "{{author}} mentioned you in {{content}} in {{space}}": "{{author}} mentioned you in {{content}} in {{space}}",
   "{{author}} created {{content}} in {{space}}": "{{author}} created {{content}} in {{space}}",
+  "Activity feed": "Activity feed",
   "Unknown space type": "Unknown space type",
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
   "Create a space": "Create a space",

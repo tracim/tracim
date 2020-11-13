@@ -25,7 +25,7 @@ describe('Switching between workspaces advanced', () => {
     it('should be able to re-open it', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.dashboard__header__advancedmode__button')
+        .find('.dashboard__workspace__detail__right__button')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -33,7 +33,7 @@ describe('Switching between workspaces advanced', () => {
         .click()
 
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.dashboard__header__advancedmode__button')
+        .find('.dashboard__workspace__detail__right__button')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })

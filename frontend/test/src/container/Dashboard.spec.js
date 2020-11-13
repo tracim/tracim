@@ -8,7 +8,7 @@ import { firstWorkspace, firstWorkspaceFromApi } from '../../fixture/workspace/f
 import { appList } from '../../hocMock/redux/appList/appList.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { user } from '../../hocMock/redux/user/user'
-import { withRouterMock } from '../../hocMock/withRouter'
+import { withRouterMock, RouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate.js'
 import { isFunction } from '../../hocMock/helper.js'
 import { mockGetWorkspaceDetail200 } from '../../apiMock.js'
@@ -79,7 +79,7 @@ describe('<Dashboard />', () => {
 
   mockGetWorkspaceDetail200(FETCH_CONFIG.apiUrl, firstWorkspace.id, firstWorkspaceFromApi)
 
-  const wrapper = mount(<DashboardWithHOC2 {...props} />)
+  const wrapper = mount(<DashboardWithHOC2 {...props} />, { wrappingComponent: RouterMock })
   const dashboardInstance = wrapper.find(DashboardWithoutHOC).instance()
 
   describe('TLM handlers', () => {

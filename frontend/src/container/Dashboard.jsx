@@ -7,7 +7,6 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
-  PageTitle,
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
@@ -50,6 +49,7 @@ import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
+import TabBar from '../component/TabBar/TabBar.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
@@ -513,25 +513,10 @@ export class Dashboard extends React.Component {
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='dashboard'>
-            <PageTitle
-              parentClass='dashboard__header'
-              title={props.t('Dashboard')}
-              subtitle=''
-              icon='home'
-              breadcrumbsList={props.breadcrumbs}
-            >
-              <div className='dashboard__header__advancedmode'>
-                {userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
-                  <button
-                    type='button'
-                    className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                    onClick={this.handleClickOpenAdvancedDashboard}
-                  >
-                    <i className='fa fa-fw fa-cog' />
-                    {props.t('Open advanced Dashboard')}
-                  </button>}
-              </div>
-            </PageTitle>
+            <TabBar
+              currentSpace={props.curWs}
+              breadcrumbs={props.breadcrumbs}
+            />
 
             <PageContent>
               <div className='dashboard__workspace'>
@@ -569,15 +554,28 @@ export class Dashboard extends React.Component {
                   </div>
                 </div>
 
-                <UserStatus
-                  user={props.user}
-                  curWs={props.curWs}
-                  displayNotifBtn={props.system.config.email_notification_activated}
-                  onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                  onClickAddNotify={this.handleClickAddNotification}
-                  onClickRemoveNotify={this.handleClickRemoveNotification}
-                  t={props.t}
-                />
+                <div className='dashboard__workspace__detail__right'>
+                  {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
+                    <button
+                      type='button'
+                      className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    >
+                      <i className='fa fa-fw fa-cog' />
+                      {props.t('Open advanced Dashboard')}
+                    </button>
+                  )}
+
+                  <UserStatus
+                    user={props.user}
+                    curWs={props.curWs}
+                    displayNotifBtn={props.system.config.email_notification_activated}
+                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                    onClickAddNotify={this.handleClickAddNotification}
+                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    t={props.t}
+                  />
+                </div>
               </div>
 
               <div className='dashboard__workspaceInfo'>

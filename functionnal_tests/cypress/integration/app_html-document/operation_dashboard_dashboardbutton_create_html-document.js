@@ -11,7 +11,7 @@ describe('operation :: workspace > create_new > html-document', function () {
   beforeEach(function () {
     cy.loginAs('administrators')
   })
-  it('dashborad > button', function () {
+  it('dashboard > button', function () {
     cy.visitPage({
       pageName: p.DASHBOARD,
       params: { workspaceId: 1 }

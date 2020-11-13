@@ -1,4 +1,4 @@
-// describe('navigation :: workspace > dashbord > link-for-webdav', function () {
+// describe('navigation :: workspace > dashboard > link-for-webdav', function () {
 //    before(function () {
 //        login (cy)
 //    })
