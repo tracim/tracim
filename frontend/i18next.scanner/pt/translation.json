@@ -316,7 +316,7 @@
   "restored": "restaurou",
   "by": "por",
   "{{user}} joined the space": "{{user}} juntou-se ao espaço",
-  "{{user}}'s role has been changed to {{role}}": "O papel de {{user}} foi alterado como {{role}}",
+  "{{user}}'s role has been changed to {{role}}": "O papel de {{user}} foi alterado para {{role}}",
   "{{user}} wants to join the space": "{{user}} deseja juntar-se ao espaço",
   "{{user}}'s request to join the space has been {{state}}": "O pedido de {{user}} para se juntar ao espaço foi {{role}}",
   "Please ask access to spaces to an administrator or space manager": "Por favor, pedir acesso a espaços a um administrador ou a um gestor de espaço",
