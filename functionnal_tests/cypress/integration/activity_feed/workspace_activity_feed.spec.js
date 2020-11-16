@@ -21,7 +21,7 @@ describe("The space activity feed page", () => {
       for (let i = 0; i < 20; ++i) {
         cy.createFile('artikodin.png', 'image/png', `png_exemple${i}.png`, workspaceId)
       }
-      cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId } })
+      cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
     })
     it('should display a "Show more" button when more than 15 activities exist', () => {
       cy.get('[data-cy=activity_feed__item]').should('have.length.gte', 15)
@@ -31,7 +31,7 @@ describe("The space activity feed page", () => {
   })
 
   describe('List', () => {
-    beforeEach(() => cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId } }))
+    beforeEach(() => cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true }))
     it('should have items', () => {
       cy.get('[data-cy=activity_feed__item]').should('have.length', 2)
     })
@@ -83,7 +83,7 @@ describe("The space activity feed page", () => {
   describe('Content item', () => {
     beforeEach(() => {
       cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
-      cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId } })
+      cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
     })
 
     it('should have a "Comment" button, clicking on it opens the content', () => {

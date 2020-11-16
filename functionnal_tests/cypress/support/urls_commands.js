@@ -97,9 +97,10 @@ Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
   })
 })
 
-Cypress.Commands.add('visitPage', ({ pageName, params = {}, getters = null }) => {
+Cypress.Commands.add('visitPage', ({ pageName, params = {}, getters = null, waitForTlm = false }) => {
   const url = formatUrl({ pageName: pageName, params: params, getters: getters })
-  return cy.visitAndWaitForTlmConnection(url)
+  if (waitForTlm) return cy.visitAndWaitForTlmConnection(url)
+  return cy.visit(url)
 })
 export { PAGES, reverseUrl, formatUrl }
 
