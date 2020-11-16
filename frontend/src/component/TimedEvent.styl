@@ -1,0 +1,21 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.timedEvent
+  font-size fontSizeSmall
+  max-width 15em
+  overflow hidden
+  white-space nowrap
+  &__bottom
+    overflow hidden
+    display flex
+    flex-direction row
+    justify-content end
+  &__author
+    overflow hidden
+    font-weight bold
+    text-overflow ellipsis
+
+@media (max-width max-sm)
+  .timedEvent
+    &__operation
+      display none

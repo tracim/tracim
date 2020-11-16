@@ -6,13 +6,13 @@ import { escape as escapeHtml } from 'lodash'
 
 import {
   Avatar,
-  DistanceDate,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
 
+import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
 
 export class MemberActivity extends React.Component {
@@ -75,10 +75,12 @@ export class MemberActivity extends React.Component {
           <Avatar publicName={newestMessage.fields.user.public_name} width={32} style={{ marginRight: '5px' }} />
           <div dangerouslySetInnerHTML={{ __html: this.getText() }} />
         </div>
-        <div className='member_activity__right'>
-          <DistanceDate absoluteDate={newestMessage.created} lang={props.user.lang} /><br />
-          {props.t('by')} <span className='member_activity__user'>{newestMessage.fields.author.public_name}</span>
-        </div>
+        <TimedEvent
+          customClass='member_activity__right'
+          date={newestMessage.created}
+          lang={props.user.lang}
+          authorName={newestMessage.fields.author.public_name}
+        />
       </div>
     )
   }

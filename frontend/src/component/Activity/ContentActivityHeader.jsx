@@ -8,12 +8,12 @@ import {
   BREADCRUMBS_TYPE,
   Breadcrumbs,
   CONTENT_TYPE,
-  DistanceDate,
   Icon,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 
+import TimedEvent from '../TimedEvent.jsx'
 import { PAGE } from '../../util/helper.js'
 
 require('./ContentActivityHeader.styl')
@@ -76,13 +76,13 @@ export class ContentActivityHeader extends React.Component {
           </Link>
           <Breadcrumbs breadcrumbsList={breadcrumbsList} />
         </div>
-        <div className='contentActivityHeader__right'>
-          <div>
-            <span className='contentActivityHeader__operation'>{`${this.getDisplayOperation(newestMessage.event_type)} `}</span>
-            <DistanceDate absoluteDate={newestMessage.created} lang={props.user.lang} />
-          </div>
-          <div>{props.t('by')} <span className='contentActivityHeader__author'>{newestMessage.fields.author.public_name}</span></div>
-        </div>
+        <TimedEvent
+          customClass='contentActivityHeader__right'
+          operation={this.getDisplayOperation(newestMessage.event_type)}
+          date={newestMessage.created}
+          lang={props.user.lang}
+          authorName={newestMessage.fields.author.public_name}
+        />
       </div>
     )
   }
