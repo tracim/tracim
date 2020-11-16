@@ -50,14 +50,6 @@ export class ContentActivityHeader extends React.Component {
         type: BREADCRUMBS_TYPE.CORE
       },
       {
-        link: (
-          <Link to={PAGE.WORKSPACE.CONTENT_LIST(workspaceId)}>
-            {props.t('All contents')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE
-      },
-      {
         link: <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>,
         type: BREADCRUMBS_TYPE.CORE
       }

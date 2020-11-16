@@ -1,15 +1,12 @@
-import { PAGES } from '../../support/urls_commands'
-import { SELECTORS as s } from '../../support/generic_selector_commands'
-import defaultAdmin from '../../fixtures/defaultAdmin.json'
-import baseUser from '../../fixtures/baseUser.json'
+import { PAGES, URLS } from '../../support/urls_commands'
 
-describe("The space activity feed page", () => {
-  const workspaceId = 1
-
+describe('The space activity feed page', () => {
+  let workspaceId = null
   beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
+    cy.createWorkspace().then(workspace => { workspaceId = workspace.workspace_id })
   })
 
   afterEach(function () {
@@ -31,15 +28,17 @@ describe("The space activity feed page", () => {
   })
 
   describe('List', () => {
-    beforeEach(() => cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true }))
+    beforeEach(() => {
+      cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+    })
     it('should have items', () => {
-      cy.get('[data-cy=activity_feed__item]').should('have.length', 2)
+      cy.get('[data-cy=activity_feed__item]').should('have.length', 1)
     })
 
     it('should add an item in first position when a file is created', () => {
       cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 3)
+        .should('have.length', 2)
         .first()
         .should('contain.text', 'png_exemple2')
     })
@@ -47,12 +46,12 @@ describe("The space activity feed page", () => {
     it('should update already an existing item when a comment for its content is posted', () => {
       cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 3)
+        .should('have.length', 2)
         .first()
         .should('contain.text', 'modified')
       cy.postComment(workspaceId, 1, 'A comment')
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 3)
+        .should('have.length', 2)
         .first()
         .should('contain.text', 'commented')
     })
@@ -62,18 +61,18 @@ describe("The space activity feed page", () => {
       cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
         .createFile('artikodin.png', 'image/png', 'png_exemple3.png', workspaceId)
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 4)
+        .should('have.length', 3)
         .first()
         .should('contain.text', 'png_exemple3')
       cy.postComment(workspaceId, firstContentId, 'A comment')
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 4)
+        .should('have.length', 3)
         .first()
         .should('contain.text', 'png_exemple3')
       cy.get('[data-cy=activity_feed__refresh]')
         .click()
       cy.get('[data-cy=activity_feed__item]')
-        .should('have.length', 4)
+        .should('have.length', 3)
         .first()
         .should('contain.text', 'png_exemple2')
         .and('contain.text', 1)
@@ -81,19 +80,20 @@ describe("The space activity feed page", () => {
   })
 
   describe('Content item', () => {
+    let fileId = null
     beforeEach(() => {
-      cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
+      cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId).then(content => { fileId = content.content_id })
       cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
     })
 
     it('should have a "Comment" button, clicking on it opens the content', () => {
       cy.get('[data-cy=contentActivityFooter__comment]').click()
-      cy.location('pathname').should('be.equal', '/ui/workspaces/1/contents/file/1')
+      cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
     })
 
     it('should have a title link, clicking on it opens the content', () => {
       cy.get('[data-cy=contentActivityHeader__label]').click()
-      cy.location('pathname').should('be.equal', '/ui/workspaces/1/contents/file/1')
+      cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
     })
   })
 })

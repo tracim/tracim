@@ -1,5 +1,4 @@
 const PAGES = {
-  FEED: 'feed',
   HOME: 'home',
   LOGIN: 'login',
   CONTENTS: 'contents',
@@ -14,7 +13,7 @@ const PAGES = {
   CONTENT_OPEN: 'contentOpen',
   ACCOUNT: 'account',
   JOIN_WORKSPACE: 'join-workspace',
-  ACTIVITY_FEED: 'activity'
+  ACTIVITY_FEED: 'activity-feed'
 }
 
 const URLS = {
@@ -102,7 +101,7 @@ Cypress.Commands.add('visitPage', ({ pageName, params = {}, getters = null, wait
   if (waitForTlm) return cy.visitAndWaitForTlmConnection(url)
   return cy.visit(url)
 })
-export { PAGES, reverseUrl, formatUrl }
+export { PAGES, URLS, reverseUrl, formatUrl }
 
 /*
 EXAMPLES

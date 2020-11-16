@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import {
   TLM_ENTITY_TYPE as TLM_ET,
@@ -59,7 +59,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
 export class ActivityFeed extends React.Component {
   constructor (props) {
     super(props)
-    props.registerGlobalLiveMessageHandler(this.updateActivityList.bind(this))
+    props.registerGlobalLiveMessageHandler(this.updateActivityList)
   }
 
   componentDidMount () {
@@ -77,19 +77,19 @@ export class ActivityFeed extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  async updateActivityList (data) {
+  updateActivityList = async (data) => {
     const { props } = this
     const updatedActivityList = await addMessageToActivityList(data, props.workspaceActivity.list, FETCH_CONFIG.apiUrl)
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
   }
 
-  sortActivityList () {
+  handleRefreshClicked = () => {
     const { props } = this
     const updatedActivityList = sortActivityList(props.workspaceActivity.list)
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
   }
 
-  async loadActivities (minActivityCount, resetList = false) {
+  loadActivities = async (minActivityCount, resetList = false) => {
     const { props } = this
     let activityList = resetList ? [] : props.workspaceActivity.list
     let hasNextPage = resetList ? true : props.workspaceActivity.hasNextPage
@@ -112,7 +112,7 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setWorkspaceActivityNextPage(hasNextPage, nextPageToken))
   }
 
-  async loadWorkspaceDetail () {
+  loadWorkspaceDetail = async () => {
     const { props } = this
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
@@ -130,7 +130,7 @@ export class ActivityFeed extends React.Component {
     }
   }
 
-  renderActivityComponent (activity) {
+  renderActivityComponent = (activity) => {
     const { props } = this
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
@@ -139,13 +139,13 @@ export class ActivityFeed extends React.Component {
     return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
   }
 
-  activityDisplayFilter (activity) {
+  activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
       (activity.entityType !== TLM_ET.SHAREDSPACE_SUBSCRIPTION ||
        activity.newestMessage.fields.subscription.state !== SUBSCRIPTION_TYPE.accepted.slug)
   }
 
-  buildBreadcrumbs () {
+  buildBreadcrumbs = () => {
     const { props } = this
 
     const breadcrumbsList = [
@@ -174,7 +174,7 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
-  setHeadTitle () {
+  setHeadTitle = () => {
     const { props } = this
 
     const headTitle = buildHeadTitle(
@@ -197,13 +197,13 @@ export class ActivityFeed extends React.Component {
             customClass='activity_feed__refresh'
             text={props.t('Refresh')}
             intent='link'
-            onClick={this.sortActivityList.bind(this)}
+            onClick={this.handleRefreshClicked}
             dataCy='activity_feed__refresh'
           />
           <div className='activity_feed__list' data-cy='activity_feed__list'>
             {props.workspaceActivity.list
-              .filter(this.activityDisplayFilter.bind(this))
-              .map(this.renderActivityComponent.bind(this)) ||
+              .filter(this.activityDisplayFilter)
+              .map(this.renderActivityComponent) ||
              props.t('No activity here')}
           </div>
           {props.workspaceActivity.hasNextPage && (
@@ -225,4 +225,4 @@ ActivityFeed.propTypes = {
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs })
-export default connect(mapStateToProps)(translate()(TracimComponent(ActivityFeed)))
+export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(ActivityFeed))))
