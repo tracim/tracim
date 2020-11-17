@@ -319,7 +319,7 @@
   "{{user}}'s role has been changed to {{role}}": "Le rôle de {{user}} a été changé en {{role}}",
   "{{user}} wants to join the space": "{{user}} souhaite rejoindre l'espace",
   "{{user}}'s request to join the space has been {{state}}": "La demande de {{user}} pour rejoindre l'espace a été {{state}}",
-  "Please ask access to spaces to an administrator or space manager": "{{Veuillez demander l'accès aux espaces à un administrateur ou gestionnaire d'espace}}",
+  "Please ask access to spaces to an administrator or space manager": "Veuillez demander l'accès aux espaces à un administrateur ou gestionnaire d'espace",
   "mention made": "mention créée",
   "unknown": "inconnue",
   "Unknown entity type": "Type d'entité inconnu",
