@@ -1,7 +1,7 @@
 const ATTRIBUTES_TO_REMOVE = ['controls', 'usemap', 'name', 'id', 'href']
 
 function getFakeAnchorElement (doc, href) {
-  // RJ - 2020-11-09 - NOTE
+  // INFO - RJ - 2020-11-09
   // <a> cannot be inside a preview, so we need to replace them by something
   // Since <a> is a transparent element [1], it can have both inline and block
   // children. Replacing <a> by either <span> or <div> won't work.
@@ -74,7 +74,7 @@ function removeInteractiveContentFromDOM (node, doc) {
     return null
   }
 
-  // remove javascript handlers, attribute that make some elements interactive, anchor name, id.
+  // remove javascript handlers, attributes that make some elements interactive, anchor name, id.
   if (node.attributes) {
     for (const attr of [].slice.call(node.attributes)) {
       if (!attr.name.startsWith('on') && !ATTRIBUTES_TO_REMOVE.includes(attr.name)) {
@@ -94,7 +94,7 @@ function removeInteractiveContentFromDOM (node, doc) {
 }
 
 export function removeInteractiveContentFromHTML (html) {
-  // RJ - 2020-11-09 - NOTE
+  // INFO - RJ - 2020-11-09
   // Previews are in a <a> tag. It is forbidden to have interactive
   // content inside a <a> tag in HTML, so let's remove interactivity from previews.
   const doc = new DOMParser().parseFromString(html, 'text/html')

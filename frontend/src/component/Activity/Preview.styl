@@ -9,7 +9,7 @@ linkColor = #007bff // This color comes from bootstrap
   position relative
   overflow hidden
   border 1px solid previewBorderColor
-  background-color white
+  background-color offWhite
   max-height previewHeight
 
   &__overflow
@@ -42,20 +42,19 @@ linkColor = #007bff // This color comes from bootstrap
       color linkColor
 
   &__unavailable
-    display:block
-    text-align:center
+    display block
+    text-align center
 
     & > a
-      display:block
+      display block
 
     .fa
       font-size previewIconFontSize
 
     .fa, span
       display inline-block
-      padding 0.5ex
+      padding 10px
       vertical-align:middle
-
 
   &__image > img
     max-width 100%

@@ -43,7 +43,7 @@ module.exports = {
     hints: false
   },
   module: {
-    rules: [isProduction ? {} : {
+    rules: [true ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
@@ -54,7 +54,7 @@ module.exports = {
       loader: 'babel-loader',
       options: {
         presets: [
-          '@babel/preset-env',
+          ['@babel/preset-env', { targets: { firefox: 83, chrome: 86 }  } ],
           '@babel/preset-react'
         ],
         plugins: [

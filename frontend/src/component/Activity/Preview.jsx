@@ -5,15 +5,17 @@ import {
   buildFilePreviewUrl as jpgPreviewUrl,
   removeExtensionOfFilename,
   removeInteractiveContentFromHTML,
+  CONTENT_TYPE,
   SCREEN_SIZE
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG, PAGE } from '../../util/helper.js'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { getHTMLPreview } from '../../action-creator.async.js'
 
 require('./Preview.styl')
 
-// possible preview sizes with their media queries, ordered from smallest to biggest
+// INFO - RJ - 2020-11-17 - possible preview sizes with their media queries, ordered from smallest to biggest
 const PREVIEW_WIDTHS = [
   [
     `(max-width: ${SCREEN_SIZE.MAX_SM})`,
@@ -28,26 +30,26 @@ const PREVIEW_WIDTHS = [
 const MAX_PREVIEW_HEIGHT = 300
 
 class Preview extends React.Component {
-  state = {
-    preview: this.isHtmlPreview() ? null : this.getJPEGPreview(),
-    previewOverflow: false,
-    previewLoading: this.isHtmlPreview(),
-    previewUnavailable: false
+  constructor (props) {
+    super(props)
+    this.state = {
+      previewComponent: this.isHtmlPreview() ? null : this.getJPEGPreview(),
+      previewOverflow: false,
+      previewLoading: this.isHtmlPreview(),
+      previewUnavailable: false
+    }
   }
 
   isHtmlPreview () {
     const type = this.props.content.content_type
-    return type === 'html-document' || type === 'thread'
+    return type === CONTENT_TYPE.HTML_DOCUMENT || type === CONTENT_TYPE.THREAD
   }
 
-  getHTMLPreviewUrl ({ content_type: type, content_id: id, workspace_id: spaceId, label }) {
-    return `${FETCH_CONFIG.apiUrl}/workspaces/${spaceId}/${type}s/${id}/preview/html/${label}.html`
-  }
 
   handleUnavailablePreview = () => {
     this.setState({
       previewLoading: false,
-      preview: null,
+      previewComponent: null,
       previewUnavailable: true
     })
   }
@@ -56,19 +58,22 @@ class Preview extends React.Component {
     this.setState({ previewLoading: true })
   }
 
-  async getHTMLPreview () {
-    const fetchResult = await fetch(this.getHTMLPreviewUrl(this.props.content), {
-      credentials: 'include',
-      headers: FETCH_CONFIG.headers,
-      method: 'GET'
-    })
+  async getHTMLPreviewComponent () {
+    const { prop } = content
 
-    if (!fetchResult.ok) {
+    const fetchResultGetHTMLPreviewUrl = await getHTMLPreview(
+      content.workspace_id,
+      content.content_id,
+      content.content_type,
+      content.label
+    )
+
+    if (!fetchResultGetHTMLPreviewUrl.ok) {
       this.handleUnavailablePreview()
       return
     }
 
-    const htmlCode = await fetchResult.text()
+    const htmlCode = await fetchResultGetHTMLPreviewUrl.text()
 
     return (
       <div className='activityFeed__preview__html'>
@@ -83,8 +88,8 @@ class Preview extends React.Component {
 
   getJPEGPreview (previewUrl) {
     const { content } = this.props
-    const label = content.label
     const filenameNoExtension = removeExtensionOfFilename(content.filename)
+    const FIRST_PAGE = 1
 
     const prev = (width) => (
       jpgPreviewUrl(
@@ -93,19 +98,19 @@ class Preview extends React.Component {
         content.content_id,
         content.current_revision_id,
         filenameNoExtension,
-        1,
+        FIRST_PAGE,
         width,
         MAX_PREVIEW_HEIGHT
       )
     )
 
-    const src = ([mediaQuery, width]) => prev(width) + ' ' + width + 'w'
+    const src = ([mediaQuery, width]) => `${prev(width)} ${width}w`
 
     return (
       <div class='activityFeed__preview__image'>
         <img
-          alt={this.props.t('Preview of {{content}}', { content: label })}
-          title={label}
+          alt={this.props.t('Preview of {{content}}', { content: content.label })}
+          title={content.label}
           src={prev(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
           srcset={PREVIEW_WIDTHS.map(src).join(',')}
           sizes={
@@ -119,23 +124,16 @@ class Preview extends React.Component {
     )
   }
 
-  setPreview (preview) {
-    this.setState({
-      preview,
-      previewLoading: false
-    })
-  }
-
   async updatePreview () {
-    let preview = null
+    let previewComponent = null
 
     if (this.isHtmlPreview()) {
-      if (!this.state.preview) {
+      if (!this.state.previewComponent) {
         this.setLoadingPreview()
       }
 
       try {
-        preview = await this.getHTMLPreview()
+        previewComponent = await this.getHTMLPreviewComponent()
       } catch (e) {
         this.handleUnavailablePreview()
         console.error('Unable to produce the preview of content ', this.props.content, e)
@@ -143,10 +141,13 @@ class Preview extends React.Component {
       }
 
     } else {
-      preview = this.getJPEGPreview()
+      previewComponent = this.getJPEGPreview()
     }
 
-    this.setPreview(preview)
+    this.setState({
+      previewComponent,
+      previewLoading: false
+    })
   }
 
   receivePreviewRef (ref) {
@@ -181,32 +182,32 @@ class Preview extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const { content } = props
 
     return (
       <div
         className={classnames(
           'activityFeed__preview', {
-            activityFeed__preview__overflow: this.state.previewOverflow,
-            activityFeed__preview__unavailable: this.state.previewUnavailable,
-            activityFeed__preview__loading: this.state.previewLoading
+            activityFeed__preview__overflow: state.previewOverflow,
+            activityFeed__preview__unavailable: state.previewUnavailable,
+            activityFeed__preview__loading: state.previewLoading
         })}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
           {(
-            this.state.previewLoading
+            state.previewLoading
               ? props.t('Preview loading...')
               : (
-                  this.state.previewUnavailable
+                  state.previewUnavailable
                     ? (
                       <>
                         <i className='fa fa-eye-slash' />
-                        <span>{this.props.t('No preview available')}</span>
+                        <span>{props.t('No preview available')}</span>
                       </>
                     )
-                    : this.state.preview
+                    : state.preview
               )
           )}
         </Link>
