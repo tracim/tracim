@@ -75,6 +75,7 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
+import ActivityFeed from './ActivityFeed.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -310,7 +311,13 @@ export class Tracim extends React.Component {
   loadNotificationList = async (userId) => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      userId,
+      {
+        excludeAuthorId: userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
+      }
+    ))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
@@ -463,6 +470,11 @@ export class Tracim extends React.Component {
                       <Dashboard />
                     </div>
                   )}
+                />
+
+                <Route
+                  path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
+                  render={(routerProps) => <ActivityFeed workspaceId={routerProps.match.params.idws} />}
                 />
 
                 <Route

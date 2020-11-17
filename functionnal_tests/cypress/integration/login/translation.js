@@ -4,7 +4,7 @@ describe('Login page', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.visitPage({ pageName: PAGES.LOGIN, params: { loginParam: '' } })
+    cy.visitPage({ pageName: PAGES.LOGIN, params: { loginParam: '' }, waitForTlm: false })
   })
 
   it('should have translations', () => {

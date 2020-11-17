@@ -15,6 +15,18 @@ function makeRandomString (length = 5) {
   return text
 }
 
+const handleUndefinedResponse = (response) => {
+  if (response === undefined) {
+    // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+    // end up with an undefined response we need to dig up to find if it's the server or cypress
+    // Issue 1836
+    cy.log(`undefined response for request to url ${url}`)
+    cy.wrap(undefined).should('be.undefined')
+  } else {
+    return response.body
+  }
+}
+
 Cypress.Commands.add('addUserToWorkspace', (userId, workspaceId, role = 'contributor') => {
   const body = {
     role: role,
@@ -74,17 +86,7 @@ Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
   return cy
     .fixture(fixturePath)
     .then(userJSON => cy.request('POST', '/api/users', userJSON))
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('createRandomWorkspace', () => {
@@ -98,17 +100,7 @@ Cypress.Commands.add('createRandomWorkspace', () => {
   }
   cy
     .request('POST', url, data)
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
@@ -116,17 +108,7 @@ Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
   return cy
     .fixture(fixturePath)
     .then(workspaceJSON => cy.request('POST', url, workspaceJSON))
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('setupBaseDB', () => {
@@ -171,17 +153,7 @@ Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId = null)
   }
   cy
     .request('POST', url, data)
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('updateHtmlDocument', (contentId, workspaceId, text, title) => {
@@ -212,17 +184,7 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
   }
   cy
     .request('POST', url, data)
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
@@ -234,17 +196,7 @@ Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
   }
   cy
     .request('POST', url, data)
-    .then(response => {
-      if (response === undefined) {
-        // FIXME -  CH - 2019/05/03 - when we send simultaneous request to create contents we
-        // end up with an undefined response we need to dig up to find if it's the server or cypress
-        // Issue 1836
-        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
-        cy.wrap(undefined).should('be.undefined')
-      } else {
-        return response.body
-      }
-    })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
@@ -274,6 +226,14 @@ Cypress.Commands.add('updateFile', (fixturePath, fixtureMime, workspaceId, conte
 
       return cy.form_request('PUT', url, form)
     })
+})
+
+Cypress.Commands.add('postComment', (workspaceId, contentId, comment) => {
+  const url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments`
+
+  return cy
+    .request('POST', url, { raw_content: comment })
+    .then(handleUndefinedResponse)
 })
 
 Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {

@@ -41,7 +41,6 @@ export const PAGE = {
   WORKSPACE: {
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
-    FEED: (idws = ':idws') => `ui/workspaces/${idws}/feed`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
     AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
@@ -49,7 +48,8 @@ export const PAGE = {
     SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
-    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`
+    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
+    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',

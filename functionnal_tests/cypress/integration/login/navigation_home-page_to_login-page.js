@@ -13,7 +13,7 @@ describe('Login page', function () {
   })
 
   it('should allow login with email and logout', function () {
-    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
+    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
       .find('input[type=text]')
@@ -48,7 +48,7 @@ describe('Login page', function () {
   })
 
   it('should allow login with username and logout', function () {
-    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
+    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
       .find('input[type=text]')

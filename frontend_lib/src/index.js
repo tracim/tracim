@@ -136,6 +136,8 @@ import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
+import DistanceDate from './component/DistanceDate.jsx'
+import Icon from './component/Icon/Icon.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -170,7 +172,9 @@ import {
   getFileRevision,
   putFileContent,
   putMyselfFileRead,
-  getContentComment
+  getContentComment,
+  getContent,
+  getWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -325,5 +329,9 @@ export {
   lightenColor,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
-  TextInput
+  TextInput,
+  getContent,
+  DistanceDate,
+  Icon,
+  getWorkspaceContent
 }
