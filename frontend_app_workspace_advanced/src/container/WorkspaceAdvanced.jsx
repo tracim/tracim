@@ -27,6 +27,7 @@ import {
   getSubscriptionRequestList,
   getWorkspaceMember,
   putLabel,
+  putDefaultRole,
   putDescription,
   putAgendaEnabled,
   putDownloadEnabled,
@@ -317,6 +318,22 @@ export class WorkspaceAdvanced extends React.Component {
     switch (fetchPutDescription.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
+    }
+  }
+
+  handleChangeNewDefaultRole = newDefaultRole => {
+    this.setState(prev => ({ content: { ...prev.content, default_user_role: newDefaultRole } }))
+  }
+
+  handleClickValidateNewDefaultRole = async () => {
+    const { props, state } = this
+    const fetchPutDefaultRole = await handleFetchResult(
+      await putDefaultRole(state.config.apiUrl, state.content, state.content.default_user_role)
+    )
+
+    switch (fetchPutDefaultRole.apiResponse.status) {
+      case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new default role', 'warning'))
     }
   }
 
@@ -694,12 +711,15 @@ export class WorkspaceAdvanced extends React.Component {
           <WorkspaceAdvancedConfiguration
             customColor={state.config.hexcolor}
             description={state.content.description}
+            defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidateNewDefaultRole={this.handleClickValidateNewDefaultRole}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             onChangeDescription={this.handleChangeDescription}
+            onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
             key='workspace_advanced'
           />
 
