@@ -143,7 +143,7 @@ export class PopupCreateWorkspace extends React.Component {
 
           addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
 
-          this.setState({ parentOptions: spaceList, isFirstStep: false })
+          this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
         }
         default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
