@@ -113,9 +113,8 @@ you should follow this documentation : [Live message setup for dev env](/backend
 
 #### For production usage
 
-You should install pushpin, for example in debian/ubuntu:
-
-    sudo apt install pushpin
+You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS.
+We recommend to use pushpin version 1.30 as this version has been extensively tested and is in use in our official docker image.
 
 and configure it to proxy tracim (by default tracim web run on port 6543):
 
