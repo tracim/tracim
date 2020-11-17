@@ -56,6 +56,11 @@ describe('In activity.js module', () => {
     createMessage(3, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE, {
       author: foo,
       content: fileContent
+    }),
+    createMessage(2, TLM_ET.MENTION, TLM_CET.CREATED, undefined, {
+      author: foo,
+      mention: { recipient: 'all' },
+      content: fileContent
     })
   ]
 
@@ -66,6 +71,7 @@ describe('In activity.js module', () => {
       { author: foo, created: messageList[0].created, eventId: 6, eventType: messageList[0].event_type }
     ],
     reactionList: [],
+    commentList: [],
     newestMessage: messageList[0]
   }
   const contentActivity = {
@@ -73,7 +79,8 @@ describe('In activity.js module', () => {
     entityType: TLM_ET.CONTENT,
     eventList: [
       { author: foo, created: messageList[1].created, eventId: 5, eventType: messageList[1].event_type },
-      { author: foo, created: messageList[3].created, eventId: 3, eventType: messageList[3].event_type }
+      { author: foo, created: messageList[3].created, eventId: 3, eventType: messageList[3].event_type },
+      { author: foo, created: messageList[4].created, eventId: 2, eventType: messageList[4].event_type }
     ],
     reactionList: [],
     commentList: [],
@@ -87,6 +94,7 @@ describe('In activity.js module', () => {
       { author: bar, created: messageList[2].created, eventId: 4, eventType: messageList[2].event_type }
     ],
     reactionList: [],
+    commentList: [],
     newestMessage: messageList[2]
   }
 
@@ -117,6 +125,7 @@ describe('In activity.js module', () => {
             { author: foo, created: modifiedMessage.created, eventId: 7, eventType: modifiedMessage.event_type },
             ...contentActivity.eventList
           ],
+          commentList: [],
           newestMessage: modifiedMessage
         }
       },

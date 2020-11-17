@@ -6,13 +6,15 @@ import { Link, withRouter } from 'react-router-dom'
 
 import {
   TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   CONTENT_TYPE,
   IconButton,
   TracimComponent,
   NUMBER_RESULTS_BY_PAGE,
   SUBSCRIPTION_TYPE,
   BREADCRUMBS_TYPE,
-  buildHeadTitle
+  buildHeadTitle,
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 
 import {
@@ -55,6 +57,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
 ])
+const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
+const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 export class ActivityFeed extends React.Component {
   constructor (props) {
@@ -79,6 +83,8 @@ export class ActivityFeed extends React.Component {
 
   updateActivityList = async (data) => {
     const { props } = this
+    if (!data.fields.workspace || !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
+
     const updatedActivityList = await addMessageToActivityList(data, props.workspaceActivity.list, FETCH_CONFIG.apiUrl)
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
   }
@@ -139,10 +145,24 @@ export class ActivityFeed extends React.Component {
     return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
   }
 
+  isSubscriptionRequestOrRejection = (activity) => {
+    return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
+      DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
+  }
+
+  isMemberCreatedOrModified = (activity) => {
+    const coreEventType = activity.newestMessage.event_type.split('.')[1]
+    return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+      DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
+  }
+
   activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
-      (activity.entityType !== TLM_ET.SHAREDSPACE_SUBSCRIPTION ||
-       activity.newestMessage.fields.subscription.state !== SUBSCRIPTION_TYPE.accepted.slug)
+      (
+        activity.entityType === TLM_ET.CONTENT ||
+        this.isSubscriptionRequestOrRejection(activity) ||
+        this.isMemberCreatedOrModified(activity)
+      )
   }
 
   buildBreadcrumbs = () => {
@@ -178,7 +198,7 @@ export class ActivityFeed extends React.Component {
     const { props } = this
 
     const headTitle = buildHeadTitle(
-      [props.t('Dashboard'), props.currentWorkspace.label]
+      [props.t('Activity feed'), props.currentWorkspace.label]
     )
     props.dispatch(setHeadTitle(headTitle))
   }

@@ -9,6 +9,7 @@ export const ContentWithoutPreviewActivity = props => {
       content={props.activity.newestMessage.fields.content}
       workspace={props.activity.newestMessage.fields.workspace}
       eventList={props.activity.eventList}
+      newestMessage={props.activity.newestMessage}
     />
   )
 }

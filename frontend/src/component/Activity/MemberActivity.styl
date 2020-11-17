@@ -1,22 +1,16 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
   
-.member_activity
+.memberActivity
   display flex
   flex-direction row
-  align-items center
-  justify-content: space-between
   & .avatar
-    margin-left 2px
+    margin-left 4px
     margin-right 10px
-  &__left
-    display flex
-    flex-direction row
-    white-space nowrap
+  &__text
+    margin-right auto
     overflow hidden
-    align-items center
-    & > *
-      text-overflow ellipsis
-      overflow hidden
+    text-overflow ellipsis
+    white-space nowrap
   &__user
     font-weight bold
 

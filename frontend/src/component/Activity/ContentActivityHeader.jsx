@@ -19,11 +19,13 @@ import { PAGE } from '../../util/helper.js'
 require('./ContentActivityHeader.styl')
 
 export class ContentActivityHeader extends React.Component {
-  getDisplayOperation (eventType) {
+  getDisplayOperation (message) {
     const { props } = this
-    const [entityType, coreEventType, subEntityType] = eventType.split('.')
+    if (message.fields.content.current_revision_type === 'status-update') return props.t('status modified')
+    const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
     if (TLM_ET.MENTION === entityType) return props.t('mention made')
     if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
+
     switch (coreEventType) {
       case TLM_CET.CREATED:
         return props.t('created')
@@ -72,13 +74,13 @@ export class ContentActivityHeader extends React.Component {
         />
         <div className='contentActivityHeader__title'>
           <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
-            <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label'>{contentLabel}</span>
+            <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
           <Breadcrumbs breadcrumbsList={breadcrumbsList} />
         </div>
         <TimedEvent
           customClass='contentActivityHeader__right'
-          operation={this.getDisplayOperation(newestMessage.event_type)}
+          operation={this.getDisplayOperation(newestMessage)}
           date={newestMessage.created}
           lang={props.user.lang}
           authorName={newestMessage.fields.author.public_name}

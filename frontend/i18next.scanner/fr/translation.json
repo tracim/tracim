@@ -323,5 +323,6 @@
   "mention made": "mention créée",
   "unknown": "inconnue",
   "Unknown entity type": "Type d'entité inconnu",
-  "Unknown activity type": "Type d'activité inconnu"
+  "Unknown activity type": "Type d'activité inconnu",
+  "status modified": "statut modifié"
 }

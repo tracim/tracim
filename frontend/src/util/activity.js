@@ -15,32 +15,20 @@ const createActivityEvent = (message) => {
   }
 }
 
-const createMemberActivity = (activityId, messageList) => {
-  if (messageList.length !== 1) throw new Error('Must have at exactly one message to build a member activity')
+const createSingleMessageActivity = (activityParams, messageList) => {
+  if (messageList.length !== 1) throw new Error('Must have at exactly one message')
   const message = messageList[0]
   return {
-    id: activityId,
-    entityType: message.event_type.split('.')[0],
+    ...activityParams,
     eventList: [createActivityEvent(message)],
     reactionList: [],
-    newestMessage: message
-  }
-}
-
-const createSubscriptionActivity = (activityId, messageList) => {
-  if (messageList.length !== 1) throw new Error('Must have at exactly one message to build a subscription activity')
-  const message = messageList[0]
-  return {
-    id: activityId,
-    entityType: message.event_type.split('.')[0],
-    eventList: [createActivityEvent(message)],
-    reactionList: [],
+    commentList: [],
     newestMessage: message
   }
 }
 
 // INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
-const createContentActivity = async (activityId, messageList, apiUrl) => {
+const createContentActivity = async (activityParams, messageList, apiUrl) => {
   if (!messageList.length) throw new Error('Must have at least one message to build a content activity')
   const first = messageList[0]
 
@@ -60,8 +48,7 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
   const commentList = response.apiResponse.status === 200 ? response.body : []
   return {
-    id: activityId,
-    entityType: first.event_type.split('.')[0],
+    ...activityParams,
     eventList: messageList.map(createActivityEvent),
     reactionList: [],
     commentList: commentList,
@@ -70,42 +57,46 @@ const createContentActivity = async (activityId, messageList, apiUrl) => {
   }
 }
 
-const getActivityId = (message) => {
+const getActivityParams = (message) => {
   const [entityType, , subEntityType] = message.event_type.split('.')
-  let id = null
   switch (entityType) {
-    case TLM_ET.CONTENT:
-    case TLM_ET.MENTION:
-      id = (subEntityType === TLM_ST.COMMENT)
+    case TLM_ET.CONTENT: {
+      const id = (subEntityType === TLM_ST.COMMENT)
         ? message.fields.content.parent_id
         : message.fields.content.content_id
-      break
+      return { id: `${entityType}-${id}`, entityType: entityType }
+    }
+    case TLM_ET.MENTION: {
+      const id = (message.fields.content.content_type === TLM_ST.COMMENT)
+        ? message.fields.content.parent_id
+        : message.fields.content.content_id
+      return { id: `${TLM_ET.CONTENT}-${id}`, entityType: TLM_ET.CONTENT }
+    }
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-      id = `e${message.event_id}`
-      break
+      return { id: `${entityType}-e${message.event_id}`, entityType: entityType }
   }
-  if (id === null) return null
-  return `${entityType}-${id}`
+  return null
 }
 
-const createActivity = async (activityId, activityMessageList, apiUrl) => {
-  if (activityId.startsWith(TLM_ET.CONTENT)) {
-    return await createContentActivity(activityId, activityMessageList, apiUrl)
-  } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_MEMBER)) {
-    return createMemberActivity(activityId, activityMessageList)
-  } else if (activityId.startsWith(TLM_ET.SHAREDSPACE_SUBSCRIPTION)) {
-    return createSubscriptionActivity(activityId, activityMessageList)
+const createActivity = async (activityParams, activityMessageList, apiUrl) => {
+  switch (activityParams.entityType) {
+    case TLM_ET.CONTENT:
+      return await createContentActivity(activityParams, activityMessageList, apiUrl)
+    case TLM_ET.SHAREDSPACE_MEMBER:
+    case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
+      return createSingleMessageActivity(activityParams, activityMessageList)
   }
+  throw new Error(`Unknown activity entity type: ${activityParams.entityType}`)
 }
 
 const groupMessageListByActivityId = (messageList) => {
   const activityMap = new Map()
   for (const message of messageList) {
-    const activityId = getActivityId(message)
-    if (activityId !== null) {
-      const activityMessageList = activityMap.get(activityId) || []
-      activityMap.set(activityId, [...activityMessageList, message])
+    const activityParams = getActivityParams(message)
+    if (activityParams !== null) {
+      const activityParamsAndMessageList = activityMap.get(activityParams.id) || { list: [] }
+      activityMap.set(activityParams.id, { params: activityParams, list: [...activityParamsAndMessageList.list, message] })
     }
   }
 
@@ -114,8 +105,8 @@ const groupMessageListByActivityId = (messageList) => {
 
 const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
   const activityCreationList = []
-  for (const [activityId, activityMessageList] of activityMap) {
-    activityCreationList.push(createActivity(activityId, activityMessageList, apiUrl))
+  for (const { params, list } of activityMap.values()) {
+    activityCreationList.push(createActivity(params, list, apiUrl))
   }
   return await Promise.all(activityCreationList)
 }
@@ -177,10 +168,10 @@ const updateActivity = (message, activity) => {
  * @param {*} activityList
  */
 export const addMessageToActivityList = async (message, activityList, apiUrl) => {
-  const activityId = getActivityId(message)
-  const activityIndex = activityList.findIndex(a => a.id === activityId)
+  const activityParams = getActivityParams(message)
+  const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
-    const activity = await createActivity(activityId, [message], apiUrl)
+    const activity = await createActivity(activityParams, [message], apiUrl)
     return [activity, ...activityList]
   }
   const oldActivity = activityList[activityIndex]
