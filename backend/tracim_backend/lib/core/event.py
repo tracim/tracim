@@ -318,6 +318,36 @@ class EventApi:
         context.pending_events.append(event)
         return event
 
+    def generate_user_messages_for_workspace(
+        self,
+        context: TracimContext,
+        user_id: int,
+        workspace_ids: List[int],
+        max_event_history: int = -1,
+    ):
+        event_ids_query = self._session.query(Event.event_id)
+        existing_message_for_user_subquery = (
+            self._session.query(Message.event_id).filter(Message.receiver_id == user_id).subquery()
+        )
+        event_ids_query = event_ids_query.filter(
+            ~Event.event_id.in_(existing_message_for_user_subquery)
+        )
+        event_ids_query = event_ids_query.filter(
+            Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+        )
+        event_ids_query = event_ids_query.order_by(Event.event_id.desc())
+        if max_event_history >= 0:
+            event_ids_query = event_ids_query.limit(max_event_history)
+        processing_mode = self._config.JOBS__PROCESSING_MODE
+        if processing_mode == CFG.CST.ASYNC:
+            message_builder = AsyncLiveMessageBuilder(
+                context=context
+            )  # type: BaseLiveMessageBuilder
+        else:
+            message_builder = SyncLiveMessageBuilder(context=context)
+        for event in event_ids_query.all():
+            message_builder.create_historic_message_for_user(event.event_id, user_id=user_id)
+
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
         try:
@@ -515,6 +545,7 @@ class EventBuilder:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
+        self._create_historic_event_on_workspace(role, context)
         self._create_role_event(OperationType.CREATED, role, context)
 
     @hookimpl
@@ -528,6 +559,18 @@ class EventBuilder:
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
         self._create_role_event(OperationType.DELETED, role, context)
+
+    def _create_historic_event_on_workspace(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ):
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.generate_user_messages_for_workspace(
+            context=context,
+            user_id=role.user_id,
+            workspace_ids=[role.workspace_id],
+            max_event_history=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+        )
 
     def _create_role_event(
         self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
@@ -753,6 +796,25 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
+    @abc.abstractmethod
+    def create_historic_message_for_user(self, event_id: int, user_id: int) -> None:
+        pass
+
+    def _create_historic_message_for_user(self, event_id: int, user_id: int) -> None:
+        with self.context() as context:
+            session = context.dbsession
+            event = session.query(Event).filter(Event.event_id == event_id).one()
+            receiver_ids = self._get_receiver_ids(event, session)
+            if user_id in receiver_ids:
+                message = Message(
+                    receiver_id=user_id,
+                    event=event,
+                    event_id=event.event_id,
+                    sent=None,
+                    read=datetime.utcnow(),
+                )
+                session.add(message)
+
     def _get_receiver_ids(self, event: Event, session: Session) -> Iterable[int]:
         try:
             get_receiver_ids = self._get_receiver_ids_callables[event.entity_type]
@@ -781,6 +843,17 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
         )
         queue.enqueue(self._publish_messages_for_event, event_id)
 
+    def create_historic_message_for_user(self, event_id: int, user_id: int) -> None:
+        redis_connection = get_redis_connection(self._config)
+        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        logger.debug(
+            self,
+            "create historic message (event_id={}, user_id={}) asynchronously to RQ queue {}".format(
+                event_id, user_id, RQ_QUEUE_NAME
+            ),
+        )
+        queue.enqueue(self._create_historic_message_for_user, event_id)
+
 
 class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
     """"Live message building + sending executed in tracim web application."""
@@ -796,3 +869,12 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         logger.debug(self, "publish event(id={}) synchronously".format(event_id))
         self._publish_messages_for_event(event_id)
+
+    def create_historic_message_for_user(self, event_id: int, user_id: int) -> None:
+        logger.debug(
+            self,
+            "create historic message (event_id={}, user_id={}) synchronously".format(
+                event_id, user_id
+            ),
+        )
+        self._create_historic_message_for_user(event_id, user_id)
