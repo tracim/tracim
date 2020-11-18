@@ -130,17 +130,17 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
         >
           <div className='workspace_advanced__functionality__title'>
             Liste des fonctionnalités
-        </div>
+          </div>
 
           <div className='workspace_advanced__functionality__text'>
             Liste des fonctionnalités présentes sur Tracim que vous pouvez désactiver :
-        </div>
+          </div>
 
           <ul className='workspace_advanced__functionality__list'>
             <li className='workspace_advanced__functionality__list__item'>
               <div className='item__text'>
                 Calendrier de l'espace de travail :
-            </div>
+              </div>
               <div className='item__btnswitch'>
                 <BtnSwitch />
               </div>
@@ -149,7 +149,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             <li className='workspace_advanced__functionality__list__item'>
               <div className='item__text'>
                 Visioconférence :
-            </div>
+              </div>
               <div className='item__btnswitch'>
                 <BtnSwitch />
               </div>
