@@ -76,8 +76,8 @@ class ApplicationApi(object):
         """
         menu_entries = [
             copy(dashboard_menu_entry),
-            copy(all_content_menu_entry),
             copy(activity_menu_entry),
+            copy(all_content_menu_entry),
         ]
         applications_in_context = [
             self.get_application_in_context(app, app_config) for app in self.get_all()
