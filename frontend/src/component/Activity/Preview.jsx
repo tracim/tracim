@@ -98,7 +98,7 @@ class Preview extends React.Component {
     const filenameNoExtension = removeExtensionOfFilename(content.filename)
     const FIRST_PAGE = 1
 
-    const prev = (width) => (
+    const previewURL = (width) => (
       jpgPreviewUrl(
         FETCH_CONFIG.apiUrl,
         content.workspace_id,
@@ -111,14 +111,14 @@ class Preview extends React.Component {
       )
     )
 
-    const src = ([mediaQuery, width]) => `${prev(width)} ${width}w`
+    const src = ([mediaQuery, width]) => `${previewURL(width)} ${width}w`
 
     return (
       <div class='activityFeed__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
           title={content.label}
-          src={prev(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
+          src={previewURL(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
           srcset={PREVIEW_WIDTHS.map(src).join(',')}
           sizes={
             PREVIEW_WIDTHS
