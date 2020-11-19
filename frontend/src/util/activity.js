@@ -104,10 +104,7 @@ const groupMessageListByActivityId = (messageList) => {
 const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
   const activityCreationList = []
   for (const { params, list } of activityMap.values()) {
-    const activity = createActivity(params, list, apiUrl)
-    if (activity) {
-      activityCreationList.push(activity)
-    }
+    activityCreationList.push(createActivity(params, list, apiUrl))
   }
   return Promise.all(activityCreationList)
 }

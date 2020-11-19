@@ -48,7 +48,12 @@ class Preview extends React.Component {
   handleUnavailablePreview = () => {
     this.setState({
       previewLoading: false,
-      previewComponent: null,
+      previewComponent: (
+        <>
+          <i className='fa fa-eye-slash' />
+          <span>{this.props.t('No preview available')}</span>
+        </>
+      ),
       previewUnavailable: true
     })
   }
@@ -212,16 +217,7 @@ class Preview extends React.Component {
           {(
             state.previewLoading
               ? props.t('Preview loading...')
-              : (
-                state.previewUnavailable
-                  ? (
-                    <>
-                      <i className='fa fa-eye-slash' />
-                      <span>{props.t('No preview available')}</span>
-                    </>
-                  )
-                  : state.previewComponent
-              )
+              : state.previewComponent
           )}
         </Link>
       </div>
