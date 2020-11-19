@@ -16,7 +16,11 @@ const createActivityEvent = (message) => {
 }
 
 const createSingleMessageActivity = (activityParams, messageList) => {
-  if (messageList.length !== 1) throw new Error('Must have at exactly one message')
+  if (messageList.length !== 1) {
+    console.error('Expected the message list to be of size 1 in createSingleMessageActivity')
+    return null
+  }
+
   const message = messageList[0]
   return {
     ...activityParams,
@@ -29,7 +33,11 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 
 // INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
-  if (!messageList.length) throw new Error('Must have at least one message to build a content activity')
+  if (!messageList.length) {
+    console.error('The message list was unexpectedly empty in createContentActivity')
+    return null
+  }
+
   const first = messageList[0]
 
   let content = first.fields.content
@@ -79,15 +87,17 @@ const getActivityParams = (message) => {
   return null
 }
 
-const createActivity = async (activityParams, activityMessageList, apiUrl) => {
+const createActivity = (activityParams, activityMessageList, apiUrl) => {
   switch (activityParams.entityType) {
     case TLM_ET.CONTENT:
-      return await createContentActivity(activityParams, activityMessageList, apiUrl)
+      return createContentActivity(activityParams, activityMessageList, apiUrl)
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
       return createSingleMessageActivity(activityParams, activityMessageList)
   }
-  throw new Error(`Unknown activity entity type: ${activityParams.entityType}`)
+
+  console.error(`Note: unknown activity entity type: ${activityParams.entityType}`)
+  return null
 }
 
 const groupMessageListByActivityId = (messageList) => {
@@ -103,12 +113,15 @@ const groupMessageListByActivityId = (messageList) => {
   return activityMap
 }
 
-const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
+const createActivityListFromActivityMap = (activityMap, apiUrl) => {
   const activityCreationList = []
   for (const { params, list } of activityMap.values()) {
-    activityCreationList.push(createActivity(params, list, apiUrl))
+    const activity = createActivity(params, list, apiUrl)
+    if (activity) {
+      activityCreationList.push(activity)
+    }
   }
-  return await Promise.all(activityCreationList)
+  return Promise.all(activityCreationList)
 }
 
 /**

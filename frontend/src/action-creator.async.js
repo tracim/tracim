@@ -850,7 +850,7 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
+const defaultExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
 
 export const getNotificationList = (
   userId,
@@ -858,9 +858,11 @@ export const getNotificationList = (
     excludeAuthorId = null,
     notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
     nextPageToken = null,
-    workspaceId = null
+    workspaceId = null,
+    allEvents = false
   }) => async dispatch => {
-  const queryParameterList = [eventTypesParam]
+  const queryParameterList = []
+  if (!allEvents) queryParameterList.push(defaultExcludedEventTypesParam)
   if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
@@ -916,7 +918,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 
 export const getUserMessagesSummary = userId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${eventTypesParam}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
     param: {
       credentials: 'include',
       headers: {
@@ -995,11 +997,12 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
   })
 }
 
-export const getHTMLPreview (workspaceId, contentId, contentType, label) {
+export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${spaceId}/${contentType}s/${contentId}/preview/html/${label}.html`, {
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${label}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
   })
+}

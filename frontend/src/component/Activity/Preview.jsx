@@ -58,22 +58,38 @@ class Preview extends React.Component {
     this.setState({ previewLoading: true })
   }
 
-  async getHTMLPreviewComponent () {
-    const { prop } = content
 
-    const fetchResultGetHTMLPreviewUrl = await getHTMLPreview(
+  async getHTMLPreviewCode (content) {
+    if (content.content_type === CONTENT_TYPE.HTML_DOCUMENT) {
+      return content.raw_content
+    }
+
+    const fetchResultGetHTMLPreview = await getHTMLPreview(
       content.workspace_id,
-      content.content_id,
       content.content_type,
+      content.content_id,
       content.label
     )
 
-    if (!fetchResultGetHTMLPreviewUrl.ok) {
-      this.handleUnavailablePreview()
-      return
+    if (!fetchResultGetHTMLPreview.ok) {
+      return null
     }
 
-    const htmlCode = await fetchResultGetHTMLPreviewUrl.text()
+    return fetchResultGetHTMLPreview.text()
+  }
+
+  async getHTMLPreviewComponent () {
+    const { content } = this.props
+
+    const htmlCode = await this.getHTMLPreviewCode(content)
+
+    if (htmlCode === null) {
+      // RJ - NOTE - 2020-11-18: comparing to null, since the empty string
+      // would be a valid HTML preview code
+
+      this.handleUnavailablePreview()
+      return null
+    }
 
     return (
       <div className='activityFeed__preview__html'>
@@ -207,7 +223,7 @@ class Preview extends React.Component {
                         <span>{props.t('No preview available')}</span>
                       </>
                     )
-                    : state.preview
+                    : state.previewComponent
               )
           )}
         </Link>
