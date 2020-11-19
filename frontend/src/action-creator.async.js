@@ -53,7 +53,13 @@ import {
   ACCESSIBLE_WORKSPACE_LIST,
   WORKSPACE_SUBSCRIPTION_LIST
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml, updateTLMAuthor, NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
+import {
+  ErrorFlashMessageTemplateHtml,
+  updateTLMAuthor,
+  NUMBER_RESULTS_BY_PAGE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_ENTITY_TYPE
+} from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -850,7 +856,14 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-const defaultExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
+const defaultExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.join(',')
+
+const activityExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.filter(
+  ev => {
+    const [entityType, eventType] = ev.split('.')
+    return (entityType !== TLM_ENTITY_TYPE.CONTENT || eventType !== TLM_CORE_EVENT_TYPE.MODIFIED)
+  }
+).join(',')
 
 export const getNotificationList = (
   userId,
@@ -859,10 +872,13 @@ export const getNotificationList = (
     notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
     nextPageToken = null,
     workspaceId = null,
-    allEvents = false
+    activityFeedEvents = false
   }) => async dispatch => {
-  const queryParameterList = []
-  if (!allEvents) queryParameterList.push(defaultExcludedEventTypesParam)
+  const queryParameterList = [
+    activityFeedEvents
+      ? activityExcludedEventTypesParam
+      : defaultExcludedEventTypesParam
+  ]
   if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
