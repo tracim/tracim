@@ -33,10 +33,10 @@ class Preview extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      previewComponent: this.isHtmlPreview() ? null : this.getJPEGPreview(),
       previewOverflow: false,
       previewLoading: this.isHtmlPreview(),
-      previewUnavailable: false
+      previewUnavailable: false,
+      previewHtmlCode: null
     }
   }
 
@@ -48,12 +48,7 @@ class Preview extends React.Component {
   handleUnavailablePreview = () => {
     this.setState({
       previewLoading: false,
-      previewComponent: (
-        <>
-          <i className='fa fa-eye-slash' />
-          <span>{this.props.t('No preview available')}</span>
-        </>
-      ),
+      previewHtmlCode: null,
       previewUnavailable: true
     })
   }
@@ -81,7 +76,7 @@ class Preview extends React.Component {
     return fetchResultGetHTMLPreview.text()
   }
 
-  async getHTMLPreviewComponent () {
+  async retrieveHtmlPreviewCode () {
     const { content } = this.props
 
     const htmlCode = await this.getHTMLPreviewCode(content)
@@ -91,21 +86,14 @@ class Preview extends React.Component {
       // would be a valid HTML preview code
 
       this.handleUnavailablePreview()
-      return null
     }
 
-    return (
-      <div className='activityFeed__preview__html'>
-        <article
-          dangerouslySetInnerHTML={{
-            __html: removeInteractiveContentFromHTML(htmlCode)
-          }}
-        />
-      </div>
-    )
+    this.setState({
+      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode)
+    })
   }
 
-  getJPEGPreview (previewUrl) {
+  getJPEGPreviewComponent (previewUrl) {
     const { content } = this.props
     const filenameNoExtension = removeExtensionOfFilename(content.filename)
     const FIRST_PAGE = 1
@@ -152,7 +140,7 @@ class Preview extends React.Component {
       }
 
       try {
-        previewComponent = await this.getHTMLPreviewComponent()
+        this.retrieveHtmlPreviewCode()
       } catch (e) {
         this.handleUnavailablePreview()
         console.error('Unable to produce the preview of content ', this.props.content, e)
@@ -181,6 +169,13 @@ class Preview extends React.Component {
     }
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    return (
+      nextProps.content.current_revision_id !== this.props.content.current_revision_id ||
+      Object.entries(nextState).some(([key, val]) => val !== this.state[key])
+    )
+  }
+
   componentDidMount () {
     if (this.isHtmlPreview()) {
       this.updatePreview()
@@ -199,6 +194,48 @@ class Preview extends React.Component {
     }
   }
 
+  getUnavailablePreviewComponent () {
+    return (
+      <>
+        <i className='fa fa-eye-slash' />
+        <span>{this.props.t('No preview available')}</span>
+      </>
+    )
+  }
+
+  getHTMLPreviewComponent () {
+    return (
+      <div className='activityFeed__preview__html'>
+        <article
+          dangerouslySetInnerHTML={{
+            __html: this.state.previewHtmlCode
+          }}
+        />
+      </div>
+    )
+  }
+
+  getPreviewComponent () {
+    const { props, state } = this
+    if (state.previewLoading) {
+      return <>{props.t('Preview loading...')}</>
+    }
+
+    if (state.previewUnavailable) {
+      return this.getUnavailablePreviewComponent()
+    }
+
+    if (this.isHtmlPreview()) {
+      if (state.previewHtmlCode === null) {
+        return this.getUnavailablePreviewComponent()
+      }
+
+      return this.getHTMLPreviewComponent()
+    }
+
+    return this.getJPEGPreviewComponent()
+  }
+
   render () {
     const { props, state } = this
     const { content } = props
@@ -210,15 +247,12 @@ class Preview extends React.Component {
             activityFeed__preview__overflow: state.previewOverflow,
             activityFeed__preview__unavailable: state.previewUnavailable,
             activityFeed__preview__loading: state.previewLoading
-          })}
+          }
+        )}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
-          {(
-            state.previewLoading
-              ? props.t('Preview loading...')
-              : state.previewComponent
-          )}
+          {this.getPreviewComponent()}
         </Link>
       </div>
     )
