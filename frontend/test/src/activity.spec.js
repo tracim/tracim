@@ -7,7 +7,7 @@ import {
 } from 'tracim_frontend_lib'
 import { mergeWithActivityList, addMessageToActivityList } from '../../src/util/activity.js'
 
-import { mockGetContentComments200 } from '../apiMock.js'
+import { mockGetContentComments200, mockGetFileContent400 } from '../apiMock.js'
 
 const createMessage = (eventId, entityType, coreEventType, subEntityType, fields) => {
   return {
@@ -33,7 +33,15 @@ describe('In activity.js module', () => {
     username: 'bar',
     avatar_url: null
   }
-  const fileContent = { content_id: 42, workspace_id: 23 }
+  const workspace = { workspace_id: 23 }
+  const fileContent = { content_id: 42, workspace_id: workspace.workspace_id, content_type: 'file' }
+  const commentContent = {
+    content_id: 254,
+    content_type: TLM_ST.COMMENT,
+    workspace_id: fileContent.workspace_id,
+    parent_id: fileContent.content_id,
+    parent_content_type: fileContent.content_type
+  }
   const readerMember = { role: 'reader' }
 
   const messageList = [
@@ -41,7 +49,7 @@ describe('In activity.js module', () => {
       author: foo,
       user: bar,
       member: readerMember,
-      workspace: { workspace_id: 23 }
+      workspace: workspace
     }),
     createMessage(5, TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE, {
       author: foo,
@@ -51,7 +59,7 @@ describe('In activity.js module', () => {
       author: bar,
       user: bar,
       subscription: {},
-      workspace: { workspace_id: 23 }
+      workspace: workspace
     }),
     createMessage(3, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE, {
       author: foo,
@@ -104,6 +112,18 @@ describe('In activity.js module', () => {
       const resultActivityList = await mergeWithActivityList(messageList, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal([memberActivity, contentActivity, subscriptionActivity])
+    })
+
+    it('should ignore comment messages which cannot retrieve their parent content', async () => {
+      const message = createMessage(1, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT, {
+        author: foo,
+        content: commentContent,
+        workspace: workspace
+      })
+      const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
+      const resultActivityList = await mergeWithActivityList([message], [], apiUrl)
+      expect(mock.isDone()).to.equal(true)
+      expect(resultActivityList).to.be.deep.equal([])
     })
   })
 
@@ -179,6 +199,18 @@ describe('In activity.js module', () => {
       )
       expect(mock.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal([expectedContentActivity, memberActivity, contentActivity, subscriptionActivity])
+    })
+
+    it('should ignore comment messages which cannot retrieve their parent content', async () => {
+      const message = createMessage(1, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT, {
+        author: foo,
+        content: commentContent,
+        workspace: workspace
+      })
+      const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
+      const resultActivityList = await addMessageToActivityList(message, [], apiUrl)
+      expect(mock.isDone()).to.equal(true)
+      expect(resultActivityList).to.be.deep.equal([])
     })
   })
 })

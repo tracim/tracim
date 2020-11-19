@@ -42,7 +42,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     ))
     if (response.apiResponse.status === 200) {
       content = response.body
-    }
+    } else return null
   }
 
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
@@ -108,7 +108,8 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
   for (const { params, list } of activityMap.values()) {
     activityCreationList.push(createActivity(params, list, apiUrl))
   }
-  return await Promise.all(activityCreationList)
+  // NOTE - SG - 2020-11-19 - remove the null activities (can happen with content activities)
+  return (await Promise.all(activityCreationList)).filter(i => i)
 }
 
 /**
@@ -176,7 +177,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
     const activity = await createActivity(activityParams, [message], apiUrl)
-    return [activity, ...activityList]
+    return activity ? [activity, ...activityList] : activityList
   }
   const oldActivity = activityList[activityIndex]
   const updatedActivity = updateActivity(message, oldActivity)
