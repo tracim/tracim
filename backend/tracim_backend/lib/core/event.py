@@ -318,6 +318,52 @@ class EventApi:
         context.pending_events.append(event)
         return event
 
+    def generate_historic_workspaces_messages_for_user(
+        self,
+        context: TracimContext,
+        user_id: int,
+        workspace_ids: List[int],
+        max_event_history: int = -1,
+    ) -> List[Message]:
+        """
+        Generate up to max_event_history missing messages to ensure the last max_event_history event
+        related to given workspaces exist as message for user given.
+        """
+        session = context.dbsession
+        already_known_event_ids_query = session.query(Message.event_id).filter(
+            Message.receiver_id == user_id
+        )
+        workspace_event_ids_query = session.query(Event.event_id).filter(
+            Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+        )
+        if max_event_history >= 0:
+            workspace_event_ids_query = workspace_event_ids_query.order_by(
+                Message.event_id.desc()
+            ).limit(max_event_history)
+
+        event_query = (
+            session.query(Event)
+            .filter(Event.event_id.in_(workspace_event_ids_query.subquery()))
+            .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
+        )
+        messages = []
+        for event in event_query:
+            receiver_ids = BaseLiveMessageBuilder._get_receiver_ids_callables[event.entity_type](
+                event, session, context.app_config
+            )
+            if user_id in receiver_ids:
+                messages.append(
+                    Message(
+                        receiver_id=user_id,
+                        event=event,
+                        event_id=event.event_id,
+                        sent=None,
+                        read=datetime.utcnow(),
+                    )
+                )
+        session.add_all(messages)
+        return messages
+
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
         try:
@@ -515,7 +561,20 @@ class EventBuilder:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
+        self._create_workspace_historic_messages_for_current_user(role, context)
         self._create_role_event(OperationType.CREATED, role, context)
+
+    def _create_workspace_historic_messages_for_current_user(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ):
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.generate_historic_workspaces_messages_for_user(
+            context=context,
+            user_id=role.user_id,
+            workspace_ids=[role.workspace_id],
+            max_event_history=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+        )
 
     @hookimpl
     def on_user_role_in_workspace_modified(
