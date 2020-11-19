@@ -45,7 +45,6 @@ class Preview extends React.Component {
     return type === CONTENT_TYPE.HTML_DOCUMENT || type === CONTENT_TYPE.THREAD
   }
 
-
   handleUnavailablePreview = () => {
     this.setState({
       previewLoading: false,
@@ -57,7 +56,6 @@ class Preview extends React.Component {
   setLoadingPreview () {
     this.setState({ previewLoading: true })
   }
-
 
   async getHTMLPreviewCode (content) {
     if (content.content_type === CONTENT_TYPE.HTML_DOCUMENT) {
@@ -155,7 +153,6 @@ class Preview extends React.Component {
         console.error('Unable to produce the preview of content ', this.props.content, e)
         return
       }
-
     } else {
       previewComponent = this.getJPEGPreview()
     }
@@ -208,7 +205,7 @@ class Preview extends React.Component {
             activityFeed__preview__overflow: state.previewOverflow,
             activityFeed__preview__unavailable: state.previewUnavailable,
             activityFeed__preview__loading: state.previewLoading
-        })}
+          })}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
@@ -216,14 +213,14 @@ class Preview extends React.Component {
             state.previewLoading
               ? props.t('Preview loading...')
               : (
-                  state.previewUnavailable
-                    ? (
-                      <>
-                        <i className='fa fa-eye-slash' />
-                        <span>{props.t('No preview available')}</span>
-                      </>
-                    )
-                    : state.previewComponent
+                state.previewUnavailable
+                  ? (
+                    <>
+                      <i className='fa fa-eye-slash' />
+                      <span>{props.t('No preview available')}</span>
+                    </>
+                  )
+                  : state.previewComponent
               )
           )}
         </Link>
