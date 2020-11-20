@@ -36,8 +36,7 @@ import {
   setBreadcrumbs,
   setHeadTitle,
   newFlashMessage,
-  setWorkspaceDetail,
-  setWorkspaceContentList
+  setWorkspaceDetail
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
