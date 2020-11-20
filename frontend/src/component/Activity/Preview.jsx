@@ -136,7 +136,7 @@ class Preview extends React.Component {
 
     if (this.isHtmlPreview()) {
       if (!this.state.previewComponent) {
-        this.setLoadingPreview()
+        this.setPreviewLoading()
       }
 
       try {
