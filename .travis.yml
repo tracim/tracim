@@ -50,6 +50,7 @@ _install_backend: &_install_backend
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - echo "$TRACIM_SQLALCHEMY__URL"
+    - python $TRAVIS_BUILD_DIR/python_sqlite_info.py
     - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
     - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
     - mkdir -p $TRACIM_SESSION__DATA_DIR
