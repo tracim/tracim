@@ -44,6 +44,7 @@ from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
+from tracim_backend.tests.utils import MessageHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
@@ -437,6 +438,11 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
 @pytest.fixture
 def event_helper(session) -> EventHelper:
     return EventHelper(session)
+
+
+@pytest.fixture
+def message_helper(session) -> MessageHelper:
+    return MessageHelper(session)
 
 
 @pytest.fixture

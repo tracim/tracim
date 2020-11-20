@@ -2,6 +2,7 @@ import pytest
 import transaction
 
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
+from tracim_backend.lib.core.event import EventApi
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -500,3 +501,170 @@ class TestEventReceiver:
         assert admin_user.user_id in receivers_ids
         assert workspace_content_manager.user_id not in receivers_ids
         assert other_user.user_id not in receivers_ids
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestEventApi:
+    def test__generate_historic_workspaces_messages_for_user_at_workspace_join_hook__ok__nominal_case(
+        self, session, app_config, admin_user, workspace_and_users, message_helper, role_api_factory
+    ):
+        """
+        Test hook on workspace_join about adding previous workspace event as user messages,
+        Default tracim config should add all previous event as user message without sent set.
+        Please notice that only those message are generated in this test, MessageBuilder is disabled
+        in this test context, so anly created message are historic one.
+        """
+        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        default_workspace_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert default_workspace_messages == []
+
+        rapi = role_api_factory.get(current_user=event_initiator)
+        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+
+        workspace_message_at_workspace_join = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_at_workspace_join) > len(default_workspace_messages)
+        for message in workspace_message_at_workspace_join:
+            assert message.sent is None
+            assert message.receiver_id == other_user.user_id
+            assert message.event.workspace["workspace_id"] == my_workspace.workspace_id
+
+    @pytest.mark.parametrize(
+        "config_section",
+        [{"name": "base_test_historic_message_generation_disabled"}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize("max_message_generated", [1, 2, 100])
+    def test__generate_historic_workspaces_messages_for_user_at_workspace_join__ok__positive_max_message(
+        self,
+        session,
+        app_config,
+        admin_user,
+        workspace_and_users,
+        message_helper,
+        role_api_factory,
+        max_message_generated,
+    ):
+        """
+        Test more specifically generate_historic_workspaces_messages method, we do set
+        config parameter to 0 to avoid hook creating itself the required messages itself.
+        Case where max_message_generated > 0
+        """
+        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        # default
+        default_workspace_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert default_workspace_messages == []
+
+        # try generate workspace message: not in workspace, should return empty list
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
+        generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+            user_id=other_user.user_id,
+            workspace_ids=[my_workspace.workspace_id],
+            max_event_history=max_message_generated,
+        )
+        assert generated_messages == []
+        transaction.commit()
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert last_messages == []
+
+        # join workspace: should not generated message these feature are disabled
+        rapi = role_api_factory.get(current_user=event_initiator)
+        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert last_messages == []
+
+        # retry generate workspace message: should return message list
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
+        generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+            user_id=other_user.user_id,
+            workspace_ids=[my_workspace.workspace_id],
+            max_event_history=max_message_generated,
+        )
+        transaction.commit()
+        assert generated_messages
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert last_messages
+        assert len(generated_messages) == len(last_messages)
+        assert len(last_messages) <= max_message_generated
+
+        # re-retry generate workspace message: should not create new message
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
+        new_generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+            user_id=other_user.user_id,
+            workspace_ids=[my_workspace.workspace_id],
+            max_event_history=max_message_generated,
+        )
+        transaction.commit()
+        assert not new_generated_messages
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert last_messages
+        assert len(generated_messages) == len(last_messages)
+        assert len(last_messages) <= max_message_generated
+
+    @pytest.mark.parametrize(
+        "config_section",
+        [{"name": "base_test_historic_message_generation_disabled"}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize("max_message_generated", [-1, 0])
+    def test__generate_historic_workspaces_messages_for_user_at_workspace_join__ok__other_cases(
+        self,
+        session,
+        app_config,
+        admin_user,
+        workspace_and_users,
+        message_helper,
+        role_api_factory,
+        max_message_generated,
+    ):
+        """
+        Test more specifically generate_historic_workspaces_messages method, we do set
+        config parameter to 0 to avoid hook creating itself the required messages itself.
+        Case where max_message_generated == 0 or -1 (infinite)
+        """
+        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        # default
+        default_workspace_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert default_workspace_messages == []
+
+        # join workspace: should not generated message these feature are disabled
+        rapi = role_api_factory.get(current_user=event_initiator)
+        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        transaction.commit()
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert last_messages == []
+
+        # generate workspace message: should return message list
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
+        event_api.generate_historic_workspaces_messages_for_user(
+            user_id=other_user.user_id,
+            workspace_ids=[my_workspace.workspace_id],
+            max_event_history=max_message_generated,
+        )
+        transaction.commit()
+        last_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        if max_message_generated == -1:
+            assert len(last_messages) == 5
+        elif not max_message_generated:
+            assert len(last_messages) == 0

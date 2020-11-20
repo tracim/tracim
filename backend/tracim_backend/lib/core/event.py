@@ -319,17 +319,16 @@ class EventApi:
         return event
 
     def generate_historic_workspaces_messages_for_user(
-        self,
-        context: TracimContext,
-        user_id: int,
-        workspace_ids: List[int],
-        max_event_history: int = -1,
+        self, user_id: int, workspace_ids: List[int], max_event_history: int = -1,
     ) -> List[Message]:
         """
         Generate up to max_event_history missing messages to ensure the last max_event_history event
         related to given workspaces exist as message for user given.
         """
-        session = context.dbsession
+        if not max_event_history:
+            return []
+
+        session = self._session
         already_known_event_ids_query = session.query(Message.event_id).filter(
             Message.receiver_id == user_id
         )
@@ -338,7 +337,7 @@ class EventApi:
         )
         if max_event_history >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
-                Message.event_id.desc()
+                Event.event_id.desc()
             ).limit(max_event_history)
 
         event_query = (
@@ -349,7 +348,7 @@ class EventApi:
         messages = []
         for event in event_query:
             receiver_ids = BaseLiveMessageBuilder._get_receiver_ids_callables[event.entity_type](
-                event, session, context.app_config
+                event, session, self._config
             )
             if user_id in receiver_ids:
                 messages.append(
@@ -570,7 +569,6 @@ class EventBuilder:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.generate_historic_workspaces_messages_for_user(
-            context=context,
             user_id=role.user_id,
             workspace_ids=[role.workspace_id],
             max_event_history=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,

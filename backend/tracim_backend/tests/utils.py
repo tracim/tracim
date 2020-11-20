@@ -42,6 +42,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import Event
+from tracim_backend.models.event import Message
 from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.tracim_session import TracimSession
@@ -275,6 +276,27 @@ class EventHelper(object):
     @property
     def last_event(self) -> typing.Optional[Event]:
         return self._session.query(Event).order_by(Event.event_id.desc()).limit(1).one()
+
+
+class MessageHelper(object):
+    def __init__(self, db_session: TracimSession) -> None:
+        self._session = db_session
+
+    def last_user_workspace_messages(
+        self, count: int, workspace_id: int, user_id: int
+    ) -> typing.List[Event]:
+        messages = (
+            self._session.query(Message)
+            .join(Event)
+            .filter(
+                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_([workspace_id])
+            )
+            .filter(Message.receiver_id == user_id)
+            .order_by(Message.event_id.desc())
+            .limit(count)
+            .all()
+        )
+        return sorted(messages, key=lambda e: e.event_id)
 
 
 class DockerCompose:
