@@ -188,7 +188,6 @@ jobs:
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.7"
-      dist: xenial
       <<: *_backend_quick_test
       python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/
