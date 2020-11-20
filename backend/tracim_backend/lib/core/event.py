@@ -340,9 +340,12 @@ class EventApi:
                 Event.event_id.desc()
             ).limit(max_messages_count)
 
+        # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
+        # mysql/mariadb doesn't support limit operator in subquery
+        workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
         event_query = (
             session.query(Event)
-            .filter(Event.event_id.in_(workspace_event_ids_query.subquery()))
+            .filter(Event.event_id.in_(workspace_event_ids))
             .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
         )
         messages = []
