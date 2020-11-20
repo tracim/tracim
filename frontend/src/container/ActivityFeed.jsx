@@ -64,6 +64,7 @@ export class ActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.updateActivityList)
+    this.changingActivityList = false
   }
 
   componentDidMount () {
@@ -81,12 +82,25 @@ export class ActivityFeed extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  waitForNoChange = () => {
+    return new Promise((resolve, reject) => {
+      const waitNotIsChanging = () => {
+        if (!this.changingActivityList) return resolve()
+        setTimeout(waitNotIsChanging, 5)
+      }
+      waitNotIsChanging()
+    })
+  }
+
   updateActivityList = async (data) => {
     const { props } = this
     if (!data.fields.workspace || !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
 
+    await this.waitForNoChange()
+    this.changingActivityList = true
     const updatedActivityList = await addMessageToActivityList(data, props.workspaceActivity.list, FETCH_CONFIG.apiUrl)
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
+    this.changingActivityList = false
   }
 
   handleRefreshClicked = () => {
@@ -97,9 +111,16 @@ export class ActivityFeed extends React.Component {
 
   loadActivities = async (minActivityCount, resetList = false) => {
     const { props } = this
-    let activityList = resetList ? [] : props.workspaceActivity.list
-    let hasNextPage = resetList ? true : props.workspaceActivity.hasNextPage
-    let nextPageToken = resetList ? '' : props.workspaceActivity.nextPageToken
+    let activityList = props.workspaceActivity.list
+    let hasNextPage = props.workspaceActivity.hasNextPage
+    let nextPageToken = props.workspaceActivity.nextPageToken
+    if (resetList) {
+      activityList = []
+      hasNextPage = true
+      nextPageToken = ''
+    }
+    await this.waitForNoChange()
+    this.changingActivityList = true
     while (hasNextPage && activityList.length < minActivityCount) {
       const messageListResponse = await props.dispatch(getNotificationList(
         props.user.userId,
@@ -109,13 +130,17 @@ export class ActivityFeed extends React.Component {
           workspaceId: props.workspaceId
         }
       ))
-      activityList = await mergeWithActivityList(messageListResponse.json.items, activityList, FETCH_CONFIG.apiUrl)
+      activityList = await mergeWithActivityList(
+        messageListResponse.json.items,
+        activityList,
+        FETCH_CONFIG.apiUrl
+      )
       hasNextPage = messageListResponse.json.has_next
       nextPageToken = messageListResponse.json.next_page_token
     }
-
     props.dispatch(setWorkspaceActivityList(activityList))
     props.dispatch(setWorkspaceActivityNextPage(hasNextPage, nextPageToken))
+    this.changingActivityList = false
   }
 
   loadWorkspaceDetail = async () => {
