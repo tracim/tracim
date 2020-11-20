@@ -53,7 +53,7 @@ class Preview extends React.Component {
     })
   }
 
-  setLoadingPreview () {
+  setPreviewLoading () {
     this.setState({ previewLoading: true })
   }
 
