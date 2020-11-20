@@ -43,6 +43,29 @@ describe('App Workspace Advanced', function () {
     })
   })
 
+  describe("Changing the space's default role", () => {
+    it('Should show a flash message', function () {
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+      .find('.dashboard__workspace__detail__right__button.btn')
+      .click()
+
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .find('.workspace_advanced__defaultRole')
+        .should('be.visible')
+
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .find('.workspace_advanced__defaultRole__list .singleChoiceList__item')
+        .first()
+        .click()
+
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .find('.workspace_advanced__defaultRole__bottom__btn')
+        .click()
+
+      cy.contains('.flashmessage__container__content__text__paragraph', 'Save successful')
+    })
+  })
+
   describe('Member list', () => {
     let userId = 0
     let userPublicName = ''
@@ -80,7 +103,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.singleChoiceList__item__radioButton > input')
+        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
         .first()
         .click()
 
@@ -114,7 +137,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.singleChoiceList__item__radioButton > input')
+        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
         .first()
         .click()
 
@@ -148,7 +171,7 @@ describe('App Workspace Advanced', function () {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.singleChoiceList__item__radioButton > input')
+        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
         .first()
         .click()
 

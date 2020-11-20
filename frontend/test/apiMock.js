@@ -213,6 +213,12 @@ const mockGetContent200 = (apiUrl, contentId, content) => {
     .reply(200, content)
 }
 
+const mockGetFileContent400 = (apiUrl, workspaceId, contentId) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/files/${contentId}`)
+    .reply(400, {})
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -242,5 +248,6 @@ export {
   mockGetUser200,
   mockGetFolderContentList200,
   mockGetContentComments200,
-  mockGetContent200
+  mockGetContent200,
+  mockGetFileContent400
 }

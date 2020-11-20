@@ -90,8 +90,8 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__folder_case(self):
         """
@@ -127,8 +127,8 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__agenda_enabled_workspace_case(self):
         app_config = Mock()
@@ -152,8 +152,8 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 4
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
         assert default_workspace_menu_entry[3].label == agenda.label
 
     def test_get_default_workspace_menu_entry__ok__agenda_disabled_workspace_case(self):
@@ -178,5 +178,5 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label

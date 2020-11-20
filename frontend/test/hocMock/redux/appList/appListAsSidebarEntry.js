@@ -9,7 +9,7 @@ import { serialize } from 'tracim_frontend_lib'
 export const sidebarEntryDashboardFromApi = {
   slug: 'dashboard',
   route: '/ui/workspaces/1/dashboard',
-  fa_icon: 'home',
+  fa_icon: 'tachometer',
   hexcolor: '#fdfdfd',
   label: 'Dashboard'
 }
