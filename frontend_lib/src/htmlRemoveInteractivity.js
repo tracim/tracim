@@ -1,4 +1,4 @@
-const ATTRIBUTES_TO_REMOVE = ['controls', 'usemap', 'name', 'id', 'href']
+const ATTRIBUTES_TO_REMOVE = ['controls', 'usemap', 'name', 'id', 'href', 'for']
 
 function getFakeAnchorElement (doc, href) {
   // INFO - RJ - 2020-11-09
