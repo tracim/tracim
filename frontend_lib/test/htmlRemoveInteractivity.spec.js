@@ -66,9 +66,9 @@ describe('The HTML without interactivity', () => {
     expect(resultingHTMLBody.querySelector('[id], [name], [name], [controls], [for]')).to.be.null
   })
 
-  it('does not have any button, a, input, select', () => {
+  it('does not have any button, a, input, select, details, script, style', () => {
     // eslint-disable-next-line no-unused-expressions
-    expect(resultingHTMLBody.querySelector('button, a, input, select, details')).to.be.null
+    expect(resultingHTMLBody.querySelector('button, a, input, select, details, script, style')).to.be.null
   })
 
   it('has a fake link', () => {
