@@ -505,7 +505,7 @@ class TestEventReceiver:
 
 @pytest.mark.usefixtures("base_fixture")
 class TestEventApi:
-    def test__generate_historic_workspaces_messages_for_user_at_workspace_join_hook__ok__nominal_case(
+    def test__message_history_creation_with_workspace_join_hook__ok__nominal_case(
         self, session, app_config, admin_user, workspace_and_users, message_helper, role_api_factory
     ):
         """
@@ -539,7 +539,7 @@ class TestEventApi:
         indirect=True,
     )
     @pytest.mark.parametrize("max_message_generated", [1, 2, 100])
-    def test__generate_historic_workspaces_messages_for_user_at_workspace_join__ok__positive_max_message(
+    def test__create_messages_history_for_user__ok__positive_max_message(
         self,
         session,
         app_config,
@@ -563,10 +563,10 @@ class TestEventApi:
 
         # try generate workspace message: not in workspace, should return empty list
         event_api = EventApi(current_user=admin_user, session=session, config=app_config)
-        generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+        generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
-            max_event_history=max_message_generated,
+            max_messages_count=max_message_generated,
         )
         assert generated_messages == []
         transaction.commit()
@@ -586,10 +586,10 @@ class TestEventApi:
 
         # retry generate workspace message: should return message list
         event_api = EventApi(current_user=admin_user, session=session, config=app_config)
-        generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+        generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
-            max_event_history=max_message_generated,
+            max_messages_count=max_message_generated,
         )
         transaction.commit()
         assert generated_messages
@@ -602,10 +602,10 @@ class TestEventApi:
 
         # re-retry generate workspace message: should not create new message
         event_api = EventApi(current_user=admin_user, session=session, config=app_config)
-        new_generated_messages = event_api.generate_historic_workspaces_messages_for_user(
+        new_generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
-            max_event_history=max_message_generated,
+            max_messages_count=max_message_generated,
         )
         transaction.commit()
         assert not new_generated_messages
@@ -622,7 +622,7 @@ class TestEventApi:
         indirect=True,
     )
     @pytest.mark.parametrize("max_message_generated", [-1, 0])
-    def test__generate_historic_workspaces_messages_for_user_at_workspace_join__ok__other_cases(
+    def test__create_messages_history_for_user_ok__not_positive_max_message(
         self,
         session,
         app_config,
@@ -655,10 +655,10 @@ class TestEventApi:
 
         # generate workspace message: should return message list
         event_api = EventApi(current_user=admin_user, session=session, config=app_config)
-        event_api.generate_historic_workspaces_messages_for_user(
+        event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
-            max_event_history=max_message_generated,
+            max_messages_count=max_message_generated,
         )
         transaction.commit()
         last_messages = message_helper.last_user_workspace_messages(

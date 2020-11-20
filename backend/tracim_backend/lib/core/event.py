@@ -318,14 +318,14 @@ class EventApi:
         context.pending_events.append(event)
         return event
 
-    def generate_historic_workspaces_messages_for_user(
-        self, user_id: int, workspace_ids: List[int], max_event_history: int = -1,
+    def create_messages_history_for_user(
+        self, user_id: int, workspace_ids: List[int], max_messages_count: int = -1,
     ) -> List[Message]:
         """
-        Generate up to max_event_history missing messages to ensure the last max_event_history event
+        Generate up to max_messages_count missing messages to ensure the last max_messages_count event
         related to given workspaces exist as message for user given.
         """
-        if not max_event_history:
+        if not max_messages_count:
             return []
 
         session = self._session
@@ -335,10 +335,10 @@ class EventApi:
         workspace_event_ids_query = session.query(Event.event_id).filter(
             Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
         )
-        if max_event_history >= 0:
+        if max_messages_count >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
                 Event.event_id.desc()
-            ).limit(max_event_history)
+            ).limit(max_messages_count)
 
         event_query = (
             session.query(Event)
@@ -568,10 +568,10 @@ class EventBuilder:
     ):
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.generate_historic_workspaces_messages_for_user(
+        event_api.create_messages_history_for_user(
             user_id=role.user_id,
             workspace_ids=[role.workspace_id],
-            max_event_history=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
         )
 
     @hookimpl
