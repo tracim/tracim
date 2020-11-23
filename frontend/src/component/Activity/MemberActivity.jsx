@@ -1,16 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import { escape as escapeHtml } from 'lodash'
 
 import {
   Avatar,
+  BREADCRUMBS_TYPE,
+  Breadcrumbs,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
+import { PAGE } from '../../util/helper.js'
 
 import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
@@ -26,7 +30,7 @@ export class MemberActivity extends React.Component {
     }
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return props.t('{{user}} joined the space', i18nOpts)
+        return props.t('{{user}} joined the space {{workspace}}', i18nOpts)
       case TLM_CET.MODIFIED:
         return props.t("{{user}}'s role has been changed to {{role}}", i18nOpts)
     }
@@ -42,7 +46,7 @@ export class MemberActivity extends React.Component {
     }
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return props.t('{{user}} wants to join the space', i18nOpts)
+        return props.t('{{user}} wants to join the space {{workspace}}', i18nOpts)
       case TLM_CET.MODIFIED:
         return props.t("{{user}}'s request to join the space has been {{state}}", i18nOpts)
     }
@@ -52,9 +56,11 @@ export class MemberActivity extends React.Component {
   getText () {
     const { props } = this
     const userPublicName = escapeHtml(props.activity.newestMessage.fields.user.public_name)
+    const workspaceLabel = escapeHtml(props.activity.newestMessage.fields.workspace.label)
     const [entityType, coreEventType] = props.activity.newestMessage.event_type.split('.')
     const i18nOpts = {
       user: `<span title='${userPublicName}' class='memberActivity__user'>${userPublicName}</span>`,
+      workspace: `<span title='${workspaceLabel}' class='memberActivity__workspace'>${workspaceLabel}</span>`,
       interpolation: { escapeValue: false }
     }
     switch (entityType) {
@@ -69,10 +75,23 @@ export class MemberActivity extends React.Component {
   render () {
     const { props } = this
     const newestMessage = props.activity.newestMessage
+
+    const workspaceId = newestMessage.fields.workspace.workspace_id
+    const workspaceLabel = newestMessage.fields.workspace.label
+    const breadcrumbsList = [
+      {
+        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
+        type: BREADCRUMBS_TYPE.CORE
+      }
+    ]
+
     return (
       <div className='memberActivity'>
         <Avatar publicName={newestMessage.fields.user.public_name} width={32} style={{ marginRight: '5px' }} />
-        <div className='memberActivity__text' dangerouslySetInnerHTML={{ __html: this.getText() }} />
+        <div className='memberActivity__title'>
+          <div className='memberActivity__text' dangerouslySetInnerHTML={{ __html: this.getText() }} />
+          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+        </div>
         <TimedEvent
           customClass='memberActivity__right'
           date={newestMessage.created}

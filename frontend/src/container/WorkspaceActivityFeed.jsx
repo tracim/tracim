@@ -19,7 +19,8 @@ import {
   setBreadcrumbs,
   setHeadTitle,
   newFlashMessage,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  resetWorkspaceActivity
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
@@ -139,12 +140,17 @@ export class WorkspaceActivityFeed extends React.Component {
 WorkspaceActivityFeed.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
-  handleRefreshClicked: PropTypes.func.isRequired,
+  onRefreshClicked: PropTypes.func.isRequired,
   workspaceId: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {
   return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs }
 }
-const component = withActivity(TracimComponent(WorkspaceActivityFeed), setWorkspaceActivityList, setWorkspaceActivityNextPage)
+const component = withActivity(
+  TracimComponent(WorkspaceActivityFeed),
+  setWorkspaceActivityList,
+  setWorkspaceActivityNextPage,
+  resetWorkspaceActivity
+)
 export default connect(mapStateToProps)(withRouter(translate()(component)))

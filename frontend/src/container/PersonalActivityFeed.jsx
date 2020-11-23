@@ -17,7 +17,8 @@ import {
   setBreadcrumbs,
   setHeadTitle,
   setUserActivityList,
-  setUserActivityNextPage
+  setUserActivityNextPage,
+  resetUserActivity
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
@@ -70,7 +71,7 @@ export class PersonalActivityFeed extends React.Component {
         />
         <ActivityList
           activity={props.activity}
-          onRefreshClicked={props.handleRefreshClicked}
+          onRefreshClicked={props.onRefreshClicked}
           onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
         />
       </div>
@@ -81,9 +82,14 @@ export class PersonalActivityFeed extends React.Component {
 PersonalActivityFeed.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
-  handleRefreshClicked: PropTypes.func.isRequired
+  onRefreshClicked: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
-const component = withActivity(TracimComponent(PersonalActivityFeed), setUserActivityList, setUserActivityNextPage)
+const component = withActivity(
+  TracimComponent(PersonalActivityFeed),
+  setUserActivityList,
+  setUserActivityNextPage,
+  resetUserActivity
+)
 export default connect(mapStateToProps)(withRouter(translate()(component)))

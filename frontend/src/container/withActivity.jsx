@@ -21,7 +21,7 @@ const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
  * @param {function} setActivityNextPage a redux action that will set the
  *  activity.hasNextPage/nextPageToken props when dispatched.
  */
-const withActivity = (WrappedComponent, setActivityList, setActivityNextPage) => {
+const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, resetActivityList) => {
   return class extends React.Component {
     constructor (props) {
       super(props)
@@ -75,6 +75,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage) =>
       let hasNextPage = props.activity.hasNextPage
       let nextPageToken = props.activity.nextPageToken
       if (resetList) {
+        props.dispatch(resetActivityList())
         activityList = []
         hasNextPage = true
         nextPageToken = ''
