@@ -127,7 +127,8 @@ export class ActivityFeed extends React.Component {
         {
           nextPageToken: nextPageToken,
           notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
-          workspaceId: props.workspaceId
+          workspaceId: props.workspaceId,
+          activityFeedEvents: true
         }
       ))
       activityList = await mergeWithActivityList(
