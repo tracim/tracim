@@ -1,5 +1,7 @@
 import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages
+from setuptools import setup
 
 requires = [
     # pyramid
@@ -9,12 +11,12 @@ requires = [
     "pyramid_retry",
     "waitress",
     # Database
-    'pyramid_tm',
-    'SQLAlchemy',
-    'transaction',
-    'zope.sqlalchemy',
-    'alembic',
-    'sqlakeyset',
+    "pyramid_tm",
+    "SQLAlchemy",
+    "transaction",
+    "zope.sqlalchemy",
+    "alembic",
+    "sqlakeyset",
     # API
     "hapic[marshmallow]>=0.83",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
@@ -129,7 +131,7 @@ setup(
             "webdav = tracim_backend:webdav",
             "caldav = tracim_backend:caldav",
         ],
-        "console_scripts": ["tracimcli = tracim_backend.command:main",],
+        "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
@@ -151,6 +153,6 @@ setup(
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None),]
+        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
     },
 )
