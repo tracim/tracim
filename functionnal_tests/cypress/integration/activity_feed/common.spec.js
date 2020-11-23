@@ -27,7 +27,7 @@ for (const pageTestCase of activityPages) {
         }
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
-      it('should display a "Show more" button when more than 15 activities exist', () => {
+      it('should display a "See more" button when more than 15 activities exist', () => {
         cy.get('[data-cy=activityList__item]').should('have.length.gte', 15)
         cy.get('[data-cy=activityList__more]').click()
         cy.get('[data-cy=activityList__item]').should('have.length.gte', 20)
@@ -86,7 +86,7 @@ for (const pageTestCase of activityPages) {
       })
     })
 
-    describe('Content item', () => {
+    describe('File Content item', () => {
       let fileId = null
       beforeEach(() => {
         cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId).then(content => { fileId = content.content_id })
@@ -101,6 +101,70 @@ for (const pageTestCase of activityPages) {
       it('should have a title link, clicking on it opens the content', () => {
         cy.get('[data-cy=contentActivityHeader__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
+      })
+
+      it('should have a preview, clicking on it opens the content', () => {
+        cy.get('.activityFeed__preview__image > img').click()
+        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
+      })
+    })
+
+    describe('Note content item', () => {
+      let contentId = -1
+      beforeEach(() => {
+        cy.createHtmlDocument('Note 1', workspaceId).then(doc => {
+          contentId = doc.content_id
+        })
+      })
+
+      it('should render a small note correctly', () => {
+        cy.updateHtmlDocument(
+          contentId,
+          workspaceId,
+          'a small text',
+          'Note 1'
+        )
+
+        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+
+        cy.get('.activityFeed__preview')
+          .should('not.have.class', 'activityFeed__preview__overflow')
+
+        cy.get('.activityFeed__preview__html')
+          .should('contain.text', 'a small text')
+      })
+
+      it('should render a long note correctly', () => {
+        cy.updateHtmlDocument(
+          contentId,
+          workspaceId,
+          `<pre>
+            A long text.
+            This morning, I was writing Cypress tests.
+            They would fail randomly, you know?
+            Business as usual.
+            Not only my tests were failing, but tests others wrote too.
+            I was beginning to feel desesperate.
+            this.skip() was looking at me, amused.
+            ‘I am strong though’, I said to myself.
+            And then, I saw a Light.
+            A Voice, out of nowhere, began to speak!
+            It was starting to save me. To tell me how to fix the Holy Tests.
+            ‘It is easy’, It was saying. ‘The trick is that’
+            And the Voice stopped speaking. The Light went away.
+            I went back to the Holy Randomly Failing Tests.
+          </pre>`,
+          'The Holy Tests'
+        )
+
+        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+
+        cy.get('.activityFeed__preview')
+          .should('not.have.class', 'activityFeed__preview__overflow')
+
+        cy.get('.activityFeed__preview__html')
+          .click()
+        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId}))
       })
     })
   })

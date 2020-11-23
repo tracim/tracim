@@ -35,7 +35,7 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = global.document.dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
   global.CustomEvent = () => {}
   global.fetch = require('node-fetch')
-  global.GLOBAL_excludedNotifications = ''
+  global.GLOBAL_excludedNotifications = []
 }
 
 Enzyme.configure({ adapter: new Adapter() })

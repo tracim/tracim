@@ -78,7 +78,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         props.dispatch(resetActivityList())
         activityList = []
         hasNextPage = true
-        nextPageToken = ''
+        nextPageToken = '',
       }
       await this.waitForNoChange()
       this.changingActivityList = true
@@ -88,6 +88,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           {
             nextPageToken: nextPageToken,
             notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
+            activityFeedEvents: true,
             workspaceId: workspaceId
           }
         ))
