@@ -77,23 +77,23 @@ class WorkspaceListItem extends React.Component {
       <li
         id={props.id}
         className={classnames(
-          'sidebar__content__navigation__workspace__item',
+          'sidebar__content__navigation__item',
           {
-            'sidebar__content__navigation__workspace__item__current primaryColorBorder':
+            'sidebar__content__navigation__item__current primaryColorBorder':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           }
         )}
-        data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
+        data-cy={`sidebar__content__navigation__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
       >
         <Link
-          className='sidebar__content__navigation__workspace__item__wrapper'
+          className='sidebar__content__navigation__item__wrapper'
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__workspace__item__dragNdrop`} />
+            <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
           )}
 
           {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
@@ -115,9 +115,9 @@ class WorkspaceListItem extends React.Component {
 
           <div
             className={classnames(
-              'sidebar__content__navigation__workspace__item__name',
+              'sidebar__content__navigation__item__name',
               {
-                sidebar__content__navigation__workspace__item__current__name:
+                sidebar__content__navigation__item__current__name:
                   props.level === 0 &&
                   props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
               }
@@ -131,7 +131,7 @@ class WorkspaceListItem extends React.Component {
         {state.showDropdownMenuButton && (
           <DropdownMenu
             buttonIcon='fa-ellipsis-v'
-            buttonCustomClass='sidebar__content__navigation__workspace__item__menu'
+            buttonCustomClass='sidebar__content__navigation__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >

@@ -7,7 +7,7 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
-var dateFnsLocale = {
+const dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en'),
   pt: require('date-fns/locale/pt')
@@ -303,21 +303,21 @@ export const updateTLMAuthor = author => {
   return author
     ? { ...author, is_from_system_admin: false }
     : {
-      allowed_space: 0,
-      auth_type: 'internal',
-      avatar_url: null,
-      created: '',
-      email: '',
-      is_active: true,
-      is_deleted: false,
-      is_from_system_admin: true,
-      lang: 'en',
-      profile: 'administrators',
-      public_name: i18n.t('System Administrator'),
-      timezone: '',
-      user_id: 0,
-      username: ''
-    }
+        allowed_space: 0,
+        auth_type: 'internal',
+        avatar_url: null,
+        created: '',
+        email: '',
+        is_active: true,
+        is_deleted: false,
+        is_from_system_admin: true,
+        lang: 'en',
+        profile: 'administrators',
+        public_name: i18n.t('System Administrator'),
+        timezone: '',
+        user_id: 0,
+        username: ''
+      }
 }
 
 // INFO - GB - 2019-07-05 - This password generator function was based on

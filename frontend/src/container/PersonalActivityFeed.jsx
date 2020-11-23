@@ -1,0 +1,89 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
+import { Link, withRouter } from 'react-router-dom'
+
+import {
+  BREADCRUMBS_TYPE,
+  buildHeadTitle,
+  PageTitle,
+  TracimComponent
+} from 'tracim_frontend_lib'
+
+import ActivityList from '../component/Activity/ActivityList.jsx'
+import { PAGE } from '../util/helper.js'
+import {
+  setBreadcrumbs,
+  setHeadTitle,
+  setUserActivityList,
+  setUserActivityNextPage
+} from '../action-creator.sync.js'
+import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
+
+require('../css/PersonalActivityFeed.styl')
+
+export class PersonalActivityFeed extends React.Component {
+  constructor (props) {
+    super(props)
+    props.registerGlobalLiveMessageHandler(props.handleTlm)
+  }
+
+  componentDidMount () {
+    this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
+    this.setHeadTitle()
+    this.buildBreadcrumbs()
+  }
+
+  setHeadTitle = () => {
+    const { props } = this
+    const headTitle = buildHeadTitle([props.t('Activity feed')])
+    props.dispatch(setHeadTitle(headTitle))
+  }
+
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    const breadcrumbsList = [
+      {
+        link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+        type: BREADCRUMBS_TYPE.CORE
+      },
+      {
+        link: <Link to={PAGE.ACTIVITY_FEED}>{props.t('Activity feed')}</Link>,
+        type: BREADCRUMBS_TYPE.CORE
+      }
+    ]
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
+  }
+
+  render () {
+    const { props } = this
+    return (
+      <div className='personalActivityFeed'>
+        <PageTitle
+          title={props.t('Activity feed')}
+          icon='newspaper-o'
+          breadcrumbsList={props.breadcrumbs}
+          iconTooltip='newspaper-o'
+        />
+        <ActivityList
+          activity={props.activity}
+          onRefreshClicked={props.handleRefreshClicked}
+          onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+        />
+      </div>
+    )
+  }
+}
+
+PersonalActivityFeed.propTypes = {
+  loadActivities: PropTypes.func.isRequired,
+  handleTlm: PropTypes.func.isRequired,
+  handleRefreshClicked: PropTypes.func.isRequired
+}
+
+const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
+const component = withActivity(TracimComponent(PersonalActivityFeed), setUserActivityList, setUserActivityNextPage)
+export default connect(mapStateToProps)(withRouter(translate()(component)))
