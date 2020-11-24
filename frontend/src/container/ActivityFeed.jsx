@@ -118,6 +118,22 @@ export class ActivityFeed extends React.Component {
     props.dispatch(setWorkspaceActivityNextPage(hasNextPage, nextPageToken))
   }
 
+  handleClickCopyLink = content => {
+    const { props } = this
+    // INFO - GB - 2020-11-20 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+      props.workspaceId,
+      content.content_type,
+      content.content_id
+    )}`
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+    props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
+  }
+
   loadWorkspaceDetail = async () => {
     const { props } = this
 
@@ -140,7 +156,10 @@ export class ActivityFeed extends React.Component {
     const { props } = this
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity)
+      ? componentConstructor({
+        ...activity,
+        onClickCopyLink: () => this.handleClickCopyLink(activity.newestMessage.fields.content)
+      })
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
   }
