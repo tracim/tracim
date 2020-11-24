@@ -117,7 +117,7 @@ for (const pageTestCase of activityPages) {
         })
       })
 
-      it('should render a small note correctly', () => {
+      it('should render a small note without the visual overflow', () => {
         cy.updateHtmlDocument(
           contentId,
           workspaceId,
@@ -134,7 +134,7 @@ for (const pageTestCase of activityPages) {
           .should('contain.text', 'a small text')
       })
 
-      it('should render a long note correctly', () => {
+      it('should render a long note with the visual overflow', () => {
         cy.updateHtmlDocument(
           contentId,
           workspaceId,
@@ -160,7 +160,7 @@ for (const pageTestCase of activityPages) {
         cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
 
         cy.get('.activityFeed__preview')
-          .should('not.have.class', 'activityFeed__preview__overflow')
+          .should('have.class', 'activityFeed__preview__overflow')
 
         cy.get('.activityFeed__preview__html')
           .click()
