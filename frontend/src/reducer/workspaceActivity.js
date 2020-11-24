@@ -1,5 +1,6 @@
 import {
   SET,
+  RESET,
   WORKSPACE_ACTIVITY,
   LIST,
   NEXT_PAGE
@@ -13,6 +14,8 @@ const defaultWorkspaceActivityState = {
 
 const workspaceActivity = (state = defaultWorkspaceActivityState, action) => {
   switch (action.type) {
+    case `${RESET}/${WORKSPACE_ACTIVITY}`:
+      return defaultWorkspaceActivityState
     case `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`:
       return { ...state, list: action.activityList }
     case `${SET}/${WORKSPACE_ACTIVITY}/${NEXT_PAGE}`:

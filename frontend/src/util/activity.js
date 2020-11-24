@@ -16,7 +16,6 @@ const createActivityEvent = (message) => {
 }
 
 const createSingleMessageActivity = (activityParams, messageList) => {
-  if (messageList.length !== 1) throw new Error('Must have at exactly one message')
   const message = messageList[0]
   return {
     ...activityParams,
@@ -29,7 +28,6 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 
 // INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
-  if (!messageList.length) throw new Error('Must have at least one message to build a content activity')
   const first = messageList[0]
 
   let content = first.fields.content
@@ -85,9 +83,9 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
       return await createContentActivity(activityParams, activityMessageList, apiUrl)
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-      return createSingleMessageActivity(activityParams, activityMessageList)
+    default:
+      return await createSingleMessageActivity(activityParams, activityMessageList)
   }
-  throw new Error(`Unknown activity entity type: ${activityParams.entityType}`)
 }
 
 const groupMessageListByActivityId = (messageList) => {
