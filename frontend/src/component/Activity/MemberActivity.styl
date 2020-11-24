@@ -1,5 +1,5 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
-  
+
 .memberActivity
   display flex
   flex-direction row
@@ -17,8 +17,11 @@
   &__user
     font-weight bold
   &__workspace
-    text-decoration  underline
-
+    text-decoration underline
+    color fontColor
+    &:hover
+      color fontColor
+      text-decoration underline
   &__right
     margin-left  10px
     font-size fontSizeSmall

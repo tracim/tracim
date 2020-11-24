@@ -78,7 +78,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         props.dispatch(resetActivityList())
         activityList = []
         hasNextPage = true
-        nextPageToken = '',
+        nextPageToken = ''
       }
       await this.waitForNoChange()
       this.changingActivityList = true
