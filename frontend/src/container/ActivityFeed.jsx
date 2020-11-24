@@ -187,7 +187,11 @@ export class ActivityFeed extends React.Component {
         onClickCopyLink: () => this.handleClickCopyLink(activity.newestMessage.fields.content)
       })
       : <span>{props.t('Unknown activity type')}</span>
-    return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
+    return (
+      <div className='activity_feed__item' data-cy='activity_feed__item' key={activity.id}>
+        {component}
+      </div>
+    )
   }
 
   isSubscriptionRequestOrRejection = (activity) => {
