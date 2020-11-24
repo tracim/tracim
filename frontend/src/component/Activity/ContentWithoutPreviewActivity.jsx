@@ -10,7 +10,7 @@ export const ContentWithoutPreviewActivity = props => {
       workspace={props.activity.newestMessage.fields.workspace}
       eventList={props.activity.eventList}
       newestMessage={props.activity.newestMessage}
-      onClickCopyLink={props.activity.onClickCopyLink} // eslint-disable-line react/jsx-handler-names
+      handleClickCopyLink={props.activity.onClickCopyLink}
     />
   )
 }
