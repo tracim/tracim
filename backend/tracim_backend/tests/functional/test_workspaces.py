@@ -120,7 +120,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["owner"]
         assert workspace["parent_id"] is None
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
-        (user_role_created, workspace_created) = event_helper.last_events(2)
+        (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == author
@@ -697,7 +697,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
         workspace_id = res.json_body["workspace_id"]
-        (user_role_created, workspace_created) = event_helper.last_events(2)
+        (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == author
@@ -712,6 +712,59 @@ class TestWorkspaceEndpoint(object):
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
         assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
         assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
+
+    def test_api__create_children_workspace__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "parent",
+            "description": "parent_workspace",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": None,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        parent_workspace_id = res.json_body["workspace_id"]
+        assert parent_workspace_id
+        params = {
+            "label": "children",
+            "description": "children_workspace",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": parent_workspace_id,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["label"] == "children"
+        assert workspace["description"] == "children_workspace"
+        children_workspace_id = res.json_body["workspace_id"]
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace["parent_id"] == parent_workspace_id
+        res = web_testapp.get("/api/workspaces/{}".format(children_workspace_id), status=200)
+        workspace_2 = res.json_body
+        assert workspace["workspace_id"] == workspace_2["workspace_id"]
+        assert workspace["parent_id"] == workspace_2["parent_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
 
     def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """
