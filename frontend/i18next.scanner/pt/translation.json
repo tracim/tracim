@@ -306,7 +306,6 @@
   "You joined the space {{space}}": "Você juntou-se ao espaço {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "O seu pedido de acesso ao {{space}} será processado por um gestor do espaço. O resultado será mostrado no muro de notificação.",
   "Refresh": "Actualizar",
-  "No activity here": "Nenhuma atividade aqui",
   "Request accepted": "Pedido aceito",
   "Comment": "Comentar",
   "commented": "comentou",
@@ -315,14 +314,14 @@
   "deleted": "eliminou",
   "restored": "restaurou",
   "by": "por",
-  "{{user}} joined the space": "{{user}} juntou-se ao espaço",
-  "{{user}}'s role has been changed to {{role}}": "O papel de {{user}} foi alterado para {{role}}",
-  "{{user}} wants to join the space": "{{user}} deseja juntar-se ao espaço",
-  "{{user}}'s request to join the space has been {{state}}": "O pedido de {{user}} para se juntar ao espaço foi {{role}}",
   "Please ask access to spaces to an administrator or space manager": "Por favor, pedir acesso a espaços a um administrador ou a um gestor de espaço",
   "mention made": "menção feita",
   "unknown": "desconhecida",
-  "Unknown entity type": "Tipo de entidade desconhecida",
   "Unknown activity type": "Tipo de atividade desconhecida",
-  "status modified": "status modificado"
+  "status modified": "status modificado",
+  "Loading activity feed…": "__NOT_TRANSLATED__",
+  "No activity": "__NOT_TRANSLATED__",
+  "Preview of {{content}}": "__NOT_TRANSLATED__",
+  "No preview available": "__NOT_TRANSLATED__",
+  "Preview loading...": "__NOT_TRANSLATED__"
 }

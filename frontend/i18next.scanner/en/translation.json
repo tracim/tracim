@@ -305,7 +305,6 @@
   "You joined the space {{space}}": "You joined the space {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.",
   "Refresh": "Refresh",
-  "No activity here": "No activity here",
   "Unknown space": "Unknown space",
   "Request accepted": "Request accepted",
   "Comment": "Comment",
@@ -315,14 +314,14 @@
   "deleted": "deleted",
   "restored": "restored",
   "by": "by",
-  "{{user}} joined the space": "{{user}} joined the space",
-  "{{user}}'s role has been changed to {{role}}": "{{user}}'s role has been changed to {{role}}",
-  "{{user}} wants to join the space": "{{user}} wants to join the space",
-  "{{user}}'s request to join the space has been {{state}}": "{{user}}'s request to join the space has been {{state}}",
   "Please ask access to spaces to an administrator or space manager": "Please ask access to spaces to an administrator or space manager",
   "mention made": "mention made",
   "unknown": "unknown",
-  "Unknown entity type": "Unknown entity type",
   "Unknown activity type": "Unknown activity type",
-  "status modified": "status modified"
+  "status modified": "status modified",
+  "Loading activity feed…": "Loading activity feed…",
+  "No activity": "No activity",
+  "Preview of {{content}}": "Preview of {{content}}",
+  "No preview available": "No preview available",
+  "Preview loading...": "Preview loading..."
 }

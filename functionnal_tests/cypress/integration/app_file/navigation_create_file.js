@@ -7,12 +7,12 @@ describe('navigate :: workspace > create_new > file', function () {
   beforeEach(function () {
     cy.loginAs('users')
     cy.visit('/')
-    cy.get('.sidebar__content__navigation__workspace__item__name').click()
+    cy.get('.sidebar__content__navigation__item__name').click()
   })
 
   it('dashboard > button', function () {
-    cy.get('.sidebar__content__navigation__workspace__item__name').should('be.visible')
-    cy.get('.sidebar__content__navigation__workspace__item__menu').click()
+    cy.get('.sidebar__content__navigation__item__name').should('be.visible')
+    cy.get('.sidebar__content__navigation__item__menu').click()
     cy.get('[data-cy=sidebar_subdropdown-dashboard]').should('be.visible').click()
     cy.get('.dashboard__calltoaction .fa-paperclip').should('be.visible').click()
     cy.get('.cardPopup__container').should('be.visible')

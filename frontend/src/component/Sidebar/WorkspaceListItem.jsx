@@ -83,7 +83,7 @@ class WorkspaceListItem extends React.Component {
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           }
         )}
-        data-cy={`sidebar__content__navigation__item_${props.workspaceId}`}
+        data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
