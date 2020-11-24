@@ -319,9 +319,9 @@
   "unknown": "desconhecida",
   "Unknown activity type": "Tipo de atividade desconhecida",
   "status modified": "status modificado",
-  "Loading activity feed…": "__NOT_TRANSLATED__",
-  "No activity": "__NOT_TRANSLATED__",
-  "Preview of {{content}}": "__NOT_TRANSLATED__",
-  "No preview available": "__NOT_TRANSLATED__",
-  "Preview loading...": "__NOT_TRANSLATED__"
+  "Loading activity feed…": "Carregando o feed de atividade…",
+  "No activity": "Nenhuma atividade",
+  "Preview of {{content}}": "Pré-visualização de {{content}}",
+  "No preview available": "Pré-visualização indisponível",
+  "Preview loading...": "Pré-visualização carregando..."
 }
