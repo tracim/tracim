@@ -90,6 +90,7 @@
       "Element",
       "EventSource",
       "CustomEvent",
+      "HTMLElement",
       "DOMParser",
       "globalThis",
       "GLOBAL_primaryColor"

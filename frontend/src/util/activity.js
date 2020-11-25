@@ -16,7 +16,6 @@ const createActivityEvent = (message) => {
 }
 
 const createSingleMessageActivity = (activityParams, messageList) => {
-  if (messageList.length !== 1) throw new Error('Must have at exactly one message')
   const message = messageList[0]
   return {
     ...activityParams,
@@ -29,7 +28,6 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 
 // INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
-  if (!messageList.length) throw new Error('Must have at least one message to build a content activity')
   const first = messageList[0]
 
   let content = first.fields.content
@@ -42,7 +40,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     ))
     if (response.apiResponse.status === 200) {
       content = response.body
-    }
+    } else return null
   }
 
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
@@ -85,9 +83,9 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
       return await createContentActivity(activityParams, activityMessageList, apiUrl)
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-      return createSingleMessageActivity(activityParams, activityMessageList)
+    default:
+      return await createSingleMessageActivity(activityParams, activityMessageList)
   }
-  throw new Error(`Unknown activity entity type: ${activityParams.entityType}`)
 }
 
 const groupMessageListByActivityId = (messageList) => {
@@ -108,7 +106,8 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
   for (const { params, list } of activityMap.values()) {
     activityCreationList.push(createActivity(params, list, apiUrl))
   }
-  return await Promise.all(activityCreationList)
+  // NOTE - SG - 2020-11-19 - remove the null activities (can happen with content activities)
+  return (await Promise.all(activityCreationList)).filter(i => i)
 }
 
 /**
@@ -176,7 +175,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
     const activity = await createActivity(activityParams, [message], apiUrl)
-    return [activity, ...activityList]
+    return activity ? [activity, ...activityList] : activityList
   }
   const oldActivity = activityList[activityIndex]
   const updatedActivity = updateActivity(message, oldActivity)

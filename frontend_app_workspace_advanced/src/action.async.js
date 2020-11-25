@@ -19,6 +19,11 @@ export const putDescription = (apiUrl, workspace, newDescription) =>
     description: newDescription
   })
 
+export const putDefaultRole = (apiUrl, workspace, newDefaultRole) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    default_user_role: newDefaultRole
+  })
+
 export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspace.workspace_id}`, {
     agenda_enabled: agendaEnabled

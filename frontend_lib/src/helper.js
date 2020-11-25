@@ -391,8 +391,10 @@ export const checkEmailValidity = email => {
   return domainParts.length === 2
 }
 
-export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) =>
-  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
+export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
+  const rev = revisionId ? `/revisions/${revisionId}` : ''
+  return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
+}
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 

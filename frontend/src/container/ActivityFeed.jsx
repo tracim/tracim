@@ -64,6 +64,7 @@ export class ActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.updateActivityList)
+    this.changingActivityList = false
   }
 
   componentDidMount () {
@@ -81,12 +82,25 @@ export class ActivityFeed extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  waitForNoChange = () => {
+    return new Promise((resolve, reject) => {
+      const waitNotIsChanging = () => {
+        if (!this.changingActivityList) return resolve()
+        setTimeout(waitNotIsChanging, 5)
+      }
+      waitNotIsChanging()
+    })
+  }
+
   updateActivityList = async (data) => {
     const { props } = this
     if (!data.fields.workspace || !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
 
+    await this.waitForNoChange()
+    this.changingActivityList = true
     const updatedActivityList = await addMessageToActivityList(data, props.workspaceActivity.list, FETCH_CONFIG.apiUrl)
     props.dispatch(setWorkspaceActivityList(updatedActivityList))
+    this.changingActivityList = false
   }
 
   handleRefreshClicked = () => {
@@ -97,9 +111,16 @@ export class ActivityFeed extends React.Component {
 
   loadActivities = async (minActivityCount, resetList = false) => {
     const { props } = this
-    let activityList = resetList ? [] : props.workspaceActivity.list
-    let hasNextPage = resetList ? true : props.workspaceActivity.hasNextPage
-    let nextPageToken = resetList ? '' : props.workspaceActivity.nextPageToken
+    let activityList = props.workspaceActivity.list
+    let hasNextPage = props.workspaceActivity.hasNextPage
+    let nextPageToken = props.workspaceActivity.nextPageToken
+    if (resetList) {
+      activityList = []
+      hasNextPage = true
+      nextPageToken = ''
+    }
+    await this.waitForNoChange()
+    this.changingActivityList = true
     while (hasNextPage && activityList.length < minActivityCount) {
       const messageListResponse = await props.dispatch(getNotificationList(
         props.user.userId,
@@ -107,16 +128,37 @@ export class ActivityFeed extends React.Component {
           nextPageToken: nextPageToken,
           notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
           workspaceId: props.workspaceId,
-          includeNotSent: true
+          includeNotSent: true,
+          activityFeedEvents: true
         }
       ))
-      activityList = await mergeWithActivityList(messageListResponse.json.items, activityList, FETCH_CONFIG.apiUrl)
+      activityList = await mergeWithActivityList(
+        messageListResponse.json.items,
+        activityList,
+        FETCH_CONFIG.apiUrl
+      )
       hasNextPage = messageListResponse.json.has_next
       nextPageToken = messageListResponse.json.next_page_token
     }
-
     props.dispatch(setWorkspaceActivityList(activityList))
     props.dispatch(setWorkspaceActivityNextPage(hasNextPage, nextPageToken))
+    this.changingActivityList = false
+  }
+
+  handleClickCopyLink = content => {
+    const { props } = this
+    // INFO - GB - 2020-11-20 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+      props.workspaceId,
+      content.content_type,
+      content.content_id
+    )}`
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+    props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
   loadWorkspaceDetail = async () => {
@@ -141,9 +183,16 @@ export class ActivityFeed extends React.Component {
     const { props } = this
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity)
+      ? componentConstructor({
+        ...activity,
+        onClickCopyLink: () => this.handleClickCopyLink(activity.newestMessage.fields.content)
+      })
       : <span>{props.t('Unknown activity type')}</span>
-    return <div className='activity_feed__item' data-cy='activity_feed__item'>{component}</div>
+    return (
+      <div className='activity_feed__item' data-cy='activity_feed__item' key={activity.id}>
+        {component}
+      </div>
+    )
   }
 
   isSubscriptionRequestOrRejection = (activity) => {
