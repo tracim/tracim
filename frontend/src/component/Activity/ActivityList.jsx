@@ -17,10 +17,10 @@ import MemberActivity from './MemberActivity.jsx'
 require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
-  [TLM_ET.CONTENT, (activity) => {
+  [TLM_ET.CONTENT, (activity, onCopyLinkClicked) => {
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
       ? <ContentWithoutPreviewActivity activity={activity} key={activity.id} />
-      : <ContentWithPreviewActivity activity={activity} key={activity.id} />
+      : <ContentWithPreviewActivity activity={activity} key={activity.id} onClickCopyLink={onCopyLinkClicked} />
   }],
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
@@ -32,7 +32,7 @@ const ActivityList = (props) => {
   const renderActivityComponent = (activity) => {
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity)
+      ? componentConstructor(activity, () => props.onCopyLinkClicked(activity.newestMessage.fields.content))
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
   }
@@ -88,7 +88,8 @@ const ActivityList = (props) => {
 ActivityList.propTypes = {
   activity: PropTypes.object.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
-  onLoadMoreClicked: PropTypes.func.isRequired
+  onLoadMoreClicked: PropTypes.func.isRequired,
+  onCopyLinkClicked: PropTypes.func.isRequired
 }
 
 export default translate()(ActivityList)

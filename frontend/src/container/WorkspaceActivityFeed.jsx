@@ -131,6 +131,7 @@ export class WorkspaceActivityFeed extends React.Component {
               props.workspaceId
             )
           }}
+          onCopyLinkClicked={props.onCopyLinkClicked}
         />
       </div>
     )
@@ -141,6 +142,7 @@ WorkspaceActivityFeed.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
+  onCopyLinkClicked: PropTypes.func.isRequired,
   workspaceId: PropTypes.string.isRequired
 }
 

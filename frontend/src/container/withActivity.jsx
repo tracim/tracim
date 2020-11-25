@@ -7,8 +7,9 @@ import {
   addMessageToActivityList,
   sortActivityList
 } from '../util/activity.js'
-import { FETCH_CONFIG } from '../util/helper.js'
+import { FETCH_CONFIG, PAGE } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 
 const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
@@ -42,6 +43,23 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         }
         waitNotIsChanging()
       })
+    }
+
+    handleClickCopyLink = content => {
+      const { props } = this
+      // INFO - GB - 2020-11-20 - Algorithm based on
+      // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+      const tmp = document.createElement('textarea')
+      document.body.appendChild(tmp)
+      tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+        props.workspaceId,
+        content.content_type,
+        content.content_id
+      )}`
+      tmp.select()
+      document.execCommand('copy')
+      document.body.removeChild(tmp)
+      props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }
 
     updateActivityListFromTlm = async (data) => {
@@ -112,6 +130,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           loadActivities={this.loadActivities}
           handleTlm={this.updateActivityListFromTlm}
           onRefreshClicked={this.handleRefreshClicked}
+          onCopyLinkClicked={this.handleClickCopyLink}
           {...this.props}
         />)
     }

@@ -73,6 +73,7 @@ export class PersonalActivityFeed extends React.Component {
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
           onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+          onCopyLinkClicked={props.onCopyLinkClicked}
         />
       </div>
     )
@@ -82,7 +83,8 @@ export class PersonalActivityFeed extends React.Component {
 PersonalActivityFeed.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
-  onRefreshClicked: PropTypes.func.isRequired
+  onRefreshClicked: PropTypes.func.isRequired,
+  onCopyLinkClicked: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
