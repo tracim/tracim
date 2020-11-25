@@ -32,13 +32,13 @@ describe('Workspace', () => {
       .get('[data-cy="dashboardWorkspaceLabel"]')
       .contains(spaceTitle)
 
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
+    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
       .should('exist')
   })
 
   const getWorkspaceItemByName = (cy, spaceTitle) => (
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
-      .parents('li.sidebar__content__navigation__workspace__item')
+    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
+      .parents('li.sidebar__content__navigation__item')
   )
 
   describe('Creating a workspace while a lot of workspace are already created', () => {

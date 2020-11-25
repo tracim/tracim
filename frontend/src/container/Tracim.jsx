@@ -75,7 +75,8 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
-import ActivityFeed from './ActivityFeed.jsx'
+import PersonalActivityFeed from './PersonalActivityFeed.jsx'
+import WorkspaceActivityFeed from './WorkspaceActivityFeed.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -425,6 +426,8 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.LOGIN} component={Login} />
 
+          <Route path={PAGE.ACTIVITY_FEED} component={PersonalActivityFeed} />
+
           <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
 
           <Route path={PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF} component={ForgotPasswordNoEmailNotif} />
@@ -474,7 +477,7 @@ export class Tracim extends React.Component {
 
                 <Route
                   path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
-                  render={(routerProps) => <ActivityFeed workspaceId={routerProps.match.params.idws} />}
+                  render={(routerProps) => <WorkspaceActivityFeed workspaceId={routerProps.match.params.idws} />}
                 />
 
                 <Route

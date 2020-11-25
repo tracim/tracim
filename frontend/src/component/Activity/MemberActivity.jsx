@@ -1,78 +1,111 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
-import { escape as escapeHtml } from 'lodash'
+import { Link } from 'react-router-dom'
+import { translate, Trans } from 'react-i18next'
 
 import {
   Avatar,
+  BREADCRUMBS_TYPE,
+  Breadcrumbs,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
+import { PAGE } from '../../util/helper.js'
 
 import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
 
 export class MemberActivity extends React.Component {
-  getSpaceMemberText (coreEventType, i18nOpts) {
+  getSpaceMemberText (coreEventType, userPublicName, workspaceLabel, workspaceId) {
     const { props } = this
-    const role = ROLE_LIST.find(r => r.slug === props.activity.newestMessage.fields.member.role)
-
-    i18nOpts = {
-      ...i18nOpts,
-      role: props.t(role.label)
-    }
+    const r = ROLE_LIST.find(r => r.slug === props.activity.newestMessage.fields.member.role)
+    const role = props.t(r.label)
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return props.t('{{user}} joined the space', i18nOpts)
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            joined the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
+            </Link>
+          </Trans>
+        )
       case TLM_CET.MODIFIED:
-        return props.t("{{user}}'s role has been changed to {{role}}", i18nOpts)
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>'s&nbsp;
+            role has been changed to {{ role }}
+          </Trans>
+        )
     }
     return ''
   }
 
-  getSpaceSubscriptionText (coreEventType, i18nOpts) {
+  getSpaceSubscriptionText (coreEventType, userPublicName, workspaceLabel, workspaceId) {
     const { props } = this
-    const subscription = SUBSCRIPTION_TYPE_LIST.find(s => s.slug === props.activity.newestMessage.fields.subscription.state)
-    i18nOpts = {
-      ...i18nOpts,
-      state: props.t(subscription.label)
-    }
+    const s = SUBSCRIPTION_TYPE_LIST.find(s => s.slug === props.activity.newestMessage.fields.subscription.state)
+    const state = props.t(s.label)
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return props.t('{{user}} wants to join the space', i18nOpts)
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            wants to join the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
+            </Link>
+          </Trans>
+        )
       case TLM_CET.MODIFIED:
-        return props.t("{{user}}'s request to join the space has been {{state}}", i18nOpts)
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>'s&nbsp;
+            request to join the space has been {{ state }}
+          </Trans>
+        )
     }
     return ''
   }
 
   getText () {
     const { props } = this
-    const userPublicName = escapeHtml(props.activity.newestMessage.fields.user.public_name)
+    const userPublicName = props.activity.newestMessage.fields.user.public_name
+    const workspaceLabel = props.activity.newestMessage.fields.workspace.label
+    const workspaceId = props.activity.newestMessage.fields.workspace.workspace_id
     const [entityType, coreEventType] = props.activity.newestMessage.event_type.split('.')
-    const i18nOpts = {
-      user: `<span title='${userPublicName}' class='memberActivity__user'>${userPublicName}</span>`,
-      interpolation: { escapeValue: false }
-    }
     switch (entityType) {
       case TLM_ET.SHAREDSPACE_MEMBER:
-        return this.getSpaceMemberText(coreEventType, i18nOpts)
+        return this.getSpaceMemberText(coreEventType, userPublicName, workspaceLabel, workspaceId)
       case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-        return this.getSpaceSubscriptionText(coreEventType, i18nOpts)
+        return this.getSpaceSubscriptionText(coreEventType, userPublicName, workspaceLabel, workspaceId)
     }
-    return <span>{props.t('Unknown entity type')}</span>
+    return <Trans>Unknown entity type</Trans>
   }
 
   render () {
     const { props } = this
     const newestMessage = props.activity.newestMessage
+
+    const workspaceId = newestMessage.fields.workspace.workspace_id
+    const workspaceLabel = newestMessage.fields.workspace.label
+    const breadcrumbsList = [
+      {
+        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
+        type: BREADCRUMBS_TYPE.CORE
+      }
+    ]
+
     return (
       <div className='memberActivity'>
         <Avatar publicName={newestMessage.fields.user.public_name} width={32} style={{ marginRight: '5px' }} />
-        <div className='memberActivity__text' dangerouslySetInnerHTML={{ __html: this.getText() }} />
+        <div className='memberActivity__title'>
+          {this.getText()}
+          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+        </div>
         <TimedEvent
           customClass='memberActivity__right'
           date={newestMessage.created}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { Link, withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
@@ -29,6 +29,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   scrollIntoViewIfNeeded,
+  Icon,
   IconButton
 } from 'tracim_frontend_lib'
 
@@ -87,6 +88,26 @@ export class Sidebar extends React.Component {
         />
         {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
+    )
+  }
+
+  getSidebarItem = (label, to) => {
+    return (
+      <Link
+        className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
+          {
+            'sidebar__content__navigation__item__current primaryColorBorder':
+              this.props.location.pathname.endsWith(to)
+          })}
+        to={to}
+      >
+        <div
+          className='sidebar__content__navigation__item__name'
+          title={label}
+        >
+          <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
+        </div>
+      </Link>
     )
   }
 
@@ -159,6 +180,7 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
+                {this.getSidebarItem(props.t('Activity feed'), PAGE.ACTIVITY_FEED)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>

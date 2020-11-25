@@ -38,11 +38,11 @@ describe('App Agenda', () => {
         .invoke('attr', 'data-config')
         .should('contain', `agenda/workspace/${workspace1.workspace_id}/`)
 
-      cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspace2.label}"]`)
+      cy.get(`.sidebar__content__navigation__item__name[title="${workspace2.label}"]`)
         .click()
 
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: workspace2.workspace_id } })
-        .find('.sidebar__content__navigation__workspace__item__menu')
+        .find('.sidebar__content__navigation__item__menu')
         .click()
         .get('[data-cy="sidebar_subdropdown-agenda"]')
         .click()

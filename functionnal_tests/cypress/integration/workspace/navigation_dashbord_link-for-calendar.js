@@ -8,7 +8,7 @@
 //        logout (cy)
 //    })
 //    it ('', function () {
-//        cy.get('.sidebar__content__navigation__workspace__item .fa-chevron-up').should('be.visible')
+//        cy.get('.sidebar__content__navigation__item .fa-chevron-up').should('be.visible')
 //        cy.visit('/workspaces/1/dashboard')
 //        cy.get('.dashboard__header__title').should('be.visible')
 //        cy.get('.dashboard__moreinfo__calendar__btn__text').click()

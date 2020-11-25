@@ -16,6 +16,7 @@ import notificationPage from './notificationPage.js'
 import accessibleWorkspaceList from './accessibleWorkspaceList.js'
 import workspaceSubscriptionList from './workspaceSubscriptionList.js'
 import workspaceActivity from './workspaceActivity.js'
+import userActivity from './userActivity.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -34,7 +35,8 @@ const rootReducer = combineReducers({
   notificationPage,
   accessibleWorkspaceList,
   workspaceSubscriptionList,
-  workspaceActivity
+  workspaceActivity,
+  userActivity
 })
 
 export default rootReducer

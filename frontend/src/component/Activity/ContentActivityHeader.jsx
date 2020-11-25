@@ -95,7 +95,7 @@ export class ContentActivityHeader extends React.Component {
           <IconButton
             customClass='contentActivityHeader__actionMenu__item'
             icon='link'
-            onClick={props.handleClickCopyLink}
+            onClick={props.onClickCopyLink}
             text={props.t('Copy content link')}
             key={`link-${contentId}`}
           />
@@ -121,5 +121,5 @@ ContentActivityHeader.propTypes = {
   workspace: PropTypes.object.isRequired,
   eventList: PropTypes.array.isRequired,
   newestMessage: PropTypes.object.isRequired,
-  handleClickCopyLink: PropTypes.func.isRequired
+  onClickCopyLink: PropTypes.func.isRequired
 }
