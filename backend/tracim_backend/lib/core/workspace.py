@@ -141,9 +141,6 @@ class WorkspaceApi(object):
         workspace.access_type = access_type
         workspace.default_user_role = default_user_role
         workspace.parent = parent
-        self._session.add(workspace)
-        if save_now:
-            self._session.flush()
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -155,6 +152,9 @@ class WorkspaceApi(object):
                 with_notif=True,
                 flush=False,
             )
+        self._session.add(workspace)
+        if save_now:
+            self._session.flush()
         self._session.add(role)
         if save_now:
             self._session.flush()
