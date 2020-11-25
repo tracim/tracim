@@ -27,7 +27,7 @@ import ActivityList from '../component/Activity/ActivityList.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
-require('../css/WorkspaceActivityFeed.styl')
+require('../css/ActivityFeed.styl')
 
 export class WorkspaceActivityFeed extends React.Component {
   constructor (props) {

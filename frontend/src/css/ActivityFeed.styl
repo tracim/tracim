@@ -1,6 +1,6 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-.personalActivityFeed
+.activityFeed
   background-color veryLightGrey
   display flex
   flex-direction column
@@ -9,6 +9,14 @@
   overflow auto
   height "calc(100vh - %s)" % headerHeight
 
-  & .tabBar
+  & .activityList
+    margin-top 10px
     margin-bottom 10px
+
+.personalActivityFeed
+  @extend .activityFeed
+
+.workspaceActivityFeed
+  @extend .activityFeed
+  & .tabBar
     width 100%

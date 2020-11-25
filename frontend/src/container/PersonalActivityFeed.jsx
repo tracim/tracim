@@ -22,7 +22,7 @@ import {
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
-require('../css/PersonalActivityFeed.styl')
+require('../css/ActivityFeed.styl')
 
 export class PersonalActivityFeed extends React.Component {
   constructor (props) {
@@ -66,8 +66,8 @@ export class PersonalActivityFeed extends React.Component {
         <PageTitle
           title={props.t('Activity feed')}
           icon='newspaper-o'
+          iconTooltip={props.t('Activity feed')}
           breadcrumbsList={props.breadcrumbs}
-          iconTooltip='newspaper-o'
         />
         <ActivityList
           activity={props.activity}
