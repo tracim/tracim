@@ -1221,9 +1221,9 @@ class TestWorkspacesEndpoints(object):
         res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
         assert len(res.json_body) == 4
         assert res.json_body[0]["workspace_id"] == parent1.workspace_id
-        assert res.json_body[1]["workspace_id"] == child1_1.workspace_id
-        assert res.json_body[2]["workspace_id"] == child1_2.workspace_id
-        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+        assert res.json_body[2]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[3]["workspace_id"] == child1_2.workspace_id
 
     def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
         """
