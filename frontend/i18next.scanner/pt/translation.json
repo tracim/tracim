@@ -323,5 +323,10 @@
   "No activity": "Nenhuma atividade",
   "Preview of {{content}}": "Pré-visualização de {{content}}",
   "No preview available": "Pré-visualização indisponível",
-  "Preview loading...": "Pré-visualização carregando..."
+  "Preview loading...": "Pré-visualização carregando...",
+  "Unknown entity type": "Tipo de entidade desconhecida",
+  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> juntou-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "O papel de <0><0>{{userPublicName}}</0></0> foi alterado para <2>{{role}}</2>",
+  "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deseja juntar-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "O pedido de <0><0>{{userPublicName}}</0></0> para se juntar ao espaço foi <2>{{state}}</2>"
 }

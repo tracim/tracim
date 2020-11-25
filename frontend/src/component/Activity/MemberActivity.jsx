@@ -19,28 +19,54 @@ import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
 
 export class MemberActivity extends React.Component {
-  getSpaceMemberText (coreEventType, user, workspace) {
+  getSpaceMemberText (coreEventType, userPublicName, workspaceLabel, workspaceId) {
     const { props } = this
     const r = ROLE_LIST.find(r => r.slug === props.activity.newestMessage.fields.member.role)
     const role = props.t(r.label)
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return <Trans>{user} joined the space {workspace}</Trans>
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            joined the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
+            </Link>
+          </Trans>
+        )
       case TLM_CET.MODIFIED:
-        return <Trans>{user}'s role has been changed to {{ role }}</Trans>
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>'s&nbsp;
+            role has been changed to {{ role }}
+          </Trans>
+        )
     }
     return ''
   }
 
-  getSpaceSubscriptionText (coreEventType, user, workspace) {
+  getSpaceSubscriptionText (coreEventType, userPublicName, workspaceLabel, workspaceId) {
     const { props } = this
     const s = SUBSCRIPTION_TYPE_LIST.find(s => s.slug === props.activity.newestMessage.fields.subscription.state)
     const state = props.t(s.label)
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return <Trans>{user} wants to join the space {workspace}</Trans>
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            wants to join the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel} }</span>
+            </Link>
+          </Trans>
+        )
       case TLM_CET.MODIFIED:
-        return <Trans>{user}'s request to join the space has been {{ state }}</Trans>
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>'s&nbsp;
+            request to join the space has been {{ state }}
+          </Trans>
+        )
     }
     return ''
   }
@@ -48,20 +74,14 @@ export class MemberActivity extends React.Component {
   getText () {
     const { props } = this
     const userPublicName = props.activity.newestMessage.fields.user.public_name
-    const userSpan = <span className='memberActivity__user'>{userPublicName}</span>
     const workspaceLabel = props.activity.newestMessage.fields.workspace.label
     const workspaceId = props.activity.newestMessage.fields.workspace.workspace_id
-    const workspaceLink = (
-      <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
-        <span className='memberActivity__workspace'>{workspaceLabel}</span>
-      </Link>
-    )
     const [entityType, coreEventType] = props.activity.newestMessage.event_type.split('.')
     switch (entityType) {
       case TLM_ET.SHAREDSPACE_MEMBER:
-        return this.getSpaceMemberText(coreEventType, userSpan, workspaceLink)
+        return this.getSpaceMemberText(coreEventType, userPublicName, workspaceLabel, workspaceId)
       case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
-        return this.getSpaceSubscriptionText(coreEventType, userSpan, workspaceLink)
+        return this.getSpaceSubscriptionText(coreEventType, userPublicName, workspaceLabel, workspaceId)
     }
     return <Trans>Unknown entity type</Trans>
   }
