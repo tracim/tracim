@@ -665,6 +665,6 @@ class TestEventApi:
             100, my_workspace.workspace_id, other_user.user_id
         )
         if max_message_generated == -1:
-            assert len(last_messages) == 4
+            assert len(last_messages) == 5
         elif not max_message_generated:
             assert len(last_messages) == 0

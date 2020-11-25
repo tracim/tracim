@@ -153,8 +153,6 @@ class WorkspaceApi(object):
                 flush=False,
             )
         self._session.add(workspace)
-        if save_now:
-            self._session.flush()
         self._session.add(role)
         if save_now:
             self._session.flush()
