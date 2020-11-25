@@ -94,10 +94,17 @@ export class Sidebar extends React.Component {
   getSidebarItem = (label, to) => {
     return (
       <Link
-        className='sidebar__content__navigation__item sidebar__content__navigation__item__wrapper'
+        className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
+          {
+            'sidebar__content__navigation__item__current primaryColorBorder':
+              this.props.location.pathname.endsWith(to)
+          })}
         to={to}
       >
-        <div className='sidebar__content__navigation__item__name' title={label}>
+        <div
+          className='sidebar__content__navigation__item__name'
+          title={label}
+        >
           <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
         </div>
       </Link>

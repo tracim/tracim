@@ -74,6 +74,9 @@ sidebarColorDarken = darken(sidebarColor, 15%)
       &__item
         display flex
         align-items center
+        border-left-width 0
+        border-left-style solid
+        padding-left 5px
         border-bottom 1px solid darkGrey
         background-color sidebarColor
         cursor pointer
@@ -117,12 +120,10 @@ sidebarColorDarken = darken(sidebarColor, 15%)
           overflow hidden
           text-overflow ellipsis
         &__current
+          padding-left 0
           background-color lightDarkGrey
-          font-weight bold
           border-left-width 5px
-          border-left-style solid
-          &__name
-            padding-left 5px
+          font-weight bold
   &__footer
     margin-top auto
     position relative

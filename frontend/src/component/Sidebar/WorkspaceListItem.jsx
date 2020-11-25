@@ -71,7 +71,6 @@ class WorkspaceListItem extends React.Component {
     const { props, state } = this
     const INDENT_WIDTH = 20
     const BASE_MARGIN = 10
-    const ACTIVE_BORDER_WIDTH = 5
 
     return (
       <li
@@ -79,7 +78,7 @@ class WorkspaceListItem extends React.Component {
         className={classnames(
           'sidebar__content__navigation__item',
           {
-            'sidebar__content__navigation__item__current primaryColorBorder':
+            'primaryColorBorder sidebar__content__navigation__item__current':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           }
         )}
@@ -98,13 +97,11 @@ class WorkspaceListItem extends React.Component {
 
           {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
             // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
-            // If the space is active the border width (5px) is subtracted
             props.level > 0 && (
               <div
                 style={{
                   marginLeft:
-                  `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN -
-                    (props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) ? ACTIVE_BORDER_WIDTH : 0)
+                  `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN
                   }px`
                 }}
               >
@@ -114,14 +111,7 @@ class WorkspaceListItem extends React.Component {
           }
 
           <div
-            className={classnames(
-              'sidebar__content__navigation__item__name',
-              {
-                sidebar__content__navigation__item__current__name:
-                  props.level === 0 &&
-                  props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
-              }
-            )}
+            className='sidebar__content__navigation__item__name'
             title={props.label}
           >
             {props.label}
