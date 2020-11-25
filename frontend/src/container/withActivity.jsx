@@ -20,8 +20,9 @@ const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
  * @param {function} setActivityList a redux action that will set the activity.list prop when dispatched.
  * @param {function} setActivityNextPage a redux action that will set the
  *  activity.hasNextPage/nextPageToken props when dispatched.
+ * @param {function} resetActivity a redux action that resets the activity prop when dispatched.
  */
-const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, resetActivityList) => {
+const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, resetActivity) => {
   return class extends React.Component {
     constructor (props) {
       super(props)
@@ -75,7 +76,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       let hasNextPage = props.activity.hasNextPage
       let nextPageToken = props.activity.nextPageToken
       if (resetList) {
-        props.dispatch(resetActivityList())
+        props.dispatch(resetActivity())
         activityList = []
         hasNextPage = true
         nextPageToken = ''
