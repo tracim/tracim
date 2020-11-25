@@ -27,6 +27,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
   return class extends React.Component {
     constructor (props) {
       super(props)
+      this.state = {
+        showRefresh: false
+      }
       this.changingActivityList = false
     }
 
@@ -69,6 +72,11 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = true
       const updatedActivityList = await addMessageToActivityList(data, props.activity.list, FETCH_CONFIG.apiUrl)
       props.dispatch(setActivityList(updatedActivityList))
+      const showRefresh = (
+        updatedActivityList.length > 0 &&
+        updatedActivityList[0].newestMessage.event_id !== data.event_id
+      )
+      this.setState({ showRefresh })
       this.changingActivityList = false
     }
 
@@ -78,6 +86,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     handleRefreshClicked = () => {
       const { props } = this
       const updatedActivityList = sortActivityList(props.activity.list)
+      this.setState({ showRefresh: false })
       props.dispatch(setActivityList(updatedActivityList))
     }
 
@@ -131,6 +140,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           handleTlm={this.updateActivityListFromTlm}
           onRefreshClicked={this.handleRefreshClicked}
           onCopyLinkClicked={this.handleClickCopyLink}
+          showRefresh={this.state.showRefresh}
           {...this.props}
         />)
     }

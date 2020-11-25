@@ -74,6 +74,7 @@ export class PersonalActivityFeed extends React.Component {
           onRefreshClicked={props.onRefreshClicked}
           onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
           onCopyLinkClicked={props.onCopyLinkClicked}
+          showRefresh={props.showRefresh}
         />
       </div>
     )
