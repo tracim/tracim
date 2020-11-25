@@ -56,7 +56,7 @@ export class MemberActivity extends React.Component {
             <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
             wants to join the space&nbsp;
             <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
-              <span className='memberActivity__workspace'>{{ workspaceLabel} }</span>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
             </Link>
           </Trans>
         )
