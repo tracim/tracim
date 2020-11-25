@@ -10,6 +10,7 @@ export const ContentWithoutPreviewActivity = props => {
       workspace={props.activity.newestMessage.fields.workspace}
       eventList={props.activity.eventList}
       newestMessage={props.activity.newestMessage}
+      handleClickCopyLink={props.activity.onClickCopyLink}
     />
   )
 }

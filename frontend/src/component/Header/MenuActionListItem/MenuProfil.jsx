@@ -17,6 +17,7 @@ export const MenuProfil = props => {
           <Avatar
             width='40px'
             publicName={props.user.publicName}
+            key='menuprofil__dropdown__avatar'
           />
         }
         buttonLabel={props.user.publicName}

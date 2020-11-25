@@ -114,12 +114,12 @@ class Preview extends React.Component {
     const src = ([mediaQuery, width]) => `${previewURL(width)} ${width}w`
 
     return (
-      <div class='activityFeed__preview__image'>
+      <div className='activityFeed__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
           title={content.label}
           src={previewURL(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
-          srcset={PREVIEW_WIDTHS.map(src).join(',')}
+          srcSet={PREVIEW_WIDTHS.map(src).join(',')}
           sizes={
             PREVIEW_WIDTHS
               .map(([mediaQuery, width]) => `${mediaQuery} ${width}px`.trim())

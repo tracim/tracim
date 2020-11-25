@@ -8,7 +8,9 @@ import {
   BREADCRUMBS_TYPE,
   Breadcrumbs,
   CONTENT_TYPE,
+  DropdownMenu,
   Icon,
+  IconButton,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
@@ -85,6 +87,27 @@ export class ContentActivityHeader extends React.Component {
           lang={props.user.lang}
           authorName={newestMessage.fields.author.public_name}
         />
+        <DropdownMenu
+          buttonCustomClass='contentActivityHeader__actionMenu'
+          buttonIcon='fa-ellipsis-v'
+          buttonTooltip={props.t('Actions')}
+        >
+          <IconButton
+            customClass='contentActivityHeader__actionMenu__item'
+            icon='link'
+            onClick={props.handleClickCopyLink}
+            text={props.t('Copy content link')}
+            key={`link-${contentId}`}
+          />
+
+          <Link
+            title={props.t('Open content')}
+            to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
+          >
+            <i className={`fa fa-fw fa-${app.faIcon}`} />
+            {props.t('Open content')}
+          </Link>
+        </DropdownMenu>
       </div>
     )
   }
@@ -97,5 +120,6 @@ ContentActivityHeader.propTypes = {
   content: PropTypes.object.isRequired,
   workspace: PropTypes.object.isRequired,
   eventList: PropTypes.array.isRequired,
-  newestMessage: PropTypes.object.isRequired
+  newestMessage: PropTypes.object.isRequired,
+  handleClickCopyLink: PropTypes.func.isRequired
 }

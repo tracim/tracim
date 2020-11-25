@@ -13,6 +13,7 @@
   "Activity feed": "Feed de atividades",
   "Are you sure you want to remove this member from the space?": "Tem a certeza de que quer remover este membro do espaço?",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
+  "Copy content link": "Copiar ligação do conteúdo",
   "Unknown space type": "Tipo de espaço desconhecido",
   "Create a space": "Criar um espaço",
   "Dashboard": "Painel",
@@ -324,5 +325,7 @@
   "unknown": "desconhecida",
   "Unknown entity type": "Tipo de entidade desconhecida",
   "Unknown activity type": "Tipo de atividade desconhecida",
-  "status modified": "status modificado"
+  "Open content": "Abrir conteúdo",
+  "status modified": "status modificado",
+  "The link has been copied to clipboard": "A ligaçao foi copiada para a área de transferência"
 }

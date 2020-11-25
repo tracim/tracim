@@ -21,6 +21,14 @@
     margin-left 10px
     text-align right
     align-items flex-end
+  &__actionMenu
+    padding 0
+    margin-left 10px
+    &::after
+      display none
+    &__item
+      padding 10px
+      border none
 
   & .breadcrumbs
     position relative
@@ -30,4 +38,6 @@
 @media (max-width max-sm)
   .contentActivityHeader
     & .breadcrumbs
+      display none
+    &__actionMenu
       display none
