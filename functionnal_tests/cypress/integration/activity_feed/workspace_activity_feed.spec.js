@@ -105,9 +105,11 @@ describe('The space activity feed page', () => {
 
   describe('Note content item', () => {
     let contentId = -1
+    const smallContent = 'a small text'
+    const contentName = 'Note 1'
 
     beforeEach(() => {
-      cy.createHtmlDocument('Note 1', workspaceId).then(doc => {
+      cy.createHtmlDocument(contentName, workspaceId).then(doc => {
         contentId = doc.content_id
       })
     })
@@ -116,17 +118,16 @@ describe('The space activity feed page', () => {
       cy.updateHtmlDocument(
         contentId,
         workspaceId,
-        'a small text',
-        'Note 1'
+        smallContent,
+        contentName
       )
 
       cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
 
-      cy.get('.activityFeed__preview')
-        .should('not.have.class', 'activityFeed__preview__overflow')
+      cy.get('.activityFeed__preview__overflow').should('not.exist')
 
       cy.get('.activityFeed__preview__html')
-        .should('contain.text', 'a small text')
+        .should('contain.text', smallContent)
     })
 
     it('should render a long note correctly', () => {
@@ -154,8 +155,7 @@ describe('The space activity feed page', () => {
 
       cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
 
-      cy.get('.activityFeed__preview')
-        .should('not.have.class', 'activityFeed__preview__overflow')
+      cy.get('.activityFeed__preview__overflow').should('be.visible')
 
       cy.get('.activityFeed__preview__html')
       .click()
