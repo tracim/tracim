@@ -114,8 +114,7 @@
   "Error while deleting content": "Erro ao eliminar o conteúdo",
   "Error while restoring content": "Erro ao restaurar o conteúdo",
   "@all Please notice that I did an important update on this content.": "@todos reparem que fiz uma actualização importante deste conteúdo.",
-  "An error has happened while getting": "Aconteceu um erro ao obter",
-  "known members list": "lista de membros conhecidos",
+  "An error has happened while getting the known members list": "Aconteceu um erro ao obter la lista de membros conhecidos",
   "Sends a notification to all members of the space": "Envia uma notificação a todos os membros do espaço",
   "Error while detecting the mentions": "Erro ao eliminar as menções"
 }

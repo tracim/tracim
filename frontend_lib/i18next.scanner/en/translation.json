@@ -114,8 +114,7 @@
   "Error while deleting content": "Error while deleting content",
   "Error while restoring content": "Error while restoring content",
   "@all Please notice that I did an important update on this content.": "@all Please notice that I did an important update on this content.",
-  "An error has happened while getting": "An error has happened while getting",
-  "known members list": "known members list",
+  "An error has happened while getting the known members list": "An error has happened while getting the known members list",
   "Sends a notification to all members of the space": "Sends a notification to all members of the space",
   "Error while detecting the mentions": "Error while detecting the mentions"
 }
