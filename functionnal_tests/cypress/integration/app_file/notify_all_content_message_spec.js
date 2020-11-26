@@ -35,14 +35,14 @@ describe('In Html Document', () => {
     })
 
     const languageTestcases = [
-      { code: 'fr', mentionContains: '@tous Veuillez' },
       { code: 'en', mentionContains: '@all Please' },
-      { code: 'pt', mentionContains: '@todos' }
+      { code: 'fr', mentionContains: '@tous Veuillez' },
+      { code: 'pt', mentionContains: '@todos reparem' }
     ]
 
     for (const testCase of languageTestcases) {
       describe('clicking at "notify all" message', () => {
-        it('should send a comment with a translated @all mention', () => {
+        it(`should send a comment with a translated @all mention (${testCase.code})`, () => {
           cy.changeLanguage(testCase.code)
           cy.get('[data-cy=popin_right_part_properties]').should('be.visible').click()
           cy.get('.fileProperties__content__detail__btndesc').should('be.visible').click()
