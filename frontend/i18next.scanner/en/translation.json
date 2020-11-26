@@ -12,7 +12,7 @@
   "{{author}} created {{content}} in {{space}}": "{{author}} created {{content}} in {{space}}",
   "Activity feed": "Activity feed",
   "Empty note": "Empty note",
-  "Empty comment": "Empty comment",
+  "Empty thread": "Empty thread",
   "Copy content link": "Copy content link",
   "Unknown space type": "Unknown space type",
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
