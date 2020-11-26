@@ -69,6 +69,7 @@ for (const pageTestCase of activityPages) {
           .should('have.length', initialItemCount + 2)
           .first()
           .should('contain.text', 'png_exemple3')
+        cy.get('[data-cy=activityList__refresh]').should('not.exist')
         cy.postComment(workspaceId, firstContentId, 'A comment')
         cy.get('[data-cy=activityList__item]')
           .should('have.length', initialItemCount + 2)

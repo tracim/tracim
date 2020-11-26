@@ -132,6 +132,7 @@ export class WorkspaceActivityFeed extends React.Component {
             )
           }}
           onCopyLinkClicked={props.onCopyLinkClicked}
+          showRefresh={props.showRefresh}
         />
       </div>
     )
