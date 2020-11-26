@@ -5,7 +5,7 @@ describe('content :: admin > workspace', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE })
+    cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE, waitForTlm: true })
   })
 
   it('checks the visibility of crucial elements', function () {
