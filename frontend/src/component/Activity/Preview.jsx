@@ -214,7 +214,7 @@ class Preview extends React.Component {
 
       return this.noPreviewComponent(
         props.content.content_type === CONTENT_TYPE.THREAD
-          ? props.t('Empty comment')
+          ? props.t('Empty thread')
           : props.t('Empty note')
       )
     }
