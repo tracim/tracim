@@ -9,18 +9,20 @@ linkColor = #007bff // This color comes from bootstrap
   position relative
   overflow hidden
   border 1px solid previewBorderColor
-  background-color offWhite
+  background-color veryLightGrey
   max-height previewHeight
   margin 10px 0
 
   &__overflow
     background-image:
-      linear-gradient(to top, rgba(0, 0, 0, 0.125), white),
-      radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.25), transparent)
-
-    background-size 100% 25%
+      linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent),
+      radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1), transparent)
     background-repeat no-repeat
     background-position bottom
+    position absolute
+    bottom 0
+    height 25%
+    width 100%
 
   & > a
     display flex
@@ -38,6 +40,8 @@ linkColor = #007bff // This color comes from bootstrap
 
   &__html
     text-align justify
+    background-color offWhite
+    margin 10px
 
     a-in-preview
       color linkColor
