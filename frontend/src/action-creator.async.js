@@ -1016,7 +1016,7 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
 export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${label}.html`, {
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
