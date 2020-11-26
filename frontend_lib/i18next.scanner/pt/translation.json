@@ -102,5 +102,20 @@
   "Confirm": "Confirmar",
   "pending": "pendente",
   "rejected": "rejeitado",
-  "accepted": "aceito"
+  "accepted": "aceito",
+  "A content with same name already exists": "__NOT_TRANSLATED__",
+  "Error while saving the title": "__NOT_TRANSLATED__",
+  "You are trying to mention an invalid user": "__NOT_TRANSLATED__",
+  "You can't send an empty comment": "__NOT_TRANSLATED__",
+  "You must change the status or restore this content before any change": "__NOT_TRANSLATED__",
+  "Error while saving the comment": "__NOT_TRANSLATED__",
+  "Error while changing status": "__NOT_TRANSLATED__",
+  "Error while archiving content": "__NOT_TRANSLATED__",
+  "Error while deleting content": "__NOT_TRANSLATED__",
+  "Error while restoring content": "__NOT_TRANSLATED__",
+  "@all Please notice that I did an important update on this content.": "__NOT_TRANSLATED__",
+  "An error has happened while getting": "__NOT_TRANSLATED__",
+  "known members list": "__NOT_TRANSLATED__",
+  "Sends a notification to all members of the space": "__NOT_TRANSLATED__",
+  "Error while detecting the mentions": "__NOT_TRANSLATED__"
 }

@@ -102,5 +102,20 @@
   "Confirm": "Confirmer",
   "pending": "en attente",
   "rejected": "refusée",
-  "accepted": "acceptée"
+  "accepted": "acceptée",
+  "A content with same name already exists": "Un contenu ayant le même nom existe déjà",
+  "Error while saving the title": "Erreur pendant la sauvegarde du titre",
+  "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
+  "You must change the status or restore this content before any change": "Vous devez changer le statut ou restaurer ce contenu avant de pouvoir l'éditer",
+  "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
+  "Error while changing status": "Erreur pendant le changement du statut",
+  "Error while archiving content": "Erreur pendant l'archivage du contenu",
+  "Error while deleting content": "Erreur pendant la suppression du contenu",
+  "Error while restoring content": "Erreur pendant la restauration du contenu",
+  "@all Please notice that I did an important update on this content.": "@tous Veuillez remarquer que j'ai fait une mise à jour importante de ce contenu.",
+  "An error has happened while getting": "Une erreur s'est produite lors de l'obtention de",
+  "known members list": "liste de membres connus",
+  "Sends a notification to all members of the space": "Envoie une notification à tous les membres de l'espace",
+  "Error while detecting the mentions": "Erreur pendant la détection des mentions"
 }

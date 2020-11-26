@@ -311,7 +311,7 @@ export function appContentFactory (WrappedComponent) {
     }
 
     appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all please notice that I did an important update on this content.')
+      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
 
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
