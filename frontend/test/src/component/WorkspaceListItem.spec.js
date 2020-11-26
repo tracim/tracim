@@ -49,15 +49,15 @@ describe('<WorkspaceListItem />', () => {
   it('force success', () => assert(true, true))
 
   // it(`should display "${props.label}"`, () =>
-  //   expect(wrapper.find('.sidebar__content__navigation__workspace__item__name')).to.have.text().equal(props.label)
+  //   expect(wrapper.find('.sidebar__content__navigation__item__name')).to.have.text().equal(props.label)
   // )
   // it(`should display the first 2 letters of the label in uppercase`, () =>
-  //   expect(wrapper.find('.sidebar__content__navigation__workspace__item__number')).to.have.text().equal(props.label.substring(0, 2).toUpperCase())
+  //   expect(wrapper.find('.sidebar__content__navigation__item__number')).to.have.text().equal(props.label.substring(0, 2).toUpperCase())
   // )
   // it(`should display the first 2 letters on the background color ${GLOBAL_primaryColor.hex}`, () =>
-  //   expect(wrapper.find('.sidebar__content__navigation__workspace__item__number')).to.have.style('background-color').equal(GLOBAL_primaryColor.rgb)
+  //   expect(wrapper.find('.sidebar__content__navigation__item__number')).to.have.style('background-color').equal(GLOBAL_primaryColor.rgb)
   // )
   // it(`should have ${firstWorkspace.sidebarEntry.length} children`, () =>
-  //   expect(wrapper.find('.sidebar__content__navigation__workspace__item__submenu li')).to.have.lengthOf(6)
+  //   expect(wrapper.find('.sidebar__content__navigation__item__submenu li')).to.have.lengthOf(6)
   // )
 })

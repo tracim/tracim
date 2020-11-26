@@ -1,20 +1,29 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
-  
+
 .memberActivity
   display flex
   flex-direction row
+  justify-content space-between
+
   & .avatar
     margin-left 4px
     margin-right 10px
-  &__text
+  &__title
     margin-right auto
+  &__text
     overflow hidden
     text-overflow ellipsis
     white-space nowrap
   &__user
     font-weight bold
-
+  &__workspace
+    text-decoration underline
+    color fontColor
+    &:hover
+      color fontColor
+      text-decoration underline
   &__right
+    margin-left  10px
     font-size fontSizeSmall
     text-align right
     white-space nowrap

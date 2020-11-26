@@ -7,7 +7,7 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
-var dateFnsLocale = {
+const dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en'),
   pt: require('date-fns/locale/pt')

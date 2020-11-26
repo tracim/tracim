@@ -202,3 +202,12 @@ export const setWorkspaceActivityNextPage = (hasNextPage, nextPageToken) => ({
   nextPageToken
 })
 export const resetWorkspaceActivity = () => ({ type: `${RESET}/${WORKSPACE_ACTIVITY}` })
+
+export const USER_ACTIVITY = 'UserActivity'
+export const setUserActivityList = activityList => ({ type: `${SET}/${USER_ACTIVITY}/${LIST}`, activityList })
+export const setUserActivityNextPage = (hasNextPage, nextPageToken) => ({
+  type: `${SET}/${USER_ACTIVITY}/${NEXT_PAGE}`,
+  hasNextPage,
+  nextPageToken
+})
+export const resetUserActivity = () => ({ type: `${RESET}/${USER_ACTIVITY}` })

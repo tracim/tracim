@@ -1,10 +1,6 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-feedWidth = 800px
-smallScreenFeedWidth = 400px
-spacingSize = 10px
-
-.activity_feed
+.activityFeed
   background-color veryLightGrey
   display flex
   flex-direction column
@@ -13,34 +9,14 @@ spacingSize = 10px
   overflow auto
   height "calc(100vh - %s)" % headerHeight
 
+  & .activityList
+    margin-top 10px
+    margin-bottom 10px
+
+.personalActivityFeed
+  @extend .activityFeed
+
+.workspaceActivityFeed
+  @extend .activityFeed
   & .tabBar
-    margin-bottom 10px
     width 100%
-
-  &__content
-    display flex
-    width feedWidth
-    align-items center
-    flex-direction column
-    padding-bottom spacingSize
-
-  &__refresh
-    margin-right 0
-    margin-bottom 10px
-
-  &__list
-    display flex
-    width 100%
-    flex-direction column
-
-  &__item
-    background-color offWhite
-    border 1px solid grey
-    border-radius 5px
-    padding spacingSize
-    margin-bottom spacingSize
-
-@media (max-width: max-sm)
-  .activity_feed
-    &__content
-      width smallScreenFeedWidth

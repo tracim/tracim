@@ -1,0 +1,37 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+feedWidth = 800px
+smallScreenFeedWidth = 400px
+spacingSize = 10px
+
+.activityList
+  background-color veryLightGrey
+  display flex
+  flex-direction column
+  align-items center
+  width feedWidth
+  padding-bottom spacingSize
+
+  &__refresh
+    margin-right 0
+    margin-bottom 10px
+
+  &__list
+    display flex
+    width 100%
+    flex-direction column
+
+  &__item
+    background-color offWhite
+    border 1px solid grey
+    border-radius 5px
+    padding spacingSize
+    margin-bottom spacingSize
+
+  &__placeholder
+    font-size fontSizeMedium
+    text-align center
+
+@media (max-width: max-sm)
+  .activityList
+    width smallScreenFeedWidth
