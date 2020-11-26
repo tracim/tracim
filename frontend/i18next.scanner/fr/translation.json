@@ -12,7 +12,7 @@
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} a changé le statut de {{content}} dans {{space}}",
   "Activity feed": "Fil d'actualité",
   "Empty note": "Note vide",
-  "Empty comment": "Commentaire vide",
+  "Empty thread": "Discussion vide",
   "Are you sure you want to remove this member from the space?": "Voulez-vous vraiment retirer ce membre de l'espace ?",
   "Copy content link": "Copier le lien du contenu",
   "Unknown space type": "Type d'espace inconnu",
