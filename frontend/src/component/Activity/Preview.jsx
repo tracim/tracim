@@ -265,7 +265,7 @@ class Preview extends React.Component {
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
           {this.getPreviewComponent()}
           {state.previewOverflow && (
-            <div className='activityFeed__preview__overflow__overlay' />
+            <div className='activityFeed__preview__overflowOverlay' />
           )}
         </Link>
       </div>
