@@ -281,6 +281,8 @@ class EventApi:
         include_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: List[int] = None,
+        workspace_ids: Optional[List[int]] = None,
+        related_to_content_ids: Optional[List[int]] = None,
     ) -> int:
         return self._base_query(
             user_id=user_id,
@@ -288,6 +290,8 @@ class EventApi:
             exclude_event_types=exclude_event_types,
             read_status=read_status,
             exclude_author_ids=exclude_author_ids,
+            workspace_ids=workspace_ids,
+            related_to_content_ids=related_to_content_ids,
         ).count()
 
     def create_event(

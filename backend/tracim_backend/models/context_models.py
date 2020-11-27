@@ -638,10 +638,14 @@ class UserMessagesSummaryQuery(object):
         include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: str = "",
+        workspace_ids: str = "",
+        related_to_content_ids: str = "",
     ) -> None:
         self.include_event_types = include_event_types
         self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
+        self.workspace_ids = string_to_list(workspace_ids, ",", int)
+        self.related_to_content_ids = string_to_list(related_to_content_ids, ",", int)
 
 
 class FolderContentUpdate(object):

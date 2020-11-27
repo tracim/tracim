@@ -611,6 +611,44 @@ class TestMessages(object):
         assert message_dicts["user"]["user_id"] == 1
         assert message_dicts["user"]["username"] == "TheAdmin"
 
+    @pytest.mark.parametrize(
+        "related_to_content_ids, nb_messages",
+        [([], 4), ([1, 2], 2), ([1, 2, 3], 4), ([2], 1), ([1], 2)],
+    )
+    def test_api__messages_summary__ok_200__content_filter(
+        self, session, web_testapp, related_to_content_ids, nb_messages
+    ) -> None:
+        create_content_messages(session)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        if not related_to_content_ids:
+            related_to_content_ids_str = ""
+        else:
+            related_to_content_ids_str = ",".join([str(wid) for wid in related_to_content_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?related_to_content_ids={}".format(
+                related_to_content_ids_str
+            ),
+            status=200,
+        ).json_body
+        assert result["messages_count"] == nb_messages
+
+    @pytest.mark.parametrize(
+        "workspace_ids, nb_messages", [([], 3), ([1, 2], 2), ([1], 1), ([2], 1)]
+    )
+    def test_api__messages_summary__ok_200__workspace_filter(
+        self, session, web_testapp, workspace_ids, nb_messages
+    ) -> None:
+        create_workspace_messages(session)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        if not workspace_ids:
+            workspace_ids_str = ""
+        else:
+            workspace_ids_str = ",".join([str(wid) for wid in workspace_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?workspace_ids={}".format(workspace_ids_str), status=200,
+        ).json_body
+        assert result["messages_count"] == nb_messages
+
     def test_api__messages_summary__err_400__invalid_event_type_filter(
         self, session, web_testapp,
     ) -> None:
