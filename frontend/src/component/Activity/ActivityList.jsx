@@ -59,13 +59,15 @@ const ActivityList = (props) => {
 
   return (
     <div className='activityList'>
-      <IconButton
-        customClass='activityList__refresh'
-        text={props.t('Refresh')}
-        intent='link'
-        onClick={props.onRefreshClicked}
-        dataCy='activityList__refresh'
-      />
+      {props.showRefresh && (
+        <IconButton
+          customClass='activityList__refresh'
+          text={props.t('Refresh')}
+          intent='link'
+          onClick={props.onRefreshClicked}
+          dataCy='activityList__refresh'
+        />
+      )}
       <div className='activityList__list' data-cy='activityList__list'>
         {props.activity.list.length > 0
           ? props.activity.list
@@ -87,6 +89,7 @@ const ActivityList = (props) => {
 
 ActivityList.propTypes = {
   activity: PropTypes.object.isRequired,
+  showRefresh: PropTypes.bool.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired
