@@ -10,7 +10,7 @@
     "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
     "build-dev": "NODE_ENV=development webpack-cli",
     "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
-    "build-translation": "node i18next.scanner.js",
+    "build-translation": "node ../i18next.scanner.js",
     "lint": "cd src && yarn standard --parser babel-eslint --plugin react && cd ../test && yarn standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
