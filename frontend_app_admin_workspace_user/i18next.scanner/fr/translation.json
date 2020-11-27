@@ -8,8 +8,6 @@
   "Error while enabling or disabling user": "Erreur lors de l'activation ou de la désactivation de l'utilisateur",
   "Error while saving new profile": "Erreur lors de l'enregistrement d'un nouveau profil",
   "Error while saving new user": "Erreur lors de l'enregistrement d'un nouvel utilisateur",
-  "Are you sure?": "Êtes-vous sûr ?",
-  "Cancel": "Annuler",
   "Delete": "Supprimer",
   "User account management": "Gestion des comptes utilisateur",
   "On this page you can manage the users of your Tracim instance.": "Sur cette page, vous pouvez administrer les utilisateurs de votre instance de Tracim",

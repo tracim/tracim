@@ -1,4 +1,7 @@
-module.exports = {
+const scanner = require('i18next-scanner')
+const vfs = require('vinyl-fs')
+
+const options = {
   debug: false,
   removeUnusedKeys: true,
   func: {
@@ -46,3 +49,7 @@ module.exports = {
     lineEnding: '\n'
   }
 }
+
+vfs.src(['./src/**/*.jsx', './src/**/*.js'])
+  .pipe(scanner(options))
+  .pipe(vfs.dest('./i18next.scanner'))
