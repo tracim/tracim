@@ -118,7 +118,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
             notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
             activityFeedEvents: true,
             workspaceId: workspaceId,
-            includeNotSent: true
+            includeNotSent: true
           }
         ))
         activityList = await mergeWithActivityList(
