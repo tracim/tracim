@@ -88,6 +88,52 @@ def create_workspace_messages(session, unread: bool = False) -> typing.List[trac
     return messages
 
 
+def create_content_messages(session, unread: bool = False) -> typing.List[tracim_event.Message]:
+    messages = []
+    with transaction.manager:
+        # remove messages created by the base fixture
+        session.query(tracim_event.Message).delete()
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 1}, "content": {"content_id": 1, "parent_id": None}},
+        )
+        session.add(event)
+        read_datetime = datetime.datetime.utcnow()
+        if unread:
+            read_datetime = None
+        messages.append(tracim_event.Message(event=event, receiver_id=1, read=read_datetime))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 2, "parent_id": 1}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.WORKSPACE,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 3, "parent_id": None}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 4, "parent_id": 3}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1))
+        session.add_all(messages)
+        session.flush()
+    transaction.commit()
+    messages.reverse()
+    return messages
+
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestMessages(object):
@@ -194,7 +240,7 @@ class TestMessages(object):
         self, session, web_testapp, workspace_ids
     ) -> None:
         """
-        Get messages through the classic HTTP endpoint. Filter by event_type
+        Get messages through the classic HTTP endpoint. Filter by workspace_id
         """
         messages = create_workspace_messages(session)
         if workspace_ids:
@@ -208,6 +254,40 @@ class TestMessages(object):
         workspace_ids_str = ",".join([str(wid) for wid in workspace_ids])
         result = web_testapp.get(
             "/api/users/1/messages?workspace_ids={}".format(workspace_ids_str), status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(messages) == len(message_dicts)
+        for message, message_dict in zip(messages, message_dicts):
+            assert {
+                "event_id": message.event_id,
+                "event_type": message.event_type,
+                "fields": message.fields,
+                "created": message.created.strftime(DATETIME_FORMAT),
+                "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
+            } == message_dict
+
+    @pytest.mark.parametrize("related_to_content_ids", [[], [1, 2], [1], [2]])
+    def test_api__get_messages__ok_200__content_filter(
+        self, session, web_testapp, related_to_content_ids
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint. Filter by content_id and content parent_id
+        """
+        messages = create_content_messages(session)
+        if related_to_content_ids:
+            new_messages = []
+            for m in messages:
+                if m.event.fields.get("content"):
+                    if m.event.content["content_id"] in related_to_content_ids:
+                        new_messages.append(m)
+                    elif m.event.content["parent_id"] in related_to_content_ids:
+                        new_messages.append(m)
+            messages = new_messages
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        related_to_content_ids_str = ",".join([str(wid) for wid in related_to_content_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages?related_to_content_ids={}".format(related_to_content_ids_str),
+            status=200,
         ).json_body
         message_dicts = result.get("items")
         assert len(messages) == len(message_dicts)
