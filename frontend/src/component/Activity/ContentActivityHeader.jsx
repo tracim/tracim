@@ -101,6 +101,7 @@ export class ContentActivityHeader extends React.Component {
           />
 
           <Link
+            className='contentActivityHeader__actionMenu__item'
             title={props.t('Open content')}
             to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
           >
