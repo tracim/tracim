@@ -11,6 +11,8 @@
   "{{author}} updated {{content}} in {{space}}": "{{author}} actualizou {{content}} em {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} modificou o status de {{content}} em {{space}}",
   "Activity feed": "Feed de atividades",
+  "Empty note": "Nota vazia",
+  "Empty thread": "Discussão vazia",
   "Are you sure you want to remove this member from the space?": "Tem a certeza de que quer remover este membro do espaço?",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Copy content link": "Copiar ligação do conteúdo",

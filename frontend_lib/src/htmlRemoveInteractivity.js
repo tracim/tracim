@@ -98,5 +98,11 @@ export function removeInteractiveContentFromHTML (html) {
   // Previews are in a <a> tag. It is forbidden to have interactive
   // content inside a <a> tag in HTML, so let's remove interactivity from previews.
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  return removeInteractiveContentFromDOM(doc.body, doc).innerHTML
+  const bodyWithoutInteractivity = removeInteractiveContentFromDOM(doc.body, doc)
+
+  if (!bodyWithoutInteractivity.textContent.trim()) {
+    return ''
+  }
+
+  return bodyWithoutInteractivity.innerHTML
 }

@@ -101,7 +101,7 @@ export class MemberActivity extends React.Component {
 
     return (
       <div className='memberActivity'>
-        <Avatar publicName={newestMessage.fields.user.public_name} width={32} style={{ marginRight: '5px' }} />
+        <Avatar publicName={newestMessage.fields.user.public_name} width='32px' style={{ marginRight: '5px' }} />
         <div className='memberActivity__title'>
           {this.getText()}
           <Breadcrumbs breadcrumbsList={breadcrumbsList} />

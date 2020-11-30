@@ -1,5 +1,6 @@
 import { JSDOM } from 'jsdom'
 import chai from 'chai'
+import sinon from 'sinon'
 import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
@@ -35,5 +36,6 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = () => {}
 }
 
+sinon.stub(console, 'log')
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
