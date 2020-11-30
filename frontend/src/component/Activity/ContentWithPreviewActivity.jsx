@@ -14,6 +14,7 @@ export const ContentWithPreviewActivity = props => {
         eventList={props.activity.eventList}
         newestMessage={props.activity.newestMessage}
         onClickCopyLink={props.onClickCopyLink}
+        onEventClicked={props.onEventClicked}
       />
       <Preview content={props.activity.content} />
       <ContentActivityFooter
@@ -29,5 +30,6 @@ export default ContentWithPreviewActivity
 
 ContentWithPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
-  onClickCopyLink: PropTypes.func.isRequired
+  onClickCopyLink: PropTypes.func.isRequired,
+  onEventClicked: PropTypes.func
 }

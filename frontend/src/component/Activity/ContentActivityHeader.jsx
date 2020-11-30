@@ -86,6 +86,9 @@ export class ContentActivityHeader extends React.Component {
           date={newestMessage.created}
           lang={props.user.lang}
           authorName={newestMessage.fields.author.public_name}
+          eventList={props.eventList}
+          onEventClicked={props.onEventClicked}
+          dataCy='contentActivityTimedEvent'
         />
         <DropdownMenu
           buttonCustomClass='contentActivityHeader__actionMenu'
@@ -121,5 +124,6 @@ ContentActivityHeader.propTypes = {
   workspace: PropTypes.object.isRequired,
   eventList: PropTypes.array.isRequired,
   newestMessage: PropTypes.object.isRequired,
-  onClickCopyLink: PropTypes.func.isRequired
+  onClickCopyLink: PropTypes.func.isRequired,
+  onEventClicked: PropTypes.func
 }

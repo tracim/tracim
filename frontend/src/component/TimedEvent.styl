@@ -2,10 +2,16 @@
 
 .timedEvent
   font-size fontSizeSmall
-  overflow hidden
   white-space nowrap
   display flex
   flex-direction column
+  &__top
+    text-decoration underline
+    padding 0
+    margin 0
+    font-size fontSizeSmall
+    &::after
+      display none
   &__bottom
     overflow hidden
     display flex
@@ -15,6 +21,11 @@
     overflow hidden
     font-weight bold
     text-overflow ellipsis
+  & .dropdownMenuItem
+    cursor auto
+    border-bottom 1px solid mediumGrey
+    &:hover
+      background-color offWhite
 
 @media (max-width max-sm)
   .timedEvent

@@ -18,7 +18,8 @@ import {
   setHeadTitle,
   setUserActivityList,
   setUserActivityNextPage,
-  resetUserActivity
+  resetUserActivity,
+  setUserActivityEventList
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
@@ -74,6 +75,7 @@ export class PersonalActivityFeed extends React.Component {
           onRefreshClicked={props.onRefreshClicked}
           onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
           onCopyLinkClicked={props.onCopyLinkClicked}
+          onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
         />
       </div>
@@ -85,7 +87,8 @@ PersonalActivityFeed.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
-  onCopyLinkClicked: PropTypes.func.isRequired
+  onCopyLinkClicked: PropTypes.func.isRequired,
+  onEventClicked: PropTypes.func
 }
 
 const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
@@ -93,6 +96,7 @@ const component = withActivity(
   TracimComponent(PersonalActivityFeed),
   setUserActivityList,
   setUserActivityNextPage,
-  resetUserActivity
+  resetUserActivity,
+  setUserActivityEventList
 )
 export default connect(mapStateToProps)(withRouter(translate()(component)))

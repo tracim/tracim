@@ -20,7 +20,8 @@ import {
   setHeadTitle,
   newFlashMessage,
   setWorkspaceDetail,
-  resetWorkspaceActivity
+  resetWorkspaceActivity,
+  setWorkspaceActivityEventList
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
@@ -154,6 +155,7 @@ const component = withActivity(
   TracimComponent(WorkspaceActivityFeed),
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
-  resetWorkspaceActivity
+  resetWorkspaceActivity,
+  setWorkspaceActivityEventList
 )
 export default connect(mapStateToProps)(withRouter(translate()(component)))
