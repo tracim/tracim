@@ -311,7 +311,7 @@ export function appContentFactory (WrappedComponent) {
     }
 
     appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all please notice that I did an important update on this content.')
+      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
 
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
@@ -347,7 +347,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
         case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+        default: this.sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
       }
       return mentionList
     }

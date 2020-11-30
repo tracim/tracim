@@ -76,6 +76,7 @@ Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
   const tlm = { opened: false }
   const signalOpenedTlmConnection = (win) => {
     win.document.addEventListener(APP_CUSTOM_EVENT_LISTENER, (event) => {
+      if (tlm.opened) return
       tlm.opened = (
         event.type === APP_CUSTOM_EVENT_LISTENER &&
         event.detail.type === TRACIM_LIVE_MESSAGE_STATUS_CHANGED &&

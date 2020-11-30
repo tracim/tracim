@@ -44,6 +44,7 @@ from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
+from tracim_backend.tests.utils import MessageHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
@@ -117,6 +118,10 @@ def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTe
         extra_config_vars={"app:main": settings},
         hostname="127.0.0.1",
     ) as server:
+        # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
+        # will check hostname:port to verify if test server
+        # is correctly runned. So server run check can take forever and fail if for some reason,
+        # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
         server.start()
         yield server
     session_factory.close_all()
@@ -437,6 +442,11 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
 @pytest.fixture
 def event_helper(session) -> EventHelper:
     return EventHelper(session)
+
+
+@pytest.fixture
+def message_helper(session) -> MessageHelper:
+    return MessageHelper(session)
 
 
 @pytest.fixture

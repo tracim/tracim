@@ -5,6 +5,15 @@ const activityPages = [
   { name: 'Space', page: PAGES.WORKSPACE_ACTIVITY_FEED, initialItemCount: 1 }
 ]
 
+const fileName2 = 'png_exemple2.png'
+const fileName2WithoutExtention = 'png_exemple2'
+
+const fileName3 = 'png_exemple3.png'
+const fileName3WithoutExtention = 'png_exemple3'
+
+const fileImage = 'artikodin.png'
+const fileType = 'image/png'
+
 for (const pageTestCase of activityPages) {
   const { name, page, initialItemCount } = pageTestCase
   describe(`The ${name} activity feed page`, () => {
@@ -23,7 +32,7 @@ for (const pageTestCase of activityPages) {
     describe('Pagination', () => {
       beforeEach(() => {
         for (let i = 0; i < 20; ++i) {
-          cy.createFile('artikodin.png', 'image/png', `png_exemple${i}.png`, workspaceId)
+          cy.createFile(fileImage, fileType, `png_exemple${i}.png`, workspaceId)
         }
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
@@ -43,44 +52,47 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should add an item in first position when a file is created', () => {
-        cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
+        cy.createFile(fileImage, fileType, fileName2, workspaceId)
+        cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
         cy.get('[data-cy=activityList__item]')
-          .should('have.length', initialItemCount + 1)
           .first()
-          .should('contain.text', 'png_exemple2')
+          .should('contain.text', fileName2WithoutExtention)
       })
 
       it('should update already an existing item when a comment for its content is posted', () => {
-        cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
+        cy.createFile(fileImage, fileType, fileName2, workspaceId)
+        cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
         cy.get('[data-cy=activityList__item]')
-          .should('have.length', initialItemCount + 1)
           .first()
           .should('contain.text', 'modified')
         cy.postComment(workspaceId, 1, 'A comment')
-        cy.contains('[data-cy=activityList__item]', 'png_exemple2')
+        cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
           .should('contain.text', 'commented')
       })
 
       it('should be reordered only when the "Refresh" button is pressed', () => {
         const firstContentId = 1
-        cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId)
-          .createFile('artikodin.png', 'image/png', 'png_exemple3.png', workspaceId)
+        cy.createFile(fileImage, fileType, fileName2, workspaceId)
+          .createFile(fileImage, fileType, fileName3, workspaceId)
+
+        cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
+        cy.contains('[data-cy=activityList__item]', fileName3WithoutExtention)
         cy.get('[data-cy=activityList__item]')
-          .should('have.length', initialItemCount + 2)
           .first()
-          .should('contain.text', 'png_exemple3')
+          .should('contain.text', fileName3WithoutExtention)
         cy.get('[data-cy=activityList__refresh]').should('not.exist')
+
         cy.postComment(workspaceId, firstContentId, 'A comment')
         cy.get('[data-cy=activityList__item]')
-          .should('have.length', initialItemCount + 2)
           .first()
-          .should('contain.text', 'png_exemple3')
+          .should('contain.text', fileName3WithoutExtention)
+
         cy.get('[data-cy=activityList__refresh]')
           .click()
+
         cy.get('[data-cy=activityList__item]')
-          .should('have.length', initialItemCount + 2)
           .first()
-          .should('contain.text', 'png_exemple2')
+          .should('contain.text', fileName2WithoutExtention)
           .and('contain.text', 1)
       })
     })
@@ -88,7 +100,7 @@ for (const pageTestCase of activityPages) {
     describe('File Content item', () => {
       let fileId = null
       beforeEach(() => {
-        cy.createFile('artikodin.png', 'image/png', 'png_exemple2.png', workspaceId).then(content => { fileId = content.content_id })
+        cy.createFile(fileImage, fileType, fileName2, workspaceId).then(content => { fileId = content.content_id })
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
 

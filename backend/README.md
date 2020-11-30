@@ -39,7 +39,7 @@ For better preview support:
 
 #### Supported database engines
 
-- SQLite 3.9+
+- SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+

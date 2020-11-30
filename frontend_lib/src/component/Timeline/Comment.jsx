@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import Avatar from '../Avatar/Avatar.jsx'
+import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 
 const Comment = props => {
@@ -35,8 +36,9 @@ const Comment = props => {
 
             <div
               className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
-              dangerouslySetInnerHTML={{ __html: props.text }}
-            />
+            >
+              <HTMLContent>{props.text}</HTMLContent>
+            </div>
           </div>
         </div>
       </div>

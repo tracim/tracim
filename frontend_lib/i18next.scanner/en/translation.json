@@ -102,5 +102,19 @@
   "Confirm": "Confirm",
   "pending": "pending",
   "rejected": "rejected",
-  "accepted": "accepted"
+  "accepted": "accepted",
+  "A content with same name already exists": "A content with same name already exists",
+  "Error while saving the title": "Error while saving the title",
+  "You are trying to mention an invalid user": "You are trying to mention an invalid user",
+  "You can't send an empty comment": "You can't send an empty comment",
+  "You must change the status or restore this content before any change": "You must change the status or restore this content before any change",
+  "Error while saving the comment": "Error while saving the comment",
+  "Error while changing status": "Error while changing status",
+  "Error while archiving content": "Error while archiving content",
+  "Error while deleting content": "Error while deleting content",
+  "Error while restoring content": "Error while restoring content",
+  "@all Please notice that I did an important update on this content.": "@all Please notice that I did an important update on this content.",
+  "An error has happened while getting the known members list": "An error has happened while getting the known members list",
+  "Sends a notification to all members of the space": "Sends a notification to all members of the space",
+  "Error while detecting the mentions": "Error while detecting the mentions"
 }

@@ -4,6 +4,7 @@ import {
   APP_FEATURE_MODE,
   MentionAutoComplete,
   PromptMessage,
+  HTMLContent,
   TextAreaApp
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
@@ -85,7 +86,9 @@ export const HtmlDocument = props => {
               )}
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.text }} />
+            <div className='html-document__contentpage__textnote__text'>
+              <HTMLContent>{props.text}</HTMLContent>
+            </div>
           </div>
         )}
 
