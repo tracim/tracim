@@ -1604,6 +1604,13 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
+    include_not_sent = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description="if set to 1, then show not sent message."
+        " Default is 0 - hide not sent message content",
+        validate=bool_as_int_validator,
+    )
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
@@ -1642,6 +1649,13 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
 
     exclude_event_types = EventTypeListField()
     include_event_types = EventTypeListField()
+    include_not_sent = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description="if set to 1, then show not sent message."
+        " Default is 0 - hide not sent message content",
+        validate=bool_as_int_validator,
+    )
     exclude_author_ids = ExcludeAuthorIdsField
 
     @post_load

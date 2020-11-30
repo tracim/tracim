@@ -872,6 +872,7 @@ export const getNotificationList = (
     notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
     nextPageToken = null,
     workspaceId = null,
+    includeNotSent = false,
     activityFeedEvents = false
   }) => async dispatch => {
   const queryParameterList = [
@@ -883,6 +884,7 @@ export const getNotificationList = (
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
   if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)
+  if (includeNotSent) queryParameterList.push('include_not_sent=1')
   const fetchGetNotificationWall = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?${queryParameterList.join('&')}`,
     param: {

@@ -616,6 +616,7 @@ class LiveMessageQuery(object):
         page_token: Optional[str] = None,
         exclude_author_ids: str = "",
         workspace_ids: str = "",
+        include_not_sent: int = 0,
     ) -> None:
         self.read_status = ReadStatus(read_status)
         self.count = count
@@ -624,6 +625,7 @@ class LiveMessageQuery(object):
         self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
         self.workspace_ids = string_to_list(workspace_ids, ",", int)
+        self.include_not_sent = bool(include_not_sent)
 
 
 class UserMessagesSummaryQuery(object):
@@ -636,10 +638,12 @@ class UserMessagesSummaryQuery(object):
         include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: str = "",
+        include_not_sent: int = 0,
     ) -> None:
         self.include_event_types = include_event_types
         self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
+        self.include_not_sent = bool(include_not_sent)
 
 
 class FolderContentUpdate(object):
