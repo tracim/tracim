@@ -19,11 +19,11 @@ PageWrapper.propTypes = {
   children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
     if (
       children.length > 2 ||
-      children[0].type !== PageTitle ||
+      (children[0].type !== PageTitle && !children[0].type.displayName.includes('TabBar')) ||
       children[1].type !== PageContent
       // children.some(p => p.type !== CardHeader && p.type !== CardBody)
     ) {
-      return new Error(`PropType Error: childrens of ${componentName} must be: 1 PageTitle and 1 PageContent.`)
+      return new Error(`PropType Error: childrens of ${componentName} must be: 1 PageTitle or 1 TabBar, and 1 PageContent.`)
     }
   }).isRequired
 }

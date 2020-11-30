@@ -872,6 +872,7 @@ export const getNotificationList = (
     notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
     nextPageToken = null,
     workspaceId = null,
+    includeNotSent = false,
     activityFeedEvents = false
   }) => async dispatch => {
   const queryParameterList = [
@@ -883,6 +884,7 @@ export const getNotificationList = (
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
   if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)
+  if (includeNotSent) queryParameterList.push('include_not_sent=1')
   const fetchGetNotificationWall = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?${queryParameterList.join('&')}`,
     param: {
@@ -1016,7 +1018,7 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
 export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${label}.html`, {
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'

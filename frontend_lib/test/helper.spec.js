@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import {
+  buildFilePreviewUrl,
   createSpaceTree,
   generateLocalStorageContentId,
   convertBackslashNToBr,
@@ -498,6 +499,16 @@ describe('helper.js', () => {
 
       sortWorkspaceList(workspaceList, 'en')
       expect(workspaceList).to.deep.equal(workspaceListSortedByFolderAndNaturally)
+    })
+  })
+
+  describe('Function buildFilePreviewUrl', () => {
+    it('should URL-encode the file name', () => {
+      expect(
+        buildFilePreviewUrl('http://unit.test/', 1, 2, 3, "Captures / d'écran (n°1)", 4, 640, 480)
+      ).to.equal(
+        "http://unit.test//workspaces/1/files/2/revisions/3/preview/jpg/640x480/Captures%20%2F%20d'%C3%A9cran%20(n%C2%B01).jpg?page=4"
+      )
     })
   })
 })

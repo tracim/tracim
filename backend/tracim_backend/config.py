@@ -403,6 +403,9 @@ class CFG(object):
             cast_func=WorkspaceAccessType,
             do_strip=True,
         )
+        self.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT = int(
+            self.get_raw_config("workspace.join.max_messages_history_count", "-1")
+        )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config(

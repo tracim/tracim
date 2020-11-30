@@ -5,6 +5,7 @@ import {
   buildFilePreviewUrl as jpgPreviewUrl,
   removeExtensionOfFilename,
   removeInteractiveContentFromHTML,
+  HTMLContent,
   CONTENT_TYPE,
   SCREEN_SIZE
 } from 'tracim_frontend_lib'
@@ -195,22 +196,32 @@ class Preview extends React.Component {
   }
 
   getUnavailablePreviewComponent () {
+    return this.noPreviewComponent(this.props.t('No preview available'))
+  }
+
+  noPreviewComponent (details) {
     return (
       <>
         <i className='fa fa-eye-slash' />
-        <span>{this.props.t('No preview available')}</span>
+        <span>{details}</span>
       </>
     )
   }
 
   getHTMLPreviewComponent () {
+    if (!this.state.previewHtmlCode) {
+      const { props } = this
+
+      return this.noPreviewComponent(
+        props.content.content_type === CONTENT_TYPE.THREAD
+          ? props.t('Empty thread')
+          : props.t('Empty note')
+      )
+    }
+
     return (
       <div className='activityFeed__preview__html'>
-        <article
-          dangerouslySetInnerHTML={{
-            __html: this.state.previewHtmlCode
-          }}
-        />
+        <HTMLContent>{this.state.previewHtmlCode}</HTMLContent>
       </div>
     )
   }
@@ -244,7 +255,8 @@ class Preview extends React.Component {
       <div
         className={classnames(
           'activityFeed__preview', {
-            activityFeed__preview__unavailable: state.previewUnavailable,
+            activityFeed__preview__overflow: state.previewOverflow,
+            activityFeed__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
             activityFeed__preview__loading: state.previewLoading
           }
         )}
@@ -253,7 +265,7 @@ class Preview extends React.Component {
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
           {this.getPreviewComponent()}
           {state.previewOverflow && (
-            <div className='activityFeed__preview__overflow' />
+            <div className='activityFeed__preview__overflowOverlay' />
           )}
         </Link>
       </div>

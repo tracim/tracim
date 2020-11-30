@@ -666,6 +666,7 @@ class UserController(Controller):
                 include_event_types=hapic_data.query.include_event_types,
                 exclude_event_types=hapic_data.query.exclude_event_types,
                 workspace_ids=hapic_data.query.workspace_ids,
+                include_not_sent=hapic_data.query.include_not_sent,
                 related_to_content_ids=hapic_data.query.related_to_content_ids,
             )
         )
@@ -692,6 +693,7 @@ class UserController(Controller):
             include_event_types=hapic_data.query.include_event_types,
             exclude_event_types=hapic_data.query.exclude_event_types,
             exclude_author_ids=hapic_data.query.exclude_author_ids,
+            include_not_sent=hapic_data.query.include_not_sent,
             workspace_ids=hapic_data.query.workspace_ids,
             related_to_content_ids=hapic_data.query.related_to_content_ids,
         )
@@ -701,6 +703,7 @@ class UserController(Controller):
             include_event_types=hapic_data.query.include_event_types,
             exclude_event_types=hapic_data.query.exclude_event_types,
             exclude_author_ids=hapic_data.query.exclude_author_ids,
+            include_not_sent=hapic_data.query.include_not_sent,
             workspace_ids=hapic_data.query.workspace_ids,
             related_to_content_ids=hapic_data.query.related_to_content_ids,
         )

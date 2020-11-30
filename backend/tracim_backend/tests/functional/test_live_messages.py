@@ -136,6 +136,7 @@ class TestLiveMessages(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
+    @pytest.mark.pushpin
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__nominal_case(
         self, pushpin, app_config
     ):
@@ -156,6 +157,7 @@ class TestLiveMessages(object):
         assert json.loads(event1.data) == {"test_message": "example"}
         assert event1.event == "message"
 
+    @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
@@ -193,6 +195,7 @@ class TestLiveMessages(object):
         assert result["fields"]["author"]["user_id"] == 1
         assert event1.event == "message"
 
+    @pytest.mark.pushpin
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_async_live_test"}], indirect=True
     )
@@ -232,6 +235,7 @@ class TestLiveMessages(object):
         assert result["fields"]["author"]["user_id"] == 1
         assert event1.event == "message"
 
+    @pytest.mark.pushpin
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_async_live_test"}], indirect=True
     )
@@ -269,6 +273,7 @@ class TestLiveMessages(object):
         assert result["fields"]["author"]["user_id"] == 1
         assert event1.event == "message"
 
+    @pytest.mark.pushpin
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_async_live_test"}], indirect=True
     )
@@ -298,6 +303,7 @@ class TestLiveMessages(object):
         result = json.loads(event1.data)
         assert result["event_type"] == "content.modified.html-document"
 
+    @pytest.mark.pushpin
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_async_live_test"}], indirect=True
     )
@@ -356,6 +362,7 @@ class TestLiveMessages(object):
         event3 = next(client_events)
         assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"
 
+    @pytest.mark.pushpin
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__disconnect(
         self, pushpin, app_config
     ):

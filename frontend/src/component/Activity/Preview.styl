@@ -13,7 +13,7 @@ linkColor = #007bff // This color comes from bootstrap
   max-height previewHeight
   margin 10px 0
 
-  &__overflow
+  &__overflowOverlay
     background-image:
       linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent),
       radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1), transparent)
@@ -40,11 +40,16 @@ linkColor = #007bff // This color comes from bootstrap
 
   &__html
     text-align justify
-    background-color offWhite
     margin 10px
 
     a-in-preview
       color linkColor
+
+    > .html-content
+      background offWhite
+      border 1px solid previewBorderColor
+      padding 10px
+      align-self stretch
 
   &__unavailable
     display block

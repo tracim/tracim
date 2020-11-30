@@ -142,6 +142,7 @@ class EventApi:
         after_event_id: int = 0,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
+        include_not_sent: bool = False,
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
@@ -159,6 +160,8 @@ class EventApi:
                     .in_(related_to_content_ids),
                 )
             )
+        if not include_not_sent:
+            query = query.filter(Message.sent != None)  # noqa: E711
         if event_id:
             query = query.filter(Message.event_id == event_id)
         if user_id:
@@ -260,6 +263,7 @@ class EventApi:
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: Optional[int] = None,
+        include_not_sent: bool = False,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
     ) -> Page:
@@ -270,6 +274,7 @@ class EventApi:
             exclude_event_types=exclude_event_types,
             exclude_author_ids=exclude_author_ids,
             workspace_ids=workspace_ids,
+            include_not_sent=include_not_sent,
             related_to_content_ids=related_to_content_ids,
         ).order_by(Message.event_id.desc())
         return get_page(query, per_page=count, page=page_token or False)
@@ -281,6 +286,7 @@ class EventApi:
         include_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_event_types: List[EventTypeDatabaseParameters] = None,
         exclude_author_ids: List[int] = None,
+        include_not_sent=False,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
     ) -> int:
@@ -290,6 +296,7 @@ class EventApi:
             exclude_event_types=exclude_event_types,
             read_status=read_status,
             exclude_author_ids=exclude_author_ids,
+            include_not_sent=include_not_sent,
             workspace_ids=workspace_ids,
             related_to_content_ids=related_to_content_ids,
         ).count()
@@ -327,6 +334,54 @@ class EventApi:
         context.dbsession.add(event)
         context.pending_events.append(event)
         return event
+
+    def create_messages_history_for_user(
+        self, user_id: int, workspace_ids: List[int], max_messages_count: int = -1,
+    ) -> List[Message]:
+        """
+        Generate up to max_messages_count missing messages to ensure the last max_messages_count event
+        related to given workspaces exist as message for user given.
+        """
+        if not max_messages_count:
+            return []
+
+        session = self._session
+        already_known_event_ids_query = session.query(Message.event_id).filter(
+            Message.receiver_id == user_id
+        )
+        workspace_event_ids_query = session.query(Event.event_id).filter(
+            Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+        )
+        if max_messages_count >= 0:
+            workspace_event_ids_query = workspace_event_ids_query.order_by(
+                Event.event_id.desc()
+            ).limit(max_messages_count)
+
+        # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
+        # mysql/mariadb doesn't support limit operator in subquery
+        workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
+        event_query = (
+            session.query(Event)
+            .filter(Event.event_id.in_(workspace_event_ids))
+            .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
+        )
+        messages = []
+        for event in event_query:
+            receiver_ids = BaseLiveMessageBuilder._get_receiver_ids_callables[event.entity_type](
+                event, session, self._config
+            )
+            if user_id in receiver_ids:
+                messages.append(
+                    Message(
+                        receiver_id=user_id,
+                        event=event,
+                        event_id=event.event_id,
+                        sent=None,
+                        read=datetime.utcnow(),
+                    )
+                )
+        session.add_all(messages)
+        return messages
 
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
@@ -525,7 +580,19 @@ class EventBuilder:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
+        self._create_workspace_historic_messages_for_current_user(role, context)
         self._create_role_event(OperationType.CREATED, role, context)
+
+    def _create_workspace_historic_messages_for_current_user(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ):
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_messages_history_for_user(
+            user_id=role.user_id,
+            workspace_ids=[role.workspace_id],
+            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+        )
 
     @hookimpl
     def on_user_role_in_workspace_modified(

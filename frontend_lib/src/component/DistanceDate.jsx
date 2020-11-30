@@ -11,8 +11,8 @@ const DistanceDate = (props) => {
 }
 
 DistanceDate.propTypes = {
-  absoluteDate: PropTypes.string.required,
-  lang: PropTypes.string.required
+  absoluteDate: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired
 }
 
 export default translate()(DistanceDate)
