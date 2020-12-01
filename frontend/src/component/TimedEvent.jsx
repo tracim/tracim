@@ -31,7 +31,7 @@ const TimedEvent = (props) => {
           <DropdownMenu
             buttonCustomClass='timedEvent__top'
             buttonClick={props.onEventClicked} // eslint-disable-line
-            buttonLabel={topContents}
+            buttonOpts={topContents}
             buttonTooltip=''
           >
             {props.eventList.map(createHistoryTimedEvent)}
