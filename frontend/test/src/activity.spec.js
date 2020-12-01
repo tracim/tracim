@@ -76,7 +76,7 @@ describe('In activity.js module', () => {
     id: 'workspace_member-e6',
     entityType: TLM_ET.SHAREDSPACE_MEMBER,
     eventList: [
-      { author: foo, created: messageList[0].created, eventId: 6, eventType: messageList[0].event_type }
+      { author: foo, created: messageList[0].created, eventId: 6, eventType: messageList[0].event_type.split('.')[1] }
     ],
     reactionList: [],
     commentList: [],
@@ -86,9 +86,9 @@ describe('In activity.js module', () => {
     id: 'content-42',
     entityType: TLM_ET.CONTENT,
     eventList: [
-      { author: foo, created: messageList[1].created, eventId: 5, eventType: messageList[1].event_type },
-      { author: foo, created: messageList[3].created, eventId: 3, eventType: messageList[3].event_type },
-      { author: foo, created: messageList[4].created, eventId: 2, eventType: messageList[4].event_type }
+      { author: foo, created: messageList[1].created, eventId: 5, eventType: messageList[1].event_type.split('.')[1] },
+      { author: foo, created: messageList[3].created, eventId: 3, eventType: messageList[3].event_type.split('.')[1] },
+      { author: foo, created: messageList[4].created, eventId: 2, eventType: messageList[4].event_type.split('.')[1] }
     ],
     reactionList: [],
     commentList: [],
@@ -99,7 +99,7 @@ describe('In activity.js module', () => {
     id: 'workspace_subscription-e4',
     entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION,
     eventList: [
-      { author: bar, created: messageList[2].created, eventId: 4, eventType: messageList[2].event_type }
+      { author: bar, created: messageList[2].created, eventId: 4, eventType: messageList[2].event_type.split('.')[1] }
     ],
     reactionList: [],
     commentList: [],
@@ -142,7 +142,7 @@ describe('In activity.js module', () => {
         expectedContentActivity: {
           ...contentActivity,
           eventList: [
-            { author: foo, created: modifiedMessage.created, eventId: 7, eventType: modifiedMessage.event_type },
+            { author: foo, created: modifiedMessage.created, eventId: 7, eventType: modifiedMessage.event_type.split('.')[1] },
             ...contentActivity.eventList
           ],
           commentList: [],
@@ -154,7 +154,7 @@ describe('In activity.js module', () => {
         expectedContentActivity: {
           ...contentActivity,
           eventList: [
-            { author: foo, created: commentedMessage.created, eventId: 7, eventType: commentedMessage.event_type },
+            { author: foo, created: commentedMessage.created, eventId: 7, eventType: 'commented' },
             ...contentActivity.eventList
           ],
           commentList: [commentedMessage.fields.content],
@@ -185,7 +185,7 @@ describe('In activity.js module', () => {
         id: 'content-12',
         entityType: TLM_ET.CONTENT,
         eventList: [
-          { author: foo, created: message.created, eventId: 7, eventType: message.event_type }
+          { author: foo, created: message.created, eventId: 7, eventType: message.event_type.split('.')[1] }
         ],
         reactionList: [],
         commentList: [],
