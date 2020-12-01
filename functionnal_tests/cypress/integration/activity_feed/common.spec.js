@@ -118,6 +118,11 @@ for (const pageTestCase of activityPages) {
         cy.get('.activityFeed__preview__image > img').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
+
+      it('should have a button on last activity, clicking on it opens a short history', () => {
+        cy.get('[data-cy=contentActivityTimedEvent] > .dropdown').click()
+        cy.get('[data-cy=contentActivityTimedEvent] .dropdownMenu').should('exist')
+      })
     })
 
     describe('Note content item', () => {

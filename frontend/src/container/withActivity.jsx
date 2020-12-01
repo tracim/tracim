@@ -12,6 +12,7 @@ import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
 const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
+const ACTIVITY_HISTORY_COUNT = 5
 const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
 
 /**
@@ -22,8 +23,9 @@ const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
  * @param {function} setActivityNextPage a redux action that will set the
  *  activity.hasNextPage/nextPageToken props when dispatched.
  * @param {function} resetActivity a redux action that resets the activity prop when dispatched.
+ * @param {function} setActivityEventList a redux action that sets the event list of a given activity
  */
-const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, resetActivity) => {
+const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, resetActivity, setActivityEventList) => {
   return class extends React.Component {
     constructor (props) {
       super(props)
@@ -63,6 +65,21 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       document.execCommand('copy')
       document.body.removeChild(tmp)
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
+    }
+
+    handleEventClick = async (activity) => {
+      const { props } = this
+      const messageListResponse = await props.dispatch(getNotificationList(
+        props.user.userId,
+        {
+          notificationsPerPage: ACTIVITY_HISTORY_COUNT,
+          activityFeedEvents: true,
+          relatedContentId: activity.content.content_id,
+          workspaceId: activity.content.workspace_id,
+          includeNotSent: true
+        }
+      ))
+      props.dispatch(setActivityEventList(activity, messageListResponse.json.items))
     }
 
     updateActivityListFromTlm = async (data) => {
@@ -141,9 +158,11 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           handleTlm={this.updateActivityListFromTlm}
           onRefreshClicked={this.handleRefreshClicked}
           onCopyLinkClicked={this.handleClickCopyLink}
+          onEventClicked={this.handleEventClick}
           showRefresh={this.state.showRefresh}
           {...this.props}
-        />)
+        />
+      )
     }
   }
 }

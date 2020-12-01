@@ -7,9 +7,10 @@ import {
 } from 'tracim_frontend_lib'
 
 const createActivityEvent = (message) => {
+  const [, eventType, subEntityType] = message.event_type.split('.')
   return {
     eventId: message.event_id,
-    eventType: message.event_type,
+    eventType: subEntityType === TLM_ST.COMMENT ? 'commented' : eventType,
     author: message.fields.author,
     created: message.created
   }
@@ -54,7 +55,6 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     content: content
   }
 }
-
 const getActivityParams = (message) => {
   const [entityType, , subEntityType] = message.event_type.split('.')
   switch (entityType) {
@@ -179,6 +179,27 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
   }
   const oldActivity = activityList[activityIndex]
   const updatedActivity = updateActivity(message, oldActivity)
+  const updatedActivityList = [...activityList]
+  updatedActivityList[activityIndex] = updatedActivity
+  return updatedActivityList
+}
+
+/**
+ * Set the event list of a given activity by building them from messages.
+ * Does nothing if the activity is not in the given list
+ * @param {str} activityId id of the activity to modify
+ * @param {*} activityList list of activitiesx
+ * @param {*} messageList list of messages for building events
+ * @return updated activity
+ */
+export const setActivityEventList = (activityId, activityList, messageList) => {
+  const activityIndex = activityList.findIndex(a => a.id === activityId)
+  if (activityIndex === -1) return activityList
+  const oldActivity = activityList[activityIndex]
+  const updatedActivity = {
+    ...oldActivity,
+    eventList: messageList.map(createActivityEvent)
+  }
   const updatedActivityList = [...activityList]
   updatedActivityList[activityIndex] = updatedActivity
   return updatedActivityList

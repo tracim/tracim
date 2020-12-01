@@ -34,5 +34,9 @@ node_modules
 /tools_docker/test_docker/test_config.env
 tools_docker/test_docker/__pycache__
 
-# tern for emacs
+# tern & projectile for emacs
 .tern*
+.projectile
+# emacs save file
+#*
+.#*

@@ -17,10 +17,24 @@ import MemberActivity from './MemberActivity.jsx'
 require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
-  [TLM_ET.CONTENT, (activity, onCopyLinkClicked) => {
+  [TLM_ET.CONTENT, (activity, onCopyLinkClicked, onEventClicked) => {
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
-      ? <ContentWithoutPreviewActivity activity={activity} key={activity.id} />
-      : <ContentWithPreviewActivity activity={activity} key={activity.id} onClickCopyLink={onCopyLinkClicked} />
+      ? (
+        <ContentWithoutPreviewActivity
+          activity={activity}
+          key={activity.id}
+          onClickCopyLink={onCopyLinkClicked}
+          onEventClicked={onEventClicked}
+        />
+      )
+      : (
+        <ContentWithPreviewActivity
+          activity={activity}
+          key={activity.id}
+          onClickCopyLink={onCopyLinkClicked}
+          onEventClicked={onEventClicked}
+        />
+      )
   }],
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
@@ -32,7 +46,7 @@ const ActivityList = (props) => {
   const renderActivityComponent = (activity) => {
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity, () => props.onCopyLinkClicked(activity.newestMessage.fields.content))
+      ? componentConstructor(activity, () => props.onCopyLinkClicked(activity.newestMessage.fields.content), () => props.onEventClicked(activity))
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
   }
@@ -92,7 +106,8 @@ ActivityList.propTypes = {
   showRefresh: PropTypes.bool.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
-  onCopyLinkClicked: PropTypes.func.isRequired
+  onCopyLinkClicked: PropTypes.func.isRequired,
+  onEventClicked: PropTypes.func
 }
 
 export default translate()(ActivityList)

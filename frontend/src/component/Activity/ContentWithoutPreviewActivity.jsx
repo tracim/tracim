@@ -11,6 +11,7 @@ export const ContentWithoutPreviewActivity = props => {
       eventList={props.activity.eventList}
       newestMessage={props.activity.newestMessage}
       onClickCopyLink={props.onClickCopyLink}
+      onEventClicked={props.onEventClicked}
     />
   )
 }
@@ -19,5 +20,6 @@ export default ContentWithoutPreviewActivity
 
 ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
-  onClickCopyLink: PropTypes.func.isRequired
+  onClickCopyLink: PropTypes.func.isRequired,
+  onEventClicked: PropTypes.func
 }

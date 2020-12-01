@@ -20,7 +20,8 @@ import {
   setHeadTitle,
   newFlashMessage,
   setWorkspaceDetail,
-  resetWorkspaceActivity
+  resetWorkspaceActivity,
+  setWorkspaceActivityEventList
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
@@ -132,6 +133,7 @@ export class WorkspaceActivityFeed extends React.Component {
             )
           }}
           onCopyLinkClicked={props.onCopyLinkClicked}
+          onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
         />
       </div>
@@ -154,6 +156,7 @@ const component = withActivity(
   TracimComponent(WorkspaceActivityFeed),
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
-  resetWorkspaceActivity
+  resetWorkspaceActivity,
+  setWorkspaceActivityEventList
 )
 export default connect(mapStateToProps)(withRouter(translate()(component)))
