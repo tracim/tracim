@@ -19,18 +19,22 @@ require('./ActivityList.styl')
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.CONTENT, (activity, onCopyLinkClicked, onEventClicked) => {
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
-      ? <ContentWithoutPreviewActivity
+      ? (
+        <ContentWithoutPreviewActivity
           activity={activity}
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
         />
-      : <ContentWithPreviewActivity
+      )
+      : (
+        <ContentWithPreviewActivity
           activity={activity}
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
         />
+      )
   }],
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
@@ -81,8 +85,8 @@ const ActivityList = (props) => {
       <div className='activityList__list' data-cy='activityList__list'>
         {props.activity.list.length > 0
           ? props.activity.list
-              .filter(activityDisplayFilter)
-              .map(renderActivityComponent)
+            .filter(activityDisplayFilter)
+            .map(renderActivityComponent)
           : <div className='activityList__placeholder'>{props.activity.hasNextPage ? props.t('Loading activity feed…') : props.t('No activity')}</div>}
       </div>
       {props.activity.list.length > 0 && props.activity.hasNextPage && (

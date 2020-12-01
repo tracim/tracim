@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
@@ -9,7 +10,11 @@ require('./TimedEvent.styl')
 const TimedEvent = (props) => {
   const topContents = (
     <>
-      {props.operation && <span className='timedEvent__operation'>{props.operation}</span>}&nbsp;
+      {props.operation && (
+        <span className={classnames('timedEvent__operation', { rootTimedEvent__operation: props.isRoot })}>
+          {props.operation}
+        </span>
+      )}&nbsp;
       <DistanceDate absoluteDate={props.date} lang={props.lang} />
     </>
   )
@@ -21,11 +26,15 @@ const TimedEvent = (props) => {
       lang={props.lang}
       operation={event.eventType}
       t={props.t}
-      customClass=''
+      customClass={props.customClass || ''}
+      isRoot={false}
     />
   )
   return (
-    <div className={`timedEvent ${props.customClass}`} data-cy={props.dataCy}>
+    <div
+      className={classnames('timedEvent', props.customClass, { rootTimedEvent: props.isRoot })}
+      data-cy={props.dataCy}
+    >
       {props.onEventClicked
         ? (
           <DropdownMenu
@@ -36,7 +45,7 @@ const TimedEvent = (props) => {
           >
             {props.eventList.map(createHistoryTimedEvent)}
           </DropdownMenu>
-          )
+        )
         : <div>{topContents}</div>}
       <div className='timedEvent__bottom'>
         {props.t('by')}&nbsp;
@@ -54,13 +63,15 @@ TimedEvent.propTypes = {
   customClass: PropTypes.string,
   eventList: PropTypes.array,
   onEventClicked: PropTypes.func,
-  dataCy: PropTypes.string
+  dataCy: PropTypes.string,
+  isRoot: PropTypes.bool
 }
 
-TimedEvent.defaultPropTypes = {
+TimedEvent.defaultProps = {
   customClass: '',
   operation: '',
-  eventList: []
+  eventList: [],
+  isRoot: true
 }
 
 export default translate()(TimedEvent)
