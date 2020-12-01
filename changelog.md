@@ -5,7 +5,6 @@
 ### New Features
 
 - New activity feeds available per-space and per-user. You can now see what happened during your absence.
-You have this kind of information about 
 
 ### Fixed Issues
 
