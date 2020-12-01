@@ -1616,6 +1616,12 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         example="3,4",
         description="comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
     )
+    related_to_content_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of content_ids for event: events unrelated to these content are not included."
+        "event of content itself or of direct children will be provided.",
+    )
 
     @post_load
     def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
@@ -1657,6 +1663,17 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
         validate=bool_as_int_validator,
     )
     exclude_author_ids = ExcludeAuthorIdsField
+    workspace_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
+    )
+    related_to_content_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of content_ids for event: events unrelated to these content are not included."
+        "event of content itself or of direct children will be provided.",
+    )
 
     @post_load
     def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
