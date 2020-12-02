@@ -1,5 +1,23 @@
 
 
+## 3.3.0 / 2020-12-xx
+
+### New Features
+
+- Personal and per-space activity feeds help you keep up with what is going on in Tracim: you will be able to notice new contents, new members and other updates in real time at a glance.
+
+### Fixed Issues
+
+- Frontend: [#3772](https://github.com/tracim/tracim/issues/3772),
+[#3805](https://github.com/tracim/tracim/issues/3805),
+[#3813](https://github.com/tracim/tracim/issues/3813),
+[#3820](https://github.com/tracim/tracim/issues/3820),
+[#3847](https://github.com/tracim/tracim/issues/3847),
+[#3870](https://github.com/tracim/tracim/issues/3870),
+[#3877](https://github.com/tracim/tracim/issues/3877)
+- Backend: [#3830](https://github.com/tracim/tracim/issues/3830)
+
+
 ## 3.2.2 / 2020-11-17
 
 ### Fixed Issues
