@@ -1,9 +1,24 @@
-module.exports = {
+const scanner = require('i18next-scanner')
+const vfs = require('vinyl-fs')
+
+const options = {
   debug: false,
   removeUnusedKeys: true,
   func: {
     list: ['t', 'props.t', 'this.props.t', 'i18n.t'],
     extensions: ['.js', '.jsx']
+  },
+  trans: {
+    component: 'Trans',
+    i18nKey: 'i18nKey',
+    defaultsKey: 'defaults',
+    extensions: ['.js', '.jsx'],
+    fallbackKey: (ns, value) => value,
+    acorn: {
+      ecmaVersion: 10, // defaults to 10
+      sourceType: 'module' // defaults to 'module'
+      // Check out https://github.com/acornjs/acorn/tree/master/acorn#interface for additional options
+    }
   },
   lngs: ['en', 'fr', 'pt'],
   defaultLng: 'en',
@@ -21,7 +36,7 @@ module.exports = {
   // Return key as the default value for English language. Otherwise, returns '__NOT_TRANSLATED__'
   defaultValue: (lng, ns, key) => lng === 'en' ? key : '__NOT_TRANSLATED__',
 
-  react: {wait: true},
+  react: { wait: true },
 
   resource: {
     // The path where resources get loaded from.
@@ -32,9 +47,9 @@ module.exports = {
     savePath: '{{lng}}/{{ns}}.json',
     jsonIndent: 2,
     lineEnding: '\n'
-  },
-  // interpolation: {
-  //   escapeValue: false, // not needed for react!!
-  // },
-  trans: false,
+  }
 }
+
+vfs.src(['./src/**/*.jsx', './src/**/*.js'])
+  .pipe(scanner(options))
+  .pipe(vfs.dest('./i18next.scanner'))

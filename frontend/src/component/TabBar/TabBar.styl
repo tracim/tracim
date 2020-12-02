@@ -1,0 +1,53 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+tabWidth = 185 //185px
+
+.tabBar
+  display flex
+  background-color offWhite
+  & .pageTitleGeneric
+    width "calc(100% - %s)" % (3*tabWidth)px
+
+.tab
+  border-bottom 1px solid grey
+  width (tabWidth)px
+  display flex
+  align-items center
+  justify-content center
+  border-left 1px solid grey
+  padding-top 5px
+  color fontColor
+  &__active
+    padding-top 0px
+    border-top-width 5px
+    border-top-style solid
+    border-bottom 1px solid transparent
+    background-color veryLightGrey
+  & .fa
+    margin-right 10px
+  // INFO -GB - 2020-11-20 - The style below should be specific to tachometer icon.
+  // See https://github.com/tracim/tracim/issues/3863
+  & .fa-tachometer
+    margin-bottom 1px
+  &:hover
+    color fontColor
+    background-color veryLightGrey
+
+@media (max-width: max-md)
+  tabWidth = 50
+  .tab
+    width (tabWidth)px
+    & .fa
+      margin 0
+    &__label
+      display none
+  .tabBar
+    .breadcrumbs
+      display none
+    & .pageTitleGeneric
+      width "calc(100% - %s)" % (3*tabWidth)px
+
+@media (max-width: max-xs)
+  .tabBar
+    .pageTitleGeneric__title__icon
+      display none

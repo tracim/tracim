@@ -1,0 +1,70 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+previewBorderColor = mediumGrey
+previewHeight = 300px
+linkColor = #007bff // This color comes from bootstrap
+
+.activityFeed__preview
+  box-sizing content-box
+  position relative
+  overflow hidden
+  border 1px solid previewBorderColor
+  background-color veryLightGrey
+  max-height previewHeight
+  margin 10px 0
+
+  &__overflowOverlay
+    background-image:
+      linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent),
+      radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1), transparent)
+    background-repeat no-repeat
+    background-position bottom
+    position absolute
+    bottom 0
+    height 25%
+    width 100%
+
+  & > a
+    display flex
+    min-height 100%
+    color inherit
+    overflow hidden
+
+    & > *
+      display flex
+      flex 1
+      align-items center
+      justify-content center
+      flex-direction column
+      overflow hidden
+
+  &__html
+    text-align justify
+    margin 10px
+
+    a-in-preview
+      color linkColor
+
+    > .html-content
+      background offWhite
+      border 1px solid previewBorderColor
+      padding 10px
+      align-self stretch
+
+  &__unavailable
+    display block
+    text-align center
+
+    & > a
+      display block
+
+    .fa
+      font-size fontSizeMedium
+
+    .fa, span
+      display inline-block
+      padding 10px 10px 10px 0
+      vertical-align middle
+
+  &__image > img
+    max-width 100%

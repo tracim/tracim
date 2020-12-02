@@ -143,7 +143,7 @@ export class PopupCreateWorkspace extends React.Component {
 
           addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
 
-          this.setState({ parentOptions: spaceList, isFirstStep: false })
+          this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
         }
         default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
@@ -170,7 +170,11 @@ export class PopupCreateWorkspace extends React.Component {
     ))
 
     switch (fetchPostSpace.apiResponse.status) {
-      case 200: this.handleClose(); break
+      case 200:
+        props.data.config.history.push(props.data.config.PAGE.WORKSPACE.DASHBOARD(fetchPostSpace.body.workspace_id))
+        this.handleClose()
+        break
+
       case 400:
         switch (fetchPostSpace.body.code) {
           case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break

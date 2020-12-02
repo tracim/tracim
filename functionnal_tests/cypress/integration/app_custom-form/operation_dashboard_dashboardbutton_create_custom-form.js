@@ -4,7 +4,7 @@ describe('operation :: workspace > create_new > custom-form', function () {
     cy.setupBaseDB()
   })
 
-  it('dashborad > button', function () {
+  it('dashboard > button', function () {
     // TODO Custom_form tests are skipped for now, tests must be enabled when the app will be activated
     // see: https://github.com/tracim/tracim/issues/2895
     this.skip()

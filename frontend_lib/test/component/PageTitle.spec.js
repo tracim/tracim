@@ -43,7 +43,7 @@ describe('<PageTitle />', () => {
     })
 
     it(`should display the title: "${props.title}"`, () => {
-      expect(wrapper.find(`div.${props.parentClass}__title`)).to.have.text().equal(props.title)
+      expect(wrapper.find('div.pageTitleGeneric__title__label')).to.have.text().equal(props.title)
     })
 
     it(`should display the title: "${props.subtitle}"`, () => {

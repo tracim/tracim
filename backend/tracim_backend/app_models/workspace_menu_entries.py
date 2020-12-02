@@ -16,7 +16,14 @@ dashboard_menu_entry = WorkspaceMenuEntry(
     label="Dashboard",
     route="/ui/workspaces/{workspace_id}/dashboard",
     hexcolor="#fdfdfd",
-    fa_icon="home",
+    fa_icon="tachometer",
+)
+activity_menu_entry = WorkspaceMenuEntry(
+    slug="activity",
+    label="Activity feed",
+    route="/ui/workspaces/{workspace_id}/activity-feed",
+    hexcolor="#bbbbbb",
+    fa_icon="newspaper-o",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
     slug="contents/all",

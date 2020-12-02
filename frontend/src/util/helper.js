@@ -24,8 +24,7 @@ export const FETCH_CONFIG = {
 }
 
 export const ANCHOR_NAMESPACE = {
-  workspaceItem: 'workspaceItem',
-  notificationItem: 'notificationItem'
+  workspaceItem: 'workspaceItem'
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?
@@ -49,7 +48,8 @@ export const PAGE = {
     SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
-    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`
+    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
+    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -66,7 +66,8 @@ export const PAGE = {
   SEARCH_RESULT: '/ui/search-result',
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
-  JOIN_WORKSPACE: '/ui/join-workspace'
+  JOIN_WORKSPACE: '/ui/join-workspace',
+  ACTIVITY_FEED: '/ui/activity-feed'
 }
 
 export const unLoggedAllowedPageList = [

@@ -7,7 +7,7 @@
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
     "buildtracimlib": "yarn run build && yarn run buildoptimized",
     "buildtracimlib-dev": "yarn run build-dev && yarn run buildoptimized-dev",
-    "build-translation": "node i18next.scanner.js",
+    "build-translation": "node ../i18next.scanner.js",
     "build": "./build-script.sh",
     "build-dev": "./build-script.sh dev",
     "buildoptimized": "./build-script.sh optimized",
@@ -90,6 +90,7 @@
       "Element",
       "EventSource",
       "CustomEvent",
+      "HTMLElement",
       "DOMParser",
       "globalThis",
       "GLOBAL_primaryColor"

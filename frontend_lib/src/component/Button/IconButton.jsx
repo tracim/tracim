@@ -6,10 +6,12 @@ import { darkenColor } from '../../helper.js'
 require('./IconButton.styl')
 
 const IconButton = props => {
-  const classes = ['iconbutton']
-  classes.push('iconbutton__' + props.mode)
-  classes.push('iconbutton__' + props.intent)
-  classes.push(`iconbutton__${props.intent}_${props.mode}`)
+  const classes = [
+    `iconbutton__${props.intent}_${props.mode}`,
+    'iconbutton__' + props.intent,
+    'iconbutton__' + props.mode,
+    'iconbutton'
+  ]
   if (props.customClass) classes.push(props.customClass)
   const className = classes.join(' ')
 
@@ -26,25 +28,26 @@ const IconButton = props => {
       title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      <i className={`fa fa-fw fa-${props.icon}`} /> <span className='iconbutton__label'>{props.text}</span>
+      {props.icon && <i className={`fa fa-fw fa-${props.icon}`} />}<span className='iconbutton__text'>{props.text}</span>
     </button>
   )
 }
 
 IconButton.propTypes = {
-  icon: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   title: PropTypes.string,
   color: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  intent: PropTypes.oneOf(['primary', 'secondary']),
+  intent: PropTypes.oneOf(['primary', 'secondary', 'link']),
   mode: PropTypes.oneOf(['dark', 'light']),
   customClass: PropTypes.string,
   dataCy: PropTypes.string
 }
 
 IconButton.defaultProps = {
+  icon: undefined,
   onClick: undefined,
   disabled: false,
   title: undefined,

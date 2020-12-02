@@ -4,6 +4,7 @@ from pyramid.config import Configurator
 
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.workspace_menu_entries import activity_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.lib.core.application import ApplicationApi
@@ -87,9 +88,10 @@ class TestApplicationApi(object):
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )
-        assert len(default_workspace_menu_entry) == 2
+        assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__folder_case(self):
         """
@@ -123,9 +125,10 @@ class TestApplicationApi(object):
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )
-        assert len(default_workspace_menu_entry) == 2
+        assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__agenda_enabled_workspace_case(self):
         app_config = Mock()
@@ -147,10 +150,11 @@ class TestApplicationApi(object):
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )
-        assert len(default_workspace_menu_entry) == 3
+        assert len(default_workspace_menu_entry) == 4
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == agenda.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
+        assert default_workspace_menu_entry[3].label == agenda.label
 
     def test_get_default_workspace_menu_entry__ok__agenda_disabled_workspace_case(self):
         app_config = Mock()
@@ -172,6 +176,7 @@ class TestApplicationApi(object):
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )
-        assert len(default_workspace_menu_entry) == 2
+        assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
+        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[2].label == all_content_menu_entry.label

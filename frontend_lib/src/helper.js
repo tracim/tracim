@@ -7,7 +7,7 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
-var dateFnsLocale = {
+const dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en'),
   pt: require('date-fns/locale/pt')
@@ -262,17 +262,29 @@ export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'sign-in'
+  faIcon: 'sign-in',
+  tradKey: [
+    i18n.t('pending')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'pending'
 }
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
-  faIcon: 'times'
+  faIcon: 'times',
+  tradKey: [
+    i18n.t('rejected')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'rejected'
 }
 const SUBSCRIPTION_ACCEPTED = {
   id: 3,
   slug: 'accepted',
-  faIcon: 'check'
+  faIcon: 'check',
+  tradKey: [
+    i18n.t('accepted')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'accepted'
 }
 export const SUBSCRIPTION_TYPE = {
   pending: SUBSCRIPTION_PENDING,
@@ -379,8 +391,10 @@ export const checkEmailValidity = email => {
   return domainParts.length === 2
 }
 
-export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) =>
-  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
+export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
+  const rev = revisionId ? `/revisions/${revisionId}` : ''
+  return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
+}
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 
@@ -593,6 +607,35 @@ export const sortWorkspaceList = (workspaceList, lang) => {
     }
     return res
   })
+}
+
+export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
+  // RJ - 2020-11-05 - INFO
+  //
+  // This function scrolls to the elementToScrollTo DOM element, if not in view.
+  // If the element is visible, nothing will happen.
+  //
+  // fixedContainer needs to be a DOM element that contains elementToScrollTo
+  // and that which position does not change when scrolling to the element.
+  // A "scroll view" contained in fixedContainer and containing elementToScrollTo
+  // is not required but may be here.
+  // elementToScrollTo.scrollIntoView() is used to scoll to the element.
+  // inspired of the following non standard method:
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+
+  if (elementToScrollTo && fixedContainer) {
+    const fixedContainerBCR = fixedContainer.getBoundingClientRect()
+    const elementBcr = elementToScrollTo.getBoundingClientRect()
+
+    const notInView = (
+      (elementBcr.top < fixedContainerBCR.top) ||
+      (elementBcr.bottom >= fixedContainerBCR.bottom)
+    )
+
+    if (notInView) {
+      elementToScrollTo.scrollIntoView()
+    }
+  }
 }
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()

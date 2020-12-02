@@ -105,3 +105,9 @@ export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent
 
 export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/users/me/workspaces/${workspaceId}/contents/${contentId}/read`)
+
+export const getContent = (apiUrl, contentId) =>
+  baseFetch('GET', `${apiUrl}/contents/${contentId}`)
+
+export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)

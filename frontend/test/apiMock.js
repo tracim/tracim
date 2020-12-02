@@ -201,6 +201,24 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
     .reply(204, true)
 }
 
+const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments`)
+    .reply(200, comments)
+}
+
+const mockGetContent200 = (apiUrl, contentId, content) => {
+  return nock(apiUrl)
+    .get(`/contents/${contentId}`)
+    .reply(200, content)
+}
+
+const mockGetFileContent400 = (apiUrl, workspaceId, contentId) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/files/${contentId}`)
+    .reply(400, {})
+}
+
 export {
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
@@ -228,5 +246,8 @@ export {
   mockGetLoggedUserCalendar200,
   mockGetUserCalendar200,
   mockGetUser200,
-  mockGetFolderContentList200
+  mockGetFolderContentList200,
+  mockGetContentComments200,
+  mockGetContent200,
+  mockGetFileContent400
 }

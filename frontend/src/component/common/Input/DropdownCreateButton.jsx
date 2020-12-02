@@ -21,7 +21,6 @@ export const DropdownCreateButton = props => {
             props.onClickCreateContent(e, props.folderId, app.slug)
           }}
           key={app.slug}
-          childrenKey={app.slug}
         >
           <i
             className={`fa fa-fw fa-${app.faIcon}`}

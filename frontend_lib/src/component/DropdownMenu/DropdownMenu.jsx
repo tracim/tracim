@@ -19,7 +19,7 @@ const DropdownMenu = props => {
         disabled={props.buttonDisabled}
         id='dropdownMenuButton'
         onClick={e => { e.stopPropagation(); props.buttonClick() }}
-        title={props.buttonTooltip ? props.buttonTooltip : props.buttonLabel}
+        title={props.buttonTooltip ? props.buttonTooltip : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)}
         type='button'
       >
         {props.buttonOpts}
@@ -33,7 +33,7 @@ const DropdownMenu = props => {
         className={classnames('dropdownMenu dropdown-menu', props.menuCustomClass)}
       >
         {(props.children.length > 1
-          ? props.children.map(child => child && <DropdownMenuItem key={child.childrenKey} customClass={props.itemCustomClass}> {child} </DropdownMenuItem>)
+          ? props.children.map(child => child && <DropdownMenuItem key={child.key} customClass={props.itemCustomClass}> {child} </DropdownMenuItem>)
           : <DropdownMenuItem customClass={props.itemCustomClass}> {props.children} </DropdownMenuItem>
         )}
       </div>
@@ -51,6 +51,7 @@ DropdownMenu.propTypes = {
   buttonIcon: PropTypes.string,
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
+  buttonOpts: PropTypes.component,
   buttonTooltip: PropTypes.string,
   itemCustomClass: PropTypes.string,
   menuCustomClass: PropTypes.string,

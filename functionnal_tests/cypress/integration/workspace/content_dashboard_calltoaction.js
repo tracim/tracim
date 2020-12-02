@@ -1,12 +1,20 @@
-describe('content :: workspace > dashbord', function () {
+import { PAGES } from '../../support/urls_commands'
+
+let workspaceId
+
+describe('content :: workspace > dashboard', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      workspaceId = workspace.workspace_id
+    })
   })
 
-  beforeEach(function () {
+  beforeEach(() => {
     cy.loginAs('users')
-    cy.visit('/ui/workspaces/1/dashboard')
+    cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId: workspaceId } })
   })
 
   it('dashboard__workspace > calltoaction', function () {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { Link, withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
@@ -28,13 +28,15 @@ import {
   TracimComponent,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  getOrCreateSessionClientToken,
+  scrollIntoViewIfNeeded,
+  Icon,
   IconButton
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
+    this.frameRef = React.createRef()
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       sidebarClose: isMobile
@@ -58,26 +60,16 @@ export class Sidebar extends React.Component {
     const { props } = this
 
     const tlmUser = tlmFieldObject.fields.user
-    const tlmAuthor = tlmFieldObject.fields.author
     const tlmWorkspace = tlmFieldObject.fields.workspace
     const loggedUserId = props.user.userId
 
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
       props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.fields.member))
-
-      // INFO - CH - 2020-06-25 - if logged used is author of the TLM and the new role is for him, it means the logged
-      // user created a new workspace
-      // the clientToken is to avoid redirecting the eventually opened other browser's tabs
-      const clientToken = getOrCreateSessionClientToken()
-      if (loggedUserId === tlmAuthor.user_id && clientToken === tlmFieldObject.fields.client_token) {
-        if (tlmWorkspace.workspace_id && document.getElementById(tlmWorkspace.workspace_id)) {
-          document.getElementById(tlmWorkspace.workspace_id).scrollIntoView()
-        }
-        props.history.push(PAGE.WORKSPACE.DASHBOARD(tlmWorkspace.workspace_id))
-      }
     }
   }
+
+  spaceItemId = (id) => `sidebar-space-item-${id}`
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
@@ -92,9 +84,30 @@ export class Sidebar extends React.Component {
           onClickAllContent={this.handleClickAllContent}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
+          id={this.spaceItemId(space.id)}
         />
         {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
+    )
+  }
+
+  getSidebarItem = (label, to) => {
+    return (
+      <Link
+        className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
+          {
+            'sidebar__content__navigation__item__current primaryColorBorder':
+              this.props.location.pathname.endsWith(to)
+          })}
+        to={to}
+      >
+        <div
+          className='sidebar__content__navigation__item__name'
+          title={label}
+        >
+          <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
+        </div>
+      </Link>
     )
   }
 
@@ -109,6 +122,13 @@ export class Sidebar extends React.Component {
       if (props.workspaceList.find(space => space.id === spaceIdInUrl) !== undefined) {
         this.setState({ activeWorkspaceId: spaceIdInUrl })
       }
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.currentWorkspace.id !== this.props.currentWorkspace.id) {
+      const spaceListItem = document.getElementById(this.spaceItemId(this.props.currentWorkspace.id))
+      scrollIntoViewIfNeeded(spaceListItem, this.frameRef.current)
     }
   }
 
@@ -146,7 +166,7 @@ export class Sidebar extends React.Component {
             ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
             : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
-        <div className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
+        <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
             {/*
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
@@ -160,6 +180,7 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
+                {this.getSidebarItem(props.t('Activity feed'), PAGE.ACTIVITY_FEED)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>

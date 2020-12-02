@@ -22,10 +22,13 @@ offWhite = #fdfdfd
 
 headerHeight = 61px // INFO - CH - 2019-04-19 - the total header height. Used to calculate height of layout like height: "calc(100% - %s)" % headerHeight
 
+fontSizeTitle = 25px
+fontSizeMedium = 20px
 fontSizeSmall = 14px
 listItemHeight = 5px
 popupWidth = 420px
-
+bigIconSize = 32px
+previewIconFontSize = 30px
 /*************************/
 /**** BOX SHADOW ****/
 shadow-bottom = 0px 0px 5px 1px #606060
@@ -35,16 +38,19 @@ shadow-half = 1px 1px 1px 1px #ababab
 
 /***********************/
 /**** MEDIA QUERIES ****/
-min-xs = 0px
-max-xs = 575px
 
-min-sm = 576px
-max-sm = 767px
+json('../screenSizes.json')
 
-min-md = 768px
-max-md = 991px
+min-xs = unit(MIN_XS, px)
+max-xs = unit(MAX_XS, px)
 
-min-lg = 992px
-max-lg = 1199px
+min-sm = unit(MIN_SM, px)
+max-sm = unit(MAX_SM, px)
 
-min-xl = 1200px
+min-md = unit(MIN_MD, px)
+max-md = unit(MAX_MD, px)
+
+min-lg = unit(MIN_LG, px)
+max-lg = unit(MAX_LG, px)
+
+min-xl = unit(MIN_XL, px)

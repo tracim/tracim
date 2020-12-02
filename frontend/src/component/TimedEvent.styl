@@ -1,0 +1,33 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.timedEvent
+  font-size fontSizeSmall
+  white-space nowrap
+  display flex
+  flex-direction column
+  &__top
+    text-decoration underline
+    padding 0
+    margin 0
+    font-size fontSizeSmall
+    &::after
+      display none
+  &__bottom
+    overflow hidden
+    display flex
+    flex-direction row
+    justify-content end
+  &__author
+    overflow hidden
+    font-weight bold
+    text-overflow ellipsis
+  & .dropdownMenuItem
+    cursor auto
+    border-bottom 1px solid mediumGrey
+    padding-right 5px
+    &:hover
+      background-color offWhite
+
+@media (max-width max-sm)
+  .rootTimedEvent__operation
+      display none

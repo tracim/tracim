@@ -18,7 +18,7 @@ const AdminLink = props => {
       <Link
         to={PAGE.ADMIN.WORKSPACE}
         data-cy='adminlink__workspace__link'
-        childrenKey='adminlink__workspace__link'
+        key='adminlink__workspace__link'
       >
         <i className={`fa fa-fw fa-${workspaceConfig.faIcon}`} />
         {props.t('Spaces')}
@@ -27,9 +27,9 @@ const AdminLink = props => {
       <Link
         to={PAGE.ADMIN.USER}
         data-cy='adminlink__user__link'
-        childrenKey='adminlink__user__link'
+        key='adminlink__user__link'
       >
-        <i className='fa fa-fw fa-users' />
+        <i className='fa fa-fw fa-user-o' />
         {props.t('Users')}
       </Link>
     </DropdownMenu>

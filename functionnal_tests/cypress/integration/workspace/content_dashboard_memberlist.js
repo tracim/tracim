@@ -1,4 +1,4 @@
-describe('content :: workspace > dashbord', function () {
+describe('content :: workspace > dashboard', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()

@@ -10,7 +10,9 @@ import tracim_backend.models.event as tracim_event
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-def create_events_and_messages(session, unread: bool = False) -> typing.List[tracim_event.Message]:
+def create_events_and_messages(
+    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+) -> typing.List[tracim_event.Message]:
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
@@ -24,7 +26,9 @@ def create_events_and_messages(session, unread: bool = False) -> typing.List[tra
         read_datetime = datetime.datetime.utcnow()
         if unread:
             read_datetime = None
-        messages.append(tracim_event.Message(event=event, receiver_id=1, read=read_datetime))
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
 
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
@@ -32,7 +36,7 @@ def create_events_and_messages(session, unread: bool = False) -> typing.List[tra
             fields={"example": "bar", "author": {"user_id": 2}},
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1))
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
 
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
@@ -40,8 +44,101 @@ def create_events_and_messages(session, unread: bool = False) -> typing.List[tra
             fields={"example": "event without author", "author": None},
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1))
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
 
+        session.add_all(messages)
+        session.flush()
+    transaction.commit()
+    messages.reverse()
+    return messages
+
+
+def create_workspace_messages(
+    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+) -> typing.List[tracim_event.Message]:
+    messages = []
+    with transaction.manager:
+        # remove messages created by the base fixture
+        session.query(tracim_event.Message).delete()
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.WORKSPACE,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 1}, "workspace": {"workspace_id": 1}},
+        )
+        session.add(event)
+        read_datetime = datetime.datetime.utcnow()
+        if unread:
+            read_datetime = None
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.WORKSPACE_MEMBER,
+            operation=tracim_event.OperationType.MODIFIED,
+            fields={"author": {"user_id": 2}, "workspace": {"workspace_id": 2}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.USER,
+            operation=tracim_event.OperationType.MODIFIED,
+            fields={"example": "event without author", "author": None},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+
+        session.add_all(messages)
+        session.flush()
+    transaction.commit()
+    messages.reverse()
+    return messages
+
+
+def create_content_messages(
+    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+) -> typing.List[tracim_event.Message]:
+    messages = []
+    with transaction.manager:
+        # remove messages created by the base fixture
+        session.query(tracim_event.Message).delete()
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 1}, "content": {"content_id": 1, "parent_id": None}},
+        )
+        session.add(event)
+        read_datetime = datetime.datetime.utcnow()
+        if unread:
+            read_datetime = None
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 2, "parent_id": 1}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.WORKSPACE,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 3, "parent_id": None}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+
+        event = tracim_event.Event(
+            entity_type=tracim_event.EntityType.CONTENT,
+            operation=tracim_event.OperationType.CREATED,
+            fields={"author": {"user_id": 2}, "content": {"content_id": 4, "parent_id": 3}},
+        )
+        session.add(event)
+        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
         session.add_all(messages)
         session.flush()
     transaction.commit()
@@ -63,7 +160,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint.
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
         if read_status == "read":
             messages = [m for m in messages if m.read]
         elif read_status == "unread":
@@ -84,13 +181,40 @@ class TestMessages(object):
                 "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
             } == message_dict
 
+    @pytest.mark.parametrize("include_not_sent", [True, False])
+    def test_api__get_messages__ok_200__include_not_sent__no_sent_date_set(
+        self, session, web_testapp, include_not_sent: str
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint.
+        """
+        messages = create_events_and_messages(session, sent_date=None)
+        if not include_not_sent:
+            messages = []
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        result = web_testapp.get(
+            "/api/users/1/messages?include_not_sent={}".format(str(int(include_not_sent))),
+            status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(messages) == len(message_dicts)
+        for message, message_dict in zip(messages, message_dicts):
+            assert {
+                "event_id": message.event_id,
+                "event_type": message.event_type,
+                "fields": message.fields,
+                "created": message.created.strftime(DATETIME_FORMAT),
+                "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
+            } == message_dict
+
     def test_api__get_messages__ok_200__exclude_author_ids_filter(
         self, session, web_testapp
     ) -> None:
         """
         Get messages through the classic HTTP endpoint. Filter by author_ids
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -130,7 +254,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint. Filter by event_type
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
@@ -138,6 +262,71 @@ class TestMessages(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         result = web_testapp.get(
             "/api/users/1/messages?include_event_types={}".format(event_type), status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(messages) == len(message_dicts)
+        for message, message_dict in zip(messages, message_dicts):
+            assert {
+                "event_id": message.event_id,
+                "event_type": message.event_type,
+                "fields": message.fields,
+                "created": message.created.strftime(DATETIME_FORMAT),
+                "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
+            } == message_dict
+
+    @pytest.mark.parametrize("workspace_ids", [[], [1, 2], [1], [2]])
+    def test_api__get_messages__ok_200__workspace_filter(
+        self, session, web_testapp, workspace_ids
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint. Filter by workspace_id
+        """
+        messages = create_workspace_messages(session, sent_date=datetime.datetime.utcnow())
+        if workspace_ids:
+            new_messages = []
+            for m in messages:
+                if m.event.fields.get("workspace"):
+                    if m.event.workspace["workspace_id"] in workspace_ids:
+                        new_messages.append(m)
+            messages = new_messages
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace_ids_str = ",".join([str(wid) for wid in workspace_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages?workspace_ids={}".format(workspace_ids_str), status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        assert len(messages) == len(message_dicts)
+        for message, message_dict in zip(messages, message_dicts):
+            assert {
+                "event_id": message.event_id,
+                "event_type": message.event_type,
+                "fields": message.fields,
+                "created": message.created.strftime(DATETIME_FORMAT),
+                "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
+            } == message_dict
+
+    @pytest.mark.parametrize("related_to_content_ids", [[], [1, 2], [1], [2]])
+    def test_api__get_messages__ok_200__content_filter(
+        self, session, web_testapp, related_to_content_ids
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint. Filter by content_id and content parent_id
+        """
+        messages = create_content_messages(session, sent_date=datetime.datetime.utcnow())
+        if related_to_content_ids:
+            new_messages = []
+            for m in messages:
+                if m.event.fields.get("content"):
+                    if m.event.content["content_id"] in related_to_content_ids:
+                        new_messages.append(m)
+                    elif m.event.content["parent_id"] in related_to_content_ids:
+                        new_messages.append(m)
+            messages = new_messages
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        related_to_content_ids_str = ",".join([str(wid) for wid in related_to_content_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages?related_to_content_ids={}".format(related_to_content_ids_str),
+            status=200,
         ).json_body
         message_dicts = result.get("items")
         assert len(messages) == len(message_dicts)
@@ -160,7 +349,7 @@ class TestMessages(object):
         """
         Check invalid event type case
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
@@ -184,7 +373,7 @@ class TestMessages(object):
         Get messages through the classic HTTP endpoint.
         Paginate with both "count" and "before_event_id"
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
         assert len(messages) == 3
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         message_dicts_0 = web_testapp.get("/api/users/1/messages", status=200,).json_body.get(
@@ -250,7 +439,9 @@ class TestMessages(object):
         """
         Read all unread messages
         """
-        messages = create_events_and_messages(session, unread=True)
+        messages = create_events_and_messages(
+            session, unread=True, sent_date=datetime.datetime.utcnow()
+        )
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -309,7 +500,7 @@ class TestMessages(object):
         """
         Read one unread message
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -347,7 +538,7 @@ class TestMessages(object):
         """
         Read one unread message, check if only one message as been read
         """
-        create_events_and_messages(session, unread=True)
+        create_events_and_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -373,7 +564,7 @@ class TestMessages(object):
         """
         Read one unread message
         """
-        messages = create_events_and_messages(session)
+        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -409,7 +600,7 @@ class TestMessages(object):
         """
         check summary of messages
         """
-        create_events_and_messages(session)
+        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -432,7 +623,7 @@ class TestMessages(object):
             ("exclude", ["user.modified"], 1, 0),
         ],
     )
-    def test_api__messages_summary__ok_200__filer_event_types_all(
+    def test_api__messages_summary__ok_200__filter_event_types_all(
         self,
         session,
         web_testapp,
@@ -444,7 +635,7 @@ class TestMessages(object):
         """
         check summary of messages
         """
-        create_events_and_messages(session)
+        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         event_type_filter = ",".join(event_types)
@@ -460,6 +651,44 @@ class TestMessages(object):
         assert message_dicts["messages_count"] == read_messages_count + unread_messages_count
         assert message_dicts["user"]["user_id"] == 1
         assert message_dicts["user"]["username"] == "TheAdmin"
+
+    @pytest.mark.parametrize(
+        "related_to_content_ids, nb_messages",
+        [([], 4), ([1, 2], 2), ([1, 2, 3], 4), ([2], 1), ([1], 2)],
+    )
+    def test_api__messages_summary__ok_200__content_filter(
+        self, session, web_testapp, related_to_content_ids, nb_messages
+    ) -> None:
+        create_content_messages(session, sent_date=datetime.datetime.utcnow())
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        if not related_to_content_ids:
+            related_to_content_ids_str = ""
+        else:
+            related_to_content_ids_str = ",".join([str(wid) for wid in related_to_content_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?related_to_content_ids={}".format(
+                related_to_content_ids_str
+            ),
+            status=200,
+        ).json_body
+        assert result["messages_count"] == nb_messages
+
+    @pytest.mark.parametrize(
+        "workspace_ids, nb_messages", [([], 3), ([1, 2], 2), ([1], 1), ([2], 1)]
+    )
+    def test_api__messages_summary__ok_200__workspace_filter(
+        self, session, web_testapp, workspace_ids, nb_messages
+    ) -> None:
+        create_workspace_messages(session, sent_date=datetime.datetime.utcnow())
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        if not workspace_ids:
+            workspace_ids_str = ""
+        else:
+            workspace_ids_str = ",".join([str(wid) for wid in workspace_ids])
+        result = web_testapp.get(
+            "/api/users/1/messages/summary?workspace_ids={}".format(workspace_ids_str), status=200,
+        ).json_body
+        assert result["messages_count"] == nb_messages
 
     def test_api__messages_summary__err_400__invalid_event_type_filter(
         self, session, web_testapp,

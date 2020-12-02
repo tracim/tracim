@@ -50,6 +50,7 @@ import {
   permissiveNumberEqual,
   sortWorkspaceList,
   updateTLMAuthor,
+  scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor
 } from './helper.js'
@@ -135,6 +136,8 @@ import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
+import DistanceDate from './component/DistanceDate.jsx'
+import Icon from './component/Icon/Icon.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -169,7 +172,9 @@ import {
   getFileRevision,
   putFileContent,
   putMyselfFileRead,
-  getContentComment
+  getContentComment,
+  getContent,
+  getWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -187,6 +192,10 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
+export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
+
+export { default as SCREEN_SIZE } from './screenSizes.json'
+export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 
 export {
   appContentFactory,
@@ -319,9 +328,14 @@ export {
   permissiveNumberEqual,
   SingleChoiceList,
   UserInfo,
+  scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
-  TextInput
+  TextInput,
+  getContent,
+  DistanceDate,
+  Icon,
+  getWorkspaceContent
 }

@@ -1,0 +1,15 @@
+{
+  "MIN_XS": 0,
+  "MAX_XS": 575,
+
+  "MIN_SM": 576,
+  "MAX_SM": 767,
+
+  "MIN_MD": 768,
+  "MAX_MD": 991,
+
+  "MIN_LG": 992,
+  "MAX_LG": 1199,
+
+  "MIN_XL": 1200
+}

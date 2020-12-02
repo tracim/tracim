@@ -8,7 +8,7 @@ describe('Login page', function () {
   })
 
   beforeEach(function () {
-    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
+    cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
   })
 
   afterEach(function () {

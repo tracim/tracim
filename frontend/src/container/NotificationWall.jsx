@@ -32,10 +32,7 @@ import {
   ComposedIcon,
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
-import {
-  PAGE,
-  ANCHOR_NAMESPACE
-} from '../util/helper.js'
+import { PAGE } from '../util/helper.js'
 
 import { escape as escapeHtml } from 'lodash'
 
@@ -66,7 +63,14 @@ export class NotificationWall extends React.Component {
   handleClickSeeMore = async () => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(props.user.userId, NUMBER_RESULTS_BY_PAGE, props.notificationPage.nextPageToken))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      props.user.userId,
+      {
+        excludeAuthorId: props.user.userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
+        nextPageToken: props.notificationPage.nextPageToken
+      }
+    ))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
@@ -380,7 +384,6 @@ export class NotificationWall extends React.Component {
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
-                id={`${ANCHOR_NAMESPACE.notificationItem}:${notification.id}`}
                 key={notification.id}
               >
                 <Link
@@ -393,7 +396,7 @@ export class NotificationWall extends React.Component {
                 >
                   <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
-                    <Avatar publicName={notification.author} width={23} style={{ marginRight: '5px' }} />
+                    <Avatar publicName={notification.author} width='23px' style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (

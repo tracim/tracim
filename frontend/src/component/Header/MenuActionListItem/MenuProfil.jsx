@@ -17,6 +17,7 @@ export const MenuProfil = props => {
           <Avatar
             width='40px'
             publicName={props.user.publicName}
+            key='menuprofil__dropdown__avatar'
           />
         }
         buttonLabel={props.user.publicName}
@@ -27,7 +28,7 @@ export const MenuProfil = props => {
         <Link
           to={PAGE.ACCOUNT}
           data-cy='menuprofil__dropdown__account__link'
-          childrenKey='menuprofil__dropdown__account__link'
+          key='menuprofil__dropdown__account__link'
         >
           <i className='fa fa-fw fa-user-o' />
           {props.t('My Account')}
@@ -37,7 +38,7 @@ export const MenuProfil = props => {
           className='transparentButton'
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
-          childrenKey='menuprofil__dropdown__logout__link'
+          key='menuprofil__dropdown__logout__link'
         >
           <i className='fa fa-fw fa-sign-out' />
           {props.t('Logout')}

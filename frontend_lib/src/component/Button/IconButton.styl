@@ -18,21 +18,31 @@
   &__light
     color offWhite
 
+  &__text
+    padding-left 5px
+    white-space pre
+
+  // Intents styling
   &__primary
     background-color var(--primaryColor)
-  &__primary:hover
-    background-color var(--primaryDarkColor)
+    &:hover
+      background-color var(--primaryDarkColor)
 
   &__secondary
     background-color transparent
-  &__secondary:hover
-    background-color rgba(0, 0, 0, 0.1)
+    &:hover
+      background-color rgba(0, 0, 0, 0.1)
+    &_light
+      border-color offWhite
+      border-width 1px
+    &_dark
+      border-color var(--primaryDarkColor)
+      border-width 1px
 
-  &__secondary_light
-    border-color offWhite
-    border-width 1px
-  &__secondary_dark
-    border-color var(--primaryDarkColor)
-    border-width 1px
-  &__text
-    white-space pre
+  &__link
+    background-color transparent
+    border none
+    text-decoration underline
+    padding 0 5px
+    &:hover
+      text-decoration underline

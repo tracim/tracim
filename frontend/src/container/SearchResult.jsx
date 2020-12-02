@@ -229,11 +229,12 @@ export class SearchResult extends React.Component {
                 : props.t('Search results')
               )}
               icon='search'
-              subtitle={this.getSubtitle()}
               breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='searchResult'>
+              <div>{this.getSubtitle()}</div>
+
               <div className='folder__content' data-cy='search__content'>
                 {currentNumberSearchResults > 0 && (
                   <ContentItemHeader showSearchDetails />

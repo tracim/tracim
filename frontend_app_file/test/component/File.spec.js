@@ -189,8 +189,8 @@ describe('<File />', () => {
           it('should have the new page_nb', () => {
             expect(wrapper.state('newContent').page_nb).to.equal(tlmData.fields.content.page_nb)
           })
-          it('should have build the new previewUrl', () => {
-            expect(wrapper.state('newContent').previewUrl).to.equal(debug.config.apiUrl + '/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New File.jpg?page=1')
+          it('should have the new previewUrl', () => {
+            expect(wrapper.state('newContent').previewUrl).to.equal(debug.config.apiUrl + '/workspaces/0/files/0/revisions/137/preview/jpg/500x500/New%20File.jpg?page=1')
           })
           it('should have 3 preview pages', () => {
             expect(wrapper.state('newContent').lightboxUrlList.length).to.equal(3)

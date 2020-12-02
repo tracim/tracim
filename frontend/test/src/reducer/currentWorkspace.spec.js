@@ -55,6 +55,8 @@ describe('reducer currentWorkspace.js', () => {
       const rez = serializeWorkspace(firstWorkspaceFromApi)
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
+          accessType: firstWorkspaceFromApi.access_type,
+          defaultRole: firstWorkspaceFromApi.default_user_role,
           id: firstWorkspaceFromApi.workspace_id,
           slug: firstWorkspaceFromApi.slug,
           label: firstWorkspaceFromApi.label,

@@ -81,6 +81,7 @@ tests_require = [
     "pytest-dotenv",
     "pytest-pyramid-server",
     "pytest-services",
+    "pytest-timeout",
     "responses",
     "mock",
     "Pillow",

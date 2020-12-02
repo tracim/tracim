@@ -1,7 +1,7 @@
 version: '3'
 services:
   pushpin:
-    image: fanout/pushpin
+    image: fanout/pushpin:1.30.0
     network_mode: host
     volumes:
       - ${PUSHPIN_CONFIG_DIR}:/etc/pushpin
