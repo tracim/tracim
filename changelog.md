@@ -14,8 +14,8 @@
 [#3820](https://github.com/tracim/tracim/issues/3820),
 [#3847](https://github.com/tracim/tracim/issues/3847),
 [#3870](https://github.com/tracim/tracim/issues/3870),
-[#3877](https://github.com/tracim/tracim/issues/3877),
-- Backend: [#3830](https://github.com/tracim/tracim/issues/3830),
+[#3877](https://github.com/tracim/tracim/issues/3877)
+- Backend: [#3830](https://github.com/tracim/tracim/issues/3830)
 
 
 ## 3.2.2 / 2020-11-17
