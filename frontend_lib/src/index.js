@@ -56,7 +56,7 @@ import {
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   handleMentionsBeforeSave
 } from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -324,7 +324,7 @@ export {
   putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   handleMentionsBeforeSave,
   NoHoverListItem,
   permissiveNumberEqual,

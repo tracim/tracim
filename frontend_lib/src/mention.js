@@ -53,7 +53,7 @@ const isAWrappedMention = (node) => (
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
-export const getInvalidMentionsList = (content, knownMentions) => {
+export const getInvalidMentionList = (content, knownMentions) => {
   const doc = getDocumentFromHTMLString(content)
   let mentionsInContent = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
   mentionsInContent = [...new Set(mentionsInContent)]

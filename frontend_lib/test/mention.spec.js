@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import {
   wrapMentionsInSpanTags,
   addClassToMentionsOfUser,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   removeMentionMeClass,
   handleMentionsBeforeSave,
   MENTION_ID_PREFIX,
@@ -240,11 +240,11 @@ describe('mention.js', () => {
     })
   })
 
-  describe('getInvalidMentionsList()', () => {
+  describe('getInvalidMentionList()', () => {
     it('should return the invalid mentions in content', () => {
       const knownMentions = [{ mention: 'user1' }, { mention: 'user2' }]
-      const content = '<p>This is a content with two @user1 @user1 mentions and a @invalid_mention also two @not_a_member @not_a_member mentions</p>'
-      expect(getInvalidMentionsList(content, knownMentions)).to.deep.equal(invalidMentionsList)
+      const content = '<p>This is a content with two @user1 @user1 mentions and a @invalid_mention also two @not_a_member @not_a_member mentions, and also group mentions @all @tous @todos </p>'
+      expect(getInvalidMentionList(content, knownMentions)).to.deep.equal(invalidMentionsList)
     })
   })
 })

@@ -13,7 +13,7 @@ import {
   CUSTOM_EVENT,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
   NewVersionBtn,
@@ -449,7 +449,7 @@ export class HtmlDocument extends React.Component {
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
-    const oldInvalidMentionList = getInvalidMentionsList(rawContentBeforeEdit, knownMentions)
+    const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
     this.setState({ oldInvalidMentionList: oldInvalidMentionList })
   }
 
@@ -500,7 +500,7 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const content = tinymce.activeEditor.getContent()
-    const allInvalidMentionList = getInvalidMentionsList(content, knownMentions)
+    const allInvalidMentionList = getInvalidMentionList(content, knownMentions)
     const newInvalidMentionList = allInvalidMentionList.filter(mention => {
       return state.oldInvalidMentionList.indexOf(mention) === -1
     })
@@ -619,7 +619,7 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
-    const invalidMentionList = getInvalidMentionsList(comment, knownMentions)
+    const invalidMentionList = getInvalidMentionList(comment, knownMentions)
 
     if (invalidMentionList.length > 0) {
       this.setState({

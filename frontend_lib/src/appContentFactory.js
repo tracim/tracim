@@ -12,7 +12,7 @@ import {
 import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   getMatchingGroupMentionList
 } from './mention.js'
 import {
@@ -155,7 +155,7 @@ export function appContentFactory (WrappedComponent) {
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
       let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
       knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionsList(newCommentForApi, knownMentions)
+      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
       let newCommentForApiWithMention
       try {

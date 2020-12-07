@@ -26,7 +26,7 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import {
@@ -296,7 +296,7 @@ export class Thread extends React.Component {
     const { state } = this
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
-    const invalidMentionList = getInvalidMentionsList(comment, knownMentions)
+    const invalidMentionList = getInvalidMentionList(comment, knownMentions)
 
     if (invalidMentionList.length > 0) {
       this.setState({

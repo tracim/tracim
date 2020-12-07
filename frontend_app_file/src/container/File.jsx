@@ -44,7 +44,7 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
-  getInvalidMentionsList,
+  getInvalidMentionList,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
@@ -448,7 +448,7 @@ export class File extends React.Component {
     const { state } = this
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
-    const invalidMentionList = getInvalidMentionsList(comment, knownMentions)
+    const invalidMentionList = getInvalidMentionList(comment, knownMentions)
 
     if (invalidMentionList.length > 0) {
       this.setState({
