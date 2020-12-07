@@ -153,7 +153,8 @@ export function appContentFactory (WrappedComponent) {
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.activeEditor.getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
-      const knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionsList(newCommentForApi, knownMentions)
 
       let newCommentForApiWithMention

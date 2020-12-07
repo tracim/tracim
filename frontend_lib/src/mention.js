@@ -57,8 +57,7 @@ export const getInvalidMentionsList = (content, knownMentions) => {
   const doc = getDocumentFromHTMLString(content)
   let mentionsInContent = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
   mentionsInContent = [...new Set(mentionsInContent)]
-  const possibleMentions = knownMentions.map(mentionObj => `@${mentionObj.mention}`)
-  return mentionsInContent.filter(mention => possibleMentions.indexOf(mention) === -1)
+  return mentionsInContent.filter(mention => knownMentions.indexOf(mention) === -1)
 }
 
 export const wrapMentionsInSpanTags = (node, doc, invalidMentionList) => {

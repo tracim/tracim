@@ -294,7 +294,7 @@ export class Thread extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { state } = this
-    const knownMentions = await this.searchForMentionInQuery('')
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
     const invalidMentionList = getInvalidMentionsList(comment, knownMentions)
 
