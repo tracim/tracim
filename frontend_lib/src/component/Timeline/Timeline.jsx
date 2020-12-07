@@ -165,7 +165,9 @@ export class Timeline extends React.Component {
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='html-document__contentpage__textnote__mentions'>{props.invalidMentionList.join(',')}</div>
+                <div className='timeline__texteditor__mentions'>
+                  {props.invalidMentionList.join(' ,')}
+                </div>
               </>
             }
             confirmLabel={props.t('Edit')}
@@ -253,15 +255,19 @@ Timeline.propTypes = {
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   allowClickOnRevision: PropTypes.bool,
+  invalidMentionList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
   isLastTimelineItemCurrentToken: PropTypes.bool,
   rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
+  onClickCancelSave: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
+  onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func
+  searchForMentionInQuery: PropTypes.func,
+  showInvalidMentionPopup: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -278,11 +284,15 @@ Timeline.defaultProps = {
   onClickWysiwygBtn: () => { },
   onClickRevisionBtn: () => { },
   allowClickOnRevision: true,
+  invalidMentionList: [],
   shouldScrollToBottom: true,
   isLastTimelineItemCurrentToken: false,
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
+  onClickCancelSave: () => { },
+  onClickSaveAnyway: () => { },
   showTitle: true,
-  searchForMentionInQuery: () => { }
+  searchForMentionInQuery: () => { },
+  showInvalidMentionPopup: false
 }

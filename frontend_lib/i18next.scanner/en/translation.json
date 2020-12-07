@@ -116,5 +116,8 @@
   "@all Please notice that I did an important update on this content.": "@all Please notice that I did an important update on this content.",
   "An error has happened while getting the known members list": "An error has happened while getting the known members list",
   "Sends a notification to all members of the space": "Sends a notification to all members of the space",
-  "Error while detecting the mentions": "Error while detecting the mentions"
+  "Error while detecting the mentions": "Error while detecting the mentions",
+  "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
+  "Edit": "Edit",
+  "Validate anyway": "Validate anyway"
 }

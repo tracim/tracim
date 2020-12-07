@@ -27,5 +27,7 @@
   "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",
   "You must change the status or restore this note before any change": "Vous devez changer le statut ou restaurer cette note avant de le modifier",
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
-  "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur"
+  "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
+  "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
+  "Validate anyway": "Valider quand même"
 }
