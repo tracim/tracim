@@ -12,6 +12,7 @@ import {
 import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
+  getInvalidMentionsList,
   getMatchingGroupMentionList
 } from './mention.js'
 import {
@@ -152,10 +153,12 @@ export function appContentFactory (WrappedComponent) {
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.activeEditor.getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      const knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      const invalidMentionList = getInvalidMentionsList(newCommentForApi, knownMentions)
 
       let newCommentForApiWithMention
       try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername)
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
       } catch (e) {
         return Promise.reject(e)
       }

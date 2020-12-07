@@ -9,10 +9,12 @@ const ConfirmPopup = (props) => (
   <CardPopup
     customClass='confirm_popup'
     customHeaderClass='primaryColorBg'
-    onClose={props.onCancel}
+    onClose={props.onClose || props.onCancel}
   >
     <div className='confirm_popup__body'>
-      <div className='confirm_popup__body__msg'>{props.msg || props.t('Are you sure?')}</div>
+      <div className='confirm_popup__body__msg'>
+        {props.msg || props.t('Are you sure?')}
+      </div>
       <div className='confirm_popup__body__btn'>
         <button
           type='button'
@@ -20,7 +22,7 @@ const ConfirmPopup = (props) => (
           data-cy='confirm_popup__button_cancel'
           onClick={props.onCancel}
         >
-          {props.t('Cancel')}
+          {props.cancelLabel || props.t('Cancel')}
         </button>
         <button
           type='button'
@@ -36,13 +38,16 @@ const ConfirmPopup = (props) => (
 )
 
 ConfirmPopup.propTypes = {
+  cancelLabel: PropTypes.string,
   confirmLabel: PropTypes.string,
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  msg: PropTypes.string
+  onClose: PropTypes.func,
+  msg: PropTypes.oneOfType([PropTypes.string, PropTypes.component])
 }
 
 ConfirmPopup.defaultProps = {
+  cancelLabel: '',
   confirmLabel: '',
   msg: ''
 }

@@ -11,6 +11,7 @@ import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
+import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -156,6 +157,22 @@ export class Timeline extends React.Component {
           <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
         </ul>
 
+        {props.showInvalidMentionPopup && (
+          <ConfirmPopup
+            onConfirm={props.onClickCancelSave}
+            onClose={props.onClickCancelSave}
+            onCancel={props.onClickSaveAnyway}
+            msg={
+              <>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+                <div className='html-document__contentpage__textnote__mentions'>{props.invalidMentionList.join(',')}</div>
+              </>
+            }
+            confirmLabel={props.t('Edit')}
+            cancelLabel={props.t('Validate anyway')}
+          />
+        )}
+
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
             <div
@@ -258,8 +275,8 @@ Timeline.defaultProps = {
   },
   timelineData: [],
   wysiwyg: false,
-  onClickWysiwygBtn: () => {},
-  onClickRevisionBtn: () => {},
+  onClickWysiwygBtn: () => { },
+  onClickRevisionBtn: () => { },
   allowClickOnRevision: true,
   shouldScrollToBottom: true,
   isLastTimelineItemCurrentToken: false,
@@ -267,5 +284,5 @@ Timeline.defaultProps = {
   isArchived: false,
   isDeleted: false,
   showTitle: true,
-  searchForMentionInQuery: () => {}
+  searchForMentionInQuery: () => { }
 }
