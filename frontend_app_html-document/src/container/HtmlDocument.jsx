@@ -597,7 +597,7 @@ export class HtmlDocument extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateAnywayNewComment = async () => {
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -611,7 +611,6 @@ export class HtmlDocument extends React.Component {
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
-    this.setState({ showInvalidMentionPopupInComment: false })
   }
 
   handleClickValidateNewCommentBtn = async () => {

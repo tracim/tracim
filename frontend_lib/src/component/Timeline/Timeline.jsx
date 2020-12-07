@@ -166,7 +166,7 @@ export class Timeline extends React.Component {
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
                 <div className='timeline__texteditor__mentions'>
-                  {props.invalidMentionList.join(' ,')}
+                  {props.invalidMentionList.join(', ')}
                 </div>
               </>
             }
