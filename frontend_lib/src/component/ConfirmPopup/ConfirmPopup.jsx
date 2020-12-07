@@ -29,6 +29,7 @@ const ConfirmPopup = (props) => (
           className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
           data-cy='confirm_popup__button_confirm'
           onClick={props.onConfirm}
+          autoFocus
         >
           {props.confirmLabel || props.t('Confirm')}
         </button>

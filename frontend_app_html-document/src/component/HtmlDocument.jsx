@@ -93,7 +93,7 @@ export const HtmlDocument = props => {
           </div>
         )}
 
-        {props.showInvalidMentionPopup &&
+        {props.showInvalidMentionPopup && (
           <ConfirmPopup
             onConfirm={props.onClickCancelSave}
             onClose={props.onClickCancelSave}
@@ -101,13 +101,15 @@ export const HtmlDocument = props => {
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='html-document__contentpage__textnote__mentions'>{props.invalidMentionList.join(',')}</div>
+                <div className='html-document__contentpage__textnote__mentions'>
+                  {props.invalidMentionList.join(', ')}
+                </div>
               </>
             }
             confirmLabel={props.t('Edit')}
             cancelLabel={props.t('Validate anyway')}
           />
-        }
+        )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>

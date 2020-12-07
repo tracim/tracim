@@ -503,10 +503,10 @@ export class HtmlDocument extends React.Component {
     const newInvalidMentionList = allInvalidMentionList.filter(mention => {
       return this.state.oldInvalidMentionList.indexOf(mention) === -1
     })
-    if(newInvalidMentionList.length > 0) {
+    if (newInvalidMentionList.length > 0) {
       this.setState({
         invalidMentionList: newInvalidMentionList,
-        showInvalidMentionPopupInContent : true
+        showInvalidMentionPopupInContent: true
       })
     } else this.handleSaveHtmlDocument()
   }
@@ -550,7 +550,7 @@ export class HtmlDocument extends React.Component {
             raw_content: newDocumentForApiWithMention
           },
           oldInvalidMentionList: allInvalidMentionList,
-          showInvalidMentionPopupInContent : false
+          showInvalidMentionPopupInContent: false
         }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
@@ -611,7 +611,7 @@ export class HtmlDocument extends React.Component {
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
-    this.setState({ showInvalidMentionPopupInComment : false })
+    this.setState({ showInvalidMentionPopupInComment: false })
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -620,10 +620,10 @@ export class HtmlDocument extends React.Component {
     const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
     const invalidMentionList = getInvalidMentionsList(comment, knownMentions)
 
-    if(invalidMentionList.length > 0) {
+    if (invalidMentionList.length > 0) {
       this.setState({
         invalidMentionList: invalidMentionList,
-        showInvalidMentionPopupInComment : true
+        showInvalidMentionPopupInComment: true
       })
     } else this.handleClickValidateAnywayNewComment()
   }

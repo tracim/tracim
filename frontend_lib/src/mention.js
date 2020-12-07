@@ -55,7 +55,8 @@ const isAWrappedMention = (node) => (
 
 export const getInvalidMentionsList = (content, knownMentions) => {
   const doc = getDocumentFromHTMLString(content)
-  const mentionsInContent = doc.body.innerText.match(MENTION_REGEX_GLOBAL) || []
+  let mentionsInContent = doc.body.innerText.match(MENTION_REGEX_GLOBAL) || []
+  mentionsInContent = [...new Set(mentionsInContent)]
   const possibleMentions = knownMentions.map(mentionObj => `@${mentionObj.mention}`)
   return mentionsInContent.filter(mention => possibleMentions.indexOf(mention) === -1)
 }
