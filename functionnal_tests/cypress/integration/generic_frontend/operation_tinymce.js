@@ -88,7 +88,7 @@ describe('TinyMce text editor', function () {
         })
       })
 
-      it('it should not leave any span after saving the content', function () {
+      it('should not leave any span after saving the content', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
