@@ -2,11 +2,14 @@ import { expect } from 'chai'
 import {
   wrapMentionsInSpanTags,
   addClassToMentionsOfUser,
+  getInvalidMentionsList,
   removeMentionMeClass,
   handleMentionsBeforeSave,
   MENTION_ID_PREFIX,
   MENTION_ME_CLASS
 } from '../src/mention.js'
+
+const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
 describe('mention.js', () => {
   describe('function wrapMentionsInSpanTags', () => {
@@ -14,7 +17,7 @@ describe('mention.js', () => {
 
     function getWrappedDocument (html) {
       const doc = parser.parseFromString(html, 'text/html')
-      return wrapMentionsInSpanTags(doc.body, doc)
+      return wrapMentionsInSpanTags(doc.body, doc, invalidMentionsList)
     }
 
     describe('with a source without any mention', () => {
@@ -134,6 +137,11 @@ describe('mention.js', () => {
       expect(getWrappedDocument('@mention').textContent).to.equal('@mention')
       expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
     })
+
+    it('should not wrap invalid mentions', () => {
+      const docBody = getWrappedDocument('This is a text with a @invalid_mention that should NOT be wrapped, neither @not_a_member')
+      expect(docBody.getElementsByTagName('span')).to.have.lengthOf(0)
+    })
   })
 
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
@@ -229,6 +237,14 @@ describe('mention.js', () => {
           expect(e).to.be.a(Error)
         }
       })
+    })
+  })
+
+  describe('getInvalidMentionsList()', () => {
+    it('should return the invalid mentions in content', () => {
+      const knownMentions = [{ mention: 'user1' }, { mention: 'user2' }]
+      const content = '<p>This is a content with two @user1 @user1 mentions and a @invalid_mention also two @not_a_member @not_a_member mentions</p>'
+      expect(getInvalidMentionsList(content, knownMentions)).to.deep.equal(invalidMentionsList)
     })
   })
 })

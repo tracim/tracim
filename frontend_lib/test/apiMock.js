@@ -62,6 +62,12 @@ const mockPutContentDeleteRestore204 = (apiUrl, workspaceId, contentId) => {
     .reply(204, '')
 }
 
+const mockGetMyselfKnownMember200 = (apiUrl, workspaceId, knownMemberList) => {
+  return nock(apiUrl)
+    .get(`/users/me/known_members?acp=&include_workspace_ids=${workspaceId}&limit=15`)
+    .reply(200, knownMemberList)
+}
+
 const mockGetReservedUsernames200 = (apiUrl) => {
   return nock(apiUrl)
     .get('/system/reserved-usernames')
@@ -113,6 +119,7 @@ export {
   mockPutContentDelete204,
   mockPutContentArchiveRestore204,
   mockPutContentDeleteRestore204,
+  mockGetMyselfKnownMember200,
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
   mockGetReservedUsernames500,
