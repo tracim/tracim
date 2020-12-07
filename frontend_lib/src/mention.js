@@ -58,7 +58,6 @@ export const getInvalidMentionsList = (content, knownMentions) => {
   let mentionsInContent = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
   mentionsInContent = [...new Set(mentionsInContent)]
   const possibleMentions = knownMentions.map(mentionObj => `@${mentionObj.mention}`)
-  console.log('aaaa', knownMentions, possibleMentions)
   return mentionsInContent.filter(mention => possibleMentions.indexOf(mention) === -1)
 }
 
