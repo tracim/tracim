@@ -356,6 +356,8 @@ class CFG(object):
         self.SESSION__URL = self.get_raw_config("session.url")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
+        self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
+        self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
@@ -729,6 +731,7 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
+        self._check_webdav_config_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -760,6 +763,18 @@ class CFG(object):
             )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
         self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
+
+        if not self.SESSION__SECURE and self.API__BASE_URL.startswith("https://"):
+            logger.warning(
+                self,
+                "session.secure option not enabled but api base url is using HTTPS, we strongly recommend you to activate this "
+                "options if you are using HTTPS".format(),
+            )
+        if not self.SESSION__HTTPONLY:
+            logger.warning(
+                self,
+                '"session.httponly" parameter disabled, this is unsafe. We strongly recommend to enable it.',
+            )
         # INFO - G.M - 2019-04-03 - check color file validity
         self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
@@ -799,7 +814,9 @@ class CFG(object):
             )
 
         self.check_mandatory_param("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
-
+        self.check_https_url_path("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
+        self.check_mandatory_param("API__BASE_URL", self.API__BASE_URL)
+        self.check_https_url_path("API__BASE_URL", self.API__BASE_URL)
         self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
         self.check_directory_path_param(
             "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
@@ -994,6 +1011,10 @@ class CFG(object):
                 when_str="if elasticsearch search feature is enabled",
             )
 
+    def _check_webdav_config_validity(self):
+        self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+        self.check_https_url_path("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
         """
@@ -1038,6 +1059,17 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
                 "Set it before continuing.".format(param_name, when_str=when_str)
+            )
+
+    def check_https_url_path(
+        self, param_name: str, value: typing.Any, extended_str: str = ""
+    ) -> None:
+        if not isinstance(value, str) or not value.startswith("https://"):
+            logger.warning(
+                self,
+                'parameter "{}"  value "{}" is not set with an https url, this either mean a mistake '
+                "or a that you are running tracim with an unsafe configuration. HTTPS is strongly recommended "
+                "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
     def check_directory_path_param(

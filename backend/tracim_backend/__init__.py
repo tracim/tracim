@@ -137,6 +137,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
     tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
     tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    tracim_setting_for_beaker["session.httponly"] = app_config.SESSION__HTTPONLY
+    tracim_setting_for_beaker["session.secure"] = app_config.SESSION__SECURE
     session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
     configurator.set_session_factory(session_factory)
     pyramid_beaker.set_cache_regions_from_settings(tracim_setting_for_beaker)

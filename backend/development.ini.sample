@@ -227,6 +227,12 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
+# enable or disable http-only for cookie, by default set as True. Disable it only
+# if you know what you're doing as this is less secure.
+; session.httponly = True
+# enable or disable secure for cookie, by default set as False. We strongly
+# recommend you to set it a True if you are using https.
+; session.secure = False
 
 ####
 # AUTH
@@ -238,7 +244,7 @@ session.cookie_on_exception = True
 # and 'Tracim-Api-Login' (mail of existing user) headers.
 
 ## Api key auth is disabled by default,
-## you should set a not-null value to api.key to active it:
+## you should set a not-null value to api.key to enable it:
 ; api.key =
 api.key = %(basic_setup.api_key)s
 ## base url of the backend API, default to same as website.base_url
@@ -259,7 +265,7 @@ api.key = %(basic_setup.api_key)s
 ## header and pretend to be anyone. Only trusted server should be able to
 ## set remote_user_header.
 ## remote user auth is disabled by default,
-## you should set a not-null value to auth_remote_header to active it:
+## you should set a not-null value to auth_remote_header to enable it:
 ; remote_user_header =
 
 ## Auth type list (internal or ldap), can be a list of item separated by ','
@@ -400,7 +406,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## on this space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
-# You can activate notification specific log using 'tracim_email_notification' logger.
+# You can enable notification specific log using 'tracim_email_notification' logger.
 
 
 ### SMTP ###
@@ -416,7 +422,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # email.notification.smtp.user = your_smtp_user
 # email.notification.smtp.password = your_smtp_password
 
-# active implicit ssl if you are using implicit smtp with encryption port like 465
+# enable implicit ssl if you are using implicit smtp with encryption port like 465
 # by default, Tracim will try to use explicit smtp encryption using starttls, and unencrypted
 # connection as fallback.
 ; email.notification.smtp.use_implicit_ssl = False
@@ -643,7 +649,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # be carefull this template is use to find all index to delete with tracimcli search delete command
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
-# if you use ingest mode in elasticsearch, you can activate file content ingest
+# if you use ingest mode in elasticsearch, you can enable file content ingest
 # for search
 ; search.elasticsearch.use_ingest = False
 
@@ -759,11 +765,11 @@ script_location = tracim_backend/migration
 ## max length of characters to apply to the "slug" field
 ; truncate_slug_length = 40
 
-# set to 'true' to run the environment during
+# set to 'True' to run the environment during
 # the 'revision' command, regardless of autogenerate
 ; revision_environment = False
 
-# set to 'true' to allow .pyc and .pyo files without
+# set to 'True' to allow .pyc and .pyo files without
 # a source .py file to be detected as revisions in the
 # versions/ directory
 ; sourceless = False
