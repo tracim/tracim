@@ -192,21 +192,17 @@ export class Account extends React.Component {
 
     props.dispatch(setBreadcrumbs([{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
+    }, {
+      link: <Link to={PAGE.ADMIN.USER}>{props.t('User account management')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('User account management')
+    }, {
+      link: <span>{state.userToEdit.publicName}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: state.userToEdit.publicName,
       notALink: true
-    }, {
-      link: <Link to={PAGE.ADMIN.USER}>{props.t('Users')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: (
-        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.userId)}>
-          {state.userToEdit.publicName}
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE
     }]))
   }
 

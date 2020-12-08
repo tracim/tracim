@@ -218,22 +218,23 @@ export class AdminWorkspaceUser extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
-      notALink: true
+      label: props.t('Home')
     }]
 
     if (state.config.type === 'workspace') {
       breadcrumbsList.push({
-        link: <Link to='/ui/admin/workspace'>{props.t('Space')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <span>{props.t('Space management')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Space management'),
+        notALink: true
       })
     } else if (state.config.type === 'user') {
       breadcrumbsList.push({
-        link: <Link to='/ui/admin/user'>{props.t('Users')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <span>{props.t('User account management')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('User account management'),
+        notALink: true
       })
     }
 

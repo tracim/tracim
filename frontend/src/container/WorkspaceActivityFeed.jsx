@@ -81,7 +81,8 @@ export class WorkspaceActivityFeed extends React.Component {
     const breadcrumbsList = [
       {
         link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Home')
       },
       {
         link: (
@@ -89,15 +90,14 @@ export class WorkspaceActivityFeed extends React.Component {
             {props.currentWorkspace.label}
           </Link>
         ),
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.currentWorkspace.label
       },
       {
-        link: (
-          <Link to={PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId)}>
-            {props.t('Activity feed')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE
+        link: <span>{props.t('Activity feed')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Activity feed'),
+        notALink: true
       }
     ]
 

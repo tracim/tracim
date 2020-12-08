@@ -95,7 +95,8 @@ export class MemberActivity extends React.Component {
     const breadcrumbsList = [
       {
         link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: workspaceLabel
       }
     ]
 

@@ -299,27 +299,38 @@ export class Gallery extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
     }, {
       link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
-      type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+      label: workspaceLabel
     }]
     if (state.folderId) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: folderDetail.fileName
       })
     }
+    breadcrumbsList.push({
+      link: <span>{props.t('Gallery')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Gallery'),
+      notALink: true
+    })
     if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
+      const fileName = this.displayedPicture().fileName
       breadcrumbsList.push({
         link: (
           <Link
             to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.displayedPictureId()}`}
           >
-            {this.displayedPicture().fileName}
+            {fileName}
           </Link>
         ),
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: fileName
       })
     }
 

@@ -49,11 +49,14 @@ export class PersonalActivityFeed extends React.Component {
     const breadcrumbsList = [
       {
         link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Home')
       },
       {
-        link: <Link to={PAGE.ACTIVITY_FEED}>{props.t('Activity feed')}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
+        link: <span>{props.t('Activity feed')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Activity feed'),
+        notALink: true
       }
     ]
 

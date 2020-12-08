@@ -129,14 +129,13 @@ export class Account extends React.Component {
 
     props.dispatch(setBreadcrumbs([{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span className='nolink'>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
-      notALink: true
+      label: props.t('Home')
     }, {
-      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      link: <span>{props.t('My account')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('My account'),
+      notALink: true
     }]))
   }
 

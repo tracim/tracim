@@ -220,21 +220,21 @@ export class Dashboard extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
     }, {
       link: (
         <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
           {props.curWs.label}
         </Link>
       ),
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.curWs.label
     }, {
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.t('Dashboard')}
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE
+      link: <span>{props.t('Dashboard')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Dashboard'),
+      notALink: true
     }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))

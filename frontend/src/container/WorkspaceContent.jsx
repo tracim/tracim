@@ -246,42 +246,42 @@ export class WorkspaceContent extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props, state } = this
+    const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === state.workspaceIdInUrl).label)
     const breadcrumbsList = [{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
     }, {
       link: (
         <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.t(props.workspaceList.find(ws => ws.id === state.workspaceIdInUrl).label)}
+          {workspaceLabel}
         </Link>
       ),
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: workspaceLabel
     }]
 
-    const urlFilter = qs.parse(props.location.search).type
-
-    if (urlFilter) {
-      breadcrumbsList.push({
-        link: (
-          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}?type=${urlFilter}`}>
-            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || { label: '' }).label + 's')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE
-      })
-    } else {
+    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
+    if (props.breadcrumbs.length === breadcrumbsList.length + 2 && state.appOpenedType) {
       breadcrumbsList.push({
         link: (
           <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}`}>
             {props.t('All contents')}
           </Link>
         ),
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('All contents')
+      },
+      props.breadcrumbs[props.breadcrumbs.length - 1]
+      )
+    } else {
+      breadcrumbsList.push({
+        link: <span>{props.t('All contents')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('All contents'),
+        notALink: true
       })
     }
-
-    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
-    if (props.breadcrumbs.length === breadcrumbsList.length + 1 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[props.breadcrumbs.length - 1])
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
@@ -332,13 +332,13 @@ export class WorkspaceContent extends React.Component {
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
             props.dispatch(newFlashMessage(props.t('Space not found'), 'warning'))
-            props.history.push('/ui')
+            props.history.push(PAGE.HOME)
             throw new Error(fetchContentList.json.message)
         }
         break
       case 401: break
       default: {
-        props.history.push('/ui')
+        props.history.push(PAGE.HOME)
         throw new Error('Error while loading content list')
       }
     }

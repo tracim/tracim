@@ -10,6 +10,7 @@ export const Breadcrumbs = props => {
         <li
           className={`breadcrumbs__item ${crumb.notALink ? '' : 'primaryColorFont primaryColorFontDarkenHover'}`}
           key={`breacrumbs_${i}`}
+          title={crumb.label || ''}
         >
           {crumb.link}
         </li>

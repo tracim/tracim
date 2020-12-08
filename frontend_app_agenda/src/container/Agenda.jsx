@@ -230,21 +230,27 @@ export class Agenda extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
     }]
 
     if (state.config.appConfig.workspaceId) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: state.content.workspaceLabel
       }, {
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/agenda`}>{props.t('Agenda')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <span>{props.t('Agenda')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Agenda'),
+        notALink: true
       })
     } else {
       breadcrumbsList.push({
-        link: <Link to='/ui/agenda'>{props.t('All my agendas')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <span>{props.t('All my agendas')}</span>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('All my agendas'),
+        notALink: true
       })
     }
 

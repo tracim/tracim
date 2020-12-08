@@ -70,12 +70,12 @@ class PageTitle extends React.Component {
 export default PageTitle
 
 PageTitle.propTypes = {
+  breadcrumbsList: PropTypes.array.isRequired,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   subtitle: PropTypes.string,
   parentClass: PropTypes.string,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  breadcrumbsList: PropTypes.array,
   iconTooltip: PropTypes.string
 }
 
@@ -84,6 +84,5 @@ PageTitle.defaultProps = {
   customClass: '',
   icon: '',
   subtitle: '',
-  breadcrumbsList: [],
   iconTooltip: ''
 }
