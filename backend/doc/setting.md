@@ -32,7 +32,10 @@ The priority order is (from less to more priority):
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
 | TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
 | TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
+| TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |
+| TRACIM_SESSION__SECURE                                                    | session.secure                                                 | SESSION__SECURE                                                    |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
+| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
 | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |
@@ -134,7 +137,6 @@ The priority order is (from less to more priority):
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
-| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 
 
 ### Parameters Only Working in the Configuration File
@@ -241,6 +243,9 @@ Generic configuration (needed for all backend):
     session.cookie_expires = 604800
     session.timeout = 604800
     session.cookie_on_exception = True
+    session.httponly = True
+    # only if you are using HTTPS:
+    # session.secure = True
 
 for other beaker backends, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
 
