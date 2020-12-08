@@ -53,11 +53,13 @@ const isAWrappedMention = (node) => (
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
-export const getInvalidMentionList = (content, knownMentions) => {
+export const getInvalidMentionList = (content, knownMembersMentions) => {
   const doc = getDocumentFromHTMLString(content)
-  let mentionsInContent = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
-  mentionsInContent = [...new Set(mentionsInContent)]
-  return mentionsInContent.filter(mention => knownMentions.indexOf(mention) === -1)
+  const foundMentions = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
+  const possibleMentions = [...knownMembersMentions, ...GROUP_MENTION_TRANSLATION_LIST.map(mention => `@${mention}`)]
+  return [...new Set(foundMentions.filter(
+    mention => !possibleMentions.includes(mention)
+  ))]
 }
 
 export const wrapMentionsInSpanTags = (node, doc, invalidMentionList) => {
