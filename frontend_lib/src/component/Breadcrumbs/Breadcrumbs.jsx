@@ -21,9 +21,5 @@ export const Breadcrumbs = props => {
 export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
-  breadcrumbsList: PropTypes.array
-}
-
-Breadcrumbs.defaultProps = {
-  breadcrumbsList: []
+  breadcrumbsList: PropTypes.array.isRequired
 }
