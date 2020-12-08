@@ -53,6 +53,20 @@ const isAWrappedMention = (node) => (
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
+export const handleInvalidMentionInComment = (memberList, isWysiwyg, comment, setState) => {
+  const knownMembersMentions = memberList.map(member => `@${member.username}`)
+  const content = isWysiwyg ? tinymce.activeEditor.getContent() : comment
+  const invalidMentionList = getInvalidMentionList(content, knownMembersMentions)
+
+  if (invalidMentionList.length > 0) {
+    setState({
+      invalidMentionList: invalidMentionList,
+      showInvalidMentionPopupInComment: true
+    })
+    return true
+  } else return false
+}
+
 export const getInvalidMentionList = (content, knownMembersMentions) => {
   const doc = getDocumentFromHTMLString(content)
   const foundMentions = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []

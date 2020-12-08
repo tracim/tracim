@@ -10,6 +10,7 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
+  handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -44,7 +45,6 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
-  getInvalidMentionList,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
@@ -446,16 +446,15 @@ export class File extends React.Component {
 
   handleClickValidateNewCommentBtn = async () => {
     const { state } = this
-    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
-    const comment = state.timelineWysiwyg ? tinymce.activeEditor.getContent() : state.newComment
-    const invalidMentionList = getInvalidMentionList(comment, knownMentions)
 
-    if (invalidMentionList.length > 0) {
-      this.setState({
-        invalidMentionList: invalidMentionList,
-        showInvalidMentionPopupInComment: true
-      })
-    } else this.handleClickValidateAnywayNewComment()
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
+    }
   }
 
   handleClickValidateAnywayNewComment = () => {
