@@ -612,7 +612,7 @@ class FileController(Controller):
     @hapic.output_body(FileContentSchema())
     def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
-        Get thread content
+        Get file content
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
