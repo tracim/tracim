@@ -11,12 +11,12 @@ import {
   DropdownMenu,
   Icon,
   IconButton,
+  PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 
 import TimedEvent from '../TimedEvent.jsx'
-import { PAGE } from '../../util/helper.js'
 
 require('./ContentActivityHeader.styl')
 

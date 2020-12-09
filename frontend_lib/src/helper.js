@@ -7,6 +7,41 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 import { CUSTOM_EVENT } from './customEvent.js'
 import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
 
+export const PAGE = {
+  HOME: '/ui',
+  WORKSPACE: {
+    ROOT: '/ui/workspaces',
+    DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
+    NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
+    AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
+    CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
+    SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
+    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
+    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
+    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
+    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
+  },
+  LOGIN: '/ui/login',
+  FORGOT_PASSWORD: '/ui/forgot-password',
+  FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
+  RESET_PASSWORD: '/ui/reset-password',
+  ACCOUNT: '/ui/account',
+  AGENDA: '/ui/agenda',
+  ADMIN: {
+    ROOT: '/ui/admin',
+    WORKSPACE: '/ui/admin/workspace',
+    USER: '/ui/admin/user',
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
+  },
+  SEARCH_RESULT: '/ui/search-result',
+  GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
+  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
+  JOIN_WORKSPACE: '/ui/join-workspace',
+  ACTIVITY_FEED: '/ui/activity-feed',
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
+}
+
 const dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en'),

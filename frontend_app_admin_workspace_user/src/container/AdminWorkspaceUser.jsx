@@ -20,7 +20,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   debug,
@@ -217,7 +218,12 @@ export class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }]

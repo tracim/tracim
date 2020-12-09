@@ -39,6 +39,7 @@ import {
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
+  PAGE,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
@@ -385,7 +386,7 @@ export class HtmlDocument extends React.Component {
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          url: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.config.slug, state.content.content_id),
           label: content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE

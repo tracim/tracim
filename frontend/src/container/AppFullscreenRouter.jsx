@@ -2,13 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Route, Redirect } from 'react-router-dom'
-import {
-  PAGE,
-  findUserRoleIdInWorkspace
-} from '../util/helper.js'
+import { findUserRoleIdInWorkspace } from '../util/helper.js'
 import appFactory from '../util/appFactory.js'
 import {
   CUSTOM_EVENT,
+  PAGE,
   PROFILE,
   ROLE_LIST
 } from 'tracim_frontend_lib'

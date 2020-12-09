@@ -5,7 +5,6 @@ import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
 import {
-  PAGE,
   findUserRoleIdInWorkspace,
   sortContentList,
   SHARE_FOLDER_ID,
@@ -29,6 +28,7 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -248,7 +248,12 @@ export class WorkspaceContent extends React.Component {
     const { props, state } = this
     const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === state.workspaceIdInUrl).label)
     const breadcrumbsList = [{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }, {
@@ -265,7 +270,7 @@ export class WorkspaceContent extends React.Component {
     if (props.breadcrumbs.length === breadcrumbsList.length + 2 && state.appOpenedType) {
       breadcrumbsList.push({
         link: (
-          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}`}>
+          <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}>
             {props.t('All contents')}
           </Link>
         ),

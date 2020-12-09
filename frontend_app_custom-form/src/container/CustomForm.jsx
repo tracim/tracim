@@ -17,7 +17,8 @@ import {
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  getContentComment
+  getContentComment,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -214,7 +215,7 @@ class CustomForm extends React.Component {
       type: 'appendBreadcrumbs',
       data: {
         breadcrumbs: [{
-          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          url: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.config.slug, state.content.content_id),
           label: state.content.label,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE

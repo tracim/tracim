@@ -20,7 +20,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -38,7 +39,6 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
@@ -128,7 +128,12 @@ export class Account extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }, {

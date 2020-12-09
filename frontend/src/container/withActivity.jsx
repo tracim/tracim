@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
+import { NUMBER_RESULTS_BY_PAGE, PAGE } from 'tracim_frontend_lib'
 
 import {
   mergeWithActivityList,
   addMessageToActivityList,
   sortActivityList
 } from '../util/activity.js'
-import { FETCH_CONFIG, PAGE } from '../util/helper.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 

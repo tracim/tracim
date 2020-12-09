@@ -52,7 +52,8 @@ import {
   updateTLMAuthor,
   scrollIntoViewIfNeeded,
   darkenColor,
-  lightenColor
+  lightenColor,
+  PAGE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -341,5 +342,6 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent
+  getWorkspaceContent,
+  PAGE
 }

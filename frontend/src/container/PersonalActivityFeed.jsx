@@ -7,12 +7,12 @@ import { Link, withRouter } from 'react-router-dom'
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  PAGE,
   PageTitle,
   TracimComponent
 } from 'tracim_frontend_lib'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
-import { PAGE } from '../util/helper.js'
 import {
   setBreadcrumbs,
   setHeadTitle,
@@ -48,7 +48,12 @@ export class PersonalActivityFeed extends React.Component {
 
     const breadcrumbsList = [
       {
-        link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+        link: (
+          <Link to={PAGE.HOME}>
+            <i className='fa fa-home' />
+            <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+          </Link>
+        ),
         type: BREADCRUMBS_TYPE.CORE,
         label: props.t('Home')
       },

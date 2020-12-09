@@ -5,8 +5,7 @@ import { AppFullscreenRouter as AppFullscreenRouterWithoutHOC } from '../../../s
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
 import { MemoryRouter } from 'react-router'
-import { PAGE } from '../../../src/util/helper.js'
-import { ROLE } from 'tracim_frontend_lib'
+import { PAGE, ROLE } from 'tracim_frontend_lib'
 
 describe('<AppFullscreenRouter />', () => {
   const renderAppFullscreenCallBack = sinon.spy()

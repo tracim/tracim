@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-// require('./Breadcrumbs.styl') // CH - 2019-04-30 - see https://github.com/tracim/tracim/issues/1156
+import { translate } from 'react-i18next'
 
 export const Breadcrumbs = props => {
   return (
@@ -19,7 +18,7 @@ export const Breadcrumbs = props => {
   )
 }
 
-export default Breadcrumbs
+export default translate()(Breadcrumbs)
 
 Breadcrumbs.propTypes = {
   breadcrumbsList: PropTypes.array.isRequired

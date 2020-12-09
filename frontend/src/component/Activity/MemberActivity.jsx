@@ -8,12 +8,12 @@ import {
   Avatar,
   BREADCRUMBS_TYPE,
   Breadcrumbs,
+  PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
-import { PAGE } from '../../util/helper.js'
 
 import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')

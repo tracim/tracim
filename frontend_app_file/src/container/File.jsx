@@ -45,12 +45,13 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
+  PAGE,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
+import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -372,8 +373,7 @@ export class File extends React.Component {
       type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
-          // FIXME - b.l - refactor urls
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
+          url: PAGE.WORKSPACE.CONTENT(content.workspace_id, state.config.slug, content.content_id),
           label: `${content.filename}`,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE

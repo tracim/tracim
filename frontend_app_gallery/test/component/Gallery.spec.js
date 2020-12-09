@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { Gallery as GalleryWithoutHOC } from '../../src/container/Gallery.jsx'
 import { DIRECTION } from '../../src/helper'
-import { defaultDebug } from 'tracim_frontend_lib'
+import { defaultDebug, PAGE } from 'tracim_frontend_lib'
 import {
   mockGetContents200,
   mockGetWorkspaceDetail200,
@@ -274,7 +274,7 @@ describe('<Gallery />', () => {
       it('should build the correct breadcrumbsList when workspace gallery', () => {
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
         expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
         expect(wrapper.state().breadcrumbsList[3].link.props.to)
@@ -284,7 +284,7 @@ describe('<Gallery />', () => {
         wrapper.setState({ imagePreviewList: [] })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(3)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
@@ -296,7 +296,7 @@ describe('<Gallery />', () => {
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, folderDetail, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal('/ui')
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
         expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},${folderDetail.folderParentIdList.join(',')}`)
         expect(wrapper.state().breadcrumbsList[3].link.props.to)

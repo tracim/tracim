@@ -23,6 +23,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   BREADCRUMBS_TYPE,
+  PAGE,
   ROLE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -298,11 +299,16 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }, {
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
+      link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
       label: workspaceLabel
     }]
@@ -324,7 +330,7 @@ export class Gallery extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link
-            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.displayedPictureId()}`}
+            to={PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId())}
           >
             {fileName}
           </Link>

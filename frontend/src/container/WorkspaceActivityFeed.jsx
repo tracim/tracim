@@ -8,10 +8,10 @@ import {
   TracimComponent,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 
-import { PAGE } from '../util/helper.js'
 import { getWorkspaceDetail } from '../action-creator.async.js'
 import {
   setWorkspaceActivityList,
@@ -80,7 +80,12 @@ export class WorkspaceActivityFeed extends React.Component {
 
     const breadcrumbsList = [
       {
-        link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+        link: (
+          <Link to={PAGE.HOME}>
+            <i className='fa fa-home' />
+            <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+          </Link>
+        ),
         type: BREADCRUMBS_TYPE.CORE,
         label: props.t('Home')
       },

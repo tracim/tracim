@@ -2,8 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
-import { Badge, ROLE } from 'tracim_frontend_lib'
-import { PAGE } from '../../util/helper.js'
+import { Badge, PAGE, ROLE } from 'tracim_frontend_lib'
 
 require('./RecentActivity.styl')
 

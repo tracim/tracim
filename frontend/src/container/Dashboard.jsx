@@ -15,6 +15,7 @@ import {
   ROLE_LIST,
   PROFILE,
   buildHeadTitle,
+  PAGE,
   removeAtInUsername
 } from 'tracim_frontend_lib'
 import {
@@ -42,7 +43,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
-import { PAGE, findUserRoleIdInWorkspace } from '../util/helper.js'
+import { findUserRoleIdInWorkspace } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -219,7 +220,12 @@ export class Dashboard extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }, {

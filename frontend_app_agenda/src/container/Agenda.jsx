@@ -12,6 +12,7 @@ import {
   PageWrapper,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
+  PAGE,
   RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -229,14 +230,19 @@ export class Agenda extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
+      link: (
+        <Link to={PAGE.HOME}>
+          <i className='fa fa-home' />
+          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
+        </Link>
+      ),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }]
 
     if (state.config.appConfig.workspaceId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
+        link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{state.content.workspaceLabel}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
         label: state.content.workspaceLabel
       }, {
