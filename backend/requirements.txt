@@ -5,6 +5,7 @@
 #    pip-compile
 #
 alembic==1.0.5            # via tracim_backend (setup.py)
+anyascii==0.1.7           # via filedepot
 apispec-marshmallow-advanced==0.4  # via hapic, tracim_backend (setup.py)
 apispec==2.0.2            # via apispec-marshmallow-advanced, hapic
 attrs==18.2.0             # via cmd2
@@ -29,7 +30,7 @@ elasticsearch-dsl==7.0.0  # via tracim_backend (setup.py)
 elasticsearch==7.0.1      # via elasticsearch-dsl, tracim_backend (setup.py)
 email-reply-parser==0.5.9  # via tracim_backend (setup.py)
 ffmpeg-python==0.2.0      # via preview-generator
-filedepot==0.5.2          # via tracim_backend (setup.py)
+filedepot==0.8.0          # via tracim_backend (setup.py)
 filelock==3.0.10          # via preview-generator, tracim_backend (setup.py)
 future==0.18.2            # via ffmpeg-python
 gitdb==4.0.5              # via gitpython
@@ -100,7 +101,7 @@ tnetstring3==0.3.1        # via tracim_backend (setup.py)
 transaction==2.4.0        # via pyramid-tm, tracim_backend (setup.py), zope.sqlalchemy
 translationstring==1.3    # via pyramid
 tzlocal==1.5.1            # via caldav
-unidecode==1.0.23         # via filedepot, python-slugify
+unidecode==1.0.23         # via python-slugify
 urllib3==1.24.2           # via elasticsearch, requests
 venusian==1.1.0           # via pyramid
 vobject==0.9.6.1          # via caldav, radicale
