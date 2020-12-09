@@ -4,11 +4,18 @@ import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
   sortTimelineByDate
 } from './helper.js'
+
+import {
+  LOCAL_STORAGE_ITEM_TYPE,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
+
 import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
@@ -73,17 +80,19 @@ export function appContentFactory (WrappedComponent) {
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
 
-      const previouslyUnsavedComment = localStorage.getItem(
-        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appSlug, 'comment')
-      )
+      const newComment = this.state.content.content_id === newContent.content_id
+        ? this.state.newComment
+        : getLocalStorageItem(
+          LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+          newContent,
+          appSlug
+        ) || ''
 
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
         timelineWysiwyg: false,
-        newComment: prev.content.content_id === newContent.content_id
-          ? prev.newComment
-          : (previouslyUnsavedComment || '')
+        newComment
       }))
     }
 
@@ -138,8 +147,10 @@ export function appContentFactory (WrappedComponent) {
       const newComment = e.target.value
       setState({ newComment: newComment })
 
-      localStorage.setItem(
-        generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment'),
+      setLocalStorageItem(
+        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+        content,
+        appSlug,
         newComment
       )
     }
@@ -169,8 +180,10 @@ export function appContentFactory (WrappedComponent) {
           setState({ newComment: '' })
           if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
+          removeLocalStorageItem(
+            LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+            content,
+            appSlug
           )
           break
         case 400:

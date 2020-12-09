@@ -11,7 +11,6 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
-  generateLocalStorageContentId,
   getCurrentContentVersionNumber,
   getOrCreateSessionClientToken,
   handleFetchResult,
@@ -34,6 +33,10 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
+  LOCAL_STORAGE_ITEM_TYPE,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem,
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
@@ -345,33 +348,6 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
-
-  getLocalStorageItem = type => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong getLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    return localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type)
-    )
-  }
-
-  setLocalStorageItem = (type, value) => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong setLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    localStorage.setItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
-      value
-    )
-  }
-
   buildBreadcrumbs = (content) => {
     const { state } = this
 
@@ -403,8 +379,10 @@ export class HtmlDocument extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
-    const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
+    const localStorageComment = getLocalStorageItem(
+      LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+      resHtmlDocument.body,
+      state.appName
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -418,10 +396,12 @@ export class HtmlDocument extends React.Component {
       ? APP_FEATURE_MODE.EDIT
       : APP_FEATURE_MODE.VIEW
 
-    // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
-    const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'rawContent')
+    const localStorageRawContent = getLocalStorageItem(
+      LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+      resHtmlDocument.body,
+      state.appName
     )
+
     const hasLocalStorageRawContent = !!localStorageRawContent
 
     const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
@@ -459,7 +439,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
+    const previouslyUnsavedRawContent = getLocalStorageItem('rawContent', this.state.content, this.state.appName)
 
     this.setState(prev => ({
       content: {
@@ -482,9 +462,10 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW
     }))
 
-    const { state } = this
-    localStorage.removeItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+    removeLocalStorageItem(
+      LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+      this.state.content,
+      this.state.appName
     )
   }
 
@@ -501,18 +482,18 @@ export class HtmlDocument extends React.Component {
       return
     }
 
-    const backupLocalStorage = this.getLocalStorageItem('rawContent')
-
-    localStorage.removeItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
-    )
-
     const fetchResultSaveHtmlDoc = await handleFetchResult(
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200: {
+        removeLocalStorageItem(
+          LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+          state.content,
+          state.appName
+        )
+
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
         this.setState(prev => ({
@@ -531,7 +512,6 @@ export class HtmlDocument extends React.Component {
         break
       }
       case 400:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
           case 2067:
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
@@ -545,7 +525,6 @@ export class HtmlDocument extends React.Component {
         }
         break
       default:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
         this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
@@ -555,7 +534,7 @@ export class HtmlDocument extends React.Component {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
-    this.setLocalStorageItem('rawContent', newText)
+    setLocalStorageItem('rawContent', this.state.content, this.state.appName, newText)
   }
 
   handleChangeNewComment = e => {
@@ -821,7 +800,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem('rawContent', state.content, state.appName)}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

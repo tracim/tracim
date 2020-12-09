@@ -21,7 +21,8 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  generateLocalStorageContentId,
+  LOCAL_STORAGE_ITEM_TYPE,
+  getLocalStorageItem,
   Badge,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
@@ -232,19 +233,24 @@ export class File extends React.Component {
 
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
-
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
-
-    await this.loadContent()
-    this.loadTimeline()
-    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+    this.updateTimelineAndContent()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async updateTimelineAndContent (pageToLoad = null) {
+    this.setState({
+      newComment: getLocalStorageItem(
+        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+        this.state.content,
+        this.state.appName
+      ) || ''
+    })
+
+    await this.loadContent(pageToLoad)
+    this.loadTimeline()
+    if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -252,12 +258,7 @@ export class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.setState({ fileCurrentPage: 1 })
-      await this.loadContent(1)
-      this.loadTimeline()
-      if (state.config.workspace.downloadEnabled) {
-        this.setState({})
-        this.loadShareLinkList()
-      }
+      this.updateTimelineAndContent(1)
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')

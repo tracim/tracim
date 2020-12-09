@@ -13,7 +13,8 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  generateLocalStorageContentId,
+  LOCAL_STORAGE_ITEM_TYPE,
+  getLocalStorageItem,
   BREADCRUMBS_TYPE,
   ROLE,
   CUSTOM_EVENT,
@@ -157,28 +158,32 @@ export class Thread extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
+    this.updateTimelineAndContent()
+  }
 
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
+  async updateTimelineAndContent () {
+    this.setState({
+      newComment: getLocalStorageItem(
+        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+        this.state.content,
+        this.state.appName
+      ) || ''
+    })
 
     await this.loadContent()
     this.loadTimeline()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
     console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      await this.loadContent()
-      this.loadTimeline()
+      this.updateTimelineAndContent()
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')

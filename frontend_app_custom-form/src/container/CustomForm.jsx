@@ -14,7 +14,10 @@ import {
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId,
+  LOCAL_STORAGE_ITEM_TYPE,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   getContentComment
@@ -180,33 +183,6 @@ class CustomForm extends React.Component {
     }
   })
 
-  isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
-
-  getLocalStorageItem = type => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong getLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    return localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type)
-    )
-  }
-
-  setLocalStorageItem = (type, value) => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong setLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    localStorage.setItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
-      value
-    )
-  }
-
   buildBreadcrumbs = () => {
     const { state } = this
 
@@ -264,9 +240,7 @@ class CustomForm extends React.Component {
         }))
       ], [])
 
-    const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resCustomForm.body.workspace_id, resCustomForm.body.content_id, appName, 'comment')
-    )
+    const localStorageComment = getLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.COMMENT, resCustomForm.body, appName)
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
     // see https://github.com/tracim/tracim/issues/1206
@@ -281,15 +255,17 @@ class CustomForm extends React.Component {
       ? MODE.EDIT
       : MODE.VIEW
 
-    // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
-    const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resCustomForm.body.workspace_id, resCustomForm.body.content_id, appName, 'rawContent')
+    const localStorageRawContent = getLocalStorageItem(
+      LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+      resCustomForm.body,
+      appName
     )
+
     // HACK
     // const hasLocalStorageRawContent = !!localStorageRawContent
-    const rawContent = JSON.parse(resCustomForm.body.raw_content)
-    // const hasLocalStorageRawContent = !!localStorageRawContent
     const hasLocalStorageRawContent = false
+    const rawContent = JSON.parse(resCustomForm.body.raw_content)
+
     this.setState({
       mode: modeToRender,
       content: {
@@ -353,7 +329,7 @@ class CustomForm extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
+    const previouslyUnsavedRawContent = this.getLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, this.state.content, this.state.appName)
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -375,9 +351,7 @@ class CustomForm extends React.Component {
     }))
 
     const { appName, content } = this.state
-    localStorage.removeItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
-    )
+    removeLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, content, appName)
   }
 
   handleSubmit = (data) => {
@@ -394,13 +368,6 @@ class CustomForm extends React.Component {
 
   handleSaveCustomForm = async (data) => {
     const { state, props } = this
-    const backupLocalStorage = this.getLocalStorageItem('rawContent')
-
-    localStorage.removeItem(
-      // HACK
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, 'html-document', 'rawContent')
-    )
-
     const fetchResultSaveCustomForm = await handleFetchResult(
       // HACK
       await putCustomFormContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, data)
@@ -408,11 +375,13 @@ class CustomForm extends React.Component {
 
     switch (fetchResultSaveCustomForm.apiResponse.status) {
       case 200:
+        // HACK
+        removeLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, state.content, 'html-document')
+
         // this.handleCloseNewVersion() // HACK
         this.loadContent()
         break
       default:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
         this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
     }
   }
@@ -420,14 +389,14 @@ class CustomForm extends React.Component {
   handleChangeForm = e => {
     // const newText = JSON.stringify(e.formData) // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: e.formData } }))
-    // this.setLocalStorageItem('rawContent', e.formData)
+    // setLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, this.state.content, this.state.appName, e.formData)
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({ newComment })
 
-    this.setLocalStorageItem('comment', newComment)
+    setLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.COMMENT, this.state.content, this.state.appName, newComment)
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -443,9 +412,7 @@ class CustomForm extends React.Component {
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({ newComment: '' })
-        localStorage.removeItem(
-          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-        )
+        removeLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.COMMENT, state.content, state.appName)
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break
@@ -675,7 +642,7 @@ class CustomForm extends React.Component {
               isDeleted={content.is_deleted}
               isDeprecated={content.status === config.availableStatuses[3].slug}
               deprecatedStatus={config.availableStatuses[3]}
-              isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
+              isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && getLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, content, this.state.appName)}
               onClickRestoreArchived={this.handleClickRestoreArchived}
               onClickRestoreDeleted={this.handleClickRestoreDeleted}
               onClickShowDraft={this.handleClickNewVersion}
