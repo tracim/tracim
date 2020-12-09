@@ -352,6 +352,12 @@ You can run it this way with Docker:
     docker pull elasticsearch:7.0.0
     docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
 
+You need also a minio server on port 9000 for s» related test
+You can run it this way with Docker:
+
+    docker pull minio/minio
+    docker run -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
+
 Create default test_storage_dir folder tree to make test work properly out of the box:
 
     ./create_test_storage_dir.sh
