@@ -360,7 +360,7 @@ You need also a minio server on port 9000 for s» related test
 You can run it this way with Docker:
 
     docker pull minio/minio
-    docker run -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
+    docker run -d -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
 
 Create default test_storage_dir folder tree to make test work properly out of the box:
 

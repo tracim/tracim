@@ -95,7 +95,7 @@ _install_backend: &_install_backend
     - docker pull elasticsearch:7.0.0
     - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
     - docker pull minio/minio
-    - docker run -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
+    - docker run -d -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose pull
     - cd $TRAVIS_BUILD_DIR
