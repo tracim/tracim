@@ -62,6 +62,7 @@ _install_backend: &_install_backend
     - pip install -r "requirements-build.txt"
     - pip install -r "requirements.txt"
     - pip install -r "requirements-test.txt"
+    - pip install -r "requirements-storage-s3.txt"
     # postgresql
     - |
       if [ "${DB}" == "postgres" ]; then

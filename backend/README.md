@@ -92,6 +92,10 @@ For MySQL/MariaDB:
 
     pip install -r requirements-db-mysql.txt
 
+If you want to store file on s3, you need to install s3 driver:
+
+    pip install -r requirements-storage-s3.txt
+
 
 Configuration
 ---------------
