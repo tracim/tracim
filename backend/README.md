@@ -362,6 +362,9 @@ You can run it this way with Docker:
     docker pull minio/minio
     docker run -d -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
 
+please note that syntax is similar to minio command line, "minio server /data" will start the minio server and use
+/data dir (in our case, it's the /data of the docker).
+
 Create default test_storage_dir folder tree to make test work properly out of the box:
 
     ./create_test_storage_dir.sh
