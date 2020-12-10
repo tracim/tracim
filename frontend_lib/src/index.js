@@ -2,6 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
@@ -203,6 +204,7 @@ export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 export {
   appContentFactory,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
   handleInvalidMentionInComment,

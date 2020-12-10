@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
-
 import {
   BREADCRUMBS_TYPE,
   Breadcrumbs,
+  buildContentPathBreadcrumbs,
   CONTENT_TYPE,
   DropdownMenu,
   Icon,
@@ -15,7 +15,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
-
+import { FETCH_CONFIG } from '../../util/helper.js'
 import TimedEvent from '../TimedEvent.jsx'
 
 require('./ContentActivityHeader.styl')
@@ -53,13 +53,9 @@ export class ContentActivityHeader extends React.Component {
         link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
         type: BREADCRUMBS_TYPE.CORE,
         label: workspaceLabel
-      },
-      {
-        link: <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: contentLabel
       }
     ]
+    buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, props.content, props)
 
     const newestMessage = props.newestMessage
 

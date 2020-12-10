@@ -5,7 +5,11 @@ import { distanceInWords, isAfter } from 'date-fns'
 import color from 'color'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
-import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
+import {
+  getContentPath,
+  getReservedUsernames,
+  getUsernameAvailability
+} from './action.async.js'
 
 export const PAGE = {
   HOME: '/ui',
@@ -675,3 +679,34 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
+
+export const buildContentPathBreadcrumbs = async (apiUrl, content, props) => {
+  const fetchGetContentPath = await handleFetchResult(
+    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+  )
+
+  switch (fetchGetContentPath.apiResponse.status) {
+    case 200:
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+        data: {
+          breadcrumbs: fetchGetContentPath.body.items.map(crumb => ({
+            url: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+            label: crumb.label,
+            link: null,
+            type: BREADCRUMBS_TYPE.APP_FEATURE
+          }))
+        }
+      })
+      break
+    default:
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: props.t('Error while getting breadcrumbs'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+  }
+}

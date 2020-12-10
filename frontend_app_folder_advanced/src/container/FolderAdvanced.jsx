@@ -3,6 +3,7 @@ import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  buildContentPathBreadcrumbs,
   getContentTypeList,
   appContentFactory,
   PopinFixed,
@@ -15,8 +16,6 @@ import {
   CUSTOM_EVENT,
   ROLE,
   buildHeadTitle,
-  BREADCRUMBS_TYPE,
-  PAGE,
   RefreshWarningMessage,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -182,19 +181,7 @@ export class FolderAdvanced extends React.Component {
   loadTimeline = () => {}
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          url: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.config.slug, state.content.content_id),
-          label: content.label,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   handleClickBtnCloseApp = () => {

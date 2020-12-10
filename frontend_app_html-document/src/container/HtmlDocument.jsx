@@ -8,7 +8,7 @@ import {
   APP_FEATURE_MODE,
   appContentFactory,
   ArchiveDeleteContent,
-  BREADCRUMBS_TYPE,
+  buildContentPathBreadcrumbs,
   buildHeadTitle,
   CUSTOM_EVENT,
   generateLocalStorageContentId,
@@ -380,19 +380,7 @@ export class HtmlDocument extends React.Component {
   }
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          url: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.config.slug, state.content.content_id),
-          label: content.label,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   loadContent = async () => {

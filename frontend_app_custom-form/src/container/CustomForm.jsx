@@ -3,6 +3,7 @@ import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  buildContentPathBreadcrumbs,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -80,13 +81,13 @@ class CustomForm extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
-    const { state } = this
+    const { state, props } = this
     switch (type) {
       case 'custom-form_showApp':
         console.log('%c<CustomForm> Custom event', 'color: #28a745', type, data)
         if (appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, 'custom-form')) { // HACK HARCODING 'CUSTOM-FORM'
           this.setState({ isVisible: true })
-          this.buildBreadcrumbs()
+          buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
         }
         break
 
@@ -131,10 +132,9 @@ class CustomForm extends React.Component {
   }
 
   async componentDidMount () {
-    console.log('%c<CustomForm> did mount', `color: ${this.state.config.hexcolor}`)
-
+    // console.log('%c<CustomForm> did mount', `color: ${this.state.config.hexcolor}`)
     await this.loadContent()
-    this.buildBreadcrumbs()
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, this.state.content, this.props)
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -146,7 +146,7 @@ class CustomForm extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      this.buildBreadcrumbs()
+      buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
       // tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -206,22 +206,6 @@ class CustomForm extends React.Component {
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
       value
     )
-  }
-
-  buildBreadcrumbs = () => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: 'appendBreadcrumbs',
-      data: {
-        breadcrumbs: [{
-          url: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.config.slug, state.content.content_id),
-          label: state.content.label,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
   }
 
   loadContent = async () => {
