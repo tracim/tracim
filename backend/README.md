@@ -356,7 +356,7 @@ You can run it this way with Docker:
     docker pull elasticsearch:7.0.0
     docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
 
-You need also a minio server on port 9000 for s» related test
+You also need a minio server on port 9000 for tests related to s3.
 You can run it this way with Docker:
 
     docker pull minio/minio
