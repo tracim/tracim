@@ -732,19 +732,6 @@ class ContentApi(object):
             )
         return revision
 
-    # INFO - A.P - 2017-07-03 - python file object getter
-    # in case of we cook a version of preview manager that allows a pythonic
-    # access to files
-    # def get_one_revision_file(self, revision_id: int = None):
-    #     """
-    #     This function allows us to directly get a Python file object from its
-    #     revision identifier.
-    #     :param revision_id: The revision id of the file we want to return
-    #     :return: The corresponding Python file object
-    #     """
-    #     revision = self.get_one_revision(revision_id)
-    #     return DepotManager.get().get(revision.depot_file)
-
     @contextmanager
     def get_one_revision_filepath(self, revision_id: int = None) -> str:
         """
@@ -754,7 +741,7 @@ class ContentApi(object):
         :return: The corresponding filepath
         """
         revision = self.get_one_revision(revision_id)
-        depot = DepotManager.get()
+        depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE_NAME)
         depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
         revision.file_extension
         try:

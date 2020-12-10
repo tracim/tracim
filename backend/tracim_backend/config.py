@@ -1127,7 +1127,7 @@ class CFG(object):
             }
 
         DepotManager.configure(
-            self.UPLOADED_FILES__LOCAL__STORAGE_PATH, uploaded_files_settings, prefix="depot."
+            name=self.UPLOADED_FILES__STORAGE_NAME, config=uploaded_files_settings, prefix="depot."
         )
 
     class CST(object):
