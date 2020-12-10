@@ -239,7 +239,9 @@ class ShareController(Controller):
             raise ContentTypeNotAllowed()
 
         try:
-            file = DepotManager.get(app_config.UPLOADED_FILES__STORAGE_NAME).get(content.depot_file)
+            file = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
+                content.depot_file
+            )
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(

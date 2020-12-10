@@ -119,7 +119,7 @@ class DeleteDBCommand(AppContextCommand):
             print("Database deletion done.")
             try:
                 print("Cleaning depot begin.")
-                depot = DepotManager.get(app_config.UPLOADED_FILES__STORAGE_NAME)
+                depot = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
                 depot_files = depot.list()
                 for file_ in depot_files:
                     try:

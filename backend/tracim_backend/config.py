@@ -472,31 +472,37 @@ class CFG(object):
         self.DEPOT_STORAGE_NAME = self.get_raw_config(
             "depot_storage_name", "tracim", deprecated=True
         )
-        self.UPLOADED_FILES__STORAGE_NAME = self.get_raw_config(
-            "uploaded_files.storage_name", self.DEPOT_STORAGE_NAME
+        self.UPLOADED_FILES__STORAGE__STORAGE_NAME = self.get_raw_config(
+            "uploaded_files.storage.storage_name", self.DEPOT_STORAGE_NAME
         )
-        self.UPLOADED_FILES__STORAGE_TYPE = self.get_raw_config(
-            "uploaded_files.storage_type", "local"
+        self.UPLOADED_FILES__STORAGE__STORAGE_TYPE = self.get_raw_config(
+            "uploaded_files.storage.storage_type", "local"
         )
         # Local file parameters
-        self.UPLOADED_FILES__LOCAL__STORAGE_PATH = self.get_raw_config(
-            "uploaded_files.local.storage_path", self.DEPOT_STORAGE_DIR
+        self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH = self.get_raw_config(
+            "uploaded_files.storage.local.storage_path", self.DEPOT_STORAGE_DIR
         )
         # S3 parameters
-        self.UPLOADED_FILES__S3__ACCESS_KEY_ID = self.get_raw_config(
-            "uploaded_files.s3.access_key_id"
+        self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID = self.get_raw_config(
+            "uploaded_files.storage.s3.access_key_id"
         )
-        self.UPLOADED_FILES__S3__SECRET_ACCESS_KEY = self.get_raw_config(
-            "uploaded_files.s3.secret_access_key"
+        self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY = self.get_raw_config(
+            "uploaded_files.storage.s3.secret_access_key"
         )
-        self.UPLOADED_FILES__S3__POLICY = self.get_raw_config("uploaded_files.s3.policy")
-        self.UPLOADED_FILES__S3__ENDPOINT_URL = self.get_raw_config(
-            "uploaded_files.s3.endpoint_url"
+        self.UPLOADED_FILES__STORAGE__S3__POLICY = self.get_raw_config(
+            "uploaded_files.storage.s3.policy"
         )
-        self.UPLOADED_FILES__S3__BUCKET = self.get_raw_config("uploaded_files.s3.bucket")
-        self.UPLOADED_FILES__S3__REGION_NAME = self.get_raw_config("uploaded_files.s3.region_name")
-        self.UPLOADED_FILES__S3__STORAGE_CLASS = self.get_raw_config(
-            "uploaded_files.s3.storage_class"
+        self.UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL = self.get_raw_config(
+            "uploaded_files.storage.s3.endpoint_url"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__BUCKET = self.get_raw_config(
+            "uploaded_files.storage.s3.bucket"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__REGION_NAME = self.get_raw_config(
+            "uploaded_files.storage.s3.region_name"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS = self.get_raw_config(
+            "uploaded_files.storage.s3.storage_class"
         )
 
     def _load_live_messages_config(self) -> None:
@@ -873,43 +879,49 @@ class CFG(object):
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE_NAME", self.UPLOADED_FILES__STORAGE_NAME
+            "UPLOADED_FILES__STORAGE__STORAGE_NAME", self.UPLOADED_FILES__STORAGE__STORAGE_NAME
         )
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE_TYPE
+            "UPLOADED_FILES__STORAGE__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
         )
         file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
-        if self.UPLOADED_FILES__STORAGE_TYPE not in file_storage_type_slugs:
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
             file_storage_str_list = ", ".join(
                 ['"{}"'.format(slug) for slug in file_storage_type_slugs]
             )
             raise ConfigurationError(
-                'ERROR uploaded_files.storage_type given "{}" is invalid,'
+                'ERROR uploaded_files.storage.storage_type given "{}" is invalid,'
                 "valids values are {}.".format(
-                    self.UPLOADED_FILES__STORAGE_TYPE, file_storage_str_list
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE, file_storage_str_list
                 )
             )
-        if self.UPLOADED_FILES__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             self.check_mandatory_param(
-                "UPLOADED_FILES__STORAGE_PATH",
-                self.UPLOADED_FILES__LOCAL__STORAGE_PATH,
-                when_str='if storage type is "{}"'.format(self.UPLOADED_FILES__STORAGE_TYPE),
+                "UPLOADED_FILES__STORAGE__STORAGE_PATH",
+                self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
             )
             self.check_directory_path_param(
-                "UPLOADED_FILES__LOCAL__STORAGE_PATH",
-                self.UPLOADED_FILES__LOCAL__STORAGE_PATH,
+                "UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH",
+                self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
                 writable=True,
             )
-        if self.UPLOADED_FILES__STORAGE_TYPE == DepotFileStorageType.S3.slug:
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.S3.slug:
             self.check_mandatory_param(
-                "UPLOADED_FILES__S3__ACCESS_KEY_ID",
-                self.UPLOADED_FILES__S3__ACCESS_KEY_ID,
-                when_str='if storage type is "{}"'.format(self.UPLOADED_FILES__STORAGE_TYPE),
+                "UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID",
+                self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
             )
             self.check_mandatory_param(
-                "UPLOADED_FILES__S3__SECRET_ACCESS_KEY",
-                self.UPLOADED_FILES__S3__SECRET_ACCESS_KEY,
-                when_str='if storage type is "{}"'.format(self.UPLOADED_FILES__STORAGE_TYPE),
+                "UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY",
+                self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
             )
 
     def _check_live_messages_config_validity(self) -> None:
@@ -1105,21 +1117,21 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful DepotManager is a Singleton!
 
-        if self.UPLOADED_FILES__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             uploaded_files_settings = {
                 "depot.backend": DepotFileStorageType.LOCAL.depot_storage_backend,
-                "depot.storage_path": self.UPLOADED_FILES__LOCAL__STORAGE_PATH,
+                "depot.storage_path": self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
             }
-        elif self.UPLOADED_FILES__STORAGE_TYPE == DepotFileStorageType.S3.slug:
+        elif self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.S3.slug:
             uploaded_files_settings = {
                 "depot.backend": DepotFileStorageType.S3.depot_storage_backend,
-                "depot.access_key_id": self.UPLOADED_FILES__S3__ACCESS_KEY_ID,
-                "depot.secret_access_key": self.UPLOADED_FILES__S3__SECRET_ACCESS_KEY,
-                "depot.policy": self.UPLOADED_FILES__S3__POLICY,
-                "depot.endpoint_url": self.UPLOADED_FILES__S3__ENDPOINT_URL,
-                "depot.bucket": self.UPLOADED_FILES__S3__BUCKET,
-                "depot.region_name": self.UPLOADED_FILES__S3__REGION_NAME,
-                "depot.storage_class": self.UPLOADED_FILES__S3__STORAGE_CLASS,
+                "depot.access_key_id": self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID,
+                "depot.secret_access_key": self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY,
+                "depot.policy": self.UPLOADED_FILES__STORAGE__S3__POLICY,
+                "depot.endpoint_url": self.UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL,
+                "depot.bucket": self.UPLOADED_FILES__STORAGE__S3__BUCKET,
+                "depot.region_name": self.UPLOADED_FILES__STORAGE__S3__REGION_NAME,
+                "depot.storage_class": self.UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS,
             }
         else:
             uploaded_files_settings = {
@@ -1127,7 +1139,9 @@ class CFG(object):
             }
 
         DepotManager.configure(
-            name=self.UPLOADED_FILES__STORAGE_NAME, config=uploaded_files_settings, prefix="depot."
+            name=self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
+            config=uploaded_files_settings,
+            prefix="depot.",
         )
 
     class CST(object):

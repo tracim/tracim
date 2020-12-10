@@ -741,7 +741,7 @@ class ContentApi(object):
         :return: The corresponding filepath
         """
         revision = self.get_one_revision(revision_id)
-        depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE_NAME)
+        depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
         depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
         revision.file_extension
         try:

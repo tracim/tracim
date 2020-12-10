@@ -35,8 +35,8 @@ basic_setup.website_base_url = http://localhost:7999
 basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
-basic_setup.depot_storage_type = local
-basic_setup.depot_storage_dir = %(here)s/depot
+basic_setup.uploaded_files_storage_type = local
+basic_setup.uploaded_files_storage_path = %(here)s/depot
 basic_setup.caldav_storage_dir = %(here)s/radicale_storage
 basic_setup.preview_cache_dir = %(here)s/previews
 basic_setup.sessions_data_root_dir = %(here)s
@@ -181,26 +181,26 @@ sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
 
 ### Uploaded files ###
 
-; uploaded_files.storage_name = tracim
+; uploaded_files.storage.storage_name = tracim
 ## storage type, can be either "local" (local dir), "memory" (ram storage) or "s3" (remote S3 compatible storage)
-uploaded_files.storage_type = %(basic_setup.depot_storage_type)s
+uploaded_files.storage.storage_type = %(basic_setup.uploaded_files_storage_type)s
 
 ## This is where none database file will be stored if storage_type is "local"
-uploaded_files.local.storage_path = %(basic_setup.depot_storage_dir)s
+uploaded_files.storage.local.storage_path = %(basic_setup.uploaded_files_storage_path)s
 
 ## S3 credentials (require boto3 packaqe):
-; uploaded_files.s3.access_key_id =
-; uploaded_files.s3.secret_access_key =
-; uploaded_files.s3.bucket =
-; uploaded_files.s3.region_name =
+; uploaded_files.storage.s3.access_key_id =
+; uploaded_files.storage.s3.secret_access_key =
+; uploaded_files.storage.s3.bucket =
+; uploaded_files.storage.s3.region_name =
 ## S3 canned ACL policy can be either "private" or "public-read"
-; uploaded_files.s3.policy =
+; uploaded_files.storage.s3.policy =
 ## use specific s3 storage class
-; uploaded_files.s3.storage_class =
+; uploaded_files.storage.s3.storage_class =
 ## allow to define other S3 provided than AWS
-; uploaded_files.s3.endpoint_url =
+; uploaded_files.storage.s3.endpoint_url =
 # permit to store file under specific prefix, trailing slash prefix like "dirname/" permit to store in subdirectory
-; uploaded_files.s3.prefix =
+; uploaded_files.storage.s3.prefix =
 
 
 
