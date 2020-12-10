@@ -271,36 +271,39 @@ describe('<Gallery />', () => {
     })
 
     describe('buildBreadcrumbs()', () => {
-      it('should build the correct breadcrumbsList when workspace gallery', () => {
-        wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
-        expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
-        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
-        expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
-        expect(wrapper.state().breadcrumbsList[3].link.props.to)
-          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId}`)
-      })
       it('should build the correct breadcrumbsList when empty workspace gallery', () => {
-        wrapper.setState({ imagePreviewList: [] })
+        wrapper.setState({ imagePreviewList: [], folderId: null })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(3)
         expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
-        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
-        expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},`)
-        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
+        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
+        expect(wrapper.state().breadcrumbsList[2].label).to.equal('Gallery')
       })
+
+      it('should build the correct breadcrumbsList when workspace gallery', () => {
+        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList, folderId: null })
+        wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
+        expect(wrapper.state().breadcrumbsList.length).to.equal(4)
+        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
+        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
+        expect(wrapper.state().breadcrumbsList[2].label).to.equal('Gallery')
+        expect(wrapper.state().breadcrumbsList[3].link.props.to)
+          .to.equal(PAGE.WORKSPACE.CONTENT(props.data.config.appConfig.workspaceId, 'file', stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId))
+      })
+
       it('should build the correct breadcrumbsList when folder gallery', () => {
         const folderId = 1
         const folderDetail = { fileName: 'folder1', folderParentIdList: [2, 3] }
         wrapper.setState({ folderId: folderId })
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, folderDetail, true)
-        expect(wrapper.state().breadcrumbsList.length).to.equal(4)
+        expect(wrapper.state().breadcrumbsList.length).to.equal(5)
         expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.HOME)
-        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/dashboard`)
+        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
         expect(wrapper.state().breadcrumbsList[2].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},${folderDetail.folderParentIdList.join(',')}`)
-        expect(wrapper.state().breadcrumbsList[3].link.props.to)
-          .to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents/file/${stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId}`)
+        expect(wrapper.state().breadcrumbsList[3].label).to.equal('Gallery')
+        expect(wrapper.state().breadcrumbsList[4].link.props.to)
+          .to.equal(PAGE.WORKSPACE.CONTENT(props.data.config.appConfig.workspaceId, 'file', stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId))
       })
     })
   })

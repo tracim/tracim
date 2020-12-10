@@ -40,5 +40,5 @@ export const Breadcrumbs = props => {
 export default translate()(Breadcrumbs)
 
 Breadcrumbs.propTypes = {
-  breadcrumbsList: PropTypes.array.isRequired,
+  breadcrumbsList: PropTypes.array.isRequired
 }

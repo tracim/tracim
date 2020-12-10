@@ -1,24 +1,31 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import Breadcrumbs from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
+import { Breadcrumbs } from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
 require('../../src/component/Breadcrumbs/Breadcrumbs.styl')
 
 describe('<Breadcrumbs />', () => {
   const breadcrumbsList = [{
     link: <a href='/ui'><i className='fa fa-home' />Home</a>,
+    label: 'Home',
     type: 'CORE'
   }, {
     link: <span className='nolink'>First level</span>,
+    label: 'First level',
     type: 'CORE',
     notALink: true
   }, {
     link: <a className='secondlvl' href='/ui/second'>Second level</a>,
+    label: 'Second level',
     type: 'CORE'
   }]
 
+  const props = {
+    breadcrumbsList: breadcrumbsList,
+    t: key => key
+  }
   const wrapper = shallow(
-    <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+    <Breadcrumbs {...props} />
   )
 
   describe('The first level', () => {
