@@ -1395,6 +1395,21 @@ class Content(DeclarativeBase):
             )
         return []
 
+    @property
+    def recursive_parents(self) -> List["Content"]:
+        """
+        :return: list of parent Content order from the direct parent to the last ancestor
+        """
+
+        # TODO - G.M - 2020-10-06 - Explore the idea of recursive CTE here, it's not so trivial as
+        # we should keep tree order between id query retriever and content query.
+        parents = []
+        current_parent = self.parent
+        while current_parent:
+            parents.append(current_parent)
+            current_parent = current_parent.parent
+        return parents
+
     def get_children(self, recursively: bool = False) -> List["Content"]:
         """
         Get all children of content recursively or not (including children of children...)

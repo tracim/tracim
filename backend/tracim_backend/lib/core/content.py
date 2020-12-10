@@ -670,6 +670,15 @@ class ContentApi(object):
 
         return content
 
+    def get_content_path(self, content: Content) -> typing.List[Content]:
+        """
+        Return parents ordered from the last ancestor to the direct ancestor + content itself
+        """
+        content_path = list(content.recursive_parents)
+        content_path.reverse()
+        content_path.append(content)
+        return content_path
+
     def get_one(
         self,
         content_id: int,
