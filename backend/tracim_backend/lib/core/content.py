@@ -740,11 +740,16 @@ class ContentApi(object):
         :param revision_id: The revision id of the filepath we want to return
         :return: The corresponding filepath
         """
+
         revision = self.get_one_revision(revision_id)
         depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
         depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
-        revision.file_extension
         try:
+            # HACK - G.M - This mecanism is very inefficient because:
+            # - generate a temporary file each time and
+            # - skip internal cache mecanism of preview_generator as filepath is always different
+            # Improvement need to be made in preview_generator itself.
+            # to handle more properly theses issues.
             with tempfile.NamedTemporaryFile(
                 "w+b", prefix="revision-content-", suffix=revision.file_extension
             ) as tmp:
