@@ -15,6 +15,7 @@ export const ContentWithPreviewActivity = props => {
         newestMessage={props.activity.newestMessage}
         onClickCopyLink={props.onClickCopyLink}
         onEventClicked={props.onEventClicked}
+        breadcrumbsList={props.breadcrumbsList}
       />
       <Preview content={props.activity.content} />
       <ContentActivityFooter
@@ -31,5 +32,10 @@ export default ContentWithPreviewActivity
 ContentWithPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
+  breadcrumbsList: PropTypes.array,
   onEventClicked: PropTypes.func
+}
+
+ContentWithPreviewActivity.defaultProps = {
+  breadcrumbsList: []
 }

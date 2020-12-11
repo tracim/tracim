@@ -17,7 +17,8 @@ import MemberActivity from './MemberActivity.jsx'
 require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
-  [TLM_ET.CONTENT, (activity, onCopyLinkClicked, onEventClicked) => {
+  [TLM_ET.CONTENT, (activity, breadcrumbsList, onCopyLinkClicked, onEventClicked) => {
+    debugger;
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
@@ -25,6 +26,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
+          breadcrumbsList={breadcrumbsList()}
         />
       )
       : (
@@ -33,6 +35,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
+          breadcrumbsList={breadcrumbsList()}
         />
       )
   }],
@@ -44,9 +47,15 @@ const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED
 
 const ActivityList = (props) => {
   const renderActivityComponent = (activity) => {
+    console.log('bbbbbbbbbbbbbbbbbbb', activity)
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity, () => props.onCopyLinkClicked(activity.newestMessage.fields.content), () => props.onEventClicked(activity))
+      ? componentConstructor(
+        activity,
+        props.breadcrumbsList(activity),
+        () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
+        () => props.onEventClicked(activity)
+      )
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
   }
@@ -108,6 +117,10 @@ ActivityList.propTypes = {
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
   onEventClicked: PropTypes.func
+}
+
+ActivityList.defaultProps = {
+  breadcrumbsList: []
 }
 
 export default translate()(ActivityList)

@@ -153,6 +153,7 @@ import {
 
 import {
   baseFetch,
+  getContentPath,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -207,7 +208,8 @@ export {
   buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
-  handleInvalidMentionInComment,
+  getContentPath,
+  handleInvalidMentionInComment
   naturalCompareLabels,
   sortWorkspaceList,
   TracimComponent,
