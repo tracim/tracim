@@ -5070,7 +5070,7 @@ class TestWorkspaceContents(object):
             ),
             status=200,
         ).json_body
-        assert len(my_file_path["items"]) == 3
+        assert len(my_file_path["items"]) == 2
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
         assert my_file_path["items"][0]["label"] == first_dir.label
         assert my_file_path["items"][0]["content_type"] == "folder"
@@ -5085,7 +5085,7 @@ class TestWorkspaceContents(object):
             ),
             status=200,
         ).json_body
-        assert len(my_file_path["items"]) == 3
+        assert len(my_file_path["items"]) == 1
         assert my_file_path["items"][0]["content_id"] == another_content.content_id
         assert my_file_path["items"][0]["label"] == another_content.label
         assert my_file_path["items"][0]["content_type"] == "html-document"
