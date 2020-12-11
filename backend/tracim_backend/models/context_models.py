@@ -1637,9 +1637,12 @@ class PaginatedObject(object):
         self.items = page
 
 
-class ListItemsObject(object):
-    def __init__(self, items_list: List) -> None:
-        self.items = items_list
+T = typing.TypeVar("T")
+
+
+class ListItemsObject(typing.Generic[T]):
+    def __init__(self, items: List[T]) -> None:
+        self.items = items
 
 
 class UserMessagesSummary(object):
