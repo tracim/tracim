@@ -2,8 +2,10 @@
 import base64
 import cgi
 from datetime import datetime
+from typing import Generic
 from typing import List
 from typing import Optional
+from typing import TypeVar
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -1637,10 +1639,10 @@ class PaginatedObject(object):
         self.items = page
 
 
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
-class ListItemsObject(typing.Generic[T]):
+class ListItemsObject(Generic[T]):
     def __init__(self, items: List[T]) -> None:
         self.items = items
 
