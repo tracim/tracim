@@ -1,4 +1,5 @@
 {
+  "all": "tous",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -113,7 +114,7 @@
   "Error while archiving content": "Erreur pendant l'archivage du contenu",
   "Error while deleting content": "Erreur pendant la suppression du contenu",
   "Error while restoring content": "Erreur pendant la restauration du contenu",
-  "@all Please notice that I did an important update on this content.": "@tous Veuillez remarquer que j'ai fait une mise à jour importante de ce contenu.",
+  "@all Please notice that I did an important update on this content.": "@tous Veuillez noter que j'ai fait une mise à jour importante de ce contenu.",
   "An error has happened while getting the known members list": "Une erreur s'est produite lors de la récupération de la liste de membres connus",
   "Sends a notification to all members of the space": "Envoie une notification à tous les membres de l'espace",
   "Error while detecting the mentions": "Erreur pendant la détection des mentions"
