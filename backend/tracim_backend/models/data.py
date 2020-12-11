@@ -1410,6 +1410,16 @@ class Content(DeclarativeBase):
             current_parent = current_parent.parent
         return parents
 
+    @property
+    def content_path(self) -> List["Content"]:
+        """
+        Return content parents ordered from the last ancestor to the direct ancestor + content itself
+        """
+        content_path = list(self.recursive_parents)
+        content_path.reverse()
+        content_path.append(self)
+        return content_path
+
     def get_children(self, recursively: bool = False) -> List["Content"]:
         """
         Get all children of content recursively or not (including children of children...)

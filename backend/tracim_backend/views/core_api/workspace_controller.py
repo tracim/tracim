@@ -609,9 +609,8 @@ class WorkspaceController(Controller):
             content_type=content_type_list.Any_SLUG,
             workspace=request.current_workspace,
         )
-        content_path = api.get_content_path(content)
         return ListItemsObject(
-            [api.get_content_in_context(path_content) for path_content in content_path]
+            [api.get_content_in_context(path_content) for path_content in content.content_path]
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
