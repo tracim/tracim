@@ -21,7 +21,7 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  LOCAL_STORAGE_ITEM_TYPE,
+  LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   Badge,
   BREADCRUMBS_TYPE,
@@ -239,9 +239,9 @@ export class File extends React.Component {
   async updateTimelineAndContent (pageToLoad = null) {
     this.setState({
       newComment: getLocalStorageItem(
-        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+        this.state.appName,
         this.state.content,
-        this.state.appName
+        LOCAL_STORAGE_FIELD.COMMENT
       ) || ''
     })
 

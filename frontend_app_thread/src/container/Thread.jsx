@@ -13,7 +13,7 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  LOCAL_STORAGE_ITEM_TYPE,
+  LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   BREADCRUMBS_TYPE,
   ROLE,
@@ -166,9 +166,9 @@ export class Thread extends React.Component {
   async updateTimelineAndContent () {
     this.setState({
       newComment: getLocalStorageItem(
-        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+        this.state.appName,
         this.state.content,
-        this.state.appName
+        LOCAL_STORAGE_FIELD.COMMENT
       ) || ''
     })
 

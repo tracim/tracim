@@ -33,7 +33,7 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  LOCAL_STORAGE_ITEM_TYPE,
+  LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   setLocalStorageItem,
   removeLocalStorageItem,
@@ -380,9 +380,9 @@ export class HtmlDocument extends React.Component {
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
     const localStorageComment = getLocalStorageItem(
-      LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+      state.appName,
       resHtmlDocument.body,
-      state.appName
+      LOCAL_STORAGE_FIELD.COMMENT
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -397,9 +397,9 @@ export class HtmlDocument extends React.Component {
       : APP_FEATURE_MODE.VIEW
 
     const localStorageRawContent = getLocalStorageItem(
-      LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+      state.appName,
       resHtmlDocument.body,
-      state.appName
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
 
     const hasLocalStorageRawContent = !!localStorageRawContent
@@ -439,7 +439,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = getLocalStorageItem('rawContent', this.state.content, this.state.appName)
+    const previouslyUnsavedRawContent = getLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)
 
     this.setState(prev => ({
       content: {
@@ -463,9 +463,9 @@ export class HtmlDocument extends React.Component {
     }))
 
     removeLocalStorageItem(
-      LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+      this.state.appName,
       this.state.content,
-      this.state.appName
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
   }
 
@@ -489,9 +489,9 @@ export class HtmlDocument extends React.Component {
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200: {
         removeLocalStorageItem(
-          LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT,
+          state.appName,
           state.content,
-          state.appName
+          LOCAL_STORAGE_FIELD.RAW_CONTENT
         )
 
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
@@ -534,7 +534,7 @@ export class HtmlDocument extends React.Component {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
-    setLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, this.state.content, this.state.appName, newText)
+    setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
   }
 
   handleChangeNewComment = e => {
@@ -800,7 +800,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem('rawContent', state.content, state.appName)}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

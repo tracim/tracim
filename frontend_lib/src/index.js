@@ -197,7 +197,7 @@ export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 
 export {
-  LOCAL_STORAGE_ITEM_TYPE,
+  LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   setLocalStorageItem,
   removeLocalStorageItem

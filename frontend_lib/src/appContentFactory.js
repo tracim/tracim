@@ -10,7 +10,7 @@ import {
 } from './helper.js'
 
 import {
-  LOCAL_STORAGE_ITEM_TYPE,
+  LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   setLocalStorageItem,
   removeLocalStorageItem
@@ -83,9 +83,9 @@ export function appContentFactory (WrappedComponent) {
       const newComment = this.state.content.content_id === newContent.content_id
         ? this.state.newComment
         : getLocalStorageItem(
-          LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+          appSlug,
           newContent,
-          appSlug
+          LOCAL_STORAGE_FIELD.COMMENT
         ) || ''
 
       setState(prev => ({
@@ -148,9 +148,9 @@ export function appContentFactory (WrappedComponent) {
       setState({ newComment: newComment })
 
       setLocalStorageItem(
-        LOCAL_STORAGE_ITEM_TYPE.COMMENT,
-        content,
         appSlug,
+        content,
+        LOCAL_STORAGE_FIELD.COMMENT,
         newComment
       )
     }
@@ -181,9 +181,9 @@ export function appContentFactory (WrappedComponent) {
           if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
           removeLocalStorageItem(
-            LOCAL_STORAGE_ITEM_TYPE.COMMENT,
+            appSlug,
             content,
-            appSlug
+            LOCAL_STORAGE_FIELD.COMMENT
           )
           break
         case 400:
