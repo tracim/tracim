@@ -15,6 +15,11 @@
 # All parameters starting with `basic_setup` can be used as variables in other parameters.
 # For simple needs they are all you need to customize.
 
+## Special Parameter
+# The syntax "%(here)s" is automatically replace by the directory of the config file.
+# If you do use it, please note that your config file directory may vary depending where you decide
+# to place your config file.
+
 ## GENERAL TRACIM config:
 # These config are common for all app: REST API, Webdav, etc...
 
@@ -203,6 +208,10 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ; preview.jpg.restricted_dims = False
 
 ### Session ###
+
+# Warning ! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
+# in order to avoid security issues. see tracim settings documentation (available in source
+code, see "settings.md").
 
 ### pyramid_beaker parameters ###
 
