@@ -73,9 +73,9 @@ export class PersonalActivityFeed extends React.Component {
 
   getContentBreadcrumbsList = async (activity) => {
     const { props } = this
+    debugger;
     const content = activity.content
     const workspace = activity.newestMessage.fields.workspace
-    debugger;
     const breadcrumbsList = [
       {
         link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspace.workspace_id)}>{workspace.label}</Link>,
@@ -90,10 +90,9 @@ export class PersonalActivityFeed extends React.Component {
 
     switch (fetchGetContentPath.apiResponse.status) {
       case 200:
-        breadcrumbsList.push(fetchGetContentPath.body.items.map(crumb => ({
-          url: PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
+        breadcrumbsList.push(...fetchGetContentPath.body.items.map(crumb => ({
           label: crumb.label,
-          link: null,
+          link: <Link to={PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id)}>{crumb.label}</Link>,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         })))
         return breadcrumbsList
@@ -106,6 +105,7 @@ export class PersonalActivityFeed extends React.Component {
             delay: undefined
           }
         })
+        return []
     }
   }
 
@@ -126,7 +126,7 @@ export class PersonalActivityFeed extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
-          breadcrumbsList={async t => await this.getContentBreadcrumbsList(t)}
+          breadcrumbsList={this.getContentBreadcrumbsList}
         />
       </div>
     )
