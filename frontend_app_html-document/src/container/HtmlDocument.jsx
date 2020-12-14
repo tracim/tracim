@@ -534,7 +534,7 @@ export class HtmlDocument extends React.Component {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
-    setLocalStorageItem('rawContent', this.state.content, this.state.appName, newText)
+    setLocalStorageItem(LOCAL_STORAGE_ITEM_TYPE.RAW_CONTENT, this.state.content, this.state.appName, newText)
   }
 
   handleChangeNewComment = e => {
