@@ -224,40 +224,87 @@ The recommended session back-end for production is redis as it avoids having to 
 
 A relevant configuration for file backend (default):
 
-    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
-    session.type = file
-    session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+```ini
+# note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+session.type = file
+session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+```
+
 
 A relevant configuration for redis backend:
 
-    session.type = ext:redis
-    session.url = redis://localhost:6379/0
+```ini
+session.type = ext:redis
+session.url = redis://localhost:6379/0
+```
 
 Generic configuration (needed for all backend):
 
-    # note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
-    session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
-    session.key = session_key
-    session.secret = %(basic_setup.session_secret)s
-    session.save_accessed_time = True
-    session.cookie_expires = 604800
-    session.timeout = 604800
-    session.cookie_on_exception = True
-    session.httponly = True
-    # only if you are using HTTPS:
-    # session.secure = True
+```ini
+# note: basic_setup.sessions_data_root_dir parameter should exist and be a real path
+session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
+session.key = session_key
+session.secret = %(basic_setup.session_secret)s
+session.save_accessed_time = True
+session.cookie_expires = 604800
+session.timeout = 604800
+session.cookie_on_exception = True
+session.httponly = True
+# only if you are using HTTPS:
+# session.secure = True
+```
+
 
 for other beaker backends, read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
 
 #### File back-end upkeep
 
-When this back-end is used, the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
+When this back-end is used (please note that it is the default backend !), the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
  To avoid keeping expired session files you should run :
 
-    find . -type f -mtime +10 -print -exec rm {} \;
+```shell
+find <session.data_dir> -type f -mtime +10 -print -exec rm {} \;
+```
+note: in default config session.data_dir value point to a directory named sessions_data in same directory as the
+ config file.
 
 regularly (for example by using a cron job), which will delete file which have not been modified since 10 days.
 You should use this command in both session data and session lock dirs.
+
+#### Cleanup existing sessions
+
+If you decide to change the session configuration, it's safer to delete all existing session in order to avoid user
+from using cookie related to a not updated session.
+
+
+
+To do this with file backend (default backend):
+
+```ini
+session.type = file
+session.data_dir = <session.data_dir>
+```
+
+do:
+
+```shell
+rm -r <session.data_dir>/*
+```
+note: in default config session.data_dir value point to a directory named sessions_data in same directory as the
+ config file.
+
+With redis backend :
+
+```ini
+session.type = ext:redis
+session.url = redis://localhost:6379/0
+```
+
+do:
+
+```shell
+redis-cli keys 'beaker_cache:*' | xargs redis-cli del
+```
 
 
 ### LDAP Authentication
