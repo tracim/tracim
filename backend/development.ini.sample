@@ -143,6 +143,31 @@ workspace.join.max_messages_history_count = -1
 ; build_version =
 
 ####
+# Content Security Policy
+#
+# Tracim can generate a content security policy header that only
+# enables script execution from Tracim frontend to avoid XSS attacks.
+# It also forbids <object> tags.
+# This behavior can be tuned by using "additional_directives" if some other
+# scripts/resources are needed for your installation or usage.
+# By default the header is generated.
+####
+# Enable or disable the content security policy header
+; content_security_policy.enabled = True
+# You can set this to an URI where browsers will report CSP failures.
+# Multiple URIs are possible by separating them with spaces (the config value is added as it is)
+# They must be secured by a valid SSL/TLS connection and certificate
+# Example: content_security_policy.report_uri = https://www.myreporturi.com https://www.another-reporturi.org
+; content_security_policy.report_uri =
+# If set to True, the generated header will be Content-Security-Policy-Report-Only.
+# Useful to test policy changes before enforcing them
+# If set to true, "report_uri" must also have a valid value.
+; content_security_policy.report_only = False
+# additional directives to tune the CSP header, they are added without any change to the header
+; content_security_policy.additional_directives =
+
+
+####
 # LIMITATION
 ####
 
