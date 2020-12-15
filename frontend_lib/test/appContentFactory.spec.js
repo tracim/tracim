@@ -151,12 +151,17 @@ describe('appContentFactory.js', () => {
 
   describe('function appContentCustomEventHandlerReloadContent', () => {
     const newContent = { ...fakeContent, content_id: fakeContent.content_id + 1 }
+    const initialState = { content: fakeContent }
     const fakeTinymceRemove = sinon.spy()
 
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
-      wrapper.instance().setState({ content: fakeContent })
+      wrapper.instance().setState(initialState)
       wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
+      const lastSetStateArg = fakeSetState.lastCall.args[0]
+      if (typeof lastSetStateArg === 'function') {
+        lastSetStateArg(initialState)
+      }
     })
 
     after(() => {

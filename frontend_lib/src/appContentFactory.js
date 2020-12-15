@@ -80,19 +80,17 @@ export function appContentFactory (WrappedComponent) {
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
 
-      const newComment = this.state.content.content_id === newContent.content_id
-        ? this.state.newComment
-        : getLocalStorageItem(
-          appSlug,
-          newContent,
-          LOCAL_STORAGE_FIELD.COMMENT
-        ) || ''
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
         timelineWysiwyg: false,
-        newComment
+        newComment: prev.content.content_id === newContent.content_id
+          ? prev.newComment
+          : getLocalStorageItem(
+            appSlug,
+            newContent,
+            LOCAL_STORAGE_FIELD.COMMENT
+          ) || ''
       }))
     }
 
