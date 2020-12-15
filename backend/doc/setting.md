@@ -726,3 +726,15 @@ Filenames of the templates inside the directory are not relevant. Only their ext
 For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
 After all these changes in the configuration, you should restart all  process (web, webdav, etc...).
+
+# Security settings
+
+## Content Security Policy
+
+By default Tracim setups a [Content-Security-Policy header](https://www.w3.org/TR/CSP2/) which will disable all external scripts and styles.
+The content of the header can be tuned with the `content_security_policy.*` settings:
+
+- `content_security_policy.enabled = False` will entirely disable the header. Use only if you have a good reason to do that
+- `content_security_policy.report_uri = https://areport.uri` can be used to setup an uri that browser will use to report violations as described in the [W3C documentation](https://www.w3.org/TR/CSP2/#directive-report-uri)
+- `content_security_policy.report_only = True` can be used to only report violations without enforcing them.
+- `content_security_policy.additional_directives` is added to the header and can be used to override/finely tune the default Tracim values.

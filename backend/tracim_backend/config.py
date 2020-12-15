@@ -307,6 +307,8 @@ class CFG(object):
         self._load_webdav_config()
         self.log_config_header("Search config parameters:")
         self._load_search_config()
+        self.log_config_header("Content Security Policy parameters:")
+        self._load_content_security_policy_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -719,6 +721,21 @@ class CFG(object):
         self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
         self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
 
+    def _load_content_security_policy_config(self) -> None:
+        prefix = "content_security_policy"
+        self.CONTENT_SECURITY_POLICY__ENABLED = asbool(
+            self.get_raw_config("{}.enabled".format(prefix), "True")
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_URI = self.get_raw_config(
+            "{}.report_uri".format(prefix), None
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_ONLY = asbool(
+            self.get_raw_config("{}.report_only".format(prefix), "False")
+        )
+        self.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES = self.get_raw_config(
+            "{}.additional_directives".format(prefix), ""
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -732,6 +749,7 @@ class CFG(object):
         self._check_ldap_config_validity()
         self._check_search_config_validity()
         self._check_webdav_config_validity()
+        self._check_content_security_policy_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -1014,6 +1032,14 @@ class CFG(object):
     def _check_webdav_config_validity(self):
         self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
         self.check_https_url_path("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+
+    def _check_content_security_policy_validity(self) -> None:
+        if self.CONTENT_SECURITY_POLICY__ENABLED and self.CONTENT_SECURITY_POLICY__REPORT_ONLY:
+            self.check_mandatory_param(
+                "CONTENT_SECURITY_POLICY__REPORT_URI",
+                self.CONTENT_SECURITY_POLICY__REPORT_URI,
+                when_str="if content_security_policy.report_only is enabled",
+            )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
