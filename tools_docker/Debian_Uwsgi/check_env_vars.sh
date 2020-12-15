@@ -38,3 +38,26 @@ if ! [ "$DATABASE_TYPE" = sqlite ]; then
     postgresql, mysql, sqlite" ;;
     esac
 fi
+
+if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
+    if ! [ -n "GOCRYPTFS_PASSWORD_PATH"]:
+        echo "You must set GOCRYPTFS_PASSWORD_PATH environment variable"
+        exit 1
+    fi
+    if ! [ -n "$GOCRYPTFS_PREVIEW_STORAGE_DIR"]:
+        echo "You must set GOCRYPTFS_PREVIEW_STORAGE_DIR environment variable"
+        exit 1
+    fi
+    if ! [ -n "$GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR"]:
+        echo "You must set GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR environment variable"
+        exit 1
+    fi
+    if ! [ -n "$TRACIM_PREVIEW_CACHE_DIR"]:
+        echo "You must set TRACIM_PREVIEW_CACHE_DIR environment variable"
+        exit 1
+    fi
+    if ! [ -n "$TRACIM_DEPOT_STORAGE_DIR"]:
+        echo "You must set TRACIM_DEPOT_STORAGE_DIR environment variable"
+        exit 1
+    fi
+fi

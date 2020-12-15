@@ -17,6 +17,14 @@ if [ ! "$?" = 0 ]; then
     exit 1
 fi
 
+if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
+    echo "Activation of Encryption"
+    /bin/bash /tracim/tools_docker/Debian_Uwsgi/encryption.sh
+    if [ ! "$?" = 0 ]; then
+        exit 1
+    fi
+fi
+
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 
@@ -55,7 +63,7 @@ case "$DATABASE_TYPE" in
     ;;
 esac
 
-# Initialize database if needed
+# Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/backend/
     tracimcli db init -c /etc/tracim/development.ini

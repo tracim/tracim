@@ -83,6 +83,10 @@ ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
+ENV ENABLE_GOCRYPTFS_ENCRYPTION=0
+ENV GOCRYPTFS_PREVIEW_STORAGE_DIR="/encrypted/preview"
+ENV GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR="/encrypted/uploaded_files"
+ENV GOCRYPTFS_PASSWORD_PATH="/encrypted/password.txt"
 
 RUN \
     printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
@@ -118,6 +122,7 @@ RUN \
         uwsgi-plugin-python3 \
         vim \
         xvfb \
+        gocryptfs \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
