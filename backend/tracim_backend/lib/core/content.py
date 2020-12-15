@@ -25,6 +25,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -732,29 +733,63 @@ class ContentApi(object):
             )
         return revision
 
+    def get_valid_content_filepath(
+        self, depot_stored_file: StoredFile, file_extension: str = ""
+    ) -> typing.Generator[str, None, None]:
+        """
+        Generic way to get content filepath for all depot backend.
+        :param depot_stored_file: content as depot StoredFile
+        :param file_extension: extension of the file we expect
+        :return: content filepath
+        """
+        # HACK - G.M - This mecanism is very inefficient because:
+        # - generate a temporary file each time and
+        # - skip internal cache mecanism of preview_generator as filepath is always different
+        # Improvement need to be made in preview_generator itself.
+        # to handle more properly theses issues.
+        with tempfile.NamedTemporaryFile(
+            "w+b", prefix="revision-content-", suffix=file_extension
+        ) as tmp:
+            tmp.write(depot_stored_file.read())
+            yield tmp.name
+
+    def get_valid_content_filepath_legacy(
+        self, depot_stored_file: StoredFile
+    ) -> typing.Generator[str, None, None]:
+        """
+        Legacy way to get content filepath, only work for local file backend of depot
+        ("depot.io.local.LocalFileStorage", aka "local" in tracim config),
+        we keep it for now as this mecanism is the only that currently work with preview_generator
+        cache mecanism.
+        :param depot_stored_file: content as depot StoredFile
+        :return: content filepath
+        """
+        yield depot_stored_file._file_path  # type: str
+
     @contextmanager
-    def get_one_revision_filepath(self, revision_id: int = None) -> str:
+    def get_one_revision_filepath(self, revision_id: int) -> typing.Generator[str, None, None]:
         """
         This method allows us to directly get a file path from its revision
         identifier.
         :param revision_id: The revision id of the filepath we want to return
         :return: The corresponding filepath
         """
-
-        revision = self.get_one_revision(revision_id)
-        depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
-        depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
         try:
-            # HACK - G.M - This mecanism is very inefficient because:
-            # - generate a temporary file each time and
-            # - skip internal cache mecanism of preview_generator as filepath is always different
-            # Improvement need to be made in preview_generator itself.
-            # to handle more properly theses issues.
-            with tempfile.NamedTemporaryFile(
-                "w+b", prefix="revision-content-", suffix=revision.file_extension
-            ) as tmp:
-                tmp.write(depot_stored_file.read())
-                yield tmp.name
+            revision = self.get_one_revision(revision_id)
+            depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
+            depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
+            # FIXME - G.M - 2020-12-15 : Use legacy mecanism for local storage type for now as
+            # it's far more efficient now. standard mecanism should
+            # be improved with new preview_generator version.
+            if (
+                self._config.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                == DepotFileStorageType.LOCAL.slug
+            ):
+                return self.get_valid_content_filepath_legacy(depot_stored_file)
+            else:
+                return self.get_valid_content_filepath(
+                    depot_stored_file, file_extension=revision.file_extension
+                )
         except IOError as exc:
             raise RevisionFilePathSearchFailedDepotCorrupted(
                 "IOError Unable to find Revision filepath." "File may be not available."
