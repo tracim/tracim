@@ -217,32 +217,22 @@ export class AdminWorkspaceUser extends React.Component {
   buildBreadcrumbs = () => {
     const { props, state } = this
 
-    const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }]
+    const breadcrumbsList = []
 
+    let page = null
+    let label = null
     if (state.config.type === 'workspace') {
-      breadcrumbsList.push({
-        link: <span>{props.t('Space management')}</span>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Space management'),
-        notALink: true
-      })
+      page = PAGE.ADMIN.WORKSPACE
+      label = props.t('Space management')
     } else if (state.config.type === 'user') {
-      breadcrumbsList.push({
-        link: <span>{props.t('User account management')}</span>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('User account management'),
-        notALink: true
-      })
+      page = PAGE.ADMIN.USER
+      label = props.t('User account management')
     }
+    breadcrumbsList.push({
+      link: <Link to={page}>{label}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: label
+    })
 
     // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
     // app crash telling it cannot render a Link outside a router

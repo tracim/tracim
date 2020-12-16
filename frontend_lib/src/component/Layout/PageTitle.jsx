@@ -1,11 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
+import { Link } from 'react-router-dom'
+
+import { PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
-class PageTitle extends React.Component {
+export class PageTitle extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -21,6 +25,14 @@ class PageTitle extends React.Component {
 
   render () {
     const { props } = this
+
+    const title = props.t('Home')
+    const breadcrumbsRoot = (
+      <Link to={PAGE.HOME} title={title} className='primaryColorFont primaryColorFontDarkenHover'>
+        <i className='fa fa-home' />
+        <span className='breadcrumbs__item__home'>{title}</span>
+      </Link>
+    )
 
     return (
       <div className={classnames(props.parentClass, props.customClass, 'pageTitleGeneric')}>
@@ -50,7 +62,7 @@ class PageTitle extends React.Component {
         </div>
 
         {props.breadcrumbsList.length > 0
-          ? <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
+          ? <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
           : <div />}
 
         {props.subtitle.length > 0 && (
@@ -67,7 +79,7 @@ class PageTitle extends React.Component {
     )
   }
 }
-export default PageTitle
+export default translate()(PageTitle)
 
 PageTitle.propTypes = {
   breadcrumbsList: PropTypes.array.isRequired,

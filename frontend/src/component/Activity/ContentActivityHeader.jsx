@@ -46,7 +46,6 @@ export class ContentActivityHeader extends React.Component {
     const contentType = props.content.content_type
 
     const newestMessage = props.newestMessage
-    console.log('hjklçlkjhgvfcd')
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'question', hexcolor: '#000000' }
@@ -64,7 +63,7 @@ export class ContentActivityHeader extends React.Component {
           <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
             <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
-          <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
+          <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
         <TimedEvent
           customClass='contentActivityHeader__right'
@@ -93,6 +92,7 @@ export class ContentActivityHeader extends React.Component {
             className='contentActivityHeader__actionMenu__item'
             title={props.t('Open content')}
             to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
+            key={`open-${contentId}`}
           >
             <i className={`fa fa-fw fa-${app.faIcon}`} />
             {props.t('Open content')}

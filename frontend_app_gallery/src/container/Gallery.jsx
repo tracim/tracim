@@ -299,15 +299,6 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }, {
       link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{workspaceLabel}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
       label: workspaceLabel
@@ -320,10 +311,9 @@ export class Gallery extends React.Component {
       })
     }
     breadcrumbsList.push({
-      link: <span>{props.t('Gallery')}</span>,
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Gallery'),
-      notALink: true
+      link: <Link to={PAGE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
+      type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+      label: props.t('Gallery')
     })
     if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
       const fileName = this.displayedPicture().fileName

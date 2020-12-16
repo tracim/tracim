@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
+import { Link } from 'react-router-dom'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import color from 'color'
@@ -693,8 +694,12 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content, props) => {
           breadcrumbs: fetchGetContentPath.body.items.map(crumb => ({
             url: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
             label: crumb.label,
-            link: null,
-            type: BREADCRUMBS_TYPE.APP_FEATURE
+            link: (
+              <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id)}>
+                {crumb.label}
+              </Link>
+            ),
+            type: BREADCRUMBS_TYPE.CORE
           }))
         }
       })

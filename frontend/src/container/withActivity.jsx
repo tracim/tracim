@@ -79,7 +79,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           includeNotSent: true
         }
       ))
-      props.dispatch(setActivityEventList(activity, messageListResponse.json.items))
+      props.dispatch(setActivityEventList(activity.id, messageListResponse.json.items))
     }
 
     updateActivityListFromTlm = async (data) => {

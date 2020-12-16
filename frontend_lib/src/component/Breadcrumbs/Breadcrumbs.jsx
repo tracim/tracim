@@ -1,33 +1,39 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
 
 export const Breadcrumbs = props => {
-  const MAX_NUMBER_OF_LAYERS = 6
-  const LAST_VISIBLE_LAYERS = 3
-  let breadcrumbsList = props.breadcrumbsList
+  const MAX_NUMBER_OF_LEVELS = 6
+  const LAST_VISIBLE_LEVELS = 3
+  let breadcrumbsList = [...props.breadcrumbsList]
 
-  if (props.breadcrumbsList.length >= MAX_NUMBER_OF_LAYERS) {
-    const beginingList = props.breadcrumbsList[0].label === props.t('Home')
-      ? [props.breadcrumbsList[0], props.breadcrumbsList[1]]
-      : [props.breadcrumbsList[0]]
+  if (props.breadcrumbsList.length >= MAX_NUMBER_OF_LEVELS) {
     breadcrumbsList = [
-      ...beginingList,
+      props.breadcrumbsList[0],
       {
         label: props.breadcrumbsList.map(crumb => crumb.label).join(' > '),
-        link: <span>...</span>,
+        link: <span>…</span>,
         notALink: true
       },
-      ...props.breadcrumbsList.slice(Math.max(props.breadcrumbsList.length - LAST_VISIBLE_LAYERS, 0))
+      ...props.breadcrumbsList.slice(Math.max(props.breadcrumbsList.length - LAST_VISIBLE_LEVELS, 0))
     ]
   }
 
+  // NOTE - S.G. - 2020-12-17 - convert the last breadcrumb to a span if not specified otherwise
+  if (!props.keepLastBreadcrumbAsLink && breadcrumbsList.length > 0) {
+    const lastBreadcrumb = {
+      ...breadcrumbsList[breadcrumbsList.length - 1],
+      link: <span>{breadcrumbsList[breadcrumbsList.length - 1].label}</span>,
+      notALink: true
+    }
+    breadcrumbsList[breadcrumbsList.length - 1] = lastBreadcrumb
+  }
   return (
     <ul className='breadcrumbs'>
+      {props.root && <li key='root'>{props.root}</li>}
       {breadcrumbsList.map((crumb, i) =>
         <li
           className={`breadcrumbs__item ${crumb.notALink ? '' : 'primaryColorFont primaryColorFontDarkenHover'}`}
-          key={`breacrumbs_${i}`}
+          key={`breadcrumbs_${i}`}
           title={crumb.label || ''}
         >
           {crumb.link}
@@ -37,8 +43,14 @@ export const Breadcrumbs = props => {
   )
 }
 
-export default translate()(Breadcrumbs)
+export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
-  breadcrumbsList: PropTypes.array.isRequired
+  root: PropTypes.node,
+  breadcrumbsList: PropTypes.array.isRequired,
+  keepLastBreadcrumbAsLink: PropTypes.bool
+}
+
+Breadcrumbs.defaultProps = {
+  keepLastBreadcrumbAsLink: false
 }

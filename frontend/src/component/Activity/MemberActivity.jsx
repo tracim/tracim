@@ -105,7 +105,7 @@ export class MemberActivity extends React.Component {
         <Avatar publicName={newestMessage.fields.user.public_name} width='32px' style={{ marginRight: '5px' }} />
         <div className='memberActivity__title'>
           {this.getText()}
-          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+          <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
         <TimedEvent
           customClass='memberActivity__right'

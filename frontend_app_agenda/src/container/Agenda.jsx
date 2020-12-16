@@ -229,34 +229,24 @@ export class Agenda extends React.Component {
   buildBreadcrumbs = () => {
     const { props, state } = this
 
-    const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }]
+    const breadcrumbsList = []
 
-    if (state.config.appConfig.workspaceId) {
+    const workspaceId = state.config.appConfig.workspaceId
+    if (workspaceId) {
       breadcrumbsList.push({
-        link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{state.content.workspaceLabel}</Link>,
+        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{state.content.workspaceLabel}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
         label: state.content.workspaceLabel
       }, {
-        link: <span>{props.t('Agenda')}</span>,
+        link: <Link to={PAGE.WORKSPACE.AGENDA(workspaceId)}>{props.t('Agenda')}</Link>,
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Agenda'),
-        notALink: true
+        label: props.t('Agenda')
       })
     } else {
       breadcrumbsList.push({
-        link: <span>{props.t('All my agendas')}</span>,
+        link: <Link to={PAGE.AGENDA}>{props.t('All my agendas')}</Link>,
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('All my agendas'),
-        notALink: true
+        label: props.t('All my agendas')
       })
     }
 

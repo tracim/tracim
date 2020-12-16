@@ -39,7 +39,6 @@ import {
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
-  PAGE,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'

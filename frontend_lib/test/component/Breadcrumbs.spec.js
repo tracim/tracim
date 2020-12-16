@@ -22,6 +22,7 @@ describe('<Breadcrumbs />', () => {
 
   const props = {
     breadcrumbsList: breadcrumbsList,
+    keepLastBreadcrumbAsLink: true,
     t: key => key
   }
   const wrapper = shallow(

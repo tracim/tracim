@@ -25,7 +25,6 @@ import {
   displayDistanceDate,
   generateLocalStorageContentId,
   Badge,
-  BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,

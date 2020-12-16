@@ -204,19 +204,9 @@ export class SearchResult extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
+      link: <Link to={PAGE.SEARCH_RESULT}>{props.t('Search results')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }, {
-      link: <span>{props.t('Search results')}</span>,
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Search results'),
-      notALink: true
+      label: props.t('Search results')
     }]))
   }
 

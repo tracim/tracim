@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   SET,
   PREPEND,
@@ -41,12 +40,7 @@ export function breadcrumbs (state = [], action) {
       return orderBreadcrumbs([
         // INFO - CH - 2019-04-16 - app features cannot set breadcrumbs from root so it needs to overrides itself every time
         ...state.filter(crumb => crumb.type !== BREADCRUMBS_TYPE.APP_FEATURE),
-        ...action.appendBreadcrumbs.map(crumb => ({
-          link: <span>{crumb.label}</span>,
-          type: BREADCRUMBS_TYPE.APP_FEATURE,
-          label: crumb.label,
-          notALink: true
-        }))
+        ...action.appendBreadcrumbs
       ])
 
     case `${RESET}/${BREADCRUMBS}/${APP_FEATURE}`:

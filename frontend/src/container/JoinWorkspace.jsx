@@ -66,19 +66,9 @@ export class JoinWorkspace extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
+      link: <Link to={PAGE.JOIN_WORKSPACE}>{props.t('Join a space')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }, {
-      link: <span>{props.t('Join a space')}</span>,
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Join a space'),
-      notALink: true
+      label: props.t('Join a space')
     }]))
   }
 

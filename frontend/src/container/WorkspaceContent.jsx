@@ -246,48 +246,24 @@ export class WorkspaceContent extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props, state } = this
-    const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === state.workspaceIdInUrl).label)
+
+    if (state.appOpenedType) return
+
+    const workspaceId = state.workspaceIdInUrl
+    const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === workspaceId).label)
     const breadcrumbsList = [{
       link: (
-        <Link to={PAGE.HOME}>
-          <i className='fa fa-home' />
-          <span className='breadcrumbs__item__home'>{props.t('Home')}</span>
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
-    }, {
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+        <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
           {workspaceLabel}
         </Link>
       ),
       type: BREADCRUMBS_TYPE.CORE,
       label: workspaceLabel
+    }, {
+      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('All contents')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('All contents')
     }]
-
-    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
-    if (props.breadcrumbs.length === breadcrumbsList.length + 2 && state.appOpenedType) {
-      breadcrumbsList.push({
-        link: (
-          <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}>
-            {props.t('All contents')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('All contents')
-      },
-      props.breadcrumbs[props.breadcrumbs.length - 1]
-      )
-    } else {
-      breadcrumbsList.push({
-        link: <span>{props.t('All contents')}</span>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('All contents'),
-        notALink: true
-      })
-    }
-
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 

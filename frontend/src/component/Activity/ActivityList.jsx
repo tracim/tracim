@@ -1,10 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
+  BREADCRUMBS_TYPE,
   CONTENT_TYPE,
+  CUSTOM_EVENT,
   IconButton,
+  PAGE,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
@@ -45,12 +49,42 @@ const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
 const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 const ActivityList = (props) => {
-  const renderActivityComponent = async (activity) => {
+  const buildActivityBreadcrumbsList = (activity) => {
+    const workspace = activity.newestMessage.fields.workspace
+    const dashboardBreadcrumb = {
+      link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspace.workspace_id)}>{workspace.label}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: workspace.label
+    }
+
+    if (activity.contentPath.length > 0) {
+      return [
+        dashboardBreadcrumb,
+        ...activity.contentPath.map(crumb => ({
+          label: crumb.label,
+          link: <Link to={PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id)}>{crumb.label}</Link>,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }))
+      ]
+    } else {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: props.t('Error while getting breadcrumbs'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return []
+    }
+  }
+
+  const renderActivityComponent = (activity) => {
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
       ? componentConstructor(
         activity,
-        activity.entityType === TLM_ET.CONTENT ? await props.breadcrumbsList(activity) : [],
+        activity.entityType === TLM_ET.CONTENT ? buildActivityBreadcrumbsList(activity) : [],
         () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
         () => props.onEventClicked(activity)
       )
@@ -115,10 +149,6 @@ ActivityList.propTypes = {
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
   onEventClicked: PropTypes.func
-}
-
-ActivityList.defaultProps = {
-  breadcrumbsList: []
 }
 
 export default translate()(ActivityList)
