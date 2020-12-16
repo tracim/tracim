@@ -190,8 +190,7 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
 Cypress.Commands.add('createComment', (workspaceId, contentId, rawContent) => {
   let url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments`
   let data = { raw_content: rawContent }
-  cy
-    .request('POST', url, data)
+  cy.request('POST', url, data)
     .then(handleUndefinedResponse)
 })
 
