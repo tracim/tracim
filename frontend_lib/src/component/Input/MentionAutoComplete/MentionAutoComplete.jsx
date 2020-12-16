@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import Avatar from '../../Avatar/Avatar'
+import Avatar, { AVATAR_SIZE } from '../../Avatar/Avatar'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
@@ -16,7 +16,7 @@ export const MentionAutoComplete = props => {
             key={m.mention}
             onClick={() => props.onClickAutoCompleteItem(m)}
           >
-            {m.username && <Avatar width='15px' style={{ marginTop: '5px' }} publicName={m.detail} />}
+            {m.username && <Avatar size={AVATAR_SIZE.MINI} style={{ marginTop: '5px' }} publicName={m.detail} />}
             <b className='autocomplete__item__mention'>@{m.mention}</b> - {props.t(m.detail)}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (

@@ -84,7 +84,7 @@ import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
 
-import Avatar from './component/Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
@@ -200,6 +200,7 @@ export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 export {
   appContentFactory,
   addRevisionFromTLM,
+  AVATAR_SIZE,
   createSpaceTree,
   DropdownMenu,
   naturalCompareLabels,
