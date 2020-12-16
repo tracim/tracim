@@ -161,6 +161,7 @@ docker run \
        -it \
        --privileged \
        -e DATABASE_TYPE=sqlite \
+       -e ENABLE_GOCRYPTFS_ENCRYPTION=1 \
        -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/previews \
        -e TRACIM_PREVIEW_CACHE_DIR=/media/previews \
        -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/uploaded_files \
