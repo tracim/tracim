@@ -77,11 +77,10 @@ When is finished, you can quit your container. Index is now updated with all of 
 
 #### Example commands
 
-Exemple with basic instance of Tracim (local usage with webdav and caldav):
-
-        docker run -e DATABASE_TYPE=sqlite \
+    docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+
 
 To run the Tracim container with MySQL or PostgreSQL, you must set the ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` environment variables.
 
@@ -145,6 +144,18 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
+
+## secure (TODO)
+
+Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
+
+        docker run
+               --privileged
+               -e DATABASE_TYPE=sqlite \
+               -p 8081:80 \
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim:gocryptfs
+
+TODO: add parameters required for encryption.
 
 ### Build images
 
