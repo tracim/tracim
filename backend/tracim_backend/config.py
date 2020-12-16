@@ -484,10 +484,10 @@ class CFG(object):
         )
         # S3 parameters
         self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID = self.get_raw_config(
-            "uploaded_files.storage.s3.access_key_id"
+            "uploaded_files.storage.s3.access_key_id", secret=True
         )
         self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY = self.get_raw_config(
-            "uploaded_files.storage.s3.secret_access_key"
+            "uploaded_files.storage.s3.secret_access_key", secret=True
         )
         self.UPLOADED_FILES__STORAGE__S3__POLICY = self.get_raw_config(
             "uploaded_files.storage.s3.policy"
