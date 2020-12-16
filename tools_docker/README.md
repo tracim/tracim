@@ -145,17 +145,40 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
-## secure (TODO)
+#### Running with gocryptfs encryption
 
 Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
-        docker run
-               --privileged
-               -e DATABASE_TYPE=sqlite \
-               -p 8081:80 \
-               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim:gocryptfs
+for this exemple,
+you first need to write password you want in `~/tracim/secret/password.txt` file.
 
-TODO: add parameters required for encryption.
+```bash
+echo "password" -> ~/tracim/secret/password.txt
+```
+
+```bash
+docker run \
+       -it \
+       --privileged \
+       -e DATABASE_TYPE=sqlite \
+       -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/previews \
+       -e TRACIM_PREVIEW_CACHE_DIR=/media/previews \
+       -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/uploaded_files \
+       -e TRACIM_DEPOT_STORAGE_DIR=/media/uploaded_files \
+       -e GOCRYPTFS_PASSWORD_PATH=/var/secret/password.txt \
+       -p 8081:80 \
+       -v ~/tracim/etc:/etc/tracim \
+       -v ~/tracim/var:/var/tracim \
+       -v ~/tracim/secret:/var/secret \
+       algoo/tracim
+```
+
+if you want a bit more security, you can remove password file.
+You will need it each time you need to run the docker.
+
+```bash
+rm ~/tracim/secret/password.txt
+```
 
 ### Build images
 
