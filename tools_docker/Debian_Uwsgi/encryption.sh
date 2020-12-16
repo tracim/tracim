@@ -18,6 +18,9 @@ encrypt_dir() {
     fi
     if [ ! -f "${encrypted_dir}/gocryptfs.conf" ]; then
         su www-data -s "/bin/bash" -c "gocryptfs -init -q --nosyslog --passfile '$passfile' '$encrypted_dir'"|| exit 1
+        # RJ - 2020-12-16 - NOTE
+        # -q is to prevent gocryptfs from showing the master key and leaking
+        # it in the logs
     fi
     su www-data -s "/bin/bash" -c "gocryptfs -q --nosyslog --passfile '$passfile' '$encrypted_dir' '$mounted_dir'" || exit 1
 }

@@ -159,7 +159,9 @@ echo "password" -> ~/tracim/secret/password.txt
 ```bash
 docker run \
        -it \
-       --privileged \
+       --device /dev/fuse
+       --cap-add SYS_ADMIN
+       --security-opt apparmor:unconfined
        -e DATABASE_TYPE=sqlite \
        -e ENABLE_GOCRYPTFS_ENCRYPTION=1 \
        -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/previews \
