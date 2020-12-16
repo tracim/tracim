@@ -17,7 +17,7 @@ export const MentionAutoComplete = props => {
             onClick={() => props.onClickAutoCompleteItem(m)}
           >
             {m.username && <Avatar size={AVATAR_SIZE.MINI} style={{ marginTop: '5px' }} publicName={m.detail} />}
-            <b className='autocomplete__item__mention'>@{m.mention}</b> - {props.t(m.detail)}
+            <b className='autocomplete__item__mention'>@{m.mention}</b>&nbsp;-&nbsp;{props.t(m.detail)}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (
             <div className='autocomplete__delimiter' />
