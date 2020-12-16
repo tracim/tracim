@@ -351,16 +351,16 @@ You can run it this way with Docker:
     docker run -d -p 3890:389 rroemhild/test-openldap
 
 You need also a elasticsearch server on port 9200 for elasticsearch related test
-You can run it this way with Docker:
+You can run it this way with Docker Compose:
 
-    docker pull elasticsearch:7.0.0
-    docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+    # from backend folder
+    docker-compose up elasticsearch
 
 You also need a minio server on port 9000 for tests related to s3.
-You can run it this way with Docker:
+You can run it this way with Docker Compose:
 
-    docker pull minio/minio
-    docker run -d -p 9000:9000 -e MINIO_ACCESS_KEY=minioadmin -e MINIO_SECRET_KEY=minioadmin minio/minio server /data
+    # from backend folder
+    docker-compose up minio
 
 please note that syntax is similar to minio command line, "minio server /data" will start the minio server and use
 /data dir (in our case, it's the /data of the docker and his content will be deleted after stopped the docker as we do not
