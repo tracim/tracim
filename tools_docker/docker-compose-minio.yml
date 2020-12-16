@@ -1,0 +1,65 @@
+# To use this file you should generate:
+# - a username and password for the postgresql database
+# - a pair of keys for minio storage
+# then setup those in a .env file as follow:
+# POSTGRES_USER=<postgresql_user>
+# POSTGRES_PASSWORD=<postgresql_password>
+# MINIO_ACCESS_KEY=<access_key>
+# MINIO_SECRET_KEY=<secret_key>
+version: "3"
+services:
+  tracim:
+    # replace "latest" with the version of your choice, minio storage is supported since version 3.4.0
+    image: algoo/tracim:latest
+    networks: [backend, frontend]
+    depends_on: [minio, db]
+    ports:
+      - "8080:80"
+    environment:
+      TRACIM_UPLOADED_FILES__STORAGE__STORAGE_TYPE: s3
+      TRACIM_UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL: http://minio:9000
+      TRACIM_UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID: ${MINIO_ACCESS_KEY}
+      TRACIM_UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY}
+      DATABASE_TYPE: postgresql
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: tracim
+      START_WEBDAV: 0
+      REPLY_BY_EMAIL: 0
+    restart: on-failure
+    volumes:
+      - tracim-config:/etc/tracim
+      - tracim-data:/var/tracim
+
+  db:
+    image: postgres:11
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks: [backend]
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=tracim
+
+  minio:
+    image: minio/minio:RELEASE.2020-12-16T05-05-17Z
+
+    networks: [backend]
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - tracim-uploaded-files:/data
+    command: server /data
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+  tracim-config:
+  tracim-data:
+  tracim-uploaded-files:
