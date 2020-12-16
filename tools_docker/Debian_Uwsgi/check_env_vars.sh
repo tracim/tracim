@@ -40,7 +40,7 @@ if ! [ "$DATABASE_TYPE" = sqlite ]; then
 fi
 
 if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
-    if ! [ -n "GOCRYPTFS_PASSWORD_PATH" ]; then
+    if ! [ -n "$GOCRYPTFS_PASSWORD_PATH" ]; then
         echo "You must set GOCRYPTFS_PASSWORD_PATH environment variable"
         exit 1
     fi
