@@ -7,8 +7,6 @@ Many parameters can also be changed using environment variables.
 The environment variables override the corresponding parameters found in the configuration file.
 The list of parameters supported through environment variables is documented [here](env_settings.md).
 
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
-
 Some parameters are currently only configurable through the configuration file:
 
 - all parameters outside the [DEFAULT] section, including: `[alembic]`, `[app:*]`, `[server:*]`, `[loggers]`
