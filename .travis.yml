@@ -94,7 +94,7 @@ _install_backend: &_install_backend
     - docker run -d -p 3890:389 rroemhild/test-openldap
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose pull
-    - docker-compose up minio elasticsearch
+    - docker-compose up -d minio elasticsearch
     - cd $TRAVIS_BUILD_DIR
     # using old version of pytest-cov to avoid
     # version conflict with python-coveralls
