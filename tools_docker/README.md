@@ -188,6 +188,12 @@ To build image
     cd tools_docker/Debian_Uwsgi
     docker build -t algoo/tracim:latest .
 
+
+To build encrypted-enabled image (beta):
+
+    cd tools_docker/Debian_New_Uwsgi
+    docker build -t algoo/tracim:latest .
+
 #### With Custom Branch or Tag
 
 ⚠ **It is not possible to build an image with both ARG TAG and ARG BRANCH at same time.**
