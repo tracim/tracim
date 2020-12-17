@@ -209,7 +209,7 @@ export {
   createSpaceTree,
   DropdownMenu,
   getContentPath,
-  handleInvalidMentionInComment
+  handleInvalidMentionInComment,
   naturalCompareLabels,
   sortWorkspaceList,
   TracimComponent,
