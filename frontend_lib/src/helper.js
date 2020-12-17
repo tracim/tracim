@@ -699,7 +699,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content, props) => {
                 {crumb.label}
               </Link>
             ),
-            type: BREADCRUMBS_TYPE.CORE
+            type: BREADCRUMBS_TYPE.APP_FEATURE
           }))
         }
       })
