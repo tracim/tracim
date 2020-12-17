@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-encrypt_dir() {
+function as_user {
+    su $TRACIM_USER -s "/bin/bash" -c "$1"
+}
+function encrypt_dir() {
     encrypted_dir=$1
     mounted_dir=$2
     passfile=$3
@@ -17,12 +20,12 @@ encrypt_dir() {
         chmod 775 "$mounted_dir"
     fi
     if [ ! -f "${encrypted_dir}/gocryptfs.conf" ]; then
-        su www-data -s "/bin/bash" -c "gocryptfs -init -q --nosyslog --passfile '$passfile' '$encrypted_dir'"|| exit 1
+        as_user "gocryptfs -init -q --nosyslog --passfile '$passfile' '$encrypted_dir'"|| exit 1
         # RJ - 2020-12-16 - NOTE
         # -q is to prevent gocryptfs from showing the master key and leaking
         # it in the logs
     fi
-    su www-data -s "/bin/bash" -c "gocryptfs -q --nosyslog --passfile '$passfile' '$encrypted_dir' '$mounted_dir'" || exit 1
+    as_user "gocryptfs -q --nosyslog --passfile '$passfile' '$encrypted_dir' '$mounted_dir'" || exit 1
 }
 
 encrypt_dir "$GOCRYPTFS_PREVIEW_STORAGE_DIR" "$TRACIM_PREVIEW_CACHE_DIR" "$GOCRYPTFS_PASSWORD_PATH"

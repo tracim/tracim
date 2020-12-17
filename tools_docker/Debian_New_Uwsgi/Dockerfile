@@ -83,7 +83,8 @@ ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
-
+ENV ENABLE_GOCRYPTFS_ENCRYPTION=0
+ENV DOCKER_SCRIPT_DIR="/tracim/tools_docker/Debian_New_Uwsgi"
 RUN \
     printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
     && apt install -qy \
@@ -118,6 +119,8 @@ RUN \
         uwsgi-plugin-python3 \
         vim \
         xvfb \
+        gocryptfs \
+        fuse \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
@@ -132,4 +135,4 @@ COPY --from=builder /usr/local /usr/local
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
 
-CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh"]
+CMD ["/bin/bash","$DOCKER_SCRIPT_DIR/entrypoint.sh"]
