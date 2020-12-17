@@ -1,3 +1,11 @@
+# Tracim configuration parameters which can be given as an environment variable
+
+This list is generated using
+```
+tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
+```
+Note that you need to activate all applcations (`app.enabled` setting) for this list to be complete.
+
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
