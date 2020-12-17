@@ -7,7 +7,7 @@
 - Note: [#3722](https://github.com/tracim/tracim/issues/3722)
 - Mention: [#3927](https://github.com/tracim/tracim/issues/3927)
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
-[#3809](https://github.com/tracim/tracim/issues/)
+[#3809](https://github.com/tracim/tracim/issues/3809)
 
 
 ## 3.3.0 / 2020-12-02
