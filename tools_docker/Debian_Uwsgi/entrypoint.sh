@@ -18,16 +18,17 @@ if [ ! "$?" = 0 ]; then
 fi
 
 if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
-    echo "Activation of Encryption"
+    echo "-- Activation of Encryption --"
     /bin/bash /tracim/tools_docker/Debian_Uwsgi/encryption.sh
     if [ ! "$?" = 0 ]; then
+        echo "Encryption activation Failed !"
         exit 1
     fi
+    echo "-- Encryption activated --"
 fi
 
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
-
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
 
@@ -66,13 +67,12 @@ esac
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/backend/
-    tracimcli db init -c /etc/tracim/development.ini
-    alembic -c /etc/tracim/development.ini stamp head
+    su www-data -s "/bin/bash" -c "tracimcli db init -c /etc/tracim/development.ini"
+    su www-data -s "/bin/bash" -c "alembic -c /etc/tracim/development.ini stamp head"
 else
     cd /tracim/backend/
-    alembic -c /etc/tracim/development.ini upgrade head
+    su www-data -s "/bin/bash" -c "alembic -c /etc/tracim/development.ini upgrade head"
 fi
-
 chown www-data:www-data -R /var/tracim
 
 # activate apache modules
@@ -90,7 +90,6 @@ else
     sed -i "s|^webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
     sed -i "s|^\s*Define START_WEBDAV|    # Define START_WEBDAV|g" /etc/tracim/apache2.conf
 fi
-
 # Activate or deactivate caldav
 if [ "$START_CALDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_caldav.ini ]; then
@@ -102,7 +101,6 @@ else
     rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
     sed -i "s|^\s*Define START_CALDAV|    # Define START_CALDAV|g" /etc/tracim/apache2.conf
 fi
-
 # INFO - G.M - 2020-01-28 - enable collaborative_document_edition app as default app
 # to work properly other config parameter should be setted correctly and external server for document
 # edition like collabora should be started.
@@ -115,8 +113,7 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 # TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
 # Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
 cd /tracim/backend/
-tracimcli search index-create -c /etc/tracim/development.ini
-
+su www-data -s "/bin/bash" -c "tracimcli search index-create -c /etc/tracim/development.ini"
 
 # starting services
 service pushpin start # tracim live messages (TLMs) sending
@@ -129,13 +126,12 @@ supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
 if [ "$REPLY_BY_EMAIL" = "1" ];then
     supervisorctl start tracim_mail_fetcher
 fi
-
 # Start tracim
 set +e
 service uwsgi restart
 set -e
 if [ "$START_CALDAV" = "1" ]; then
     cd /tracim/backend/
-    tracimcli caldav sync -c /etc/tracim/development.ini
+    su www-data -s "/bin/bash" -c "tracimcli caldav sync -c /etc/tracim/development.ini"
 fi
 tail -f /var/tracim/logs/tracim_web.log

@@ -17,9 +17,9 @@ encrypt_dir() {
         chmod 775 "$mounted_dir"
     fi
     if [ ! -f "${encrypted_dir}/gocryptfs.conf" ]; then
-        su www-data -s "/bin/bash" -c "gocryptfs -init --passfile \"$passfile\" \"$encrypted_dir\"" || exit 1
+        su www-data -s "/bin/bash" -c "gocryptfs -init --passfile '$passfile' '$encrypted_dir'" || exit 1
     fi
-    su www-data -s "/bin/bash" -c "gocryptfs --passfile \"$passfile\" \"$encrypted_dir\" \"$mounted_dir\""  || exit 1
+    su www-data -s "/bin/bash" -c "gocryptfs --passfile '$passfile' '$encrypted_dir' '$mounted_dir'"  || exit 1
 }
 
 encrypt_dir "$GOCRYPTFS_PREVIEW_STORAGE_DIR" "$TRACIM_PREVIEW_CACHE_DIR" "$GOCRYPTFS_PASSWORD_PATH"
