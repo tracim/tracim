@@ -22,8 +22,6 @@ The priority order is (from less to more priority):
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
 | TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
-| TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
-| TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
@@ -33,6 +31,7 @@ The priority order is (from less to more priority):
 | TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
 | TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
+| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
 | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |
@@ -41,6 +40,7 @@ The priority order is (from less to more priority):
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
 | TRACIM_WORKSPACE__ALLOWED_ACCESS_TYPES                                    | workspace.allowed_access_types                                 | WORKSPACE__ALLOWED_ACCESS_TYPES                                    |
+| TRACIM_WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT                        | workspace.join.max_messages_history_count                      | WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT                        |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
 | TRACIM_DEBUG                                                              | debug                                                          | DEBUG                                                              |
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
@@ -52,6 +52,18 @@ The priority order is (from less to more priority):
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
+| TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
+| TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
+| TRACIM_UPLOADED_FILES__STORAGE__STORAGE_NAME                              | uploaded_files.storage.storage_name                            | UPLOADED_FILES__STORAGE__STORAGE_NAME                              |
+| TRACIM_UPLOADED_FILES__STORAGE__STORAGE_TYPE                              | uploaded_files.storage.storage_type                            | UPLOADED_FILES__STORAGE__STORAGE_TYPE                              |
+| TRACIM_UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH                       | uploaded_files.storage.local.storage_path                      | UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH                       |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID                         | uploaded_files.storage.s3.access_key_id                        | UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID                         |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY                     | uploaded_files.storage.s3.secret_access_key                    | UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY                     |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__POLICY                                | uploaded_files.storage.s3.policy                               | UPLOADED_FILES__STORAGE__S3__POLICY                                |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL                          | uploaded_files.storage.s3.endpoint_url                         | UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL                          |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__BUCKET                                | uploaded_files.storage.s3.bucket                               | UPLOADED_FILES__STORAGE__S3__BUCKET                                |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__REGION_NAME                           | uploaded_files.storage.s3.region_name                          | UPLOADED_FILES__STORAGE__S3__REGION_NAME                           |
+| TRACIM_UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS                         | uploaded_files.storage.s3.storage_class                        | UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS                         |
 | TRACIM_LIMITATION__SHAREDSPACE_PER_USER                                   | limitation.sharedspace_per_user                                | LIMITATION__SHAREDSPACE_PER_USER                                   |
 | TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE                               | limitation.content_length_file_size                            | LIMITATION__CONTENT_LENGTH_FILE_SIZE                               |
 | TRACIM_LIMITATION__WORKSPACE_SIZE                                         | limitation.workspace_size                                      | LIMITATION__WORKSPACE_SIZE                                         |
@@ -121,9 +133,6 @@ The priority order is (from less to more priority):
 | TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             | search.elasticsearch.request_timeout                           | SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |
@@ -134,8 +143,6 @@ The priority order is (from less to more priority):
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
-| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
-
 
 ### Parameters Only Working in the Configuration File
 
