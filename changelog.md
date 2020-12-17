@@ -9,6 +9,7 @@
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
 [#3809](https://github.com/tracim/tracim/issues/)
 
+
 ## 3.3.0 / 2020-12-02
 
 ### New Features
