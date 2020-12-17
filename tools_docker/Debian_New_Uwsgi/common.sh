@@ -51,7 +51,7 @@ fi
 
 # Create apache conf file if none exists
 if [ ! -f /etc/tracim/apache2.conf ]; then
-    cp /tracim/tools_docker/Debian_Uwsgi/apache2.conf.sample /etc/tracim/apache2.conf
+    cp "$DOCKER_SCRIPT_DIR/apache2.conf.sample" /etc/tracim/apache2.conf
 fi
 if [ ! -L /etc/apache2/sites-available/tracim.conf ]; then
     ln -s /etc/tracim/apache2.conf /etc/apache2/sites-available/tracim.conf
@@ -62,7 +62,7 @@ fi
 
 # Create uwsgi conf file if none exists
 if [ ! -f /etc/tracim/tracim_web.ini ]; then
-    cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_web.ini
+    cp "$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_web.ini
     sed -i "s|^#workers = .*|workers = 4|g" /etc/tracim/tracim_web.ini
     sed -i "s|^#threads = .*|threads = 4|g" /etc/tracim/tracim_web.ini
     sed -i "s|^#socket = :8081|socket = :8081|g" /etc/tracim/tracim_web.ini
@@ -235,7 +235,7 @@ fi
 # Create Webdav file/config if not exist and activate it
 if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_webdav.ini ];then
-        cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
+        cp "$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_webdav.ini
         sed -i "s|^module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|^http-socket = .*|http-socket = :3030|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|^#workers = .*|workers = 1|g" /etc/tracim/tracim_webdav.ini
@@ -249,7 +249,7 @@ fi
 # Create Caldav file/config if not exist
 if [ "$START_CALDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_caldav.ini ];then
-        cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_caldav.ini
+        cp ""$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_caldav.ini
         sed -i "s|^module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^http-socket = .*|http-socket = localhost:5232|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^#threads = .*|threads = 8|g" /etc/tracim/tracim_caldav.ini

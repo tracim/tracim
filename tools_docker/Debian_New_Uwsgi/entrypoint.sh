@@ -31,7 +31,7 @@ function logerror {
 
 # Check environment variables
 log "Checking of docker env var"
-/bin/bash /tracim/tools_docker/Debian_Uwsgi/check_env_vars.sh
+/bin/bash "$DOCKER_SCRIPT_DIR/check_env_vars.sh"
 if [ ! "$?" = 0 ]; then
     logerror "invalid env var"
     exit 1
@@ -39,14 +39,14 @@ fi
 loggood "check of docker env var success"
 
 # Execute common tasks
-/bin/bash /tracim/tools_docker/Debian_Uwsgi/common.sh
+/bin/bash "$DOCKER_SCRIPT_DIR/common.sh"
 if [ ! "$?" = 0 ]; then
     exit 1
 fi
 
 if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
     log "Activation of Encryption"
-    /bin/bash /tracim/tools_docker/Debian_Uwsgi/encryption.sh
+    /bin/bash "$DOCKER_SCRIPT_DIR/encryption.sh"
     if [ ! "$?" = 0 ]; then
         logerror "Encryption activation Failed !"
         exit 1
@@ -157,7 +157,7 @@ service zurl start # tracim live messages (TLMs) sending
 service redis-server start  # async jobs (for mails and TLMs)
 service apache2 restart
 log "Run supervisord"
-supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
+supervisord -c "$DOCKER_SCRIPT_DIR/supervisord_tracim.conf"
 # Activate daemon for reply by email
 if [ "$REPLY_BY_EMAIL" = "1" ];then
     log "start mail fetcher"
