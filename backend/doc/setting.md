@@ -1,23 +1,20 @@
 # Setting up Tracim
 
-Tracim uses an INI configuration file for its settings.
-The default configuration file name is `development.ini`. A documented template is available in the repo: [development.ini.sample](../development.ini.sample).
+## Parameters Names
 
-Many parameters can also be changed using environment variables.
-The environment variables override the corresponding parameters found in the configuration file.
-The list of parameters supported through environment variables is documented [here](env_settings.md).
+Most settings in Tracim are configurable using both the INI configuration file and environment variables.
 
-Some parameters are currently only configurable through the configuration file:
+### Tracim fully supported variables:
 
-- all parameters outside the [DEFAULT] section, including: `[alembic]`, `[app:*]`, `[server:*]`, `[loggers]`
-- Sqlalchemy parameters `sqalchemy.*` not explicitely listed as supported.
-- Beaker sessions parameters `sessions.*` not explicitely listed as supported.
-- Caldav radicale parameters  `caldav.radicale.*` not explicitely listed as supported.
-- easy config variable shortcuts (`basic_setup.*`, `advanced_setup`).
-- Pyramid parameters (`pyramid.*`)
+You can set those parameters in INI configuration file (see `config_file_name`) or
+environnement variable (see `env_var_name`).
 
+The priority order is (from less to more priority):
+- default values
+- configuration file
+- environnement variables
 
-## Define Tracim base URL
+<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
 
 In most of the cases you'll want to serve Tracim behind an HTTP reverse-proxy to add TLS/caching support.
 You can configure Tracim's external URL with the `website.base_url` parameter, for example:
