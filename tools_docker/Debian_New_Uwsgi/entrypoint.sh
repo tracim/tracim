@@ -33,6 +33,19 @@ function logerror {
 function as_user {
     su $TRACIM_USER -s "/bin/bash" -c "$1"
 }
+function tracimcli_as_user {
+    if [ "$DEBUG" = "1" ]; then
+      debug_string = '-d'
+    else
+      debug_string = ''
+    fi
+    as_user "tracimcli $1 $debug_string -c /etc/tracim/development.ini"
+}
+function alembic_as_user {
+    as_user "alembic -c /etc/tracim/development.ini $1"
+}
+
+
 
 # Check environment variables
 log "Checking of docker env var"
@@ -101,13 +114,13 @@ loggood "checking of database success"
 if [ "$INIT_DATABASE" = true ] ; then
     log "Initialise Database"
     cd /tracim/backend/
-    as_user "tracimcli db init -c /etc/tracim/development.ini -d"
-    as_user "alembic -c /etc/tracim/development.ini stamp head"
+    tracimcli_as_user "db init"
+    alembic_as_user "stamp head"
     loggood "Database initialisation success"
 else
     log "Update database"
     cd /tracim/backend/
-    su www-data -s "/bin/bash" -c "alembic -c /etc/tracim/development.ini upgrade head"
+    alembic_as_user "upgrade head"
 fi
 loggood "database ready"
 
@@ -152,7 +165,7 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 # TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
 # Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
 cd /tracim/backend/
-as_user "tracimcli search index-create -c /etc/tracim/development.ini -d"
+tracimcli_as_user "search index-create"
 
 log "Start all services"
 # starting services
@@ -175,6 +188,6 @@ set -e
 if [ "$START_CALDAV" = "1" ]; then
     log "start caldav"
     cd /tracim/backend/
-    as_user "tracimcli caldav sync -c /etc/tracim/development.ini -d"
+    tracimcli_as_user "caldav sync"
 fi
 tail -f /var/tracim/logs/tracim_web.log
