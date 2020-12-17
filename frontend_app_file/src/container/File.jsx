@@ -10,6 +10,7 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
+  handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -96,7 +97,9 @@ export class File extends React.Component {
       previewVideo: false,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      invalidMentionList: [],
+      isLastTimelineItemCurrentToken: false,
+      showInvalidMentionPopupInComment: false
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -437,7 +440,24 @@ export class File extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = () => {
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  }
+
+  handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
+    }
+  }
+
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -707,6 +727,8 @@ export class File extends React.Component {
     }
   }
 
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
+
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -810,8 +832,12 @@ export class File extends React.Component {
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
+          invalidMentionList={state.invalidMentionList}
+          onClickCancelSave={this.handleCancelSave}
+          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
+          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+          searchForMentionInQuery={this.searchForMentionInQuery}
         />
       )
     }

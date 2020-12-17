@@ -6,6 +6,7 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
+  handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -60,7 +61,9 @@ export class Thread extends React.Component {
       ],
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      invalidMentionList: [],
+      isLastTimelineItemCurrentToken: false,
+      showInvalidMentionPopupInComment: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -285,7 +288,24 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  }
+
   handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
+    }
+  }
+
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -302,6 +322,8 @@ export class Thread extends React.Component {
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
+
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
   handleChangeStatus = async newStatus => {
     const { props, state } = this
@@ -426,9 +448,13 @@ export class Thread extends React.Component {
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             showTitle={false}
+            invalidMentionList={state.invalidMentionList}
             isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
             onInitWysiwyg={this.handleInitWysiwyg}
-            searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+            searchForMentionInQuery={this.searchForMentionInQuery}
           />
         </PopinFixedContent>
       </PopinFixed>
