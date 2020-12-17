@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+
+function create_log_symlink() {
+    destination=$1
+    symlink=$2
+    if [ ! -L "$symlink" ]; then
+        ln -sf "$destination" "$symlink"
+    fi
+}
 # address on which tracim web is accessible within docker
 # on port 8080 as uwsgi listens here by default.
 tracim_web_internal_listen="localhost:8080"
@@ -153,45 +161,20 @@ if [ ! -f /var/tracim/logs/zurl.log ];then
 fi
 
 # Create symbollic link to easy find log in container folder
-if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
-    ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
-fi
-if [ ! -L /var/log/uwsgi/app/tracim_webdav.log ]; then
-    ln -sf /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
-fi
-if [ ! -L /var/log/uwsgi/app/tracim_caldav.log ]; then
-    ln -sf /var/tracim/logs/tracim_caldav.log /var/log/uwsgi/app/tracim_caldav.log
-fi
-if [ ! -L /var/log/apache2/tracim-access.log ]; then
-    ln -sf /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
-fi
-if [ ! -L /var/log/apache2/tracim-error.log ]; then
-  ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
-fi
-if [ ! -L /var/log/redis-server.log ]; then
-  ln -sf /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
-fi
-if [ ! -L /var/log/access_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
-fi
-if [ ! -L /var/log/error_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
-fi
-if [ ! -L /var/log/m2adapter.log ]; then
-  ln -sf /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
-fi
-if [ ! -L /var/log/mongrel2_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
-fi
-if [ ! -L /var/log/pushpin-handler.log ]; then
-  ln -sf /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
-fi
-if [ ! -L /var/log/pushpin-proxy.log ]; then
-  ln -sf /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
-fi
-if [ ! -L /var/log/zurl.log ]; then
-  ln -sf /var/tracim/logs/zurl.log /var/log/zurl.log
-fi
+# create_symlink_if_not_exist
+create_log_symlink /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
+create_log_symlink /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
+create_log_symlink /var/tracim/logs/tracim_caldav.log /var/log/uwsgi/app/tracim_caldav.log
+create_log_symlink /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
+create_log_symlink /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
+create_log_symlink /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
+create_log_symlink var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
+create_log_symlink /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
+create_log_symlink /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
+create_log_symlink /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
+create_log_symlink /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
+create_log_symlink /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
+create_log_symlink /var/tracim/logs/zurl.log /var/log/zurl.log
 
 # Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
 sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
