@@ -35,9 +35,9 @@ function as_user {
 }
 function tracimcli_as_user {
     if [ "$DEBUG" = "1" ]; then
-      debug_string = '-d'
+      debug_string='-d'
     else
-      debug_string = ''
+      debug_string=''
     fi
     as_user "tracimcli $1 $debug_string -c /etc/tracim/development.ini"
 }
