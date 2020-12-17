@@ -311,7 +311,7 @@ export class Gallery extends React.Component {
       })
     }
     breadcrumbsList.push({
-      link: <Link to={PAGE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
+      link: <Link to={PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
       label: props.t('Gallery')
     })
