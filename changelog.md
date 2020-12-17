@@ -3,9 +3,9 @@
 ## 3.3.1 / 2020-12-17
 
 ### Fixed Issues
-
-- Note: [#3722](https://github.com/tracim/tracim/issues/3722)
-- Mention: [#3927](https://github.com/tracim/tracim/issues/3927)
+ 
+- Mention: [#3722](https://github.com/tracim/tracim/issues/3722),
+[#3927](https://github.com/tracim/tracim/issues/3927)
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
 [#3809](https://github.com/tracim/tracim/issues/3809)
 
