@@ -231,8 +231,8 @@ fi
 
 # Create Caldav file/config if not exist
 if [ "$START_CALDAV" = "1" ]; then
-    if [ ! -f /etc/tracim/tracim_caldav.ini ];then
-        cp ""$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_caldav.ini
+    if [ ! -f /etc/tracim/tracim_caldav.ini ]; then
+        cp "$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_caldav.ini
         sed -i "s|^module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^http-socket = .*|http-socket = localhost:5232|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^#threads = .*|threads = 8|g" /etc/tracim/tracim_caldav.ini
