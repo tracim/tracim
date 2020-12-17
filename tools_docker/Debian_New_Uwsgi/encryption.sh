@@ -44,12 +44,13 @@ function encrypt_dir() {
         chmod 775 "$mounted_dir"
     fi
     if [ ! -f "${encrypted_dir}/gocryptfs.conf" ]; then
-        echo "initialize encrypted dir in $encrypted_dir"
+        log "initialize encrypted dir in $encrypted_dir"
         as_user "gocryptfs -init -q --nosyslog --passfile '$passfile' '$encrypted_dir'"
-
+        loggood "initialized encrypted_dir dir in $encrypted_dir"
     fi
+    log "mount encrypted dir $encrypted_dir at $mounted_dir"
     as_user "gocryptfs -q --nosyslog --passfile '$passfile' '$encrypted_dir' '$mounted_dir'"
-    echo "mount encrypted dir $encrypted_dir at $mounted_dir"
+    loggood "mounted encrypted dir $encrypted_dir at $mounted_dir"
 }
 chown $TRACIM_USER:$TRACIM_USER $GOCRYPTFS_PASSWORD_PATH
 chmod 400 $GOCRYPTFS_PASSWORD_PATH
