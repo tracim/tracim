@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+TRACIM_USER='www-data'
+function create_log_symlink() {
+    destination=$1
+    symlink=$2
+    if [ ! -L "$symlink" ]; then
+        ln -sf "$destination" "$symlink"
+    fi
+}
+function create_dir() {
+    if [ ! -d "$1" ]; then
+        mkdir "$1" -p
+    fi
+}
 # address on which tracim web is accessible within docker
 # on port 8080 as uwsgi listens here by default.
 tracim_web_internal_listen="localhost:8080"
@@ -153,45 +166,20 @@ if [ ! -f /var/tracim/logs/zurl.log ];then
 fi
 
 # Create symbollic link to easy find log in container folder
-if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
-    ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
-fi
-if [ ! -L /var/log/uwsgi/app/tracim_webdav.log ]; then
-    ln -sf /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
-fi
-if [ ! -L /var/log/uwsgi/app/tracim_caldav.log ]; then
-    ln -sf /var/tracim/logs/tracim_caldav.log /var/log/uwsgi/app/tracim_caldav.log
-fi
-if [ ! -L /var/log/apache2/tracim-access.log ]; then
-    ln -sf /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
-fi
-if [ ! -L /var/log/apache2/tracim-error.log ]; then
-  ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
-fi
-if [ ! -L /var/log/redis-server.log ]; then
-  ln -sf /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
-fi
-if [ ! -L /var/log/access_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
-fi
-if [ ! -L /var/log/error_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
-fi
-if [ ! -L /var/log/m2adapter.log ]; then
-  ln -sf /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
-fi
-if [ ! -L /var/log/mongrel2_7999.log ]; then
-  ln -sf /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
-fi
-if [ ! -L /var/log/pushpin-handler.log ]; then
-  ln -sf /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
-fi
-if [ ! -L /var/log/pushpin-proxy.log ]; then
-  ln -sf /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
-fi
-if [ ! -L /var/log/zurl.log ]; then
-  ln -sf /var/tracim/logs/zurl.log /var/log/zurl.log
-fi
+# create_symlink_if_not_exist
+create_log_symlink /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
+create_log_symlink /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
+create_log_symlink /var/tracim/logs/tracim_caldav.log /var/log/uwsgi/app/tracim_caldav.log
+create_log_symlink /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
+create_log_symlink /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
+create_log_symlink /var/tracim/logs/redis/redis-server.log /var/log/redis-server.log
+create_log_symlink var/tracim/logs/pushpin/access_7999.log /var/log/access_7999.log
+create_log_symlink /var/tracim/logs/pushpin/error_7999.log /var/log/error_7999.log
+create_log_symlink /var/tracim/logs/pushpin/m2adapter.log /var/log/m2adapter.log
+create_log_symlink /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_7999.log
+create_log_symlink /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
+create_log_symlink /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
+create_log_symlink /var/tracim/logs/zurl.log /var/log/zurl.log
 
 # Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
 sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
@@ -210,27 +198,13 @@ if [ ! -d /var/run/uwsgi/app ]; then
 fi
 
 # Create Tracim required folder
-if [ ! -d /var/tracim/data ]; then
-    mkdir /var/tracim/data -p
-fi
-if [ ! -f /var/tracim/assets ]; then
-    mkdir /var/tracim/assets -p
-fi
-if [ ! -d /var/tracim/data/sessions_data ]; then
-    mkdir /var/tracim/data/sessions_data
-fi
-if [ ! -d /var/tracim/data/sessions_lock ]; then
-    mkdir /var/tracim/data/sessions_lock
-fi
-if [ ! -d /var/tracim/data/depot ]; then
-    mkdir /var/tracim/data/depot
-fi
-if [ ! -d /var/tracim/data/preview ]; then
-    mkdir /var/tracim/data/preview
-fi
-if [ ! -d /var/tracim/data/radicale_storage ]; then
-    mkdir /var/tracim/data/radicale_storage
-fi
+create_dir /var/tracim/data
+create_dir /var/tracim/assets
+create_dir /var/tracim/data/sessions_data
+create_dir /var/tracim/data/sessions_lock
+create_dir /var/tracim/data/depot
+create_dir /var/tracim/data/preview
+create_dir /var/tracim/data/radicale_storage
 
 # Create Webdav file/config if not exist and activate it
 if [ "$START_WEBDAV" = "1" ]; then
@@ -248,8 +222,8 @@ fi
 
 # Create Caldav file/config if not exist
 if [ "$START_CALDAV" = "1" ]; then
-    if [ ! -f /etc/tracim/tracim_caldav.ini ];then
-        cp ""$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_caldav.ini
+    if [ ! -f /etc/tracim/tracim_caldav.ini ]; then
+        cp "$DOCKER_SCRIPT_DIR/uwsgi.ini.sample" /etc/tracim/tracim_caldav.ini
         sed -i "s|^module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^http-socket = .*|http-socket = localhost:5232|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|^#threads = .*|threads = 8|g" /etc/tracim/tracim_caldav.ini

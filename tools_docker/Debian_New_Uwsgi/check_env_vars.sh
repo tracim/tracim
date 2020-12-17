@@ -1,36 +1,20 @@
 #!/usr/bin/env bash
-
+function check_param(){
+    name=$1
+    value=$2
+    if ! [ -n "$value" ]; then
+        echo "You must set $name environment variable"
+        exit 1
+    fi
+}
 # Ensure DATABASE_TYPE is set
-if ! [ -n "$DATABASE_TYPE" ]; then
-    echo "You must set DATABASE_TYPE environment variable"
-    exit 1
-fi
-
+check_param "DATABASE_TYPE" $DATABASE_TYPE
 if ! [ "$DATABASE_TYPE" = sqlite ]; then
     # Ensure DATABASE_USER is set
-    if ! [ -n "$DATABASE_USER" ]; then
-        echo "You must set DATABASE_USER environment variable"
-        exit 1
-    fi
-
-    # Ensure DATABASE_PASSWORD is set
-    if ! [ -n "$DATABASE_PASSWORD" ]; then
-        echo "You must set DATABASE_PASSWORD environment variable"
-        exit 1
-    fi
-
-    # Ensure DATABASE_HOST is set
-    if ! [ -n "$DATABASE_HOST" ]; then
-        echo "You must set DATABASE_HOST environment variable"
-        exit 1
-    fi
-
-    # Ensure DATABASE_NAME is set
-    if ! [ -n "$DATABASE_NAME" ]; then
-        echo "You must set DATABASE_NAME environment variable"
-        exit 1
-    fi
-
+    check_param "DATABASE_USER" $DATABASE_USER
+    check_param "DATABASE_PASSWORD" $DATABASE_PASSWORD
+    check_param "DATABASE_HOST" $DATABASE_HOST
+    check_param "DATABASE_NAME" $DATABASE_NAME
     # Ensure DATABASE_TYPE value
     case "$DATABASE_TYPE" in
         postgresql|mysql|sqlite) ;;
@@ -40,24 +24,9 @@ if ! [ "$DATABASE_TYPE" = sqlite ]; then
 fi
 
 if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
-    if ! [ -n "$GOCRYPTFS_PASSWORD_PATH" ]; then
-        echo "You must set GOCRYPTFS_PASSWORD_PATH environment variable"
-        exit 1
-    fi
-    if ! [ -n "$GOCRYPTFS_PREVIEW_STORAGE_DIR" ]; then
-        echo "You must set GOCRYPTFS_PREVIEW_STORAGE_DIR environment variable"
-        exit 1
-    fi
-    if ! [ -n "$GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR" ]; then
-        echo "You must set GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR environment variable"
-        exit 1
-    fi
-    if ! [ -n "$TRACIM_PREVIEW_CACHE_DIR" ]; then
-        echo "You must set TRACIM_PREVIEW_CACHE_DIR environment variable"
-        exit 1
-    fi
-    if ! [ -n "$TRACIM_DEPOT_STORAGE_DIR" ]; then
-        echo "You must set TRACIM_DEPOT_STORAGE_DIR environment variable"
-        exit 1
-    fi
+    check_param "GOCRYPTFS_PASSWORD_PATH" $GOCRYPTFS_PASSWORD_PATH
+    check_param "GOCRYPTFS_PREVIEW_STORAGE_DIR" $GOCRYPTFS_PREVIEW_STORAGE_DIR
+    check_param "GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR" $GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR
+    check_param "TRACIM_PREVIEW_CACHE_DIR" $TRACIM_PREVIEW_CACHE_DIR
+    check_param "TRACIM_DEPOT_STORAGE_DIR" $TRACIM_DEPOT_STORAGE_DIR
 fi

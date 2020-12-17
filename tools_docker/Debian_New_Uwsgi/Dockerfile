@@ -135,4 +135,4 @@ COPY --from=builder /usr/local /usr/local
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
 
-CMD ["/bin/bash","$DOCKER_SCRIPT_DIR/entrypoint.sh"]
+CMD ["/bin/bash","/tracim/tools_docker/Debian_New_Uwsgi/entrypoint.sh"]

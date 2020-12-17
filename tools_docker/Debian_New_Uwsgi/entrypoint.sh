@@ -58,11 +58,11 @@ if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
     fi
     loggood "Encryption activated"
 fi
-
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+chown www-data:www-data -R /var/tracim
 
 log "Checking database"
 case "$DATABASE_TYPE" in
@@ -101,7 +101,7 @@ loggood "checking of database success"
 if [ "$INIT_DATABASE" = true ] ; then
     log "Initialise Database"
     cd /tracim/backend/
-    as_user "tracimcli db init -c /etc/tracim/development.ini"
+    as_user "tracimcli db init -c /etc/tracim/development.ini -d"
     as_user "alembic -c /etc/tracim/development.ini stamp head"
     loggood "Database initialisation success"
 else
@@ -110,7 +110,6 @@ else
     su www-data -s "/bin/bash" -c "alembic -c /etc/tracim/development.ini upgrade head"
 fi
 loggood "database ready"
-chown www-data:www-data -R /var/tracim
 
 # activate apache modules
 a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav expires proxy_uwsgi
@@ -153,7 +152,7 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 # TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
 # Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
 cd /tracim/backend/
-as_user "tracimcli search index-create -c /etc/tracim/development.ini"
+as_user "tracimcli search index-create -c /etc/tracim/development.ini -d"
 
 log "Start all services"
 # starting services
@@ -176,6 +175,6 @@ set -e
 if [ "$START_CALDAV" = "1" ]; then
     log "start caldav"
     cd /tracim/backend/
-    as_user "tracimcli caldav sync -c /etc/tracim/development.ini"
+    as_user "tracimcli caldav sync -c /etc/tracim/development.ini -d"
 fi
 tail -f /var/tracim/logs/tracim_web.log
