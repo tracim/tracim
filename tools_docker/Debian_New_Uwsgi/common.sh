@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
-
+TRACIM_USER='www-data'
 function create_log_symlink() {
     destination=$1
     symlink=$2
     if [ ! -L "$symlink" ]; then
         ln -sf "$destination" "$symlink"
+    fi
+}
+function create_dir() {
+    if [ ! -d "$1" ]; then
+        mkdir "$1" -p
     fi
 }
 # address on which tracim web is accessible within docker
@@ -193,27 +198,13 @@ if [ ! -d /var/run/uwsgi/app ]; then
 fi
 
 # Create Tracim required folder
-if [ ! -d /var/tracim/data ]; then
-    mkdir /var/tracim/data -p
-fi
-if [ ! -f /var/tracim/assets ]; then
-    mkdir /var/tracim/assets -p
-fi
-if [ ! -d /var/tracim/data/sessions_data ]; then
-    mkdir /var/tracim/data/sessions_data
-fi
-if [ ! -d /var/tracim/data/sessions_lock ]; then
-    mkdir /var/tracim/data/sessions_lock
-fi
-if [ ! -d /var/tracim/data/depot ]; then
-    mkdir /var/tracim/data/depot
-fi
-if [ ! -d /var/tracim/data/preview ]; then
-    mkdir /var/tracim/data/preview
-fi
-if [ ! -d /var/tracim/data/radicale_storage ]; then
-    mkdir /var/tracim/data/radicale_storage
-fi
+create_dir /var/tracim/data
+create_dir /var/tracim/assets
+create_dir /var/tracim/data/sessions_data
+create_dir /var/tracim/data/sessions_lock
+create_dir /var/tracim/data/depot
+create_dir /var/tracim/data/preview
+create_dir /var/tracim/data/radicale_storage
 
 # Create Webdav file/config if not exist and activate it
 if [ "$START_WEBDAV" = "1" ]; then
