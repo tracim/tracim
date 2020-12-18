@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
-  CUSTOM_EVENT,
   IconButton,
   PAGE,
   SUBSCRIPTION_TYPE,
@@ -67,14 +66,8 @@ const ActivityList = (props) => {
         }))
       ]
     } else {
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: props.t('Error while getting breadcrumbs'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      // NOTE - S.G. - 2020-12-18 - Do not display a message to avoid
+      // multiple errors if several breadcrumbs cannot be fetched
       return []
     }
   }

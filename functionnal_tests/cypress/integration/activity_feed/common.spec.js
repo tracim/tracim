@@ -59,7 +59,7 @@ for (const pageTestCase of activityPages) {
           .should('contain.text', fileName2WithoutExtention)
       })
 
-      it('should update already an existing item when a comment for its content is posted', () => {
+      it('should update an already existing item when a comment for its content is posted', () => {
         cy.createFile(fileImage, fileType, fileName2, workspaceId)
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
         cy.get('[data-cy=activityList__item]')
