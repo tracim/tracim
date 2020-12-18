@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom'
 import { PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
+require('./PageTitle.styl')
+
 export class PageTitle extends React.Component {
   constructor (props) {
     super(props)
@@ -28,9 +30,8 @@ export class PageTitle extends React.Component {
 
     const title = props.t('Home')
     const breadcrumbsRoot = (
-      <Link to={PAGE.HOME} title={title} className='primaryColorFont primaryColorFontDarkenHover'>
-        <i className='fa fa-home' />
-        <span className='breadcrumbs__item__home'>{title}</span>
+      <Link to={PAGE.HOME} title={title} className='primaryColorFont primaryColorFontDarkenHover pageTitle__rootBreadcrumb'>
+        <i className='fa fa-home' /><span className='pageTitle__rootBreadcrumb__title'>{title}</span>
       </Link>
     )
 
