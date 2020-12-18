@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  buildContentPathBreadcrumbs,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -24,7 +25,6 @@ import {
   displayDistanceDate,
   generateLocalStorageContentId,
   Badge,
-  BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -45,12 +45,13 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
+  PAGE,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
+import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -366,20 +367,7 @@ export class File extends React.Component {
   }
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          // FIXME - b.l - refactor urls
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
-          label: `${content.filename}`,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   handleClickBtnCloseApp = () => {

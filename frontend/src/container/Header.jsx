@@ -24,7 +24,6 @@ import {
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
-  PAGE,
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
@@ -33,7 +32,8 @@ import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  PAGE
 } from 'tracim_frontend_lib'
 
 const qs = require('query-string')

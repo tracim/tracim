@@ -2,6 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
@@ -52,7 +53,8 @@ import {
   updateTLMAuthor,
   scrollIntoViewIfNeeded,
   darkenColor,
-  lightenColor
+  lightenColor,
+  PAGE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -151,6 +153,7 @@ import {
 
 import {
   baseFetch,
+  getContentPath,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -202,8 +205,10 @@ export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 export {
   appContentFactory,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
+  getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
   sortWorkspaceList,
@@ -341,5 +346,6 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent
+  getWorkspaceContent,
+  PAGE
 }
