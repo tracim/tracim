@@ -70,8 +70,9 @@ Tests can now be started:
 pytest test_docker
 ```
 
-It will check in the Docker container if all the Tracim services are correctly running after launching the Tracim, Collabora and ElasticSearch Docker containers
+It will check in the Docker container if all the Tracim services are correctly running after launching the Tracim, Collabora and ElasticSearch Docker containers.
 
+You need to stop the containers between tests. For this, you can use `stop_containers.sh`.
 
 ## Semi-Manual testing
 
