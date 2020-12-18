@@ -193,14 +193,13 @@ def test_removed_packages(tracim):
     assert not tracim.package('build-essential').is_installed
 
 def test_tracimcli_access(tracim, capsys):
-    result = tracim.check_output('tracimcli dev parameters value -f -d -c /etc/tracim/development.ini')
+    result = tracim.check_output('su www-data -s /bin/bash -c"tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"')
     with capsys.disabled():
         print('\n')
         print(result)
         print('\n')
     assert result
 
-@pytest.mark.xfail("do not work as expected, need to be fixed")
 def test_gocryptfs_mount(tracim, capsys):
     result = tracim.check_output(
             'mount | grep gocryptfs'

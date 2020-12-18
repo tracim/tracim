@@ -40,6 +40,9 @@ def tracim_docker_params(tracim_env_var_params):
         '--name', 'tracim.test',
         '--hostname', "tracim.test",
         '-d',
+        '--device', '/dev/fuse',
+        '--cap-add', 'SYS_ADMIN',
+        '--security-opt', 'apparmor:unconfined',
         '--network',
         DOCKER_TEST_NETWORK,
     ]
