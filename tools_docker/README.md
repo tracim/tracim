@@ -147,6 +147,8 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 #### Running with gocryptfs encryption
 
+This need the new specific Debian_New_Uwsgi docker (see build section). This is an experimental
+docker image, the new feature from this docker will maybe be merged to the standard docker or removed.
 Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
 for this exemple,
@@ -158,7 +160,6 @@ echo "password" -> ~/tracim/secret/password.txt
 
 ```bash
 docker run \
-       -it \
        --device /dev/fuse
        --cap-add SYS_ADMIN
        --security-opt apparmor:unconfined
@@ -183,6 +184,9 @@ You will need it each time you need to run the docker.
 rm ~/tracim/secret/password.txt
 ```
 
+Note: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
+this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
+
 ### Build images
 
 To build image
@@ -191,7 +195,7 @@ To build image
     docker build -t algoo/tracim:latest .
 
 
-To build encryption-enabled image (beta):
+To build encryption-enabled (gocryptfs based) image (experimental):
 
     cd tools_docker/Debian_New_Uwsgi
     docker build -t algoo/tracim:latest .
