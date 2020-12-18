@@ -325,6 +325,8 @@ class CFG(object):
         self._load_webdav_config()
         self.log_config_header("Search config parameters:")
         self._load_search_config()
+        self.log_config_header("Content Security Policy parameters:")
+        self._load_content_security_policy_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -371,6 +373,8 @@ class CFG(object):
         self.SESSION__URL = self.get_raw_config("session.url")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
+        self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
+        self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
@@ -773,6 +777,21 @@ class CFG(object):
         self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
         self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
 
+    def _load_content_security_policy_config(self) -> None:
+        prefix = "content_security_policy"
+        self.CONTENT_SECURITY_POLICY__ENABLED = asbool(
+            self.get_raw_config("{}.enabled".format(prefix), "True")
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_URI = self.get_raw_config(
+            "{}.report_uri".format(prefix), None
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_ONLY = asbool(
+            self.get_raw_config("{}.report_only".format(prefix), "False")
+        )
+        self.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES = self.get_raw_config(
+            "{}.additional_directives".format(prefix), ""
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -786,6 +805,8 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
+        self._check_webdav_config_validity()
+        self._check_content_security_policy_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -817,6 +838,18 @@ class CFG(object):
             )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
         self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
+
+        if not self.SESSION__SECURE and self.API__BASE_URL.startswith("https://"):
+            logger.warning(
+                self,
+                "session.secure option not enabled but api base url is using HTTPS, we strongly recommend you to activate this "
+                "options if you are using HTTPS".format(),
+            )
+        if not self.SESSION__HTTPONLY:
+            logger.warning(
+                self,
+                '"session.httponly" parameter disabled, this is unsafe. We strongly recommend to enable it.',
+            )
         # INFO - G.M - 2019-04-03 - check color file validity
         self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
@@ -851,7 +884,9 @@ class CFG(object):
             )
 
         self.check_mandatory_param("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
-
+        self.check_https_url_path("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
+        self.check_mandatory_param("API__BASE_URL", self.API__BASE_URL)
+        self.check_https_url_path("API__BASE_URL", self.API__BASE_URL)
         self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
         self.check_directory_path_param(
             "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
@@ -1093,6 +1128,18 @@ class CFG(object):
                 when_str="if elasticsearch search feature is enabled",
             )
 
+    def _check_webdav_config_validity(self):
+        self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+        self.check_https_url_path("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+
+    def _check_content_security_policy_validity(self) -> None:
+        if self.CONTENT_SECURITY_POLICY__ENABLED and self.CONTENT_SECURITY_POLICY__REPORT_ONLY:
+            self.check_mandatory_param(
+                "CONTENT_SECURITY_POLICY__REPORT_URI",
+                self.CONTENT_SECURITY_POLICY__REPORT_URI,
+                when_str="if content_security_policy.report_only is enabled",
+            )
+
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
         """
@@ -1159,6 +1206,17 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
                 "Set it before continuing.".format(param_name, when_str=when_str)
+            )
+
+    def check_https_url_path(
+        self, param_name: str, value: typing.Any, extended_str: str = ""
+    ) -> None:
+        if not isinstance(value, str) or not value.startswith("https://"):
+            logger.warning(
+                self,
+                'parameter "{}"  value "{}" is not set with an https url, this either mean a mistake '
+                "or a that you are running tracim with an unsafe configuration. HTTPS is strongly recommended "
+                "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
     def check_directory_path_param(
