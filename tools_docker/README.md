@@ -163,9 +163,9 @@ instead in order to not store the password in the bash history.
 
 ```bash
 docker run \
-       --device /dev/fuse
-       --cap-add SYS_ADMIN
-       --security-opt apparmor:unconfined
+       --device /dev/fuse \
+       --cap-add SYS_ADMIN \
+       --security-opt apparmor:unconfined \
        -e DATABASE_TYPE=sqlite \
        -e ENABLE_GOCRYPTFS_ENCRYPTION=1 \
        -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/data/preview \
