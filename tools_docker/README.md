@@ -158,6 +158,9 @@ you first need to write password you want in `~/tracim/secret/password.txt` file
 echo "password" > ~/tracim/secret/password.txt
 ```
 
+Note: this is just an example, we suggest you to write password with a text editor
+instead in order to not store the password in the bash history.
+
 ```bash
 docker run \
        --device /dev/fuse
