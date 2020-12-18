@@ -1,0 +1,73 @@
+<VirtualHost *:80>
+
+    Alias "/assets" "/tracim/frontend/dist/assets"
+    Alias "/favicon.ico" "/tracim/frontend/dist/assets/favicon.ico"
+    <Directory "/tracim/frontend/dist/assets">
+        Require all granted
+        RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresDefault "access plus 1 months"
+        </IfModule>
+    </Directory>
+
+    Alias "/app" "/tracim/frontend/dist/app"
+    <Directory "/tracim/frontend/dist/app">
+        Require all granted
+        RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresDefault "access plus 1 months"
+        </IfModule>
+    </Directory>
+
+    # This directive is needed for macOS webdav usage (at least)
+    # If we want to remove it we have to address this issue
+    # https://github.com/tracim/tracim/issues/3320
+    SetEnv proxy-sendcl
+
+    # Setting Destination header from https to http in proxy
+    # is needed for working move/copy in webdav
+    # Can't be added in Location https://httpd.apache.org/docs/2.4/en/mod/mod_headers.html
+    RequestHeader edit Destination ^https http early
+
+    # Proxying Webdav
+    # Define START_WEBDAV
+    <IfDefine START_WEBDAV>
+        <Location /webdav>
+            # Preserving host is needed for working move/copy in webdav
+            ProxyPreserveHost On
+            ProxyPass http://127.0.0.1:3030/webdav
+            ProxyPassReverse http://127.0.0.1:3030/webdav
+        </Location>
+    </IfDefine>
+
+    # Proxying Caldav
+    # Define START_CALDAV
+    <IfDefine START_CALDAV>
+        ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
+        ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
+    </IfDefine>
+
+    # Proxying Frontend
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /ui uwsgi://127.0.0.1:8081/
+
+    # Proxying Tracim Live Message to Pushpin
+    # NOTE: no reverse as ProxyPassMatchReverse does not exist...
+    ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+
+    # Proxying Backend API
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /api uwsgi://127.0.0.1:8081/
+
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081/
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081/
+
+    ProxyPassMatch ^/$ uwsgi://localhost:8081/
+    ProxyPassReverse / uwsgi://127.0.0.1:8081/
+
+    CustomLog /var/tracim/logs/apache2-access.log combined
+    ErrorLog /var/tracim/logs/apache2-error.log
+
+</VirtualHost>
