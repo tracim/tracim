@@ -15,7 +15,7 @@
 ### New Features
 
 - Personal and per-space activity feeds help you keep up with what is going on in Tracim: you will be able to notice new contents, new members and other updates in real time at a glance.
-- Access to applications through tabs (dashboard, contents, activity feed, etc)
+- Tabs to access the dashboard, activity feed and all contents
 
 ### Fixed Issues
 
