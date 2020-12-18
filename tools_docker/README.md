@@ -145,10 +145,15 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
-#### Running with gocryptfs encryption
+#### Running with gocryptfs encryption (Experimental !)
 
-This need the new specific Debian_New_Uwsgi docker (see build section). This is an experimental
-docker image, the new feature from this docker will maybe be merged to the standard docker or removed.
+Warning: This is an experimental docker image,
+the new feature from this docker will maybe be merged to the standard docker or removed.
+
+Warning: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
+this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
+
+This need the new specific Debian_New_Uwsgi docker (see build section).
 Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
 Note: with this new docker, all tracimcli and alembic command should be runned as
@@ -196,8 +201,6 @@ You will need it each time you need to run the docker.
 rm ~/tracim/secret/password.txt
 ```
 
-Note: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
-this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
 
 ### Build images
 
