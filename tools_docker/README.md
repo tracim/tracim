@@ -168,12 +168,12 @@ docker run \
        --security-opt apparmor:unconfined
        -e DATABASE_TYPE=sqlite \
        -e ENABLE_GOCRYPTFS_ENCRYPTION=1 \
-       -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/previews \
+       -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/data/preview \
        -e TRACIM_PREVIEW_CACHE_DIR=/media/previews \
-       -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/uploaded_files \
+       -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/data/uploaded_files \
        -e TRACIM_DEPOT_STORAGE_DIR=/media/uploaded_files \
        -e GOCRYPTFS_PASSWORD_PATH=/var/secret/password.txt \
-       -p 8081:80 \
+       -p 8080:80 \
        -v ~/tracim/etc:/etc/tracim \
        -v ~/tracim/var:/var/tracim \
        -v ~/tracim/secret:/var/secret \
