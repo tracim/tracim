@@ -79,6 +79,11 @@ Using configurations files and `STOP_CONTAINER_AT_THE_END=False` you can manuall
 This way you can try some custom cases like using existing data or testing whether Collabora works, email notifications and email replies work.
 If you have correctly set up `dns-proxy-server`, tracim should be available with "http://tracim.test"
 
+for semi manual test, its better to do this:
+```sh
+pytest -m test_all_in_one_step test_docker
+```
+
 ## Configuration file
 
 There are 2 configuration files: `tracim.env` and `test_config.env`, first one

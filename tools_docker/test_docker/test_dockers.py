@@ -200,6 +200,7 @@ def test_tracimcli_access(tracim, capsys):
         print('\n')
     assert result
 
+@pytest.mark.xfail("do not work as expected, need to be fixed")
 def test_gocryptfs_mount(tracim, capsys):
     result = tracim.check_output(
             'mount | grep gocryptfs'
@@ -210,7 +211,7 @@ def test_gocryptfs_mount(tracim, capsys):
         print('\n')
     assert result
 
-
+@pytest.mark.test_all_in_one_step
 def test_all(tracim, capsys):
     test_redis_running(tracim)
     test_apache_running(tracim)

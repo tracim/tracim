@@ -20,6 +20,7 @@ SLEEP_AFTER_START_COLLABORA_CONTAINER = int(test_config_value['SLEEP_AFTER_START
 TRACIM_DOMAIN_NAME = test_config_value['TRACIM_DOMAIN_NAME']
 TRACIM_ETC_FOLDER = test_config_value['TRACIM_ETC_FOLDER']
 TRACIM_VAR_FOLDER = test_config_value['TRACIM_VAR_FOLDER']
+TRACIM_SECRET_FOLDER = test_config_value['TRACIM_SECRET_FOLDER']
 
 @pytest.fixture(scope='session')
 def tracim_env_var_file_path():
@@ -51,6 +52,9 @@ def tracim_docker_params(tracim_env_var_params):
     if TRACIM_VAR_FOLDER:
         params.append('-v')
         params.append('{}:/var/tracim'.format(TRACIM_VAR_FOLDER))
+    if TRACIM_SECRET_FOLDER:
+        params.append('-v')
+        params.append('{}:/var/secret'.format(TRACIM_SECRET_FOLDER))
     params.append(DOCKER_TRACIM_IMAGE)
     return params
 
