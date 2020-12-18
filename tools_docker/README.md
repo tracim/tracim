@@ -158,8 +158,9 @@ user www-data, example:
 su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"
 ```
 
-for this exemple,
+for this example,
 you first need to write password you want in `~/tracim/secret/password.txt` file.
+Folder `~/tracim/secret` will be mounted as a docker volume.
 
 ```bash
 mkdir -p ~/tracim/secret
