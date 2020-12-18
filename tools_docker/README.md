@@ -176,7 +176,7 @@ docker run \
        algoo/tracim
 ```
 
-if you want a bit more security, you can remove password file.
+For more security, you may want to remove the password file.
 You will need it each time you need to run the docker.
 
 ```bash
@@ -191,7 +191,7 @@ To build image
     docker build -t algoo/tracim:latest .
 
 
-To build encrypted-enabled image (beta):
+To build encryption-enabled image (beta):
 
     cd tools_docker/Debian_New_Uwsgi
     docker build -t algoo/tracim:latest .
