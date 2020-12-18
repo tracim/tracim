@@ -155,6 +155,7 @@ for this exemple,
 you first need to write password you want in `~/tracim/secret/password.txt` file.
 
 ```bash
+mkdir -p ~/tracim/secret
 echo "password" > ~/tracim/secret/password.txt
 ```
 
