@@ -151,6 +151,13 @@ This need the new specific Debian_New_Uwsgi docker (see build section). This is 
 docker image, the new feature from this docker will maybe be merged to the standard docker or removed.
 Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
+Note: with this new docker, all tracimcli and alembic command should be runned as
+user www-data, example:
+
+```bash
+su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"
+```
+
 for this exemple,
 you first need to write password you want in `~/tracim/secret/password.txt` file.
 
