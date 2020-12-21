@@ -1,9 +1,18 @@
+## 3.4.0 / 2020-12-21
 
+### New Features
+
+- Files uploaded to Tracim can now be stored on a Amazon S3 compatible server, see [backend documentetation](backend/doc/setting.md) for details on how to configure it.
+- Security improvements: restrict cookie access and enable [Content Security Policy](https://www.w3.org/TR/CSP2/) header, see [backend documentation](backend/doc/setting.md) for details.
+
+### Fixed Issues
+
+- Avatar sizes: [#3903](https://github.com/tracim/tracim/issues/3903)
 
 ## 3.3.1 / 2020-12-18
 
 ### Fixed Issues
- 
+
 - Mention: [#3722](https://github.com/tracim/tracim/issues/3722),
 [#3927](https://github.com/tracim/tracim/issues/3927)
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
@@ -34,7 +43,7 @@
 ### Fixed Issues
 
 - Backend: [#3836](https://github.com/tracim/tracim/issues/3836)
- 
+
 
 ## 3.2.1 / 2020-11-04
 
