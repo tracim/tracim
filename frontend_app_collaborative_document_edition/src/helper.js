@@ -29,13 +29,6 @@ export const FILE_TYPES = {
   }
 }
 
-export const PAGE = {
-  WORKSPACE: {
-    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`
-  },
-  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
-}
-
 export const getTemplateFromFileType = (software, fileType, availableTemplates) => {
   const softwareSupportedFileTypes = FILE_TYPES[software] || {}
   const extension = softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].ext : 'notAnExtension'

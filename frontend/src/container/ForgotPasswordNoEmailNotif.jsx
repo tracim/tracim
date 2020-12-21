@@ -6,9 +6,8 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import Button from '../component/common/Input/Button.jsx'
-import { PAGE } from '../util/helper.js'
 import { resetBreadcrumbs, setConfig, setHeadTitle } from '../action-creator.sync.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
 import { getConfig } from '../action-creator.async'
 
 export class ForgotPasswordNoEmailNotif extends React.Component {

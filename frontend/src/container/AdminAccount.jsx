@@ -24,7 +24,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -42,7 +43,6 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
@@ -191,22 +191,13 @@ export class Account extends React.Component {
     const { props, state } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span>{props.t('Administration')}</span>,
+      link: <Link to={PAGE.ADMIN.USER}>{props.t('User account management')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      notALink: true
+      label: props.t('User account management')
     }, {
-      link: <Link to={PAGE.ADMIN.USER}>{props.t('Users')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: (
-        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.userId)}>
-          {state.userToEdit.publicName}
-        </Link>
-      ),
-      type: BREADCRUMBS_TYPE.CORE
+      link: <Link to={PAGE.ADMIN.USER}>{state.userToEdit.publicName}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: state.userToEdit.publicName
     }]))
   }
 

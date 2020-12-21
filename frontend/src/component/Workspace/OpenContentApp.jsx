@@ -44,7 +44,8 @@ export class OpenContentApp extends React.Component {
           ...contentType.find(ct => ct.slug === contentToOpen.type),
           workspace: {
             label: currentWorkspace.label,
-            downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content')
+            downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content'),
+            memberList: currentWorkspace.memberList
           }
         }
         // open app

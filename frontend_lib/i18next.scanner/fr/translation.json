@@ -117,5 +117,8 @@
   "@all Please notice that I did an important update on this content.": "@tous Veuillez noter que j'ai fait une mise à jour importante de ce contenu.",
   "An error has happened while getting the known members list": "Une erreur s'est produite lors de la récupération de la liste de membres connus",
   "Sends a notification to all members of the space": "Envoie une notification à tous les membres de l'espace",
-  "Error while detecting the mentions": "Erreur pendant la détection des mentions"
+  "Error while detecting the mentions": "Erreur pendant la détection des mentions",
+  "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
+  "Edit": "Modifier",
+  "Validate anyway": "Valider quand même"
 }

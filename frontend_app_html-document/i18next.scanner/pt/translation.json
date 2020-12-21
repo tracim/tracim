@@ -27,5 +27,7 @@
   "You are trying to mention an invalid user": "Está a tentar mencionar um utilizador inválido",
   "You must change the status or restore this note before any change": "É necessário alterar o status ou restaurar esta nota antes de qualquer alteração",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
-  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador"
+  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador",
+  "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
+  "Validate anyway": "Validar de qualquer forma"
 }

@@ -1,9 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE } from '../../../util/helper.js'
 import { translate } from 'react-i18next'
-import { Avatar, DropdownMenu } from 'tracim_frontend_lib'
+import { Avatar, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
 
