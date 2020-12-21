@@ -74,7 +74,9 @@ class WOPIController(Controller):
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/GetFile.html#getfile
         """
         try:
-            file_ = DepotManager.get().get(request.current_content.depot_file)
+            file_ = DepotManager.get(request.app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
+                request.current_content.depot_file
+            )
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(

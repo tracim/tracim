@@ -8,6 +8,7 @@ import { commentList as fixtureCommentList } from './fixture/contentCommentList.
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import {
+  mockGetMyselfKnownMember200,
   mockPutContent200,
   mockPostContentComment200,
   mockPutContentStatus204,
@@ -45,6 +46,8 @@ describe('appContentFactory.js', () => {
   const appContentSlug = 'appContentSlugExample'
 
   const fakeApiUrl = 'http://fake.url/api'
+
+  mockGetMyselfKnownMember200(fakeApiUrl, fakeContent.workspace_id, ['@user1'])
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {

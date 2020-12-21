@@ -2,6 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
@@ -51,10 +52,13 @@ import {
   updateTLMAuthor,
   scrollIntoViewIfNeeded,
   darkenColor,
-  lightenColor
+  lightenColor,
+  PAGE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
+  getInvalidMentionList,
+  handleInvalidMentionInComment,
   handleMentionsBeforeSave
 } from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -148,6 +152,7 @@ import {
 
 import {
   baseFetch,
+  getContentPath,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -206,8 +211,11 @@ export {
 export {
   appContentFactory,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
+  getContentPath,
+  handleInvalidMentionInComment,
   naturalCompareLabels,
   sortWorkspaceList,
   TracimComponent,
@@ -328,6 +336,7 @@ export {
   putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
+  getInvalidMentionList,
   handleMentionsBeforeSave,
   NoHoverListItem,
   permissiveNumberEqual,
@@ -342,5 +351,6 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent
+  getWorkspaceContent,
+  PAGE
 }

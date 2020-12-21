@@ -8,12 +8,12 @@ import {
   Avatar,
   BREADCRUMBS_TYPE,
   Breadcrumbs,
+  PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
-import { PAGE } from '../../util/helper.js'
 
 import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
@@ -95,7 +95,8 @@ export class MemberActivity extends React.Component {
     const breadcrumbsList = [
       {
         link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
+        type: BREADCRUMBS_TYPE.CORE,
+        label: workspaceLabel
       }
     ]
 
@@ -104,7 +105,7 @@ export class MemberActivity extends React.Component {
         <Avatar publicName={newestMessage.fields.user.public_name} width='32px' style={{ marginRight: '5px' }} />
         <div className='memberActivity__title'>
           {this.getText()}
-          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+          <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
         <TimedEvent
           customClass='memberActivity__right'

@@ -12,7 +12,6 @@ import {
 } from '../action-creator.sync.js'
 import {
   NO_ACTIVE_SPACE_ID,
-  PAGE,
   workspaceConfig,
   getUserProfile,
   unLoggedAllowedPageList,
@@ -30,7 +29,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   scrollIntoViewIfNeeded,
   Icon,
-  IconButton
+  IconButton,
+  PAGE
 } from 'tracim_frontend_lib'
 
 export class Sidebar extends React.Component {

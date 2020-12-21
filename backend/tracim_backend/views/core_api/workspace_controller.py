@@ -45,6 +45,7 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
@@ -58,6 +59,7 @@ from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 from tracim_backend.views.core_api.schemas import ContentMoveSchema
+from tracim_backend.views.core_api.schemas import ContentPathInfoSchema
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
@@ -592,6 +594,26 @@ class WorkspaceController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(ContentPathInfoSchema())
+    def get_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Get Content Path : return all hierarchy of content from workspace root to content
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config
+        )
+        content = api.get_one(
+            content_id=hapic_data.path.content_id,
+            content_type=content_type_list.Any_SLUG,
+            workspace=request.current_workspace,
+        )
+        return ListItemsObject(
+            [api.get_content_in_context(path_content) for path_content in content.content_path]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
@@ -881,3 +903,10 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.reject_subscription, route_name="reject_subscription")
+        # Content path
+        configurator.add_route(
+            "get_content_path",
+            "/workspaces/{workspace_id}/contents/{content_id}/path",
+            request_method="GET",
+        )
+        configurator.add_view(self.get_content_path, route_name="get_content_path")

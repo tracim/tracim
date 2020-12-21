@@ -3,7 +3,8 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getWorkspaceContent
+  getWorkspaceContent,
+  getContentPath
 } from 'tracim_frontend_lib'
 
 const createActivityEvent = (message) => {
@@ -20,7 +21,7 @@ const createSingleMessageActivity = (activityParams, messageList) => {
   const message = messageList[0]
   return {
     ...activityParams,
-    eventList: [createActivityEvent(message)],
+    eventList: [],
     reactionList: [],
     commentList: [],
     newestMessage: message
@@ -46,13 +47,20 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
   const commentList = response.apiResponse.status === 200 ? response.body : []
+
+  const fetchGetContentPath = await handleFetchResult(
+    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+  )
+  const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : []
+
   return {
     ...activityParams,
-    eventList: messageList.map(createActivityEvent),
+    eventList: [],
     reactionList: [],
     commentList: commentList,
     newestMessage: first,
-    content: content
+    content: content,
+    contentPath: contentPath
   }
 }
 const getActivityParams = (message) => {

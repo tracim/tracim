@@ -183,6 +183,8 @@ def test_existing_packages(tracim):
     assert tracim.package("libimage-exiftool-perl").is_installed
     assert tracim.package("libfile-mimeinfo-perl").is_installed
     assert tracim.pip_package.get_packages().get('tracim-backend')
+    assert tracim.package('fuse').is_installed
+    assert tracim.package('gocryptfs').is_installed
 
 def test_removed_packages(tracim):
     assert not tracim.package('curl').is_installed
@@ -191,14 +193,24 @@ def test_removed_packages(tracim):
     assert not tracim.package('build-essential').is_installed
 
 def test_tracimcli_access(tracim, capsys):
-    result = tracim.check_output('tracimcli dev parameters value -f -d -c /etc/tracim/development.ini')
+    result = tracim.check_output('su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"')
     with capsys.disabled():
         print('\n')
         print(result)
         print('\n')
     assert result
 
+def test_gocryptfs_mount(tracim, capsys):
+    result = tracim.check_output(
+            'mount | grep gocryptfs'
+    )
+    with capsys.disabled():
+        print('\n')
+        print(result)
+        print('\n')
+    assert result
 
+@pytest.mark.test_all_in_one_step
 def test_all(tracim, capsys):
     test_redis_running(tracim)
     test_apache_running(tracim)
@@ -221,3 +233,4 @@ def test_all(tracim, capsys):
     test_existing_packages(tracim)
     test_removed_packages(tracim)
     test_tracimcli_access(tracim, capsys)
+    test_gocryptfs_mount(tracim, capsys)

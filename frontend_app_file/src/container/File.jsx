@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  buildContentPathBreadcrumbs,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -10,6 +11,7 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
+  handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -24,7 +26,6 @@ import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   Badge,
-  BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -45,12 +46,13 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
+  PAGE,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
+import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -97,7 +99,9 @@ export class File extends React.Component {
       previewVideo: false,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      invalidMentionList: [],
+      isLastTimelineItemCurrentToken: false,
+      showInvalidMentionPopupInComment: false
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -364,20 +368,7 @@ export class File extends React.Component {
   }
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          // FIXME - b.l - refactor urls
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
-          label: `${content.filename}`,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   handleClickBtnCloseApp = () => {
@@ -438,7 +429,24 @@ export class File extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = () => {
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  }
+
+  handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
+    }
+  }
+
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -708,6 +716,8 @@ export class File extends React.Component {
     }
   }
 
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
+
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -811,8 +821,12 @@ export class File extends React.Component {
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
+          invalidMentionList={state.invalidMentionList}
+          onClickCancelSave={this.handleCancelSave}
+          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
+          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+          searchForMentionInQuery={this.searchForMentionInQuery}
         />
       )
     }
