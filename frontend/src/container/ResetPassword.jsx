@@ -18,8 +18,7 @@ import {
   setConfig,
   setHeadTitle
 } from '../action-creator.sync.js'
-import { PAGE } from '../util/helper.js'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 

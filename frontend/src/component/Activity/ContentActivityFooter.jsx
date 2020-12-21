@@ -3,9 +3,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
-import { IconButton } from 'tracim_frontend_lib'
-
-import { PAGE } from '../../util/helper.js'
+import { IconButton, PAGE } from 'tracim_frontend_lib'
 
 require('./ContentActivityFooter.styl')
 

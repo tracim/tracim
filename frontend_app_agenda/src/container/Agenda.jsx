@@ -12,6 +12,7 @@ import {
   PageWrapper,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
+  PAGE,
   RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -228,23 +229,24 @@ export class Agenda extends React.Component {
   buildBreadcrumbs = () => {
     const { props, state } = this
 
-    const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }]
+    const breadcrumbsList = []
 
-    if (state.config.appConfig.workspaceId) {
+    const workspaceId = state.config.appConfig.workspaceId
+    if (workspaceId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{state.content.workspaceLabel}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: state.content.workspaceLabel
       }, {
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/agenda`}>{props.t('Agenda')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <Link to={PAGE.WORKSPACE.AGENDA(workspaceId)}>{props.t('Agenda')}</Link>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('Agenda')
       })
     } else {
       breadcrumbsList.push({
-        link: <Link to='/ui/agenda'>{props.t('All my agendas')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        link: <Link to={PAGE.AGENDA}>{props.t('All my agendas')}</Link>,
+        type: BREADCRUMBS_TYPE.CORE,
+        label: props.t('All my agendas')
       })
     }
 
