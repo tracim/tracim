@@ -21,7 +21,7 @@ class TestContentSecurityPolicy:
         assert res.headers["Content-Security-Policy"]
         content_security_policy = res.headers["Content-Security-Policy"]
         directives = content_security_policy.split(";")
-        assert any(("script-src 'unsafe-eval' 'nonce-" in d) for d in directives)
+        assert any(("script-src 'nonce-" in d) for d in directives)
 
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_test_csp_disabled"}], indirect=True
