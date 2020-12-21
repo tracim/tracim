@@ -14,6 +14,7 @@ import {
   SPACE_TYPE_LIST,
   SUBSCRIPTION_TYPE,
   IconButton,
+  PAGE,
   TextInput
 } from 'tracim_frontend_lib'
 
@@ -23,9 +24,6 @@ import {
   setHeadTitle,
   setWorkspaceSubscriptionList
 } from '../action-creator.sync.js'
-import {
-  PAGE
-} from '../util/helper.js'
 import { getWorkspaceSubscriptions, postUserWorkspace, putUserWorkspaceSubscription } from '../action-creator.async.js'
 
 require('../css/JoinWorkspace.styl')
@@ -68,11 +66,9 @@ export class JoinWorkspace extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
       link: <Link to={PAGE.JOIN_WORKSPACE}>{props.t('Join a space')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Join a space')
     }]))
   }
 

@@ -3,10 +3,10 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import Tab from './Tab.jsx'
 import {
+  PAGE,
   PageTitle,
   SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
-import { PAGE } from '../../util/helper.js'
 
 require('./TabBar.styl')
 

@@ -31,10 +31,9 @@ import {
   TracimComponent,
   Avatar,
   ComposedIcon,
-  formatAbsoluteDate
+  formatAbsoluteDate,
+  PAGE
 } from 'tracim_frontend_lib'
-import { PAGE } from '../util/helper.js'
-
 import { escape as escapeHtml } from 'lodash'
 
 export class NotificationWall extends React.Component {

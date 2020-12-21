@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import PageTitle from '../../src/component/Layout/PageTitle.jsx'
+import { PageTitle } from '../../src/component/Layout/PageTitle.jsx'
 
 describe('<PageTitle />', () => {
   const props = {
@@ -10,7 +10,8 @@ describe('<PageTitle />', () => {
     title: 'randomTitle',
     subtitle: 'randomSubtitle',
     icon: 'randomIcon',
-    breadcrumbsList: ['random', 'breadcrumbs', 'list']
+    breadcrumbsList: ['random', 'breadcrumbs', 'list'],
+    t: () => {}
   }
 
   const Children = () => <div><h1>Random title</h1>I am a children of PageTitle</div>
@@ -22,7 +23,6 @@ describe('<PageTitle />', () => {
       <Children />
     </PageTitle>
   )
-
   describe('Static design', () => {
     it('should have its children', () =>
       expect(wrapper.find('.pageTitleGeneric').find(Children).length).equal(1)

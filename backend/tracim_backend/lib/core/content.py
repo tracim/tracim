@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 import datetime
 import os
+import tempfile
 import typing
 
 from depot.io.interfaces import StoredFile
@@ -24,6 +25,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -731,20 +733,41 @@ class ContentApi(object):
             )
         return revision
 
-    # INFO - A.P - 2017-07-03 - python file object getter
-    # in case of we cook a version of preview manager that allows a pythonic
-    # access to files
-    # def get_one_revision_file(self, revision_id: int = None):
-    #     """
-    #     This function allows us to directly get a Python file object from its
-    #     revision identifier.
-    #     :param revision_id: The revision id of the file we want to return
-    #     :return: The corresponding Python file object
-    #     """
-    #     revision = self.get_one_revision(revision_id)
-    #     return DepotManager.get().get(revision.depot_file)
+    def get_valid_content_filepath(
+        self, depot_stored_file: StoredFile, file_extension: str = ""
+    ) -> typing.Generator[str, None, None]:
+        """
+        Generic way to get content filepath for all depot backend.
+        :param depot_stored_file: content as depot StoredFile
+        :param file_extension: extension of the file we expect
+        :return: content filepath
+        """
+        # HACK - G.M - This mecanism is very inefficient because:
+        # - generate a temporary file each time and
+        # - skip internal cache mecanism of preview_generator as filepath is always different
+        # Improvement need to be made in preview_generator itself.
+        # to handle more properly theses issues.
+        with tempfile.NamedTemporaryFile(
+            "w+b", prefix="revision-content-", suffix=file_extension
+        ) as tmp:
+            tmp.write(depot_stored_file.read())
+            yield tmp.name
 
-    def get_one_revision_filepath(self, revision_id: int = None) -> str:
+    def get_valid_content_filepath_legacy(
+        self, depot_stored_file: StoredFile
+    ) -> typing.Generator[str, None, None]:
+        """
+        Legacy way to get content filepath, only work for local file backend of depot
+        ("depot.io.local.LocalFileStorage", aka "local" in tracim config),
+        we keep it for now as this mecanism is the only that currently work with preview_generator
+        cache mecanism.
+        :param depot_stored_file: content as depot StoredFile
+        :return: content filepath
+        """
+        yield depot_stored_file._file_path  # type: str
+
+    @contextmanager
+    def get_one_revision_filepath(self, revision_id: int) -> typing.Generator[str, None, None]:
         """
         This method allows us to directly get a file path from its revision
         identifier.
@@ -753,10 +776,20 @@ class ContentApi(object):
         """
         try:
             revision = self.get_one_revision(revision_id)
-            depot = DepotManager.get()
+            depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
             depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
-            depot_file_path = depot_stored_file._file_path  # type: str
-            return depot_file_path
+            # FIXME - G.M - 2020-12-15 : Use legacy mecanism for local storage type for now as
+            # it's far more efficient now. standard mecanism should
+            # be improved with new preview_generator version.
+            if (
+                self._config.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                == DepotFileStorageType.LOCAL.slug
+            ):
+                return self.get_valid_content_filepath_legacy(depot_stored_file)
+            else:
+                return self.get_valid_content_filepath(
+                    depot_stored_file, file_extension=revision.file_extension
+                )
         except IOError as exc:
             raise RevisionFilePathSearchFailedDepotCorrupted(
                 "IOError Unable to find Revision filepath." "File may be not available."
@@ -838,17 +871,19 @@ class ContentApi(object):
         :return: preview_path as string
         """
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
-            page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
-                raise PageOfPreviewNotFound(
-                    "page_number {page_number} of content {content_id} does not exist".format(
-                        page_number=page_number, content_id=content_id
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                page_number = preview_manager_page_format(page_number)
+                if page_number >= self.preview_manager.get_page_nb(
+                    file_path, file_ext=file_extension
+                ):
+                    raise PageOfPreviewNotFound(
+                        "page_number {page_number} of content {content_id} does not exist".format(
+                            page_number=page_number, content_id=content_id
+                        )
                     )
+                pdf_preview_path = self.preview_manager.get_pdf_preview(
+                    file_path, page=page_number, file_ext=file_extension
                 )
-            pdf_preview_path = self.preview_manager.get_pdf_preview(
-                file_path, page=page_number, file_ext=file_extension
-            )
         except PageOfPreviewNotFound as exc:
             # passthrough as this exception is already supported with
             # specific error code.
@@ -881,10 +916,10 @@ class ContentApi(object):
         :return: path of the full pdf preview of this revision
         """
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
-            pdf_preview_path = self.preview_manager.get_pdf_preview(
-                file_path, file_ext=file_extension
-            )
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                pdf_preview_path = self.preview_manager.get_pdf_preview(
+                    file_path, file_ext=file_extension
+                )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
@@ -934,33 +969,35 @@ class ContentApi(object):
         :return: preview_path as string
         """
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
-                raise PageOfPreviewNotFound(
-                    "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(
-                        page_number=page_number, revision_id=revision_id, content_id=content_id
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                if page_number >= self.preview_manager.get_page_nb(
+                    file_path, file_ext=file_extension
+                ):
+                    raise PageOfPreviewNotFound(
+                        "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(
+                            page_number=page_number, revision_id=revision_id, content_id=content_id
+                        )
                     )
-                )
-            if not width and not height:
-                width = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].width
-                height = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].height
+                if not width and not height:
+                    width = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].width
+                    height = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].height
 
-            allowed_dim = False
-            for preview_dim in self._config.PREVIEW__JPG__ALLOWED_DIMS:
-                if width == preview_dim.width and height == preview_dim.height:
-                    allowed_dim = True
-                    break
+                allowed_dim = False
+                for preview_dim in self._config.PREVIEW__JPG__ALLOWED_DIMS:
+                    if width == preview_dim.width and height == preview_dim.height:
+                        allowed_dim = True
+                        break
 
-            if not allowed_dim and self._config.PREVIEW__JPG__RESTRICTED_DIMS:
-                raise PreviewDimNotAllowed(
-                    "Size {width}x{height} is not allowed for jpeg preview".format(
-                        width=width, height=height
+                if not allowed_dim and self._config.PREVIEW__JPG__RESTRICTED_DIMS:
+                    raise PreviewDimNotAllowed(
+                        "Size {width}x{height} is not allowed for jpeg preview".format(
+                            width=width, height=height
+                        )
                     )
+                jpg_preview_path = self.preview_manager.get_jpeg_preview(
+                    file_path, page=page_number, width=width, height=height, file_ext=file_extension
                 )
-            jpg_preview_path = self.preview_manager.get_jpeg_preview(
-                file_path, page=page_number, width=width, height=height, file_ext=file_extension
-            )
         except (PreviewDimNotAllowed, PageOfPreviewNotFound) as exc:
             # passthrough as those exceptions are already supported with
             # specific error code.
@@ -1886,8 +1923,8 @@ class ContentApi(object):
 
     def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
-            nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return None
         except RevisionFilePathSearchFailedDepotCorrupted:
@@ -1902,8 +1939,8 @@ class ContentApi(object):
 
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
-            return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
         except RevisionFilePathSearchFailedDepotCorrupted:
@@ -1917,8 +1954,8 @@ class ContentApi(object):
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
         try:
-            file_path = self.get_one_revision_filepath(revision_id)
-            return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
+            with self.get_one_revision_filepath(revision_id) as file_path:
+                return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
         except RevisionFilePathSearchFailedDepotCorrupted:

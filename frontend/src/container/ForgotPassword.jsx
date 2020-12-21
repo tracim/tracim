@@ -14,10 +14,10 @@ import {
   setConfig,
   setHeadTitle
 } from '../action-creator.sync.js'
-import { PAGE } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
-  checkEmailValidity
+  checkEmailValidity,
+  PAGE
 } from 'tracim_frontend_lib'
 
 export class ForgotPassword extends React.Component {

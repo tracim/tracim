@@ -1,8 +1,8 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { PAGE, workspaceConfig } from '../../../util/helper.js'
-import { DropdownMenu } from 'tracim_frontend_lib'
+import { workspaceConfig } from '../../../util/helper.js'
+import { DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./AdminLink.styl')
 

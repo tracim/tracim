@@ -13,6 +13,7 @@ export const TextAreaApp = props =>
       className={`${props.customClass}__text editionmode__text`}
       value={props.text}
       onChange={props.onChangeText}
+      autoFocus
     />
 
     <div className={`${props.customClass}__button editionmode__button`}>

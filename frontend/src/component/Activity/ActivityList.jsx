@@ -1,10 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
+  BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   IconButton,
+  PAGE,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
@@ -17,7 +20,7 @@ import MemberActivity from './MemberActivity.jsx'
 require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
-  [TLM_ET.CONTENT, (activity, onCopyLinkClicked, onEventClicked) => {
+  [TLM_ET.CONTENT, (activity, breadcrumbsList, onCopyLinkClicked, onEventClicked) => {
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
@@ -25,6 +28,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
+          breadcrumbsList={breadcrumbsList}
         />
       )
       : (
@@ -33,6 +37,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
+          breadcrumbsList={breadcrumbsList}
         />
       )
   }],
@@ -43,10 +48,39 @@ const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
 const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 const ActivityList = (props) => {
+  const buildActivityBreadcrumbsList = (activity) => {
+    const workspace = activity.newestMessage.fields.workspace
+    const dashboardBreadcrumb = {
+      link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspace.workspace_id)}>{workspace.label}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: workspace.label
+    }
+
+    if (activity.contentPath.length > 0) {
+      return [
+        dashboardBreadcrumb,
+        ...activity.contentPath.map(crumb => ({
+          label: crumb.label,
+          link: <Link to={PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id)}>{crumb.label}</Link>,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }))
+      ]
+    } else {
+      // NOTE - S.G. - 2020-12-18 - Do not display a message to avoid
+      // multiple errors if several breadcrumbs cannot be fetched
+      return []
+    }
+  }
+
   const renderActivityComponent = (activity) => {
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
     const component = componentConstructor
-      ? componentConstructor(activity, () => props.onCopyLinkClicked(activity.newestMessage.fields.content), () => props.onEventClicked(activity))
+      ? componentConstructor(
+        activity,
+        activity.entityType === TLM_ET.CONTENT ? buildActivityBreadcrumbsList(activity) : [],
+        () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
+        () => props.onEventClicked(activity)
+      )
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
   }
