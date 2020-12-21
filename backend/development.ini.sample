@@ -16,7 +16,7 @@
 # For simple needs they are all you need to customize.
 
 ## Special Parameter
-# The syntax "%(here)s" is automatically replace by the directory of the config file.
+# The syntax "%(here)s" is automatically replaced by the directory of the config file.
 # If you do use it, please note that your config file directory may vary depending where you decide
 # to place your config file.
 
@@ -253,8 +253,8 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 ### Session ###
 
-# Warning ! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
-# in order to avoid security issues. see tracim settings documentation (available in source
+# Warning! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
+# in order to avoid security issues. See the Tracim settings documentation (available in source
 code, see "settings.md").
 
 ### pyramid_beaker parameters ###
@@ -459,7 +459,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## on this space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
-# You can enable notification specific log using 'tracim_email_notification' logger.
+# You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 
 ### SMTP ###
