@@ -4,8 +4,8 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID, PAGE } from '../../util/helper.js'
-import { ROLE, DropdownMenu } from 'tracim_frontend_lib'
+import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
+import { ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')

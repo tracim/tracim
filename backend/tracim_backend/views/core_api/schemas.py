@@ -1326,6 +1326,13 @@ class ContentCreationSchema(marshmallow.Schema):
         return ContentCreation(**data)
 
 
+class ContentMinimalSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    label = StrippedString(example="Intervention Report 12")
+    slug = StrippedString(example="intervention-report-12")
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+
+
 class ContentDigestSchema(marshmallow.Schema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
@@ -1584,6 +1591,10 @@ class LiveMessageSchemaPage(marshmallow.Schema):
     has_previous = marshmallow.fields.Bool()
     per_page = marshmallow.fields.Int()
     items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
+
+
+class ContentPathInfoSchema(marshmallow.Schema):
+    items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
 
 
 class GetLiveMessageQuerySchema(marshmallow.Schema):

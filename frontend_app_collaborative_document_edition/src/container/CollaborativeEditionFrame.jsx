@@ -1,7 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
-import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
   CUSTOM_EVENT,
@@ -9,6 +8,7 @@ import {
   buildHeadTitle,
   getFileContent,
   getWorkspaceDetail,
+  PAGE,
   ROLE
 } from 'tracim_frontend_lib'
 import { getWOPIToken } from '../action.async.js'
