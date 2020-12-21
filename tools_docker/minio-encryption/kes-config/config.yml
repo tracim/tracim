@@ -1,0 +1,26 @@
+# Listen on every interface, only localhost is listened to by default
+address: 0.0.0.0:7373
+# Disable root policy
+root: disabled
+
+# TLS key and certificate that will be used (kes can only be accessed with TLS enabled)
+tls:
+  key:  /kes-config/kes.key
+  cert: /kes-config/kes.cert
+
+# Policies to govern the authorization given to "identities"
+policy:
+  minio:
+    # Authorize those 3 apis to clients identified by
+    # the environment variable given in ${MINIO_IDENTITY}
+    paths:
+    - /v1/key/create/minio*
+    - /v1/key/generate/minio*
+    - /v1/key/decrypt/minio*
+    identities:
+    - ${MINIO_IDENTITY}
+
+keys:
+  fs:
+    # Secret keys will be stored here
+    path: /kes-config/keys

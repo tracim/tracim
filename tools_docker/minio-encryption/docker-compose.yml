@@ -1,0 +1,62 @@
+# Please read the instructions at ../../backend/doc/minio-encryption.md
+version: "3"
+services:
+  tracim:
+    # replace "latest" with the version of your choice, minio storage is supported since version 3.4.1
+    image: algoo/tracim:fuck
+    networks: [backend, frontend]
+    depends_on: [minio]
+    ports:
+      - "8080:80"
+    environment:
+      TRACIM_UPLOADED_FILES__STORAGE__STORAGE_TYPE: s3
+      TRACIM_UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL: http://minio:9000
+      TRACIM_UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID: ${MINIO_ACCESS_KEY}
+      TRACIM_UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY}
+      TRACIM_UPLOADED_FILES__STORAGE__S3__BUCKET: tracim
+      DATABASE_TYPE: sqlite
+    restart: on-failure
+    volumes:
+      - tracim-config:/etc/tracim
+      - tracim-data:/var/tracim
+
+  minio:
+    image: minio/minio:RELEASE.2020-12-16T05-05-17Z
+    networks: [backend, minio]
+    depends_on: [kes]
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_KMS_KES_ENDPOINT: https://kes:7373
+      MINIO_KMS_KES_KEY_FILE: /minio-config/private.key
+      MINIO_KMS_KES_CERT_FILE: /minio-config/public.cert
+      MINIO_KMS_KES_KEY_NAME: minio
+    volumes:
+      - ./files:/data
+      - ./minio-config:/minio-config
+    # NOTE: "-S /minio-config/certs" is needed if the kes
+    # certificate is self-signed (or has an unknown CA).
+    # In this case kes.cert must be available in /minio-config/certs/CAs/
+    command: server -S /minio-config/certs /data
+
+  kes:
+    image: minio/kes:v0.13.0
+    environment:
+      MINIO_IDENTITY: ${MINIO_IDENTITY}
+    networks: [minio]
+    # NOTE: "--auth off" is needed for self-signed certificates
+    # If the minio public.cert file is signed by a real CA you can remove the flag
+    command: server --config /kes-config/config.yml --auth off
+    volumes:
+      - ./kes-config:/kes-config
+
+networks:
+  frontend:
+  backend:
+  minio:
+
+volumes:
+  tracim-config:
+  tracim-data:
