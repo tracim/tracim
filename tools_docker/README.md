@@ -77,11 +77,10 @@ When is finished, you can quit your container. Index is now updated with all of 
 
 #### Example commands
 
-Exemple with basic instance of Tracim (local usage with webdav and caldav):
-
-        docker run -e DATABASE_TYPE=sqlite \
+    docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+
 
 To run the Tracim container with MySQL or PostgreSQL, you must set the ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` environment variables.
 
@@ -146,11 +145,74 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
+#### Running with gocryptfs encryption (Experimental !)
+
+Warning: This is an experimental docker image,
+the new feature from this docker will maybe be merged to the standard docker or removed.
+
+Warning: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
+this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
+
+This need the new specific Debian_New_Uwsgi docker (see build section).
+Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
+
+Note: with this new docker, all tracimcli and alembic command should be runned as
+user www-data, example:
+
+```bash
+su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"
+```
+
+for this example,
+you first need to write password you want in `~/tracim/secret/password.txt` file.
+Folder `~/tracim/secret` will be mounted as a docker volume.
+
+```bash
+mkdir -p ~/tracim/secret
+echo "password" > ~/tracim/secret/password.txt
+```
+
+Note: this is just an example, we suggest you to write password with a text editor
+instead in order to not store the password in the bash history.
+
+```bash
+docker run \
+       --device /dev/fuse \
+       --cap-add SYS_ADMIN \
+       --security-opt apparmor:unconfined \
+       -e DATABASE_TYPE=sqlite \
+       -e ENABLE_GOCRYPTFS_ENCRYPTION=1 \
+       -e GOCRYPTFS_PREVIEW_STORAGE_DIR=/var/tracim/data/preview \
+       -e TRACIM_PREVIEW_CACHE_DIR=/media/previews \
+       -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/data/uploaded_files \
+       -e TRACIM_DEPOT_STORAGE_DIR=/media/uploaded_files \
+       -e GOCRYPTFS_PASSWORD_PATH=/var/secret/password.txt \
+       -p 8080:80 \
+       -v ~/tracim/etc:/etc/tracim \
+       -v ~/tracim/var:/var/tracim \
+       -v ~/tracim/secret:/var/secret \
+       algoo/tracim
+```
+
+For more security, you may want to remove the password file.
+You will need it each time you need to run the docker.
+
+```bash
+rm ~/tracim/secret/password.txt
+```
+
+
 ### Build images
 
 To build image
 
     cd tools_docker/Debian_Uwsgi
+    docker build -t algoo/tracim:latest .
+
+
+To build encryption-enabled (gocryptfs based) image (experimental):
+
+    cd tools_docker/Debian_New_Uwsgi
     docker build -t algoo/tracim:latest .
 
 #### With Custom Branch or Tag
