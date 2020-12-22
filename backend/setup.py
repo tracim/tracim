@@ -28,7 +28,7 @@ requires = [
     "wsgidav",
     "PyYAML",
     # others
-    "filedepot",
+    "filedepot>=0.8.0",
     "babel",
     "python-slugify",
     "preview-generator>=0.15.4",
@@ -108,6 +108,9 @@ mysql_require = ["PyMySQL[rsa]"]
 postgresql_require = [
     "psycopg2",
 ]
+s3_require = [
+    "boto3",
+]
 # Python version adaptations
 if sys.version_info < (3, 5):
     requires.append("typing")
@@ -122,6 +125,7 @@ setup(
         "dev": tests_require + devtools_require,
         "mysql": mysql_require,
         "postgresql": postgresql_require,
+        "s3": s3_require,
     },
     install_requires=requires,
     entry_points={

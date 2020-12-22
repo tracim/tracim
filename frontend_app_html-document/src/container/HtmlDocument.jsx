@@ -8,13 +8,15 @@ import {
   APP_FEATURE_MODE,
   appContentFactory,
   ArchiveDeleteContent,
-  BREADCRUMBS_TYPE,
+  buildContentPathBreadcrumbs,
   buildHeadTitle,
   CUSTOM_EVENT,
   generateLocalStorageContentId,
   getCurrentContentVersionNumber,
+  getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
+  handleInvalidMentionInComment,
   NewVersionBtn,
   PopinFixed,
   PopinFixedContent,
@@ -81,7 +83,11 @@ export class HtmlDocument extends React.Component {
       isLastTimelineItemCurrentToken: false,
       isAutoCompleteActivated: false,
       autoCompleteCursorPosition: 0,
-      autoCompleteItemList: []
+      autoCompleteItemList: [],
+      invalidMentionList: [],
+      oldInvalidMentionList: [],
+      showInvalidMentionPopupInComment: false,
+      showInvalidMentionPopupInContent: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -373,19 +379,7 @@ export class HtmlDocument extends React.Component {
   }
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
-          label: content.label,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   loadContent = async () => {
@@ -443,6 +437,9 @@ export class HtmlDocument extends React.Component {
     this.buildBreadcrumbs(resHtmlDocument.body)
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
+    const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
+    this.setState({ oldInvalidMentionList: oldInvalidMentionList })
   }
 
   loadTimeline = () => {
@@ -488,14 +485,36 @@ export class HtmlDocument extends React.Component {
     )
   }
 
+  handleClickSaveDocument = async () => {
+    const { state } = this
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
+    const content = tinymce.activeEditor.getContent()
+    const allInvalidMentionList = getInvalidMentionList(content, knownMentions)
+    const newInvalidMentionList = allInvalidMentionList.filter(mention => {
+      return state.oldInvalidMentionList.indexOf(mention) === -1
+    })
+
+    if (newInvalidMentionList.length > 0) {
+      this.setState({
+        invalidMentionList: newInvalidMentionList,
+        showInvalidMentionPopupInContent: true
+      })
+    } else this.handleSaveHtmlDocument()
+  }
+
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
     const content = tinymce.activeEditor.getContent()
+    const allInvalidMentionList = [...state.oldInvalidMentionList, ...state.invalidMentionList]
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(content, state.loggedUser.username)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(
+        content,
+        state.loggedUser.username,
+        allInvalidMentionList
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
@@ -520,7 +539,9 @@ export class HtmlDocument extends React.Component {
           content: {
             ...prev.content,
             raw_content: newDocumentForApiWithMention
-          }
+          },
+          oldInvalidMentionList: allInvalidMentionList,
+          showInvalidMentionPopupInContent: false
         }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
@@ -567,7 +588,7 @@ export class HtmlDocument extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -580,6 +601,19 @@ export class HtmlDocument extends React.Component {
       )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
+  }
+
+  handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
     }
   }
 
@@ -692,6 +726,8 @@ export class HtmlDocument extends React.Component {
       this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
     }
   }
+
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInContent: false, showInvalidMentionPopupInComment: false })
 
   handleClickNotifyAll = async () => {
     const { state, props } = this
@@ -807,12 +843,13 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             customColor={state.config.hexcolor}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
-            onClickValidateBtn={this.handleSaveHtmlDocument}
+            onClickValidateBtn={this.handleClickSaveDocument}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             text={state.content.raw_content}
@@ -835,6 +872,9 @@ export class HtmlDocument extends React.Component {
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleSaveHtmlDocument}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
           />
 
           <PopinFixedRightPart
@@ -862,6 +902,10 @@ export class HtmlDocument extends React.Component {
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                   searchForMentionInQuery={this.searchForMentionInQuery}
                   onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+                  onClickCancelSave={this.handleCancelSave}
+                  onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+                  showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                  invalidMentionList={state.invalidMentionList}
                 />
               )
             }]}

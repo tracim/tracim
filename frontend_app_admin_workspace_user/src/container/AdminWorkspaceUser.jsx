@@ -20,7 +20,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   debug,
@@ -216,26 +217,22 @@ export class AdminWorkspaceUser extends React.Component {
   buildBreadcrumbs = () => {
     const { props, state } = this
 
-    const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span>{props.t('Administration')}</span>,
-      type: BREADCRUMBS_TYPE.CORE,
-      notALink: true
-    }]
+    const breadcrumbsList = []
 
+    let page = null
+    let label = null
     if (state.config.type === 'workspace') {
-      breadcrumbsList.push({
-        link: <Link to='/ui/admin/workspace'>{props.t('Space')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
-      })
+      page = PAGE.ADMIN.WORKSPACE
+      label = props.t('Space management')
     } else if (state.config.type === 'user') {
-      breadcrumbsList.push({
-        link: <Link to='/ui/admin/user'>{props.t('Users')}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
-      })
+      page = PAGE.ADMIN.USER
+      label = props.t('User account management')
     }
+    breadcrumbsList.push({
+      link: <Link to={page}>{label}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: label
+    })
 
     // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
     // app crash telling it cannot render a Link outside a router

@@ -1,3 +1,22 @@
+## 3.4.0 / 2020-12-21
+
+### New Features
+
+- Files uploaded to Tracim can now be stored on a Amazon S3 compatible server, see [backend documentation](backend/doc/setting.md#uploaded-files-storage) for details on how to configure it. This storage type will be improved to optimize preview generation from S3 stored files.
+- Security improvements: restrict cookie access and enable [Content Security Policy](https://www.w3.org/TR/CSP2/) header, see [backend documentation](backend/doc/setting.md#content-security-policy) for details.
+
+### Fixed Issues
+
+- Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
+
+## 3.3.1 / 2020-12-18
+
+### Fixed Issues
+
+- Mention: [#3722](https://github.com/tracim/tracim/issues/3722),
+[#3927](https://github.com/tracim/tracim/issues/3927)
+- Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
+[#3809](https://github.com/tracim/tracim/issues/3809)
 
 
 ## 3.3.0 / 2020-12-02
@@ -5,6 +24,7 @@
 ### New Features
 
 - Personal and per-space activity feeds help you keep up with what is going on in Tracim: you will be able to notice new contents, new members and other updates in real time at a glance.
+- Tabs to access the dashboard, activity feed and all contents
 
 ### Fixed Issues
 
@@ -23,7 +43,7 @@
 ### Fixed Issues
 
 - Backend: [#3836](https://github.com/tracim/tracim/issues/3836)
- 
+
 
 ## 3.2.1 / 2020-11-04
 

@@ -1,4 +1,5 @@
 {
+  "all": "todos",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
   "Send": "Enviar",
@@ -116,5 +117,8 @@
   "@all Please notice that I did an important update on this content.": "@todos reparem que fiz uma actualização importante deste conteúdo.",
   "An error has happened while getting the known members list": "Aconteceu um erro ao obter la lista de membros conhecidos",
   "Sends a notification to all members of the space": "Envia uma notificação a todos os membros do espaço",
-  "Error while detecting the mentions": "Erro ao eliminar as menções"
+  "Error while detecting the mentions": "Erro ao eliminar as menções",
+  "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
+  "Edit": "Editar",
+  "Validate anyway": "Validar de qualquer forma"
 }

@@ -5,3 +5,20 @@ services:
     network_mode: host
     volumes:
       - ${PUSHPIN_CONFIG_DIR}:/etc/pushpin
+  minio:
+    image: minio/minio:RELEASE.2020-12-16T05-05-17Z
+    ports:
+      - "9000:9000"
+    environment:
+      # default values for testing, change this if used for production!!
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: server /data
+  elasticsearch:
+    image: elasticsearch:7.0.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      discovery.type: single-node
+      cluster.routing.allocation.disk.threshold_enabled: "false"

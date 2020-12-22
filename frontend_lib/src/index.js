@@ -2,6 +2,7 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
@@ -52,10 +53,13 @@ import {
   updateTLMAuthor,
   scrollIntoViewIfNeeded,
   darkenColor,
-  lightenColor
+  lightenColor,
+  PAGE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
+  getInvalidMentionList,
+  handleInvalidMentionInComment,
   handleMentionsBeforeSave
 } from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -84,7 +88,7 @@ import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
 
-import Avatar from './component/Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
@@ -149,6 +153,7 @@ import {
 
 import {
   baseFetch,
+  getContentPath,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -200,8 +205,12 @@ export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 export {
   appContentFactory,
   addRevisionFromTLM,
+  AVATAR_SIZE,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
+  getContentPath,
+  handleInvalidMentionInComment,
   naturalCompareLabels,
   sortWorkspaceList,
   TracimComponent,
@@ -323,6 +332,7 @@ export {
   putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
+  getInvalidMentionList,
   handleMentionsBeforeSave,
   NoHoverListItem,
   permissiveNumberEqual,
@@ -337,5 +347,6 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent
+  getWorkspaceContent,
+  PAGE
 }

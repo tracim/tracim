@@ -51,7 +51,7 @@ DropdownMenu.propTypes = {
   buttonIcon: PropTypes.string,
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
-  buttonOpts: PropTypes.component,
+  buttonOpts: PropTypes.node,
   buttonTooltip: PropTypes.string,
   itemCustomClass: PropTypes.string,
   menuCustomClass: PropTypes.string,
