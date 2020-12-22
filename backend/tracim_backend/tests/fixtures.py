@@ -2,7 +2,6 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
-import shutil
 import subprocess
 import typing
 
@@ -37,10 +36,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
-from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
-from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
@@ -58,29 +55,13 @@ from tracim_backend.tests.utils import tracim_plugin_loader
 
 
 @pytest.fixture
-def pushpin_config_file():
-    return TEST_PUSHPIN_FILE_PATH
-
-
-@pytest.fixture
 def pushpin(tracim_webserver, tmp_path_factory):
-    pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
-    my_dir = dirname(__file__)
-    shutil.copyfile(
-        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
-    )
-    with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
-        routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
-    compose = DockerCompose()
-    compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
     while True:
         try:
             requests.get("http://localhost:7999")
             break
         except requests.exceptions.ConnectionError:
             pass
-    yield compose
-    compose.down()
 
 
 @pytest.fixture
@@ -117,6 +98,9 @@ def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTe
         config_dir=config_dir,
         extra_config_vars={"app:main": settings},
         hostname="127.0.0.1",
+        # NOTE SG 2020-12-22: this port MUST be the same as the one defined in
+        # backend/pushpin_config/routes file
+        port=6543,
     ) as server:
         # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
         # will check hostname:port to verify if test server

@@ -22,3 +22,13 @@ services:
     environment:
       discovery.type: single-node
       cluster.routing.allocation.disk.threshold_enabled: "false"
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  openldap:
+    # no useable tag for this image
+    image: rroemhild/test-openldap:latest
+    ports:
+      - "3890:389"
