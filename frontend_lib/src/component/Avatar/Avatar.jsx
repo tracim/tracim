@@ -4,6 +4,13 @@ import PropTypes from 'prop-types'
 // require('./Avatar.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
 
+export const AVATAR_SIZE = {
+  BIG: '100px',
+  MEDIUM: '50px',
+  SMALL: '30px',
+  MINI: '20px'
+}
+
 export class Avatar extends React.Component {
   stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
 
@@ -36,7 +43,7 @@ export class Avatar extends React.Component {
     const { props } = this
 
     const generatedColor = this.generateColorFromName(props.publicName)
-    const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.width)) / 2
+    const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2
 
     return (
       <div className='avatar-wrapper' style={{ ...props.style }} title={props.publicName}>
@@ -44,9 +51,9 @@ export class Avatar extends React.Component {
           className='avatar'
           data-cy='avatar'
           style={{
-            width: props.width,
-            height: props.width,
-            borderRadius: props.width,
+            width: props.size,
+            height: props.size,
+            borderRadius: props.size,
             backgroundColor: generatedColor,
             fontSize: fontSize
           }}
@@ -60,12 +67,12 @@ export class Avatar extends React.Component {
 
 Avatar.propTypes = {
   publicName: PropTypes.string.isRequired,
-  width: PropTypes.string,
+  size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
   style: PropTypes.object
 }
 
 Avatar.defaultProps = {
-  width: '50px',
+  size: AVATAR_SIZE.MEDIUM,
   style: {}
 }
 

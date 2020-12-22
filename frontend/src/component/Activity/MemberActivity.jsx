@@ -6,6 +6,7 @@ import { translate, Trans } from 'react-i18next'
 
 import {
   Avatar,
+  AVATAR_SIZE,
   BREADCRUMBS_TYPE,
   Breadcrumbs,
   PAGE,
@@ -102,7 +103,7 @@ export class MemberActivity extends React.Component {
 
     return (
       <div className='memberActivity'>
-        <Avatar publicName={newestMessage.fields.user.public_name} width='32px' style={{ marginRight: '5px' }} />
+        <Avatar size={AVATAR_SIZE.SMALL} publicName={newestMessage.fields.user.public_name} style={{ marginRight: '5px' }} />
         <div className='memberActivity__title'>
           {this.getText()}
           <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />

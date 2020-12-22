@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import Avatar from '../Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import { ROLE } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
@@ -46,7 +46,7 @@ export const NewMemberForm = props => {
                     key={u.user_id}
                   >
                     <div className='autocomplete__item__avatar'>
-                      <Avatar publicName={u.public_name} width='44px' />
+                      <Avatar size={AVATAR_SIZE.MEDIUM} publicName={u.public_name} />
                     </div>
 
                     <div

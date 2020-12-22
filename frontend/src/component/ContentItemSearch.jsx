@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Badge, Avatar } from 'tracim_frontend_lib'
+import { AVATAR_SIZE, Badge, Avatar } from 'tracim_frontend_lib'
 
 require('./ContentItemSearch.styl')
 
@@ -40,7 +40,7 @@ export const ContentItemSearch = props => {
 
       <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
-          width='40px'
+          size={AVATAR_SIZE.SMALL}
           style={{
             display: 'inline-block',
             marginRight: '10px'
