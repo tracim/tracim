@@ -1,11 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
+import { Link } from 'react-router-dom'
+
+import { PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
-class PageTitle extends React.Component {
+require('./PageTitle.styl')
+
+export class PageTitle extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -21,6 +27,13 @@ class PageTitle extends React.Component {
 
   render () {
     const { props } = this
+
+    const title = props.t('Home')
+    const breadcrumbsRoot = (
+      <Link to={PAGE.HOME} title={title} className='primaryColorFont primaryColorFontDarkenHover pageTitle__rootBreadcrumb'>
+        <i className='fa fa-home' /><span className='pageTitle__rootBreadcrumb__title'>{title}</span>
+      </Link>
+    )
 
     return (
       <div className={classnames(props.parentClass, props.customClass, 'pageTitleGeneric')}>
@@ -50,7 +63,7 @@ class PageTitle extends React.Component {
         </div>
 
         {props.breadcrumbsList.length > 0
-          ? <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
+          ? <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
           : <div />}
 
         {props.subtitle.length > 0 && (
@@ -67,15 +80,15 @@ class PageTitle extends React.Component {
     )
   }
 }
-export default PageTitle
+export default translate()(PageTitle)
 
 PageTitle.propTypes = {
+  breadcrumbsList: PropTypes.array.isRequired,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   subtitle: PropTypes.string,
   parentClass: PropTypes.string,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  breadcrumbsList: PropTypes.array,
   iconTooltip: PropTypes.string
 }
 
@@ -84,6 +97,5 @@ PageTitle.defaultProps = {
   customClass: '',
   icon: '',
   subtitle: '',
-  breadcrumbsList: [],
   iconTooltip: ''
 }

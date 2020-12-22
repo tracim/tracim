@@ -10,14 +10,12 @@ import {
   ProgressBar,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
+  PAGE,
   setupCommonRequestHeaders
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
-import {
-  FETCH_CONFIG,
-  PAGE
-} from '../util/helper.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { setHeadTitle } from '../action-creator.sync.js'
 import { getGuestUploadInfo } from '../action-creator.async'
 

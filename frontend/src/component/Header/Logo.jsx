@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { PAGE } from '../../util/helper.js'
+import { PAGE } from 'tracim_frontend_lib'
 
 const Logo = props => {
   return (

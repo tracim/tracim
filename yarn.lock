@@ -7287,6 +7287,15 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"is-core-module@npm:^2.1.0":
+  version: 2.2.0
+  resolution: "is-core-module@npm:2.2.0"
+  dependencies:
+    has: ^1.0.3
+  checksum: 2344744de98a3bc22e2bb30895f307d7889f09e963f9bcb1cc321788f508c8b463f75e0a9ca009eeeb8eb9465181b5c15f1ec9299a6bb6921cfbb2423892e0ba
+  languageName: node
+  linkType: hard
+
 "is-data-descriptor@npm:^0.1.4":
   version: 0.1.4
   resolution: "is-data-descriptor@npm:0.1.4"
@@ -11003,7 +11012,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-select@npm:^3.0.4, react-select@npm:^3.1.0":
+"react-select@npm:^3.0.4":
   version: 3.1.0
   resolution: "react-select@npm:3.1.0"
   dependencies:
@@ -11603,20 +11612,22 @@ fsevents@^1.2.7:
   linkType: hard
 
 "resolve@^1.10.0, resolve@^1.10.1, resolve@^1.11.0, resolve@^1.12.0, resolve@^1.13.1, resolve@^1.17.0":
-  version: 1.17.0
-  resolution: "resolve@npm:1.17.0"
+  version: 1.19.0
+  resolution: "resolve@npm:1.19.0"
   dependencies:
+    is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 5e3cdb8cf68c20b0c5edeb6505e7fab20c6776af0cae4b978836e557420aef7bb50acd25339bbb143b7f80533aa1988c7e827a0061aee9c237926a7d2c41f8d0
+  checksum: 8b23c7fde1224898ffb9fec2a2295a44d1564981343bdbf5fd3769465658f6a6f6647bb7ea66dfb3c1291ca86046b0233be2edfcd8ca05b38886521e8869677c
   languageName: node
   linkType: hard
 
 "resolve@patch:resolve@^1.10.0#builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#builtin<compat/resolve>, resolve@patch:resolve@^1.11.0#builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#builtin<compat/resolve>, resolve@patch:resolve@^1.17.0#builtin<compat/resolve>":
-  version: 1.17.0
-  resolution: "resolve@patch:resolve@npm%3A1.17.0#builtin<compat/resolve>::version=1.17.0&hash=3388aa"
+  version: 1.19.0
+  resolution: "resolve@patch:resolve@npm%3A1.19.0#builtin<compat/resolve>::version=1.19.0&hash=3388aa"
   dependencies:
+    is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 4bcfb568860d0c361fd16c26b6fce429711138ff0de7dd353bdd73fcb5c7eede2f4602d40ccfa08ff45ec7ef9830845eab2021a46036af0a6e5b58bab1ff6399
+  checksum: 188d5167e8578a9af8d194faf382b8f3526aad5145391c24ecdc6246c6fc82c10fc66d6352267f8e93c5977c503d61803169c91b9e2ee36dd2de759915c9b673
   languageName: node
   linkType: hard
 
@@ -11711,7 +11722,6 @@ fsevents@^1.2.7:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     eslint: ^6.8.0
-    react-select: ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -13196,7 +13206,7 @@ fsevents@^1.2.7:
     vinyl-fs: ^3.0.3
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13255,7 +13265,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13308,7 +13318,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13365,7 +13375,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13417,7 +13427,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13473,7 +13483,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13525,7 +13535,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13588,7 +13598,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13641,7 +13651,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13696,7 +13706,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13748,7 +13758,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13798,7 +13808,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13851,7 +13861,7 @@ fsevents@^1.2.7:
     url-loader: ^2.0.1
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13914,7 +13924,7 @@ fsevents@^1.2.7:
     uuid: ^8.1.0
     webpack: ^4.42.1
     webpack-cli: ^3.3.11
-    webpack-dev-server: ^3.10.3
+    webpack-dev-server: ^3.11.0
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
@@ -13929,7 +13939,6 @@ fsevents@^1.2.7:
   dependencies:
     classnames: ^2.2.6
     core-js: ^3.6.4
-    css-loader: ^3.5.1
     date-fns: ^1.30.1
     eslint: ^6.8.0
     lodash: ^4.17.11
@@ -14600,7 +14609,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^3.10.3":
+"webpack-dev-server@npm:^3.11.0":
   version: 3.11.0
   resolution: "webpack-dev-server@npm:3.11.0"
   dependencies:

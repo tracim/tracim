@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   APP_FEATURE_MODE,
+  ConfirmPopup,
   MentionAutoComplete,
   PromptMessage,
   HTMLContent,
@@ -90,6 +91,24 @@ export const HtmlDocument = props => {
               <HTMLContent>{props.text}</HTMLContent>
             </div>
           </div>
+        )}
+
+        {props.showInvalidMentionPopup && (
+          <ConfirmPopup
+            onConfirm={props.onClickCancelSave}
+            onClose={props.onClickCancelSave}
+            onCancel={props.onClickSaveAnyway}
+            msg={
+              <>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+                <div className='html-document__contentpage__textnote__mentions'>
+                  {props.invalidMentionList.join(', ')}
+                </div>
+              </>
+            }
+            confirmLabel={props.t('Edit')}
+            cancelLabel={props.t('Validate anyway')}
+          />
         )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&

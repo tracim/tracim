@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, PAGE } from './helper.js'
+import { FETCH_CONFIG } from './helper.js'
 import i18n from './i18n.js'
-import { ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
+import { PAGE, ROLE_LIST, PROFILE } from 'tracim_frontend_lib'
 
 const mapStateToProps = ({ system, currentWorkspace, workspaceList }) => ({ system, currentWorkspace, workspaceList })
 

@@ -3,20 +3,17 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
-
 import {
-  BREADCRUMBS_TYPE,
   Breadcrumbs,
   CONTENT_TYPE,
   DropdownMenu,
   Icon,
   IconButton,
+  PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
-
 import TimedEvent from '../TimedEvent.jsx'
-import { PAGE } from '../../util/helper.js'
 
 require('./ContentActivityHeader.styl')
 
@@ -44,23 +41,11 @@ export class ContentActivityHeader extends React.Component {
   render () {
     const { props } = this
     const workspaceId = props.workspace.workspace_id
-    const workspaceLabel = props.workspace.label
     const contentId = props.content.content_id
     const contentLabel = props.content.label
     const contentType = props.content.content_type
-    const breadcrumbsList = [
-      {
-        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
-      },
-      {
-        link: <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>{contentLabel}</Link>,
-        type: BREADCRUMBS_TYPE.CORE
-      }
-    ]
 
     const newestMessage = props.newestMessage
-
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'question', hexcolor: '#000000' }
@@ -78,7 +63,7 @@ export class ContentActivityHeader extends React.Component {
           <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
             <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
-          <Breadcrumbs breadcrumbsList={breadcrumbsList} />
+          <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
         <TimedEvent
           customClass='contentActivityHeader__right'
@@ -107,6 +92,7 @@ export class ContentActivityHeader extends React.Component {
             className='contentActivityHeader__actionMenu__item'
             title={props.t('Open content')}
             to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
+            key={`open-${contentId}`}
           >
             <i className={`fa fa-fw fa-${app.faIcon}`} />
             {props.t('Open content')}
@@ -126,5 +112,10 @@ ContentActivityHeader.propTypes = {
   eventList: PropTypes.array.isRequired,
   newestMessage: PropTypes.object.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
+  breadcrumbsList: PropTypes.array,
   onEventClicked: PropTypes.func
+}
+
+ContentActivityHeader.defaultProps = {
+  breadcrumbsList: []
 }

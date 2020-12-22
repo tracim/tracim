@@ -68,7 +68,7 @@
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.11.0"
   },
   "standard": {
     "globals": [

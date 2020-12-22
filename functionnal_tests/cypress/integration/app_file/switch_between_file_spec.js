@@ -44,10 +44,8 @@ describe('App File', () => {
 
         cy.get('.breadcrumbs__item')
           .its('length')
-          .should('eq', 4)
-
-        cy.get('.breadcrumbs__item a')
-          .contains(fileTitle_2)
+          .should('eq', 3)
+        cy.get('.breadcrumbs__item').last().contains(fileTitle_2)
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
@@ -57,7 +55,7 @@ describe('App File', () => {
 
         cy.get('.breadcrumbs__item')
           .its('length')
-          .should('eq', 3)
+          .should('eq', 2)
 
         cy.get('[data-cy="popinFixed"]')
           .should('not.be.visible')
@@ -75,8 +73,7 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.get('.breadcrumbs__item a')
-          .contains('All contents')
+        cy.contains('.breadcrumbs__item', 'All contents')
           .click()
 
         cy.get('[data-cy="popinFixed"]')

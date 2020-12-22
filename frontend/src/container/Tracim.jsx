@@ -27,10 +27,10 @@ import {
   serialize,
   TracimComponent,
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
-  PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,

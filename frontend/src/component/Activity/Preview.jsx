@@ -7,9 +7,10 @@ import {
   removeInteractiveContentFromHTML,
   HTMLContent,
   CONTENT_TYPE,
+  PAGE,
   SCREEN_SIZE
 } from 'tracim_frontend_lib'
-import { FETCH_CONFIG, PAGE } from '../../util/helper.js'
+import { FETCH_CONFIG } from '../../util/helper.js'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { getHTMLPreview } from '../../action-creator.async.js'

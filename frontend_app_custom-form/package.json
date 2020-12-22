@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
     "cheerio": "^1.0.0",

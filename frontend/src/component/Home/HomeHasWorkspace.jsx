@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Avatar } from 'tracim_frontend_lib'
+import { Avatar, AVATAR_SIZE } from 'tracim_frontend_lib'
 
 require('./Home.styl')
 
@@ -12,7 +12,7 @@ export const HomeHasWorkspace = props =>
 
     <div className='homepagecard__user'>
       <div className='homepagecard__user__avatar'>
-        <Avatar publicName={props.user.publicName} width='75px' />
+        <Avatar size={AVATAR_SIZE.BIG} publicName={props.user.publicName} />
       </div>
 
       <div className='homepagecard__user__publicname'>

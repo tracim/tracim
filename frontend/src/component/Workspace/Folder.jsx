@@ -7,9 +7,8 @@ import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { DropdownMenu, ROLE } from 'tracim_frontend_lib'
+import { DropdownMenu, PAGE, ROLE } from 'tracim_frontend_lib'
 import {
-  PAGE,
   DRAG_AND_DROP,
   sortContentList,
   SHARE_FOLDER_ID,
