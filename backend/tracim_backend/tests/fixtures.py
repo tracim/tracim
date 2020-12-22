@@ -59,7 +59,6 @@ DATABASE_URLS = {
     "postgresql": "postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8",
 }
 
-
 @pytest.fixture
 def pushpin(tracim_webserver, tmp_path_factory):
     while True:
