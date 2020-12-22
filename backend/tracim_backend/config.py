@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 import json
 import os
 import typing
@@ -36,6 +37,21 @@ CONFIG_LOG_TEMPLATE = (
 ID_SOURCE_ENV_VAR = "SOURCE_ENV_VAR"
 ID_SOURCE_CONFIG = "SOURCE_CONFIG"
 ID_SOURCE_DEFAULT = "SOURCE_DEFAULT"
+
+DEPOT_LOCAL_STORAGE_BACKEND = "depot.io.local.LocalFileStorage"
+DEPOT_S3_STORAGE_BACKEND = "depot.io.boto3.S3Storage"
+DEPOT_MEMORY_STORAGE_BACKEND = "depot.io.memory.MemoryFileStorage"
+DEPOT_CONTENT_CONF_PREFIX = "uploaded_files"
+
+
+class DepotFileStorageType(Enum):
+    LOCAL = ("local", "depot.io.local.LocalFileStorage")
+    S3 = ("s3", "depot.io.boto3.S3Storage")
+    MEMORY = ("memory", "depot.io.memory.MemoryFileStorage")
+
+    def __init__(self, slug: str, depot_storage_backend: str):
+        self.slug = slug
+        self.depot_storage_backend = depot_storage_backend
 
 
 class ConfigParam(object):
@@ -293,6 +309,8 @@ class CFG(object):
         """Parse configuration file and env variables"""
         self.log_config_header("Global config parameters:")
         self._load_global_config()
+        self.log_config_header("uploaded files config parameters:")
+        self.__load_uploaded_files_config()
         self.log_config_header("Limitation config parameters:")
         self._load_limitation_config()
         self.log_config_header("Jobs config parameters:")
@@ -307,6 +325,8 @@ class CFG(object):
         self._load_webdav_config()
         self.log_config_header("Search config parameters:")
         self._load_search_config()
+        self.log_config_header("Content Security Policy parameters:")
+        self._load_content_security_policy_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -335,9 +355,6 @@ class CFG(object):
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
-        default_depot_storage_dir = self.here_macro_replace("%(here)s/depot")
-        self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir", default_depot_storage_dir)
-        self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name", "tracim")
         default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
 
@@ -356,6 +373,8 @@ class CFG(object):
         self.SESSION__URL = self.get_raw_config("session.url")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
+        self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
+        self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
@@ -447,6 +466,47 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+    def __load_uploaded_files_config(self) -> None:
+        default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
+        self.DEPOT_STORAGE_DIR = self.get_raw_config(
+            "depot_storage_dir", default_depot_storage_path, deprecated=True
+        )
+        self.DEPOT_STORAGE_NAME = self.get_raw_config(
+            "depot_storage_name", "tracim", deprecated=True
+        )
+        self.UPLOADED_FILES__STORAGE__STORAGE_NAME = self.get_raw_config(
+            "uploaded_files.storage.storage_name", self.DEPOT_STORAGE_NAME
+        )
+        self.UPLOADED_FILES__STORAGE__STORAGE_TYPE = self.get_raw_config(
+            "uploaded_files.storage.storage_type", "local"
+        )
+        # Local file parameters
+        self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH = self.get_raw_config(
+            "uploaded_files.storage.local.storage_path", self.DEPOT_STORAGE_DIR
+        )
+        # S3 parameters
+        self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID = self.get_raw_config(
+            "uploaded_files.storage.s3.access_key_id", secret=True
+        )
+        self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY = self.get_raw_config(
+            "uploaded_files.storage.s3.secret_access_key", secret=True
+        )
+        self.UPLOADED_FILES__STORAGE__S3__POLICY = self.get_raw_config(
+            "uploaded_files.storage.s3.policy"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL = self.get_raw_config(
+            "uploaded_files.storage.s3.endpoint_url"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__BUCKET = self.get_raw_config(
+            "uploaded_files.storage.s3.bucket"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__REGION_NAME = self.get_raw_config(
+            "uploaded_files.storage.s3.region_name"
+        )
+        self.UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS = self.get_raw_config(
+            "uploaded_files.storage.s3.storage_class"
         )
 
     def _load_live_messages_config(self) -> None:
@@ -717,6 +777,21 @@ class CFG(object):
         self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
         self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
 
+    def _load_content_security_policy_config(self) -> None:
+        prefix = "content_security_policy"
+        self.CONTENT_SECURITY_POLICY__ENABLED = asbool(
+            self.get_raw_config("{}.enabled".format(prefix), "True")
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_URI = self.get_raw_config(
+            "{}.report_uri".format(prefix), None
+        )
+        self.CONTENT_SECURITY_POLICY__REPORT_ONLY = asbool(
+            self.get_raw_config("{}.report_only".format(prefix), "False")
+        )
+        self.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES = self.get_raw_config(
+            "{}.additional_directives".format(prefix), ""
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -724,11 +799,14 @@ class CFG(object):
         Check if config setted is correct
         """
         self._check_global_config_validity()
+        self._check_uploaded_files_config_validity()
         self._check_live_messages_config_validity()
         self._check_jobs_config_validity()
         self._check_email_config_validity()
         self._check_ldap_config_validity()
         self._check_search_config_validity()
+        self._check_webdav_config_validity()
+        self._check_content_security_policy_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -760,6 +838,18 @@ class CFG(object):
             )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
         self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
+
+        if not self.SESSION__SECURE and self.API__BASE_URL.startswith("https://"):
+            logger.warning(
+                self,
+                "session.secure option not enabled but api base url is using HTTPS, we strongly recommend you to activate this "
+                "options if you are using HTTPS".format(),
+            )
+        if not self.SESSION__HTTPONLY:
+            logger.warning(
+                self,
+                '"session.httponly" parameter disabled, this is unsafe. We strongly recommend to enable it.',
+            )
         # INFO - G.M - 2019-04-03 - check color file validity
         self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
@@ -784,11 +874,6 @@ class CFG(object):
                 "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
-        self.check_mandatory_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR)
-        self.check_directory_path_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR, writable=True)
-
-        self.check_mandatory_param("DEPOT_STORAGE_NAME", self.DEPOT_STORAGE_NAME)
-
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
 
@@ -799,7 +884,9 @@ class CFG(object):
             )
 
         self.check_mandatory_param("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
-
+        self.check_https_url_path("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
+        self.check_mandatory_param("API__BASE_URL", self.API__BASE_URL)
+        self.check_https_url_path("API__BASE_URL", self.API__BASE_URL)
         self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
         self.check_directory_path_param(
             "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
@@ -823,6 +910,53 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR user.default_profile given "{}" is invalid,'
                 "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
+            )
+
+    def _check_uploaded_files_config_validity(self) -> None:
+        self.check_mandatory_param(
+            "UPLOADED_FILES__STORAGE__STORAGE_NAME", self.UPLOADED_FILES__STORAGE__STORAGE_NAME
+        )
+        self.check_mandatory_param(
+            "UPLOADED_FILES__STORAGE__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+        )
+        file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
+            file_storage_str_list = ", ".join(
+                ['"{}"'.format(slug) for slug in file_storage_type_slugs]
+            )
+            raise ConfigurationError(
+                'ERROR uploaded_files.storage.storage_type given "{}" is invalid,'
+                "valids values are {}.".format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE, file_storage_str_list
+                )
+            )
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
+            self.check_mandatory_param(
+                "UPLOADED_FILES__STORAGE__STORAGE_PATH",
+                self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
+            )
+            self.check_directory_path_param(
+                "UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH",
+                self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
+                writable=True,
+            )
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.S3.slug:
+            self.check_mandatory_param(
+                "UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID",
+                self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
+            )
+            self.check_mandatory_param(
+                "UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY",
+                self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY,
+                when_str='if storage type is "{}"'.format(
+                    self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+                ),
             )
 
     def _check_live_messages_config_validity(self) -> None:
@@ -994,6 +1128,18 @@ class CFG(object):
                 when_str="if elasticsearch search feature is enabled",
             )
 
+    def _check_webdav_config_validity(self):
+        self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+        self.check_https_url_path("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
+
+    def _check_content_security_policy_validity(self) -> None:
+        if self.CONTENT_SECURITY_POLICY__ENABLED and self.CONTENT_SECURITY_POLICY__REPORT_ONLY:
+            self.check_mandatory_param(
+                "CONTENT_SECURITY_POLICY__REPORT_URI",
+                self.CONTENT_SECURITY_POLICY__REPORT_URI,
+                when_str="if content_security_policy.report_only is enabled",
+            )
+
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
         """
@@ -1018,10 +1164,32 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful DepotManager is a Singleton!
 
-        depot_storage_name = self.DEPOT_STORAGE_NAME
-        depot_storage_path = self.DEPOT_STORAGE_DIR
-        depot_storage_settings = {"depot.storage_path": depot_storage_path}
-        DepotManager.configure(depot_storage_name, depot_storage_settings)
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
+            uploaded_files_settings = {
+                "depot.backend": DepotFileStorageType.LOCAL.depot_storage_backend,
+                "depot.storage_path": self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
+            }
+        elif self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.S3.slug:
+            uploaded_files_settings = {
+                "depot.backend": DepotFileStorageType.S3.depot_storage_backend,
+                "depot.access_key_id": self.UPLOADED_FILES__STORAGE__S3__ACCESS_KEY_ID,
+                "depot.secret_access_key": self.UPLOADED_FILES__STORAGE__S3__SECRET_ACCESS_KEY,
+                "depot.policy": self.UPLOADED_FILES__STORAGE__S3__POLICY,
+                "depot.endpoint_url": self.UPLOADED_FILES__STORAGE__S3__ENDPOINT_URL,
+                "depot.bucket": self.UPLOADED_FILES__STORAGE__S3__BUCKET,
+                "depot.region_name": self.UPLOADED_FILES__STORAGE__S3__REGION_NAME,
+                "depot.storage_class": self.UPLOADED_FILES__STORAGE__S3__STORAGE_CLASS,
+            }
+        else:
+            uploaded_files_settings = {
+                "depot.backend": DepotFileStorageType.MEMORY.depot_storage_backend
+            }
+
+        DepotManager.configure(
+            name=self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
+            config=uploaded_files_settings,
+            prefix="depot.",
+        )
 
     class CST(object):
         ASYNC = "ASYNC"
@@ -1038,6 +1206,17 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
                 "Set it before continuing.".format(param_name, when_str=when_str)
+            )
+
+    def check_https_url_path(
+        self, param_name: str, value: typing.Any, extended_str: str = ""
+    ) -> None:
+        if not isinstance(value, str) or not value.startswith("https://"):
+            logger.warning(
+                self,
+                'parameter "{}"  value "{}" is not set with an https url, this either mean a mistake '
+                "or a that you are running tracim with an unsafe configuration. HTTPS is strongly recommended "
+                "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
     def check_directory_path_param(

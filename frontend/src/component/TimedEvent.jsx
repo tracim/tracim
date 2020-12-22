@@ -9,14 +9,14 @@ require('./TimedEvent.styl')
 
 const TimedEvent = (props) => {
   const topContents = (
-    <>
+    <div key={`timedEvent-${props.date}`}>
       {props.operation && (
         <span className={classnames('timedEvent__operation', { rootTimedEvent__operation: props.isRoot })}>
           {props.operation}
         </span>
       )}&nbsp;
       <DistanceDate absoluteDate={props.date} lang={props.lang} />
-    </>
+    </div>
   )
   const createHistoryTimedEvent = event => (
     <TimedEvent

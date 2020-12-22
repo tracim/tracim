@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   FETCH_CONFIG,
-  PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
@@ -57,6 +56,7 @@ import {
   ErrorFlashMessageTemplateHtml,
   updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
+  PAGE,
   TLM_CORE_EVENT_TYPE,
   TLM_ENTITY_TYPE
 } from 'tracim_frontend_lib'

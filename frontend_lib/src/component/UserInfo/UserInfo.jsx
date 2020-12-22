@@ -1,11 +1,11 @@
 import React from 'react'
-import { Avatar } from '../Avatar/Avatar.jsx'
+import { Avatar, AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import PropTypes from 'prop-types'
 
 const UserInfo = props => {
   return (
     <div className='userInfo'>
-      <Avatar width='40px' publicName={props.publicName} />
+      <Avatar size={AVATAR_SIZE.SMALL} publicName={props.publicName} />
       <div className='userInfo__name' title={props.publicName}>
         {props.publicName}
         {props.username && (

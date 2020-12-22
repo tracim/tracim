@@ -1,9 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { DropdownMenu, ROLE } from 'tracim_frontend_lib'
+import { DropdownMenu, PAGE, ROLE } from 'tracim_frontend_lib'
 import { connect } from 'react-redux'
-import { PAGE } from '../../util/helper.js'
 import { Link } from 'react-router-dom'
 
 require('./BtnExtandedAction.styl')

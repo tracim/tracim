@@ -11,6 +11,7 @@ import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
+import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -156,6 +157,24 @@ export class Timeline extends React.Component {
           <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
         </ul>
 
+        {props.showInvalidMentionPopup && (
+          <ConfirmPopup
+            onConfirm={props.onClickCancelSave}
+            onClose={props.onClickCancelSave}
+            onCancel={props.onClickSaveAnyway}
+            msg={
+              <>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+                <div className='timeline__texteditor__mentions'>
+                  {props.invalidMentionList.join(', ')}
+                </div>
+              </>
+            }
+            confirmLabel={props.t('Edit')}
+            cancelLabel={props.t('Validate anyway')}
+          />
+        )}
+
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
             <div
@@ -236,15 +255,19 @@ Timeline.propTypes = {
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   allowClickOnRevision: PropTypes.bool,
+  invalidMentionList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
   isLastTimelineItemCurrentToken: PropTypes.bool,
   rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
+  onClickCancelSave: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
+  onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func
+  searchForMentionInQuery: PropTypes.func,
+  showInvalidMentionPopup: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -258,14 +281,18 @@ Timeline.defaultProps = {
   },
   timelineData: [],
   wysiwyg: false,
-  onClickWysiwygBtn: () => {},
-  onClickRevisionBtn: () => {},
+  onClickWysiwygBtn: () => { },
+  onClickRevisionBtn: () => { },
   allowClickOnRevision: true,
+  invalidMentionList: [],
   shouldScrollToBottom: true,
   isLastTimelineItemCurrentToken: false,
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
+  onClickCancelSave: () => { },
+  onClickSaveAnyway: () => { },
   showTitle: true,
-  searchForMentionInQuery: () => {}
+  searchForMentionInQuery: () => { },
+  showInvalidMentionPopup: false
 }

@@ -3,7 +3,6 @@
 module.exports = {
   classnames: require('classnames'),
   'core-js/stable': require('core-js/stable'),
-  'css-loader': require('css-loader'),
   'date-fns': require('date-fns'),
   'lodash': require('lodash'),
   'lodash/debounce': require('lodash/debounce'),

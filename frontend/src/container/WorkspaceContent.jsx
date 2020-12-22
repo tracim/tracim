@@ -5,7 +5,6 @@ import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
 import {
-  PAGE,
   findUserRoleIdInWorkspace,
   sortContentList,
   SHARE_FOLDER_ID,
@@ -29,6 +28,7 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -246,43 +246,24 @@ export class WorkspaceContent extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props, state } = this
+
+    if (state.appOpenedType) return
+
+    const workspaceId = state.workspaceIdInUrl
+    const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === workspaceId).label)
     const breadcrumbsList = [{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
       link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.t(props.workspaceList.find(ws => ws.id === state.workspaceIdInUrl).label)}
+        <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+          {workspaceLabel}
         </Link>
       ),
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: workspaceLabel
+    }, {
+      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('Contents')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Contents')
     }]
-
-    const urlFilter = qs.parse(props.location.search).type
-
-    if (urlFilter) {
-      breadcrumbsList.push({
-        link: (
-          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}?type=${urlFilter}`}>
-            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || { label: '' }).label + 's')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE
-      })
-    } else {
-      breadcrumbsList.push({
-        link: (
-          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}`}>
-            {props.t('Contents')}
-          </Link>
-        ),
-        type: BREADCRUMBS_TYPE.CORE
-      })
-    }
-
-    // INFO - GM - 2020/03/03 - add file breadcrumbs link if it exists
-    if (props.breadcrumbs.length === breadcrumbsList.length + 1 && state.appOpenedType) breadcrumbsList.push(props.breadcrumbs[props.breadcrumbs.length - 1])
-
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
@@ -332,13 +313,13 @@ export class WorkspaceContent extends React.Component {
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
             props.dispatch(newFlashMessage(props.t('Space not found'), 'warning'))
-            props.history.push('/ui')
+            props.history.push(PAGE.HOME)
             throw new Error(fetchContentList.json.message)
         }
         break
       case 401: break
       default: {
-        props.history.push('/ui')
+        props.history.push(PAGE.HOME)
         throw new Error('Error while loading content list')
       }
     }

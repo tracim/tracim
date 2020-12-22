@@ -1,9 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE } from '../../../util/helper.js'
 import { translate } from 'react-i18next'
-import { Avatar, DropdownMenu } from 'tracim_frontend_lib'
+import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
 
@@ -15,7 +14,7 @@ export const MenuProfil = props => {
       <DropdownMenu
         buttonOpts={
           <Avatar
-            width='40px'
+            size={AVATAR_SIZE.SMALL}
             publicName={props.user.publicName}
             key='menuprofil__dropdown__avatar'
           />

@@ -203,7 +203,9 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         try:
-            file = DepotManager.get().get(content.depot_file)
+            file = DepotManager.get(request.app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
+                content.depot_file
+            )
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
@@ -248,7 +250,9 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         try:
-            file = DepotManager.get().get(revision.depot_file)
+            file = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
+                revision.depot_file
+            )
         except IOError as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
@@ -612,7 +616,7 @@ class FileController(Controller):
     @hapic.output_body(FileContentSchema())
     def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
-        Get thread content
+        Get file content
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(

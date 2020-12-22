@@ -13,9 +13,9 @@ import {
 import {
   displayFileSize,
   handleFetchResult,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  PAGE
 } from 'tracim_frontend_lib'
-import { PAGE } from '../util/helper.js'
 
 class GuestDownload extends React.Component {
   constructor (props) {

@@ -9,7 +9,10 @@
 - [ ] If relevant, manual tests have been done to ensure the stability of the whole application and that the involved feature works
 - [ ] The original issue is up to date w.r.t the latest discussions and contains a short summary of the implemented solution
 - [ ] Automated tests covering the feature or the fix, have been written, deemed irrelevant (give the reason), or an issue has been created to implement the test (give the link)
-- [ ] If there are modifications in the Tracim configuration files (eg. `development.ini`), make sure it is documented in `backend/doc/setting.md` and notify relevant people of this change
+- [ ] Make sure that:
+  - if there are modifications in the Tracim configuration files (eg. `development.ini`), they are documented in `backend/doc/setting.md`
+  - any migration process required for existing instances is documented
+  - relevant people for these changes are notified
 
 **For code reviewers**
 
