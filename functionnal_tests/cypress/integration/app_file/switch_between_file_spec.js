@@ -76,7 +76,7 @@ describe('App File', () => {
           .click()
 
         cy.get('.breadcrumbs__item a')
-          .contains('All contents')
+          .contains('Contents')
           .click()
 
         cy.get('[data-cy="popinFixed"]')

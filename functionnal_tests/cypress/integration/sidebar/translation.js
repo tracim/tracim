@@ -11,7 +11,7 @@ describe('The sidebar', function () {
   it('should have translations', () => {
     cy.get('[data-cy=sidebar__content__navigation__workspace__item_1]').should('be.visible').click()
     cy.get('.sidebar__content__navigation__item__menu').should('be.visible').click()
-    cy.get('li').contains('All Contents').should('be.visible')
+    cy.get('li').contains('Contents').should('be.visible')
 
     cy.changeLanguage('fr')
     cy.get('[data-cy=sidebar__content__navigation__workspace__item_1]').should('be.visible').click()

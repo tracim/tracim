@@ -14,6 +14,6 @@
   "Some input are invalid": "Certaines entrées ne sont pas valides",
   "Space's name:": "Nom de l'espace :",
   "Space's type:": "Type de l'espace :",
-  "This is the role that members will have by default when they join your space.": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoindront votre espace.",
+  "This is the role that members will have by default when they join your space if it is open or on request.": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace si celui-ci est ouvert ou sur demande.",
   "You cannot create anymore space": "Vous ne pouvez pas créer d'espaces supplémentaire"
 }

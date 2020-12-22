@@ -273,7 +273,7 @@ export class WorkspaceContent extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}`}>
-            {props.t('All contents')}
+            {props.t('Contents')}
           </Link>
         ),
         type: BREADCRUMBS_TYPE.CORE
