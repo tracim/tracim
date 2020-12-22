@@ -19,6 +19,7 @@ import {
   getWorkspaceDetail,
   deleteWorkspace,
   getMyselfKnownMember,
+  PAGE,
   SPACE_TYPE,
   PopinFixedRightPartContent
 } from 'tracim_frontend_lib'
@@ -585,7 +586,7 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: '/ui' } })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: PAGE.HOME } })
         this.handleClickBtnCloseApp()
         break
       default: this.sendGlobalFlashMessage(props.t('Error while deleting space', 'warning'))

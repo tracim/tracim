@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import Avatar from '../../src/component/Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from '../../src/component/Avatar/Avatar.jsx'
 
 require('../../src/component/Avatar/Avatar.styl')
 
@@ -12,7 +12,7 @@ describe('<Avatar />', () => {
 
   const props = {
     publicName: 'myName',
-    width: '100px',
+    size: AVATAR_SIZE.BIG,
     style: {
       color: 'yellow'
     }
@@ -39,10 +39,10 @@ describe('<Avatar />', () => {
       expect(wrapper.find('.avatar-wrapper').prop('style')).to.deep.equal(props.style)
     })
 
-    it(`should display its avatar in width, height and borderRadius: ${props.width}`, () => {
-      expect(wrapper.find('.avatar').prop('style').width).to.equal(props.width)
-      expect(wrapper.find('.avatar').prop('style').height).to.equal(props.width)
-      expect(wrapper.find('.avatar').prop('style').borderRadius).to.equal(props.width)
+    it(`should display its avatar in width, height and borderRadius: ${props.size}`, () => {
+      expect(wrapper.find('.avatar').prop('style').width).to.equal(props.size)
+      expect(wrapper.find('.avatar').prop('style').height).to.equal(props.size)
+      expect(wrapper.find('.avatar').prop('style').borderRadius).to.equal(props.size)
     })
   })
 

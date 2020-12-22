@@ -62,6 +62,7 @@ _install_backend: &_install_backend
     - pip install -r "requirements-build.txt"
     - pip install -r "requirements.txt"
     - pip install -r "requirements-test.txt"
+    - pip install -r "requirements-storage-s3.txt"
     # postgresql
     - |
       if [ "${DB}" == "postgres" ]; then
@@ -91,10 +92,9 @@ _install_backend: &_install_backend
     - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
     - docker pull rroemhild/test-openldap
     - docker run -d -p 3890:389 rroemhild/test-openldap
-    - docker pull elasticsearch:7.0.0
-    - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose pull
+    - docker-compose up -d minio elasticsearch
     - cd $TRAVIS_BUILD_DIR
     # using old version of pytest-cov to avoid
     # version conflict with python-coveralls

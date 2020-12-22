@@ -9,8 +9,7 @@ import appFactory from '../util/appFactory.js'
 import {
   COOKIE_FRONTEND,
   workspaceConfig,
-  FETCH_CONFIG,
-  PAGE
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
@@ -20,7 +19,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   putUserUsername

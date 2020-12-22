@@ -1,8 +1,11 @@
+import glob
 import os
+import pathlib
 import typing
 
 from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
+from pyramid.response import Response
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import PageNotFound
@@ -15,6 +18,21 @@ from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"
 APP_FRONTEND_PATH = "app/{minislug}.app.js"
+# INFO S.G - 2020-12-10 - minimum recommended size is 128bits = 16bytes, doubling this
+CSP_NONCE_SIZE = 32
+BASE_CSP_DIRECTIVES = (
+    # NOTE S.G - 2020-12-14 - unsafe-eval will be needed for custom forms app
+    # (react-jsonschema-form/ajv dependency)
+    ("script-src", "'nonce-{nonce}'"),
+    # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
+    ("style-src", "'unsafe-inline' 'self'"),
+    ("connect-src", "'self'"),
+    ("font-src", "data: *"),
+    ("img-src", "data: *"),
+    ("media-src", "data: *"),
+    ("object-src", "'none'"),
+    ("default-src", "'self'"),
+)
 
 
 class FrontendController(Controller):
@@ -67,6 +85,26 @@ class FrontendController(Controller):
             if os.path.exists(app_path):
                 frontend_apps.append(app)
 
+        base_response = None
+        csp_nonce = ""
+        if app_config.CONTENT_SECURITY_POLICY__ENABLED:
+            csp_nonce = os.urandom(CSP_NONCE_SIZE).hex()
+            csp_headers = []
+            csp_header_key = (
+                "Content-Security-Policy-Report-Only"
+                if app_config.CONTENT_SECURITY_POLICY__REPORT_ONLY
+                else "Content-Security-Policy"
+            )
+            csp = "; ".join("{} {}".format(k, v) for k, v in BASE_CSP_DIRECTIVES)
+            csp = "{}; {}".format(csp, app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES)
+            csp_header_value = csp.format(nonce=csp_nonce)
+            if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
+                csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))
+                csp_header_value = "{}; report-uri {}".format(
+                    csp_header_value, app_config.CONTENT_SECURITY_POLICY__REPORT_URI
+                )
+            csp_headers.append((csp_header_key, csp_header_value))
+            base_response = Response(headerlist=[("Content-Type", "text/html")] + csp_headers)
         return render_to_response(
             self._get_index_file_path(),
             {
@@ -76,7 +114,11 @@ class FrontendController(Controller):
                 "custom_toolbox_files": self.custom_toolbox_files,
                 "cache_token": self.cache_token,
                 "excluded_notifications": app_config.WEB__NOTIFICATIONS__EXCLUDED,
+                "csp_nonce": csp_nonce,
+                "glob": self.glob,
             },
+            request=request,
+            response=base_response,
         )
 
     def bind(self, configurator: Configurator) -> None:
@@ -101,3 +143,9 @@ class FrontendController(Controller):
             configurator.add_static_view(
                 name=dirname, path=os.path.join(self.dist_folder_path, dirname)
             )
+
+    def glob(self, pattern: str) -> typing.List[str]:
+        return [
+            str(pathlib.Path(p).relative_to(self.dist_folder_path))
+            for p in glob.glob(str(pathlib.Path(self.dist_folder_path, pattern)))
+        ]

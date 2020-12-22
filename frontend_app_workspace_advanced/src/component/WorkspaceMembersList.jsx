@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   Avatar,
+  AVATAR_SIZE,
   DropdownMenu,
   NewMemberForm
 } from 'tracim_frontend_lib'
@@ -36,7 +37,7 @@ export const WorkspaceMembersList = props => {
                 data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar width='50px' publicName={m.user.public_name} />
+                  <Avatar size={AVATAR_SIZE.MEDIUM} publicName={m.user.public_name} />
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>

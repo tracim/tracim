@@ -6,6 +6,7 @@ export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
 export const MENTION_REGEX = /@([a-zA-Z0-9\-_]+)(?=\s|$)/
+export const MENTION_REGEX_GLOBAL = /@([a-zA-Z0-9\-_]+)(?=\s|$)/g
 export const GROUP_MENTION_LIST = [
   {
     mention: 'all',
@@ -17,7 +18,7 @@ export const GROUP_MENTION_LIST = [
 
 export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos']
 
-const wrapMentionsFromText = (text, doc) => {
+const wrapMentionsFromText = (text, doc, invalidMentionList) => {
   // takes a text as string, and returns a document fragment
   // containing this text, with tags added for the mentions
   const match = text.match(MENTION_REGEX)
@@ -29,14 +30,19 @@ const wrapMentionsFromText = (text, doc) => {
 
   fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
 
-  const wrappedMention = doc.createElement(MENTION_TAG_NAME)
-  wrappedMention.className = MENTION_CLASS
-  wrappedMention.id = `${MENTION_ID_PREFIX}${uuidv4()}`
-  wrappedMention.textContent = match[0]
-  fragment.appendChild(wrappedMention)
+  if (invalidMentionList.indexOf(match[0]) === -1) {
+    const wrappedMention = doc.createElement(MENTION_TAG_NAME)
+    wrappedMention.className = MENTION_CLASS
+    wrappedMention.id = `${MENTION_ID_PREFIX}${uuidv4()}`
+    wrappedMention.textContent = match[0]
+    fragment.appendChild(wrappedMention)
+  } else {
+    const notWrappedMention = doc.createTextNode(match[0])
+    fragment.appendChild(notWrappedMention)
+  }
 
   const mentionEndIndex = match.index + match[0].length
-  fragment.appendChild(wrapMentionsFromText(text.substring(mentionEndIndex), doc))
+  fragment.appendChild(wrapMentionsFromText(text.substring(mentionEndIndex), doc, invalidMentionList))
 
   return fragment
 }
@@ -47,7 +53,30 @@ const isAWrappedMention = (node) => (
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
-export const wrapMentionsInSpanTags = (node, doc) => {
+export const handleInvalidMentionInComment = (memberList, isWysiwyg, comment, setState) => {
+  const knownMembersMentions = memberList.map(member => `@${member.username}`)
+  const content = isWysiwyg ? tinymce.activeEditor.getContent() : comment
+  const invalidMentionList = getInvalidMentionList(content, knownMembersMentions)
+
+  if (invalidMentionList.length > 0) {
+    setState({
+      invalidMentionList: invalidMentionList,
+      showInvalidMentionPopupInComment: true
+    })
+    return true
+  } else return false
+}
+
+export const getInvalidMentionList = (content, knownMembersMentions) => {
+  const doc = getDocumentFromHTMLString(content)
+  const foundMentions = doc.body.textContent.match(MENTION_REGEX_GLOBAL) || []
+  const possibleMentions = [...knownMembersMentions, ...GROUP_MENTION_TRANSLATION_LIST.map(mention => `@${mention}`)]
+  return [...new Set(foundMentions.filter(
+    mention => !possibleMentions.includes(mention)
+  ))]
+}
+
+export const wrapMentionsInSpanTags = (node, doc, invalidMentionList) => {
   // takes a DOM node, and returns a copy with mention
   // wrapped in tags MENTION_TAG_NAME, with class MENTION_CLASS
   // and mention-xxx IDs
@@ -63,8 +92,8 @@ export const wrapMentionsInSpanTags = (node, doc) => {
   for (const child of node.childNodes) {
     resultingNode.appendChild(
       (child.nodeName === '#text')
-        ? wrapMentionsFromText(child.textContent, doc)
-        : wrapMentionsInSpanTags(child, doc)
+        ? wrapMentionsFromText(child.textContent, doc, invalidMentionList)
+        : wrapMentionsInSpanTags(child, doc, invalidMentionList)
     )
   }
 
@@ -111,10 +140,10 @@ export const removeMentionMeClass = (body) => {
   }
 }
 
-export const handleMentionsBeforeSave = (htmlString, loggedUsername) => {
+export const handleMentionsBeforeSave = (htmlString, loggedUsername, invalidMentionList) => {
   try {
     const doc = getDocumentFromHTMLString(htmlString)
-    const bodyWithWrappedMentions = wrapMentionsInSpanTags(doc.body, doc)
+    const bodyWithWrappedMentions = wrapMentionsInSpanTags(doc.body, doc, invalidMentionList)
     removeMentionMeClass(bodyWithWrappedMentions, loggedUsername)
     return bodyWithWrappedMentions.innerHTML
   } catch (e) {

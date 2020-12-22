@@ -16,6 +16,7 @@ import {
   setNextPage
 } from '../action-creator.sync.js'
 import {
+  AVATAR_SIZE,
   CONTENT_TYPE,
   PROFILE,
   displayDistanceDate,
@@ -30,10 +31,9 @@ import {
   TracimComponent,
   Avatar,
   ComposedIcon,
-  formatAbsoluteDate
+  formatAbsoluteDate,
+  PAGE
 } from 'tracim_frontend_lib'
-import { PAGE } from '../util/helper.js'
-
 import { escape as escapeHtml } from 'lodash'
 
 export class NotificationWall extends React.Component {
@@ -396,7 +396,7 @@ export class NotificationWall extends React.Component {
                 >
                   <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
-                    <Avatar publicName={notification.author} width='23px' style={{ marginRight: '5px' }} />
+                    <Avatar size={AVATAR_SIZE.MINI} publicName={notification.author} style={{ marginRight: '5px' }} />
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (
