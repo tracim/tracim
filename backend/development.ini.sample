@@ -254,8 +254,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 # Warning! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
-# in order to avoid security issues. See the Tracim settings documentation (available in source
-code, see "settings.md").
+# in order to avoid security issues. See the Tracim settings documentation (available in source code, see "settings.md").
 
 ### pyramid_beaker parameters ###
 
