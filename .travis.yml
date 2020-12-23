@@ -20,7 +20,7 @@ env:
     - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
-  secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
+    - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
 dist: bionic
 python: "3.6"
