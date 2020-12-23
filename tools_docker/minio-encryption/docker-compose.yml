@@ -3,7 +3,7 @@ version: "3"
 services:
   tracim:
     # replace "latest" with the version of your choice, minio storage is supported since version 3.4.1
-    image: algoo/tracim:fuck
+    image: algoo/tracim:latest
     networks: [backend, frontend]
     depends_on: [minio]
     ports:
