@@ -20,6 +20,7 @@ env:
     - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
+  secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
 dist: bionic
 python: "3.6"
@@ -57,6 +58,7 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
     - ls -R /tmp/test
+    - docker login -u algooci -p $DOCKER_PW
   install:
     - cd $TRAVIS_BUILD_DIR/backend
     - pip install -r "requirements-build.txt"
@@ -87,6 +89,8 @@ _install_backend: &_install_backend
     # sqlite : do nothing
     - pip install -e "."
     - cd $TRAVIS_BUILD_DIR
+  after_install:
+    - docker logout
   before_script:
     - docker pull mailhog/mailhog
     - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
