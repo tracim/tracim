@@ -1,3 +1,19 @@
+## 3.4.1 / 2020-12-23
+
+### Fixed Issues
+
+- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+
+### Breaking/Important Changes
+
+#### Backend configuration file (development.ini)
+
+- The `basic_setup.depot_storage_dir` parameter has been renamed to `basic_setup.uploaded_files_storage_path`
+- The `depot_storage_dir` parameter has been renamed to `uploaded_files.storage.local.storage_path`
+- The `depot_storage_name` parameter has been renamed to `uploaded_files.storage.storage_name`
+
+The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
+
 ## 3.4.0 / 2020-12-21
 
 ### New Features
