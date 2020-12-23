@@ -24,7 +24,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/development.ini
     sed -i "s|^basic_setup.website_base_url = .*|basic_setup.website_base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
-    sed -i "s|^basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
+    sed -i "s|^basic_setup.uploaded_files_storage_path = .*|basic_setup.uploaded_files_storage_path = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|^basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
