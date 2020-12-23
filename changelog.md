@@ -1,3 +1,9 @@
+## 3.4.1 / 2020-12-23
+
+### Fixed Issues
+
+- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+
 ## 3.4.0 / 2020-12-21
 
 ### New Features
