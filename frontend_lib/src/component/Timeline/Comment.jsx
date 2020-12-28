@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import Avatar from '../Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 
@@ -20,7 +20,7 @@ const Comment = props => {
           className={classnames(`${props.customClass}__body`, 'comment__body')}
           style={props.fromMe ? styleSent : {}}
         >
-          <Avatar width='44px' publicName={props.author} />
+          <Avatar size={AVATAR_SIZE.MEDIUM} publicName={props.author} />
 
           <div className='comment__body__content'>
             <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>

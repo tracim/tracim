@@ -15,6 +15,11 @@
 # All parameters starting with `basic_setup` can be used as variables in other parameters.
 # For simple needs they are all you need to customize.
 
+## Special Parameter
+# The syntax "%(here)s" is automatically replaced by the directory of the config file.
+# If you do use it, please note that your config file directory may vary depending where you decide
+# to place your config file.
+
 ## GENERAL TRACIM config:
 # These config are common for all app: REST API, Webdav, etc...
 
@@ -139,6 +144,31 @@ workspace.join.max_messages_history_count = -1
 ; build_version =
 
 ####
+# Content Security Policy
+#
+# Tracim can generate a content security policy header that only
+# enables script execution from Tracim frontend to avoid XSS attacks.
+# It also forbids <object> tags.
+# This behavior can be tuned by using "additional_directives" if some other
+# scripts/resources are needed for your installation or usage.
+# By default the header is generated.
+####
+# Enable or disable the content security policy header
+; content_security_policy.enabled = True
+# You can set this to an URI where browsers will report CSP failures.
+# Multiple URIs are possible by separating them with spaces (the config value is added as it is)
+# They must be secured by a valid SSL/TLS connection and certificate
+# Example: content_security_policy.report_uri = https://www.myreporturi.com https://www.another-reporturi.org
+; content_security_policy.report_uri =
+# If set to True, the generated header will be Content-Security-Policy-Report-Only.
+# Useful to test policy changes before enforcing them
+# If set to true, "report_uri" must also have a valid value.
+; content_security_policy.report_only = False
+# additional directives to tune the CSP header, they are added without any change to the header
+; content_security_policy.additional_directives =
+
+
+####
 # LIMITATION
 ####
 
@@ -223,6 +253,9 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 ### Session ###
 
+# Warning! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
+# in order to avoid security issues. See the Tracim settings documentation (available in source code, see "settings.md").
+
 ### pyramid_beaker parameters ###
 
 session.type = file
@@ -246,6 +279,12 @@ session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
 session.cookie_on_exception = True
+# enable or disable http-only for cookie, by default set as True. Disable it only
+# if you know what you're doing as this is less secure.
+; session.httponly = True
+# enable or disable secure for cookie, by default set as False. We strongly
+# recommend you to set it a True if you are using https.
+; session.secure = False
 
 ####
 # AUTH
@@ -257,7 +296,7 @@ session.cookie_on_exception = True
 # and 'Tracim-Api-Login' (mail of existing user) headers.
 
 ## Api key auth is disabled by default,
-## you should set a not-null value to api.key to active it:
+## you should set a not-null value to api.key to enable it:
 ; api.key =
 api.key = %(basic_setup.api_key)s
 ## base url of the backend API, default to same as website.base_url
@@ -278,7 +317,7 @@ api.key = %(basic_setup.api_key)s
 ## header and pretend to be anyone. Only trusted server should be able to
 ## set remote_user_header.
 ## remote user auth is disabled by default,
-## you should set a not-null value to auth_remote_header to active it:
+## you should set a not-null value to auth_remote_header to enable it:
 ; remote_user_header =
 
 ## Auth type list (internal or ldap), can be a list of item separated by ','
@@ -419,7 +458,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ## on this space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
-# You can activate notification specific log using 'tracim_email_notification' logger.
+# You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 
 ### SMTP ###
@@ -435,7 +474,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # email.notification.smtp.user = your_smtp_user
 # email.notification.smtp.password = your_smtp_password
 
-# active implicit ssl if you are using implicit smtp with encryption port like 465
+# enable implicit ssl if you are using implicit smtp with encryption port like 465
 # by default, Tracim will try to use explicit smtp encryption using starttls, and unencrypted
 # connection as fallback.
 ; email.notification.smtp.use_implicit_ssl = False
@@ -662,7 +701,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # be carefull this template is use to find all index to delete with tracimcli search delete command
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
-# if you use ingest mode in elasticsearch, you can activate file content ingest
+# if you use ingest mode in elasticsearch, you can enable file content ingest
 # for search
 ; search.elasticsearch.use_ingest = False
 
@@ -778,11 +817,11 @@ script_location = tracim_backend/migration
 ## max length of characters to apply to the "slug" field
 ; truncate_slug_length = 40
 
-# set to 'true' to run the environment during
+# set to 'True' to run the environment during
 # the 'revision' command, regardless of autogenerate
 ; revision_environment = False
 
-# set to 'true' to allow .pyc and .pyo files without
+# set to 'True' to allow .pyc and .pyo files without
 # a source .py file to be detected as revisions in the
 # versions/ directory
 ; sourceless = False

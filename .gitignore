@@ -37,6 +37,6 @@ tools_docker/test_docker/__pycache__
 # tern & projectile for emacs
 .tern*
 .projectile
-# emacs save file
-#*
-.#*
+# emacs save files
+\#*
+.\#*
