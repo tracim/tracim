@@ -152,7 +152,7 @@
   "New email": "Nouvel email",
   "Do not show this popup again": "Ne plus afficher cette fenêtre",
   "Change my password": "Changer mon mot de passe",
-  "Change my account settings": "Changer mes paramètres du compte",
+  "Change my account settings": "Changer les paramètres de mon compte",
   "Your account's password cannot be changed, please contact an administrator": "Le mot de passe de votre compte ne peut pas être changé, veuillez contacter un administrateur",
   "An error has happened, please try again": "Une erreur est survenue, veuillez réessayer",
   "Click here to unsubscribe": "Cliquez ici pour vous désabonner",
@@ -331,5 +331,5 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
-  "User account management": "Gestion des comptes des utilisateurs"
+  "User account management": "Gestion des comptes utilisateurs"
 }
