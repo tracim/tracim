@@ -50,5 +50,5 @@
   "Request accepted": "Request accepted",
   "Request rejected": "Request rejected",
   "There are no requests yet.": "There are no requests yet.",
-  "This is the role that members will have by default when they join your space if it is open or on request.": "This is the role that members will have by default when they join your space if it is open or on request."
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "This is the role that members will have by default when they join your space (for open and on request spaces only)."
 }

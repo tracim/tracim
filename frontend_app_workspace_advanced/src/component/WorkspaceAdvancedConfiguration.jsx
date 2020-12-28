@@ -74,7 +74,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               trigger={isMobile ? 'focus' : 'hover'}
             >
               <PopoverBody>
-                {props.t('This is the role that members will have by default when they join your space if it is open or on request.')}
+                {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
               </PopoverBody>
             </Popover>
           </div>

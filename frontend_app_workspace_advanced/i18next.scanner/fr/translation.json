@@ -50,5 +50,5 @@
   "Request accepted": "Demande acceptée",
   "Request rejected": "Demande refusée",
   "There are no requests yet.": "Vous n'avez pas encore de demande.",
-  "This is the role that members will have by default when they join your space if it is open or on request.": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace si celui-ci est ouvert ou sur demande."
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace (uniquement pour les espaces ouverts ou sur demande)."
 }
