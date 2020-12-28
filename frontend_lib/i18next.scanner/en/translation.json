@@ -1,5 +1,4 @@
 {
-  "all": "all",
   "Timeline": "Timeline",
   "Restore": "Restore",
   "Simple edition": "Simple edition",
@@ -120,5 +119,7 @@
   "Error while detecting the mentions": "Error while detecting the mentions",
   "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
   "Edit": "Edit",
-  "Validate anyway": "Validate anyway"
+  "Validate anyway": "Validate anyway",
+  "Home": "Home",
+  "Error while getting breadcrumbs": "Error while getting breadcrumbs"
 }

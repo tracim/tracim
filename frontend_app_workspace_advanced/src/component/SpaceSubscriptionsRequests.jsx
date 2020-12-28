@@ -9,7 +9,6 @@ import {
 } from 'tracim_frontend_lib'
 
 export const SpaceSubscriptionsRequests = props => {
-  console.log(props)
   return (
     props.subscriptionRequestList.length
       ? (

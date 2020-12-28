@@ -108,7 +108,6 @@
   "Create in folder": "Criar na pasta",
   "Create": "Criar",
   "Users": "Utilizadores",
-  "My Account": "Minha conta",
   "Logout": "Terminar sessão",
   "Welcome to Tracim": "Bem-vindo ao Tracim",
   "You aren't member of any space yet": " Você ainda não é membro de nenhum espaço",
@@ -138,12 +137,10 @@
   "Note, only administrators can send invitational email": "Nota, os administradores são os únicos que podem enviar um e-mail de convite",
   "This user already is in the space": "Este utilizador já está no espaço",
   "Error while loading members list": "Erro ao carregar a lista dos membros",
-  "My profile": "Meu perfil",
   "To change your password, please refer to an administrator": "Para mudar sua palavra-passe, consulte um administrador",
   "Unfortunately, email notifications aren't activated, we can't send you a reset password email": "Infelizmente, as notificações por e-mail estão desativadas, não podemos enviar-lhe um e-mail de reinicialização da palavra-passe",
   "Go back to previous page": "Voltar para a página precedente",
   "{{userName}} account edition": "{{userName}} edição de conta",
-  "Profile": "Perfil",
   "Change the password": "Mudar a palavra-passe",
   "Change the account settings": "Mudar as definições de conta",
   "New full name": "Novo nome completo",
@@ -332,5 +329,7 @@
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> juntou-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "O papel de <0><0>{{userPublicName}}</0></0> foi alterado para <2>{{role}}</2>",
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deseja juntar-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "O pedido de <0><0>{{userPublicName}}</0></0> para se juntar ao espaço foi <2>{{state}}</2>"
+  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "O pedido de <0><0>{{userPublicName}}</0></0> para se juntar ao espaço foi <2>{{state}}</2>",
+  "Account": "Conta",
+  "User account management": "Gestão da conta de utilizador"
 }

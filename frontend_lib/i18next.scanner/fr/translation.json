@@ -1,5 +1,4 @@
 {
-  "all": "tous",
   "Timeline": "Historique",
   "Restore": "Restaurer",
   "Simple edition": "Édition simple",
@@ -120,5 +119,7 @@
   "Error while detecting the mentions": "Erreur pendant la détection des mentions",
   "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
   "Edit": "Modifier",
-  "Validate anyway": "Valider quand même"
+  "Validate anyway": "Valider quand même",
+  "Home": "Accueil",
+  "Error while getting breadcrumbs": "Erreur lors de l'obtention du fil d'ariane"
 }

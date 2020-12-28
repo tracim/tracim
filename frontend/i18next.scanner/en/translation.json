@@ -108,7 +108,6 @@
   "Create in folder": "Create in folder",
   "Create": "Create",
   "Users": "Users",
-  "My Account": "My Account",
   "Logout": "Logout",
   "Search…": "Search…",
   "Welcome to Tracim": "Welcome to Tracim",
@@ -141,12 +140,10 @@
   "Note, only administrators can send invitational email": "Note, only administrators can send invitational email",
   "This user already is in the space": "This user already is in the space",
   "Error while loading members list": "Error while loading members list",
-  "My profile": "My profile",
   "To change your password, please refer to an administrator": "To change your password, please refer to an administrator",
   "Unfortunately, email notifications aren't activated, we can't send you a reset password email": "Unfortunately, email notifications aren't activated, we can't send you a reset password email",
   "Go back to previous page": "Go back to previous page",
   "{{userName}} account edition": "{{userName}} account edition",
-  "Profile": "Profile",
   "Change the password": "Change the password",
   "Change the account settings": "Change the account settings",
   "New full name": "New full name",
@@ -332,5 +329,7 @@
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>",
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>"
+  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>",
+  "Account": "Account",
+  "User account management": "User account management"
 }
