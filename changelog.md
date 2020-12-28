@@ -1,9 +1,34 @@
+## 3.4.1 / 2020-12-23
 
+### Fixed Issues
+
+- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+
+### Breaking/Important Changes
+
+#### Backend configuration file (development.ini)
+
+- The `basic_setup.depot_storage_dir` parameter has been renamed to `basic_setup.uploaded_files_storage_path`
+- The `depot_storage_dir` parameter has been renamed to `uploaded_files.storage.local.storage_path`
+- The `depot_storage_name` parameter has been renamed to `uploaded_files.storage.storage_name`
+
+The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
+
+## 3.4.0 / 2020-12-21
+
+### New Features
+
+- Files uploaded to Tracim can now be stored on a Amazon S3 compatible server, see [backend documentation](backend/doc/setting.md#uploaded-files-storage) for details on how to configure it. This storage type will be improved to optimize preview generation from S3 stored files.
+- Security improvements: restrict cookie access and enable [Content Security Policy](https://www.w3.org/TR/CSP2/) header, see [backend documentation](backend/doc/setting.md#content-security-policy) for details.
+
+### Fixed Issues
+
+- Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
 
 ## 3.3.1 / 2020-12-18
 
 ### Fixed Issues
- 
+
 - Mention: [#3722](https://github.com/tracim/tracim/issues/3722),
 [#3927](https://github.com/tracim/tracim/issues/3927)
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
@@ -34,7 +59,7 @@
 ### Fixed Issues
 
 - Backend: [#3836](https://github.com/tracim/tracim/issues/3836)
- 
+
 
 ## 3.2.1 / 2020-11-04
 
