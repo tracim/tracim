@@ -5,6 +5,9 @@ from smtplib import SMTPRecipientsRefused
 import typing as typing
 
 from pyramid_ldap3 import Connector
+from sqlakeyset import Page
+from sqlakeyset import get_page
+from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
@@ -35,6 +38,7 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
+from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
@@ -52,6 +56,7 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
@@ -59,12 +64,15 @@ from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import PublicUserProfile
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 
@@ -310,7 +318,7 @@ class UserApi(object):
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector",
+        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector"
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -513,7 +521,7 @@ class UserApi(object):
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None,) -> User:
+    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
@@ -827,10 +835,7 @@ class UserApi(object):
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [
-            AuthType.INTERNAL,
-            AuthType.UNKNOWN,
-        ]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
                 "password modification disallowed".format(user.login, user.auth_type)
@@ -838,10 +843,7 @@ class UserApi(object):
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [
-            AuthType.INTERNAL,
-            AuthType.UNKNOWN,
-        ]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
                 "email modification disallowed".format(user.login, user.auth_type)
@@ -983,7 +985,7 @@ class UserApi(object):
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
+            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME
         )
 
     def enable(self, user: User, do_save=False):
@@ -1121,3 +1123,102 @@ class UserApi(object):
             return False
 
         return True
+
+    def create_user_following(
+        self,
+        follower_id: int,
+        leader_id: int,
+        created_date: typing.Optional[datetime.datetime] = None,
+        do_save: bool = True,
+    ) -> UserFollower:
+        # NOTE BS 20201229: sqlalchemy raise database specific error. In addition, error is
+        # raised at commit, so after view execution (so we can't catch it with hapic view
+        # decorators). So check if row exist before try to insert.
+        if (
+            self._session.query(UserFollower)
+            .filter(
+                and_(UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id)
+            )
+            .count()
+        ):
+            raise UserFollowAlreadyDefined("User follow already defined")
+
+        user_follower = UserFollower(
+            follower_id=follower_id, leader_id=leader_id, created_date=created_date
+        )
+        self._session.add(user_follower)
+
+        if do_save:
+            self._session.flush()
+
+        return user_follower
+
+    def delete_user_following(self, follower_id: int, leader_id: int, do_save: bool = True) -> None:
+        try:
+            user_follow = (
+                self._session.query(UserFollower)
+                .filter(
+                    and_(
+                        UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id
+                    )
+                )
+                .one()
+            )
+            self._session.delete(user_follow)
+        except NoResultFound:
+            raise NotFound("User following does not exist")
+
+        if do_save:
+            self._session.flush()
+
+    def get_paginated_user_following_for_user(
+        self,
+        user_id: int,
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+        filter_user_id: typing.Optional[int] = None,
+    ) -> Page:
+        query = (
+            self._session.query(UserFollower.leader_id.label("user_id"))
+            .filter(UserFollower.follower_id == user_id)
+            .order_by(UserFollower.leader_id)
+        )
+        if filter_user_id is not None:
+            query = query.filter(UserFollower.leader_id == filter_user_id)
+        return get_page(query, per_page=count, page=page_token or False)
+
+    def get_paginated_user_followers_for_user(
+        self,
+        user_id: int,
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+        filter_user_id: typing.Optional[int] = None,
+    ) -> Page:
+        query = (
+            self._session.query(UserFollower.follower_id.label("user_id"))
+            .filter(UserFollower.leader_id == user_id)
+            .order_by(UserFollower.follower_id)
+        )
+        if filter_user_id is not None:
+            query = query.filter(UserFollower.follower_id == filter_user_id)
+        return get_page(query, per_page=count, page=page_token or False)
+
+    def get_user_follow_count(
+        self, follower_id: typing.Optional[int] = None, leader_id: typing.Optional[int] = None
+    ) -> int:
+        assert follower_id is not None or leader_id is not None
+        query = self._session.query(UserFollower)
+
+        if follower_id is not None:
+            query = query.filter(UserFollower.follower_id == follower_id)
+
+        if leader_id is not None:
+            query = query.filter(UserFollower.leader_id == leader_id)
+
+        return query.count()
+
+    def get_public_user_profile(self, user_id: int) -> PublicUserProfile:
+        followers_count = self.get_user_follow_count(leader_id=user_id)
+        following_count = self.get_user_follow_count(follower_id=user_id)
+
+        return PublicUserProfile(followers_count=followers_count, following_count=following_count)
