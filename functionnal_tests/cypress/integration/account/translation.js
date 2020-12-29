@@ -12,7 +12,7 @@ describe('Account page', function () {
     cy.get('.account__userpreference__setting').contains('Change my account settings')
 
     cy.changeLanguage('fr')
-    cy.get('.account__userpreference__setting').contains('Changer mes paramètres du compte')
+    cy.get('.account__userpreference__setting').contains('Changer les paramètres de mon compte')
 
     cy.changeLanguage('pt')
     cy.get('.account__userpreference__setting').contains('Mudar minhas definições de conta')
