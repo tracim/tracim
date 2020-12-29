@@ -53,6 +53,13 @@ from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import tracim_plugin_loader
 
+DATABASE_URLS = {
+    "sqlite": "sqlite:////tmp/tracim.sqlite",
+    "mysql": "mysql+pymysql://user:secret@127.0.0.1:3306/tracim_test",
+    "mariadb": "mysql+pymysql://user:secret@127.0.0.1:3307/tracim_test",
+    "postgresql": "postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8",
+}
+
 
 @pytest.fixture
 def pushpin(tracim_webserver, tmp_path_factory):
@@ -130,9 +137,10 @@ def config_section(request) -> str:
 
 
 @pytest.fixture
-def settings(config_uri, config_section):
+def settings(config_uri, config_section, sqlalchemy_database):
     _settings = plaster.get_settings(config_uri, config_section)
     _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
+    _settings["sqlalchemy.url"] = DATABASE_URLS[sqlalchemy_database]
     return _settings
 
 

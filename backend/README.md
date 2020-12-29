@@ -320,59 +320,30 @@ See [main readme](../README.md)  section _Install and run pushpin for UI updates
 
 ## Run Tests and Others Checks ##
 
-### Run Tests ###
+### Setup & Run Tests ###
 
-Some functional tests need additional daemons that are run through docker:
+First setup the needed tools and directories (only needed once):
 
-```shell
-sudo apt install docker.io docker-compose
-```
-
-Some directories are required to make tests functional, you can create them and do some other check
-with this script:
-
-    # in the backend folder
+    # from backend directory
     python3 ./setup_dev_env.py
-
-Before running some functional test related to email, you need a local working *MailHog*
-see here: https://github.com/mailhog/MailHog
-
-You can run it this way with Docker:
-
-    docker pull mailhog/mailhog
-    docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-
-You need also a test ldap server on port 3890 for ldap related test.
-See here: https://github.com/rroemhild/docker-test-openldap
-
-You can run it this way with Docker:
-
-    docker pull rroemhild/test-openldap
-    docker run -d -p 3890:389 rroemhild/test-openldap
-
-You need also a elasticsearch server on port 9200 for elasticsearch related test
-You can run it this way with Docker Compose:
-
-    # from backend folder
-    docker-compose up elasticsearch
-
-You also need a minio server on port 9000 for tests related to s3.
-You can run it this way with Docker Compose:
-
-    # from backend folder
-    docker-compose up minio
-
-please note that syntax is similar to minio command line, "minio server /data" will start the minio server and use
-/data dir (in our case, it's the /data of the docker and his content will be deleted after stopped the docker as we do not
-create a docker volume), see minio documentation for more info: https://docs.min.io/docs/minio-docker-quickstart-guide.html .
-
-Create default test_storage_dir folder tree to make test work properly out of the box:
-
     ./create_test_storage_dir.sh
+    # several external services (mail/databases/…) are started through a docker compose file
+    sudo apt install docker.io docker-compose
+    # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
+    sudo usermod -a -G docker $USER
 
-Run your project's tests:
+Running tests can be done with:
 
+    docker-compose up -d
     pytest
+    docker-compose down
+
+
+By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
+
+    pytest --database=postgresql
+
+Possible databases are `sqlite`, `postgresql`, `mysql` and `mariadb`.
 
 ### Linting and Other Checks ###
 
@@ -380,21 +351,9 @@ Install the required versions:
 
     pip install -r requirements-devtool.txt
 
-Run mypy checks:
+Then run flake8:
 
-    mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
-
-Code formatting using black:
-
-    black -l 100 tracim_backend
-
-Sorting of import:
-
-    isort tracim_backend/**/*.py
-
-Flake8 check(unused import, variable and many other checks):
-
-    flake8 tracim_backend
+    flake8
 
 ### About Pytest Tests Config ###
 
@@ -441,16 +400,16 @@ what a specific user can do.
 see [here](doc/known_issues.md)
 
 # Documentation
-- [apache.md](apache.md): Using Apache as a proxy for Tracim
-- [api.md](api.md): Using the Tracim API
-- [cli.md](cli.md): Controlling Tracim from the Command Line Using `tracimcli`
-- [database.md](database.md): Handling the Database (deprecated)
-- [devtools.md](devtools.md): Miscellaneous Information About the Developer Tools
-- [hello_world_plugin.py](hello_world_plugin.py): an hello world plugin
-- [i18n.md](i18n.md): Translating the Backend
-- [known_issues.md](known_issues.md): Known issues with the Tracim Backend
-- [migrate_from_v1.md](migrate_from_v1.md): Migrate from Tracim v1
-- [migration.md](migration.md): Performing Migrations
-- [roles.md](roles.md): Roles in Tracim
-- [setting.md](setting.md): Setting up Tracim
-- [webdav.md](webdav.md): Using WebDAV on Various Operating Systems
+- [apache.md](doc/apache.md): Using Apache as a proxy for Tracim
+- [api.md](doc/api.md): Using the Tracim API
+- [cli.md](doc/cli.md): Controlling Tracim from the Command Line Using `tracimcli`
+- [database.md](doc/database.md): Handling the Database (deprecated)
+- [devtools.md](doc/devtools.md): Miscellaneous Information About the Developer Tools
+- [hello_world_plugin.py](doc/hello_world_plugin.py): an hello world plugin
+- [i18n.md](doc/i18n.md): Translating the Backend
+- [known_issues.md](doc/known_issues.md): Known issues with the Tracim Backend
+- [migrate_from_v1.md](-oc/migrate_from_v1.md): Migrate from Tracim v1
+- [migration.md](doc/migration.md): Performing Migrations
+- [roles.md](doc/roles.md): Roles in Tracim
+- [setting.md](doc/setting.md): Setting up Tracim
+- [webdav.md](doc/webdav.md): Using WebDAV on Various Operating Systems

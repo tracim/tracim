@@ -48,13 +48,21 @@ services:
       MYSQL_DATABASE: tracim_test
       MYSQL_USER: user
       MYSQL_PASSWORD: secret
-      MYSQL_RANDOM_ROOT_PASSWORD: true
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
   mariadb:
     image: mariadb/server:10.3
     ports:
-      "3306:3306"
+      - "3307:3306"
     environment:
       MARIADB_DATABASE: tracim_test
       MARIADB_USER: user
       MARIADB_PASSWORD: secret
-      MARIADB_RANDOM_ROOT_PASSWORD: true
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+  collabora:
+    image: collabora/code:4.2.6.2
+    network_mode: host
+    environment:
+      SLEEPFORDEBUGGER: "0"
+      extra_params: "--o:ssl.enable=false"
+    cap_add:
+      - MKNOD
