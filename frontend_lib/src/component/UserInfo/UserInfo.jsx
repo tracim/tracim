@@ -8,7 +8,7 @@ const UserInfo = props => {
       <Avatar size={AVATAR_SIZE.SMALL} publicName={props.publicName} />
       <div className='userInfo__name' title={props.publicName}>
         {props.publicName}
-        {props.username.length && (
+        {props.username && (
           <div className='userInfo__username' title={`@${props.username}`}>
             @{props.username}
           </div>

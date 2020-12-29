@@ -11,7 +11,7 @@ const SIDEBAR = [{
 }, {
   faIcon: 'th',
   hexcolor: '#bbbbbb',
-  label: 'All Contents',
+  label: 'Contents',
   route: `/ui/workspaces/${workspaceId}/contents`,
   slug: 'contents/all'
 }, {

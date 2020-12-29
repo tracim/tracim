@@ -73,7 +73,7 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.contains('.breadcrumbs__item', 'All contents')
+        cy.contains('.breadcrumbs__item', 'Contents')
           .click()
 
         cy.get('[data-cy="popinFixed"]')
