@@ -49,3 +49,11 @@ services:
     image: redis:alpine3.12
     ports:
       - "6379:6379"
+  collabora:
+    image: collabora/code:4.2.6.2
+    network_mode: host
+    environment:
+      SLEEPFORDEBUGGER: "0"
+      extra_params: "--o:ssl.enable=false"
+    cap_add:
+      - MKNOD
