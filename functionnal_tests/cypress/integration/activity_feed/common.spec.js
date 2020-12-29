@@ -71,8 +71,8 @@ for (const pageTestCase of activityPages) {
           .should('contain.text', 'commented')
       })
 
-      /* FIXME - GB - 2020-12-29 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3392
-      it('should be reordered only when the "Refresh" button is pressed', () => {
+      // FIXME - GB - 2020-12-29 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3392
+      it.skip('should be reordered only when the "Refresh" button is pressed', () => {
         let firstContentId = null
         cy.createFile(fileImage, fileType, fileName2, workspaceId)
           .then(content => {
@@ -99,7 +99,7 @@ for (const pageTestCase of activityPages) {
               })
             })
           })
-      })*/
+      })
     })
 
     describe('File Content item', () => {
