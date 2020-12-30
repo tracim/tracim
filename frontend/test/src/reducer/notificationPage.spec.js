@@ -34,7 +34,10 @@ const TLM = {
 }
 
 const notification = {
-  author: 'Global manager',
+  author: {
+    publicName: globalManagerFromApi.public_name,
+    userId: globalManagerFromApi.user_id
+  },
   content: null,
   created: '2020-07-23T12:44:50Z',
   id: 583,

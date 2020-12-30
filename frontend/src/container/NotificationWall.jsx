@@ -86,7 +86,7 @@ export class NotificationWall extends React.Component {
 
     const [entityType, eventType, contentType] = notification.type.split('.')
 
-    const escapedAuthor = escapeHtml(notification.author)
+    const escapedAuthor = notification.author ? escapeHtml(notification.author.publicName) : ''
     const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
 
     const escapedContentLabel = (
@@ -211,12 +211,22 @@ export class NotificationWall extends React.Component {
 
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
-        case TLM_EVENT.CREATED: return {
-          icon: 'user-plus',
-          text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
-          url: dashboardUrl
+        case TLM_EVENT.CREATED: {
+          let notificationText
+          if (props.user.userId === notification.user.userId) {
+            notificationText = '{{author}} added you to {{space}}'
+          } else {
+            if (notification.author.userId === notification.user.userId) {
+              notificationText = '{{author}} joined space {{space}}'
+            } else {
+              notificationText = '{{author}} added {{user}} to {{space}}'
+            }
+          }
+          return {
+            icon: 'user-plus',
+            text: props.t(notificationText, i18nOpts),
+            url: dashboardUrl
+          }
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'user-o+history',
@@ -327,7 +337,7 @@ export class NotificationWall extends React.Component {
 
     return {
       icon: 'bell',
-      text: `${notification.author} ${notification.type}`,
+      text: `${escapedAuthor} ${notification.type}`,
       url: contentUrl,
       emptyUrlMsg: defaultEmptyUrlMsg,
       msgType: 'warning'
@@ -396,7 +406,11 @@ export class NotificationWall extends React.Component {
                 >
                   <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
-                    <Avatar size={AVATAR_SIZE.MINI} publicName={notification.author} style={{ marginRight: '5px' }} />
+                    <Avatar
+                      size={AVATAR_SIZE.MINI}
+                      publicName={notification.author ? notification.author.publicName : 'unkown'}
+                      style={{ marginRight: '5px' }}
+                    />
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (

@@ -1,6 +1,7 @@
 {
   "{{author}} commented on {{content}} in {{space}}": "{{author}} commented on {{content}} in {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} changed the status of {{content}} in {{space}}",
+  "{{author}} joined space {{space}}": "{{author}} joined space {{space}}",
   "{{author}} updated {{content}} in {{space}}": "{{author}} updated {{content}} in {{space}}",
   "{{author}} added you to {{space}}": "{{author}} added you to {{space}}",
   "{{author}} removed you from {{space}}": "{{author}} removed you from {{space}}",

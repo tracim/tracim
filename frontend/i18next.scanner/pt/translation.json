@@ -1,5 +1,6 @@
 {
   "{{author}} added you to {{space}}": "{{author}} adicionou-o à {{space}}",
+  "{{author}} joined space {{space}}": "{{author}} juntou-se ao espaço {{space}}",
   "{{author}} removed you from {{space}}": "{{author}} eliminou-o de {{space}}",
   "{{author}} removed {{user}} from {{space}}": "{{author}} eliminou {{user}} de {{space}}",
   "{{author}} modified your role in {{space}}": "{{author}} modificou sua função em {{space}}",
