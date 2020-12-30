@@ -1124,7 +1124,7 @@ class UserApi(object):
 
         return True
 
-    def create_user_following(
+    def create_follower(
         self,
         follower_id: int,
         leader_id: int,
@@ -1153,7 +1153,7 @@ class UserApi(object):
 
         return user_follower
 
-    def delete_user_following(self, follower_id: int, leader_id: int, do_save: bool = True) -> None:
+    def delete_follower(self, follower_id: int, leader_id: int) -> None:
         try:
             user_follow = (
                 self._session.query(UserFollower)
@@ -1168,26 +1168,23 @@ class UserApi(object):
         except NoResultFound:
             raise NotFound("User following does not exist")
 
-        if do_save:
-            self._session.flush()
-
-    def get_paginated_user_following_for_user(
+    def get_paginated_leaders_for_user(
         self,
         user_id: int,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: typing.Optional[int] = None,
-        filter_user_id: typing.Optional[int] = None,
+        filter_leader_id: typing.Optional[int] = None,
     ) -> Page:
         query = (
             self._session.query(UserFollower.leader_id.label("user_id"))
             .filter(UserFollower.follower_id == user_id)
             .order_by(UserFollower.leader_id)
         )
-        if filter_user_id is not None:
-            query = query.filter(UserFollower.leader_id == filter_user_id)
+        if filter_leader_id is not None:
+            query = query.filter(UserFollower.leader_id == filter_leader_id)
         return get_page(query, per_page=count, page=page_token or False)
 
-    def get_paginated_user_followers_for_user(
+    def get_paginated_followers_for_leader(
         self,
         user_id: int,
         count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
@@ -1203,22 +1200,14 @@ class UserApi(object):
             query = query.filter(UserFollower.follower_id == filter_user_id)
         return get_page(query, per_page=count, page=page_token or False)
 
-    def get_user_follow_count(
-        self, follower_id: typing.Optional[int] = None, leader_id: typing.Optional[int] = None
-    ) -> int:
-        assert follower_id is not None or leader_id is not None
-        query = self._session.query(UserFollower)
+    def get_followers_count(self, leader_id: int) -> int:
+        return self._session.query(UserFollower).filter(UserFollower.leader_id == leader_id).count()
 
-        if follower_id is not None:
-            query = query.filter(UserFollower.follower_id == follower_id)
-
-        if leader_id is not None:
-            query = query.filter(UserFollower.leader_id == leader_id)
-
-        return query.count()
+    def get_leaders_count(self, user_id: int) -> int:
+        return self._session.query(UserFollower).filter(UserFollower.follower_id == user_id).count()
 
     def get_public_user_profile(self, user_id: int) -> PublicUserProfile:
-        followers_count = self.get_user_follow_count(leader_id=user_id)
-        following_count = self.get_user_follow_count(follower_id=user_id)
+        followers_count = self.get_followers_count(user_id)
+        following_count = self.get_leaders_count(user_id)
 
         return PublicUserProfile(followers_count=followers_count, following_count=following_count)

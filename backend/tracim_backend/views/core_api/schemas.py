@@ -1601,8 +1601,8 @@ class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
 
 
-class GetLiveMessageQuerySchema(marshmallow.Schema):
-    """Possible query parameters for the GET messages endpoint."""
+class BasePaginatedQuerySchema(marshmallow.Schema):
+    """Base query parameters for a paginated query"""
 
     count = marshmallow.fields.Int(
         example=10,
@@ -1615,6 +1615,11 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         description="token of the page wanted, if not provided get first" "elements",
         validate=page_token_validator,
     )
+
+
+class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
+    """Possible query parameters for the GET messages endpoint."""
+
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
@@ -1665,23 +1670,7 @@ class PathSuffixSchema(marshmallow.Schema):
     )
 
 
-class BasePaginatedQuerySchema(marshmallow.Schema):
-    """Base query parameters for a paginated query"""
-
-    count = marshmallow.fields.Int(
-        example=10,
-        validate=strictly_positive_int_validator,
-        missing=DEFAULT_NB_ITEM_PAGINATION,
-        default=DEFAULT_NB_ITEM_PAGINATION,
-        allow_none=False,
-    )
-    page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first" "elements",
-        validate=page_token_validator,
-    )
-
-
-class UserMessagesSummaryQuerySchema(BasePaginatedQuerySchema):
+class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     """Possible query parameters for the GET messages summary endpoint."""
 
     exclude_event_types = EventTypeListField()

@@ -5677,7 +5677,7 @@ class TestUserFollowerEndpoint(object):
     Tests for GET /api/users/{user_id}/following and /api/users/{user_id}/followers
     """
 
-    def test_api__create_user_following__ok_201__nominal_case(
+    def test_api__create_follower__ok_201__nominal_case(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5691,7 +5691,7 @@ class TestUserFollowerEndpoint(object):
             status=201,
         )
 
-    def test_api__create_user_following__ok_400__already_exist(
+    def test_api__create_follower__ok_400__already_exist(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5716,7 +5716,7 @@ class TestUserFollowerEndpoint(object):
         # Then
         assert res.json_body["code"] == ErrorCode.USER_FOLLOW_ALREADY_DEFINED
 
-    def test_api__create_user_following__ok_201__on_himself(
+    def test_api__create_follower__ok_201__on_himself(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5731,7 +5731,7 @@ class TestUserFollowerEndpoint(object):
             status=201,
         )
 
-    def test_api__create_user_following__error_403__on_other_user(
+    def test_api__create_follower__error_403__on_other_user(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5755,7 +5755,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -5785,8 +5785,8 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When
@@ -5829,7 +5829,7 @@ class TestUserFollowerEndpoint(object):
                     do_notify=False,
                 )
             )
-            user_api.create_user_following(
+            user_api.create_follower(
                 follower_id=admin_user.user_id, leader_id=users_to_follow[-1].user_id
             )
         transaction.commit()
@@ -5860,7 +5860,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With bob follow riyad
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When admin read api it is ok
@@ -5881,7 +5881,7 @@ class TestUserFollowerEndpoint(object):
             "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=403
         )
 
-    def test_api__delete_user_following__ok_201__nominal_case(
+    def test_api__delete_follower__ok_201__nominal_case(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5904,7 +5904,7 @@ class TestUserFollowerEndpoint(object):
             status=204,
         )
 
-    def test_api__delete_user_following__err_400__not_found(
+    def test_api__delete_follower__err_400__not_found(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -5929,7 +5929,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -5959,8 +5959,8 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
-        user_api.create_user_following(follower_id=riyad_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -6003,7 +6003,7 @@ class TestUserFollowerEndpoint(object):
                     do_notify=False,
                 )
             )
-            user_api.create_user_following(
+            user_api.create_follower(
                 follower_id=users_followers[-1].user_id, leader_id=admin_user.user_id
             )
         transaction.commit()
@@ -6034,7 +6034,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With bob follow riyad
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When admin read api it is ok
@@ -6073,9 +6073,9 @@ class TestUserPublicProfileEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_user_following(follower_id=bob_user.user_id, leader_id=admin_user.user_id)
-        user_api.create_user_following(follower_id=riyad_user.user_id, leader_id=admin_user.user_id)
-        user_api.create_user_following(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When

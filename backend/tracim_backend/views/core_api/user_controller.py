@@ -904,11 +904,11 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return PaginatedObject(
-            user_api.get_paginated_user_following_for_user(
+            user_api.get_paginated_leaders_for_user(
                 user_id=request.candidate_user.user_id,
                 page_token=hapic_data.query.page_token,
                 count=hapic_data.query.count,
-                filter_user_id=hapic_data.query.user_id,
+                filter_leader_id=hapic_data.query.user_id,
             )
         )
 
@@ -929,7 +929,7 @@ class UserController(Controller):
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        user_api.create_user_following(
+        user_api.create_follower(
             follower_id=hapic_data.path["user_id"], leader_id=hapic_data.body["user_id"]
         )
 
@@ -946,7 +946,7 @@ class UserController(Controller):
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        user_api.delete_user_following(
+        user_api.delete_follower(
             follower_id=hapic_data.path["user_id"], leader_id=hapic_data.path["leader_id"]
         )
 
@@ -964,7 +964,7 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return PaginatedObject(
-            user_api.get_paginated_user_followers_for_user(
+            user_api.get_paginated_followers_for_leader(
                 user_id=request.candidate_user.user_id,
                 page_token=hapic_data.query.page_token,
                 count=hapic_data.query.count,
