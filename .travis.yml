@@ -157,26 +157,12 @@ jobs:
 
     # INFO - G.M - 2019-04-25 - Stage: Static tests ###
     - stage: static-tests
-      name: black
-      install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
-      script:
-        - black --version
-        - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
-    - stage: static-tests
-      name: isort
-      install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
-      script:
-        - echo -n "isort " & isort --version-number
-        - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
-    - stage: static-tests
       name: flake8
       install:
         - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
       script:
         - flake8 --version
-        - flake8 $TRAVIS_BUILD_DIR/backend/tracim_backend
+        - flake8 $TRAVIS_BUILD_DIR/backend
 
     # INFO - G.M - 2019-04-25 - Stage: Quick Tests ###
     - stage: quick-tests
