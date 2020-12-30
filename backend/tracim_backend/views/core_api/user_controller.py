@@ -7,12 +7,14 @@ from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
+from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
@@ -21,6 +23,7 @@ from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
@@ -35,6 +38,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -50,11 +54,15 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
+from tracim_backend.views.core_api.schemas import GetUserFollowQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import PublicUserProfileSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetConfigSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -70,6 +78,7 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserIdSchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
 from tracim_backend.views.core_api.schemas import UserSchema
@@ -846,7 +855,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.candidate_user, session=request.dbsession, config=app_config,
+            current_user=request.candidate_user, session=request.dbsession, config=app_config
         )
 
         workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
@@ -860,7 +869,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.get_user_subscription(request.candidate_user.user_id)
 
@@ -877,9 +886,107 @@ class UserController(Controller):
             current_user=None, session=request.dbsession, config=request.app_config
         ).get_one(hapic_data.body["workspace_id"])
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.submit_subscription(workspace=workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetUserFollowQuerySchema())
+    @hapic.output_body(FollowedUsersSchemaPage())
+    def following(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
+        """
+        For given user, get list of following user ids.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return PaginatedObject(
+            user_api.get_paginated_leaders_for_user(
+                user_id=request.candidate_user.user_id,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                filter_leader_id=hapic_data.query.user_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(UserIdSchema())
+    @hapic.handle_exception(UserFollowAlreadyDefined, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.CREATED)
+    def create_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Declare given user follow an other user.
+        If following already exist, return a 400 error with {error_code} error code.
+        """.format(
+            error_code=ErrorCode.USER_FOLLOW_ALREADY_DEFINED
+        )
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user_api.create_follower(
+            follower_id=hapic_data.path["user_id"], leader_id=hapic_data.body["user_id"]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(DeleteFollowedUserPathSchema())
+    @hapic.handle_exception(NotFound, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def delete_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Delete given user following.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user_api.delete_follower(
+            follower_id=hapic_data.path["user_id"], leader_id=hapic_data.path["leader_id"]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetUserFollowQuerySchema())
+    @hapic.output_body(FollowedUsersSchemaPage())
+    def followers(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
+        """
+        For given user, get list of following user ids.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return PaginatedObject(
+            user_api.get_paginated_followers_for_leader(
+                user_id=request.candidate_user.user_id,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                filter_user_id=hapic_data.query.user_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(PublicUserProfileSchema())
+    def public_profile(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> PublicUserProfileSchema:
+        """
+        Return public user profile.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return user_api.get_public_user_profile(hapic_data.path["user_id"])
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -1057,7 +1164,7 @@ class UserController(Controller):
 
         # Tracim user messages
         configurator.add_route(
-            "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
+            "messages", "/users/{user_id:\d+}/messages", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
 
@@ -1094,12 +1201,12 @@ class UserController(Controller):
 
         # User configuration
         configurator.add_route(
-            "config_get", "/users/{user_id:\d+}/config", request_method="GET",  # noqa: W605
+            "config_get", "/users/{user_id:\d+}/config", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_config, route_name="config_get")
 
         configurator.add_route(
-            "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
+            "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
 
@@ -1127,3 +1234,35 @@ class UserController(Controller):
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.submit_subscription, route_name="subscriptions_put")
+
+        # User following/followers
+        configurator.add_route(
+            "following", "/users/{user_id:\d+}/following", request_method="GET"  # noqa: W605
+        )
+        configurator.add_view(self.following, route_name="following")
+
+        configurator.add_route(
+            "create_following",
+            "/users/{user_id:\d+}/following",
+            request_method="POST",  # noqa: W605
+        )
+        configurator.add_view(self.create_following, route_name="create_following")
+
+        configurator.add_route(
+            "delete_following",
+            "/users/{user_id:\d+}/following/{leader_id:\d+}",
+            request_method="DELETE",  # noqa: W605
+        )
+        configurator.add_view(self.delete_following, route_name="delete_following")
+
+        configurator.add_route(
+            "followers", "/users/{user_id:\d+}/followers", request_method="GET"  # noqa: W605
+        )
+        configurator.add_view(self.followers, route_name="followers")
+
+        configurator.add_route(
+            "public_profile",
+            "/users/{user_id:\d+}/public_profile",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.public_profile, route_name="public_profile")

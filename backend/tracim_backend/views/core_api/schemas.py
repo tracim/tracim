@@ -69,6 +69,7 @@ from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
+from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserProfile
@@ -1584,12 +1585,15 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
-class LiveMessageSchemaPage(marshmallow.Schema):
+class BasePaginatedSchemaPage(marshmallow.Schema):
     previous_page_token = marshmallow.fields.String()
     next_page_token = marshmallow.fields.String()
     has_next = marshmallow.fields.Bool()
     has_previous = marshmallow.fields.Bool()
     per_page = marshmallow.fields.Int()
+
+
+class LiveMessageSchemaPage(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
 
 
@@ -1597,8 +1601,8 @@ class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
 
 
-class GetLiveMessageQuerySchema(marshmallow.Schema):
-    """Possible query parameters for the GET messages endpoint."""
+class BasePaginatedQuerySchema(marshmallow.Schema):
+    """Base query parameters for a paginated query"""
 
     count = marshmallow.fields.Int(
         example=10,
@@ -1611,6 +1615,11 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         description="token of the page wanted, if not provided get first" "elements",
         validate=page_token_validator,
     )
+
+
+class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
+    """Possible query parameters for the GET messages endpoint."""
+
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
@@ -1712,3 +1721,51 @@ class WorkspaceSubscriptionSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="evaluation date", allow_none=True
     )
     evaluator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+
+
+class UserIdSchema(marshmallow.Schema):
+    """
+    Simple user id schema
+    """
+
+    user_id = marshmallow.fields.Int(example=3, required=True)
+
+
+class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
+    """Possible query parameters for the GET following and followers endpoint."""
+
+    user_id = marshmallow.fields.Int(
+        example=42, validate=strictly_positive_int_validator, allow_none=True, default=None
+    )
+
+    @post_load
+    def user_follow_query(self, data: typing.Dict[str, typing.Any]) -> UserFollowQuery:
+        return UserFollowQuery(**data)
+
+
+class FollowedUsersSchemaPage(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(UserIdSchema, many=True)
+
+
+class DeleteFollowedUserPathSchema(UserIdPathSchema):
+    leader_id = marshmallow.fields.Int(
+        example=4,
+        required=True,
+        description="id of a valid user",
+        validate=strictly_positive_int_validator,
+    )
+
+
+class PublicUserProfileSchema(marshmallow.Schema):
+    followers_count = marshmallow.fields.Int(
+        example=42,
+        required=True,
+        description="count of users following this user",
+        validate=positive_int_validator,
+    )
+    following_count = marshmallow.fields.Int(
+        example=42,
+        required=True,
+        description="count of users followed by this user",
+        validate=positive_int_validator,
+    )
