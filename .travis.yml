@@ -58,6 +58,8 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
     - ls -R /tmp/test
+    # INFO - S.G - 2020-12-30 - needed to avoid an error with "docker login"
+    - sudo dpkg -r --ignore-depends=golang-docker-credential-helpers golang-docker-credential-helpers
     - docker login -u algooci -p $DOCKER_PW
   install:
     - cd $TRAVIS_BUILD_DIR/backend
