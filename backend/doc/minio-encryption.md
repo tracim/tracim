@@ -9,8 +9,14 @@ The steps are kept minimal and the resulting configuration is not necessarily ad
 Make sure you have:
 
 - the minio client, `mc` available ([Installation instructions](https://docs.min.io/docs/minio-client-quickstart-guide.html))
+  - can be used with docker image
 - the `kes` binary available ([Installation instructions](https://github.com/minio/kes/#install))
-- `openssl` utilities to generate the needed key (`openssl` package in Debian)
+  - Example for amd64:
+```
+wget https://github.com/minio/kes/releases/latest/download/kes-linux-amd64
+chmod +x kes-linux-amd64
+```
+- `openssl` utilities to generate the needed key (`openssl` package in Debian >= 1.1.1).
 
 This guide uses a docker compose and some configuration available in [tools_docker/minio-encryption](../../tools_docker/minio-encryption).
 
@@ -43,7 +49,7 @@ Generate a TLS key/certificate as the min.io connection to `kes` must be TLS bas
 openssl ecparam -genkey -name prime256v1 | openssl ec -out kes-config/kes.key
 ```
 
-To create a self-signed certificate:
+Create a self-signed certificate:
 
 ```
 openssl req -new -x509 -days 30 -key kes-config/kes.key -out kes-config/kes.cert -subj "/C=/ST=/L=/O=/CN=kes" -addext "subjectAltName = DNS:kes"
@@ -54,13 +60,13 @@ Create an identity key/certificate for authenticating min.io with kes:
 
 ```
 cd minio-config
-kes tool identity new minio
+kes-linux-amd64 tool identity new minio
 ```
 
 Display the generated identity:
 
 ```
-kes tool identity of public.cert
+kes-linux-amd64 tool identity of public.cert
 cd -
 ```
 
@@ -90,6 +96,19 @@ Configure the `mc` client to access the minio instance:
 mc alias set myminio http://localhost:9000 <minio_access_key> <minio_secret_key>
 ```
 
+- If you use `mc` with docker:
+
+```
+docker run -d --entrypoint=/bin/sh minio/mc
+docker exec -it <container_id> /bin/bash
+```
+
+- You can now execute all necessary `mc` command.
+
+```
+mc alias set myminio http://<ip_address_minio_server>:9000 <minio_access_key> <minio_secret_key>
+```
+
 Create the encryption master key:
 
 ```
@@ -102,4 +121,18 @@ And enable encryption for the `tracim` bucket:
 mc encrypt set sse-s3 myminio/tracim/
 ```
 
-You are done!
+**You are done!**
+
+### Tips
+
+- Check list of all alias
+
+```
+mc alias list
+```
+
+- Check if sse-s3 is enabled on selected bucket
+
+```
+mc encrypt info myminio/<bucket-name>
+```
