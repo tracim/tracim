@@ -582,3 +582,7 @@ class CannotDeleteUniqueRevisionWithoutDeletingContent(Exception):
 
 class ReservedUsernameError(TracimException):
     error_code = ErrorCode.RESERVED_USERNAME
+
+
+class UserFollowAlreadyDefined(TracimException):
+    error_code = ErrorCode.USER_FOLLOW_ALREADY_DEFINED

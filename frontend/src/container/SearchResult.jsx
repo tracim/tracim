@@ -12,11 +12,9 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
-import {
-  PAGE
-} from '../util/helper.js'
 import ContentItemSearch from '../component/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
@@ -206,11 +204,9 @@ export class SearchResult extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
       link: <Link to={PAGE.SEARCH_RESULT}>{props.t('Search results')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Search results')
     }]))
   }
 
@@ -229,11 +225,12 @@ export class SearchResult extends React.Component {
                 : props.t('Search results')
               )}
               icon='search'
-              subtitle={this.getSubtitle()}
               breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='searchResult'>
+              <div>{this.getSubtitle()}</div>
+
               <div className='folder__content' data-cy='search__content'>
                 {currentNumberSearchResults > 0 && (
                   <ContentItemHeader showSearchDetails />

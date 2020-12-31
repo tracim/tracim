@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  buildContentPathBreadcrumbs,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -10,6 +11,7 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
+  handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -21,9 +23,9 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  generateLocalStorageContentId,
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
   Badge,
-  BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -44,12 +46,13 @@ import {
   getContentComment,
   getFileContent,
   getFileRevision,
+  PAGE,
   putFileContent,
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { PAGE, isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
+import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   deleteShareLink,
@@ -96,7 +99,9 @@ export class File extends React.Component {
       previewVideo: false,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false
+      invalidMentionList: [],
+      isLastTimelineItemCurrentToken: false,
+      showInvalidMentionPopupInComment: false
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -232,19 +237,24 @@ export class File extends React.Component {
 
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
-
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
-
-    await this.loadContent()
-    this.loadTimeline()
-    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+    this.updateTimelineAndContent()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async updateTimelineAndContent (pageToLoad = null) {
+    this.setState({
+      newComment: getLocalStorageItem(
+        this.state.appName,
+        this.state.content,
+        LOCAL_STORAGE_FIELD.COMMENT
+      ) || ''
+    })
+
+    await this.loadContent(pageToLoad)
+    this.loadTimeline()
+    if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -252,12 +262,7 @@ export class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.setState({ fileCurrentPage: 1 })
-      await this.loadContent(1)
-      this.loadTimeline()
-      if (state.config.workspace.downloadEnabled) {
-        this.setState({})
-        this.loadShareLinkList()
-      }
+      this.updateTimelineAndContent(1)
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -363,20 +368,7 @@ export class File extends React.Component {
   }
 
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          // FIXME - b.l - refactor urls
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
-          label: `${content.filename}`,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   handleClickBtnCloseApp = () => {
@@ -437,7 +429,24 @@ export class File extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = () => {
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  }
+
+  handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
+    }
+  }
+
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -707,6 +716,8 @@ export class File extends React.Component {
     }
   }
 
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
+
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -810,8 +821,12 @@ export class File extends React.Component {
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
           key='Timeline'
+          invalidMentionList={state.invalidMentionList}
+          onClickCancelSave={this.handleCancelSave}
+          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          searchForMentionInQuery={async (query) => await this.props.searchForMentionInQuery(query, state.content.workspace_id)}
+          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+          searchForMentionInQuery={this.searchForMentionInQuery}
         />
       )
     }

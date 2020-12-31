@@ -34,6 +34,25 @@ describe('Add a new comment', () => {
     cy.cancelXHR()
   })
 
+  it('Should apply margin between paragraphs', function () {
+    cy.get(contentHtmlDocGetter).click()
+    cy.get(cancelDocBtn).click()
+
+    cy.createComment(workspaceId, 1, [
+      '<p data-cy="comment-first-paragraph">Hello1</p>',
+      '<p data-cy="comment-middle-paragraph">Between</p>',
+      '<p data-cy="comment-last-paragraph">Hello2</p>'
+    ].join(''))
+
+    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'marginTop').should('be.equal', '0px')
+    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'paddingTop').should('be.equal', '0px')
+    cy.get('[data-cy=comment-last-paragraph]').invoke('css', 'marginBottom').should('be.equal', '0px')
+    cy.get('[data-cy=comment-last-paragraph]').invoke('css', 'paddingBottom').should('be.equal', '0px')
+
+    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
+    cy.get('[data-cy=comment-middle-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
+  })
+
   it('Should not change the comment area size', function () {
     cy.get(contentHtmlDocGetter).click()
     cy.get(cancelDocBtn).click()

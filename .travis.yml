@@ -50,6 +50,7 @@ _install_backend: &_install_backend
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - echo "$TRACIM_SQLALCHEMY__URL"
+    - python $TRAVIS_BUILD_DIR/python_sqlite_info.py
     - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
     - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
     - mkdir -p $TRACIM_SESSION__DATA_DIR
@@ -61,6 +62,7 @@ _install_backend: &_install_backend
     - pip install -r "requirements-build.txt"
     - pip install -r "requirements.txt"
     - pip install -r "requirements-test.txt"
+    - pip install -r "requirements-storage-s3.txt"
     # postgresql
     - |
       if [ "${DB}" == "postgres" ]; then
@@ -88,10 +90,12 @@ _install_backend: &_install_backend
   before_script:
     - docker pull mailhog/mailhog
     - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-    - docker pull rroemhild/test-openldap
+    - docker pull rroemhild/test-openldap
     - docker run -d -p 3890:389 rroemhild/test-openldap
-    - docker pull elasticsearch:7.0.0
-    - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+    - cd $TRAVIS_BUILD_DIR/backend
+    - docker-compose pull
+    - docker-compose up -d minio elasticsearch
+    - cd $TRAVIS_BUILD_DIR
     # using old version of pytest-cov to avoid
     # version conflict with python-coveralls
     # see https://github.com/z4r/python-coveralls/issues/66
@@ -153,26 +157,12 @@ jobs:
 
     # INFO - G.M - 2019-04-25 - Stage: Static tests ###
     - stage: static-tests
-      name: black
-      install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
-      script:
-        - black --version
-        - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
-    - stage: static-tests
-      name: isort
-      install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
-      script:
-        - echo -n "isort " & isort --version-number
-        - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
-    - stage: static-tests
       name: flake8
       install:
         - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
       script:
         - flake8 --version
-        - flake8 $TRAVIS_BUILD_DIR/backend/tracim_backend
+        - flake8 $TRAVIS_BUILD_DIR/backend
 
     # INFO - G.M - 2019-04-25 - Stage: Quick Tests ###
     - stage: quick-tests
@@ -187,7 +177,6 @@ jobs:
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.7"
-      dist: xenial
       <<: *_backend_quick_test
       python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/

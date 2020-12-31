@@ -1,6 +1,6 @@
 // import { login, logout } from '../helpers/index.js'
 //
-// describe('content :: workspace > dashbord', function () {
+// describe('content :: workspace > dashboard', function () {
 //    before(function () {
 //        login(cy)
 //        cy.visit('/workspaces/1/dashboard')

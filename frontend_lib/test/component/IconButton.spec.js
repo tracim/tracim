@@ -23,8 +23,7 @@ describe('<IconButton />', () => {
 
   describe('Static design', () => {
     it(`should display "${props.text}"`, () =>
-      // INFO - GM - 2019-08-06 - Is it normal to have a space before the text ?
-      expect(wrapper.find(`button.${props.customClass}`)).to.have.text().equal(' ' + props.text)
+      expect(wrapper.find(`button.${props.customClass}`)).to.have.text().equal(props.text)
     )
 
     it(`should have the class "${props.customClass}"`, () =>

@@ -1,28 +1,26 @@
 @import "../../css/Variable.styl"
 
 .breadcrumbs
-  position absolute
-  top 40px
-  left 35px
   display flex
   margin 0
   padding 0
   list-style none
-  font-size 0.75rem
-  flex-wrap wrap
+  font-size fontSizeSmall
   &__item
     white-space nowrap
+    text-overflow ellipsis
+    overflow hidden
     &:not(:first-child)::before
       content '>'
       margin 0 5px
-      color #777
+      color fontColor
     & > a
       color inherit !important
       &:hover
         border-bottom 1px solid
     & i
-        margin-right 5px
-        color #777
+        margin-inline-end 5px
+        color lightDarkGrey
 
 @media (max-width: max-xs)
   .breadcrumbs

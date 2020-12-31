@@ -1057,6 +1057,45 @@ class TestHtmlDocuments(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
+    @pytest.mark.parametrize("content_raw_data", ["<b>a first html comment</b>"])
+    def test_api__get_thread_html_preview__ok__200__nominal_case(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        content_raw_data,
+    ) -> None:
+        """
+        get thread html preview
+        """
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=business_workspace,
+            label="test_html_page",
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(test_html_document, "test_page", content_raw_data)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/1/html-documents/{}/preview/html/".format(
+                test_html_document.content_id
+            ),
+            status=200,
+        )
+        binary_content_raw_data = test_html_document.description.encode("utf-8")
+        assert res.body == binary_content_raw_data
+        assert res.content_length == len(binary_content_raw_data)
+        assert res.charset == "UTF-8"
+        assert res.content_type == "text/html"
+
     def test_api__update_html_document__err_400__empty_label(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
@@ -1382,7 +1421,15 @@ class TestHtmlDocuments(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section",
+    [
+        {"name": "functional_test"},
+        {"name": "functional_s3_storage_test"},
+        {"name": "functional_memory_storage_test"},
+    ],
+    indirect=True,
+)
 class TestFiles(object):
     """
     Tests for /api/workspaces/{workspace_id}/files/{content_id}
@@ -3931,6 +3978,78 @@ class TestThreads(object):
         assert content["raw_content"] == "What is the best cake?"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "Best Cakes?.thread.html"
+
+    @pytest.mark.parametrize(
+        "comments_content", [["<b>a first html comment</b>", "a second one !", "a third"]]
+    )
+    def test_api__get_thread_html_preview__ok__200__nominal_case(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
+        comments_content,
+    ) -> None:
+        """
+        get thread html preview
+        """
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        for content in comments_content:
+            params = {"raw_content": content}
+            res = web_testapp.post_json(
+                "/api/workspaces/{}/contents/{}/comments".format(
+                    business_workspace.workspace_id, test_thread.content_id
+                ),
+                params=params,
+                status=200,
+            )
+        res = web_testapp.get(
+            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=200
+        )
+        binary_first_comment_content = comments_content[0].encode("utf-8")
+        assert res.body == binary_first_comment_content
+        assert res.content_length == len(binary_first_comment_content)
+        assert res.charset == "UTF-8"
+        assert res.content_type == "text/html"
+
+    def test_api__get_thread_html_preview__err__400__no_first_comment(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list,
+    ) -> None:
+        """
+        get thread html preview
+        """
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
 
     def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
         """

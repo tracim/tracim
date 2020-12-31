@@ -1,9 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE } from '../../../util/helper.js'
 import { translate } from 'react-i18next'
-import { Avatar, DropdownMenu } from 'tracim_frontend_lib'
+import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
 
@@ -15,8 +14,9 @@ export const MenuProfil = props => {
       <DropdownMenu
         buttonOpts={
           <Avatar
-            width='40px'
+            size={AVATAR_SIZE.SMALL}
             publicName={props.user.publicName}
+            key='menuprofil__dropdown__avatar'
           />
         }
         buttonLabel={props.user.publicName}
@@ -27,17 +27,17 @@ export const MenuProfil = props => {
         <Link
           to={PAGE.ACCOUNT}
           data-cy='menuprofil__dropdown__account__link'
-          childrenKey='menuprofil__dropdown__account__link'
+          key='menuprofil__dropdown__account__link'
         >
-          <i className='fa fa-fw fa-user-o' />
-          {props.t('My Account')}
+          <i className='fa fa-fw fa-cogs' />
+          {props.t('Account Settings')}
         </Link>
 
         <button
           className='transparentButton'
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
-          childrenKey='menuprofil__dropdown__logout__link'
+          key='menuprofil__dropdown__logout__link'
         >
           <i className='fa fa-fw fa-sign-out' />
           {props.t('Logout')}

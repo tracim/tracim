@@ -4,14 +4,22 @@ import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
   sortTimelineByDate
 } from './helper.js'
+
+import {
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
+
 import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
+  getInvalidMentionList,
   getMatchingGroupMentionList
 } from './mention.js'
 import {
@@ -73,17 +81,17 @@ export function appContentFactory (WrappedComponent) {
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
 
-      const previouslyUnsavedComment = localStorage.getItem(
-        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appSlug, 'comment')
-      )
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
         timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
-          : (previouslyUnsavedComment || '')
+          : getLocalStorageItem(
+            appSlug,
+            newContent,
+            LOCAL_STORAGE_FIELD.COMMENT
+          ) || ''
       }))
     }
 
@@ -138,8 +146,10 @@ export function appContentFactory (WrappedComponent) {
       const newComment = e.target.value
       setState({ newComment: newComment })
 
-      localStorage.setItem(
-        generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment'),
+      setLocalStorageItem(
+        appSlug,
+        content,
+        LOCAL_STORAGE_FIELD.COMMENT,
         newComment
       )
     }
@@ -152,10 +162,13 @@ export function appContentFactory (WrappedComponent) {
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.activeEditor.getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+      let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      knownMentions = knownMentions.map(member => `@${member.username}`)
+      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
       let newCommentForApiWithMention
       try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername)
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
       } catch (e) {
         return Promise.reject(e)
       }
@@ -166,11 +179,13 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.apiResponse.status) {
         case 200:
-          setState({ newComment: '' })
+          setState({ newComment: '', showInvalidMentionPopupInComment: false })
           if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
+          removeLocalStorageItem(
+            appSlug,
+            content,
+            LOCAL_STORAGE_FIELD.COMMENT
           )
           break
         case 400:
@@ -311,7 +326,7 @@ export function appContentFactory (WrappedComponent) {
     }
 
     appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all please notice that I did an important update on this content.')
+      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
 
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
@@ -347,7 +362,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
         case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: this.sendGlobalFlashMessage(`${i18n.t('An error has happened while getting')} ${i18n.t('known members list')}`, 'warning'); break
+        default: this.sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
       }
       return mentionList
     }

@@ -7,41 +7,54 @@ export function TracimComponent (WrappedComponent) {
     constructor (props) {
       super(props)
 
-      this.registeredCustomEventHandlerList = {}
-      document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.execRegisteredCustomEventHandler)
+      this.customEventHandlerList = {}
+      document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.execCustomEventHandler)
 
-      this.registeredLiveMessageHandlerList = {}
-      document.addEventListener(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, this.execRegisteredLiveMessageHandler)
+      this.liveMessageHandlerList = {}
+      this.globalLiveMessageHandlerList = []
+      document.addEventListener(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, this.execLiveMessageHandler)
     }
 
     componentWillUnmount () {
-      document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.execRegisteredCustomEventHandler)
-      document.removeEventListener(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, this.execRegisteredLiveMessageHandler)
+      document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.execCustomEventHandler)
+      document.removeEventListener(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, this.execLiveMessageHandler)
     }
 
     registerCustomEventHandlerList = (customEventList) => {
       customEventList.forEach(customEvent => {
-        this.registeredCustomEventHandlerList[customEvent.name] = customEvent.handler
+        this.customEventHandlerList[customEvent.name] = customEvent.handler
       })
     }
 
-    execRegisteredCustomEventHandler = ({ detail: { type, data } }) => {
-      if (Object.hasOwnProperty.call(this.registeredCustomEventHandlerList, type)) {
-        this.registeredCustomEventHandlerList[type](data)
+    execCustomEventHandler = ({ detail: { type, data } }) => {
+      if (Object.hasOwnProperty.call(this.customEventHandlerList, type)) {
+        this.customEventHandlerList[type](data)
       }
     }
 
     registerLiveMessageHandlerList = (liveMessageList) => {
       liveMessageList.forEach(({ entityType, coreEntityType, optionalSubType, handler }) => {
         const eventType = buildTracimLiveMessageEventType(entityType, coreEntityType, optionalSubType)
-        this.registeredLiveMessageHandlerList[eventType] = handler
+        this.liveMessageHandlerList[eventType] = handler
       })
     }
 
-    execRegisteredLiveMessageHandler = ({ detail: { type, data } }) => {
-      if (Object.prototype.hasOwnProperty.call(this.registeredLiveMessageHandlerList, type)) {
-        data.fields.author = updateTLMAuthor(data.fields.author)
-        this.registeredLiveMessageHandlerList[type](data)
+    // NOTE - S.G. - 2020/11/05
+    // Register a handler that will be called for any tlm type
+    // the handler will be called with the tlm as argument.
+    registerGlobalLiveMessageHandler = (handler) => {
+      this.globalLiveMessageHandlerList.push(handler)
+    }
+
+    execLiveMessageHandler = ({ detail: { type, data } }) => {
+      const hasTypeHandler = Object.prototype.hasOwnProperty.call(this.liveMessageHandlerList, type)
+      const hasGlobalHandler = (this.globalLiveMessageHandlerList.length > 0)
+      if (hasTypeHandler || hasGlobalHandler) data.fields.author = updateTLMAuthor(data.fields.author)
+      if (hasTypeHandler) this.liveMessageHandlerList[type](data)
+      if (hasGlobalHandler) {
+        for (const handler of this.globalLiveMessageHandlerList) {
+          handler(data)
+        }
       }
     }
 
@@ -51,6 +64,7 @@ export function TracimComponent (WrappedComponent) {
           {...this.props}
           registerCustomEventHandlerList={this.registerCustomEventHandlerList}
           registerLiveMessageHandlerList={this.registerLiveMessageHandlerList}
+          registerGlobalLiveMessageHandler={this.registerGlobalLiveMessageHandler}
         />
       )
     }

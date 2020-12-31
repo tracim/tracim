@@ -2,13 +2,13 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
   naturalCompareLabels,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,
@@ -50,11 +50,15 @@ import {
   permissiveNumberEqual,
   sortWorkspaceList,
   updateTLMAuthor,
+  scrollIntoViewIfNeeded,
   darkenColor,
-  lightenColor
+  lightenColor,
+  PAGE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
+  getInvalidMentionList,
+  handleInvalidMentionInComment,
   handleMentionsBeforeSave
 } from './mention.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -83,7 +87,7 @@ import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
 
-import Avatar from './component/Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
@@ -135,6 +139,8 @@ import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
+import DistanceDate from './component/DistanceDate.jsx'
+import Icon from './component/Icon/Icon.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -146,6 +152,7 @@ import {
 
 import {
   baseFetch,
+  getContentPath,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -169,7 +176,9 @@ import {
   getFileRevision,
   putFileContent,
   putMyselfFileRead,
-  getContentComment
+  getContentComment,
+  getContent,
+  getWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -187,12 +196,27 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
+export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
+
+export { default as SCREEN_SIZE } from './screenSizes.json'
+export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
+
+export {
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
 
 export {
   appContentFactory,
   addRevisionFromTLM,
+  AVATAR_SIZE,
+  buildContentPathBreadcrumbs,
   createSpaceTree,
   DropdownMenu,
+  getContentPath,
+  handleInvalidMentionInComment,
   naturalCompareLabels,
   sortWorkspaceList,
   TracimComponent,
@@ -201,7 +225,6 @@ export {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,
@@ -314,14 +337,21 @@ export {
   putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
+  getInvalidMentionList,
   handleMentionsBeforeSave,
   NoHoverListItem,
   permissiveNumberEqual,
   SingleChoiceList,
   UserInfo,
+  scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
-  TextInput
+  TextInput,
+  getContent,
+  DistanceDate,
+  Icon,
+  getWorkspaceContent,
+  PAGE
 }

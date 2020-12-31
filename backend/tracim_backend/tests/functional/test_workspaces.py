@@ -713,6 +713,59 @@ class TestWorkspaceEndpoint(object):
         assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
         assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
 
+    def test_api__create_children_workspace__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
+        """
+        Test create workspace
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "parent",
+            "description": "parent_workspace",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": None,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        parent_workspace_id = res.json_body["workspace_id"]
+        assert parent_workspace_id
+        params = {
+            "label": "children",
+            "description": "children_workspace",
+            "agenda_enabled": False,
+            "public_upload_enabled": False,
+            "public_download_enabled": False,
+            "access_type": "confidential",
+            "default_user_role": "reader",
+            "parent_id": parent_workspace_id,
+        }
+        res = web_testapp.post_json("/api/workspaces", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["label"] == "children"
+        assert workspace["description"] == "children_workspace"
+        children_workspace_id = res.json_body["workspace_id"]
+        (workspace_created, user_role_created) = event_helper.last_events(2)
+        assert workspace_created.event_type == "workspace.created"
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert workspace_created.author == author
+        assert workspace_created.workspace == workspace
+        assert user_role_created.event_type == "workspace_member.created"
+        assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace["parent_id"] == parent_workspace_id
+        res = web_testapp.get("/api/workspaces/{}".format(children_workspace_id), status=200)
+        workspace_2 = res.json_body
+        assert workspace["workspace_id"] == workspace_2["workspace_id"]
+        assert workspace["parent_id"] == workspace_2["parent_id"]
+        assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+
     def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
         """
         Test create workspace : label already used
@@ -1168,9 +1221,9 @@ class TestWorkspacesEndpoints(object):
         res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
         assert len(res.json_body) == 4
         assert res.json_body[0]["workspace_id"] == parent1.workspace_id
-        assert res.json_body[1]["workspace_id"] == child1_1.workspace_id
-        assert res.json_body[2]["workspace_id"] == child1_2.workspace_id
-        assert res.json_body[3]["workspace_id"] == parent2.workspace_id
+        assert res.json_body[1]["workspace_id"] == parent2.workspace_id
+        assert res.json_body[2]["workspace_id"] == child1_1.workspace_id
+        assert res.json_body[3]["workspace_id"] == child1_2.workspace_id
 
     def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
         """
@@ -2936,9 +2989,10 @@ class TestUserInvitationWithMailActivatedASync(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+# TODO - G.M - 2020-12-10 - remove need of this fixture here, better to generate data in test itself.
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestWorkspaceContents(object):
+class TestWorkspaceContentsWithFixture(object):
     """
     Tests for /api/workspaces/{workspace_id}/contents endpoint
     """
@@ -4941,3 +4995,97 @@ class TestWorkspaceContents(object):
         ).json_body
         assert [content for content in new_active_contents if content["content_id"] == 13]
         assert not [content for content in new_archived_contents if content["content_id"] == 13]
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestWorkspaceContents(object):
+    """same as TestWorkspaceContentsWithFixture but without default content fixture"""
+
+    def test_api__get_content_path__ok__200__nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        content_api_factory,
+        web_testapp,
+        content_type_list,
+    ):
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        api = content_api_factory.get()
+        first_dir = api.create(
+            content_type_list.Folder.slug, workspace, None, "First Dir", "", True
+        )
+        # create another content to prevent false positive:
+        # - non linear id result for path.
+        # - not catch all function.
+        another_content = api.create(
+            content_type_list.Page.slug, workspace, None, "Another Content", "", True
+        )
+
+        second_dir = api.create(
+            content_type_list.Folder.slug, workspace, first_dir, "Second Content", "", True
+        )
+
+        my_file = api.create(
+            content_type_list.Page.slug, workspace, second_dir, "my file", "", True,
+        )
+        user_api = user_api_factory.get()
+        profile = Profile.USER
+        user = user_api.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+
+        my_file_path = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/path".format(
+                workspace.workspace_id, my_file.content_id
+            ),
+            status=200,
+        ).json_body
+        assert len(my_file_path["items"]) == 3
+        assert my_file_path["items"][0]["content_id"] == first_dir.content_id
+        assert my_file_path["items"][0]["label"] == first_dir.label
+        assert my_file_path["items"][0]["content_type"] == "folder"
+
+        assert my_file_path["items"][1]["content_id"] == second_dir.content_id
+        assert my_file_path["items"][1]["label"] == second_dir.label
+        assert my_file_path["items"][1]["content_type"] == "folder"
+
+        assert my_file_path["items"][2]["content_id"] == my_file.content_id
+        assert my_file_path["items"][2]["label"] == my_file.label
+        assert my_file_path["items"][2]["content_type"] == "html-document"
+
+        my_file_path = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/path".format(
+                workspace.workspace_id, second_dir.content_id
+            ),
+            status=200,
+        ).json_body
+        assert len(my_file_path["items"]) == 2
+        assert my_file_path["items"][0]["content_id"] == first_dir.content_id
+        assert my_file_path["items"][0]["label"] == first_dir.label
+        assert my_file_path["items"][0]["content_type"] == "folder"
+
+        assert my_file_path["items"][1]["content_id"] == second_dir.content_id
+        assert my_file_path["items"][1]["label"] == second_dir.label
+        assert my_file_path["items"][1]["content_type"] == "folder"
+
+        my_file_path = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/path".format(
+                workspace.workspace_id, another_content.content_id
+            ),
+            status=200,
+        ).json_body
+        assert len(my_file_path["items"]) == 1
+        assert my_file_path["items"][0]["content_id"] == another_content.content_id
+        assert my_file_path["items"][0]["label"] == another_content.label
+        assert my_file_path["items"][0]["content_type"] == "html-document"

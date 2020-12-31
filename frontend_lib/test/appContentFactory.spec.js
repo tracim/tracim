@@ -8,6 +8,7 @@ import { commentList as fixtureCommentList } from './fixture/contentCommentList.
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import {
+  mockGetMyselfKnownMember200,
   mockPutContent200,
   mockPostContentComment200,
   mockPutContentStatus204,
@@ -16,7 +17,7 @@ import {
   mockPutContentArchiveRestore204,
   mockPutContentDeleteRestore204
 } from './apiMock.js'
-import { generateLocalStorageContentId } from '../src/helper.js'
+import { generateLocalStorageContentId } from '../src/localStorage.js'
 
 describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.spy()
@@ -45,6 +46,8 @@ describe('appContentFactory.js', () => {
   const appContentSlug = 'appContentSlugExample'
 
   const fakeApiUrl = 'http://fake.url/api'
+
+  mockGetMyselfKnownMember200(fakeApiUrl, fakeContent.workspace_id, ['@user1'])
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {
@@ -150,12 +153,18 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerReloadContent', () => {
-    const newContent = { ...fakeContent }
+    const newContent = { ...fakeContent, content_id: fakeContent.content_id + 1 }
+    const initialState = { content: fakeContent }
     const fakeTinymceRemove = sinon.spy()
 
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
+      wrapper.instance().setState(initialState)
       wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
+      const lastSetStateArg = fakeSetState.lastCall.args[0]
+      if (typeof lastSetStateArg === 'function') {
+        lastSetStateArg(initialState)
+      }
     })
 
     after(() => {
@@ -171,7 +180,7 @@ describe('appContentFactory.js', () => {
     it('should get the localStorage value', () => {
       sinon.assert.calledWith(
         global.localStorage.getItem,
-        generateLocalStorageContentId(fakeContent.workspace_id, fakeContent.content_id, appContentSlug, 'comment')
+        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appContentSlug, 'comment')
       )
     })
 

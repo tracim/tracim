@@ -10,7 +10,7 @@
     "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
     "build-dev": "NODE_ENV=development webpack-cli",
     "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
-    "build-translation": "node i18next.scanner.js",
+    "build-translation": "node ../i18next.scanner.js",
     "lint": "cd src && yarn standard --parser babel-eslint --plugin react && cd ../test && yarn standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
@@ -57,15 +57,15 @@
     "eslint": "^6.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
-    "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/preset-env": "^7.9.5",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/register": "^7.9.0",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/plugin-transform-object-assign": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/register": "^7.12.10",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.2.2",
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
@@ -83,13 +83,13 @@
     "pnp-webpack-plugin": "^1.6.4",
     "redux-mock-store": "^1.5.3",
     "sinon": "^7.4.1",
-    "standard": "^14.3.3",
+    "standard": "^14",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.11.0"
   },
   "standard": {
     "globals": [

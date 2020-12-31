@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   FETCH_CONFIG,
-  PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
@@ -53,7 +52,14 @@ import {
   ACCESSIBLE_WORKSPACE_LIST,
   WORKSPACE_SUBSCRIPTION_LIST
 } from './action-creator.sync.js'
-import { ErrorFlashMessageTemplateHtml, updateTLMAuthor } from 'tracim_frontend_lib'
+import {
+  ErrorFlashMessageTemplateHtml,
+  updateTLMAuthor,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
+  TLM_CORE_EVENT_TYPE,
+  TLM_ENTITY_TYPE
+} from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -850,11 +856,39 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-const eventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications
+const defaultExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.join(',')
 
-export const getNotificationList = (userId, notificationsPerPage, nextPageToken = null) => async dispatch => {
+const activityExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.filter(
+  ev => {
+    const [entityType, eventType] = ev.split('.')
+    return (entityType !== TLM_ENTITY_TYPE.CONTENT || eventType !== TLM_CORE_EVENT_TYPE.MODIFIED)
+  }
+).join(',')
+
+export const getNotificationList = (
+  userId,
+  {
+    excludeAuthorId = null,
+    notificationsPerPage = NUMBER_RESULTS_BY_PAGE,
+    nextPageToken = null,
+    workspaceId = null,
+    includeNotSent = false,
+    activityFeedEvents = false,
+    relatedContentId = null
+  }) => async dispatch => {
+  const queryParameterList = [
+    activityFeedEvents
+      ? activityExcludedEventTypesParam
+      : defaultExcludedEventTypesParam
+  ]
+  if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
+  if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
+  if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
+  if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)
+  if (includeNotSent) queryParameterList.push('include_not_sent=1')
+  if (relatedContentId) queryParameterList.push(`related_to_content_ids=${relatedContentId}`)
   const fetchGetNotificationWall = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?exclude_author_ids=${userId}${eventTypesParam}&count=${notificationsPerPage}${nextPageToken ? `&page_token=${nextPageToken}` : ''}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?${queryParameterList.join('&')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
@@ -904,7 +938,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 
 export const getUserMessagesSummary = userId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${eventTypesParam}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
     param: {
       credentials: 'include',
       headers: {
@@ -980,5 +1014,15 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
     },
     actionName: WORKSPACE_SUBSCRIPTION_LIST,
     dispatch
+  })
+}
+
+export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
+  // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
+  // specific error handling
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
+    credentials: 'include',
+    headers: FETCH_CONFIG.headers,
+    method: 'GET'
   })
 }

@@ -23,6 +23,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   BREADCRUMBS_TYPE,
+  PAGE,
   ROLE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -298,28 +299,34 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to='/ui'><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{workspaceLabel}</Link>,
-      type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{workspaceLabel}</Link>,
+      type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+      label: workspaceLabel
     }]
     if (state.folderId) {
       breadcrumbsList.push({
         link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: folderDetail.fileName
       })
     }
+    breadcrumbsList.push({
+      link: <Link to={PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
+      type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+      label: props.t('Gallery')
+    })
     if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
+      const fileName = this.displayedPicture().fileName
       breadcrumbsList.push({
         link: (
           <Link
-            to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents/file/${this.displayedPictureId()}`}
+            to={PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId())}
           >
-            {this.displayedPicture().fileName}
+            {fileName}
           </Link>
         ),
-        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+        label: fileName
       })
     }
 

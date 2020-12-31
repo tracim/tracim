@@ -21,6 +21,8 @@ import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
+  accessType: '',
+  defaultRole: '',
   id: 0,
   slug: '',
   label: '',
@@ -37,6 +39,8 @@ const defaultWorkspace = {
 
 export const serializeWorkspace = ws => {
   return {
+    accessType: ws.access_type,
+    defaultRole: ws.default_user_role,
     id: ws.workspace_id,
     slug: ws.slug,
     label: ws.label,

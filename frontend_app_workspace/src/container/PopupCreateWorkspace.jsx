@@ -10,6 +10,7 @@ import {
   handleFetchResult,
   ROLE_LIST,
   sortWorkspaceList,
+  SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -142,7 +143,7 @@ export class PopupCreateWorkspace extends React.Component {
 
           addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
 
-          this.setState({ parentOptions: spaceList, isFirstStep: false })
+          this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
         }
         default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
@@ -169,7 +170,11 @@ export class PopupCreateWorkspace extends React.Component {
     ))
 
     switch (fetchPostSpace.apiResponse.status) {
-      case 200: this.handleClose(); break
+      case 200:
+        props.data.config.history.push(props.data.config.PAGE.WORKSPACE.DASHBOARD(fetchPostSpace.body.workspace_id))
+        this.handleClose()
+        break
+
       case 400:
         switch (fetchPostSpace.body.code) {
           case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break
@@ -192,7 +197,11 @@ export class PopupCreateWorkspace extends React.Component {
     switch (fetchGetAllowedSpaceTypes.apiResponse.status) {
       case 200: {
         const apiTypeList = fetchGetAllowedSpaceTypes.body.items
-        this.setState({ allowedTypes: SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug)) })
+        const allowedTypesList = SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug))
+        this.setState({
+          allowedTypes: allowedTypesList,
+          newType: (allowedTypesList.find(type => type.slug === SPACE_TYPE.confidential.slug) || allowedTypesList[0]).slug
+        })
         break
       }
       default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
@@ -236,12 +245,16 @@ export class PopupCreateWorkspace extends React.Component {
                   autoFocus
                 />
 
-                <div className='newSpace__label'> {props.t("Space's type:")} </div>
-                <SingleChoiceList
-                  list={state.allowedTypes}
-                  onChange={this.handleChangeSpacesType}
-                  currentValue={state.newType}
-                />
+                {state.allowedTypes.length > 1 && (
+                  <>
+                    <div className='newSpace__label'> {props.t("Space's type:")} </div>
+                    <SingleChoiceList
+                      list={state.allowedTypes}
+                      onChange={this.handleChangeSpacesType}
+                      currentValue={state.newType}
+                    />
+                  </>
+                )}
 
                 <div className='newSpace__button'>
                   <button
@@ -292,7 +305,7 @@ export class PopupCreateWorkspace extends React.Component {
                     trigger={isMobile ? 'focus' : 'hover'}
                   >
                     <PopoverBody>
-                      {props.t('This is the role that members will have by default when they join your space.')}
+                      {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
                     </PopoverBody>
                   </Popover>
                 </div>

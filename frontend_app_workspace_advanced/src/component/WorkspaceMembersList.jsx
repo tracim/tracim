@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   Avatar,
+  AVATAR_SIZE,
   DropdownMenu,
   NewMemberForm
 } from 'tracim_frontend_lib'
@@ -32,11 +33,11 @@ export const WorkspaceMembersList = props => {
             {props.memberList && props.memberList.filter(m => m.user).map(m =>
               <li
                 className='workspace_advanced__userlist__list__item'
-                key={`member_${m.user_id}`}
+                key={m.user_id}
                 data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar width='50px' publicName={m.user.public_name} />
+                  <Avatar size={AVATAR_SIZE.MEDIUM} publicName={m.user.public_name} />
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>
@@ -63,8 +64,7 @@ export const WorkspaceMembersList = props => {
                           <button
                             className='transparentButton'
                             onClick={() => props.onClickNewRole(m.user_id, r.slug)}
-                            key={`role_${r.id}`}
-                            childrenKey={`role_${r.id}`}
+                            key={r.id}
                           >
                             <i className={`fa fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
                             {props.t(r.label)}

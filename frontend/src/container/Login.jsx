@@ -15,6 +15,7 @@ import {
   CUSTOM_EVENT,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
+  PAGE,
   serialize
 } from 'tracim_frontend_lib'
 import {
@@ -47,10 +48,7 @@ import {
   putUserLang,
   getAccessibleWorkspaces
 } from '../action-creator.async.js'
-import {
-  PAGE,
-  COOKIE_FRONTEND
-} from '../util/helper.js'
+import { COOKIE_FRONTEND } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
@@ -254,7 +252,13 @@ class Login extends React.Component {
   loadNotificationList = async (userId) => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      userId,
+      {
+        excludeAuthorId: userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
+      }
+    ))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))

@@ -1,6 +1,8 @@
 # coding=utf-8
+from io import BytesIO
 import typing
 
+from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
@@ -10,6 +12,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -23,6 +26,8 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import FilePathSchema
+from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentModifySchema
@@ -42,6 +47,7 @@ SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_THREAD_SECTION
 )
 is_thread_content = ContentTypeChecker([THREAD_TYPE])
+CONTENT_TYPE_TEXT_HTML = "text/html"
 
 
 class ThreadController(Controller):
@@ -64,6 +70,50 @@ class ThreadController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         return api.get_content_in_context(content)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_thread_content)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(FilePathSchema())
+    @hapic.output_file([])
+    def get_thread_preview(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
+        """
+           Download preview of html document
+           Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+           Default filename value is 'raw' (without file extension) or nothing.
+           """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        first_comment = content.get_first_comment()
+        if not first_comment:
+            raise UnavailablePreview(
+                'No preview available for thread of content id "{}"'.format(content.content_id)
+            )
+        file = BytesIO()
+        byte_size = file.write(first_comment.description.encode("utf-8"))
+        file.seek(0)
+        filename = hapic_data.path.filename
+        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
+        # "raw", where filename returned will be original file one.
+        if not filename or filename == "raw":
+            filename = content.file_name
+        return HapicFile(
+            file_object=file,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download,
+            content_length=byte_size,
+            last_modified=first_comment.updated,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -156,6 +206,14 @@ class ThreadController(Controller):
             "thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="GET"
         )
         configurator.add_view(self.get_thread, route_name="thread")
+
+        # get thread preview
+        configurator.add_route(
+            "preview_thread",
+            "/workspaces/{workspace_id}/threads/{content_id}/preview/html/{filename:[^/]*}",
+            request_method="GET",
+        )
+        configurator.add_view(self.get_thread_preview, route_name="preview_thread")
 
         # update thread
         configurator.add_route(

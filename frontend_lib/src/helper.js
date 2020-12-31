@@ -1,13 +1,53 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
+import { Link } from 'react-router-dom'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import color from 'color'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
-import { getReservedUsernames, getUsernameAvailability } from './action.async.js'
+import {
+  getContentPath,
+  getReservedUsernames,
+  getUsernameAvailability
+} from './action.async.js'
 
-var dateFnsLocale = {
+export const PAGE = {
+  HOME: '/ui',
+  WORKSPACE: {
+    ROOT: '/ui/workspaces',
+    DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
+    NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
+    AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
+    CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
+    SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
+    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
+    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
+    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
+    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
+  },
+  LOGIN: '/ui/login',
+  FORGOT_PASSWORD: '/ui/forgot-password',
+  FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
+  RESET_PASSWORD: '/ui/reset-password',
+  ACCOUNT: '/ui/account',
+  AGENDA: '/ui/agenda',
+  ADMIN: {
+    ROOT: '/ui/admin',
+    WORKSPACE: '/ui/admin/workspace',
+    USER: '/ui/admin/user',
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
+  },
+  SEARCH_RESULT: '/ui/search-result',
+  GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
+  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
+  JOIN_WORKSPACE: '/ui/join-workspace',
+  ACTIVITY_FEED: '/ui/activity-feed',
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
+}
+
+const dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en'),
   pt: require('date-fns/locale/pt')
@@ -114,8 +154,6 @@ export const revisionTypeList = [{
   faIcon: 'files-o',
   label: i18n.t('Item copied')
 }]
-
-export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
 
 const WORKSPACE_MANAGER = {
   id: 8,
@@ -254,23 +292,37 @@ export const SPACE_TYPE = {
   onRequest: ON_REQUEST,
   confidential: CONFIDENTIAL
 }
-export const SPACE_TYPE_LIST = [OPEN, ON_REQUEST, CONFIDENTIAL]
+
+// INFO - GB - 2020-11-04 - The order of types in SPACE_TYPE_LIST is important to PopupCreateWorkspace.jsx. CONFIDENTIAL needs to be first.
+export const SPACE_TYPE_LIST = [CONFIDENTIAL, ON_REQUEST, OPEN]
 export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'sign-in'
+  faIcon: 'sign-in',
+  tradKey: [
+    i18n.t('pending')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'pending'
 }
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
-  faIcon: 'times'
+  faIcon: 'times',
+  tradKey: [
+    i18n.t('rejected')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'rejected'
 }
 const SUBSCRIPTION_ACCEPTED = {
   id: 3,
   slug: 'accepted',
-  faIcon: 'check'
+  faIcon: 'check',
+  tradKey: [
+    i18n.t('accepted')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'accepted'
 }
 export const SUBSCRIPTION_TYPE = {
   pending: SUBSCRIPTION_PENDING,
@@ -377,8 +429,10 @@ export const checkEmailValidity = email => {
   return domainParts.length === 2
 }
 
-export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) =>
-  `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview/jpg/${width}x${height}/${filenameNoExtension + '.jpg'}?page=${page}`
+export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
+  const rev = revisionId ? `/revisions/${revisionId}` : ''
+  return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
+}
 
 export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
 
@@ -593,5 +647,69 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
+  // RJ - 2020-11-05 - INFO
+  //
+  // This function scrolls to the elementToScrollTo DOM element, if not in view.
+  // If the element is visible, nothing will happen.
+  //
+  // fixedContainer needs to be a DOM element that contains elementToScrollTo
+  // and that which position does not change when scrolling to the element.
+  // A "scroll view" contained in fixedContainer and containing elementToScrollTo
+  // is not required but may be here.
+  // elementToScrollTo.scrollIntoView() is used to scoll to the element.
+  // inspired of the following non standard method:
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+
+  if (elementToScrollTo && fixedContainer) {
+    const fixedContainerBCR = fixedContainer.getBoundingClientRect()
+    const elementBcr = elementToScrollTo.getBoundingClientRect()
+
+    const notInView = (
+      (elementBcr.top < fixedContainerBCR.top) ||
+      (elementBcr.bottom >= fixedContainerBCR.bottom)
+    )
+
+    if (notInView) {
+      elementToScrollTo.scrollIntoView()
+    }
+  }
+}
+
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
+
+export const buildContentPathBreadcrumbs = async (apiUrl, content, props) => {
+  const fetchGetContentPath = await handleFetchResult(
+    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+  )
+
+  switch (fetchGetContentPath.apiResponse.status) {
+    case 200:
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+        data: {
+          breadcrumbs: fetchGetContentPath.body.items.map(crumb => ({
+            url: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+            label: crumb.label,
+            link: (
+              <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id)}>
+                {crumb.label}
+              </Link>
+            ),
+            type: BREADCRUMBS_TYPE.APP_FEATURE
+          }))
+        }
+      })
+      break
+    default:
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: props.t('Error while getting breadcrumbs'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+  }
+}

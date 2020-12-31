@@ -1,8 +1,10 @@
 import i18n, { getBrowserLang } from './i18n.js'
 import {
+  FETCH_CONFIG as LIB_FETCH_CONFIG,
   naturalCompareLabels,
-  PROFILE_LIST, ROLE,
-  FETCH_CONFIG as LIB_FETCH_CONFIG
+  PAGE,
+  PROFILE_LIST,
+  ROLE
 } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
@@ -24,8 +26,7 @@ export const FETCH_CONFIG = {
 }
 
 export const ANCHOR_NAMESPACE = {
-  workspaceItem: 'workspaceItem',
-  notificationItem: 'notificationItem'
+  workspaceItem: 'workspaceItem'
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?
@@ -35,38 +36,6 @@ export const workspaceConfig = {
   hexcolor: GLOBAL_primaryColor,
   creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
-}
-
-export const PAGE = {
-  HOME: '/ui',
-  WORKSPACE: {
-    ROOT: '/ui/workspaces',
-    DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
-    NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
-    AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
-    CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
-    SHARE_FOLDER: (idws = ':idws') => `/ui/workspaces/${idws}/contents/share_folder`,
-    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
-    CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
-    GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`
-  },
-  LOGIN: '/ui/login',
-  FORGOT_PASSWORD: '/ui/forgot-password',
-  FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
-  RESET_PASSWORD: '/ui/reset-password',
-  ACCOUNT: '/ui/account',
-  AGENDA: '/ui/agenda',
-  ADMIN: {
-    ROOT: '/ui/admin',
-    WORKSPACE: '/ui/admin/workspace',
-    USER: '/ui/admin/user',
-    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
-  },
-  SEARCH_RESULT: '/ui/search-result',
-  GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
-  GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
-  JOIN_WORKSPACE: '/ui/join-workspace'
 }
 
 export const unLoggedAllowedPageList = [
@@ -106,7 +75,7 @@ export const DRAG_AND_DROP = {
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
-  i18n.t('All Contents'),
+  i18n.t('Contents'),
   i18n.t('Opened'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),

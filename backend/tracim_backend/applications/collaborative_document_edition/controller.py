@@ -74,7 +74,7 @@ class CollaborativeDocumentEditionController(Controller):
         self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> FileTemplateList:
         """
-        Get thread content
+        Get file template list
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(

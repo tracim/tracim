@@ -1,11 +1,96 @@
+## 3.4.1 / 2020-12-23
+
+### Fixed Issues
+
+- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+
+### Breaking/Important Changes
+
+#### Backend configuration file (development.ini)
+
+- The `basic_setup.depot_storage_dir` parameter has been renamed to `basic_setup.uploaded_files_storage_path`
+- The `depot_storage_dir` parameter has been renamed to `uploaded_files.storage.local.storage_path`
+- The `depot_storage_name` parameter has been renamed to `uploaded_files.storage.storage_name`
+
+The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
+
+## 3.4.0 / 2020-12-21
+
+### New Features
+
+- Files uploaded to Tracim can now be stored on a Amazon S3 compatible server, see [backend documentation](backend/doc/setting.md#uploaded-files-storage) for details on how to configure it. This storage type will be improved to optimize preview generation from S3 stored files.
+- Security improvements: restrict cookie access and enable [Content Security Policy](https://www.w3.org/TR/CSP2/) header, see [backend documentation](backend/doc/setting.md#content-security-policy) for details.
+
+### Fixed Issues
+
+- Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
+
+## 3.3.1 / 2020-12-18
+
+### Fixed Issues
+
+- Mention: [#3722](https://github.com/tracim/tracim/issues/3722),
+[#3927](https://github.com/tracim/tracim/issues/3927)
+- Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
+[#3809](https://github.com/tracim/tracim/issues/3809)
+
+
+## 3.3.0 / 2020-12-02
+
+### New Features
+
+- Personal and per-space activity feeds help you keep up with what is going on in Tracim: you will be able to notice new contents, new members and other updates in real time at a glance.
+- Tabs to access the dashboard, activity feed and all contents
+
+### Fixed Issues
+
+- Frontend: [#3772](https://github.com/tracim/tracim/issues/3772),
+[#3805](https://github.com/tracim/tracim/issues/3805),
+[#3813](https://github.com/tracim/tracim/issues/3813),
+[#3820](https://github.com/tracim/tracim/issues/3820),
+[#3847](https://github.com/tracim/tracim/issues/3847),
+[#3870](https://github.com/tracim/tracim/issues/3870),
+[#3877](https://github.com/tracim/tracim/issues/3877)
+- Backend: [#3830](https://github.com/tracim/tracim/issues/3830)
+
+
+## 3.2.2 / 2020-11-17
+
+### Fixed Issues
+
+- Backend: [#3836](https://github.com/tracim/tracim/issues/3836)
+
+
+## 3.2.1 / 2020-11-04
+
+### New Features
+
+- Full implementation of spaces access types: confidential, on request and open (the type of spaces created on Tracim < 3.2.1 is confidential and retain their current access behavior)
+- Allow users to discover, join and leave spaces
+- New plugins available:
+  - Adds every new user to all open spaces and to every newly created open space. You need to activate this plugin `tracim_backend_autoinvite` (documentation available [here](backend/official_plugins/README.md))
+  - Recursively adds new members of a space to its parents with the default user role of each space. You need to activate this plugin `tracim_backend_parent_access` (documentation available [here](backend/official_plugins/README.md))
+  - When a user is removed from a space, this plugin recursively removes this user from the children of this space. You need to activate this plugin `tracim_backend_child_removal` (documentation available [here](backend/official_plugins/README.md))
+- Frontend dependencies are grouped, making Tracim faster to load on small connections and on older devices, and more lightweight on memory consumption. For developers and sysadmins, this also makes Tracim build faster.
+
+### Fixed Issues
+
+- Frontend: [#3684](https://github.com/tracim/tracim/issues/3684),
+[#3693](https://github.com/tracim/tracim/issues/3693),
+[#3696](https://github.com/tracim/tracim/issues/3696),
+[#3706](https://github.com/tracim/tracim/issues/3706),
+[#3768](https://github.com/tracim/tracim/issues/3768)
+- Backend: [#3604](https://github.com/tracim/tracim/issues/3604)
+
 
 ## 3.2.0 / 2020-10-16
 
 ### New Features
 
-- New spaces hierarchy and new sidebar view (a space can be child of another)
+- Spaces now can have sub-spaces  (a space can be child of another)
+- The sidebar has been simplified and shows the new space hierarchy
 - New access types for spaces (on request, open)
-- Automatic test can be done for Tracim docker image (feature for developers)
+- Automatic tests can be done for the Tracim docker image (feature for developers)
 
 ### Fixed Issues
 
@@ -23,8 +108,8 @@
 - Renaming `Text document` app to `Note` (issue [#3621](https://github.com/tracim/tracim/issues/3621))
 - Renaming `Shared space` to `Space` (issue [#3582](https://github.com/tracim/tracim/issues/3582))
 - Webdav (issue [#3625](https://github.com/tracim/tracim/issues/3625)):
-  - It is no longer possible to show two spaces with the same name in webdav. If this case exist on Tracim, webdav show the first space id.
-  - It is no longer possible to create/modify a space from webdav access
+  - It is no longer possible to show two spaces with the same name in WebDAV. If two spaces at the same place have the same name, only the oldest space will be shown.
+  - It is no longer possible to create/modify a space from WebDAV
 
 
 ## 3.1.5 / 2020-10-16

@@ -1,7 +1,6 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
-
 describe('Workspace', () => {
   before(() => {
     cy.resetDB()
@@ -13,12 +12,13 @@ describe('Workspace', () => {
   })
 
   const createOneSpace = (cy, spaceName) => {
-    return cy.get('.newSpace__input').should('be.visible').type(spaceName)
-    .get('.singleChoiceList__item').first().should('be.visible').click()
-    .get('.newSpace__button .btn').should('be.visible').click()
-    .get('div.newSpace__input').should('be.visible')
-    .get('.singleChoiceList__item').first().should('be.visible').click()
-    .get('.newSpace__button .btn').last().should('be.visible').click()
+    return cy
+      .get('.newSpace__input').should('be.visible').type(spaceName)
+      .get('.singleChoiceList__item').first().should('be.visible').click()
+      .get('.newSpace__button .btn').should('be.visible').click()
+      .get('div.newSpace__input').should('be.visible')
+      .get('.singleChoiceList__item').first().should('be.visible').click()
+      .get('.newSpace__button .btn').last().should('be.visible').click()
   }
 
   it('should create a new space while no others are created', () => {
@@ -32,13 +32,13 @@ describe('Workspace', () => {
       .get('[data-cy="dashboardWorkspaceLabel"]')
       .contains(spaceTitle)
 
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
+    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
       .should('exist')
   })
 
   const getWorkspaceItemByName = (cy, spaceTitle) => (
-    cy.get(`.sidebar__content__navigation__workspace__item__name[title="${spaceTitle}"]`)
-      .parents('li.sidebar__content__navigation__workspace__item')
+    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
+      .parents('li.sidebar__content__navigation__item')
   )
 
   describe('Creating a workspace while a lot of workspace are already created', () => {

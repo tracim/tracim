@@ -8,13 +8,14 @@ import {
   APP_FEATURE_MODE,
   appContentFactory,
   ArchiveDeleteContent,
-  BREADCRUMBS_TYPE,
+  buildContentPathBreadcrumbs,
   buildHeadTitle,
   CUSTOM_EVENT,
-  generateLocalStorageContentId,
   getCurrentContentVersionNumber,
+  getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
+  handleInvalidMentionInComment,
   NewVersionBtn,
   PopinFixed,
   PopinFixedContent,
@@ -34,6 +35,10 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem,
   getContentComment,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
@@ -81,7 +86,11 @@ export class HtmlDocument extends React.Component {
       isLastTimelineItemCurrentToken: false,
       isAutoCompleteActivated: false,
       autoCompleteCursorPosition: 0,
-      autoCompleteItemList: []
+      autoCompleteItemList: [],
+      invalidMentionList: [],
+      oldInvalidMentionList: [],
+      showInvalidMentionPopupInComment: false,
+      showInvalidMentionPopupInContent: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -345,47 +354,8 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
-
-  getLocalStorageItem = type => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong getLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    return localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type)
-    )
-  }
-
-  setLocalStorageItem = (type, value) => {
-    if (!this.isValidLocalStorageType(type)) {
-      console.log('error in app htmldoc, wrong setLocalStorage type')
-      return
-    }
-
-    const { state } = this
-    localStorage.setItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
-      value
-    )
-  }
-
   buildBreadcrumbs = (content) => {
-    const { state } = this
-
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-      data: {
-        breadcrumbs: [{
-          url: `/ui/workspaces/${content.workspace_id}/contents/${state.config.slug}/${content.content_id}`,
-          label: content.label,
-          link: null,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
-        }]
-      }
-    })
+    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
   }
 
   loadContent = async () => {
@@ -403,8 +373,10 @@ export class HtmlDocument extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
 
-    const localStorageComment = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'comment')
+    const localStorageComment = getLocalStorageItem(
+      state.appName,
+      resHtmlDocument.body,
+      LOCAL_STORAGE_FIELD.COMMENT
     )
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
@@ -418,10 +390,12 @@ export class HtmlDocument extends React.Component {
       ? APP_FEATURE_MODE.EDIT
       : APP_FEATURE_MODE.VIEW
 
-    // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
-    const localStorageRawContent = localStorage.getItem(
-      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, state.appName, 'rawContent')
+    const localStorageRawContent = getLocalStorageItem(
+      state.appName,
+      resHtmlDocument.body,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
+
     const hasLocalStorageRawContent = !!localStorageRawContent
 
     const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
@@ -443,6 +417,9 @@ export class HtmlDocument extends React.Component {
     this.buildBreadcrumbs(resHtmlDocument.body)
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
+    const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
+    this.setState({ oldInvalidMentionList: oldInvalidMentionList })
   }
 
   loadTimeline = () => {
@@ -459,7 +436,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
+    const previouslyUnsavedRawContent = getLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)
 
     this.setState(prev => ({
       content: {
@@ -482,30 +459,47 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW
     }))
 
-    const { state } = this
-    localStorage.removeItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+    removeLocalStorageItem(
+      this.state.appName,
+      this.state.content,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
+  }
+
+  handleClickSaveDocument = async () => {
+    const { state } = this
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
+    const content = tinymce.activeEditor.getContent()
+    const allInvalidMentionList = getInvalidMentionList(content, knownMentions)
+    const newInvalidMentionList = allInvalidMentionList.filter(mention => {
+      return state.oldInvalidMentionList.indexOf(mention) === -1
+    })
+
+    if (newInvalidMentionList.length > 0) {
+      this.setState({
+        invalidMentionList: newInvalidMentionList,
+        showInvalidMentionPopupInContent: true
+      })
+    } else this.handleSaveHtmlDocument()
   }
 
   handleSaveHtmlDocument = async () => {
     const { state, props } = this
 
     const content = tinymce.activeEditor.getContent()
+    const allInvalidMentionList = [...state.oldInvalidMentionList, ...state.invalidMentionList]
 
     let newDocumentForApiWithMention
     try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(content, state.loggedUser.username)
+      newDocumentForApiWithMention = handleMentionsBeforeSave(
+        content,
+        state.loggedUser.username,
+        allInvalidMentionList
+      )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
     }
-
-    const backupLocalStorage = this.getLocalStorageItem('rawContent')
-
-    localStorage.removeItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
-    )
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
@@ -513,6 +507,12 @@ export class HtmlDocument extends React.Component {
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200: {
+        removeLocalStorageItem(
+          state.appName,
+          state.content,
+          LOCAL_STORAGE_FIELD.RAW_CONTENT
+        )
+
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
         this.setState(prev => ({
@@ -520,7 +520,9 @@ export class HtmlDocument extends React.Component {
           content: {
             ...prev.content,
             raw_content: newDocumentForApiWithMention
-          }
+          },
+          oldInvalidMentionList: allInvalidMentionList,
+          showInvalidMentionPopupInContent: false
         }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
@@ -531,7 +533,6 @@ export class HtmlDocument extends React.Component {
         break
       }
       case 400:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
         switch (fetchResultSaveHtmlDoc.body.code) {
           case 2067:
             this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
@@ -545,7 +546,6 @@ export class HtmlDocument extends React.Component {
         }
         break
       default:
-        this.setLocalStorageItem('rawContent', backupLocalStorage)
         this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
@@ -555,7 +555,7 @@ export class HtmlDocument extends React.Component {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
-    this.setLocalStorageItem('rawContent', newText)
+    setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
   }
 
   handleChangeNewComment = e => {
@@ -567,7 +567,7 @@ export class HtmlDocument extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateAnywayNewComment = () => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -580,6 +580,19 @@ export class HtmlDocument extends React.Component {
       )
     } catch (e) {
       this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
+  }
+
+  handleClickValidateNewCommentBtn = async () => {
+    const { state } = this
+
+    if (!handleInvalidMentionInComment(
+      state.config.workspace.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayNewComment()
     }
   }
 
@@ -692,6 +705,8 @@ export class HtmlDocument extends React.Component {
       this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
     }
   }
+
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInContent: false, showInvalidMentionPopupInComment: false })
 
   handleClickNotifyAll = async () => {
     const { state, props } = this
@@ -807,12 +822,13 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             customColor={state.config.hexcolor}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
-            onClickValidateBtn={this.handleSaveHtmlDocument}
+            onClickValidateBtn={this.handleClickSaveDocument}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             text={state.content.raw_content}
@@ -821,7 +837,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && this.getLocalStorageItem('rawContent')}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
@@ -835,6 +851,9 @@ export class HtmlDocument extends React.Component {
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleSaveHtmlDocument}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
           />
 
           <PopinFixedRightPart
@@ -862,6 +881,10 @@ export class HtmlDocument extends React.Component {
                   isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                   searchForMentionInQuery={this.searchForMentionInQuery}
                   onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+                  onClickCancelSave={this.handleCancelSave}
+                  onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+                  showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                  invalidMentionList={state.invalidMentionList}
                 />
               )
             }]}

@@ -33,6 +33,7 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import WebdavAppFactory
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
@@ -44,6 +45,7 @@ from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
+from tracim_backend.tests.utils import MessageHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
@@ -66,7 +68,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
     pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
     my_dir = dirname(__file__)
     shutil.copyfile(
-        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
+        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf")
     )
     with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
         routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
@@ -117,6 +119,10 @@ def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTe
         extra_config_vars={"app:main": settings},
         hostname="127.0.0.1",
     ) as server:
+        # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
+        # will check hostname:port to verify if test server
+        # is correctly runned. So server run check can take forever and fail if for some reason,
+        # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
         server.start()
         yield server
     session_factory.close_all()
@@ -361,6 +367,40 @@ def admin_user(session: Session) -> User:
 
 
 @pytest.fixture()
+def bob_user(session: Session, user_api_factory: UserApiFactory) -> User:
+    user = user_api_factory.get().create_user(
+        email="bob@test.test",
+        username="bob",
+        password="password",
+        name="bob",
+        profile=Profile.USER,
+        timezone="Europe/Paris",
+        lang="fr",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return user
+
+
+@pytest.fixture()
+def riyad_user(session: Session, user_api_factory: UserApiFactory) -> User:
+    user = user_api_factory.get().create_user(
+        email="riyad@test.test",
+        username="riyad",
+        password="password",
+        name="riyad",
+        profile=Profile.USER,
+        timezone="Europe/Paris",
+        lang="fr",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return user
+
+
+@pytest.fixture()
 def app_list() -> typing.List[TracimApplicationInContext]:
     from tracim_backend.extensions import app_list as application_list_static
 
@@ -376,7 +416,7 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return TracimDavProvider(app_config=app_config,)
+    return TracimDavProvider(app_config=app_config)
 
 
 @pytest.fixture()
@@ -384,7 +424,7 @@ def webdav_environ_factory(
     webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
     )
 
 
@@ -437,6 +477,11 @@ def webdav_testapp(config_uri, config_section) -> TestApp:
 @pytest.fixture
 def event_helper(session) -> EventHelper:
     return EventHelper(session)
+
+
+@pytest.fixture
+def message_helper(session) -> MessageHelper:
+    return MessageHelper(session)
 
 
 @pytest.fixture

@@ -1,8 +1,11 @@
 {
   "Accept request": "Accepter la demande",
   "by {{author}} at {{date}}": "par {{author}} le {{date}}",
+  "Confirm": "Confirmer",
+  "Default role:": "Rôle par défaut :",
   "Description": "Description",
-  "Validate": "Valider",
+  "Error while rejecting user": "Erreur lors du rejet d'un utilisateur",
+  "Error while saving new default role": "Erreur lors de la sauvegarde d'un nouveau rôle par défaut",
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
@@ -19,8 +22,6 @@
   "Space's description": "Description de l'espace",
   "Delete space": "Supprimer l'espace",
   "Delete": "Supprimer",
-  "Are you sure?": "Êtes-vous sûr ?",
-  "Cancel": "Annuler",
   "Unknown user": "Utilisateur inconnu",
   "Error while deleting space": "Erreur lors de la suppression de l'espace",
   "This account is deactivated": "Ce compte est désactivé",
@@ -48,5 +49,6 @@
   "Reject request": "Refuser la demande",
   "Request accepted": "Demande acceptée",
   "Request rejected": "Demande refusée",
-  "There are no requests yet.": "Vous n'avez pas encore de demande."
+  "There are no requests yet.": "Vous n'avez pas encore de demande.",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace (uniquement pour les espaces ouverts ou sur demande)."
 }

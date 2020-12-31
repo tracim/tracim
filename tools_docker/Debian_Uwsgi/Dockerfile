@@ -53,6 +53,7 @@ RUN \
     && python3 -m pip install -r requirements.txt \
     && python3 -m pip install -r requirements-db-postgres.txt \
     && python3 -m pip install -r requirements-db-mysql.txt \
+    && python3 -m pip install -r requirements-storage-s3.txt \
     && python3 -m pip install -e "." \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
@@ -85,7 +86,8 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN \
-    apt install -qy \
+    printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
+    && apt install -qy \
         apt-transport-https \
         software-properties-common \
         gnupg2 \

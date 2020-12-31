@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import {
+  buildFilePreviewUrl,
   createSpaceTree,
-  generateLocalStorageContentId,
   convertBackslashNToBr,
   handleFetchResult,
   hasSpaces,
@@ -31,24 +31,6 @@ import {
 import sinon from 'sinon'
 
 describe('helper.js', () => {
-  describe('generateLocalStorageContentId()', () => {
-    it('should return the proper string', () => {
-      const fixture = {
-        workspaceId: 23,
-        contentId: 53,
-        contentType: 'randomContentType',
-        dataType: 'randomContentType'
-      }
-      const localStorageContentId = generateLocalStorageContentId(
-        fixture.workspaceId,
-        fixture.contentId,
-        fixture.contentType,
-        fixture.dataType
-      )
-      expect(localStorageContentId).to.eql(`${fixture.workspaceId}/${fixture.contentId}/${fixture.contentType}_${fixture.dataType}`)
-    })
-  })
-
   describe('convertBackslashNToBr()', () => {
     it('should return the proper msg', () => {
       const msg = 'random\nMessage'
@@ -498,6 +480,16 @@ describe('helper.js', () => {
 
       sortWorkspaceList(workspaceList, 'en')
       expect(workspaceList).to.deep.equal(workspaceListSortedByFolderAndNaturally)
+    })
+  })
+
+  describe('Function buildFilePreviewUrl', () => {
+    it('should URL-encode the file name', () => {
+      expect(
+        buildFilePreviewUrl('http://unit.test/', 1, 2, 3, "Captures / d'écran (n°1)", 4, 640, 480)
+      ).to.equal(
+        "http://unit.test//workspaces/1/files/2/revisions/3/preview/jpg/640x480/Captures%20%2F%20d'%C3%A9cran%20(n%C2%B01).jpg?page=4"
+      )
     })
   })
 })

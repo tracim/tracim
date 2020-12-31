@@ -27,10 +27,10 @@ import {
   serialize,
   TracimComponent,
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
-  PAGE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
@@ -75,6 +75,8 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
+import PersonalActivityFeed from './PersonalActivityFeed.jsx'
+import WorkspaceActivityFeed from './WorkspaceActivityFeed.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -310,7 +312,13 @@ export class Tracim extends React.Component {
   loadNotificationList = async (userId) => {
     const { props } = this
 
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(userId, NUMBER_RESULTS_BY_PAGE))
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      userId,
+      {
+        excludeAuthorId: userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
+      }
+    ))
     switch (fetchGetNotificationWall.status) {
       case 200:
         props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
@@ -418,6 +426,8 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.LOGIN} component={Login} />
 
+          <Route path={PAGE.ACTIVITY_FEED} component={PersonalActivityFeed} />
+
           <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
 
           <Route path={PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF} component={ForgotPasswordNoEmailNotif} />
@@ -463,6 +473,11 @@ export class Tracim extends React.Component {
                       <Dashboard />
                     </div>
                   )}
+                />
+
+                <Route
+                  path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
+                  render={(routerProps) => <WorkspaceActivityFeed workspaceId={routerProps.match.params.idws} />}
                 />
 
                 <Route

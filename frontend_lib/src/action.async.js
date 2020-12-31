@@ -8,6 +8,9 @@ export const baseFetch = (method, url, body) =>
     body: body ? JSON.stringify(body) : undefined
   })
 
+export const getContentPath = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/path`)
+
 export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle, newContent, propertiesToAddToBody) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}`, {
@@ -105,3 +108,9 @@ export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent
 
 export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/users/me/workspaces/${workspaceId}/contents/${contentId}/read`)
+
+export const getContent = (apiUrl, contentId) =>
+  baseFetch('GET', `${apiUrl}/contents/${contentId}`)
+
+export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)

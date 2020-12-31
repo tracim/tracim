@@ -1,8 +1,11 @@
 {
   "Accept request": "Aceitar pedido",
   "by {{author}} at {{date}}": "por {{author}} no {{date}}",
+  "Confirm": "Confirmar",
+  "Default role:": "Função predefinida:",
   "Description": "Descrição",
-  "Validate": "Validar",
+  "Error while rejecting user": "Erro ao rejeitar o utilizador",
+  "Error while saving new default role": "Erro ao salvar nova função predefinida",
   "Add a member": "Acrescentar um membro",
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
@@ -19,7 +22,6 @@
   "Space's description": "Descrição do espaço",
   "Delete space": "Eliminar espaço",
   "Delete": "Eliminar",
-  "Cancel": "Anular",
   "Unknown user": "Utilizador desconhecido",
   "Error while deleting space": "Erro ao eliminar o espaço",
   "This account is deactivated": "Esta conta está desativada",
@@ -41,12 +43,12 @@
   "Error while deactivating download": "Erro ao desativar o download",
   "Members List": "Lista dos Membros",
   "Optional Functionalities": "Funcionalidades Opcionais",
-  "Are you sure?": "Tem certeza?",
   "Requests to join the space": "Pedidos de acesso ao espaço",
   "Error while loading space requests": "Erro ao carregar os pedidos de acesso ao espaço",
   "Manage request": "Gerir pedido",
   "Reject request": "Rejeitar pedido",
   "Request accepted": "Pedido aceito",
   "Request rejected": "Pedido rejeitado",
-  "There are no requests yet.": "Ainda não tem pedidos."
+  "There are no requests yet.": "Ainda não tem pedidos.",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Esta é a função que os membros terão por pré-definição quando se juntarem ao seu espaço (apenas para espaços abertos ou a pedido)."
 }

@@ -4,11 +4,11 @@ import classnames from 'classnames'
 
 const DropdownMenuItem = props => {
   return (
-    <button
-      className={classnames('transparentButton dropdownMenuItem primaryColorBgActive dropdown-item', props.customClass)}
+    <span
+      className={classnames('dropdownMenuItem primaryColorBgActive dropdown-item', props.customClass)}
     >
       {props.children}
-    </button>
+    </span>
   )
 }
 

@@ -20,7 +20,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
-  CHECK_USERNAME_DEBOUNCE_WAIT
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -38,7 +39,6 @@ import {
 } from '../action-creator.async.js'
 import {
   editableUserAuthTypeList,
-  PAGE,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
@@ -51,8 +51,8 @@ export class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: 'My profile',
-      translationKey: props.t('My profile'),
+      label: 'My account',
+      translationKey: props.t('My account'),
       display: true
     }, {
       name: 'spacesConfig',
@@ -128,15 +128,9 @@ export class Account extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
-    }, {
-      link: <span className='nolink'>{props.t('Administration')}</span>,
+      link: <Link to={PAGE.ACCOUNT}>{props.t('Account Settings')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      notALink: true
-    }, {
-      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
-      type: BREADCRUMBS_TYPE.CORE
+      label: props.t('Account Settings')
     }]))
   }
 
@@ -262,7 +256,7 @@ export class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    props.dispatch(setHeadTitle(props.t('My Account')))
+    props.dispatch(setHeadTitle(props.t('Account Settings')))
   }
 
   render () {
@@ -274,7 +268,7 @@ export class Account extends React.Component {
           <PageWrapper customClass='account'>
             <PageTitle
               parentClass='account'
-              title={props.t('My account')}
+              title={props.t('Account Settings')}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
             />
