@@ -23,7 +23,7 @@ See [README.md](../README.md) at the root of the repository.
 
 [build_file.sh](./build_file.sh) will build the app and its translations files and copy everything into the `frontend/dist/app` folder.
 
-Once the script is done, reload the frontend which will load your new app version (careful for cache).
+Once the script is done, refresh the browser's page which will load your new app version (careful for cache).
 
 ### With development server
 To use the development server, you need to:
