@@ -9,15 +9,15 @@ It will try to generate a jpeg preview of the uploaded file using [Preview Gener
 
 This app also allow opening Collaborative documents.
 
-### Production
+## Production
 
 Its installation and build are handled by [install_frontend_dependencies.sh](../install_frontend_dependencies.sh) and [build_full_frontend.sh](../build_full_frontend.sh).
 
 See [README.md](../README.md) at the root of the repository.
 
-### Development
+## Development
 
-#### Basic
+### Basic
 - save your modifications
 - run `build_file.sh`
 
@@ -25,7 +25,7 @@ See [README.md](../README.md) at the root of the repository.
 
 Once the script is done, reload the frontend which will load your new app version (careful for cache).
 
-#### With development server
+### With development server
 To use the development server, you need to:
 - be logged in to the frontend with the global admin default user (so that the api doesn't return http status 401)
   - login: admin@admin.admin
@@ -38,14 +38,14 @@ It will create a web server (using webpack-dev-server) where you will see the ap
 
 The configuration file `debug.js` will be used, following the `debug.sample.js` template file.
 
-##### Update debug.js for servdev
+#### Update debug.js for servdev
 To adapt the configuration to your local database, you need to:
 - create a content of type file (in any workspace) using Tracim's frontend interface
 - in `src/debug.js`, change:
   - `content.content_id` to the id of the content you just created
   - `content.workspace_id` to the id of the workspace you just created the content in
 
-#### Run servdev with a different user
+### Run servdev with a different user
 Login with that user in the frontend.
 
 Add the `loggedUser` property at the root of your `debug.js` and update the properties you need.
@@ -80,42 +80,42 @@ const updatedDebugExample = {
 
 ___
 
-### Other available yarn scripts
+## Other available yarn scripts
 
-#### yarn run build
+### yarn run build
 
 - Build the app as standalone app including all its dependencies
 - Uses [webpack.config.js](./webpack.config.js)
 - You might not need this script
 
-#### yarn run buildoptimized
+### yarn run buildoptimized
 
 - Build the app including only its specific dependencies
 - Uses the merge dependencies feature of Tracim (see `frontend_vendors` folder)
 - Uses [webpack.optimized.config.js](webpack.optimized.config.js)
 - Is the script used by [build_file.sh](./build_file.sh)
 
-#### yarn run build-translation
+### yarn run build-translation
 
 - Build the translation files
 - It will add any new translation keys and remove unseen one
 - see [frontend/doc/i18n.md](../frontend/doc/i18n.md)
 - Must be run before pushing modifications to the displayed texts of the app
 
-#### yarn run lint
+### yarn run lint
 
 - Run the linting on any source files in the folders `src/` and `test/`
 
-#### yarn run test
+### yarn run test
 
 - Run the linting and run the tests from the `test/` folder
 - This command must be run without any errors before pushing code modifying this app
 
-#### yarn run test:quick
+### yarn run test:quick
 
 - Run the tests from the `test/` folder
 - Is faster than `yarn run test` since it doesn't run the linting
-- Is useful for test debug
+- Is useful for unit test debug
 
 ___
 
