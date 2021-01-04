@@ -20,6 +20,7 @@ env:
     - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
     - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
+    # generated using the guide at https://docs.travis-ci.com/user/encryption-keys/
     - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
 dist: bionic
@@ -59,6 +60,7 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
     - ls -R /tmp/test
     # INFO - S.G - 2020-12-30 - needed to avoid an error with "docker login"
+    # as the default docker credential helper requires a X11 display which is not present in Travis
     - sudo dpkg -r --ignore-depends=golang-docker-credential-helpers golang-docker-credential-helpers
     - docker login -u algooci -p $DOCKER_PW
   install:
