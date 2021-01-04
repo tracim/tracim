@@ -742,16 +742,29 @@ class ContentApi(object):
         :param file_extension: extension of the file we expect
         :return: content filepath
         """
-        # HACK - G.M - This mecanism is very inefficient because:
-        # - generate a temporary file each time and
-        # - skip internal cache mecanism of preview_generator as filepath is always different
+        # HACK - G.M - This mecanism is inefficient because it
+        # generate a temporary file each time
         # Improvement need to be made in preview_generator itself.
-        # to handle more properly theses issues.
-        with tempfile.NamedTemporaryFile(
-            "w+b", prefix="revision-content-", suffix=file_extension
-        ) as tmp:
-            tmp.write(depot_stored_file.read())
-            yield tmp.name
+        # to handle more properly theses issues
+        # We do rely on consistent path based on gettemdir(),
+        # normally /tmp to give consistent path, this is a quick fix which does
+        # not need change in preview-generator.
+        # note: this base path is configurable through env var according to python doc
+        # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
+        file_name = "{temp_dir}/tracim-revision-content-{file_id}{file_extension}".format(
+            temp_dir=tempfile.gettempdir(),
+            file_id=depot_stored_file.file_id,
+            file_extension=file_extension,
+        )
+        try:
+            with open(file_name, "wb",) as tmp:
+                tmp.write(depot_stored_file.read())
+                yield file_name
+        finally:
+            try:
+                os.unlink(file_name)
+            except FileNotFoundError:
+                pass
 
     def get_valid_content_filepath_legacy(
         self, depot_stored_file: StoredFile
