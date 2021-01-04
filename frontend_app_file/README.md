@@ -31,7 +31,7 @@ To use the development server, you need to:
   - login: admin@admin.admin
   - password: admin@admin.admin
   - (optional) if you need to be logged in with a different user, see [below](#run-servdev-with-a-different-user)
-- update your `debug.js` file. See [below](#update-debug.js-for-servdev)
+- update your `debug.js` file. See [below](#update-debugjs-for-servdev)
 - run `yarn run servdev`
 
 It will create a web server (using webpack-dev-server) where you will see the app loaded with some default values.
@@ -82,36 +82,48 @@ ___
 
 ## Other available yarn scripts
 
-### yarn run build
+### build the app
+
+    yarn run build 
 
 - Build the app as standalone app including all its dependencies
 - Uses [webpack.config.js](./webpack.config.js)
 - You might not need this script
 
-### yarn run buildoptimized
+### build the app optimized (without shared dependencies)
+
+    yarn run buildoptimized 
 
 - Build the app including only its specific dependencies
 - Uses the merge dependencies feature of Tracim (see `frontend_vendors` folder)
 - Uses [webpack.optimized.config.js](webpack.optimized.config.js)
 - Is the script used by [build_file.sh](./build_file.sh)
 
-### yarn run build-translation
+### build the translation files
+
+    yarn run build-translation 
 
 - Build the translation files
 - It will add any new translation keys and remove unseen one
 - see [frontend/doc/i18n.md](../frontend/doc/i18n.md)
 - Must be run before pushing modifications to the displayed texts of the app
 
-### yarn run lint
+### run the linting
+
+    yarn run lint 
 
 - Run the linting on any source files in the folders `src/` and `test/`
 
-### yarn run test
+### run all the tests
+
+    yarn run test 
 
 - Run the linting and run the tests from the `test/` folder
 - This command must be run without any errors before pushing code modifying this app
 
-### yarn run test:quick
+### run only the unit tests
+
+    yarn run test:quick 
 
 - Run the tests from the `test/` folder
 - Is faster than `yarn run test` since it doesn't run the linting
@@ -121,10 +133,10 @@ ___
 
 ### Before pushing changes to this app, you must
 
-###### Run the script for linting and unit tests without any errors
+###### 1) Run the script for linting and unit tests without any errors
 
     yarn run test
 
-###### Run the translation generation script and update any values marked `__NOT_TRANSLATED__` at least in the english translation ([here](./i18next.scanner/en/translation.json)). Notify your PR if some translations are missing
+###### 2) Run the translation generation script and update any values marked `__NOT_TRANSLATED__` at least in the english translation ([here](./i18next.scanner/en/translation.json)). Notify your PR if some translations are missing
 
     yarn run build-translation
