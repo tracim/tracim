@@ -30,7 +30,7 @@ export const HomeNoWorkspace = props =>
       </div>
       {getWorkspaceMessage(props.canCreateWorkspace, props.canJoinWorkspace, props.t)}
     </div>
-    <span class='homepagecard__buttons'>
+    <span className='homepagecard__buttons'>
       {props.canCreateWorkspace && (
         <IconButton
           dataCy='homepagecard__create_btn'
