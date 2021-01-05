@@ -39,6 +39,10 @@ This will produce two scripts:
 
 The Webpack configuration used is [webpack.optimized.config.js](./webpack.optimized.config.js).
 
+You may include the source maps using the following command:
+
+    yarn run buildoptimized-dev
+
 ### When to use this bundle
 
 This bundle should be used when building an app to be used inside Tracim.
@@ -83,7 +87,7 @@ This bundle should be used for using Tracim lib's features outside of Tracim.
 ## Frontend unit tests
 
 Frontend unit tests uses the standalone build, hence the need to build it when running [build_full_frontend.js](../build_full_frontend.js).  
-Using the optimized build which does not include the shared vendors does not work: `tracim_frontend_lib` needs to be compatible with CommonJS, and needs to access its dependencies. It is, however, impossible to make a `tracim_frontend_vendors` global object available for `tracim_frontend_lib` when using CommonJS modules, since their is no global namespace shared between the modules (in Node.js at least).
+Using the optimized build which does not include the shared vendors does not work: `tracim_frontend_lib` needs to be compatible with CommonJS, and needs to access its dependencies. It is, however, impossible to make a `tracim_frontend_vendors` global object available for `tracim_frontend_lib` when using CommonJS modules, since there is no global namespace shared between the modules (in Node.js at least).
 
 ## Building a Tracim app that uses `tracim_fontend_lib`
 

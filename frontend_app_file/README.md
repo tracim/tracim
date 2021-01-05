@@ -7,11 +7,11 @@ It is meant to handle Tracim contents of any format. Allowing renaming, download
 
 It will try to generate a jpeg preview of the uploaded file using [Preview Generator](https://github.com/algoo/preview-generator). See [here](https://github.com/algoo/preview-generator/blob/develop/doc/supported_mimetypes.rst) the list of currently handled file format by Preview Generator. 
 
-This app also allow opening Collaborative documents.
+This app also allows opening Collaborative documents.
 
 ## Production
 
-Its installation and build are handled by [install_frontend_dependencies.sh](../install_frontend_dependencies.sh) and [build_full_frontend.sh](../build_full_frontend.sh).
+Its installation and building are respectively handled by [install_frontend_dependencies.sh](../install_frontend_dependencies.sh) and [build_full_frontend.sh](../build_full_frontend.sh).
 
 See [README.md](../README.md) at the root of the repository.
 
@@ -23,7 +23,7 @@ See [README.md](../README.md) at the root of the repository.
 
 [build_file.sh](./build_file.sh) will build the app and its translations files and copy everything into the `frontend/dist/app` folder.
 
-Once the script is done, refresh the browser's page which will load your new app version (careful for cache).
+Once the script ends, refresh the browser's page to load your new app version (be careful with the cache).
 
 ### With development server
 To use the development server, you need to:
@@ -88,6 +88,7 @@ ___
 
 - Build the app as standalone app including all its dependencies
 - Uses [webpack.config.js](./webpack.config.js)
+- To build with source maps: `yarn run build-dev`
 - You might not need this script
 
 ### build the app optimized (without shared dependencies)
@@ -98,6 +99,7 @@ ___
 - Uses the merge dependencies feature of Tracim (see `frontend_vendors` folder)
 - Uses [webpack.optimized.config.js](webpack.optimized.config.js)
 - Is the script used by [build_file.sh](./build_file.sh)
+- To build with source maps: `yarn run buildoptimized-dev`
 
 ### build the translation files
 
