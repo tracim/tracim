@@ -5,13 +5,13 @@ This library groups the components shared across Tracim frontend and the Tracim 
 
 It can be built in two different ways:
 
-- [**Optimized bundle**](#optimized-build):
+- [**Optimized build**](#optimized-build):
   - A script to be inserted in an HTML page using the a `<script>` tag
   - Build without the shared dependencies
   - The default usage for Tracim
-- [**Standalone bundle**](#standalone-build):
+- [**Standalone build**](#standalone-build):
   - a script that can be published on NPM and used by external apps
-  - Build with every dependencies
+  - Build with every dependency
   - A UMD build
 
 ## Optimized build
@@ -67,21 +67,21 @@ Run:
     yarn run build
 
 This will produce two UMD modules:
-- `dist/tracim_frontend_lib.lib.js`: the library part
-- `dist/tracim_frontend_lib.style.js`: the styling part
+- `dist/tracim_frontend_lib.lib.js` is the library part
+- `dist/tracim_frontend_lib.style.js` is the styling part (css)
 
 The Webpack configuration used is [webpack.config.js](./webpack.config.js).
 
 ### When to use this bundle
 
-This bundle should be used for using Tracim lib's features outside of Tracim.
+This bundle should be used for using Tracim lib's features outside Tracim.
 
 #### Pros
 - it is a conventional build
 - it is exported as a UMD module
 
 #### Cons
-- it cannot use the tracim_vendors feature: so it will bundle dependencies that are already available in Tracim
+- it cannot use the tracim_vendors feature. So it will bundle dependencies that are already available in Tracim
 
 
 ## Frontend unit tests
@@ -186,12 +186,6 @@ Apps in the Tracim project need to support both methods, using separate Webpack 
 
 ___
 
-### Before pushing changes to this library, you must
+### Before pushing changes to this app, you must
 
-###### 1) Run the script for linting and unit tests without any errors
-
-    yarn run test
-
-###### 2) Run the translation generation script and update any values marked `__NOT_TRANSLATED__` at least in the english translation ([here](./i18next.scanner/en/translation.json)). Notify your PR if some translations are missing
-
-    yarn run build-translation
+see [frontend/doc/before_push.md](../frontend/doc/before_push.md)
