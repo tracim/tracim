@@ -763,12 +763,12 @@ class ContentApi(object):
         # This file will NOT be removed at the end on Linux (FileLock use flock):
         # see  https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
         # some investigation needs to be conducted to see if another solution is possible avoiding creating
-        # too many files.see https://github.com/tracim/tracim/issues/4014
+        # too many files. See https://github.com/tracim/tracim/issues/4014
         with filelock.FileLock(lockfile_path):
             try:
                 # HACK - G.M - 2020-01-05 - This mechanism is inefficient because it
                 # generates a temporary file each time
-                # Improvements need to be made in preview_generator itself.
+                # Improvements need to be made in preview_generator itself
                 # to handle more properly these issues.
                 # We do rely on consistent path based on gettemdir(),
                 # normally /tmp to give consistent path, this is a quick fix which does
