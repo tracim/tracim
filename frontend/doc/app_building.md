@@ -9,6 +9,8 @@ See [README.md](../../README.md) at the root of the repository.
 
 ## Development
 
+You must have run [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) before starting any build.
+
 ### Basic
 - save your modifications
 - run `build_[appName].sh`
