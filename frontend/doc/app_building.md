@@ -35,6 +35,8 @@ Once the script ends, refresh the browser's page to load your new app version (b
 
 It will create a web server (using webpack-dev-server) where you will see the app loaded with some default values.
 
+Its address is `localhost` and its port is in the `webpack.config.js` file of the app at the property `devServer.port`
+
 The configuration file `debug.js` will be used, following the `debug.sample.js` template file.
 
 #### Update debug.js for servdev
