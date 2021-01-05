@@ -760,20 +760,21 @@ class ContentApi(object):
         )
         # FIXME - G.M - 2020-01-05 - This will create a lockfile for
         # each depot file we do need (each content revision)
-        # This file will NOT been removed at the end on linux (FileLock use flock):
+        # This file will NOT be removed at the end on Linux (FileLock use flock):
         # see  https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
-        # some search need to be made to see if another solution is possible avoiding creating
-        # too much file.see https://github.com/tracim/tracim/issues/4014
+        # some investigation needs to be conducted to see if another solution is possible avoiding creating
+        # too many files.see https://github.com/tracim/tracim/issues/4014
         with filelock.FileLock(lockfile_path):
             try:
-                # HACK - G.M - 2020-01-05 - This mecanism is inefficient because it
-                # generate a temporary file each time
-                # Improvement need to be made in preview_generator itself.
-                # to handle more properly theses issues
+                # HACK - G.M - 2020-01-05 - This mechanism is inefficient because it
+                # generates a temporary file each time
+                # Improvements need to be made in preview_generator itself.
+                # to handle more properly these issues.
                 # We do rely on consistent path based on gettemdir(),
                 # normally /tmp to give consistent path, this is a quick fix which does
-                # not need change in preview-generator.
-                # note: this base path is configurable through env var according to python doc
+                # not need any change in preview-generator.
+                # note: this base path is configurable through an envirnoment var according
+                # to the Python doc:
                 # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
                 with open(file_path, "wb",) as tmp:
                     tmp.write(depot_stored_file.read())
