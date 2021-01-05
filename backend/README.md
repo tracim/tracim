@@ -347,7 +347,7 @@ See here: https://github.com/rroemhild/docker-test-openldap
 
 You can run it this way with Docker:
 
-    docker pull rroemhild/test-openldap
+    docker pull rroemhild/test-openldap:1.1
     docker run -d -p 3890:389 rroemhild/test-openldap
 
 You need also a elasticsearch server on port 9200 for elasticsearch related test
