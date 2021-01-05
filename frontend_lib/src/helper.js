@@ -155,8 +155,6 @@ export const revisionTypeList = [{
   label: i18n.t('Item copied')
 }]
 
-export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
-
 const WORKSPACE_MANAGER = {
   id: 8,
   slug: 'workspace-manager',

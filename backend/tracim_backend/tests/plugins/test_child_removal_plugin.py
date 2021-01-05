@@ -3,8 +3,8 @@ import pytest
 from tracim_backend import AuthType
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles

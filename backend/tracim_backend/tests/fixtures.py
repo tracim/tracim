@@ -32,6 +32,7 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import TracimDavProvider
 from tracim_backend.lib.webdav import WebdavAppFactory
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
@@ -140,6 +141,7 @@ def config_section(request) -> str:
 def settings(config_uri, config_section, sqlalchemy_database):
     _settings = plaster.get_settings(config_uri, config_section)
     _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
+    os.environ["TRACIM_SQLALCHEMY__URL"] = DATABASE_URLS[sqlalchemy_database]
     _settings["sqlalchemy.url"] = DATABASE_URLS[sqlalchemy_database]
     return _settings
 
@@ -201,6 +203,8 @@ def engine(config, app_config):
     else:
         isolation_level = "READ_COMMITTED"
     engine = get_engine(app_config, isolation_level=isolation_level)
+    DeclarativeBase.metadata.drop_all(engine)
+    DeclarativeBase.metadata.create_all(engine)
     yield engine
     engine.dispose()
 
@@ -250,21 +254,9 @@ def test_context(app_config, session_factory):
 
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger, test_context):
-    context = test_context
-
-    with transaction.manager:
-        try:
-            DeclarativeBase.metadata.drop_all(engine)
-            DeclarativeBase.metadata.create_all(engine)
-        except Exception as e:
-            transaction.abort()
-            raise e
-    yield context.dbsession
-
-    context.dbsession.rollback()
-    context.dbsession.close_all()
-    transaction.abort()
-    DeclarativeBase.metadata.drop_all(engine)
+    session = test_context.dbsession
+    yield session
+    session.close()
 
 
 @pytest.fixture
@@ -358,6 +350,40 @@ def admin_user(session: Session) -> User:
 
 
 @pytest.fixture()
+def bob_user(session: Session, user_api_factory: UserApiFactory) -> User:
+    user = user_api_factory.get().create_user(
+        email="bob@test.test",
+        username="bob",
+        password="password",
+        name="bob",
+        profile=Profile.USER,
+        timezone="Europe/Paris",
+        lang="fr",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return user
+
+
+@pytest.fixture()
+def riyad_user(session: Session, user_api_factory: UserApiFactory) -> User:
+    user = user_api_factory.get().create_user(
+        email="riyad@test.test",
+        username="riyad",
+        password="password",
+        name="riyad",
+        profile=Profile.USER,
+        timezone="Europe/Paris",
+        lang="fr",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return user
+
+
+@pytest.fixture()
 def app_list() -> typing.List[TracimApplicationInContext]:
     from tracim_backend.extensions import app_list as application_list_static
 
@@ -373,7 +399,7 @@ def content_type_list() -> ContentTypeList:
 
 @pytest.fixture()
 def webdav_provider(app_config: CFG):
-    return TracimDavProvider(app_config=app_config,)
+    return TracimDavProvider(app_config=app_config)
 
 
 @pytest.fixture()
@@ -381,7 +407,7 @@ def webdav_environ_factory(
     webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
     )
 
 

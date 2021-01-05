@@ -7,7 +7,6 @@
   "Agenda of space {{workspaceLabel}}": "Agenda de l'espace {{workspaceLabel}}",
   "Agenda": "Agenda",
   "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés",
-  "Home": "Accueil",
   "My agendas": "Mes agendas",
   "Some information was modified by {{author}}": "Certaines informations ont été modifiées par {{author}}"
 }

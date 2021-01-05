@@ -56,7 +56,7 @@ export class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('Profile'),
+      label: props.t('Account'),
       display: true
     }, {
       name: 'spacesConfig',
