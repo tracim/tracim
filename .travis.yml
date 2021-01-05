@@ -77,8 +77,9 @@ _install_full_tracim: &_install_full_tracim
     # setup backend for running
     - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE -d
-    - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
+    - cp development.ini.sample development.ini
+    - tracimcli db init -d
+    - alembic -c development.ini stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh
@@ -92,17 +93,20 @@ _backend_quick_test: &_backend_quick_test
     apt:
       packages:
         - libimage-exiftool-perl
+  before_script:
+    - cd $TRAVIS_BUILD_DIR/backend
   script:
-    - pytest --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
+    - pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
 
 _backend_test: &_backend_test
   <<: *_install_backend
   before_install:
     - docker-compose pull
   before_script:
+    - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose up -d
   script:
-    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=backend; else pytest --database=$DB; fi"
+    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
 
 
 jobs:
