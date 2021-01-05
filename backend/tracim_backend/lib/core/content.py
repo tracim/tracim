@@ -758,15 +758,15 @@ class ContentApi(object):
         lockfile_path = "{base_path}{file_extension}".format(
             base_path=base_path, file_extension=".lock",
         )
-        # FIXME - G.M - This will create a lockfile for
+        # FIXME - G.M - 2020-01-05 - This will create a lockfile for
         # each depot file we do need (each content revision)
         # This file will NOT been removed at the end on linux (FileLock use flock):
         # see  https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
         # some search need to be made to see if another solution is possible avoiding creating
-        # too much file.
+        # too much file.see https://github.com/tracim/tracim/issues/4014
         with filelock.FileLock(lockfile_path):
             try:
-                # HACK - G.M - This mecanism is inefficient because it
+                # HACK - G.M - 2020-01-05 - This mecanism is inefficient because it
                 # generate a temporary file each time
                 # Improvement need to be made in preview_generator itself.
                 # to handle more properly theses issues
