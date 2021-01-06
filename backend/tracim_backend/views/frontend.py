@@ -108,7 +108,7 @@ class FrontendController(Controller):
                     except KeyError:
                         csp_directives[app_key] = app_value
 
-            csp = "; ".join("{} {}".format(k, v) for k, v in csp_directives.items())
+            csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
             csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
             csp_header_value = csp.format(nonce=csp_nonce)
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
