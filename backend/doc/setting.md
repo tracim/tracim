@@ -174,8 +174,7 @@ Tracim is actively used and tested with 2 session back-ends: files and redis.
 
 The recommended session back-end for production is redis as it avoids having to manage deletion of expired session files. For other session back-ends, please read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
 
-:warning: If you decide to change the session configuration, it's safer to delete all existing session in order to avoid user
-from using cookie related to a not updated session.
+:warning: If you change the session configuration, it's safer to delete the existing sessions in order to force users to log again (and use a cookie with the changed options).
 
 ### File storage configuration (default)
 
@@ -194,7 +193,7 @@ You should use this command in both session data and session lock dirs.
 ## delete all existing sessions
 
 ```shell
-# note: <session.data_dir> refer to absolute path given by config parameter session.data_dir
+# note: <session.data_dir> refers to the absolute path given by the config parameter `session.data_dir`.
 rm -r <session.data_dir>/*
 ```
 
@@ -210,10 +209,10 @@ Then you'll need to set those parameters for redis backend:
     session.url = redis://localhost:6379/0
 
 
-## delete all existing sessions
+## delete the existing sessions
 
 ```shell
-# note: <session.url> refer to value of config parameter session.url (redis url)
+# note: <session.url> refers to the value of the config parameter `session.url` (redis url)
 redis-cli -u <session.url> keys 'beaker_cache:*' | xargs redis-cli -u <session.url> del
 ```
 
