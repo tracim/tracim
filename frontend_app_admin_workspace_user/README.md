@@ -1,7 +1,7 @@
 App Admin Space User for Tracim
-===================
+===============================
 
-This folder is an app loaded by Tracim.
+This folder is a fullscreen app loaded by Tracim.
 
 It is only accessible by users with the admin profile and is meant to manage Spaces and Users.
 

@@ -1,9 +1,9 @@
 App File for Tracim
 ===================
 
-This folder is an app loaded by Tracim.
+This folder is a feature app loaded by Tracim.
 
-It is meant to handle Tracim contents of any format. Allowing renaming, download, status change, public share and modification. It also shows the history of the content. 
+It is meant to handle Tracim contents of any format. Allowing creating, renaming, download, status change, public share and modification. It also shows the history of the content and its comments. 
 
 It will try to generate a jpeg preview of the uploaded file using [Preview Generator](https://github.com/algoo/preview-generator). See [here](https://github.com/algoo/preview-generator/blob/develop/doc/supported_mimetypes.rst) the list of currently handled file format by Preview Generator. 
 
@@ -24,7 +24,7 @@ see [frontend/doc/app_building#Development](../frontend/doc/app_building.md#deve
 - Create a content of type file (in any space) using Tracim's frontend interface
 - In `src/debug.js`, change:
   - `content.content_id` to the id of the content you just created
-  - `content.workspace_id` to the id of the workspace you just created the content in
+  - `content.workspace_id` to the id of the space you just created the content in
 
 ___
 

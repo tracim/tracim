@@ -1,5 +1,5 @@
 Frontend
-===================
+========
 
 This folder is the frontend part of Tracim.
 

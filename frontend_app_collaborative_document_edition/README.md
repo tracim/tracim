@@ -1,7 +1,7 @@
 App Collaborative Edition for Tracim
-===================
+====================================
 
-This folder is an app loaded by Tracim.
+This folder is a fullscreen app loaded by Tracim.
 
 It is meant to create and open collaborative documents.
 
@@ -12,9 +12,9 @@ The software used here is [Collabora Online](https://www.collaboraoffice.com/col
 ### How it works
 
 The `index.js` expose a function `getOnlineEditionAction`.  
-The app File call this function that returns the data to display the button to open the collaborative document in the app File.  
-When the users click it, it redirects the url and the frontend handles the new route to call the function `renderAppFullscreen` of the `index.js` (which is the basic process for opening Tracim apps)  
-The component then opened will create the iframe for Collabora Online.
+The app File call this function that returns the data to display the button to open the collaborative document from the app File.  
+When the users click it, it redirects the url, and the frontend handles the new route to call the function `renderAppFullscreen` of the `index.js` (which is the basic process for opening Tracim apps)  
+The opened component will then create the iframe for Collabora Online.
 
 ### Build the app
 

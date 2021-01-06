@@ -1,7 +1,7 @@
 App File for Tracim
 ===================
 
-This folder is an app loaded by Tracim.
+This folder is a fullscreen app loaded by Tracim.
 
 It is meant to handle Tracim contents of any format. Allowing renaming, download, status change, public share and modification. It also shows the history of the content.
 
