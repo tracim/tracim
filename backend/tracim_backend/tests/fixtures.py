@@ -254,9 +254,20 @@ def test_context(app_config, session_factory):
 
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger, test_context):
-    session = test_context.dbsession
-    yield session
-    session.close()
+    context = test_context
+    with transaction.manager:
+        try:
+            DeclarativeBase.metadata.drop_all(engine)
+            DeclarativeBase.metadata.create_all(engine)
+        except Exception as e:
+            transaction.abort()
+            raise e
+    yield context.dbsession
+
+    context.dbsession.rollback()
+    context.dbsession.close_all()
+    transaction.abort()
+    DeclarativeBase.metadata.drop_all(engine)
 
 
 @pytest.fixture

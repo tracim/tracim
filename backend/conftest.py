@@ -5,4 +5,8 @@ def pytest_addoption(parser):
 def pytest_generate_tests(metafunc):
     if "sqlalchemy_database" in metafunc.fixturenames:
         databases = metafunc.config.getoption("database")
-        metafunc.parametrize("sqlalchemy_database", databases or ["sqlite"])
+        if databases == ["all"]:
+            databases = ["sqlite", "postgresql", "mysql", "mariadb"]
+        elif not databases:
+            databases = ["sqlite"]
+        metafunc.parametrize("sqlalchemy_database", databases)

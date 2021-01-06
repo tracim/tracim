@@ -90,7 +90,7 @@ For more information about configuring the backend, see [Backend README](backend
 For more information about the configuration files, see development.ini.sample and the [backend setting documentation](backend/doc/setting.md).
 
 
-### Install the frontend: easy setup
+### Install the frontend
 
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
@@ -102,21 +102,22 @@ Alternatively, under root:
 
 You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce build time.
 
-### Install and run pushpin for UI updates
+### Run Tracim for development
 
-Tracim relies on [pushpin](https://pushpin.org/docs/about/) for UI updates, so you need to setup pushpin.
+    ./run_dev_backend.sh
 
-#### For development purpose
+This script will launch the minimal services for a functional backend: pushpin + web application.
+The application will then be available on [http://localhost:7999](http://localhost:7999).
 
-If you are in development environnement, the recommended way is to use docker,
-you should follow this documentation : [Live message setup for dev env](backend/doc/live_message_setup.md)
+### Run Tracim for production
 
-#### For production usage
+Tracim is composed of multiples services, some are web wsgi applications and others
+are daemons (servers not web-related to do some task like sending email).
 
 You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS.
 We recommend to use pushpin version 1.30 as this version has been extensively tested and is in use in our official docker image.
 
-and configure it to proxy tracim (by default tracim web run on port 6543):
+You then need to configure pushpin to proxy tracim (by default tracim web run on port 6543):
 
     echo "* localhost:6543" | sudo tee /etc/pushpin/routes
 
@@ -124,16 +125,7 @@ and after this change you need to restart your pushpin service:
 
     sudo systemctl restart pushpin
 
-more info about installation are available in [Backend README](backend/README.md).
-
-### Run Tracim
-
-Tracim is composed of multiples services, some are web wsgi applications and others
-are daemons (servers not web-related to do some task like sending email).
-
-#### Easy start (with pserve and pastedeploy)
-
-An easy way to run Tracim WSGI apps with pastedeploy (config in development.ini):
+ Tracim WSGI apps with pastedeploy (config in development.ini):
 
     cd backend/
     source env/bin/activate
@@ -141,12 +133,12 @@ An easy way to run Tracim WSGI apps with pastedeploy (config in development.ini)
     # running web server
     pserve development.ini
 
-You can run some other WSGI services with pastedeploy using the `tracimcli` command:
+You can run other WSGI services with pastedeploy using the `tracimcli` command:
 
     # running webdav server
     tracimcli webdav start
 
-    # running caldav server
+    # running caldav server (for agendas)
     tracimcli caldav start
     tracimcli caldav sync  # sync Tracim data with radicale caldav server
 
@@ -163,14 +155,17 @@ You can run some Tracim daemons too if you want those features:
     python3 daemons/mail_fetcher.py &
 
 You can now head to (if pushpin is correctly configured and use default port 7999)
-[http://127.0.0.1:7999](http://127.0.0.1:7999) and login with the admin account:
+[http://localhost:7999](http://localhost:7999) and login with the admin account:
 
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
 
-:warning: If this does not work, you can try to access [http://127.0.0.1:6543](http://127.0.0.1:6543). If it works, the issue is related to the configuration of pushpin.
+:warning: If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
 
 :warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
+
+The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](backend/README.md), sections `Running Tracim Backend Daemon`
+and `Running Tracim Backend WSGI APP`.
 
 ### Upkeep
 
@@ -183,13 +178,6 @@ You should use this command in both session data and session lock dirs.
 
 Another way to solve this issue is to set session to use another backend(we do support all beaker backend),
 see [session](/backend/doc/setting.md) documentation for more information.
-
-#### More documentation about running Tracim and Tracim services
-
-
-Full documentation about running Tracim services with uWSGI and supervisor
-is available in the [Backend README](backend/README.md), sections `Running Tracim Backend Daemon`
-and `Running Tracim Backend WSGI APP`.
 
 
 ### Running tests with Cypress
@@ -207,38 +195,18 @@ Alternatively, under root:
 
 If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
-#### Prerequisite for running Cypress tests
-
-⚠ To run Cypress tests, you need to run Tracim with a specific configuration:
-
-    cd backend/
-    source env/bin/activate
-    pserve cypress_test.ini
-
-#### If you are running tests in a development environment
-
-You must change the apiUrl property in `frontend/configEnv.json` to:
-
-    http://localhost:1337/api
-
-Then rebuild the frontend:
-
-    cd frontend/
-    yarn run build
 
 #### Run tests from the command line ##
 
 To runs all the tests in the 'functionnal_tests/cypress/integration' folder:
 
-    cd functionnal_tests/
-    yarn run cypress-run
+    ./run_dev_backend.sh cypress run
 
 #### Run tests with Cypress GUI ##
 
 You can watch the tests running directly from a (graphical) web interface:
 
-    cd functionnal_tests/
-    yarn run cypress-open
+    ./run_dev_backend.sh cypress open
 
 ### Running frontend unit tests
 

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  collabora:
+    image: collabora/code:4.2.6.2
+    network_mode: host
+    environment:
+      SLEEPFORDEBUGGER: "0"
+      extra_params: "--o:ssl.enable=false"
+    cap_add:
+      - MKNOD

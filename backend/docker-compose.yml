@@ -28,8 +28,7 @@ services:
       - "1025:1025"
       - "8025:8025"
   openldap:
-    # no useable tag for this image
-    image: rroemhild/test-openldap:latest
+    image: rroemhild/test-openldap:1.1
     ports:
       - "3890:389"
   postgresql:
@@ -58,11 +57,7 @@ services:
       MARIADB_USER: user
       MARIADB_PASSWORD: secret
       MARIADB_RANDOM_ROOT_PASSWORD: "true"
-  collabora:
-    image: collabora/code:4.2.6.2
-    network_mode: host
-    environment:
-      SLEEPFORDEBUGGER: "0"
-      extra_params: "--o:ssl.enable=false"
-    cap_add:
-      - MKNOD
+  redis:
+    image: redis:alpine3.12
+    ports:
+      - "6379:6379"

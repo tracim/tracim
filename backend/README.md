@@ -1,12 +1,10 @@
-The Tracim Backend
-==================
+# The Tracim Backend
 
 Backend source code of Tracim, using Pyramid Framework.
 
-Installation
----------------
+## Installation
 
-### Distribution dependencies ###
+### Distribution dependencies
 
 On Debian Stretch (9) with sudo:
 
@@ -37,14 +35,14 @@ For better preview support:
     sudo apt install libreoffice # most office documents file and text format
     sudo apt install inkscape # for .svg files.
 
-#### Supported database engines
+### Supported database engines
 
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
 
-### Get the Source ###
+### Get the source
 
 get source from github:
 
@@ -54,7 +52,7 @@ go to *backend* subdirectory:
 
     cd backend
 
-### Setup Python Virtualenv ###
+### Setup Python Virtualenv
 
 Create a Python virtual environment:
 
@@ -97,8 +95,7 @@ If you want to store files on s3, you need to install the S3 driver:
     pip install -r requirements-storage-s3.txt
 
 
-Configuration
----------------
+## Configuration
 
 Create [configuration file](doc/setting.md) for a development environment:
 
@@ -125,14 +122,13 @@ Stamp current version of database to last (useful for migration):
 
 Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to discover their functionalities and how to activate them.
 
-Running Tracim Backend WSGI APP
----------------
+## Deployment
 
 You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
 - uWSGI using wsgi/* script.
 - The pserve command of pyramid which only rely on development.ini pastedeploy config.
 
-### With uWSGI: great for production ###
+### With uWSGI: great for production
 
 #### Install uWSGI
 
@@ -144,7 +140,7 @@ Or with PIP:
 
     sudo pip3 install uwsgi
 
-#### All in terminal way ####
+#### All in terminal way
 
 
 Run all web services with UWSGI:
@@ -213,7 +209,7 @@ You can then run the process this way:
     # You need to replace <WSGI_CONF_CALDAV> with correct path
     uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
-### With Pserve: legacy way, useful for debug and dev ###
+### With Pserve: legacy way, useful for debug and dev
 
 This method relies on development.ini configuration. default web server used is _Waitress_
 in` development.ini.sample`
@@ -234,15 +230,13 @@ Run the CalDAV server:
     tracimcli caldav start
 
 
-Running Tracim Backend Daemon
----------------
+## Running the Tracim Backend Daemons
 
-Feature such as async email notification and email reply system need additional
-daemons to work correctly.
+Features such as async email notification and email reply system need additional daemons to work.
 
-### The Python Way
+### Manually
 
-#### Run Daemons
+#### Start Daemons
 
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
@@ -311,16 +305,23 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
     supervisord
 
 
-Running Pushpin Service
----------------
+## Running Pushpin Service
 
 For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
 
 See [main readme](../README.md)  section _Install and run pushpin for UI updates_
 
-## Run Tests and Others Checks ##
+## Lint the code
 
-### Setup & Run Tests ###
+Install the required versions:
+
+    pip install -r requirements-devtool.txt
+
+Then run flake8:
+
+    flake8
+
+## Run Tests
 
 First setup the needed tools and directories (only needed once):
 
@@ -344,16 +345,14 @@ By default the tests will be executed with the `sqlite` database, this can be ch
     pytest --database=postgresql
 
 Possible databases are `sqlite`, `postgresql`, `mysql` and `mariadb`.
+It is possible to specify several databases or even `all`:
 
-### Linting and Other Checks ###
+    # Needs the pytest-forked plugin (pip install pytest-forked)
+    # as some test fixtures do modify static variables.
+    pytest --forked --database=sqlite --database=postgresql
+    # Run tests on all databases
+    pytest --forked --database=all
 
-Install the required versions:
-
-    pip install -r requirements-devtool.txt
-
-Then run flake8:
-
-    flake8
 
 ### About Pytest Tests Config ###
 
@@ -375,8 +374,7 @@ Order of usage is (from less to more important, last is used if set):
 - default env var setting in .test.env
 - env var set by user
 
-The Tracim API
-----------
+## The Tracim API
 
 Tracim_backend gives access to a REST API in */api*.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
@@ -395,11 +393,11 @@ In Tracim, only some users can access to some information, this is also true in
 the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
 
-# Known Issues
+## Known Issues
 
 see [here](doc/known_issues.md)
 
-# Documentation
+## Other Documentation
 - [apache.md](doc/apache.md): Using Apache as a proxy for Tracim
 - [api.md](doc/api.md): Using the Tracim API
 - [cli.md](doc/cli.md): Controlling Tracim from the Command Line Using `tracimcli`
