@@ -184,8 +184,6 @@ and `Running Tracim Backend WSGI APP`.
 When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). Other session storage (e.g. redis) do not have this behavior.
 Please read the [session documentation](backend/doc/setting.md#User_sessions_in_Tracim) for more information and recommended ways to remove the unused session files.
 
-
-
 ### Running tests with Cypress
 
 #### Installation of Cypress: Automated script for easy setup
