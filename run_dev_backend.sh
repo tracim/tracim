@@ -119,6 +119,9 @@ if [ "$mode" = "cypress" ]; then
     yarn run "cypress-$cypress_arg"
     teardown
 else
+    # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
+    # disabling this for manual tests/dev in order to retain the database between launches
+    export TMPFS_DIR=/tmp
     tracimcli db init || true
     pserve development.ini
 fi

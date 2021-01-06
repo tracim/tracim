@@ -4,8 +4,7 @@ env:
     - DB=sqlite
     - COVERAGE=0
     - PSERVE_LOG=/tmp/pserve_log.log
-    - TRACIM_DEPOT_STORAGE_NAME=test
-    - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
+    - TRACIM_UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH=/tmp/test/depot
     - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
     - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
     - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
@@ -44,7 +43,7 @@ _install_backend: &_install_backend
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - echo "$TRACIM_SQLALCHEMY__URL"
     - python $TRAVIS_BUILD_DIR/python_sqlite_info.py
-    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
+    - mkdir -p $TRACIM_$UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH
     - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
     - mkdir -p $TRACIM_SESSION__DATA_DIR
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
@@ -169,7 +168,7 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=postgres
+        - DB=postgresql
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test

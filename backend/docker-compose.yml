@@ -1,3 +1,6 @@
+# Easy startup of Tracim backend services needed for testing with pytest
+# Also useful for local development
+# By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR)
 version: '3'
 services:
   pushpin:
@@ -48,6 +51,8 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: secret
       MYSQL_RANDOM_ROOT_PASSWORD: "true"
+    tmpfs:
+      - ${TMPFS_DIR}
   mariadb:
     image: mariadb/server:10.3
     ports:
