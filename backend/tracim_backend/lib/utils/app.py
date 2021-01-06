@@ -219,3 +219,13 @@ class TracimApplication(ABC):
         # HTTPStatus.UNAUTHORIZED -> HTTP code 401.
         """
         pass
+
+    def get_content_security_policy_directives(
+        self, app_config: "CFG"
+    ) -> typing.Tuple[typing.Tuple[str, str]]:
+        """
+        Return the HTTP Content-Security-Policy directives that this app needs to run properly.
+
+        Directives should be returned as an iterable of tuples, eg. (("directive-name", "directive-value"),)
+        """
+        return tuple()
