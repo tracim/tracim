@@ -117,6 +117,47 @@ case "$database_type" in
 esac
 echo "Database type: '$database_type', service: '$database_service'"
 
+if [ "$mode" = "cypress" ]; then
+    if [ -z $cypress_arg ]; then
+        echo "cypress mode needs an argument, ('open' or 'run')"
+        exit 1
+    fi
+    if [ $database_type != "sqlite" ]; then
+        echo "cypress mode only supports sqlite currently"
+        exit 1
+    fi
+    # Run tracim with a specified sqlite database as cypress resets db using a file copy
+    export DATABASE_NAME="tracim_cypress"
+    database_dir="/tmp"
+fi
+
+echo "Database type: '$database_type'"
+case "$database_type" in
+    sqlite)
+        export TRACIM_SQLALCHEMY__URL="$database_type:///$database_dir/${DATABASE_NAME}.sqlite"
+        sleep=
+        ;;
+    postgresql)
+        export TRACIM_SQLALCHEMY__URL="$database_type://user:secret@localhost:5432/${DATABASE_NAME}?client_encoding=utf8"
+        database_service=$database_type
+        sleep=2
+        ;;
+    mariadb)
+        export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3307/${DATABASE_NAME}"
+        database_service=$database_type
+        sleep=2
+        ;;
+    mysql)
+        export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3306/${DATABASE_NAME}"
+        database_service=$database_type
+        sleep=2
+        ;;
+    *)
+        echo "Unknown database type $database_type"
+        exit 1
+        ;;
+esac
+
 teardown () {
     if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
     pushd "$script_dir/backend"
