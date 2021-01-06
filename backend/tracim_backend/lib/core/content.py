@@ -8,6 +8,7 @@ import typing
 from depot.io.interfaces import StoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+import filelock
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
@@ -735,23 +736,54 @@ class ContentApi(object):
 
     def get_valid_content_filepath(
         self, depot_stored_file: StoredFile, file_extension: str = ""
-    ) -> typing.Generator[str, None, None]:
+    ):
         """
         Generic way to get content filepath for all depot backend.
         :param depot_stored_file: content as depot StoredFile
         :param file_extension: extension of the file we expect
         :return: content filepath
         """
-        # HACK - G.M - This mecanism is very inefficient because:
-        # - generate a temporary file each time and
-        # - skip internal cache mecanism of preview_generator as filepath is always different
-        # Improvement need to be made in preview_generator itself.
-        # to handle more properly theses issues.
-        with tempfile.NamedTemporaryFile(
-            "w+b", prefix="revision-content-", suffix=file_extension
-        ) as tmp:
-            tmp.write(depot_stored_file.read())
-            yield tmp.name
+
+        file_label = "tracim-revision-content-{file_id}".format(
+            file_id=depot_stored_file.file_id,
+        )
+        base_path = "{temp_dir}/{file_label}".format(
+            temp_dir=tempfile.gettempdir(), file_label=file_label,
+        )
+
+        file_path = "{base_path}{file_extension}".format(
+            base_path=base_path, file_extension=file_extension,
+        )
+
+        lockfile_path = "{base_path}{file_extension}".format(
+            base_path=base_path, file_extension=".lock",
+        )
+        # FIXME - G.M - 2020-01-05 - This will create a lockfile for
+        # each depot file we do need (each content revision)
+        # This file will NOT be removed at the end on Linux (FileLock use flock):
+        # see  https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
+        # some investigation needs to be conducted to see if another solution is possible avoiding creating
+        # too many files. See https://github.com/tracim/tracim/issues/4014
+        with filelock.FileLock(lockfile_path):
+            try:
+                # HACK - G.M - 2020-01-05 - This mechanism is inefficient because it
+                # generates a temporary file each time
+                # Improvements need to be made in preview_generator itself
+                # to handle more properly these issues.
+                # We do rely on consistent path based on gettemdir(),
+                # normally /tmp to give consistent path, this is a quick fix which does
+                # not need any change in preview-generator.
+                # note: this base path is configurable through an envirnoment var according
+                # to the Python doc:
+                # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
+                with open(file_path, "wb",) as tmp:
+                    tmp.write(depot_stored_file.read())
+                    yield file_path
+            finally:
+                try:
+                    os.unlink(file_path)
+                except FileNotFoundError:
+                    pass
 
     def get_valid_content_filepath_legacy(
         self, depot_stored_file: StoredFile

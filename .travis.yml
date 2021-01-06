@@ -90,8 +90,8 @@ _install_backend: &_install_backend
   before_script:
     - docker pull mailhog/mailhog
     - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-    - docker pull rroemhild/test-openldap
-    - docker run -d -p 3890:389 rroemhild/test-openldap
+    - docker pull rroemhild/test-openldap:1.1
+    - docker run -d -p 3890:389 rroemhild/test-openldap:1.1
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose pull
     - docker-compose up -d minio elasticsearch
