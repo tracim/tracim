@@ -190,7 +190,7 @@ To avoid keeping expired session files you should run :
 regularly (for example by using a cron job), which will delete file which have not been modified since 10 days.
 You should use this command in both session data and session lock dirs.
 
-## delete all existing sessions
+#### delete all existing sessions (file storage)
 
 ```shell
 # note: <session.data_dir> refers to the absolute path given by the config parameter `session.data_dir`.
@@ -209,7 +209,7 @@ Then you'll need to set those parameters for redis backend:
     session.url = redis://localhost:6379/0
 
 
-## delete the existing sessions
+#### delete the existing sessions (redis storage)
 
 ```shell
 # note: <session.url> refers to the value of the config parameter `session.url` (redis url)
