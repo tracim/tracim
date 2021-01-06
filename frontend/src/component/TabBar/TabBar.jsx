@@ -39,7 +39,7 @@ export const TabBar = props => {
       <Tab
         page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
         icon='th'
-        label={props.t('All contents')}
+        label={props.t('Contents')}
       />
     </div>
   )

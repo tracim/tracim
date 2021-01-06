@@ -12,7 +12,6 @@
   "User account management": "Gestão de conta do utilizador",
   "On this page you can manage the users of your Tracim instance.": "Nesta página você pode gerir os utilizadores da instância do Tracim.",
   "User": "Utilizador",
-  "Choose the profile": "Escolher o perfil",
   "Account deactivated": "Conta desativada",
   "Activated": "Ativado",
   "Deactivated": "Desativado",
@@ -36,7 +35,7 @@
   "Password": "Palavra-passe",
   "Create the user": "Criar o utilizador",
   "Create a user": "Criar um utilizador",
-  "Please enter a name, an email, a password and select a profile": "Por favor, digite um nome, um e-mail, uma palavra-passe e seleccione um perfil",
+  "Please enter a name, an email, a password and select a type": "Por favor, digite um nome, um e-mail, uma palavra-passe e seleccione um tipo",
   "Please set a password": "Defina uma palavra-passe",
   "Full name": "Nome completo",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "O nome completo deve ter pelo menos {{minimumCharactersPublicName}} carateres",
@@ -44,10 +43,8 @@
   "Email notification are disabled, please manually notify users of any change": "A notificação por e-mail está desativada, notifique os utilizadores manualmente de qualquer alteração",
   "Error, invalid email address": "Erro, endereço de e-mail inválido",
   "Create a space": "Criar um espaço",
-  "Home": "Início",
   "If you do not link an email to this new user, please notify manually the username and password.": "Se não ligar um e-mail a este novo utilizador, por favor notifique manualmente o identificador e a palavra-passe.",
-  "Users": "Utilizadores",
-  "Administration": "Administração",
   "Username": "Identificador",
-  "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}"
+  "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
+  "Choose the user's type": "Escolher o tipo do utilizador"
 }

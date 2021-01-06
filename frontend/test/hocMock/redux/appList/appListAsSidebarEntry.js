@@ -18,7 +18,7 @@ export const sidebarEntryAllContentFromApi = {
   route: '/ui/workspaces/1/contents',
   fa_icon: 'th',
   hexcolor: '#bbbbbb',
-  label: 'All Contents'
+  label: 'Contents'
 }
 export const appListAsSidebarEntry = workspaceId => [
   serialize(sidebarEntryDashboardFromApi, serializeSidebarEntryProps),
