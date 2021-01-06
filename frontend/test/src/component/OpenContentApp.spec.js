@@ -50,7 +50,7 @@ describe('<OpenContentApp />', () => {
       dispatchCustomEventCallBack.resetHistory()
     })
 
-    it('openContentApp() should call onUpdateAppOpenedTypeCallBack and renderAppFeatureCallBack to open the new App and load his content', () => {
+    it('openContentApp() should call onUpdateAppOpenedTypeCallBack and renderAppFeatureCallBack to open the new App and load its content', () => {
       wrapper.setProps({ appOpenedType: 'folder' })
       wrapperInstance.instance().openContentApp()
 

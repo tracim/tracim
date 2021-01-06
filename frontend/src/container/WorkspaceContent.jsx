@@ -528,7 +528,7 @@ export class WorkspaceContent extends React.Component {
     }
   }
 
-  handleUpdateAppOpenedType = openedAppType => this.setState({ appOpenedType: openedAppType })
+  handleUpdateAppOpenedType = appOpenedType => this.setState({ appOpenedType })
 
   handleSetFolderRead = async folderId => {
     const { props, state } = this

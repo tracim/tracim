@@ -22,26 +22,28 @@ export class OpenContentApp extends React.Component {
     } = this.props
 
     if (isNaN(workspaceId) || workspaceId === -1) return
+    const type = match.params.type
 
-    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
-      if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
+    if (type !== 'contents' && ['type', 'idcts'].every(p => Object.prototype.hasOwnProperty.call(match.params, p))) {
+      const typeObj = contentType.find(ct => ct.slug === type)
+      if (isNaN(match.params.idcts) || !type) return
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
         workspace_id: parseInt(match.params.idws),
-        type: match.params.type
+        type
       }
 
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
-      if (appOpenedType === contentToOpen.type) { // app already open
-        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
+      if (appOpenedType === type) { // app already open
+        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(type), contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
-        if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+        if (appOpenedType) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
 
         const contentInformation = {
-          ...contentType.find(ct => ct.slug === contentToOpen.type),
+          ...typeObj,
           workspace: {
             label: currentWorkspace.label,
             downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content'),
@@ -55,7 +57,7 @@ export class OpenContentApp extends React.Component {
           findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
           contentToOpen
         )
-        this.props.onUpdateAppOpenedType(contentToOpen.type)
+        this.props.onUpdateAppOpenedType(type)
       }
     }
   }
@@ -70,12 +72,14 @@ export class OpenContentApp extends React.Component {
     const { props } = this
     console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
 
-    if (props.match && prevProps.match && props.match.params.idws !== prevProps.match.params.idws) {
-      props.onUpdateAppOpenedType(false)
-      props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
+    if (props.match && prevProps.match) {
+      if (prevProps.appOpenedType && props.match.params.idcts === prevProps.match.params.idcts) return
+      if (props.match.params.idws !== prevProps.match.params.idws) {
+        props.onUpdateAppOpenedType(false)
+        props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
+        return
+      }
     }
-
-    if (props.match && prevProps.match && props.match.params.idcts === prevProps.match.params.idcts) return
 
     this.openContentApp()
   }
