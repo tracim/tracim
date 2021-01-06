@@ -1,13 +1,37 @@
-# App PageHtml for Tracim
+App Custom Form for Tracim
+===================
 
-This repo is an app loaded by Tracim.
+This folder is a feature app loaded by Tracim.
 
-### To update this repo
-- commit and push changes
-- run `$ npm run build`
-- copy dist/pageHtml.app.js and past it into Tracim(repo)/dist/app
+This app is Work In Progress and currently not available.
 
-### Development
-To see your changes without importing the app into Tracim:
-- run `$ npm run servdev`
-Which will create a web server (webpack) where you will see the app loaded with some default values
+It is meant to handle Tracim contents of type custom form.
+
+Custom form is a type that let Tracim administrators (through Tracim administration page) create customizable form.
+
+This app allows opening and fill those custom form.
+
+It also allows to create a content of a custom form type previously created by an admin.
+
+### Build the app
+
+#### For production
+
+see [frontend/doc/app_building#Production](../frontend/doc/app_building.md#production)
+
+#### For development
+
+see [frontend/doc/app_building#Development](../frontend/doc/app_building.md#development)
+
+##### Specific `debug.js` configuration
+
+- servdev isn't available for this app
+___
+
+### Other available yarn scripts
+
+see [frontend/doc/yarn_scripts.md](../frontend/doc/yarn_scripts.md)
+
+### Before pushing changes to this app, you must
+
+see [frontend/doc/before_push.md](../frontend/doc/before_push.md)
