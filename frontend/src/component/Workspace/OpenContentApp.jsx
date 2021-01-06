@@ -26,7 +26,7 @@ export class OpenContentApp extends React.Component {
 
     if (type !== 'contents' && ['type', 'idcts'].every(p => Object.prototype.hasOwnProperty.call(match.params, p))) {
       const typeObj = contentType.find(ct => ct.slug === type)
-      if (isNaN(match.params.idcts) || !type) return
+      if (isNaN(match.params.idcts) || !typeObj) return
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
