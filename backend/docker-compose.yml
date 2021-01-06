@@ -36,7 +36,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: tracim_test
+      POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: user
       POSTGRES_PASSWORD: secret
   mysql:
@@ -44,7 +44,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: tracim_test
+      MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: user
       MYSQL_PASSWORD: secret
       MYSQL_RANDOM_ROOT_PASSWORD: "true"
@@ -53,7 +53,7 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MARIADB_DATABASE: tracim_test
+      MARIADB_DATABASE: ${DATABASE_NAME}
       MARIADB_USER: user
       MARIADB_PASSWORD: secret
       MARIADB_RANDOM_ROOT_PASSWORD: "true"

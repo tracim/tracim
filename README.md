@@ -104,6 +104,7 @@ You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce bui
 
 ### Run Tracim for development
 
+    # runs the needed services using docker and a tracim web app
     ./run_dev_backend.sh
 
 This script will launch the minimal services for a functional backend: pushpin + web application.
@@ -200,12 +201,14 @@ If you need to run Cypress with an external server of Tracim, modify "baseurl" i
 
 To runs all the tests in the 'functionnal_tests/cypress/integration' folder:
 
+    # runs the needed services using docker and a tracim web app, then runs the cypress tests
     ./run_dev_backend.sh cypress run
 
 #### Run tests with Cypress GUI ##
 
 You can watch the tests running directly from a (graphical) web interface:
 
+    # runs the needed services using docker and a tracim web app, then starts cypress in GUI mode
     ./run_dev_backend.sh cypress open
 
 ### Running frontend unit tests

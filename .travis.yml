@@ -102,9 +102,6 @@ _backend_quick_test: &_backend_quick_test
 
 _backend_test: &_backend_test
   <<: *_install_backend
-  before_install:
-    - cd $TRAVIS_BUILD_DIR/backend
-    - docker-compose pull
   before_script:
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose up -d

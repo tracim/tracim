@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-cd ../backend/ && \
-. env/bin/activate && \
-tracimcli db delete --force -c ./cypress_test.ini && \
-tracimcli db init -c ./cypress_test.ini &&\
-cp /tmp/tracim_cypress.sqlite /tmp/tracim_cypress.sqlite.tmp
