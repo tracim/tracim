@@ -434,7 +434,14 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />} />
+          <Route
+            exact
+            path={PAGE.HOME}
+            component={() => {
+              if (!props.workspaceList.length) return <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />
+              return <Redirect to={{ pathname: PAGE.ACTIVITY_FEED, state: { from: props.location } }} />
+            }}
+          />
 
           <Route
             path='/ui/workspaces/:idws?'
