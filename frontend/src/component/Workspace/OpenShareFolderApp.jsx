@@ -61,7 +61,7 @@ export class OpenShareFolderApp extends React.Component {
     console.log('%c<OpenShareFolderApp> did Update', 'color: #dcae84', this.props)
 
     if (props.match && prevProps.match && props.match.params.idws !== prevProps.match.params.idws) {
-      props.onUpdateAppOpenedType()
+      props.onUpdateAppOpenedType(false)
       props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
       return
     }
