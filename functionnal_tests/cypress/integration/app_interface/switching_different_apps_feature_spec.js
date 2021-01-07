@@ -12,7 +12,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
 
-  let workspaceId, secondWorkspaceId
+  let workspaceId
 
   before(function () {
     cy.resetDB()
@@ -27,7 +27,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     })
 
     cy.createWorkspace().then(workspace => {
-      secondWorkspaceId = workspace.workspace_id
+      const secondWorkspaceId = workspace.workspace_id
       cy.getUserByRole('users').then(user => {
         cy.addUserToWorkspace(user.user_id, workspace.workspace_id)
       })

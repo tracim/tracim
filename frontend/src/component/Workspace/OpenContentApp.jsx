@@ -22,22 +22,21 @@ export class OpenContentApp extends React.Component {
     } = this.props
 
     if (isNaN(workspaceId) || workspaceId === -1) return
-    const type = match.params.type
 
-    if (type !== 'contents' && ['type', 'idcts'].every(p => Object.prototype.hasOwnProperty.call(match.params, p))) {
-      const typeObj = contentType.find(ct => ct.slug === type)
+    if (match.params.type !== 'contents' && ['type', 'idcts'].every(p => Object.keys(match.params).includes(p))) {
+      const typeObj = contentType.find(ct => ct.slug === match.params.type)
       if (isNaN(match.params.idcts) || !typeObj) return
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
         workspace_id: parseInt(match.params.idws),
-        type
+        type: match.params.type
       }
 
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
-      if (appOpenedType === type) { // app already open
-        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(type), contentToOpen)
+      if (appOpenedType === contentToOpen.type) { // app already open
+        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
         if (appOpenedType) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
@@ -57,7 +56,7 @@ export class OpenContentApp extends React.Component {
           findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
           contentToOpen
         )
-        this.props.onUpdateAppOpenedType(type)
+        this.props.onUpdateAppOpenedType(contentToOpen.type)
       }
     }
   }
