@@ -2,7 +2,7 @@ FROM debian:stretch AS base_install
 RUN \
     apt update \
     && apt upgrade -qy \
-    && apt install --no-install-recommends -qy \
+    && apt install -qy \
         git \
         libfile-mimeinfo-perl \
         libimage-exiftool-perl \
@@ -87,7 +87,7 @@ ENV LC_ALL C.UTF-8
 
 RUN \
     printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
-    && apt install --no-install-recommends -qy \
+    && apt install -qy \
         apt-transport-https \
         software-properties-common \
         gnupg2 \
