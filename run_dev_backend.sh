@@ -35,7 +35,7 @@ while :; do
     shift
 done
 
-script_dir=$(realpath $(dirname $0))
+script_dir=$(realpath "$(dirname "$0")")
 backend_pid=
 cypress_arg="$2"
 mode="$1"
@@ -53,11 +53,11 @@ if [ "$mode" != "cypress" ] && [ "$mode" != "dev" ]; then
 fi
 
 if [ "$mode" = "cypress" ]; then
-    if [ -z $cypress_arg ]; then
+    if [ -z "$cypress_arg" ]; then
         echo "cypress mode needs an argument, ('open' or 'run')"
         exit 1
     fi
-    if [ $database_type != "sqlite" ]; then
+    if [ "$database_type" != "sqlite" ]; then
         echo "cypress mode only supports sqlite currently"
         exit 1
     fi
@@ -99,12 +99,12 @@ teardown () {
 
 pushd "$script_dir/backend"
 # Use comparison with "-z" as we want to check empty strings
-if [ -z $VIRTUAL_ENV ] && [ -z $NO_VIRTUAL_ENV ]; then
-    . ./env/bin/activate
+if [ -z "$VIRTUAL_ENV" ] && [ -z "$NO_VIRTUAL_ENV" ]; then
+    . "$script_dir/backend/env/bin/activate"
 fi
 
-docker-compose up -d pushpin $database_service
-if [ ! -z "$sleep" ]; then
+docker-compose up -d pushpin "$database_service"
+if [ -n "$sleep" ]; then
     sleep $sleep
 fi
 if [ "$mode" = "cypress" ]; then

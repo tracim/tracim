@@ -203,8 +203,6 @@ def engine(config, app_config):
     else:
         isolation_level = "READ_COMMITTED"
     engine = get_engine(app_config, isolation_level=isolation_level)
-    DeclarativeBase.metadata.drop_all(engine)
-    DeclarativeBase.metadata.create_all(engine)
     yield engine
     engine.dispose()
 

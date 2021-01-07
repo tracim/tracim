@@ -62,6 +62,8 @@ services:
       MARIADB_USER: user
       MARIADB_PASSWORD: secret
       MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    tmpfs:
+      - ${TMPFS_DIR}
   redis:
     image: redis:alpine3.12
     ports:
