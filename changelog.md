@@ -1,3 +1,13 @@
+## 3.4.2 / 2021-01-07
+
+### Fixed Issues
+
+- UX: [4023](https://github.com/tracim/tracim/issues/4023)
+- Backend: [3997](https://github.com/tracim/tracim/issues/3997),
+[4000](https://github.com/tracim/tracim/issues/4000)
+- Doc: [3988](https://github.com/tracim/tracim/issues/3988)
+
+
 ## 3.4.1 / 2020-12-23
 
 ### Fixed Issues
@@ -14,6 +24,7 @@
 
 The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
 
+
 ## 3.4.0 / 2020-12-21
 
 ### New Features
@@ -24,6 +35,7 @@ The old parameter names are still functional but their usage is deprecated and t
 ### Fixed Issues
 
 - Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
+
 
 ## 3.3.1 / 2020-12-18
 
