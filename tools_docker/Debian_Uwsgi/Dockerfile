@@ -23,7 +23,7 @@ RUN \
     apt install --no-install-recommends -qy curl \
     # Node.JS 10
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt install --no-install-recommends -qy \
+    && apt install -qy \
         build-essential \
         libjpeg-dev \
         libmagickwand-dev \
