@@ -43,7 +43,7 @@ module.exports = {
     hints: false
   },
   module: {
-    rules: [true || isProduction ? {} : {
+    rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
       exclude: [/node_modules/, /frontend_lib/],
