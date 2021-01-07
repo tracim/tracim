@@ -2,7 +2,7 @@ FROM debian:stretch AS base_install
 RUN \
     apt update \
     && apt upgrade -qy \
-    && apt install -qy \
+    && apt install --no-install-recommends -qy \
         git \
         libfile-mimeinfo-perl \
         libimage-exiftool-perl \
@@ -20,10 +20,10 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
 
 # Install required packages
 RUN \
-    apt install -qy curl \
+    apt install --no-install-recommends -qy curl \
     # Node.JS 10
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt install -qy \
+    && apt install --no-install-recommends -qy \
         build-essential \
         libjpeg-dev \
         libmagickwand-dev \
@@ -87,7 +87,7 @@ ENV LC_ALL C.UTF-8
 
 RUN \
     printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
-    && apt install -qy \
+    && apt install --no-install-recommends -qy \
         apt-transport-https \
         software-properties-common \
         gnupg2 \
@@ -99,7 +99,7 @@ RUN \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
         --recv-keys 379CE192D401AB61 \
     && apt update \
-    && apt install -qy \
+    && apt install --no-install-recommends -qy \
         apache2 \
         ffmpeg \
         ghostscript \
