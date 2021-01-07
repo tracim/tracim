@@ -118,11 +118,11 @@ esac
 echo "Database type: '$database_type', service: '$database_service'"
 
 if [ "$mode" = "cypress" ]; then
-    if [ -z $cypress_arg ]; then
+    if [ -z "$cypress_arg" ]; then
         echo "cypress mode needs an argument, ('open' or 'run')"
         exit 1
     fi
-    if [ $database_type != "sqlite" ]; then
+    if [ "$database_type" != "sqlite" ]; then
         echo "cypress mode only supports sqlite currently"
         exit 1
     fi
