@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
-import { Route, Redirect } from 'react-router-dom'
+import { Route, withRouter, Redirect } from 'react-router-dom'
 import { findUserRoleIdInWorkspace } from '../util/helper.js'
 import appFactory from '../util/appFactory.js'
 import {

@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import AdminWorkspaceUser from './container/AdminWorkspaceUser.jsx'
 
 require('./css/index.styl')

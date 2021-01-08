@@ -26,7 +26,6 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-i18next": "7.4.0",
-    "react-router": "5.2.0",
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.2",
     "tracim_frontend_lib": "^1.1.9",

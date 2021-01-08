@@ -33,7 +33,6 @@
     "react-full-screen": "^0.2.4",
     "react-i18next": "7.4.0",
     "react-image-lightbox": "^5.1.0",
-    "react-router": "5.2.0",
     "react-router-dom": "^5.2.0",
     "react-slick": "^0.25.2",
     "regenerator-runtime": "^0.13.2",

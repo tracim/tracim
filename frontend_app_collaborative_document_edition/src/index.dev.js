@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 
