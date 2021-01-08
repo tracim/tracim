@@ -14,10 +14,6 @@ while [ "$1" != "" ]; do
             PRODUCTION=false
         ;;
 
-        optimized-dev)
-            PRODUCTION=false
-        ;;
-
         *)
             2>&1 echo "Unknown parameter $1"
             exit 1
