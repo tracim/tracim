@@ -1,18 +1,21 @@
 ## 3.4.2 / 2021-01-08
 
+### New Features
+
+- Personal activity feeds is now the home page when you login in Tracim if you have space
+
 ### Fixed Issues
 
-- UX: [4023](https://github.com/tracim/tracim/issues/4023)
-- Backend: [3997](https://github.com/tracim/tracim/issues/3997),
-[4000](https://github.com/tracim/tracim/issues/4000)
-- Doc: [3988](https://github.com/tracim/tracim/issues/3988)
+- Backend: [#3997](https://github.com/tracim/tracim/issues/3997),
+[#4000](https://github.com/tracim/tracim/issues/4000)
+- Doc: [#3988](https://github.com/tracim/tracim/issues/3988)
 
 
 ## 3.4.1 / 2020-12-23
 
 ### Fixed Issues
 
-- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+- Backend: [#3979](https://github.com/tracim/tracim/issues/3979)
 
 ### Breaking/Important Changes
 
