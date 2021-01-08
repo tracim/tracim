@@ -202,7 +202,7 @@ def engine(config, app_config):
         isolation_level = "SERIALIZABLE"
     else:
         isolation_level = "READ_COMMITTED"
-    engine = get_engine(app_config, isolation_level=isolation_level)
+    engine = get_engine(app_config, isolation_level=isolation_level, pool_pre_ping=True)
     yield engine
     engine.dispose()
 
