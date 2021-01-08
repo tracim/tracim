@@ -131,32 +131,30 @@ if [ "$mode" = "cypress" ]; then
     database_dir="/tmp"
 fi
 
-echo "Database type: '$database_type'"
 case "$database_type" in
     sqlite)
         export TRACIM_SQLALCHEMY__URL="$database_type:///$database_dir/${DATABASE_NAME}.sqlite"
+        database_service=
         sleep=
         ;;
     postgresql)
         export TRACIM_SQLALCHEMY__URL="$database_type://user:secret@localhost:5432/${DATABASE_NAME}?client_encoding=utf8"
         database_service=$database_type
-        sleep=2
         ;;
     mariadb)
         export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3307/${DATABASE_NAME}"
         database_service=$database_type
-        sleep=2
         ;;
     mysql)
         export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3306/${DATABASE_NAME}"
         database_service=$database_type
-        sleep=2
         ;;
     *)
         echo "Unknown database type $database_type"
         exit 1
         ;;
 esac
+echo "Database type: '$database_type', service: '$database_service'"
 
 teardown () {
     if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
@@ -169,6 +167,15 @@ run_docker_services () {
         docker compose up -d pushpin
     else
         docker compose up -d pushpin "$database_service"
+        sleep 2
+    fi
+}
+
+run_docker_services () {
+    if [ -z "$database_service" ]; then
+        docker-compose up -d pushpin
+    else
+        docker-compose up -d pushpin "$database_service"
         sleep 2
     fi
 }
