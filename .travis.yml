@@ -37,7 +37,7 @@ _install_backend: &_install_backend
         - docker-ce
         - docker-compose
         - libimage-exiftool-perl
-  before_install:
+  before_install: &before_install_backend
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
@@ -67,7 +67,7 @@ _install_backend: &_install_backend
     - sh -c "if [ '$COVERAGE' = '1' ]; then pip install \"pytest-cov<2.6\" \"python-coveralls\"; fi"
     - pip install -e "."
     - cd $TRAVIS_BUILD_DIR
-  after_install:
+  after_script:
     - docker logout
 
 _install_full_tracim: &_install_full_tracim
@@ -104,6 +104,8 @@ _backend_test: &_backend_test
   before_script:
     - cd $TRAVIS_BUILD_DIR/backend
     - docker-compose up -d
+    # NOTE - S.G - 2021-01-08 - need to sleep to wait for database (especially mysql)
+    - sleep 2
   script:
     - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
 

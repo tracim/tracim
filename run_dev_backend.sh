@@ -66,35 +66,42 @@ if [ "$mode" = "cypress" ]; then
     database_dir="/tmp"
 fi
 
-echo "Database type: '$database_type'"
 case "$database_type" in
     sqlite)
         export TRACIM_SQLALCHEMY__URL="$database_type:///$database_dir/${DATABASE_NAME}.sqlite"
+        database_service=
         sleep=
         ;;
     postgresql)
         export TRACIM_SQLALCHEMY__URL="$database_type://user:secret@localhost:5432/${DATABASE_NAME}?client_encoding=utf8"
         database_service=$database_type
-        sleep=2
         ;;
     mariadb)
         export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3307/${DATABASE_NAME}"
         database_service=$database_type
-        sleep=2
         ;;
     mysql)
         export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3306/${DATABASE_NAME}"
         database_service=$database_type
-        sleep=2
         ;;
     *)
         echo "Unknown database type $database_type"
         exit 1
         ;;
 esac
+echo "Database type: '$database_type', service: '$database_service'"
 
 teardown () {
     kill $backend_pid
+}
+
+run_docker_services () {
+    if [ -z "$database_service" ]; then
+        docker-compose up -d pushpin
+    else
+        docker-compose up -d pushpin "$database_service"
+        sleep 2
+    fi
 }
 
 pushd "$script_dir/backend"
@@ -103,11 +110,8 @@ if [ -z "$VIRTUAL_ENV" ] && [ -z "$NO_VIRTUAL_ENV" ]; then
     . "$script_dir/backend/env/bin/activate"
 fi
 
-docker-compose up -d pushpin "$database_service"
-if [ -n "$sleep" ]; then
-    sleep $sleep
-fi
 if [ "$mode" = "cypress" ]; then
+    run_docker_services $sleep
     tracimcli db delete --force || true
     tracimcli db init || true
     cp /tmp/${DATABASE_NAME}.sqlite /tmp/${DATABASE_NAME}.sqlite.tmp
@@ -119,9 +123,12 @@ if [ "$mode" = "cypress" ]; then
     yarn run "cypress-$cypress_arg"
     teardown
 else
+    # disable CSP header for development (tracim dev builds use eval()).
+    export TRACIM_CONTENT_SECURITY_POLICY__ENABLED=False
     # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
     # disabling this for manual tests/dev in order to retain the database between launches
     export TMPFS_DIR=/tmp
+    run_docker_services $sleep
     tracimcli db init || true
     pserve development.ini
 fi
