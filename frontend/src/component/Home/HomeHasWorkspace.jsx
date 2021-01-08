@@ -4,6 +4,12 @@ import { Avatar, AVATAR_SIZE } from 'tracim_frontend_lib'
 
 require('./Home.styl')
 
+// 2020-01-08 - RJ - NOTE
+// This class is not used anymore since we redirect the user to their activity
+// feed if they are a member of a workspace
+// Leaving it there for now, should we revert this decision.
+// See https://github.com/tracim/tracim/issues/4028
+
 export const HomeHasWorkspace = props =>
   <div>
     <div className='homepagecard__title hasworkspace primaryColorFont'>
