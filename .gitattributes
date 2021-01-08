@@ -55,6 +55,7 @@ cypress_test.ini export-ignore
 
 functionnal_tests export-ignore
 run_frontend_unit_test.sh export-ignore
+setup_functionnal_tests.sh
 
 python_sqlite_info.py export-ignore
 frontend*/test export-ignore
