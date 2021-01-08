@@ -916,13 +916,16 @@ class CFG(object):
                 'ERROR user.default_profile given "{}" is invalid,'
                 "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
+
+        json_schema = {}
+        ui_schema = {}
         if self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH:
             self.check_file_path_param(
                 "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
                 self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
                 readable=True,
             )
-            self.load_and_check_json_file_path_param(
+            json_schema = self.load_and_check_json_file_path_param(
                 "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
                 self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
             )
@@ -933,7 +936,7 @@ class CFG(object):
                 self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH,
                 readable=True,
             )
-            self.load_and_check_json_file_path_param(
+            ui_schema = self.load_and_check_json_file_path_param(
                 "USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH",
                 self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH,
             )
@@ -945,6 +948,9 @@ class CFG(object):
                 readable=True,
                 writable=False,
             )
+
+        self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
+        self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(

@@ -1,0 +1,18 @@
+{
+  "address": {
+    "street_address": "221B Baker Street",
+    "city": "London",
+    "state": "Great Britain"
+  },
+  "organization": {
+    "name": "Tracim",
+    "roles": [
+      "developer",
+      "administrator"
+    ]
+  },
+  "firstName": "Sherlock",
+  "lastName": "Holmes",
+  "telephone": "9999999999",
+  "birthday_date": "1854-12-15"
+}

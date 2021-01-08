@@ -23,6 +23,8 @@ from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import GetUsernameAvailability
 from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
+from tracim_backend.views.core_api.schemas import UserCustomPropertiesSchema
+from tracim_backend.views.core_api.schemas import UserCustomPropertiesUiSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
 from tracim_backend.views.core_api.schemas import WorkspaceAccessTypeSchema
 
@@ -136,6 +138,26 @@ class SystemController(Controller):
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(UserCustomPropertiesSchema())
+    def user_custom_properties_schema(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Returns user custom properties JSONSchema
+        """
+        system_api = SystemApi(request.app_config, request.dbsession)
+        return system_api.get_user_custom_properties_schema()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(UserCustomPropertiesUiSchema())
+    def custom_user_properties_ui_schema(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Returns user custom properties JSONSchema
+        """
+        system_api = SystemApi(request.app_config, request.dbsession)
+        return system_api.get_user_custom_properties_ui_schema()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -183,6 +205,24 @@ class SystemController(Controller):
             "username_availability", "/system/username-availability", request_method="GET"
         )
         configurator.add_view(self.username_availability, route_name="username_availability")
+
+        # user custom-properties schema
+        configurator.add_route(
+            "user_custom_properties_schema",
+            "/system/user-custom-properties-schema",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.user_custom_properties_schema, route_name="user_custom_properties_schema"
+        )
+        configurator.add_route(
+            "user_custom_properties_ui_schema",
+            "/system/user-custom-properties-ui-schema",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.custom_user_properties_ui_schema, route_name="user_custom_properties_ui_schema"
+        )
 
         # reserved usernames
         configurator.add_route(

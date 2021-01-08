@@ -1145,6 +1145,18 @@ class UserConfigSchema(marshmallow.Schema):
     )
 
 
+class UserCustomPropertiesSchema(marshmallow.Schema):
+    json_schema = marshmallow.fields.Dict(
+        description="json schema used for user custom properties", required=True, allow_none=False
+    )
+
+
+class UserCustomPropertiesUiSchema(marshmallow.Schema):
+    ui_schema = marshmallow.fields.Dict(
+        description="ui schema used for user custom properties", required=True, allow_none=False,
+    )
+
+
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     used_space = marshmallow.fields.Int(

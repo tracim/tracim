@@ -321,3 +321,105 @@ class TestWorkspaceAccessType(object):
         assert res.json_body["code"] is None
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestUserCustomPropertiesSchema(object):
+    """
+    Tests for GET /api/system/custom-user-properties-schema
+    """
+
+    def test_api__get_user_custom_properties_schema__ok_200__nominal_case(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
+        json_schema = res.json_body["json_schema"]
+        assert json_schema == {}
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_schema__ok_200__sample_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
+        json_schema = res.json_body["json_schema"]
+        assert json_schema["title"] == "User Info"
+        assert json_schema["definitions"] == {
+            "address": {
+                "title": "Address",
+                "description": "address of the user",
+                "type": "object",
+                "properties": {
+                    "street_address": {"type": "string"},
+                    "city": {"type": "string"},
+                    "state": {"type": "string"},
+                },
+                "required": ["street_address", "city", "state"],
+            }
+        }
+        assert json_schema["properties"]["organization"] == {
+            "title": "Organization",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "title": "name", "default": "Tracim"},
+                "roles": {
+                    "title": "roles in the organization",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["developer", "sysadmin", "manager", "administrator", "designer"],
+                    },
+                },
+            },
+        }
+        assert json_schema["properties"]["address"] == {"$ref": "#/definitions/address"}
+        assert json_schema["properties"]["birthday_date"] == {
+            "title": "birthday date",
+            "type": "string",
+            "format": "date",
+        }
+
+    def test_api__get_user_custom_properties_schema_err_401__unregistered_user(self, web_testapp):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestUserCustomPropertiesUISchema(object):
+    """
+    Tests for GET /api/system/users-custom-properties-ui-schema
+    """
+
+    def test_api__get_user_custom_properties_ui_schema__ok_200__nominal_case(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
+        ui_schema = res.json_body["ui_schema"]
+        assert ui_schema == {}
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_ui_schema__ok_200__sample_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
+        ui_schema = res.json_body["ui_schema"]
+        assert ui_schema == {}
+
+    def test_api__get_user_custom_properties_ui_schema_err_401__unregistered_user(
+        self, web_testapp
+    ):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()

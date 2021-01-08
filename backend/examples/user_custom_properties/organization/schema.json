@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User Info",
+  "description": "info about a user in this organization",
+  "type": "object",
+  "definitions": {
+    "address": {
+      "title": "Address",
+      "description": "address of the user",
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city":           { "type": "string" },
+        "state":          { "type": "string" }
+      },
+      "required": ["street_address", "city", "state"]
+    }
+  },
+  "required": [
+    "firstName",
+    "lastName"
+  ],
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "title": "First name"
+    },
+    "lastName": {
+      "type": "string",
+      "title": "Last name"
+    },
+    "telephone": {
+      "type": "string",
+      "title": "Telephone",
+      "minLength": 10
+    },
+    "birthday_date": {
+      "title": "birthday date",
+      "type": "string",
+      "format": "date"
+    },
+    "address": { "$ref": "#/definitions/address"},
+    "organization": {
+      "title": "Organization",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name",
+          "default": "Tracim"
+        },
+        "roles": {
+          "title": "roles in the organization",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "developer",
+              "sysadmin",
+              "manager",
+              "administrator",
+              "designer"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
