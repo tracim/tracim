@@ -373,7 +373,7 @@ class TestUserCustomPropertiesSchema(object):
         }
         assert json_schema["properties"]["address"] == {"$ref": "#/definitions/address"}
         assert json_schema["properties"]["birthday_date"] == {
-            "title": "birthday date",
+            "title": "Birthday date",
             "type": "string",
             "format": "date",
         }
@@ -409,7 +409,12 @@ class TestUserCustomPropertiesUISchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
-        assert ui_schema == {}
+        assert ui_schema["firstName"] == {
+            "ui:autofocus": True,
+            "ui:emptyValue": "",
+            "ui:autocomplete": "family-name",
+        }
+        assert ui_schema["telephone"] == {"ui:options": {"inputType": "tel"}}
 
     def test_api__get_user_custom_properties_ui_schema_err_401__unregistered_user(
         self, web_testapp

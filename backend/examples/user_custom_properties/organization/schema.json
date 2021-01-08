@@ -35,9 +35,13 @@
       "minLength": 10
     },
     "birthday_date": {
-      "title": "birthday date",
+      "title": "Birthday date",
       "type": "string",
       "format": "date"
+    },
+    "bio": {
+      "title": "Biography",
+      "type": "string"
     },
     "address": { "$ref": "#/definitions/address"},
     "organization": {

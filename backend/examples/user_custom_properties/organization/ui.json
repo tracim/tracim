@@ -1,1 +1,22 @@
-{}
+{
+  "firstName": {
+    "ui:autofocus": true,
+    "ui:emptyValue": "",
+    "ui:autocomplete": "family-name"
+  },
+  "lastName": {
+    "ui:emptyValue": "",
+    "ui:autocomplete": "given-name"
+  },
+  "bio": {
+    "ui:widget": "textarea"
+  },
+  "birthday_date": {
+    "ui:widget": "alt-date"
+  },
+  "telephone": {
+    "ui:options": {
+      "inputType": "tel"
+    }
+  }
+}
