@@ -3,6 +3,7 @@ import importlib
 from io import BytesIO
 import multiprocessing
 import os
+import socket
 import sys
 import typing
 from typing import Any
@@ -10,7 +11,6 @@ from typing import Optional
 from unittest import mock
 
 from PIL import Image
-import plaster
 import requests
 from requests import Response
 from sqlalchemy.orm import Session
@@ -249,13 +249,13 @@ class ElasticSearchHelper(object):
 
 
 class RadicaleServerHelper(object):
-    def __init__(self, config_uri, config_section):
-        settings = plaster.get_settings(config_uri, config_section)
-        settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
+    def __init__(self, settings):
         app_factory = CaldavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
+        port = int(settings["caldav.radicale_proxy.base_url"].split(":")[-1])
+        self.listen = "localhost:{}".format(port)
         self.radicale_server = multiprocessing.Process(
-            target=serve, kwargs={"app": app, "listen": "localhost:5232"}
+            target=serve, kwargs={"app": app, "listen": self.listen}
         )
         self.radicale_server.daemon = True
         self.radicale_server.start()
@@ -263,6 +263,10 @@ class RadicaleServerHelper(object):
     def stop_radicale_server(self):
         if self.radicale_server:
             self.radicale_server.terminate()
+
+    @property
+    def url(self) -> str:
+        return "http://{}".format(self.listen)
 
 
 class EventHelper(object):
@@ -399,3 +403,13 @@ def tracim_plugin_loader(plugin_name, pluggy_manager, plugin_root_folder):
     yield None
     for p in loaded_plugins:
         pluggy_manager.unregister(p)
+
+
+def find_free_port() -> int:
+    """
+    Return a free TCP port
+    """
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]

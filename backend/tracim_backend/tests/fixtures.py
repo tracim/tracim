@@ -50,14 +50,62 @@ from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+from tracim_backend.tests.utils import find_free_port
 from tracim_backend.tests.utils import tracim_plugin_loader
 
-DATABASE_URLS = {
-    "sqlite": "sqlite:////tmp/tracim.sqlite",
-    "mysql": "mysql+pymysql://user:secret@127.0.0.1:3306/tracim_test",
-    "mariadb": "mysql+pymysql://user:secret@127.0.0.1:3307/tracim_test",
-    "postgresql": "postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8",
-}
+
+@pytest.fixture
+def sqlalchemy_url(sqlalchemy_database, tmp_path, worker_id) -> str:
+    default_db_name = "tracim_test"
+    db_name = "{}__{}".format(default_db_name, worker_id)
+    username = "user"
+    password = "secret"
+    DATABASE_URLS = {
+        "sqlite": "sqlite:////{path}/{name}.sqlite".format(path=str(tmp_path), name=db_name),
+        "mysql": "mysql+pymysql://{username}:{password}@localhost:3306/{name}".format(
+            name=db_name, username=username, password=password
+        ),
+        "mariadb": "mysql+pymysql://{username}:{password}@localhost:3307/{name}".format(
+            name=db_name, username=username, password=password
+        ),
+        "postgresql": "postgresql://{username}:{password}@localhost:5432/{name}?client_encoding=utf8".format(
+            name=db_name, username=username, password=password
+        ),
+    }
+
+    # create the database for server-based DB
+    if sqlalchemy_database == "postgresql":
+        import psycopg2
+        from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
+        conn = psycopg2.connect(
+            "host=localhost dbname={dbname} user={username} password={password}".format(
+                dbname=default_db_name, username=username, password=password
+            )
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("CREATE DATABASE {}".format(db_name))
+        except Exception:
+            pass
+    elif sqlalchemy_database in ("mysql", "mariadb"):
+        import pymysql
+
+        port = 3306 if sqlalchemy_database == "mysql" else 3307
+        conn = pymysql.connect(
+            host="localhost", port=port, user="root", password=password, db=default_db_name
+        )
+        cursor = conn.cursor()
+        try:
+            cursor.execute("CREATE DATABASE {}".format(db_name))
+            cursor.execute(
+                "GRANT ALL ON {db_name}.* TO {user}".format(db_name=db_name, user=username)
+            )
+        except Exception:
+            pass
+
+    return DATABASE_URLS[sqlalchemy_database]
 
 @pytest.fixture
 def pushpin(tracim_webserver, tmp_path_factory):
@@ -161,11 +209,25 @@ def config_section(request) -> str:
 
 
 @pytest.fixture
-def settings(config_uri, config_section, sqlalchemy_database):
+def settings(config_uri, config_section, sqlalchemy_url, tmp_path, worker_id):
     _settings = plaster.get_settings(config_uri, config_section)
-    _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
-    os.environ["TRACIM_SQLALCHEMY__URL"] = DATABASE_URLS[sqlalchemy_database]
-    _settings["sqlalchemy.url"] = DATABASE_URLS[sqlalchemy_database]
+    _settings["here"] = str(tmp_path)
+    for path_setting in (
+        "uploaded_files_storage_path",
+        "caldav_storage_dir",
+        "preview_cache_dir",
+        "sessions_data_root_dir",
+    ):
+        (tmp_path / path_setting).mkdir()
+        _settings["basic_setup.{}".format(path_setting)] = str(tmp_path / path_setting)
+    _settings["uploaded_files.storage.s3.bucket"] = worker_id
+
+    port = find_free_port()
+    _settings["caldav.radicale_proxy.base_url"] = "http://localhost:{}".format(port)
+
+    os.environ["TRACIM_SQLALCHEMY__URL"] = sqlalchemy_url
+    _settings["sqlalchemy.url"] = sqlalchemy_url
+
     return _settings
 
 
@@ -471,8 +533,8 @@ def elasticsearch(app_config, session) -> ElasticSearchHelper:
 
 
 @pytest.fixture
-def radicale_server(config_uri, config_section) -> RadicaleServerHelper:
-    radicale_server_helper = RadicaleServerHelper(config_uri, config_section)
+def radicale_server(settings) -> RadicaleServerHelper:
+    radicale_server_helper = RadicaleServerHelper(settings)
     yield radicale_server_helper
     radicale_server_helper.stop_radicale_server()
 

@@ -32,16 +32,6 @@ END:VEVENT
 END:VCALENDAR
 """
 
-VALID_CARDDAV_BODY_PUT = """
-BEGIN:VCARD
-VERSION:4.0
-FN:Evert Pot
-N:Pot;Evert;;;
-END:VCARD
-"""
-CALDAV_URL_FOR_TEST = "http://localhost:5232"
-
-
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
     "config_section", [{"name": "functional_caldav_radicale_proxy_test"}], indirect=True
@@ -50,12 +40,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
     @pytest.mark.skip("This Need sleep method actually")
     def test_radicale_available(self, radicale_server, session) -> None:
         try:
-            result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
+            result = requests.get(radicale_server.url, timeout=3)
         except ConnectionError:
             # we do retry just one time in order to be sure server was
             # correctly setup
             sleep(0.1)
-            result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
+            result = requests.get(radicale_server.url, timeout=3)
         assert result.status_code == 200
 
     def test_proxy_user_resources_root__ok__nominal_case(
