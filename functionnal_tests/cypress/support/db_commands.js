@@ -1,7 +1,7 @@
 const userFixtures = {
   administrators: 'defaultAdmin',
   'trusted-users': '',
-  users: 'baseUser'
+  users: 'baseUser',
 }
 
 function makeRandomString (length = 5) {
