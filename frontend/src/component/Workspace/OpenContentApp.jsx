@@ -8,7 +8,7 @@ import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.js
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
-  openContentApp = () => {
+  openContentApp = (prevProps = {}) => {
     const {
       appList,
       workspaceId,
@@ -21,66 +21,68 @@ export class OpenContentApp extends React.Component {
       match
     } = this.props
 
-    if (isNaN(workspaceId) || workspaceId === -1) return
+    if (
+      !match || !workspaceId || workspaceId === -1 || !match.params.idcts ||
+      (prevProps.match && appOpenedType && match.params.idcts === prevProps.match.params.idcts)
+    ) return
 
-    if (match.params.type !== 'contents' && ['type', 'idcts'].every(p => Object.keys(match.params).includes(p))) {
-      const typeObj = contentType.find(ct => ct.slug === match.params.type)
-      if (isNaN(match.params.idcts) || !typeObj) return
+    const typeObj = contentType.find(ct => ct.slug === match.params.type)
+    if (!typeObj) return
 
-      const contentToOpen = {
-        content_id: parseInt(match.params.idcts),
-        workspace_id: parseInt(match.params.idws),
-        type: match.params.type
-      }
+    const contentToOpen = {
+      content_id: parseInt(match.params.idcts),
+      workspace_id: parseInt(match.params.idws),
+      type: match.params.type
+    }
 
-      console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
+    console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
-      if (appOpenedType === contentToOpen.type) { // app already open
+    if (prevProps.match && prevProps.match.params.idws && match.params.idws === prevProps.match.params.idws) {
+      if (appOpenedType === contentToOpen.type) {
+        // The app is already open in the same workspace, just request a reload
+        // for the new content
         dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
-      } else { // open another app
-        // if another app is already visible, hide it
-        if (appOpenedType) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
-
-        const contentInformation = {
-          ...typeObj,
-          workspace: {
-            label: currentWorkspace.label,
-            downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content'),
-            memberList: currentWorkspace.memberList
-          }
-        }
-        // open app
-        renderAppFeature(
-          contentInformation,
-          user,
-          findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
-          contentToOpen
-        )
-        this.props.onUpdateAppOpenedType(contentToOpen.type)
+        return
       }
+
+      // Otherwise, if another app is already visible, hide it so we can open
+      // the right app later
+      if (appOpenedType) {
+        dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+      }
+    }
+
+    const contentInformation = {
+      ...typeObj,
+      workspace: {
+        label: currentWorkspace.label,
+        downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content'),
+        memberList: currentWorkspace.memberList
+      }
+    }
+
+    // Open the app. If the app is already open in another workspace, it will be
+    // unmounted by renderAppFeature
+    renderAppFeature(
+      contentInformation,
+      user,
+      findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
+      contentToOpen
+    )
+
+    if (contentToOpen.type !== appOpenedType) {
+      this.props.onUpdateAppOpenedType(contentToOpen.type)
     }
   }
 
   componentDidMount () {
     console.log('%c<OpenContentApp> did Mount', 'color: #dcae84', this.props)
-
     this.openContentApp()
   }
 
   componentDidUpdate (prevProps) {
-    const { props } = this
     console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
-
-    if (props.match && prevProps.match) {
-      if (prevProps.appOpenedType && props.match.params.idcts === prevProps.match.params.idcts) return
-      if (props.match.params.idws !== prevProps.match.params.idws) {
-        props.onUpdateAppOpenedType(false)
-        props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
-        return
-      }
-    }
-
-    this.openContentApp()
+    this.openContentApp(prevProps)
   }
 
   render () {
