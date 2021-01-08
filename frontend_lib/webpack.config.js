@@ -15,7 +15,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
+    filename: 'tracim_frontend_lib.[name].js',
     pathinfo: !isProduction,
     library: process.env.SERVDEV !== 'true' ? ['tracim_frontend_lib', '[name]'] : undefined,
     libraryTarget: 'umd',

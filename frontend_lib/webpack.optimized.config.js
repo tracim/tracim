@@ -9,5 +9,5 @@ module.exports.externals = optimizedVendors
 
 Object.assign(module.exports.output, {
   libraryTarget: 'var',
-  filename: module.exports.mode === 'production' ? 'tracim_frontend_lib.tracim.[name].js' : 'tracim_frontend_lib.tracim.[name].dev.js'
+  filename: 'tracim_frontend_lib.optimized.[name].js'
 })
