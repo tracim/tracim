@@ -152,7 +152,7 @@ class SystemController(Controller):
     @hapic.output_body(UserCustomPropertiesUiSchema())
     def custom_user_properties_ui_schema(self, context, request: TracimRequest, hapic_data=None):
         """
-        Returns user custom properties JSONSchema
+        Returns user custom properties UISchema
         """
         system_api = SystemApi(request.app_config, request.dbsession)
         return system_api.get_user_custom_properties_ui_schema()
