@@ -23,6 +23,7 @@ from tracim_backend.models.data import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
@@ -483,6 +484,12 @@ class TestCommands(object):
         assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -550,6 +557,11 @@ class TestCommands(object):
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
 
+        with pytest.raises(NoResultFound):
+            session.query(UserCustomProperties).filter(
+                UserCustomProperties.user_id == user_id
+            ).one()
+
     def test_func__delete_user__ok__with_deleting_owned_workspaces(
         self,
         session,
@@ -604,6 +616,12 @@ class TestCommands(object):
         assert session.query(Content).filter(Content.id == folder2_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -633,6 +651,10 @@ class TestCommands(object):
             session.query(User).filter(User.user_id == user_id).one()
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(UserCustomProperties).filter(
+                UserCustomProperties.user_id == user_id
+            ).one()
 
     def test_func__delete_user__err__cannot_remove_user(
         self,
@@ -709,6 +731,12 @@ class TestCommands(object):
         assert session.query(Content).filter(Content.id == folder2_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -729,6 +757,11 @@ class TestCommands(object):
         assert user_retrieved
         assert user_retrieved.email == "test@test.test"
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
 
     def test_func__delete_user__ok__anonymize_with_best_effort(
         self,
@@ -814,6 +847,12 @@ class TestCommands(object):
         assert session.query(Content).filter(Content.id == folder2_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -845,6 +884,10 @@ class TestCommands(object):
         assert test_user_retrieve.email.endswith("@anonymous.local")
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(UserCustomProperties).filter(
+                UserCustomProperties.user_id == user_id
+            ).one()
 
     def test_func__delete_user__ok__anonymize_with_best_effort_specific_display_name(
         self,
@@ -929,6 +972,12 @@ class TestCommands(object):
         assert session.query(Content).filter(Content.id == folder2_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -963,6 +1012,11 @@ class TestCommands(object):
 
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+
+        with pytest.raises(NoResultFound):
+            session.query(UserCustomProperties).filter(
+                UserCustomProperties.user_id == user_id
+            ).one()
 
     def test_func__delete_user__ok__force_delete_all_user_content(
         self,
@@ -1038,6 +1092,12 @@ class TestCommands(object):
         assert session.query(Content).filter(Content.id == folder2_id).one()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -1076,6 +1136,11 @@ class TestCommands(object):
 
         with pytest.raises(NoResultFound):
             session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+
+        with pytest.raises(NoResultFound):
+            session.query(UserCustomProperties).filter(
+                UserCustomProperties.user_id == user_id
+            ).one()
 
     def test_func__delete_user__ok__force_delete_and_deleted_workspace(
         self,
@@ -1208,6 +1273,12 @@ class TestCommands(object):
         transaction.commit()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
+
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
@@ -1259,6 +1330,11 @@ class TestCommands(object):
         transaction.commit()
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
+        assert (
+            session.query(UserCustomProperties)
+            .filter(UserCustomProperties.user_id == user_id)
+            .one()
+        )
         session.close()
         # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
         # TracimCLI need reseted context when ran.
