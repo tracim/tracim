@@ -2,7 +2,7 @@
 
 ### New Features
 
-- Personal activity feeds is now the home page when you login in Tracim if you have space
+- The personal activity feed is now the home page when you log in Tracim when you are a member of a space
 
 ### Fixed Issues
 
