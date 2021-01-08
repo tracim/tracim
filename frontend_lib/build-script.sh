@@ -15,7 +15,7 @@ while [ "$1" != "" ]; do
         ;;
 
         *)
-            2>&1 echo "Unknown parameter $1"
+            >&2 echo "Unknown parameter $1"
             exit 1
     esac
     shift
