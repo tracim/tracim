@@ -33,6 +33,7 @@ from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -843,6 +844,39 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserConfigSchema())
+    def get_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.Dict:
+        """
+        get the custom properties parameters for the given user
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user, session=request.dbsession
+        )
+        return {"parameters": custom_properties_api.get_all_params()}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetConfigSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Set or update the given custom_properties parameters for the given user
+        The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
+        whole configuration, so it's not possible to remove keys through this endpoint.
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user, session=request.dbsession
+        )
+        custom_properties_api.set_params(params=hapic_data.body["parameters"])
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceSchema(many=True))
     def get_accessible_workspaces(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -1209,6 +1243,21 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User custom properties
+        configurator.add_route(
+            "custom_properties_get",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
+
+        configurator.add_route(
+            "custom_properties_post",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
 
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(
