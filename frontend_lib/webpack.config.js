@@ -21,6 +21,14 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
+  externals: {
+    'react-router-dom': { // INFO - CH - this is required for using <Link> in frontend_lib
+      root: 'ReactRouterDom',
+      commonjs2: 'react-router-dom',
+      commonjs: 'react-router-dom',
+      amd: 'react-router-dom',
+    },
+  },
   optimization: {
     namedModules: true
     // splitChunks: {

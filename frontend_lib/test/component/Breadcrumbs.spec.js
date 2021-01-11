@@ -13,7 +13,7 @@ describe('<Breadcrumbs />', () => {
     link: <span className='nolink'>First level</span>,
     label: 'First level',
     type: 'CORE',
-    notALink: true
+    isALink: false
   }, {
     link: <a className='secondlvl' href='/ui/second'>Second level</a>,
     label: 'Second level',

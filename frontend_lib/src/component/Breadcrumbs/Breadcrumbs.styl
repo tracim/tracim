@@ -20,7 +20,16 @@
         border-bottom 1px solid
     & i
         margin-inline-end 5px
-        color lightDarkGrey
+    &.root
+      white-space nowrap
+
+@media (max-width: max-md)
+  .breadcrumbs__item
+    &.root
+      & > .breadcrumbs__item__text
+        display none
+      & i
+        margin 0
 
 @media (max-width: max-xs)
   .breadcrumbs
