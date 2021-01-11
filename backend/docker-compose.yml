@@ -1,4 +1,3 @@
-
 # Easy startup of Tracim backend services needed for testing with pytest.
 # Also useful for local development.
 # By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR).
