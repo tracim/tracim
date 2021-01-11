@@ -64,7 +64,7 @@ class CollaborativeDocumentEditionApp(TracimApplication):
 
     def get_content_security_policy_directives(
         self, app_config: CFG
-    ) -> typing.Tuple[typing.Tuple[str, str]]:
+    ) -> typing.Tuple[typing.Tuple[str, str], ...]:
         return (("frame-src", app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL),)
 
 

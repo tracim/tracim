@@ -11,7 +11,7 @@ class ChildRemovalPlugin:
     """
     This plugin ensures that a user who is removed from a space is also removed from
     every child/descendant space he is member of.
-    
+
     Needs a registration using 'register_tracim_plugin' function.
     """
 
