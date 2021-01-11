@@ -10,6 +10,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.system import SystemApi
+from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
@@ -144,8 +145,12 @@ class SystemController(Controller):
         """
         Returns user custom properties JSONSchema
         """
-        system_api = SystemApi(request.app_config, request.dbsession)
-        return system_api.get_user_custom_properties_schema()
+        custom_properties_api = UserCustomPropertiesApi(
+            app_config=request.app_config,
+            session=request.dbsession,
+            current_user=request.current_user,
+        )
+        return custom_properties_api.get_json_schema()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -154,8 +159,12 @@ class SystemController(Controller):
         """
         Returns user custom properties UISchema
         """
-        system_api = SystemApi(request.app_config, request.dbsession)
-        return system_api.get_user_custom_properties_ui_schema()
+        custom_properties_api = UserCustomPropertiesApi(
+            app_config=request.app_config,
+            session=request.dbsession,
+            current_user=request.current_user,
+        )
+        return custom_properties_api.get_ui_schema()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))

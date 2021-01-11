@@ -79,9 +79,3 @@ class SystemApi(object):
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         uapi = UserApi(None, session=self._session, config=self._config)
         return uapi.get_reserved_usernames()
-
-    def get_user_custom_properties_schema(self) -> typing.Dict:
-        return {"json_schema": self._config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA}
-
-    def get_user_custom_properties_ui_schema(self) -> typing.Dict:
-        return {"ui_schema": self._config.USER__CUSTOM_PROPERTIES__UI_SCHEMA}
