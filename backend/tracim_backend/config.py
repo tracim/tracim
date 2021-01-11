@@ -20,6 +20,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
@@ -825,6 +826,8 @@ class CFG(object):
         for app in app_lib.get_all():
             app.check_config(self)
 
+        self.configure_translations()
+
     def _check_global_config_validity(self) -> None:
         """
         Check config for global stuff
@@ -1198,6 +1201,10 @@ class CFG(object):
                         config_param.config_name, config_param.config_file_name
                     )
                 )
+
+    def configure_translations(self):
+        self.TRANSLATIONS = {}
+        Translator.init_translations(self)
 
     def configure_filedepot(self) -> None:
 
