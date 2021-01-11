@@ -134,7 +134,7 @@ setup(
             "webdav = tracim_backend:webdav",
             "caldav = tracim_backend:caldav",
         ],
-        "console_scripts": ["tracimcli = tracim_backend.command:main",],
+        "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
@@ -156,6 +156,6 @@ setup(
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None),]
+        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
     },
 )
