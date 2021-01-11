@@ -75,7 +75,7 @@ export const Breadcrumbs = props => {
 export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
-  root: PropTypes.node,
+  root: PropTypes.object,
   breadcrumbsList: PropTypes.array.isRequired,
   keepLastBreadcrumbAsLink: PropTypes.bool
 }

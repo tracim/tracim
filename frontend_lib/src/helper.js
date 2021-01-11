@@ -685,14 +685,12 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
-      const rez = fetchGetContentPath.body.items.map(crumb => ({
+      return fetchGetContentPath.body.items.map(crumb => ({
         link: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
       }))
-      console.log('rez', rez)
-      return rez
     default:
       console.error('Error getting breadcrumbs data', fetchGetContentPath)
       throw new Error('')
