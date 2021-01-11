@@ -852,7 +852,9 @@ class UserController(Controller):
         get the custom properties parameters for the given user
         """
         custom_properties_api = UserCustomPropertiesApi(
-            current_user=request.candidate_user, session=request.dbsession
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
         )
         return {"parameters": custom_properties_api.get_all_params()}
 
@@ -870,7 +872,9 @@ class UserController(Controller):
         whole configuration, so it's not possible to remove keys through this endpoint.
         """
         custom_properties_api = UserCustomPropertiesApi(
-            current_user=request.candidate_user, session=request.dbsession
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
         )
         custom_properties_api.set_params(params=hapic_data.body["parameters"])
 

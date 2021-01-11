@@ -9,7 +9,8 @@
     "ui:autocomplete": "given-name"
   },
   "bio": {
-    "ui:widget": "textarea"
+    "ui:widget": "textarea",
+    "ui:help": "Give use some informations about you."
   },
   "birthday_date": {
     "ui:widget": "alt-date"

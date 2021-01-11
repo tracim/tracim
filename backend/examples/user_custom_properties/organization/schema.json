@@ -58,6 +58,14 @@
           "type": "array",
           "items": {
             "type": "string",
+            "enumNames":
+              [
+                "Developer",
+                "System Administrator",
+                "Manager",
+                "Administrator",
+                "Designer"
+              ],
             "enum": [
               "developer",
               "sysadmin",

@@ -153,6 +153,7 @@ setup(
             "dev parameters list = tracim_backend.command.devtools:ParametersListCommand",
             "dev parameters value = tracim_backend.command.devtools:ParametersValueCommand",
             "dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand",
+            "dev custom-properties translate template = tracim_backend.command.devtools:CustomPropertiesTranslateTemplateCommand",
             "user delete = tracim_backend.command.cleanup:DeleteUserCommand",
             "user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand",
         ],

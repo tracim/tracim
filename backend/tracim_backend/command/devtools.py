@@ -1,4 +1,5 @@
 import argparse
+import pprint
 
 from pyramid.scripting import AppEnvironment
 
@@ -6,6 +7,7 @@ from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.config import ConfigParam
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 
 
 class ParametersListCommand(AppContextCommand):
@@ -185,3 +187,23 @@ class LiveMessageTesterCommand(AppContextCommand):
             "user_{}".format(parsed_args.user_id), message_as_dict=test_message
         )
         print("test message (id=-1) send to user {}".format(parsed_args.user_id))
+
+
+class CustomPropertiesTranslateTemplateCommand(AppContextCommand):
+    """
+    Tool to
+    """
+
+    def get_description(self) -> str:
+        return "create translation template for user custom properties"
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]  # type: CFG
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=None, app_config=self._app_config, session=self._session
+        )
+        # TODO - G.M - 2019-01-12 - Return valid json here (using external library ?)
+        pprint.pprint(custom_properties_api.get_translation_template())
