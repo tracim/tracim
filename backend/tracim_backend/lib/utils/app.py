@@ -222,7 +222,7 @@ class TracimApplication(ABC):
 
     def get_content_security_policy_directives(
         self, app_config: "CFG"
-    ) -> typing.Tuple[typing.Tuple[str, str]]:
+    ) -> typing.Tuple[typing.Tuple[str, str], ...]:
         """
         Return the HTTP Content-Security-Policy directives that this app needs to run properly.
 
