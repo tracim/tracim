@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link, withRouter, Route } from 'react-router-dom'
+import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
