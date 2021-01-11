@@ -11,6 +11,8 @@ module.exports = {
   react: require('react'),
   'react-dom': require('react-dom'),
   'react-image-lightbox': require('react-image-lightbox'),
-  'react-router': require('react-router'),
+  // INFO - CH - Keep the line bellow or Link components will fail
+  // See https://github.com/tracim/tracim/issues/3999
+  'react-router-dom': require('react-router-dom'),
   'regenerator-runtime/runtime': require('regenerator-runtime/runtime')
 }
