@@ -153,7 +153,7 @@ HtmlDocument.propTypes = {
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
   version: PropTypes.string,
-  lastVersion: PropTypes.string,
+  lastVersion: PropTypes.number,
   text: PropTypes.string,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
