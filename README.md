@@ -163,22 +163,17 @@ You can now head to (if pushpin is correctly configured and use default port 799
 
 :warning: If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
 
-:warning: Using tracim without pushpin will mean no live message leading to unrefreshed frontend information.
-
 The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](backend/README.md), sections `Running Tracim Backend Daemon`
 and `Running Tracim Backend WSGI APP`.
 
-### Upkeep
+### Upkeep
 
-If you use default "file" storage for session, new session file will be created but not removed, which mean lot of unneeded file.
-To mitigate this, you could remove file older than 8 day with :
+When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). For example you can run this command every week:
 
     find . -type f -mtime +8 -print -exec rm {} \;
 
-You should use this command in both session data and session lock dirs.
-
-Another way to solve this issue is to set session to use another backend(we do support all beaker backend),
-see [session](/backend/doc/setting.md) documentation for more information.
+You should use this command in both "session data" and "session lock" directories.
+Other session storage (e.g. redis) do not have this behavior see [session](/backend/doc/setting.md) documentation for more information.
 
 
 ### Running tests with Cypress

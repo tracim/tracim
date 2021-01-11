@@ -1,6 +1,8 @@
-# Easy startup of Tracim backend services needed for testing with pytest
-# Also useful for local development
-# By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR)
+# Easy startup of Tracim backend services needed for testing with pytest.
+# Also useful for local development.
+# By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR).
+# WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
+# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
 version: '3'
 services:
   pushpin:
@@ -13,7 +15,6 @@ services:
     ports:
       - "9000:9000"
     environment:
-      # default values for testing, change this if used for production!!
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     command: server /data

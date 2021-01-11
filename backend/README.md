@@ -353,8 +353,11 @@ It is possible to specify several databases or even `all`:
     # Run tests on all databases
     pytest --forked --database=all
 
+### Docker-compose test file
 
-### About Pytest Tests Config ###
+The `docker-compose.yml` files lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the `.env` file next to `docker-compose.yml`.
+
+### About Pytest Tests Config
 
 For running tests, Tracim tests need config to be set:
 - specific config for specific tests is
