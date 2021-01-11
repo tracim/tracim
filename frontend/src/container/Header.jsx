@@ -28,7 +28,6 @@ import {
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
 import Search from '../component/Header/Search.jsx'
-import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,
