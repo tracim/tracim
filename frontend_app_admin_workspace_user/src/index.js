@@ -13,6 +13,7 @@ const appInterface = {
   renderAppFullscreen: data => {
     document.getElementById(data.config.domContainer).classList.add('fullWidthFullHeight')
 
+    // INFO - CH - 2020-01-11 - User Router instead of BrowserRouter because BrowserRouter doesn't have a history props
     return ReactDOM.render(
       <Router history={data.config.history}>
         <AdminWorkspaceUser data={data} />

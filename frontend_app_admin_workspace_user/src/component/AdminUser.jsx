@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import {
   Delimiter,
   PageWrapper,
@@ -244,4 +244,4 @@ export class AdminUser extends React.Component {
   }
 }
 
-export default translate()(AdminUser)
+export default withRouter(translate()(AdminUser))

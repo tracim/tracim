@@ -3,3 +3,4 @@
 .git/
 dist/admin_workspace_user.app.js
 node_modules/
+src/debug.js
