@@ -2,7 +2,7 @@
 
 ### Fixed Issues
 
-- Backend: [#4033](https://github.com/tracim/tracim/issues4033)
+- Backend: [#4033](https://github.com/tracim/tracim/issues/4033)
 
 
 ## 3.4.2 / 2021-01-08
