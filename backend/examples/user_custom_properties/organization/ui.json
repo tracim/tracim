@@ -14,7 +14,7 @@
   "birthday_date": {
     "ui:widget": "alt-date"
   },
-  "telephone": {
+  "phone_number": {
     "ui:options": {
       "inputType": "tel"
     }

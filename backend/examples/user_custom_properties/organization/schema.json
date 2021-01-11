@@ -29,9 +29,9 @@
       "type": "string",
       "title": "Last name"
     },
-    "telephone": {
+    "phone_number": {
       "type": "string",
-      "title": "Telephone",
+      "title": "Phone number",
       "minLength": 10
     },
     "birthday_date": {

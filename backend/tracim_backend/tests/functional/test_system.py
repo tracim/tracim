@@ -414,7 +414,7 @@ class TestUserCustomPropertiesUISchema(object):
             "ui:emptyValue": "",
             "ui:autocomplete": "family-name",
         }
-        assert ui_schema["telephone"] == {"ui:options": {"inputType": "tel"}}
+        assert ui_schema["phone_number"] == {"ui:options": {"inputType": "tel"}}
 
     def test_api__get_user_custom_properties_ui_schema_err_401__unregistered_user(
         self, web_testapp
