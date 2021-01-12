@@ -7,7 +7,7 @@ import { LiveMessageManager } from 'tracim_frontend_lib'
 
 require('./css/index.styl')
 
-export const history = require('history').createBrowserHistory()
+const history = require('history').createBrowserHistory()
 
 const manager = new LiveMessageManager()
 manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)

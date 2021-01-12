@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'collaborative_document_edition.app.js' : 'collaborative_document_edition.app.dev.js',
+    filename: isProduction ? 'collaborative_document_edition.app.js' : 'collaborative_document_edition.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appCollaborativeDocumentEdition',
     libraryTarget: isProduction ? 'var' : undefined
@@ -41,7 +41,6 @@ module.exports = {
       exclude: [/node_modules/, /frontend_lib/]
     }, {
       test: [/\.js$/, /\.jsx$/],
-      exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
         presets: [
@@ -53,7 +52,8 @@ module.exports = {
           '@babel/plugin-proposal-class-properties',
           '@babel/plugin-transform-object-assign'
         ]
-      }
+      },
+      exclude: [/node_modules/]
     }, {
       test: /\.css$/,
       use: ['style-loader', 'css-loader']
