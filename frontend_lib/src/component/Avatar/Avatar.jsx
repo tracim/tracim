@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 // require('./Avatar.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -20,6 +21,8 @@ export class Avatar extends React.Component {
   }
 
   generateColorFromName = publicName => {
+    // INFO - G.B. - 20210112 - The default value is "lightGrey" at frontend_lib/css/Variable.styl
+    if (publicName.length === 0) return '#f0f0f0'
     // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
     const str = this.intToRGB(this.stringToHashCode(publicName))
     return color('#' + str).desaturate(0.90).hex()
@@ -46,7 +49,11 @@ export class Avatar extends React.Component {
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2
 
     return (
-      <div className='avatar-wrapper' style={{ ...props.style }} title={props.publicName}>
+      <div
+      className={classnames('avatar-wrapper', props.customClass)}
+        style={{ ...props.style }}
+        title={props.publicName}
+      >
         <div
           className='avatar'
           data-cy='avatar'
@@ -67,11 +74,13 @@ export class Avatar extends React.Component {
 
 Avatar.propTypes = {
   publicName: PropTypes.string.isRequired,
+  customClass: PropTypes.string,
   size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
   style: PropTypes.object
 }
 
 Avatar.defaultProps = {
+  customClass: '',
   size: AVATAR_SIZE.MEDIUM,
   style: {}
 }

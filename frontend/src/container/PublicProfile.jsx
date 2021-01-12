@@ -1,0 +1,158 @@
+import React from 'react'
+import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import {
+  Avatar,
+  AVATAR_SIZE,
+  Breadcrumbs,
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT,
+  PAGE,
+  serialize,
+  TracimComponent
+} from 'tracim_frontend_lib'
+import {
+  newFlashMessage,
+  setBreadcrumbs
+} from '../action-creator.sync.js'
+import { getUser } from '../action-creator.async'
+import { serializeUserProps } from '../reducer/user.js'
+
+export class PublicProfile extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      displayedUser: undefined,
+      coverImageUrl: undefined
+    }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<Profile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+    this.buildBreadcrumbs()
+  }
+
+  componentDidMount () {
+    this.getUser()
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: (
+        <Link to={PAGE.HOME} title={props.t('Home')} className='primaryColorFont primaryColorFontDarkenHover'>
+          <i className='fa fa-home' />{props.t('Home')}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Home')
+    }, {
+      link: <Link to={PAGE.SEARCH_RESULT}>{props.t('{{user}} profil', { user: state.displayedUser.publicName })}</Link>,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName })
+    }]))
+  }
+
+  getUser = async () => {
+    const { props } = this
+    const userId = props.match.params.userid
+
+    const fetchGetUser = await props.dispatch(getUser(userId))
+
+    switch (fetchGetUser.status) {
+      case 200:
+        this.setState({
+          displayedUser: serialize(fetchGetUser.json, serializeUserProps),
+          coverImageUrl: 'default'
+        })
+        this.buildBreadcrumbs()
+        break
+      case 400:
+        switch (fetchGetUser.json.code) {
+          case 1001:
+            props.dispatch(newFlashMessage(props.t('Unkown user')))
+            props.history.push(PAGE.HOME)
+            break
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while loading user')))
+            props.history.push(PAGE.HOME)
+        }
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading user')))
+        props.history.push(PAGE.HOME)
+    }
+  }
+
+  render () {
+    const { props, state } = this
+
+    return (
+      <div className='tracim__content fullWidthFullHeight'>
+        <div className='tracim__content-scrollview'>
+          <div className='profile__cover'>
+            {state.coverImageUrl && <div className='profile__cover__default' />}
+            {!state.coverImageUrl && (
+              <div className='profile__cover__loading'>
+                <i className='fa fa-fw fa-spinner fa-spin' />
+                {props.t('Loading')}
+              </div>
+            )}
+          </div>
+          <div className='profile__mainBar'>
+            <Avatar
+              customClass='profile__mainBar__bigAvatar'
+              publicName={state.displayedUser ? state.displayedUser.publicName : ''}
+              size={AVATAR_SIZE.BIG}
+              style={{ position: 'relative', top: '-15px' }}
+            />
+            <Avatar
+              customClass='profile__mainBar__mediumAvatar'
+              publicName={state.displayedUser ? state.displayedUser.publicName : ''}
+              size={AVATAR_SIZE.MEDIUM}
+            />
+            {state.displayedUser
+              ? (
+                <div className='profile__mainBar__info'>
+                  <div className='profile__mainBar__info__user'>
+                    {state.displayedUser.publicName}
+                    {state.displayedUser.username && (
+                      <>
+                        <span className='profile__mainBar__info__user__separator'> - </span>
+                        <span className='profile__mainBar__info__user__username'>@{state.displayedUser.username}</span>
+                      </>
+                    )}
+                  </div>
+                  <Breadcrumbs breadcrumbsList={props.breadcrumbs} />
+                </div>
+              )
+              : (
+                <div>
+                  <div className='profile__text__loading' />
+                  <div className='profile__text__loading' />
+                </div>
+              )}
+          </div>
+          <div className='profile__content'>
+            <div className='profile__content__informations'>
+              {state.displayedUser ? props.t('Informations') : <div className='profile__text__loading' />}
+            </div>
+            <div className='profile__content__page'>
+              {state.displayedUser ? props.t('Personal page') : <div className='profile__text__loading' />}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+const mapStateToProps = ({ breadcrumbs }) => ({ breadcrumbs })
+export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))
