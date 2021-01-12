@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'regenerator-runtime/runtime'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
 import { Router } from 'react-router-dom'
 import { debug } from './debug.js'
