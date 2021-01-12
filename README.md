@@ -172,6 +172,7 @@ When the default "file" storage is used for session files you need to regularly 
 Please read the [session documentation](backend/doc/setting.md#User_sessions_in_Tracim) for more information and recommended ways to remove the unused session files.
 
 
+
 ### Running tests with Cypress
 
 #### Installation of Cypress: Automated script for easy setup
