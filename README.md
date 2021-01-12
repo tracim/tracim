@@ -170,7 +170,7 @@ and `Running Tracim Backend WSGI APP`.
 
 When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). For example you can run this command every week:
 
-    find . -type f -mtime +8 -print -exec rm {} \;
+    find <session.data_dir>/ -type f -mtime +8 -print -exec rm {} \;
 
 You should use this command in both "session data" and "session lock" directories.
 Other session storage (e.g. redis) do not have this behavior see [session](/backend/doc/setting.md) documentation for more information.
