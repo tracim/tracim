@@ -128,7 +128,7 @@ class Folder extends React.Component {
                         e.stopPropagation()
                         props.onClickCreateContent(e, props.folderData.id, app.slug)
                       }}
-                      key={app.slug}
+                      key={`${props.folderData.id}__${app.slug}`}
                     >
                       <i
                         className={`fa fa-fw fa-${app.faIcon}`}

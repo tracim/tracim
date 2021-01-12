@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
@@ -191,13 +191,15 @@ export class Account extends React.Component {
     const { props, state } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.ADMIN.USER}>{props.t('User account management')}</Link>,
+      link: PAGE.ADMIN.USER,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('User account management')
+      label: props.t('User account management'),
+      isALink: true
     }, {
-      link: <Link to={PAGE.ADMIN.USER}>{state.userToEdit.publicName}</Link>,
+      link: PAGE.ADMIN.USER,
       type: BREADCRUMBS_TYPE.CORE,
-      label: state.userToEdit.publicName
+      label: state.userToEdit.publicName,
+      isALink: true
     }]))
   }
 

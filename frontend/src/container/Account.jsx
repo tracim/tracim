@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
@@ -128,9 +127,10 @@ export class Account extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.ACCOUNT}>{props.t('Account Settings')}</Link>,
+      link: PAGE.ACCOUNT,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Account Settings')
+      label: props.t('Account Settings'),
+      isALink: true
     }]))
   }
 

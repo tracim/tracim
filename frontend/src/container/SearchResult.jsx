@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
@@ -204,9 +203,10 @@ export class SearchResult extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.SEARCH_RESULT}>{props.t('Search results')}</Link>,
+      link: PAGE.SEARCH_RESULT,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Search results')
+      label: props.t('Search results'),
+      isALink: true
     }]))
   }
 
