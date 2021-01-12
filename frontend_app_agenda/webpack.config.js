@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'agenda.app.js' : 'agenda.app.dev.js',
+    filename: isProduction ? 'agenda.app.js' : 'agenda.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appAgenda',
     libraryTarget: isProduction ? 'var' : undefined

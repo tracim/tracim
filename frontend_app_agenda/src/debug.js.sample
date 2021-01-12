@@ -1,0 +1,15 @@
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const debug = {
+  ...defaultDebug,
+  config: {
+    ...defaultDebug.config,
+    slug: 'agenda',
+    faIcon: 'paperclip',
+    hexcolor: '#7d4e24',
+    appConfig: {
+      workspaceId: 1
+    }
+  },
+  content: {}
+}
