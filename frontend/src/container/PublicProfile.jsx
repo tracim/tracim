@@ -3,9 +3,6 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
-  Avatar,
-  AVATAR_SIZE,
-  Breadcrumbs,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   PAGE,
@@ -18,6 +15,7 @@ import {
 } from '../action-creator.sync.js'
 import { getUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
+import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -106,44 +104,17 @@ export class PublicProfile extends React.Component {
               </div>
             )}
           </div>
-          <div className='profile__mainBar'>
-            <Avatar
-              customClass='profile__mainBar__bigAvatar'
-              publicName={state.displayedUser ? state.displayedUser.publicName : ''}
-              size={AVATAR_SIZE.BIG}
-              style={{ position: 'relative', top: '-15px' }}
-            />
-            <Avatar
-              customClass='profile__mainBar__mediumAvatar'
-              publicName={state.displayedUser ? state.displayedUser.publicName : ''}
-              size={AVATAR_SIZE.MEDIUM}
-            />
-            {state.displayedUser
-              ? (
-                <div className='profile__mainBar__info'>
-                  <div className='profile__mainBar__info__user'>
-                    {state.displayedUser.publicName}
-                    {state.displayedUser.username && (
-                      <>
-                        <span className='profile__mainBar__info__user__separator'> - </span>
-                        <span className='profile__mainBar__info__user__username'>@{state.displayedUser.username}</span>
-                      </>
-                    )}
-                  </div>
-                  <Breadcrumbs breadcrumbsList={props.breadcrumbs} />
-                </div>
-              )
-              : (
-                <div>
-                  <div className='profile__text__loading' />
-                  <div className='profile__text__loading' />
-                </div>
-              )}
-          </div>
+
+          <ProfileMainBar
+            displayedUser={state.displayedUser}
+            breadcrumbsList={props.breadcrumbs}
+          />
+
           <div className='profile__content'>
             <div className='profile__content__informations'>
               {state.displayedUser ? props.t('Informations') : <div className='profile__text__loading' />}
             </div>
+
             <div className='profile__content__page'>
               {state.displayedUser ? props.t('Personal page') : <div className='profile__text__loading' />}
             </div>
