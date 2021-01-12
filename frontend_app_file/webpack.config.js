@@ -87,8 +87,7 @@ module.exports = {
     ...[], // generic plugins always present
     ...(isProduction
       ? [] // production specific plugins
-      : [ // development specific plugins
-      ]
+      : [] // development specific plugins
     )
   ]
 }
