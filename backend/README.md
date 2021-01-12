@@ -26,7 +26,6 @@ On Debian Stretch (9) with sudo:
     qpdf \
     ufraw-batch \
     ffmpeg \
-    redis-server \
     zlib1g-dev \
     exiftool
 
@@ -329,6 +328,10 @@ First setup the needed tools and directories (only needed once):
     python3 ./setup_dev_env.py
     ./create_test_storage_dir.sh
     # several external services (mail/databases/…) are started through a docker compose file
+    # please install it by following their instructions:
+    # - https://docs.docker.com/engine/install/
+    # - https://docs.docker.com/compose/install/
+    # On Debian systems the following lines are enough
     sudo apt install docker.io docker-compose
     # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
     sudo usermod -a -G docker $USER
@@ -355,7 +358,7 @@ It is possible to specify several databases or even `all`:
 
 ### Docker-compose test file
 
-The `docker-compose.yml` files lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the `.env` file next to `docker-compose.yml`.
+The [docker-compose.yml](docker-compose.xml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
 
 ### About Pytest Tests Config
 
@@ -388,7 +391,7 @@ For example, with the default configuration:
     # run Tracim
     pserve development.ini
     # launch your favorite web-browser
-    firefox http://localhost:6543/api/doc/
+    firefox http://localhost:7999/api/doc/
 
 ## Roles, Profile and Access Rights
 
@@ -401,16 +404,5 @@ what a specific user can do.
 see [here](doc/known_issues.md)
 
 ## Other Documentation
-- [apache.md](doc/apache.md): Using Apache as a proxy for Tracim
-- [api.md](doc/api.md): Using the Tracim API
-- [cli.md](doc/cli.md): Controlling Tracim from the Command Line Using `tracimcli`
-- [database.md](doc/database.md): Handling the Database (deprecated)
-- [devtools.md](doc/devtools.md): Miscellaneous Information About the Developer Tools
-- [hello_world_plugin.py](doc/hello_world_plugin.py): an hello world plugin
-- [i18n.md](doc/i18n.md): Translating the Backend
-- [known_issues.md](doc/known_issues.md): Known issues with the Tracim Backend
-- [migrate_from_v1.md](-oc/migrate_from_v1.md): Migrate from Tracim v1
-- [migration.md](doc/migration.md): Performing Migrations
-- [roles.md](doc/roles.md): Roles in Tracim
-- [setting.md](doc/setting.md): Setting up Tracim
-- [webdav.md](doc/webdav.md): Using WebDAV on Various Operating Systems
+
+Detailed documentation on several topics is available in the [doc](doc) directory.
