@@ -1676,7 +1676,25 @@ class UserFollowQuery(BasePaginatedQuery):
         self.user_id = user_id
 
 
-class PublicUserProfile(object):
-    def __init__(self, followers_count: int, following_count: int) -> None:
+class AboutUser(object):
+    def __init__(
+        self,
+        public_name: str,
+        username: Optional[str],
+        followers_count: int,
+        leaders_count: int,
+        authored_content_revisions_count: int,
+        authored_content_revisions_space_count: int,
+    ) -> None:
+        self.public_name = public_name
+        self.username = username
         self.followers_count = followers_count
-        self.following_count = following_count
+        self.leaders_count = leaders_count
+        self.authored_content_revisions_count = authored_content_revisions_count
+        self.authored_content_revisions_space_count = authored_content_revisions_space_count
+
+
+class AuthoredContentRevisionsInfos:
+    def __init__(self, revisions_count: int, revisions_space_count: int) -> None:
+        self.count = revisions_count
+        self.space_count = revisions_space_count

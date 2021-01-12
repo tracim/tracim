@@ -68,7 +68,7 @@ def pushpin(tracim_webserver, tmp_path_factory):
     pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
     my_dir = dirname(__file__)
     shutil.copyfile(
-        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf")
+        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
     )
     with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
         routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
@@ -421,10 +421,10 @@ def webdav_provider(app_config: CFG):
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
+    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG,
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
     )
 
 

@@ -62,7 +62,7 @@ class RoleApi(object):
         return workspaces_ids
 
     def get_user_role_workspace_with_context(
-        self, user_role: UserRoleInWorkspace, newly_created: bool = None, email_sent: bool = None
+        self, user_role: UserRoleInWorkspace, newly_created: bool = None, email_sent: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -212,6 +212,22 @@ class RoleApi(object):
         self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
     ) -> typing.List[int]:
         return [user.user_id for user in self.get_workspace_members(workspace_id, min_role)]
+
+    def get_common_workspace_ids(self, user_id: int) -> typing.List[int]:
+        """
+        Return the workspace ids that the current user and the given user_id are member of.
+        """
+        assert self._user
+        query = (
+            self._session.query(UserRoleInWorkspace.workspace_id)
+            .filter(UserRoleInWorkspace.user_id == self._user.user_id)
+            .intersect(
+                self._session.query(UserRoleInWorkspace.workspace_id).filter(
+                    UserRoleInWorkspace.user_id == user_id
+                )
+            )
+        )
+        return query.all()
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()

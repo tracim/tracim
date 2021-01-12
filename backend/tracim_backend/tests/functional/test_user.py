@@ -4241,7 +4241,7 @@ class TestKnownMembersEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_known_member_filter_disabled"}], indirect=True
+    "config_section", [{"name": "test_known_member_filter_disabled"}], indirect=True
 )
 class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     # -*- coding: utf-8 -*-
@@ -6058,12 +6058,12 @@ class TestUserFollowerEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestUserPublicProfileEndpoint(object):
+class TestAboutUserEndpoint(object):
     """
-    Tests for GET /api/users/{user_id}/public_profile
+    Tests for GET /api/users/{user_id}/about
     """
 
-    def test_api__get_user_public_profile__ok__nominal_case(
+    def test_api__get_about_user__ok__nominal_case(
         self,
         user_api_factory: UserApiFactory,
         web_testapp: TestApp,
@@ -6081,9 +6081,13 @@ class TestUserPublicProfileEndpoint(object):
         # When
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/users/{user_id}/public_profile".format(user_id=admin_user.user_id), status=200
+            "/api/users/{user_id}/about".format(user_id=admin_user.user_id), status=200
         )
 
         # Then
-        assert res.json_body["following_count"] == 1
+        assert res.json_body["leaders_count"] == 1
         assert res.json_body["followers_count"] == 2
+        assert res.json_body["public_name"] == admin_user.public_name
+        assert res.json_body["username"] == admin_user.username
+        assert res.json_body["authored_content_revisions_count"] == 0
+        assert res.json_body["authored_content_revisions_space_count"] == 0
