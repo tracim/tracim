@@ -1054,11 +1054,11 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
-        queue = get_rq_queue(redis_connection, RqQueueName.EVENT)
+        queue = get_rq_queue(redis_connection, self._config.LIVE_MESSAGES__ASYNC_QUEUE_NAME)
         logger.debug(
             self,
             "publish event(id={}) asynchronously to RQ queue {}".format(
-                event_id, RqQueueName.EVENT
+                event_id, self._config.LIVE_MESSAGES__ASYNC_QUEUE_NAME
             ),
         )
         queue.enqueue(self._publish_messages_for_event, event_id)

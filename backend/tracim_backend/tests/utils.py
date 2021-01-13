@@ -232,8 +232,6 @@ class MailHogHelper(object):
             "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
         ).json()
 
-    elastic_search_api = None
-
 
 class ElasticSearchHelper(object):
     def __init__(self, app_config, session):

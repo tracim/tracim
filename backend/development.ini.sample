@@ -107,6 +107,8 @@ basic_setup.session_secret = change_this_value_please!
 # by default it will be False if jobs.processing_mode is sync and True if processing_mode is async
 # as sync publishing is done during the HTTP request
 ; live_messages.blocking_publish = False
+# name of the RQ queue used to publishing events
+; live_messages.async_queue_name = event
 
 ### Plugins ###
 # if provided, this allow Tracim to load package from this dir and if package follow

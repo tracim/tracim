@@ -1,1 +1,12 @@
+# For pytest-xdist workers
+*,path_beg=/tracim_test__master,replace_beg= localhost:6543
+*,path_beg=/tracim_test__gw0,replace_beg= localhost:6544
+*,path_beg=/tracim_test__gw1,replace_beg= localhost:6545
+*,path_beg=/tracim_test__gw2,replace_beg= localhost:6546
+*,path_beg=/tracim_test__gw3,replace_beg= localhost:6547
+*,path_beg=/tracim_test__gw4,replace_beg= localhost:6548
+*,path_beg=/tracim_test__gw5,replace_beg= localhost:6549
+*,path_beg=/tracim_test__gw6,replace_beg= localhost:6550
+*,path_beg=/tracim_test__gw7,replace_beg= localhost:6551
+# For dev and pytest without xdist
 * localhost:6543

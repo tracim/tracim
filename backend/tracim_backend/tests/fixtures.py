@@ -73,8 +73,22 @@ def sqlalchemy_url(sqlalchemy_database, tmp_path, worker_id) -> str:
         ),
     }
 
-    # create the database for server-based DB
-    if sqlalchemy_database == "postgresql":
+
+def wait_for_url(url):
+    while True:
+        try:
+            requests.get(url)
+            break
+        except requests.exceptions.ConnectionError:
+            pass
+
+
+def create_database(url) -> None:
+    """
+    Create the database for server-based DB
+    """
+    u = urllib.parse.urlparse(url)
+    if u.scheme == "postgresql":
         import psycopg2
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
@@ -105,16 +119,28 @@ def sqlalchemy_url(sqlalchemy_database, tmp_path, worker_id) -> str:
         except Exception:
             pass
 
-    return DATABASE_URLS[sqlalchemy_database]
 
 @pytest.fixture
-def pushpin(tracim_webserver, tmp_path_factory):
-    while True:
-        try:
-            requests.get("http://localhost:7999")
-            break
-        except requests.exceptions.ConnectionError:
-            pass
+def unique_name(worker_id: str) -> str:
+    return "tracim_test__{}".format(worker_id)
+
+
+@pytest.fixture()
+def sqlalchemy_url(sqlalchemy_database, tmp_path, unique_name) -> str:
+    DATABASE_URLS = {
+        "sqlite": "sqlite:////{path}/{name}.sqlite".format(path=str(tmp_path), name=unique_name),
+        "postgresql": "postgresql://{username}:{password}@localhost:5432/{name}?client_encoding=utf8".format(
+            name=unique_name, username=DATABASE_USER, password=DATABASE_PASSWORD
+        ),
+    }
+    return DATABASE_URLS[sqlalchemy_database]
+
+
+@pytest.fixture
+def pushpin(tracim_webserver, tmp_path_factory, unique_name) -> str:
+    pushpin_base = "http://localhost:7999/{}".format(unique_name)
+    wait_for_url(pushpin_base)
+    yield pushpin_base
 
 
 @pytest.fixture
@@ -131,6 +157,7 @@ def rq_database_worker(config_uri, app_config):
     base_args = ["rq", "worker", "-q", "-w", "tracim_backend.lib.rq.worker.DatabaseWorker"]
     queue_name_args = [queue_name.value for queue_name in RqQueueName]
     worker_process = subprocess.Popen(base_args + queue_name_args, env=worker_env,)
+
     yield worker_process
     empty_event_queues()
     worker_process.terminate()
@@ -146,47 +173,45 @@ def tracim_webserver(
     settings, config_uri, engine, session_factory
 ) -> typing.Generator[subprocess.Popen, None, None]:
     config_filepath = pathlib.Path(__file__).parent.parent.parent / config_uri
-    try:
-        penv = os.environ.copy()
-        penv["TRACIM_DEBUG"] = "1"
-        process = subprocess.Popen(
-            [
-                "pserve",
-                str(config_filepath),
-                "-n",
-                "tracim_webserver",
-                "--server-name",
-                "tracim_webserver",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=penv,
-        )
-        try:
-            # INFO 2021/06/22 - SG - wait to see if pserve executes properly
-            process.wait(0.5)
-            raise Exception(
-                "Error while starting server, return code={}".format(process.returncode)
-            )
-        except subprocess.TimeoutExpired:
-            # INFO 2021/06/22 - SG - the process started successfully
-            pass
-        # INFO 2021/06/22 - SG - then wait for pserve to listen on its port
-        starting = True
-        while starting:
-            try:
-                requests.get("http://localhost:6543")
-                starting = False
-            except requests.exceptions.ConnectionError:
-                pass
-        yield process
 
-    finally:
-        process.terminate()
-        try:
-            process.wait(timeout=2)
-        except Exception:
-            process.kill()
+    # NOTE SG 2020-12-22: those ports MUST be the same as the ones defined in
+    # backend/pushpin_config/routes file
+    start = 6543
+    WORKER_ID_PORTS = {
+        "master": start,
+    }
+    WORKER_ID_PORTS.update({"gw{}".format(index): start + index + 1 for index in range(8)})
+    try:
+        port = WORKER_ID_PORTS[worker_id]
+    except KeyError:
+        raise KeyError(
+            "No defined port for worker {}. Add it in backend/pushpin_config/routes AND in WORKER_ID_PORTS"
+        )
+    penv = os.environ.copy()
+    penv["TRACIM_DEBUG"] = "1"
+    listen = "localhost:{}".format(port)
+    process = subprocess.Popen(
+        [
+            "pserve",
+            str(config_filepath),
+            "-n",
+            "tracim_webserver",
+            "--server-name",
+            "tracim_webserver",
+            "http_listen={}".format(listen)
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=penv,
+    )
+    wait_for_url("http://{}".format(listen))
+    yield server_process
+    server_process.terminate()
+    try:
+        server_process.wait(5.0)
+    except TimeoutError:
+        server_process.kill()
+        raise TimeoutError("tracim webserver didn't shut down properly, had to kill it")
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -209,24 +234,30 @@ def config_section(request) -> str:
 
 
 @pytest.fixture
-def settings(config_uri, config_section, sqlalchemy_url, tmp_path, worker_id):
+def settings(config_uri, config_section, sqlalchemy_url, tmp_path, unique_name):
     _settings = plaster.get_settings(config_uri, config_section)
     _settings["here"] = str(tmp_path)
     for path_setting in (
-        "uploaded_files_storage_path",
-        "caldav_storage_dir",
+        "uploaded_files.storage.local.storage_path",
+        "caldav.radicale.storage.filesystem_folder",
         "preview_cache_dir",
-        "sessions_data_root_dir",
+        "session.data_dir",
+        "session.lock_dir",
     ):
         (tmp_path / path_setting).mkdir()
-        _settings["basic_setup.{}".format(path_setting)] = str(tmp_path / path_setting)
-    _settings["uploaded_files.storage.s3.bucket"] = worker_id
+        _settings[path_setting] = str(tmp_path / path_setting)
+    _settings["uploaded_files.storage.s3.bucket"] = unique_name
 
     port = find_free_port()
     _settings["caldav.radicale_proxy.base_url"] = "http://localhost:{}".format(port)
 
     os.environ["TRACIM_SQLALCHEMY__URL"] = sqlalchemy_url
     _settings["sqlalchemy.url"] = sqlalchemy_url
+
+    _settings["search.elasticsearch.index_alias"] = unique_name
+
+    os.environ["TRACIM_LIVE_MESSAGES__ASYNC_QUEUE_NAME"] = unique_name
+    _settings["live_messages.async_queue_name"] = unique_name
 
     return _settings
 

@@ -613,6 +613,9 @@ class CFG(object):
         self.LIVE_MESSAGES__BLOCKING_PUBLISH = asbool(
             self.get_raw_config("live_messages.blocking_publish", async_processing)
         )
+        self.LIVE_MESSAGES__ASYNC_QUEUE_NAME = self.get_raw_config(
+            "live_messages.async_queue_name", "event"
+        )
 
     def _load_limitation_config(self) -> None:
         self.LIMITATION__SHAREDSPACE_PER_USER = int(

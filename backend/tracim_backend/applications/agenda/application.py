@@ -88,7 +88,9 @@ class AgendaApp(TracimApplication):
         else:
             app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = None
 
-        radicale_storage_type = app_config.settings.get("caldav.radicale.storage.type")
+        radicale_storage_type = app_config.settings.get(
+            "caldav.radicale.storage.type", "multifilesystem"
+        )
         if radicale_storage_type != "multifilesystem":
             raise ConfigurationError(
                 '"{}" should be set to "{}"'
