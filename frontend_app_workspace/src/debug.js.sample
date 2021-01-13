@@ -1,0 +1,14 @@
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const debug = {
+  ...defaultDebug,
+  config: {
+    ...defaultDebug.config,
+    slug: 'workspace',
+    faIcon: 'users',
+    hexcolor: '#7d4e24',
+    creationLabel: 'Create a space',
+    domContainer: 'appFeatureContainer'
+  },
+  content: {}
+}
