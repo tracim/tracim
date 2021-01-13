@@ -2,8 +2,11 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
-import { DistanceDate, DropdownMenu } from 'tracim_frontend_lib'
+import {
+  DistanceDate,
+  DropdownMenu,
+  ProfileNavigation
+} from 'tracim_frontend_lib'
 
 require('./TimedEvent.styl')
 
@@ -49,7 +52,9 @@ const TimedEvent = (props) => {
         : <div>{topContents}</div>}
       <div className='timedEvent__bottom'>
         {props.t('by')}&nbsp;
-        <span className='timedEvent__author' title={props.authorName}>{props.authorName}</span>
+        <ProfileNavigation>
+          <span className='timedEvent__author' title={props.authorName}>{props.authorName}</span>
+        </ProfileNavigation>
       </div>
     </div>
   )
