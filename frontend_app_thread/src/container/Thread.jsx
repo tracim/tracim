@@ -272,7 +272,7 @@ export class Thread extends React.Component {
         }
       })
     } catch (e) {
-      console.error('Error in app file, count not build breadcrumbs', e)
+      console.error('Error in app thread, count not build breadcrumbs', e)
     }
   }
 

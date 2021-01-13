@@ -364,7 +364,7 @@ export class HtmlDocument extends React.Component {
         }
       })
     } catch (e) {
-      console.error('Error in app file, count not build breadcrumbs', e)
+      console.error('Error in app html-document, count not build breadcrumbs', e)
     }
   }
 
