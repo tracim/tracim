@@ -150,7 +150,7 @@ class SystemController(Controller):
             session=request.dbsession,
             current_user=request.current_user,
         )
-        return custom_properties_api.get_json_schema()
+        return {"json_schema": custom_properties_api.get_json_schema()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -164,7 +164,7 @@ class SystemController(Controller):
             session=request.dbsession,
             current_user=request.current_user,
         )
-        return custom_properties_api.get_ui_schema()
+        return {"ui_schema": custom_properties_api.get_ui_schema()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))

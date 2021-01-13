@@ -40,32 +40,33 @@ class UserCustomPropertiesApi:
         return query.filter(UserCustomProperties.user_id == self._current_user.user_id).one()
 
     def get_all_params(self) -> Dict[str, Any]:
+        # TODO - G.M - 2021-01-13 - Filtering by permission needed there
+        #  issue #4004
         return self.get_custom_properties().fields
 
     def set_params(self, params: Dict[str, Any]) -> UserCustomProperties:
+        # TODO - G.M - 2021-01-13 - Filtering by permission needed there
+        # issue #4004. PUT style behavior should be keep, so some tweaking
+        # is required, to not drop properties user is not able to edit.
         custom_properties = self.get_custom_properties()
-        custom_properties.fields = {**custom_properties.fields, **params}
+        custom_properties.fields = params
         self._session.add(custom_properties)
         self._session.flush()
         return custom_properties
 
     def get_json_schema(self) -> typing.Dict:
-        return {
-            "json_schema": translate_dict(
-                self._config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA,
-                keys_to_check=JSON_SCHEMA_KEYS_TO_TRANSLATE,
-                translation_method=self._translator.get_translation,
-            )
-        }
+        return translate_dict(
+            self._config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA,
+            keys_to_check=JSON_SCHEMA_KEYS_TO_TRANSLATE,
+            translation_method=self._translator.get_translation,
+        )
 
     def get_ui_schema(self) -> typing.Dict:
-        return {
-            "ui_schema": translate_dict(
-                self._config.USER__CUSTOM_PROPERTIES__UI_SCHEMA,
-                keys_to_check=UI_SCHEMA_KEYS_TO_TRANSLATE,
-                translation_method=self._translator.get_translation,
-            )
-        }
+        return translate_dict(
+            self._config.USER__CUSTOM_PROPERTIES__UI_SCHEMA,
+            keys_to_check=UI_SCHEMA_KEYS_TO_TRANSLATE,
+            translation_method=self._translator.get_translation,
+        )
 
     def get_translation_template(self) -> typing.Dict:
         """
