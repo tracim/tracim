@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'workspace_advanced.app.js' : 'workspace_advanced.app.dev.js',
+    filename: isProduction ? 'workspace_advanced.app.js' : 'workspace_advanced.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appWorkspaceAdvanced',
     libraryTarget: isProduction ? 'var' : undefined
