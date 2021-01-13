@@ -58,7 +58,6 @@ if [ -n "$backend_pid" ]; then
     exit 1
 fi
 
-
 if [ "$mode" = "cypress" ]; then
     if ! [ -s "$script_dir/functionnal_tests/cypress.json" ]; then
         cat <<EOF
@@ -115,46 +114,6 @@ case "$database_type" in
         exit 1
         ;;
 esac
-echo "Database type: '$database_type', service: '$database_service'"
-
-if [ "$mode" = "cypress" ]; then
-    if [ -z "$cypress_arg" ]; then
-        echo "cypress mode needs an argument, ('open' or 'run')"
-        exit 1
-    fi
-    if [ "$database_type" != "sqlite" ]; then
-        echo "cypress mode only supports sqlite currently"
-        exit 1
-    fi
-    # Run tracim with a specified sqlite database as cypress resets db using a file copy
-    export DATABASE_NAME="tracim_cypress"
-    database_dir="/tmp"
-fi
-
-case "$database_type" in
-    sqlite)
-        export TRACIM_SQLALCHEMY__URL="$database_type:///$database_dir/${DATABASE_NAME}.sqlite"
-        database_service=
-        sleep=
-        ;;
-    postgresql)
-        export TRACIM_SQLALCHEMY__URL="$database_type://user:secret@localhost:5432/${DATABASE_NAME}?client_encoding=utf8"
-        database_service=$database_type
-        ;;
-    mariadb)
-        export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3307/${DATABASE_NAME}"
-        database_service=$database_type
-        ;;
-    mysql)
-        export TRACIM_SQLALCHEMY__URL="mysql+pymysql://user:secret@localhost:3306/${DATABASE_NAME}"
-        database_service=$database_type
-        ;;
-    *)
-        echo "Unknown database type $database_type"
-        exit 1
-        ;;
-esac
-echo "Database type: '$database_type', service: '$database_service'"
 
 teardown () {
     if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
@@ -169,16 +128,6 @@ run_docker_services () {
         docker compose up -d pushpin "$database_service"
         sleep 2
     fi
-}
-
-run_docker_services () {
-    if [ -z "$database_service" ]; then
-        docker-compose up -d pushpin
-    else
-        docker-compose up -d pushpin "$database_service"
-        sleep 2
-    fi
-}
 
 pushd "$script_dir/backend"
 # Use comparison with "-z" as we want to check empty strings
