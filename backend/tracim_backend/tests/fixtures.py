@@ -100,22 +100,28 @@ def rq_database_worker(config_uri, app_config):
 def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTestServer:
     config_filename = basename(config_uri)
     config_dir = dirname(config_uri)
-
-    with PyramidTestServer(
-        config_filename=config_filename,
-        config_dir=config_dir,
-        extra_config_vars={"app:main": settings},
-        hostname="127.0.0.1",
-        # NOTE SG 2020-12-22: this port MUST be the same as the one defined in
-        # backend/pushpin_config/routes file
-        port=6543,
-    ) as server:
-        # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
-        # will check hostname:port to verify if test server
-        # is correctly runned. So server run check can take forever and fail if for some reason,
-        # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
-        server.start()
-        yield server
+    try:
+        with PyramidTestServer(
+            config_filename=config_filename,
+            config_dir=config_dir,
+            extra_config_vars={"app:main": settings},
+            hostname="127.0.0.1",
+            # NOTE SG 2020-12-22: this port MUST be the same as the one defined in
+            # backend/pushpin_config/routes file
+            port=6543,
+        ) as server:
+            # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
+            # will check hostname:port to verify if test server
+            # is correctly runned. So server run check can take forever and fail if for some reason,
+            # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
+            # See Github issue https://github.com/tracim/tracim/issues/4050
+            server.start()
+            yield server
+    except Exception:
+        raise Exception(
+            "The Tracim test server didn't start, please check that your "
+            "local hostname (as returned by 'hostname') resolves to '127.0.0.1'"
+        )
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
