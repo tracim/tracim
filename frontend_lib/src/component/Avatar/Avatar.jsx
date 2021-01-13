@@ -50,7 +50,7 @@ export class Avatar extends React.Component {
 
     return (
       <div
-      className={classnames('avatar-wrapper', props.customClass)}
+        className={classnames('avatar-wrapper', props.customClass)}
         style={{ ...props.style }}
         title={props.publicName}
       >

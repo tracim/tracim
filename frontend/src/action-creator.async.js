@@ -209,6 +209,21 @@ export const getUser = userId => async dispatch => {
   })
 }
 
+export const getUserPublicInformation = userId => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/about`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER,
+    dispatch
+  })
+}
+
 export const getUserConfiguration = userId => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/config`,
