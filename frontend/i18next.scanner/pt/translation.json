@@ -286,9 +286,7 @@
   "You cannot remove this member because there are no other space managers.": "Não se pode remover este membro porque não há outro gestor de espaço.",
   "Error while leaving the space": "Erro ao deixar o espaço",
   "{{author}} requested access to {{space}}": "{{author}} solicitou acesso a {{space}}",
-  "{{author}} granted you access to {{space}}": "{{author}} concedeu-lhe acesso a {{space}}",
   "{{author}} rejected your access to {{space}}": "{{author}} rejeitou-lhe o acesso a {{space}}",
-  "{{author}} granted access to {{space}} for {{user}}": "{{author}} concedeu acesso a {{space}} para {{user}}",
   "{{author}} rejected access to {{space}} for {{user}}": "{{author}} rejeitou acesso a {{space}} para {{user}}",
   "Only an administrator can see this user's profile": "Este perfil só pode ser visto pelo administrador",
   "This notification has no associated content": "Esta notificação não tem nehum conteúdo associado",
@@ -331,5 +329,11 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deseja juntar-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "O pedido de <0><0>{{userPublicName}}</0></0> para se juntar ao espaço foi <2>{{state}}</2>",
   "Account": "Conta",
-  "User account management": "Gestão da conta de utilizador"
+  "User account management": "Gestão da conta de utilizador",
+  "{{user}}'s profile": "Perfil de {{user}}",
+  "Unkown user": "Utilizador desconhecido",
+  "Loading": "Carregando",
+  "Informations": "Informações",
+  "Personal page": "Página pessoal",
+  "My profile": "Meu perfil"
 }

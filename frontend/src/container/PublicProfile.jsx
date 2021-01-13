@@ -52,7 +52,7 @@ export class PublicProfile extends React.Component {
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Home')
     }, {
-      link: <Link to={PAGE.SEARCH_RESULT}>{props.t('{{user}} profil', { user: state.displayedUser.publicName })}</Link>,
+      link: <Link to={PAGE.SEARCH_RESULT}>{props.t("{{user}}'s profile", { user: state.displayedUser.publicName })}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName })
     }]))
