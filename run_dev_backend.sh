@@ -36,7 +36,9 @@ while :; do
 done
 
 script_dir=$(realpath "$(dirname "$0")")
-backend_pid=
+set +e
+backend_pid=$(pgrep pserve)
+set -e
 cypress_arg="$2"
 mode="$1"
 export DATABASE_NAME="tracim"
@@ -48,9 +50,14 @@ if [ -z "$mode" ]; then
     mode="dev"
 fi
 if [ "$mode" != "cypress" ] && [ "$mode" != "dev" ]; then
-   echo "Unknown mode '$mode' Possible modes are 'cypress' or 'dev'"
-   exit 1
+    echo "Unknown mode '$mode' Possible modes are 'cypress' or 'dev'"
+    exit 1
 fi
+if [ -n "$backend_pid" ]; then
+    echo "Error: A Tracim development server seems to be running with PID $backend_pid, please exit it before running this command"
+    exit 1
+fi
+
 
 if [ "$mode" = "cypress" ]; then
     if [ -z "$cypress_arg" ]; then
@@ -92,7 +99,9 @@ esac
 echo "Database type: '$database_type', service: '$database_service'"
 
 teardown () {
-    kill $backend_pid
+    if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
+    pushd "$script_dir/backend"
+    docker-compose stop
 }
 
 run_docker_services () {
@@ -110,14 +119,15 @@ if [ -z "$VIRTUAL_ENV" ] && [ -z "$NO_VIRTUAL_ENV" ]; then
     . "$script_dir/backend/env/bin/activate"
 fi
 
+trap teardown HUP INT TERM
+
 if [ "$mode" = "cypress" ]; then
-    run_docker_services $sleep
+    run_docker_services "$sleep"
     tracimcli db delete --force || true
     tracimcli db init || true
     cp /tmp/${DATABASE_NAME}.sqlite /tmp/${DATABASE_NAME}.sqlite.tmp
     pserve development.ini > /tmp/${DATABASE_NAME}.log 2>&1 &
     backend_pid=$!
-    trap teardown HUP INT TERM
     popd
     pushd "$script_dir/functionnal_tests"
     yarn run "cypress-$cypress_arg"
@@ -128,7 +138,13 @@ else
     # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
     # disabling this for manual tests/dev in order to retain the database between launches
     export TMPFS_DIR=/tmp
-    run_docker_services $sleep
-    tracimcli db init || true
+    run_docker_services "$sleep"
+    if tracimcli db init; then
+        echo "Tagging database schema"
+        alembic -c development.ini stamp head
+    else
+        echo "Upgrading database schema"
+        alembic -c development.ini upgrade head
+    fi
     pserve development.ini
 fi

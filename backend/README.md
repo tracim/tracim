@@ -358,7 +358,7 @@ It is possible to specify several databases or even `all`:
 
 ### Docker-compose test file
 
-The [docker-compose.yml](docker-compose.xml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
+The [docker-compose.yml](docker-compose.yml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
 
 ### About Pytest Tests Config
 
