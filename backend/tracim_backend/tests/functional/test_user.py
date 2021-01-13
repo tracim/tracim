@@ -18,8 +18,11 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 
 
@@ -6066,16 +6069,32 @@ class TestAboutUserEndpoint(object):
     def test_api__get_about_user__ok__nominal_case(
         self,
         user_api_factory: UserApiFactory,
+        content_api_factory: ContentApiFactory,
+        workspace_api_factory: WorkspaceApiFactory,
         web_testapp: TestApp,
         admin_user: User,
         bob_user: User,
         riyad_user: User,
+        session: TracimSession,
+        content_type_list: typing.List[str],
     ) -> None:
         # With
         user_api = user_api_factory.get()
         user_api.create_follower(follower_id=bob_user.user_id, leader_id=admin_user.user_id)
         user_api.create_follower(follower_id=riyad_user.user_id, leader_id=admin_user.user_id)
         user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        content_api = content_api_factory.get()
+        content_api.create(
+            content_type_list.Page.slug, workspace, None, "creation_order_test", "", True
+        )
+        content = content_api.create(
+            content_type_list.Page.slug, workspace, None, "another creation_order_test", "", True,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "Just an update"
+        content_api.save(content)
         transaction.commit()
 
         # When
@@ -6089,5 +6108,17 @@ class TestAboutUserEndpoint(object):
         assert res.json_body["followers_count"] == 2
         assert res.json_body["public_name"] == admin_user.public_name
         assert res.json_body["username"] == admin_user.username
-        assert res.json_body["authored_content_revisions_count"] == 0
-        assert res.json_body["authored_content_revisions_space_count"] == 0
+        assert res.json_body["authored_content_revisions_count"] == 3
+        assert res.json_body["authored_content_revisions_space_count"] == 1
+
+    def test_api__get_about_user__err_user_not_existing(self, web_testapp: TestApp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/users/2/about", status=400)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+
+    def test_api__get_about_user__err_user_not_known(
+        self, admin_user: User, web_testapp: TestApp, riyad_user: User
+    ) -> None:
+        web_testapp.authorization = ("Basic", (riyad_user.email, "password"))
+        res = web_testapp.get("/api/users/{}/about".format(admin_user.user_id), status=400)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
