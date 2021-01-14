@@ -96,6 +96,7 @@
     % endfor
 
     <script type="text/javascript" src="/assets/tracim.vendors~app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     <script type="text/javascript" src="/app/workspace.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
@@ -109,8 +110,6 @@
     <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    <script type="text/javascript" src="/assets/tracim.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>

@@ -46,14 +46,7 @@ cd "$DEFAULTDIR/frontend_vendors"
 log "Building tracim_frontend_lib for tests"
 yarn workspace tracim_frontend_lib run build$dev && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
-#for app in "$DEFAULTDIR"/frontend_app_*; do
-#	if [ -f "$app/.disabled-app" ]; then
-#		log "Skipping $app because of the existence of the .disabled-app file"
-#	else
-#		cd "$app" || exit 1
-#		./build_*.sh $appdev || logerror "Failed building $app."
-#	fi
-#done
+
 cd "$DEFAULTDIR/frontend_app_file" || exit
 log "Building standalone tracim_frontend_file"
 yarn run build$dev
