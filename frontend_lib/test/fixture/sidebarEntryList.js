@@ -10,7 +10,7 @@ export const sidebarEntryList = [
     route: '/ui/workspaces/6/contents',
     hexcolor: '#bbbbbb',
     fa_icon: 'th',
-    label: 'All Contents'
+    label: 'Contents'
   }, {
     slug: 'contents/thread',
     route: '/ui/workspaces/6/contents?type=thread',

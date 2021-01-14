@@ -27,7 +27,7 @@ activity_menu_entry = WorkspaceMenuEntry(
 )
 all_content_menu_entry = WorkspaceMenuEntry(
     slug="contents/all",
-    label="All Contents",
+    label="Contents",
     route="/ui/workspaces/{workspace_id}/contents",
     hexcolor="#bbbbbb",
     fa_icon="th",

@@ -54,8 +54,8 @@ export class PersonalData extends React.Component {
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
           {(props.displayAdminInfo
-            ? props.t('Change the profile')
-            : props.t('Change my profile')
+            ? props.t('Change the account settings')
+            : props.t('Change my account settings')
           )}
         </div>
 

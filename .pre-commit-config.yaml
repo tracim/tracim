@@ -11,33 +11,23 @@ repos:
           - id: debug-statements
           - id: check-merge-conflict
     # backend specific
-    - repo: https://gitlab.com/pycqa/flake8
-      rev: 3.7.9
+    - repo: https://github.com/ambv/black
+      rev: stable
       hooks:
-          - id: flake8
-            files: 'backend/tracim_backend'
-          - id: flake8
-            files: 'backend/official_plugins'
+          - id: black
+            files: 'backend'
     - repo: https://github.com/asottile/seed-isort-config
       rev: v1.8.0
       hooks:
           - id: seed-isort-config
             args: [--settings-path=backend]
     - repo: https://github.com/pre-commit/mirrors-isort
-      rev: 'v4.3.18'
+      rev: v4.3.18
       hooks:
           - id: isort
-            args: [--settings-path=backend/setup.cfg]
-            files: 'backend/tracim_backend/(.*)/*.py'
-          - id: isort
-            args: [--settings-path=backend/setup.cfg]
-            files: 'backend/official_plugins/(.*)/*.py'
-    - repo: https://github.com/ambv/black
-      rev: stable
+            files: 'backend'
+    - repo: https://gitlab.com/pycqa/flake8
+      rev: 3.7.9
       hooks:
-          - id: black
-            args: [-l 100]
-            files: 'backend/tracim_backend'
-          - id: black
-            args: [-l 100]
-            files: 'backend/official_plugins'
+          - id: flake8
+            files: 'backend'

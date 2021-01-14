@@ -7,6 +7,7 @@ Simple script to setup require directories for pytests
 import os
 from pathlib import Path  # python3 only
 from typing import Optional
+
 from dotenv import load_dotenv
 
 env_path = Path(".") / ".test.env"

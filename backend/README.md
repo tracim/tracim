@@ -1,12 +1,10 @@
-The Tracim Backend
-==================
+# The Tracim Backend
 
 Backend source code of Tracim, using Pyramid Framework.
 
-Installation
----------------
+## Installation
 
-### Distribution dependencies ###
+### Distribution dependencies
 
 On Debian Stretch (9) with sudo:
 
@@ -28,7 +26,6 @@ On Debian Stretch (9) with sudo:
     qpdf \
     ufraw-batch \
     ffmpeg \
-    redis-server \
     zlib1g-dev \
     exiftool
 
@@ -37,14 +34,14 @@ For better preview support:
     sudo apt install libreoffice # most office documents file and text format
     sudo apt install inkscape # for .svg files.
 
-#### Supported database engines
+### Supported database engines
 
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
 
-### Get the Source ###
+### Get the source
 
 get source from github:
 
@@ -54,7 +51,7 @@ go to *backend* subdirectory:
 
     cd backend
 
-### Setup Python Virtualenv ###
+### Setup Python Virtualenv
 
 Create a Python virtual environment:
 
@@ -97,8 +94,7 @@ If you want to store files on s3, you need to install the S3 driver:
     pip install -r requirements-storage-s3.txt
 
 
-Configuration
----------------
+## Configuration
 
 Create [configuration file](doc/setting.md) for a development environment:
 
@@ -125,14 +121,13 @@ Stamp current version of database to last (useful for migration):
 
 Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to discover their functionalities and how to activate them.
 
-Running Tracim Backend WSGI APP
----------------
+## Deployment
 
 You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
 - uWSGI using wsgi/* script.
 - The pserve command of pyramid which only rely on development.ini pastedeploy config.
 
-### With uWSGI: great for production ###
+### With uWSGI: great for production
 
 #### Install uWSGI
 
@@ -144,7 +139,7 @@ Or with PIP:
 
     sudo pip3 install uwsgi
 
-#### All in terminal way ####
+#### All in terminal way
 
 
 Run all web services with UWSGI:
@@ -213,7 +208,7 @@ You can then run the process this way:
     # You need to replace <WSGI_CONF_CALDAV> with correct path
     uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
-### With Pserve: legacy way, useful for debug and dev ###
+### With Pserve: legacy way, useful for debug and dev
 
 This method relies on development.ini configuration. default web server used is _Waitress_
 in` development.ini.sample`
@@ -234,15 +229,13 @@ Run the CalDAV server:
     tracimcli caldav start
 
 
-Running Tracim Backend Daemon
----------------
+## Running the Tracim Backend Daemons
 
-Feature such as async email notification and email reply system need additional
-daemons to work correctly.
+Features such as async email notification and email reply system need additional daemons to work.
 
-### The Python Way
+### Manually
 
-#### Run Daemons
+#### Start Daemons
 
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
@@ -311,92 +304,63 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
     supervisord
 
 
-Running Pushpin Service
----------------
+## Running Pushpin Service
 
 For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
 
 See [main readme](../README.md)  section _Install and run pushpin for UI updates_
 
-## Run Tests and Others Checks ##
+## Lint the code
 
-### Run Tests ###
-
-Some functional tests need additional daemons that are run through docker:
-
-```shell
-sudo apt install docker.io docker-compose
-```
-
-Some directories are required to make tests functional, you can create them and do some other check
-with this script:
-
-    # in the backend folder
-    python3 ./setup_dev_env.py
-
-Before running some functional test related to email, you need a local working *MailHog*
-see here: https://github.com/mailhog/MailHog
-
-You can run it this way with Docker:
-
-    docker pull mailhog/mailhog
-    docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-
-You need also a test ldap server on port 3890 for ldap related test.
-See here: https://github.com/rroemhild/docker-test-openldap
-
-You can run it this way with Docker:
-
-    docker pull rroemhild/test-openldap:1.1
-    docker run -d -p 3890:389 rroemhild/test-openldap
-
-You need also a elasticsearch server on port 9200 for elasticsearch related test
-You can run it this way with Docker Compose:
-
-    # from backend folder
-    docker-compose up elasticsearch
-
-You also need a minio server on port 9000 for tests related to s3.
-You can run it this way with Docker Compose:
-
-    # from backend folder
-    docker-compose up minio
-
-please note that syntax is similar to minio command line, "minio server /data" will start the minio server and use
-/data dir (in our case, it's the /data of the docker and his content will be deleted after stopped the docker as we do not
-create a docker volume), see minio documentation for more info: https://docs.min.io/docs/minio-docker-quickstart-guide.html .
-
-Create default test_storage_dir folder tree to make test work properly out of the box:
-
-    ./create_test_storage_dir.sh
-
-Run your project's tests:
-
-    pytest
-
-### Linting and Other Checks ###
-
-Install the required versions:
+Install the required tool, `flake8` and its dependencies:
 
     pip install -r requirements-devtool.txt
 
-Run mypy checks:
+Then run flake8:
 
-    mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
+    flake8
 
-Code formatting using black:
+## Run Tests
 
-    black -l 100 tracim_backend
+First setup the needed tools and directories (only needed once):
 
-Sorting of import:
+    # from backend directory
+    python3 ./setup_dev_env.py
+    ./create_test_storage_dir.sh
+    # several external services (mail/databases/…) are started through a docker compose file
+    # please install it by following their instructions:
+    # - https://docs.docker.com/engine/install/
+    # - https://docs.docker.com/compose/install/
+    # On Debian systems the following lines are enough
+    sudo apt install docker.io docker-compose
+    # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
+    sudo usermod -a -G docker $USER
 
-    isort tracim_backend/**/*.py
+Running tests can be done with:
 
-Flake8 check(unused import, variable and many other checks):
+    docker-compose up -d
+    pytest
+    docker-compose down
 
-    flake8 tracim_backend
 
-### About Pytest Tests Config ###
+By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
+
+    pytest --database=postgresql
+
+Possible databases are `sqlite`, `postgresql`, `mysql` and `mariadb`.
+It is possible to specify several databases or even `all`:
+
+    # Needs the pytest-forked plugin (pip install pytest-forked)
+    # as some test fixtures do modify static variables.
+    pytest --forked --database=sqlite --database=postgresql
+    # Run tests on all databases
+    pytest --forked --database=all
+
+### Docker-compose test file
+
+The [docker-compose.yml](docker-compose.yml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
+
+### About Pytest Tests Config
 
 For running tests, Tracim tests need config to be set:
 - specific config for specific tests is
@@ -416,8 +380,7 @@ Order of usage is (from less to more important, last is used if set):
 - default env var setting in .test.env
 - env var set by user
 
-The Tracim API
-----------
+## The Tracim API
 
 Tracim_backend gives access to a REST API in */api*.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
@@ -428,7 +391,7 @@ For example, with the default configuration:
     # run Tracim
     pserve development.ini
     # launch your favorite web-browser
-    firefox http://localhost:6543/api/doc/
+    firefox http://localhost:7999/api/doc/
 
 ## Roles, Profile and Access Rights
 
@@ -436,21 +399,10 @@ In Tracim, only some users can access to some information, this is also true in
 the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
 
-# Known Issues
+## Known Issues
 
 see [here](doc/known_issues.md)
 
-# Documentation
-- [apache.md](apache.md): Using Apache as a proxy for Tracim
-- [api.md](api.md): Using the Tracim API
-- [cli.md](cli.md): Controlling Tracim from the Command Line Using `tracimcli`
-- [database.md](database.md): Handling the Database (deprecated)
-- [devtools.md](devtools.md): Miscellaneous Information About the Developer Tools
-- [hello_world_plugin.py](hello_world_plugin.py): an hello world plugin
-- [i18n.md](i18n.md): Translating the Backend
-- [known_issues.md](known_issues.md): Known issues with the Tracim Backend
-- [migrate_from_v1.md](migrate_from_v1.md): Migrate from Tracim v1
-- [migration.md](migration.md): Performing Migrations
-- [roles.md](roles.md): Roles in Tracim
-- [setting.md](setting.md): Setting up Tracim
-- [webdav.md](webdav.md): Using WebDAV on Various Operating Systems
+## Other Documentation
+
+Detailed documentation on several topics is available in the [doc](doc) directory.

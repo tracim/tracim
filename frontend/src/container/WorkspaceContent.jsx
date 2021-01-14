@@ -260,9 +260,9 @@ export class WorkspaceContent extends React.Component {
       type: BREADCRUMBS_TYPE.CORE,
       label: workspaceLabel
     }, {
-      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('All contents')}</Link>,
+      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('Contents')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('All contents')
+      label: props.t('Contents')
     }]
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }

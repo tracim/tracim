@@ -30,7 +30,7 @@ describe('Switching between workspaces', () => {
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: secondWorkspaceId } }).click()
 
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: secondWorkspaceId } })
-        .contains('All Contents')
+        .contains('Contents')
         .click({ force: true })
 
       cy.getTag({ selectorName: s.CONTENT_FRAME }).should('not.exist')
@@ -43,7 +43,7 @@ describe('Switching between workspaces', () => {
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: secondWorkspaceId } }).click()
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: secondWorkspaceId } })
-        .contains('All Contents')
+        .contains('Contents')
         .click({ force: true })
 
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: secondHtmlDocTitle } })

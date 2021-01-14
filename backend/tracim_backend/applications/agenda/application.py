@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import typing
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -10,8 +11,6 @@ from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.views import BASE_API
-
-import typing
 
 
 class AgendaApp(TracimApplication):

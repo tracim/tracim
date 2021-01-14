@@ -9,7 +9,6 @@ import {
   convertBackslashNToBr,
   naturalCompareLabels,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,
@@ -203,6 +202,13 @@ export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 
 export {
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
+
+export {
   appContentFactory,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -219,7 +225,6 @@ export {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,

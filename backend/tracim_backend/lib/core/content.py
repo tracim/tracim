@@ -734,9 +734,7 @@ class ContentApi(object):
             )
         return revision
 
-    def get_valid_content_filepath(
-        self, depot_stored_file: StoredFile, file_extension: str = ""
-    ):
+    def get_valid_content_filepath(self, depot_stored_file: StoredFile, file_extension: str = ""):
         """
         Generic way to get content filepath for all depot backend.
         :param depot_stored_file: content as depot StoredFile
@@ -744,9 +742,7 @@ class ContentApi(object):
         :return: content filepath
         """
 
-        file_label = "tracim-revision-content-{file_id}".format(
-            file_id=depot_stored_file.file_id,
-        )
+        file_label = "tracim-revision-content-{file_id}".format(file_id=depot_stored_file.file_id,)
         base_path = "{temp_dir}/{file_label}".format(
             temp_dir=tempfile.gettempdir(), file_label=file_label,
         )

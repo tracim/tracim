@@ -120,5 +120,7 @@
   "Error while detecting the mentions": "Erro ao eliminar as menções",
   "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
   "Edit": "Editar",
-  "Validate anyway": "Validar de qualquer forma"
+  "Validate anyway": "Validar de qualquer forma",
+  "Home": "Início",
+  "Error while getting breadcrumbs": "Erro ao obtenir a navegação estrutural"
 }
