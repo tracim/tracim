@@ -75,7 +75,7 @@ export const DRAG_AND_DROP = {
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
-  i18n.t('All Contents'),
+  i18n.t('Contents'),
   i18n.t('Opened'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),

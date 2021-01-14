@@ -11,9 +11,9 @@ describe('Sidebar', function () {
     cy.visitPage({ pageName: PAGES.HOME })
     cy.get('[data-cy=sidebar__content__navigation__workspace__item_1]').click()
   })
-  it('should have a link to All contents in the hidden menu', function () {
+  it('should have a link to Contents in the hidden menu', function () {
     cy.get('.sidebar__content__navigation__item__menu').should('be.visible').click()
-    cy.get('li').contains('All Contents').should('have.attr', 'href', '/ui/workspaces/1/contents')
+    cy.get('li').contains('Contents').should('have.attr', 'href', '/ui/workspaces/1/contents')
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').should('be.visible')
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').click()
     cy.url().should('include', '/workspaces/1/contents')

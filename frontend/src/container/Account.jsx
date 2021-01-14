@@ -51,8 +51,8 @@ export class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: 'My profile',
-      translationKey: props.t('My profile'),
+      label: 'My account',
+      translationKey: props.t('My account'),
       display: true
     }, {
       name: 'spacesConfig',
@@ -128,9 +128,9 @@ export class Account extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
+      link: <Link to={PAGE.ACCOUNT}>{props.t('Account Settings')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('My account')
+      label: props.t('Account Settings')
     }]))
   }
 
@@ -256,7 +256,7 @@ export class Account extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    props.dispatch(setHeadTitle(props.t('My Account')))
+    props.dispatch(setHeadTitle(props.t('Account Settings')))
   }
 
   render () {
@@ -268,7 +268,7 @@ export class Account extends React.Component {
           <PageWrapper customClass='account'>
             <PageTitle
               parentClass='account'
-              title={props.t('My account')}
+              title={props.t('Account Settings')}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
             />

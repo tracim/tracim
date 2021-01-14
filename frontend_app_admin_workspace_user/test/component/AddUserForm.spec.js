@@ -20,7 +20,7 @@ describe('<AddUserForm />', () => {
           newUserPassword: 'newPassword',
           newUserUsername: 'newUsername',
           newUserName: 'newName',
-          newUserProfile: 'newProfile'
+          newUserType: 'newType'
         })
       })
 
@@ -30,7 +30,7 @@ describe('<AddUserForm />', () => {
       })
 
       it('should return true if the name or the profile are empty', () => {
-        wrapper.setState({ newUserName: '', newUserProfile: '' })
+        wrapper.setState({ newUserName: '', newUserType: '' })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 

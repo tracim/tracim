@@ -185,9 +185,9 @@ The recommended session back-end for production is redis as it avoids having to 
 When this back-end is used, the session's file are [not deleted automatically](https://beaker.readthedocs.io/en/latest/sessions.html#removing-expired-old-sessions).
 To avoid keeping expired session files you should run :
 
-    find . -type f -mtime +10 -print -exec rm {} \;
+    find <session.data_dir> -type f -mtime +10 -print -exec rm {} \;
 
-regularly (for example by using a cron job), which will delete file which have not been modified since 10 days.
+regularly (for example by using a cron job), which will delete the sessions files which have not been modified since 10 days.
 You should use this command in both session data and session lock dirs.
 
 #### delete all existing sessions (file storage)

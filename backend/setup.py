@@ -1,5 +1,7 @@
 import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages
+from setuptools import setup
 
 requires = [
     # pyramid
@@ -9,12 +11,12 @@ requires = [
     "pyramid_retry",
     "waitress",
     # Database
-    'pyramid_tm',
-    'SQLAlchemy',
-    'transaction',
-    'zope.sqlalchemy',
-    'alembic',
-    'sqlakeyset',
+    "pyramid_tm",
+    "SQLAlchemy",
+    "transaction",
+    "zope.sqlalchemy",
+    "alembic",
+    "sqlakeyset",
     # API
     "hapic[marshmallow]>=0.83",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue

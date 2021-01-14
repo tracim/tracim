@@ -86,7 +86,7 @@ export class NotificationWall extends React.Component {
 
     const [entityType, eventType, contentType] = notification.type.split('.')
 
-    const escapedAuthor = escapeHtml(notification.author)
+    const escapedAuthor = notification.author ? escapeHtml(notification.author.publicName) : ''
     const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
 
     const escapedContentLabel = (
@@ -211,12 +211,22 @@ export class NotificationWall extends React.Component {
 
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
-        case TLM_EVENT.CREATED: return {
-          icon: 'user-plus',
-          text: props.user.userId === notification.user.userId
-            ? props.t('{{author}} added you to {{space}}', i18nOpts)
-            : props.t('{{author}} added {{user}} to {{space}}', i18nOpts),
-          url: dashboardUrl
+        case TLM_EVENT.CREATED: {
+          let notificationText
+          if (props.user.userId === notification.user.userId) {
+            notificationText = '{{author}} added you to {{space}}'
+          } else {
+            if (notification.author.userId === notification.user.userId) {
+              notificationText = '{{author}} joined space {{space}}'
+            } else {
+              notificationText = '{{author}} added {{user}} to {{space}}'
+            }
+          }
+          return {
+            icon: 'user-plus',
+            text: props.t(notificationText, i18nOpts),
+            url: dashboardUrl
+          }
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'user-o+history',
@@ -265,21 +275,14 @@ export class NotificationWall extends React.Component {
     const subscriptionPageURL = '' // RJ - 2020-10-19 - FIXME: depends on https://github.com/tracim/tracim/issues/3594
 
     if (entityType === TLM_ENTITY.SHAREDSPACE_SUBSCRIPTION) {
-      // RJ - 2020-10-19 - NOTE - DELETED and UNDELETED events do not make sense for subscriptions
+      // INFO - GB - 2020-12-29 - MODIFIED.accepted and DELETED events do not make notifications
 
       if (props.user.userId === notification.subscription.author.userId) {
         // RJ - 2020-10-19 - NOTE
         // TLM_EVENT.CREATED notifications should not be shown, or even received
         // assuming that the author of a subscription is always the concerned user
         if (eventType === TLM_EVENT.MODIFIED) {
-          if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
-            return {
-              icon: SUBSCRIPTION_TYPE.accepted.faIcon,
-              text: props.t('{{author}} granted you access to {{space}}', i18nOpts),
-              url: dashboardUrl
-            }
-          }
-
+          if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) return {}
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
               icon: SUBSCRIPTION_TYPE.rejected.faIcon,
@@ -297,14 +300,7 @@ export class NotificationWall extends React.Component {
             url: dashboardUrl
           }
           case TLM_EVENT.MODIFIED: {
-            if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) {
-              return {
-                icon: SUBSCRIPTION_TYPE.accepted.faIcon,
-                text: props.t('{{author}} granted access to {{space}} for {{user}}', i18nOpts),
-                url: dashboardUrl
-              }
-            }
-
+            if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) return {}
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.rejected.faIcon,
@@ -327,7 +323,7 @@ export class NotificationWall extends React.Component {
 
     return {
       icon: 'bell',
-      text: `${notification.author} ${notification.type}`,
+      text: `${escapedAuthor} ${notification.type}`,
       url: contentUrl,
       emptyUrlMsg: defaultEmptyUrlMsg,
       msgType: 'warning'
@@ -349,6 +345,7 @@ export class NotificationWall extends React.Component {
 
   render () {
     const { props } = this
+    const unkownAuthor = props.t('unkown')
 
     if (!props.notificationPage.list) return null
 
@@ -373,6 +370,7 @@ export class NotificationWall extends React.Component {
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
             const notificationDetails = this.getNotificationDetails(notification)
+            if (Object.keys(notificationDetails).length === 0) return
             const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
@@ -396,7 +394,11 @@ export class NotificationWall extends React.Component {
                 >
                   <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
-                    <Avatar size={AVATAR_SIZE.MINI} publicName={notification.author} style={{ marginRight: '5px' }} />
+                    <Avatar
+                      size={AVATAR_SIZE.MINI}
+                      publicName={notification.author ? notification.author.publicName : unkownAuthor}
+                      style={{ marginRight: '5px' }}
+                    />
                     <span
                       dangerouslySetInnerHTML={{
                         __html: (

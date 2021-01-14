@@ -110,7 +110,7 @@ class LoginCredentials(object):
     """
 
     def __init__(
-        self, password: str, email: Optional[str] = None, username: Optional[str] = None,
+        self, password: str, email: Optional[str] = None, username: Optional[str] = None
     ) -> None:
         self.email = email
         self.username = username
@@ -604,7 +604,17 @@ class TextBasedContentUpdate(object):
         self.raw_content = raw_content
 
 
-class LiveMessageQuery(object):
+class BasePaginatedQuery(object):
+    """
+    Base of paginated query
+    """
+
+    def __init__(self, count: int, page_token: Optional[str] = None) -> None:
+        self.count = count
+        self.page_token = page_token
+
+
+class LiveMessageQuery(BasePaginatedQuery):
     """
     Live Message query model
     """
@@ -621,9 +631,8 @@ class LiveMessageQuery(object):
         related_to_content_ids: str = "",
         include_not_sent: int = 0,
     ) -> None:
+        super().__init__(count=count, page_token=page_token)
         self.read_status = ReadStatus(read_status)
-        self.count = count
-        self.page_token = page_token
         self.include_event_types = include_event_types
         self.exclude_event_types = exclude_event_types
         self.exclude_author_ids = string_to_list(exclude_author_ids, ",", int)
@@ -667,11 +676,7 @@ class FolderContentUpdate(object):
 
 class Agenda(object):
     def __init__(
-        self,
-        agenda_url: str,
-        with_credentials: bool,
-        workspace_id: Optional[int],
-        agenda_type: str,
+        self, agenda_url: str, with_credentials: bool, workspace_id: Optional[int], agenda_type: str
     ) -> None:
         self.agenda_url = agenda_url
         self.with_credentials = with_credentials
@@ -1657,3 +1662,21 @@ class UserMessagesSummary(object):
     @property
     def user_id(self) -> int:
         return self.user.user_id
+
+
+class UserFollowQuery(BasePaginatedQuery):
+    """
+    User following query model
+    """
+
+    def __init__(
+        self, count: int, page_token: Optional[str] = None, user_id: Optional[int] = None
+    ) -> None:
+        super().__init__(count=count, page_token=page_token)
+        self.user_id = user_id
+
+
+class PublicUserProfile(object):
+    def __init__(self, followers_count: int, following_count: int) -> None:
+        self.followers_count = followers_count
+        self.following_count = following_count
