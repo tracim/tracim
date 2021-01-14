@@ -21,8 +21,10 @@ export class OpenContentApp extends React.Component {
       match
     } = this.props
 
+    // RJ - 2020-01-13 - NOTE: match.params.idcts can be equal to "new"
+
     if (
-      !match || !workspaceId || workspaceId === -1 || !match.params.idcts ||
+      !match || !workspaceId || workspaceId === -1 || isNaN(match.params.idcts) ||
       (prevProps.match && appOpenedType && match.params.idcts === prevProps.match.params.idcts)
     ) return
 
