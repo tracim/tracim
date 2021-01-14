@@ -1,0 +1,18 @@
+{
+  "date": {
+      "ui:description": "just a date",
+      "ui:title": "Date",
+      "ui:widget": "alt-date",
+      "ui:options": {
+        "yearsRange": [
+          1980,
+          2030
+        ]
+      }
+  },
+  "properties1": {
+    "ui:widget": "textarea",
+    "ui:help": "just some help",
+    "ui:placeholder": "write here !"
+  }
+}

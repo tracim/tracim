@@ -66,6 +66,7 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PublicUserProfileSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetConfigSchema
+from tracim_backend.views.core_api.schemas import SetCustomPropertiesSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
@@ -864,8 +865,9 @@ class UserController(Controller):
     # as complex right rules will be delegated to properties, see #4004
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_body(SetConfigSchema())
+    @hapic.input_body(SetCustomPropertiesSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_custom_properties(
         self, context, request: TracimRequest, hapic_data: HapicData

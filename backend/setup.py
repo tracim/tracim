@@ -75,6 +75,7 @@ requires = [
     "gripcontrol",
     "tnetstring3",
     "pyzmq",
+    "jsonschema",
 ]
 
 tests_require = [

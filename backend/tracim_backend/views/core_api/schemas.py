@@ -298,6 +298,16 @@ class SetConfigSchema(marshmallow.Schema):
     )
 
 
+class SetCustomPropertiesSchema(marshmallow.Schema):
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True, example={"param1": "value1"}, description="custom_properties schema",
+    )
+
+
 class SetEmailSchema(LoggedInUserPasswordSchema):
     email = marshmallow.fields.Email(
         required=True, example="hello@tracim.fr", validate=user_email_validator

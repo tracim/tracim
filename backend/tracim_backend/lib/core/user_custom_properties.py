@@ -2,7 +2,11 @@ import typing
 from typing import Any
 from typing import Dict
 
+import jsonschema
+from jsonschema import ValidationError
+
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.lib.utils.dict_parsing import get_translation_key_from_dict
 from tracim_backend.lib.utils.dict_parsing import translate_dict
 from tracim_backend.lib.utils.translation import TranslationSource
@@ -48,6 +52,15 @@ class UserCustomPropertiesApi:
         # TODO - G.M - 2021-01-13 - Filtering by permission needed there
         # issue #4004. PUT style behavior should be keep, so some tweaking
         # is required, to not drop properties user is not able to edit.
+        try:
+            jsonschema.validate(params, schema=self.get_json_schema())
+        except ValidationError as exc:
+            raise TracimValidationFailed(
+                'JSONSchema Validation Failed: {}: "{}"'.format(
+                    "> ".join([str(item) for item in exc.absolute_path]), exc.message
+                )
+            ) from exc
+
         custom_properties = self.get_custom_properties()
         custom_properties.fields = params
         self._session.add(custom_properties)

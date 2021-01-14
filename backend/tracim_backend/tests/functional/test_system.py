@@ -343,47 +343,18 @@ class TestUserCustomPropertiesSchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
         json_schema = res.json_body["json_schema"]
-        assert json_schema["title"] == "User Info"
-        assert json_schema["definitions"] == {
-            "address": {
-                "title": "Address",
-                "description": "address of the user",
-                "type": "object",
-                "properties": {
-                    "street_address": {"type": "string"},
-                    "city": {"type": "string"},
-                    "state": {"type": "string"},
-                },
-                "required": ["street_address", "city", "state"],
-            }
-        }
-        assert json_schema["properties"]["organization"] == {
-            "title": "Organization",
-            "type": "object",
-            "properties": {
-                "name": {"type": "string", "title": "name", "default": "Tracim"},
-                "roles": {
-                    "title": "roles in the organization",
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enumNames": [
-                            "Developer",
-                            "System Administrator",
-                            "Manager",
-                            "Administrator",
-                            "Designer",
-                        ],
-                        "enum": ["developer", "sysadmin", "manager", "administrator", "designer"],
-                    },
-                },
-            },
-        }
-        assert json_schema["properties"]["address"] == {"$ref": "#/definitions/address"}
-        assert json_schema["properties"]["birthday_date"] == {
-            "title": "Birthday date",
+        assert json_schema["title"] == "Test"
+        assert json_schema["type"] == "object"
+        assert json_schema["description"] == "just test data"
+        assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
+        assert json_schema.get("properties")
+        assert json_schema["properties"].get("properties1")
+        assert json_schema["properties"].get("date")
+        assert json_schema["properties"].get("fields")
+        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
             "type": "string",
-            "format": "date",
+            "enumNames": ["First", "Second", "Third"],
+            "enum": ["first", "second", "third"],
         }
 
     @pytest.mark.parametrize(
@@ -399,47 +370,18 @@ class TestUserCustomPropertiesSchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
         json_schema = res.json_body["json_schema"]
-        assert json_schema["title"] == "Information sur l'utilisateur"
-        assert json_schema["definitions"] == {
-            "address": {
-                "title": "Adresse",
-                "description": "Adresse de l'utilisateur",
-                "type": "object",
-                "properties": {
-                    "street_address": {"type": "string"},
-                    "city": {"type": "string"},
-                    "state": {"type": "string"},
-                },
-                "required": ["street_address", "city", "state"],
-            }
-        }
-        assert json_schema["properties"]["organization"] == {
-            "properties": {
-                "name": {"default": "Tracim", "title": "Nom", "type": "string"},
-                "roles": {
-                    "items": {
-                        "enum": ["developer", "sysadmin", "manager", "administrator", "designer"],
-                        "enumNames": [
-                            "Développeur",
-                            "Administrateur système",
-                            "Manager",
-                            "Administrateur",
-                            "Designeur",
-                        ],
-                        "type": "string",
-                    },
-                    "title": "Role dans l'organisation",
-                    "type": "array",
-                },
-            },
-            "title": "Organisation",
-            "type": "object",
-        }
-        assert json_schema["properties"]["address"] == {"$ref": "#/definitions/address"}
-        assert json_schema["properties"]["birthday_date"] == {
-            "format": "date",
-            "title": "Date de naissance",
+        assert json_schema["title"] == "un Test"
+        assert json_schema["type"] == "object"
+        assert json_schema["description"] == "juste des données de tests"
+        assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
+        assert json_schema.get("properties")
+        assert json_schema["properties"].get("properties1")
+        assert json_schema["properties"].get("date")
+        assert json_schema["properties"].get("fields")
+        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
             "type": "string",
+            "enumNames": ["1er", "Second", "Troisième"],
+            "enum": ["first", "second", "third"],
         }
 
     def test_api__get_user_custom_properties_schema_err_401__unregistered_user(self, web_testapp):
@@ -473,16 +415,19 @@ class TestUserCustomPropertiesUISchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
-        assert ui_schema["firstName"] == {
-            "ui:autofocus": True,
-            "ui:emptyValue": "",
-            "ui:autocomplete": "family-name",
+        assert ui_schema == {
+            "date": {
+                "ui:description": "just a date",
+                "ui:title": "Date",
+                "ui:widget": "alt-date",
+                "ui:options": {"yearsRange": [1980, 2030]},
+            },
+            "properties1": {
+                "ui:widget": "textarea",
+                "ui:help": "just some help",
+                "ui:placeholder": "write here !",
+            },
         }
-        assert ui_schema["bio"] == {
-            "ui:widget": "textarea",
-            "ui:help": "Give use some informations about you.",
-        }
-        assert ui_schema["phone_number"] == {"ui:options": {"inputType": "tel"}}
 
     @pytest.mark.parametrize(
         "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
@@ -497,13 +442,19 @@ class TestUserCustomPropertiesUISchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
-        assert ui_schema["firstName"] == {
-            "ui:autofocus": True,
-            "ui:emptyValue": "",
-            "ui:autocomplete": "family-name",
+        assert ui_schema == {
+            "date": {
+                "ui:description": "juste une date",
+                "ui:title": "Date",
+                "ui:widget": "alt-date",
+                "ui:options": {"yearsRange": [1980, 2030]},
+            },
+            "properties1": {
+                "ui:widget": "textarea",
+                "ui:help": "un peu d'aide",
+                "ui:placeholder": "écrivez ici !",
+            },
         }
-        assert ui_schema["bio"] == {"ui:widget": "textarea", "ui:help": "Parlez nous de vous."}
-        assert ui_schema["phone_number"] == {"ui:options": {"inputType": "tel"}}
 
     def test_api__get_user_custom_properties_ui_schema_err_401__unregistered_user(
         self, web_testapp

@@ -16,8 +16,10 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import UserApiFactory
 
 
+@pytest.mark.parametrize(
+    "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+)
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserCustomProperties(object):
     """
     Tests for GET and PUT /api/users/{user_id}/custom-properties
@@ -47,7 +49,7 @@ class TestUserCustomProperties(object):
 
         assert json.loads(res.body, encoding="utf-8")["parameters"] == {}
 
-    def test__put_user_custom_properties_endpoint_with_update(
+    def test__put_user_custom_properties_endpoint(
         self, user_api_factory: UserApiFactory, web_testapp: TestApp
     ):
         uapi = user_api_factory.get()
@@ -65,15 +67,23 @@ class TestUserCustomProperties(object):
 
         transaction.commit()
 
-        fixture_params1 = {"param1": 1, "param2": "two"}
-        fixture_params2 = {"param2": 2, "param3": "hello"}
-        expected_result = {"param1": 1, "param2": 2, "param3": "hello"}
+        fixture_params = {
+            "fields": {
+                "subfield5": ["first", "second"],
+                "subfield3": True,
+                "subfield4": None,
+                "subfield2": 3,
+                "subfield1": "text",
+            },
+            "date": "2021-01-13",
+            "custom": "toto",
+        }
 
         user_id = test_user.user_id
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.put_json(
             "/api/users/{user_id}/custom-properties".format(user_id=user_id),
-            params={"parameters": fixture_params1},
+            params={"parameters": fixture_params},
             status=204,
         )
 
@@ -82,27 +92,21 @@ class TestUserCustomProperties(object):
             "/api/users/{user_id}/custom-properties".format(user_id=user_id), status=200
         )
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params1
-
-        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        web_testapp.put_json(
-            "/api/users/{user_id}/custom-properties".format(user_id=user_id),
-            params={"parameters": fixture_params2},
-            status=204,
-        )
-
+        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
             "/api/users/{user_id}/custom-properties".format(user_id=user_id), status=200
         )
-
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == expected_result
+        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params
 
     @pytest.mark.parametrize(
         "user_custom_properties",
-        [{"@": "coucou"}, {"": "coucou"}, {"param1": {"a": "b"}}, {"param2": ["b"]}, ["super"]],
+        [
+            {"fields": {"subfield3": 401}},
+            {"fields": {"subfield5": ["first", "second", "invalid_enum"]}},
+        ],
     )
     def test__put_user_custom_properties_endpoint__error__400__invalid_format(
         self,
@@ -132,5 +136,5 @@ class TestUserCustomProperties(object):
             params={"parameters": user_custom_properties},
             status=400,
         ).json_body
-        assert response["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
-        assert response["message"] == "Validation error of input data"
+        assert response["code"] == ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
+        assert response["message"]

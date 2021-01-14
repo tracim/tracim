@@ -5,6 +5,8 @@ import os
 import typing
 
 from depot.manager import DepotManager
+from jsonschema import SchemaError
+from jsonschema.validators import validator_for
 from paste.deploy.converters import asbool
 
 from tracim_backend.app_models.validator import update_validators
@@ -932,6 +934,18 @@ class CFG(object):
                 "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
                 self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
             )
+            try:
+                # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
+                # - prevent an invalid json-schema
+                # - ensure that validation of content will not failed due to invalid schema.
+                cls = validator_for(json_schema)
+                cls.check_schema(json_schema)
+            except SchemaError as exc:
+                raise ConfigurationError(
+                    'ERROR  "{}" is not a valid JSONSchema'.format(
+                        "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
+                    )
+                ) from exc
 
         if self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH:
             self.check_file_path_param(
