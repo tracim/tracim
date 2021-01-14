@@ -54,13 +54,9 @@ describe('<OpenContentApp />', () => {
     }
   }
 
-
   const mapStateToProps = { contentType, user, currentWorkspace: firstWorkspace }
-
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenContentAppWithoutHOC))
-
   const wrapper = mount(<ComponentWithHoc {...props} />)
-
   const wrapperInstance = wrapper.find(OpenContentAppWithoutHOC)
 
   describe('openContentApp()', () => {
