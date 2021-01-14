@@ -230,7 +230,8 @@ export class AdminWorkspaceUser extends React.Component {
     breadcrumbsList.push({
       link: pageUrl,
       type: BREADCRUMBS_TYPE.CORE,
-      label: label
+      label: label,
+      isALink: true
     })
 
     this.setState({ breadcrumbsList: breadcrumbsList })
