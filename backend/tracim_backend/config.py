@@ -942,8 +942,8 @@ class CFG(object):
                 cls.check_schema(json_schema)
             except SchemaError as exc:
                 raise ConfigurationError(
-                    'ERROR  "{}" is not a valid JSONSchema'.format(
-                        "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
+                    'ERROR  "{}" is not a valid JSONSchema : {}'.format(
+                        "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH", str(exc)
                     )
                 ) from exc
 

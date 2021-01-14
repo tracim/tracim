@@ -1,5 +1,5 @@
 import argparse
-import pprint
+import json
 
 from pyramid.scripting import AppEnvironment
 
@@ -205,5 +205,4 @@ class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
         custom_properties_api = UserCustomPropertiesApi(
             current_user=None, app_config=self._app_config, session=self._session
         )
-        # TODO - G.M - 2021-01-12 - Return valid json here (using external library ?)
-        pprint.pprint(custom_properties_api.get_translation_template())
+        print(json.dumps(custom_properties_api.get_translation_template()))
