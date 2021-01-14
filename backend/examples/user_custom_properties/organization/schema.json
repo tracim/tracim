@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "User Info",
-  "description": "info about a user in this organization",
+  "description": "Info about a user in this organization",
   "type": "object",
   "definitions": {
     "address": {
       "title": "Address",
-      "description": "address of the user",
+      "description": "Address of the user",
       "type": "object",
       "properties": {
         "street_address": { "type": "string" },
@@ -21,11 +21,11 @@
     "lastName"
   ],
   "properties": {
-    "firstName": {
+    "first_name": {
       "type": "string",
       "title": "First name"
     },
-    "lastName": {
+    "last_name": {
       "type": "string",
       "title": "Last name"
     },
@@ -50,11 +50,11 @@
       "properties": {
         "name": {
           "type": "string",
-          "title": "name",
+          "title": "Name",
           "default": "Tracim"
         },
         "roles": {
-          "title": "roles in the organization",
+          "title": "Roles in the organization",
           "type": "array",
           "items": {
             "type": "string",

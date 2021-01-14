@@ -3,14 +3,16 @@
 User custom properties allow adding instance-specific properties
 for the users of the instance.
 
-Idea is that for each user is associated some properties
-which structure is defined by a JSONSchema draftv7 (specification available [here]('https://json-schema.org/specification-links.html#draft-7'))
+The structure of those user properties should be defined in a json schema file. Specification available [here]('https://json-schema.org/specification-links.html#draft-7'))
 
-Another specific schema, more related to the way things should be display is available too. It's
-named UISchema and base specification are available [here]('https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/').
+It is possible to fine-tune the display and edition behavior of those properties by
+the Tracim frontend in a separate file (named UI schema). Its syntax can be found [here](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/)
 
-We do support also some Tracim specific properties to have some Tracim specifics behaviors in both schema.
-We provide you also a way to translate theses schema.
+We do support also some Tracim specific parameters to have some Tracim specifics behaviors in both schema.
+
+User-visible parts of these properties (title/description/…) can be translated by providing translations files (see Translations section),
+these translations will allow the backend to automatically translate both the UI Schema and JSONSchema according
+to connected user lang.
 
 :warning: Tracim does not handle changes in the properties schema when custom property values are already existing in the database.
 If you want to change the schema in an incompatible way with the existing property values you'll have to update the `user_custom_properties` table manually.

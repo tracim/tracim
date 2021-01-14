@@ -1,20 +1,20 @@
 {
   "User Info": "Information sur l'utilisateur",
-  "info about a user in this organization": "Information sur un utilisateur de cette organisation",
+  "Info about a user in this organization": "Information sur un utilisateur de cette organisation",
   "Address": "Adresse",
-  "address of the user": "Adresse de l'utilisateur",
+  "Address of the user": "Adresse de l'utilisateur",
   "First name": "Prénom",
   "Last name": "Nom",
   "Phone number": "Numéro de téléphone",
   "Birthday date": "Date de naissance",
   "Biography": "Biographie",
   "Organization": "Organisation",
-  "name": "Nom",
-  "roles in the organization": "Role dans l'organisation",
+  "Name": "Nom",
+  "Roles in the organization": "Role dans l'organisation",
   "Developer": "Développeur",
   "System Administrator": "Administrateur système",
   "Manager": "Manager",
   "Administrator": "Administrateur",
   "Designer": "Designeur",
-  "Give use some informations about you.": "Parlez nous de vous."
+  "Write something about you.": "Parlez nous de vous."
 }
