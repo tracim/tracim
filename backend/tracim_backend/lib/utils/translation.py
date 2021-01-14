@@ -9,6 +9,9 @@ import typing
 
 from babel.core import default_locale
 
+from tracim_backend.exceptions import NotReadableFile
+from tracim_backend.exceptions import TranslationConfigurationError
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import is_file_readable
 
 if typing.TYPE_CHECKING:
@@ -59,6 +62,8 @@ class Translator(object):
 
     @classmethod
     def init_translations(cls, app_config: "CFG") -> "CFG":
+        logger.debug(cls, "Load Translations")
+
         app_config.TRANSLATIONS = {
             TranslationSource.GLOBAL.name: {},
             TranslationSource.CUSTOM_PROPERTIES.name: {},
@@ -67,14 +72,23 @@ class Translator(object):
         files = glob.glob(
             str(pathlib.Path(app_config.BACKEND__I18N_FOLDER_PATH, TranslationSource.GLOBAL.value))
         )
+        global_backend_langs = []
         for file in files:
             lang = basename(dirname(file))
-            if is_file_readable(file):
-                app_config.TRANSLATIONS[TranslationSource.GLOBAL.name][
-                    lang
-                ] = cls._get_translation_from_file(file)
+            try:
+                is_file_readable(file)
+            except NotReadableFile as exc:
+                raise TranslationConfigurationError(
+                    "translation file {} is no readable.".format(file)
+                ) from exc
+            app_config.TRANSLATIONS[TranslationSource.GLOBAL.name][
+                lang
+            ] = cls._get_translation_from_file(file)
+            global_backend_langs.append(lang)
+        logger.debug(cls, "Supported Backend language (Global): " + ",".join(global_backend_langs))
 
         # custom_properties translations
+        custom_properties_langs = []
         if app_config.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH:
             files = glob.glob(
                 str(
@@ -86,10 +100,21 @@ class Translator(object):
             )
             for file in files:
                 lang = basename(file).split(".")[0]
-                if is_file_readable(file):
-                    app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][
-                        lang
-                    ] = cls._get_translation_from_file(file)
+                try:
+                    is_file_readable(file)
+                except NotReadableFile as exc:
+                    raise TranslationConfigurationError(
+                        'ERROR: translation file "{}" is no readable.'.format(file)
+                    ) from exc
+                app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][
+                    lang
+                ] = cls._get_translation_from_file(file)
+                custom_properties_langs.append(lang)
+        logger.debug(
+            cls,
+            "Supported Backend language (Custom Properties): " + ",".join(custom_properties_langs),
+        )
+        logger.debug(cls, "Translations Loaded")
 
     @classmethod
     def _get_translation_from_file(self, filepath: str) -> typing.Optional[typing.Dict[str, str]]:
@@ -97,8 +122,9 @@ class Translator(object):
             with open(filepath) as file:
                 trads = json.load(file)
                 return trads
-        except Exception:
-            return None
+        except json.JSONDecodeError as exc:
+            not_a_valid_json_file_msg = 'ERROR: "{}" is not a valid json file.'
+            raise TranslationConfigurationError(not_a_valid_json_file_msg.format(filepath)) from exc
 
     def _get_translation(
         self, lang: str, message: str, source: TranslationSource
