@@ -2,8 +2,6 @@
 from enum import Enum
 import glob
 import json
-from os.path import basename
-from os.path import dirname
 import pathlib
 import typing
 
@@ -74,7 +72,7 @@ class Translator(object):
         )
         global_backend_langs = []
         for file in files:
-            lang = basename(dirname(file))
+            lang = pathlib.Path(file).parent.name
             try:
                 is_file_readable(file)
             except NotReadableFile as exc:
@@ -99,7 +97,7 @@ class Translator(object):
                 )
             )
             for file in files:
-                lang = basename(file).split(".")[0]
+                lang = pathlib.Path(file).name.split(".")[0]
                 try:
                     is_file_readable(file)
                 except NotReadableFile as exc:
