@@ -25,6 +25,7 @@ import {
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
+  USER_INFORMATION,
   USER_KNOWN_MEMBER_LIST,
   USER_LANG,
   USER_LOGIN,
@@ -219,7 +220,7 @@ export const getUserPublicInformation = userId => async dispatch => {
       },
       method: 'GET'
     },
-    actionName: USER,
+    actionName: USER_INFORMATION,
     dispatch
   })
 }

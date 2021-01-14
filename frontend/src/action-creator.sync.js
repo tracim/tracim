@@ -22,6 +22,7 @@ export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, 
 
 export const USER = 'User'
 export const LOGIN = 'Login'
+export const USER_INFORMATION = `${USER}/Information`
 export const USER_LOGIN = `${USER}/${LOGIN}`
 export const USER_LOGOUT = `${USER}/Logout`
 export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
