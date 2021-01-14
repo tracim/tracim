@@ -189,7 +189,7 @@ class LiveMessageTesterCommand(AppContextCommand):
         print("test message (id=-1) send to user {}".format(parsed_args.user_id))
 
 
-class CustomPropertiesTranslateTemplateCommand(AppContextCommand):
+class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
     """
     Tool to
     """

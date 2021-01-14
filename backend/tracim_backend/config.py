@@ -1300,11 +1300,11 @@ class CFG(object):
 
     def check_file_path_param(self, param_name: str, path: str, readable: bool = True,) -> None:
         """
-        Check if path exist, if it is a file is readable.
-        if check fail, raise ConfigurationError
+        Check if path exists, and if the file is readable if parameter readable is True.
+        if the check fails, raise ConfigurationError
         :param param_name: name of parameter to check
         :param path: path (value of parameter) which is check as a file path
-        :param readable: check if directory(according to path) is readable
+        :param readable: check if directory (according to path) is readable
         """
         try:
             is_file_exist(path)
@@ -1335,8 +1335,8 @@ class CFG(object):
         if check fail, raise ConfigurationError
         :param param_name: name of parameter to check
         :param path: path (value of parameter) which is check as a directory path
-        :param writable: check if directory(according to path) is readable
-        :param readable: check if directory(according to path) is writable
+        :param writable: check if directory(according to path) is writable
+        :param readable: check if directory(according to path) is readable
         """
         try:
             is_dir_exist(path)
