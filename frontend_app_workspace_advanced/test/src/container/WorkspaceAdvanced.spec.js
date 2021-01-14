@@ -11,30 +11,40 @@ import {
 } from '../../apiMock.js'
 import { debug } from '../../../src/debug.js'
 
-debug.config.apiUrl = 'http://unit.test:6543/api'
-
 describe('<WorkspaceAdvanced />', () => {
   const props = {
-    setApiUrl: () => { },
-    i18n: {},
-    registerCustomEventHandlerList: () => { },
-    registerLiveMessageHandlerList: () => { },
-    t: key => key
+    ...debug,
+    config: {
+      ...debug.config,
+      apiUrl: 'http://unit.test:6543/api'
+    },
+    content: {
+      workspace_id: workspace.workspace_id
+    }
   }
 
-  mockGetAppList200(debug.config.apiUrl, [])
-  mockGetWorkspaceDetail200(debug.config.apiUrl, workspace.workspace_id, workspace)
-  mockGetWorkspaceMember200(debug.config.apiUrl, workspace.workspace_id, false, [])
+  mockGetAppList200(props.config.apiUrl, [])
+  mockGetWorkspaceDetail200(props.config.apiUrl, workspace.workspace_id, workspace)
+  mockGetWorkspaceMember200(props.config.apiUrl, workspace.workspace_id, false, [])
+  mockGetSubscriptionRequestList200(props.config.apiUrl, workspace.workspace_id, [
+    { author: author },
+    { workspace: workspace, author: { ...author, user_id: 9 } }
+  ])
 
-  const wrapper = shallow(<WorkspaceAdvanced {...props} />)
+  const wrapper = shallow(
+    <WorkspaceAdvanced
+      setApiUrl={() => { }}
+      i18n={{}}
+      registerCustomEventHandlerList={() => { }}
+      registerLiveMessageHandlerList={() => { }}
+      t={key => key}
+      data={props}
+    />
+  )
 
   describe('its internal functions', () => {
     describe('loadSubscriptionRequestList', () => {
       it('should update subscriptionRequestList state', (done) => {
-        mockGetSubscriptionRequestList200(debug.config.apiUrl, workspace.workspace_id, [
-          { author: author },
-          { workspace: workspace, author: { ...author, user_id: 9 } }
-        ])
         wrapper.instance().loadSubscriptionRequestList().then(() => {
           expect(wrapper.state().subscriptionRequestList)
             .to.deep.equal([

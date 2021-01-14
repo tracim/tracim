@@ -8,7 +8,8 @@ export const debug = {
     faIcon: 'users',
     hexcolor: '#7d4e24',
     creationLabel: 'Create a space',
-    domContainer: 'appFeatureContainer'
+    domContainer: 'appFeatureContainer',
+    apiUrl: 'http://localhost:6543'
   },
   content: {}
 }

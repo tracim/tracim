@@ -3,11 +3,11 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { PopupCreateWorkspace } from '../../src/container/PopupCreateWorkspace.jsx'
 import { mockGetUserSpaces200 } from '../apiMock.js'
+import { debug } from '../../src/debug.js'
 
 describe('<PopupCreateWorkspace />', () => {
   const props = {
-    registerCustomEventHandlerList: () => { },
-    t: key => key,
+    ...debug,
     loggedUser: {
       userId: 5,
       username: 'JohnD',
@@ -18,8 +18,14 @@ describe('<PopupCreateWorkspace />', () => {
       lang: 'fr'
     }
   }
-  const apiUrl = 'http://localhost:6543'
-  const wrapper = shallow(<PopupCreateWorkspace {...props} />)
+  const apiUrl = debug.config.apiUrl
+  const wrapper = shallow(
+    <PopupCreateWorkspace
+      data={props}
+      t={key => key}
+      registerCustomEventHandlerList={() => { }}
+    />
+  )
 
   describe('internal functions', () => {
     describe('handleChangeNewName', () => {
@@ -67,7 +73,7 @@ describe('<PopupCreateWorkspace />', () => {
           mockGetUserSpaces200(apiUrl, props.loggedUser.userId, [])
           wrapper.instance().handleClickNextOrBack().then(() => {
             expect(wrapper.update().state('parentOptions')).to.deep.equal(
-              [{ value: props.t('None'), label: props.t('None'), spaceId: null, parentId: null }]
+              [{ value: 'None', label: 'None', spaceId: null, parentId: null }]
             )
           }).then(done, done)
         })
@@ -82,7 +88,7 @@ describe('<PopupCreateWorkspace />', () => {
           wrapper.instance().handleClickNextOrBack().then(() => {
             expect(wrapper.update().state('parentOptions')).to.deep.equal(
               [
-                { value: props.t('None'), label: props.t('None'), spaceId: null, parentId: null },
+                { value: 'None', label: 'None', spaceId: null, parentId: null },
                 { value: 'a', label: <span title='a'>{''} <i className='fa fa-fw fa-user-secret' /> {'a'}</span>, spaceId: 1, parentId: null },
                 { value: 'b', label: <span title='b'>{'-'} <i className='fa fa-fw fa-user-secret' /> {'b'}</span>, spaceId: 2, parentId: 1 },
                 { value: 'c', label: <span title='c'>{'--'} <i className='fa fa-fw fa-user-secret' /> {'c'}</span>, spaceId: 3, parentId: 2 }

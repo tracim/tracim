@@ -13,7 +13,7 @@ export const debug = {
     }
   },
   content: {
-    "workspaceList": [],
-    "userList": []
+    workspaceList: [],
+    userList: []
   }
 }
