@@ -1335,8 +1335,8 @@ class CFG(object):
         if check fail, raise ConfigurationError
         :param param_name: name of parameter to check
         :param path: path (value of parameter) which is check as a directory path
-        :param writable: check if directory(according to path) is readable
-        :param readable: check if directory(according to path) is writable
+        :param writable: check if directory(according to path) is writable
+        :param readable: check if directory(according to path) is readable
         """
         try:
             is_dir_exist(path)
