@@ -6,11 +6,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "echo 'Functional tests are not linted yet (see issue #3688)'",
-    "precypress-run": "yarn run reset-db",
-    "cypress-run": "yarn precypress-run && cypress run",
-    "precypress-open": "yarn run reset-db",
-    "cypress-open": "yarn precypress-open && npm-scripts/cypress-open",
-    "reset-db": "npm-scripts/reset-db",
+    "cypress-run": "cypress run",
+    "cypress-open": "cypress open",
     "travis-cypress-run": "npm-scripts/travis-cypress-run"
   },
   "keywords": [],
