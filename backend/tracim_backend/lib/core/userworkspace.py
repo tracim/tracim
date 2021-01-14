@@ -218,16 +218,16 @@ class RoleApi(object):
         Return the workspace ids that the current user and the given user_id are member of.
         """
         assert self._user
-        query = (
-            self._session.query(UserRoleInWorkspace.workspace_id)
-            .filter(UserRoleInWorkspace.user_id == self._user.user_id)
-            .intersect(
-                self._session.query(UserRoleInWorkspace.workspace_id).filter(
-                    UserRoleInWorkspace.user_id == user_id
-                )
-            )
+        user_workspaces_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
+            UserRoleInWorkspace.user_id == user_id
         )
-        return query.all()
+        current_user_workspaces_query = self._session.query(
+            UserRoleInWorkspace.workspace_id
+        ).filter(UserRoleInWorkspace.user_id == self._user.user_id)
+        common_workspaces_ids_query = user_workspaces_query.filter(
+            UserRoleInWorkspace.workspace_id.in_(current_user_workspaces_query)
+        )
+        return common_workspaces_ids_query.all()
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()
