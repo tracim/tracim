@@ -12,6 +12,7 @@ from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
@@ -60,6 +61,7 @@ from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import AuthoredContentRevisionsInfos
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
@@ -2209,3 +2211,10 @@ class ContentApi(object):
         ):
             return True
         return False
+
+    def get_authored_content_revisions_infos(self, user_id: int) -> AuthoredContentRevisionsInfos:
+        revision_count = func.count(ContentRevisionRO.revision_id)
+        workspace_count = func.count(ContentRevisionRO.workspace_id.distinct())
+        query = self._session.query(revision_count, workspace_count)
+        infos = query.filter(ContentRevisionRO.owner_id == user_id).one()
+        return AuthoredContentRevisionsInfos(infos[0], infos[1])
