@@ -1,24 +1,16 @@
 ---
 env:
   global:
-    - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
-    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://user:secret@127.0.0.1:3306/tracim_test
-    - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
     - COVERAGE=0
     - PSERVE_LOG=/tmp/pserve_log.log
-    - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
-    - TRACIM_DEPOT_STORAGE_NAME=test
-    - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
+    - TRACIM_UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH=/tmp/test/depot
     - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
     - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
     - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
     - TRACIM_SESSION__LOCK_DIR=/tmp/test/sessions/lock
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
-    - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
-    - TEST_PUSHPIN_FILE_PATH=$TRAVIS_BUILD_DIR/backend/pushpin_test.conf
-    - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
     # generated using the guide at https://docs.travis-ci.com/user/encryption-keys/
     - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
@@ -45,15 +37,13 @@ _install_backend: &_install_backend
         - docker-ce
         - docker-compose
         - libimage-exiftool-perl
-  services:
-    - redis
-  before_install:
+  before_install: &before_install_backend
     # INFO - G.M - 2019-05-02 - some useful debug information
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - echo "$TRACIM_SQLALCHEMY__URL"
     - python $TRAVIS_BUILD_DIR/python_sqlite_info.py
-    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
+    - mkdir -p $TRACIM_UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH
     - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
     - mkdir -p $TRACIM_SESSION__DATA_DIR
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
@@ -69,46 +59,16 @@ _install_backend: &_install_backend
     - pip install -r "requirements.txt"
     - pip install -r "requirements-test.txt"
     - pip install -r "requirements-storage-s3.txt"
-    # postgresql
-    - |
-      if [ "${DB}" == "postgres" ]; then
-        docker pull postgres:9.6
-        docker run -d -p 5432:5432 --name postgres -e POSTGRES_DB=tracim_test -e POSTGRES_USER=user -e POSTGRES_PASSWORD=secret postgres:9.6
-        pip install -r "requirements-db-postgres.txt"
-      fi
-    # mysql 8+
-    - |
-      if [ "${DB}" == "mysql" ]; then
-        docker pull mysql:8.0
-        docker run -d -p 3306:3306 --name mysqld -e MYSQL_DATABASE=tracim_test -e MYSQL_USER=user -e MYSQL_PASSWORD=secret -e MYSQL_RANDOM_ROOT_PASSWORD=true --tmpfs /var/lib/mysql mysql:8.0
-        pip install -r "requirements-db-mysql.txt"
-      fi
-    # mariadb 10.3
-    - |
-      if [ "${DB}" == "mariadb" ]; then
-        docker pull mariadb/server:10.3
-        docker run -d -p 3306:3306 --name mariadbd -e MARIADB_DATABASE=tracim_test -e MARIADB_USER=user -e MARIADB_PASSWORD=secret -e MARIADB_RANDOM_ROOT_PASSWORD=true mariadb/server:10.3
-        pip install -r "requirements-db-mysql.txt"
-      fi
-    # sqlite : do nothing
-    - pip install -e "."
-    - cd $TRAVIS_BUILD_DIR
-  after_install:
-    - docker logout
-  before_script:
-    - docker pull mailhog/mailhog
-    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-    - docker pull rroemhild/test-openldap
-    - docker run -d -p 3890:389 rroemhild/test-openldap
-    - cd $TRAVIS_BUILD_DIR/backend
-    - docker-compose pull
-    - docker-compose up -d minio elasticsearch
-    - cd $TRAVIS_BUILD_DIR
+    - pip install -r "requirements-db-postgres.txt"
+    - pip install -r "requirements-db-mysql.txt"
     # using old version of pytest-cov to avoid
     # version conflict with python-coveralls
     # see https://github.com/z4r/python-coveralls/issues/66
     - sh -c "if [ '$COVERAGE' = '1' ]; then pip install \"pytest-cov<2.6\" \"python-coveralls\"; fi"
-
+    - pip install -e "."
+    - cd $TRAVIS_BUILD_DIR
+  after_script:
+    - docker logout
 
 _install_full_tracim: &_install_full_tracim
   <<: *_install_backend
@@ -116,8 +76,9 @@ _install_full_tracim: &_install_full_tracim
     # setup backend for running
     - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE -d
-    - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
+    - cp development.ini.sample development.ini
+    - tracimcli db init -d
+    - alembic -c development.ini stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh
@@ -131,16 +92,22 @@ _backend_quick_test: &_backend_quick_test
     apt:
       packages:
         - libimage-exiftool-perl
-  services:
-    - redis-server
   before_script:
+    - cd $TRAVIS_BUILD_DIR/backend
+    # quick tests need redis to run (!!)
+    - docker-compose up -d redis
   script:
-    - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
+    - pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
 
 _backend_test: &_backend_test
   <<: *_install_backend
+  before_script:
+    - cd $TRAVIS_BUILD_DIR/backend
+    - docker-compose up -d
+    # NOTE - S.G - 2021-01-08 - need to sleep to wait for database (especially mysql)
+    - sleep 2
   script:
-    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest backend --cov=backend; else pytest backend; fi"
+    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
 
 
 jobs:
@@ -195,7 +162,6 @@ jobs:
       env:
         - DB=sqlite
         - COVERAGE=1
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
       after_success:
         - cd $TRAVIS_BUILD_DIR
         - cat .coverage
@@ -204,20 +170,17 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=postgres
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_POSTGRES_SQLALCHEMY__URL
+        - DB=postgresql
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
       env:
         - DB=mysql
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
       env:
         - DB=mariadb
-        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
       if: commit_message !~ /(\[skip ci pytest\])/
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
     - stage: frontend
@@ -236,18 +199,10 @@ jobs:
       name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
-        - DB=sqlite;
-        - TRACIM_SQLALCHEMY__URL=sqlite:////tmp/tracim_cypress.sqlite
-        - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
+        - NO_VIRTUAL_ENV="1"
       script:
-        - cd $TRAVIS_BUILD_DIR/backend
-        - PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
-        - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
-        - nohup tracimcli caldav start &
-        - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - yarn run travis-cypress-run
-        - cd $TRAVIS_BUILD_DIR
+        - ./run_dev_backend.sh cypress run
       if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:

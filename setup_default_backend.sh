@@ -36,7 +36,7 @@ function create_dir(){
 function install_backend_system_dep {
     log "install base debian-packaged-dep for backend..."
     $SUDO apt update
-    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip redis-server zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
+    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
     $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 

@@ -2,7 +2,6 @@ import logging
 import os
 from os.path import basename
 from os.path import dirname
-import shutil
 import subprocess
 import typing
 
@@ -38,10 +37,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
-from tracim_backend.tests.utils import TEST_PUSHPIN_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
-from tracim_backend.tests.utils import DockerCompose
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
@@ -57,31 +54,22 @@ from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import tracim_plugin_loader
 
-
-@pytest.fixture
-def pushpin_config_file():
-    return TEST_PUSHPIN_FILE_PATH
+DATABASE_URLS = {
+    "sqlite": "sqlite:////tmp/tracim.sqlite",
+    "mysql": "mysql+pymysql://user:secret@127.0.0.1:3306/tracim_test",
+    "mariadb": "mysql+pymysql://user:secret@127.0.0.1:3307/tracim_test",
+    "postgresql": "postgresql://user:secret@127.0.0.1:5432/tracim_test?client_encoding=utf8",
+}
 
 
 @pytest.fixture
 def pushpin(tracim_webserver, tmp_path_factory):
-    pushpin_config_dir = str(tmp_path_factory.mktemp("pushpin"))
-    my_dir = dirname(__file__)
-    shutil.copyfile(
-        os.path.join(my_dir, "pushpin.conf"), os.path.join(pushpin_config_dir, "pushpin.conf"),
-    )
-    with open(os.path.join(pushpin_config_dir, "routes"), "w") as routes:
-        routes.write("* {}:{}\n".format(tracim_webserver.hostname, tracim_webserver.port))
-    compose = DockerCompose()
-    compose.up("pushpin", env={"PUSHPIN_CONFIG_DIR": pushpin_config_dir})
     while True:
         try:
             requests.get("http://localhost:7999")
             break
         except requests.exceptions.ConnectionError:
             pass
-    yield compose
-    compose.down()
 
 
 @pytest.fixture
@@ -112,19 +100,28 @@ def rq_database_worker(config_uri, app_config):
 def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTestServer:
     config_filename = basename(config_uri)
     config_dir = dirname(config_uri)
-
-    with PyramidTestServer(
-        config_filename=config_filename,
-        config_dir=config_dir,
-        extra_config_vars={"app:main": settings},
-        hostname="127.0.0.1",
-    ) as server:
-        # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
-        # will check hostname:port to verify if test server
-        # is correctly runned. So server run check can take forever and fail if for some reason,
-        # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
-        server.start()
-        yield server
+    try:
+        with PyramidTestServer(
+            config_filename=config_filename,
+            config_dir=config_dir,
+            extra_config_vars={"app:main": settings},
+            hostname="127.0.0.1",
+            # NOTE SG 2020-12-22: this port MUST be the same as the one defined in
+            # backend/pushpin_config/routes file
+            port=6543,
+        ) as server:
+            # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
+            # will check hostname:port to verify if test server
+            # is correctly runned. So server run check can take forever and fail if for some reason,
+            # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
+            # See Github issue https://github.com/tracim/tracim/issues/4050
+            server.start()
+            yield server
+    except Exception:
+        raise Exception(
+            "The Tracim test server didn't start, please check that your "
+            "local hostname (as returned by 'hostname') resolves to '127.0.0.1'"
+        )
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -147,9 +144,11 @@ def config_section(request) -> str:
 
 
 @pytest.fixture
-def settings(config_uri, config_section):
+def settings(config_uri, config_section, sqlalchemy_database):
     _settings = plaster.get_settings(config_uri, config_section)
     _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
+    os.environ["TRACIM_SQLALCHEMY__URL"] = DATABASE_URLS[sqlalchemy_database]
+    _settings["sqlalchemy.url"] = DATABASE_URLS[sqlalchemy_database]
     return _settings
 
 
@@ -209,7 +208,7 @@ def engine(config, app_config):
         isolation_level = "SERIALIZABLE"
     else:
         isolation_level = "READ_COMMITTED"
-    engine = get_engine(app_config, isolation_level=isolation_level)
+    engine = get_engine(app_config, isolation_level=isolation_level, pool_pre_ping=True)
     yield engine
     engine.dispose()
 
@@ -260,7 +259,6 @@ def test_context(app_config, session_factory):
 @pytest.fixture
 def session(request, engine, session_factory, app_config, test_logger, test_context):
     context = test_context
-
     with transaction.manager:
         try:
             DeclarativeBase.metadata.drop_all(engine)
