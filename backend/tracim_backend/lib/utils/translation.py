@@ -117,17 +117,12 @@ class Translator(object):
         """
         Return translation according to lang
         """
-        if not source:
-            source = self.default_source
-        if not lang:
-            lang = self.default_lang
-        if lang != self.fallback_lang:
-            new_trad, trad_found = self._get_translation(lang, message, source=source)
-            if trad_found:
-                return new_trad
-        new_trad, trad_found = self._get_translation(self.fallback_lang, message, source=source)
-        if trad_found:
-            return new_trad
+        source = source or self.default_source
+        lang = lang or self.default_lang
+        for l in (lang, self.fallback_lang):
+            translated_message, translation_found = self._get_translation(l, message, source=source)
+            if translation_found:
+                return translated_message
         return message
 
 
