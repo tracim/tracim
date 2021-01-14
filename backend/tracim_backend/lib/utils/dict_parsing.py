@@ -106,7 +106,7 @@ def translate_list(
 
 def get_translation_key_from_dict(data: dict, keys_to_check: typing.List[str]):
     """
-    Utils method to allow generate translation file more easily
+    Utility method to ease the generation of translation files
     :param data: original dict
     :param keys_to_check: keys value to check for getting translation key
     """

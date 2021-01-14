@@ -189,7 +189,7 @@ class LiveMessageTesterCommand(AppContextCommand):
         print("test message (id=-1) send to user {}".format(parsed_args.user_id))
 
 
-class CustomPropertiesTranslateTemplateCommand(AppContextCommand):
+class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
     """
     Tool to
     """
@@ -205,5 +205,5 @@ class CustomPropertiesTranslateTemplateCommand(AppContextCommand):
         custom_properties_api = UserCustomPropertiesApi(
             current_user=None, app_config=self._app_config, session=self._session
         )
-        # TODO - G.M - 2019-01-12 - Return valid json here (using external library ?)
+        # TODO - G.M - 2021-01-12 - Return valid json here (using external library ?)
         pprint.pprint(custom_properties_api.get_translation_template())

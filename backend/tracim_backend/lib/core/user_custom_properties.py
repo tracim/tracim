@@ -18,11 +18,11 @@ from tracim_backend.models.user_custom_properties import UserCustomProperties
 # JSONSchema field useful to be translated.
 # note: enumNames is not standard but supported
 # see: https://react-jsonschema-form.readthedocs.io/en/latest/usage/single/#custom-labels-for-enum-fields
-JSON_SCHEMA_KEYS_TO_TRANSLATE = ["enumNames", "title", "description"]
+JSON_SCHEMA_KEYS_TO_TRANSLATE = ("enumNames", "title", "description")
 # INFO - G.M - 2020-01-11 - UISchema field useful to be translated
 # see https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/
-UI_SCHEMA_KEYS_TO_TRANSLATE = ["title", "description", "placeholder", "help"]
-UI_SCHEMA_KEYS_TO_TRANSLATE += ["ui:{}".format(key) for key in UI_SCHEMA_KEYS_TO_TRANSLATE]
+UI_SCHEMA_KEYS_TO_TRANSLATE = ("title", "description", "placeholder", "help")
+UI_SCHEMA_KEYS_TO_TRANSLATE += tuple("ui:{}".format(key) for key in UI_SCHEMA_KEYS_TO_TRANSLATE)
 
 
 class UserCustomPropertiesApi:
@@ -67,14 +67,14 @@ class UserCustomPropertiesApi:
         self._session.flush()
         return custom_properties
 
-    def get_json_schema(self) -> typing.Dict:
+    def get_json_schema(self) -> typing.Dict[str, typing.Any]:
         return translate_dict(
             self._config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA,
             keys_to_check=JSON_SCHEMA_KEYS_TO_TRANSLATE,
             translation_method=self._translator.get_translation,
         )
 
-    def get_ui_schema(self) -> typing.Dict:
+    def get_ui_schema(self) -> typing.Dict[str, typing.Any]:
         return translate_dict(
             self._config.USER__CUSTOM_PROPERTIES__UI_SCHEMA,
             keys_to_check=UI_SCHEMA_KEYS_TO_TRANSLATE,
