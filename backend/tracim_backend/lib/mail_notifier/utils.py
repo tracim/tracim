@@ -98,6 +98,9 @@ class EmailAddress(object):
 
 
 class EmailNotificationMessage(MIMEMultipart):
+
+    MSG_ID_IDSTRING = None
+
     def __init__(
         self,
         subject: str,
@@ -109,7 +112,7 @@ class EmailNotificationMessage(MIMEMultipart):
         references: typing.Optional[EmailAddress] = None,
     ):
         super().__init__("alternative")
-        self["Message-ID"] = make_msgid(domain=from_header.domain)
+        self["Message-ID"] = make_msgid(idstring=self.MSG_ID_IDSTRING, domain=from_header.domain)
         self["Date"] = formatdate()
         self["Content-Language"] = lang
         self["From"] = from_header.address

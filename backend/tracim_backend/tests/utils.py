@@ -12,7 +12,6 @@ from unittest import mock
 
 from PIL import Image
 import requests
-from requests import Response
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.session import sessionmaker
 import transaction
@@ -223,14 +222,27 @@ class MailHogHelper(object):
 
     MAILHOG_BASE_URL = "http://127.0.0.1:8025"
     MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
+    HEADER_NAME = "X-TracimTest"
 
-    def cleanup_mailhog(self) -> Response:
-        return requests.delete("{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT))
+    def __init__(self, unique_name: str) -> None:
+        self.unique_name = unique_name
+
+    def cleanup_mailhog(self) -> None:
+        for mail in self.get_mailhog_mails():
+            requests.delete(
+                "{}{}/{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT, mail["ID"])
+            )
 
     def get_mailhog_mails(self) -> typing.List[typing.Any]:
-        return requests.get(
+        mails = requests.get(
             "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
         ).json()
+        unique_name_mails = []
+        for mail in mails:
+            headers = mail["Content"]["Headers"]
+            if any(self.unique_name in mid for mid in headers.get("Message-ID", [])):
+                unique_name_mails.append(mail)
+        return unique_name_mails
 
 
 class ElasticSearchHelper(object):

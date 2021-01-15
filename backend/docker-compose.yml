@@ -33,9 +33,9 @@ services:
       - "1025:1025"
       - "8025:8025"
   openldap:
-    image: rroemhild/test-openldap:1.1
+    image: rroemhild/test-openldap:2.0
     ports:
-      - "3890:389"
+      - "3890:10389"
   postgresql:
     image: postgres:9.6
     ports:

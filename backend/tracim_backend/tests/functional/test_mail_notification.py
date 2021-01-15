@@ -41,7 +41,7 @@ class TestEmailSender(object):
         sender.connect()
         sender.disconnect()
 
-    def test__func__send_email__ok__nominal_case(self, app_config, mailhog):
+    def test__func__send_email__ok__nominal_case(self, app_config, mailhog, unique_name):
         smtp_config = SmtpConfiguration(
             app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
@@ -57,6 +57,7 @@ class TestEmailSender(object):
         msg["Subject"] = "test__func__send_email__ok__nominal_case"
         msg["From"] = "test_send_mail@localhost"
         msg["To"] = "receiver_test_send_mail@localhost"
+        msg["Message-ID"] = unique_name
         text = "test__func__send_email__ok__nominal_case"
         html = """\
         <html>

@@ -3,6 +3,8 @@ import os
 import pathlib
 import subprocess
 import typing
+import unittest.mock
+import urllib.parse
 
 from depot.manager import DepotManager
 import plaster
@@ -83,6 +85,15 @@ def wait_for_url(url):
             pass
 
 
+def quit_process(process: subprocess.Popen, name: str, max_wait: float = 5.0) -> None:
+    process.terminate()
+    try:
+        process.wait(max_wait)
+    except TimeoutError as exc:
+        process.kill()
+        raise TimeoutError("{} didn't shut down properly, had to kill it".format(name)) from exc
+
+
 def create_database(url) -> None:
     """
     Create the database for server-based DB
@@ -160,13 +171,7 @@ def rq_database_worker(config_uri, app_config):
 
     yield worker_process
     empty_event_queues()
-    worker_process.terminate()
-    try:
-        worker_process.wait(5.0)
-    except TimeoutError:
-        worker_process.kill()
-        raise TimeoutError("rq worker didn't shut down properly, had to kill it")
-
+    quit_process(worker_process, "rq worker")
 
 @pytest.fixture
 def tracim_webserver(
@@ -206,12 +211,7 @@ def tracim_webserver(
     )
     wait_for_url("http://{}".format(listen))
     yield server_process
-    server_process.terminate()
-    try:
-        server_process.wait(5.0)
-    except TimeoutError:
-        server_process.kill()
-        raise TimeoutError("tracim webserver didn't shut down properly, had to kill it")
+    quit_process(server_process, "tracim webserver")
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -549,10 +549,14 @@ def test_logger() -> None:
 
 
 @pytest.fixture
-def mailhog() -> MailHogHelper:
-    mailhog_helper = MailHogHelper()
+def mailhog(unique_name: str) -> MailHogHelper:
+    mailhog_helper = MailHogHelper(unique_name)
     mailhog_helper.cleanup_mailhog()
-    yield mailhog_helper
+    with unittest.mock.patch(
+        "tracim_backend.lib.mail_notifier.utils.EmailNotificationMessage.MSG_ID_IDSTRING",
+        new=unique_name,
+    ):
+        yield mailhog_helper
     mailhog_helper.cleanup_mailhog()
 
 
