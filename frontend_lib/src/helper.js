@@ -693,6 +693,6 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
       }))
     default:
       console.error('Error getting breadcrumbs data', fetchGetContentPath)
-      throw new Error('')
+      throw new Error('Error getting breadcrumbs data')
   }
 }
