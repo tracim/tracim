@@ -1,0 +1,17 @@
+# Optional services for testing/developing Tracim backend.
+# Those aren't currently needed by the automated tests.
+# WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
+# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
+version: '3'
+services:
+  collabora:
+    image: collabora/code:4.2.6.2
+    network_mode: host
+    environment:
+      SLEEPFORDEBUGGER: "0"
+      extra_params: "--o:ssl.enable=false"
+      # Still need to put a combination of server_name and domain for this container to work
+      # domain: <real IP> with \\., e.g. 192\\.168\\.1\\.1
+      # server_name: http://192.168.1.1:6543
+    cap_add:
+      - MKNOD

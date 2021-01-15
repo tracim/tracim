@@ -38,7 +38,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import knows_candidate_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -51,6 +51,7 @@ from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
@@ -62,7 +63,6 @@ from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import PublicUserProfileSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetConfigSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -973,12 +973,10 @@ class UserController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(knows_candidate_user)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(PublicUserProfileSchema())
-    def public_profile(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> PublicUserProfileSchema:
+    @hapic.output_body(AboutUserSchema())
+    def about_user(self, context, request: TracimRequest, hapic_data: HapicData) -> AboutUserSchema:
         """
         Return public user profile.
         """
@@ -986,7 +984,7 @@ class UserController(Controller):
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        return user_api.get_public_user_profile(hapic_data.path["user_id"])
+        return user_api.get_about_user(hapic_data.path["user_id"])
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -1261,8 +1259,6 @@ class UserController(Controller):
         configurator.add_view(self.followers, route_name="followers")
 
         configurator.add_route(
-            "public_profile",
-            "/users/{user_id:\d+}/public_profile",
-            request_method="GET",  # noqa: W605
+            "about_user", "/users/{user_id:\d+}/about", request_method="GET",  # noqa: W605
         )
-        configurator.add_view(self.public_profile, route_name="public_profile")
+        configurator.add_view(self.about_user, route_name="about_user")

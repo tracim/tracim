@@ -6,15 +6,21 @@ describe('logging in tracim', function () {
     cy.setupBaseDB()
   })
 
-  beforeEach(function () {
-    cy.loginAs('users')
+  it('redirects to the home page when the user is not a member of any workspace', function () {
+    cy.loginAs('administrators')
+    cy.createRandomUser().then(user => cy.login(user))
     cy.visit('/ui')
-  })
-
-  it('Checks information in home page', function () {
     cy.get('.homepagecard__title')
     cy.get('[data-cy=avatar]')
     cy.contains(GREETING_MSG)
     cy.get('.homepagecard.card').should('be.visible')
+    cy.url().should('not.include', '/ui/activity-feed')
+  })
+
+  it('redirects to the activity feed when the user is a member of a workspace', function () {
+    cy.loginAs('users')
+    cy.visit('/ui')
+    cy.url().should('include', '/ui/activity-feed')
+    cy.contains('Activity feed')
   })
 })

@@ -1,3 +1,8 @@
+# Easy startup of Tracim backend services needed for testing with pytest.
+# Also useful for local development.
+# By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR).
+# WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
+# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
 version: '3'
 services:
   pushpin:
@@ -10,7 +15,6 @@ services:
     ports:
       - "9000:9000"
     environment:
-      # default values for testing, change this if used for production!!
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     command: server /data
@@ -22,3 +26,46 @@ services:
     environment:
       discovery.type: single-node
       cluster.routing.allocation.disk.threshold_enabled: "false"
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  openldap:
+    image: rroemhild/test-openldap:1.1
+    ports:
+      - "3890:389"
+  postgresql:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
+    tmpfs:
+      - ${TMPFS_DIR}
+  mariadb:
+    image: mariadb/server:10.3
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_DATABASE: ${DATABASE_NAME}
+      MARIADB_USER: user
+      MARIADB_PASSWORD: secret
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    tmpfs:
+      - ${TMPFS_DIR}
+  redis:
+    image: redis:alpine3.12
+    ports:
+      - "6379:6379"

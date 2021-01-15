@@ -62,13 +62,14 @@ from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import PublicUserProfile
+from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.mention import ALL__GROUP_MENTIONS
@@ -737,10 +738,10 @@ class UserApi(object):
 
     def _check_email_correctness(self, email: str) -> bool:
         """
-           Verify if given email is correct:
-           - check format
-           - futur active check for email ? (dns based ?)
-           """
+        Verify if given email is correct:
+        - check format
+        - futur active check for email ? (dns based ?)
+        """
         # TODO - G.M - 2018-07-05 - find a better way to check email
         if not email:
             return False
@@ -1206,8 +1207,23 @@ class UserApi(object):
     def get_leaders_count(self, user_id: int) -> int:
         return self._session.query(UserFollower).filter(UserFollower.follower_id == user_id).count()
 
-    def get_public_user_profile(self, user_id: int) -> PublicUserProfile:
+    def get_about_user(self, user_id: int) -> AboutUser:
+        """
+        Return general user informations.
+        """
         followers_count = self.get_followers_count(user_id)
-        following_count = self.get_leaders_count(user_id)
+        leaders_count = self.get_leaders_count(user_id)
+        user = self.get_one(user_id)
 
-        return PublicUserProfile(followers_count=followers_count, following_count=following_count)
+        content_revisions_infos = ContentApi(
+            self._session, self._user, self._config
+        ).get_authored_content_revisions_infos(user_id)
+
+        return AboutUser(
+            public_name=user.public_name,
+            username=user.username,
+            followers_count=followers_count,
+            leaders_count=leaders_count,
+            authored_content_revisions_count=content_revisions_infos.count,
+            authored_content_revisions_space_count=content_revisions_infos.space_count,
+        )

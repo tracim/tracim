@@ -14,8 +14,10 @@ from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
@@ -185,7 +187,7 @@ class ContentTypeCreationChecker(AuthorizationChecker):
     """
 
     def __init__(
-        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None
+        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None,
     ):
         """
         :param content_type_slug: force to check a content_type, if not provided,
@@ -219,7 +221,7 @@ class CommentOwnerChecker(AuthorizationChecker):
             return True
         raise UserIsNotContentOwner(
             "user {} is not owner of comment  {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_comment.content_id
+                tracim_context.current_user.user_id, tracim_context.current_comment.content_id,
             )
         )
 
@@ -260,6 +262,31 @@ class AndAuthorizationChecker(AuthorizationChecker):
         return True
 
 
+class KnowsCandidateUserChecker(AuthorizationChecker):
+    """
+    Check that the current user knows the candidate user.
+
+    A user "knows" another when either of the following condition is true:
+      - KNOWN_MEMBERS__FILTER is False
+      - the user ids are the same (captain obvious inside)
+      - current and candidate user are member of at least one common space
+    """
+
+    def check(self, tracim_context: TracimContext) -> bool:
+        role_api = RoleApi(
+            tracim_context.dbsession, tracim_context.current_user, tracim_context.app_config,
+        )
+        if (
+            tracim_context.app_config.KNOWN_MEMBERS__FILTER
+            and tracim_context.candidate_user.user_id != tracim_context.current_user.user_id
+            and not role_api.get_common_workspace_ids(tracim_context.candidate_user.user_id)
+        ):
+            raise UserDoesNotExist(
+                "User {} not found or not known".format(tracim_context.candidate_user.user_id)
+            )
+        return True
+
+
 # Useful Authorization Checker
 # profile
 is_administrator = ProfileChecker(Profile.ADMIN)
@@ -274,6 +301,8 @@ is_current_content_contributor = CurrentContentRoleChecker(WorkspaceRoles.CONTRI
 is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
 has_personal_access = OrAuthorizationChecker(SameUserChecker(), is_administrator)
+# knows candidate user
+knows_candidate_user = KnowsCandidateUserChecker()
 # workspace
 can_see_workspace_information = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_reader, is_user)
@@ -287,7 +316,7 @@ can_delete_workspace = OrAuthorizationChecker(
 )
 # content
 can_move_content = AndAuthorizationChecker(
-    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level),
 )
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments

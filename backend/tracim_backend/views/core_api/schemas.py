@@ -1756,16 +1756,28 @@ class DeleteFollowedUserPathSchema(UserIdPathSchema):
     )
 
 
-class PublicUserProfileSchema(marshmallow.Schema):
+class AboutUserSchema(UserDigestSchema):
     followers_count = marshmallow.fields.Int(
         example=42,
         required=True,
         description="count of users following this user",
         validate=positive_int_validator,
     )
-    following_count = marshmallow.fields.Int(
+    leaders_count = marshmallow.fields.Int(
         example=42,
         required=True,
         description="count of users followed by this user",
+        validate=positive_int_validator,
+    )
+    authored_content_revisions_count = marshmallow.fields.Int(
+        example=23,
+        required=True,
+        description="count of revisions whose author is this user",
+        validate=positive_int_validator,
+    )
+    authored_content_revisions_space_count = marshmallow.fields.Int(
+        example=12,
+        required=True,
+        description="count of spaces where this user authored at least one content revision",
         validate=positive_int_validator,
     )
