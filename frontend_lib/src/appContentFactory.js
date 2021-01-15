@@ -66,7 +66,6 @@ export function appContentFactory (WrappedComponent) {
         // content.content_type is not defined there. I don't know if it is
         // called from elsewhere, but content.content_type might always be
         // undefined here https://github.com/tracim/tracim/issues/3742#issuecomment-759317358
-        // https://github.com/tracim/tracim/issues/3742#issuecomment-759317358
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type || content.type),
           data: newContent
