@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'collaborative_document_edition.app.js' : 'collaborative_document_edition.app.standalone.js',
+    filename: 'collaborative_document_edition.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appCollaborativeDocumentEdition',
     libraryTarget: isProduction ? 'var' : undefined

@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'file.app.js' : 'file.app.standalone.js',
+    filename: 'file.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appFile',
     libraryTarget: isProduction ? 'var' : undefined
