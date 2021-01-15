@@ -7,7 +7,7 @@ from jsonschema import ValidationError
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import TracimValidationFailed
-from tracim_backend.lib.utils.dict_parsing import get_translation_key_from_dict
+from tracim_backend.lib.utils.dict_parsing import extract_translation_keys_from_dict
 from tracim_backend.lib.utils.dict_parsing import translate_dict
 from tracim_backend.lib.utils.translation import TranslationSource
 from tracim_backend.lib.utils.translation import Translator
@@ -85,11 +85,11 @@ class UserCustomPropertiesApi:
         """
         Get translation template for current user custom properties
         """
-        ui_translation_dict = get_translation_key_from_dict(
+        ui_translation_dict = extract_translation_keys_from_dict(
             self._config.USER__CUSTOM_PROPERTIES__UI_SCHEMA,
             keys_to_check=UI_SCHEMA_KEYS_TO_TRANSLATE,
         )
-        json_translation_dict = get_translation_key_from_dict(
+        json_translation_dict = extract_translation_keys_from_dict(
             self._config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA,
             keys_to_check=JSON_SCHEMA_KEYS_TO_TRANSLATE,
         )

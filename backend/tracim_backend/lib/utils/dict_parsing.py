@@ -104,7 +104,7 @@ def translate_list(
     return result
 
 
-def get_translation_key_from_dict(data: dict, keys_to_check: typing.List[str]):
+def extract_translation_keys_from_dict(data: dict, keys_to_check: typing.List[str]):
     """
     Utility method to ease the generation of translation files
     :param data: original dict

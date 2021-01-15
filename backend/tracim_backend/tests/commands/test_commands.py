@@ -45,19 +45,30 @@ class TestCommandsList(object):
         output = subprocess.check_output(["tracimcli", "-h"])
         output = output.decode("utf-8")
 
+        # user
         assert output.find("user create") > 0
         assert output.find("user update") > 0
+        assert output.find("user delete") > 0
+        assert output.find("user update") > 0
+        # db
         assert output.find("db init") > 0
         assert output.find("db delete") > 0
-        assert output.find("webdav start") > 0
-        assert output.find("caldav start") > 0
-        assert output.find("caldav sync") > 0
+        assert output.find("db update-naming-conventions") > 0
+        # search
         assert output.find("search index-create") > 0
         assert output.find("search index-populate") > 0
         assert output.find("search index-upgrade-experimental") > 0
         assert output.find("search index-drop") > 0
+        # webdav
+        assert output.find("webdav start") > 0
+        # caldav
+        assert output.find("caldav start") > 0
+        assert output.find("caldav sync") > 0
+        #
         assert output.find("dev parameters list") > 0
         assert output.find("dev parameters value") > 0
+        assert output.find("dev test live-messages") > 0
+        assert output.find("dev custom-properties translate template") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
