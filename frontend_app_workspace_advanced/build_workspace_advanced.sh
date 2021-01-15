@@ -18,6 +18,7 @@ function loggood {
 
 function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
+    exit 1
 }
 
 
