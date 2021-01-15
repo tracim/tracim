@@ -842,10 +842,8 @@ class UserController(Controller):
         config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
-    # FIXME - G.M - 2021-01-13 - Permission should be adapted to be visible to only know_user
-    # THIS should be done as soon as #4027 is merged
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
-    @check_right(has_personal_access)
+    @check_right(knows_candidate_user)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserConfigSchema())
     def get_user_custom_properties(
