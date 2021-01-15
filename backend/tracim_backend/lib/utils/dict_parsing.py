@@ -39,8 +39,14 @@ def validate_simple_dict(dict_: typing.Dict) -> None:
         )
 
 
+def convert_if_string(value: typing.Any, translation_method) -> typing.Any:
+    if isinstance(value, str):
+        return translation_method(value)
+    return value
+
+
 def translate_dict(
-    data: dict, keys_to_check: typing.List[str], translation_method: typing.Callable
+    data: dict, keys_to_check: typing.List[str], translation_method: typing.Callable[[str], str]
 ) -> dict:
     """
     Regenerate similar dict but
@@ -54,57 +60,28 @@ def translate_dict(
     """
     result = {}
     for key, value in data.items():
-        if isinstance(value, str) and key in keys_to_check:
-            result[key] = translation_method(value)
-        elif isinstance(value, dict):
-            result[key] = translate_dict(
+        new_value = value
+        if isinstance(value, dict):
+            new_value = translate_dict(
                 data=value, keys_to_check=keys_to_check, translation_method=translation_method,
             )
         elif isinstance(value, list):
-            result[key] = translate_list(
-                data=value,
-                keys_to_check=keys_to_check,
-                translation_method=translation_method,
-                key=key,
-            )
-        else:
-            result[key] = value
+            if key in keys_to_check:
+                new_value = [convert_if_string(v, translation_method) for v in value]
+            else:
+                new_value = []
+                for v in value:
+                    if isinstance(v, dict):
+                        new_value.append(translate_dict(v, keys_to_check, translation_method))
+                    else:
+                        new_value.append(v)
+        elif key in keys_to_check:
+            new_value = convert_if_string(value, translation_method)
+        result[key] = new_value
     return result
 
 
-def translate_list(
-    data: list,
-    keys_to_check: typing.List[str],
-    translation_method: typing.Callable,
-    key: str = None,
-) -> typing.List:
-    """
-    Regenerate similar list but
-    replace "key: string_value" pair
-    by "key: translation_method(value)" pair
-    recursively
-    :param data: original list
-    :param keys_to_check: keys value to check for applying translation method
-    :param translation_method: method to run for translation of key
-    :param key
-    :return: translated list
-    """
-    result = []
-    for value in data:
-        if isinstance(value, str) and key in keys_to_check:
-            result.append(translation_method(value))
-        elif isinstance(value, dict):
-            result.append(
-                translate_dict(
-                    data=value, keys_to_check=keys_to_check, translation_method=translation_method
-                )
-            )
-        else:
-            result.append(value)
-    return result
-
-
-def extract_translation_keys_from_dict(data: dict, keys_to_check: typing.List[str]):
+def extract_translation_keys_from_dict(data: dict, keys_to_check: typing.List[str]) -> dict:
     """
     Utility method to ease the generation of translation files
     :param data: original dict
@@ -113,8 +90,9 @@ def extract_translation_keys_from_dict(data: dict, keys_to_check: typing.List[st
     """
     translation_dict = {}
 
-    def provision_translation_dict(value: str):
+    def provision_translation_dict(value: str) -> str:
         translation_dict[value] = ""
+        return value
 
     translate_dict(data, keys_to_check, provision_translation_dict)
 
