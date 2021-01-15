@@ -191,7 +191,7 @@ class LiveMessageTesterCommand(AppContextCommand):
 
 class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
     """
-    Tool to
+    Tool to generate a json usable as template for translation of loaded user custom properties
     """
 
     def get_description(self) -> str:
