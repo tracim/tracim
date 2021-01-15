@@ -40,6 +40,13 @@ export class PublicProfile extends React.Component {
     this.getUser()
   }
 
+  componentDidUpdate () {
+    const { props, state } = this
+    if (state.displayedUser && state.displayedUser.userId !== props.match.params.userid) {
+      this.getUser()
+    }
+  }
+
   buildBreadcrumbs = () => {
     const { props, state } = this
 
@@ -67,7 +74,10 @@ export class PublicProfile extends React.Component {
     switch (fetchGetUser.status) {
       case 200:
         this.setState({
-          displayedUser: serialize(fetchGetUser.json, serializeUserProps),
+          displayedUser: {
+            ...serialize(fetchGetUser.json, serializeUserProps),
+            userId: userId
+          },
           coverImageUrl: 'default'
         })
         this.buildBreadcrumbs()

@@ -95,8 +95,21 @@ class FrontendController(Controller):
                 if app_config.CONTENT_SECURITY_POLICY__REPORT_ONLY
                 else "Content-Security-Policy"
             )
-            csp = "; ".join("{} {}".format(k, v) for k, v in BASE_CSP_DIRECTIVES)
-            csp = "{}; {}".format(csp, app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES)
+
+            csp_directives = dict(BASE_CSP_DIRECTIVES)
+
+            # add CSP directives needed for applications
+            app_lib = ApplicationApi(app_list=app_list)
+            for app in app_lib.get_all():
+                app_directives = app.get_content_security_policy_directives(app_config)
+                for app_key, app_value in app_directives:
+                    try:
+                        csp_directives[app_key] = "{} {}".format(csp_directives[app_key], app_value)
+                    except KeyError:
+                        csp_directives[app_key] = app_value
+
+            csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
+            csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
             csp_header_value = csp.format(nonce=csp_nonce)
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
                 csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))

@@ -1,5 +1,6 @@
 {
   "{{author}} added you to {{space}}": "{{author}} vous a ajouté dans {{space}}",
+  "{{author}} joined space {{space}}": "{{author}} a rejoint l'espace {{space}}",
   "{{author}} removed you from {{space}}": "{{author}} vous a retiré de {{space}}",
   "{{author}} modified your role in {{space}}": "{{author}} a modifié votre rôle dans {{space}}",
   "{{author}} modified {{user}}'s role in {{space}}": "{{author}} a modifié le rôle de {{user}} dans {{space}}",
@@ -335,5 +336,6 @@
   "Loading": "Chargement",
   "Informations": "Informations",
   "Personal page": "Page personnelle",
-  "My profile": "Mon profil"
+  "My profile": "Mon profil",
+  "unkown": "inconnu"
 }

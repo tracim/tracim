@@ -35,19 +35,9 @@ run pushpin docker (from tracim root dir):
 docker-compose up -d pushpin
 ~~~
 
-for cypress test, you should use:
-~~~bash
-PUSHPIN_CONFIG_DIR=./pushpin_cypress_config docker-compose up -d pushpin
-~~~
-
 then run tracim:
 ~~~bash
 pserve development.ini
-~~~
-
-or, for cypress tests:
-~~~bash
-pserve cypress_test.ini
 ~~~
 
 :warning: pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)

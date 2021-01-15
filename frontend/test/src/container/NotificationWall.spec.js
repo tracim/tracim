@@ -68,7 +68,10 @@ describe('<NotificationWall />', () => {
         content: serialize(contentFromApi, serializeContentProps),
         workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
         user: serialize(globalManagerFromApi, serializeUserProps),
-        author: 'Leslie'
+        author: {
+          publicName: globalManagerFromApi.public_name,
+          userId: globalManagerFromApi.user_id
+        }
       }
       it(`should return type comment object if type is ${buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)}`, () => {
         expect(NotificationWallInstance.getNotificationDetails({
