@@ -1,8 +1,28 @@
+## 3.4.3 / 2021-01-11
+
+### Fixed Issues
+
+- Backend: [#4033](https://github.com/tracim/tracim/issues/4033)
+
+
+## 3.4.2 / 2021-01-08
+
+### New Features
+
+- The personal activity feed is now the home page when you log in Tracim when you are a member of a space
+
+### Fixed Issues
+
+- Backend: [#3997](https://github.com/tracim/tracim/issues/3997),
+[#4000](https://github.com/tracim/tracim/issues/4000)
+- Doc: [#3988](https://github.com/tracim/tracim/issues/3988)
+
+
 ## 3.4.1 / 2020-12-23
 
 ### Fixed Issues
 
-- Backend: [3979](https://github.com/tracim/tracim/issues/3979)
+- Backend: [#3979](https://github.com/tracim/tracim/issues/3979)
 
 ### Breaking/Important Changes
 
@@ -14,6 +34,7 @@
 
 The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
 
+
 ## 3.4.0 / 2020-12-21
 
 ### New Features
@@ -24,6 +45,7 @@ The old parameter names are still functional but their usage is deprecated and t
 ### Fixed Issues
 
 - Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
+
 
 ## 3.3.1 / 2020-12-18
 

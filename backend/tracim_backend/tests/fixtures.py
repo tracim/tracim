@@ -419,10 +419,10 @@ def webdav_provider(app_config: CFG):
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG
+    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG,
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
     )
 
 
