@@ -77,7 +77,7 @@ class Translator(object):
                 is_file_readable(file)
             except NotReadableFile as exc:
                 raise TranslationConfigurationError(
-                    "translation file {} is no readable.".format(file)
+                    "translation file {} is not readable: {}".format(file, str(exc))
                 ) from exc
             app_config.TRANSLATIONS[TranslationSource.GLOBAL.name][
                 lang
@@ -102,7 +102,7 @@ class Translator(object):
                     is_file_readable(file)
                 except NotReadableFile as exc:
                     raise TranslationConfigurationError(
-                        'ERROR: translation file "{}" is no readable.'.format(file)
+                        'ERROR: translation file "{}" is not readable: {}'.format(file, str(exc))
                     ) from exc
                 app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][
                     lang
@@ -121,8 +121,8 @@ class Translator(object):
                 trads = json.load(file)
                 return trads
         except json.JSONDecodeError as exc:
-            not_a_valid_json_file_msg = 'ERROR: "{}" is not a valid json file.'
-            raise TranslationConfigurationError(not_a_valid_json_file_msg.format(filepath)) from exc
+            not_a_valid_json_file_msg = 'ERROR: "{}" is not a valid json file: {}'
+            raise TranslationConfigurationError(not_a_valid_json_file_msg.format(filepath, str(exc))) from exc
 
     def _get_translation(
         self, lang: str, message: str, source: TranslationSource
