@@ -77,7 +77,7 @@ make them compatible with [i18next-json-v3]('https://www.i18next.com/misc/json-f
 
 To generate translation for an existing schema, a tool is available, which does a part of the job:
 ```shell
- $ tracimcli dev custom-properties translate template
+ $ tracimcli dev custom-properties extract-translation-source
 {'Address': '',
  'Administrator': '',
  'Biography': '',

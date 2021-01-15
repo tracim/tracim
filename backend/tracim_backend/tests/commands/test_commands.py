@@ -68,7 +68,7 @@ class TestCommandsList(object):
         assert output.find("dev parameters list") > 0
         assert output.find("dev parameters value") > 0
         assert output.find("dev test live-messages") > 0
-        assert output.find("dev custom-properties translate template") > 0
+        assert output.find("dev custom-properties extract-translation-source") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
