@@ -312,7 +312,7 @@ See [main readme](../README.md)  section _Install and run pushpin for UI updates
 
 ## Lint the code
 
-Install the required versions:
+Install the required tool, `flake8` and its dependencies:
 
     pip install -r requirements-devtool.txt
 

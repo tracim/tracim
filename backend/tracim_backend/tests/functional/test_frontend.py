@@ -45,7 +45,13 @@ class TestContentSecurityPolicy:
     def test_api__csp_header__ok_200__additional_directives(self, web_testapp):
         res = web_testapp.get("/", status=200)
         csp = res.headers.get("Content-Security-Policy")
-        assert csp.endswith("frame-ancestors 'none'")
+        assert csp.startswith("frame-ancestors 'none'")
+
+    @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
+    def test_api__csp_header__ok_200__with_collabora(self, web_testapp):
+        res = web_testapp.get("/", status=200)
+        csp = res.headers.get("Content-Security-Policy")
+        assert "frame-src http://localhost:9980" in csp
 
 
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)

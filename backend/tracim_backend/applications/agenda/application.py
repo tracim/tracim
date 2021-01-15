@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import typing
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
@@ -103,6 +104,11 @@ class AgendaApp(TracimApplication):
         agenda_controller = AgendaController()
         configurator.include(agenda_controller.bind, route_prefix=BASE_API)
         configurator.include(radicale_proxy_controller.bind)
+
+    def get_content_security_policy_directives(
+        self, app_config: CFG
+    ) -> typing.Tuple[typing.Tuple[str, str], ...]:
+        return (("frame-src", "'self'"),)
 
 
 def create_app() -> TracimApplication:
