@@ -6,6 +6,7 @@ import { PAGE } from '../../helper.js'
 const ProfileNavigation = props => {
   return (
     <Link
+      className='profileNavigation'
       to={PAGE.PUBLIC_PROFILE(props.user.userId)}
     >
       {props.children}
