@@ -47,18 +47,4 @@ log "Checking whether cypress.json exists."
 if [ ! -f cypress.json ]; then
     log "cypress.json does not exist. Copying from cypress.json.sample."
     cp cypress.json.sample cypress.json && loggood "success" || logerror "some error"
-    log "Writing path to cypress.json"
-    SUBDIR=$(pwd)
-    sed -i "s|{path_test_file}|$SUBDIR/cypress_test|g" cypress.json && loggood "success" || logerror "some error"
-    loggood "Path is now configured."
-else
-    log "cypress.json exists. Checking whether integrationFolder has the path."
-    if grep -q "\"integrationFolder\"\:\s\"{path_test_file}\"" cypress.json ; then
-        log "No. Writing the path in cypress.json"
-        SUBDIR=$(pwd)
-        sed -i "s|{path_test_file}|$SUBDIR|g" cypress.json && loggood "success" || logerror "some error"
-        loggood "Path is now configured."
-    else
-        loggood "Ok. Manually change if necessary."
-    fi
 fi
