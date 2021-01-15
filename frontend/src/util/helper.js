@@ -15,6 +15,8 @@ export const SHARE_FOLDER_ID = -1
 export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const NO_ACTIVE_SPACE_ID = -1
 
+export const history = require('history').createBrowserHistory()
+
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
 
