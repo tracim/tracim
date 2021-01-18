@@ -85,7 +85,7 @@ export class PublicProfile extends React.Component {
       case 400:
         switch (fetchGetUser.json.code) {
           case 1001:
-            props.dispatch(newFlashMessage(props.t('Unkown user')))
+            props.dispatch(newFlashMessage(props.t('Unknown user')))
             props.history.push(PAGE.HOME)
             break
           default:
