@@ -3,10 +3,10 @@
 User custom properties allow adding instance-specific properties
 for the users of the instance.
 
-The structure of those user properties should be defined in a json schema file. Specification available [here]('https://json-schema.org/specification-links.html#draft-7'))
+The structure of those user properties should be defined in a json schema file. Specification available [here]('https://json-schema.org/specification-links.html#draft-7')).
 
 It is possible to fine-tune the display and edition behavior of those properties by
-the Tracim frontend in a separate file (named UI schema). Its syntax can be found [here](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/)
+the Tracim frontend in a separate file (named UI schema). Its syntax can be found [here](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/).
 
 We do support also some Tracim specific parameters to have some Tracim specifics behaviors in both schema.
 
@@ -28,7 +28,7 @@ user.custom_properties.json_schema_file_path = %(user_custom_properties_dir)s/sc
 user.custom_properties.ui_schema_file_path = %(user_custom_properties_dir)s/ui.json
 user.custom_properties.translations_dir_path = %(user_custom_properties_dir)s/locale
 ```
-see [examples files related](../examples/user_custom_properties)
+See [examples files related](../examples/user_custom_properties).
 
 
 ### JSONSchema
@@ -67,8 +67,7 @@ The following ui schema field values are translated:
 - `title`
 - `placeholder`
 - `help`
-- all the `ui:<key>` variants of the previous fields
-for UISchema.
+- all the `ui:<key>` variants of the previous fields for UISchema.
 
 Custom properties translation files are stored in `user.custom_properties.translations_dir_path` if provided.
 They should be `json` format with a name of format `<lang>.json` (lang should be ISO 639-1 code).
