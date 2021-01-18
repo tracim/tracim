@@ -1,13 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'regenerator-runtime/runtime'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 
 require('./css/index.styl')
 
-export const history = require('history').createBrowserHistory()
+const history = require('history').createBrowserHistory()
 
 const manager = new LiveMessageManager()
 manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)

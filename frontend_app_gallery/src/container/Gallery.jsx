@@ -26,7 +26,6 @@ import {
   PAGE,
   ROLE
 } from 'tracim_frontend_lib'
-import { Link } from 'react-router-dom'
 import Carousel from '../component/Carousel.jsx'
 import { DIRECTION, buildRawFileUrl } from '../helper.js'
 import { debug } from '../debug.js'
@@ -51,7 +50,9 @@ export class Gallery extends React.Component {
       content: param.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined) : debug.config.folderId,
+      folderId: props.data
+        ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined)
+        : debug.config.folderId,
       folderDetail: {
         fileName: '',
         folderParentIdList: []
@@ -299,34 +300,32 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{workspaceLabel}</Link>,
+      link: PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId),
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-      label: workspaceLabel
+      label: workspaceLabel,
+      isALink: true
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
+        link: `/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-        label: folderDetail.fileName
+        label: folderDetail.fileName,
+        isALink: true
       })
     }
     breadcrumbsList.push({
-      link: <Link to={PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
+      link: PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId),
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-      label: props.t('Gallery')
+      label: props.t('Gallery'),
+      isALink: true
     })
     if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
       const fileName = this.displayedPicture().fileName
       breadcrumbsList.push({
-        link: (
-          <Link
-            to={PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId())}
-          >
-            {fileName}
-          </Link>
-        ),
+        link: PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId()),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-        label: fileName
+        label: fileName,
+        isALink: true
       })
     }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { Link, withRouter } from 'react-router-dom'
 import i18n from '../util/i18n.js'
 import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
@@ -28,7 +28,6 @@ import {
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
 import Search from '../component/Header/Search.jsx'
-import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,

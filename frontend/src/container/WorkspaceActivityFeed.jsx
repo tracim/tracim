@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
 
 import {
   TracimComponent,
@@ -80,18 +79,16 @@ export class WorkspaceActivityFeed extends React.Component {
 
     const breadcrumbsList = [
       {
-        link: (
-          <Link to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}>
-            {props.currentWorkspace.label}
-          </Link>
-        ),
+        link: PAGE.WORKSPACE.DASHBOARD(props.workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.currentWorkspace.label
+        label: props.currentWorkspace.label,
+        isALink: true
       },
       {
-        link: <Link to={PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId)}>{props.t('Activity feed')}</Link>,
+        link: PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Activity feed')
+        label: props.t('Activity feed'),
+        isALink: false
       }
     ]
 
@@ -153,4 +150,4 @@ const component = withActivity(
   resetWorkspaceActivity,
   setWorkspaceActivityEventList
 )
-export default connect(mapStateToProps)(withRouter(translate()(component)))
+export default connect(mapStateToProps)(translate()(component))

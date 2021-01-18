@@ -8,7 +8,12 @@ export const debug = {
     faIcon: 'file-text-o',
     hexcolor: '#00CC00',
     creationLabel: 'Write a note',
-    label: 'Note'
+    label: 'Note',
+    workspace: {
+      downloadEnabled: false,
+      label: 'test space',
+      memberList: []
+    }
   },
   content: {
     ...defaultDebug.content,

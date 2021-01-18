@@ -15,11 +15,19 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
+    filename: 'tracim_frontend_lib.[name].js',
     pathinfo: !isProduction,
     library: process.env.SERVDEV !== 'true' ? ['tracim_frontend_lib', '[name]'] : undefined,
     libraryTarget: 'umd',
     umdNamedDefine: true
+  },
+  externals: {
+    'react-router-dom': { // INFO - CH - this is required for using <Link> in frontend_lib
+      root: 'ReactRouterDom',
+      commonjs2: 'react-router-dom',
+      commonjs: 'react-router-dom',
+      amd: 'react-router-dom',
+    },
   },
   optimization: {
     namedModules: true

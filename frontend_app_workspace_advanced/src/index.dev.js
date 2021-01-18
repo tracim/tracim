@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'regenerator-runtime/runtime'
 import WorkspaceAdvanced from './container/WorkspaceAdvanced.jsx'
 import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'

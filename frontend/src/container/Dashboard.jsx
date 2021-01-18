@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -220,21 +220,15 @@ export class Dashboard extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.curWs.label}
-        </Link>
-      ),
+      link: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.curWs.label
+      label: props.curWs.label,
+      isALink: true
     }, {
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.t('Dashboard')}
-        </Link>
-      ),
+      link: '',
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Dashboard')
+      label: props.t('Dashboard'),
+      isALink: false
     }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))

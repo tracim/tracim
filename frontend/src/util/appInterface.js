@@ -59,6 +59,10 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
 
   const selectedApp = getSelectedApp(app.config.slug)
 
+  if (selectedApp && selectedApp.content && app && app.content && selectedApp.content.workspace_id !== app.content.workspace_id) {
+    unMountApp()
+  }
+
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
 
@@ -78,7 +82,7 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
     globalThis.GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
     if (previouslySelectedAppFeature !== selectedApp.name) {
-      globalThis.GLOBAL_dispatchEvent({ type: 'unmount_appFeature', data: {} })
+      globalThis.GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.UNMOUNT_APP_FEATURE, data: {} })
     }
 
     selectedApp.renderAppFeature(app)
@@ -156,41 +160,45 @@ globalThis.GLOBAL_dispatchEvent = function (event) {
   document.dispatchEvent(customEvent)
 }
 
+function unMountAppFeature () {
+  if (previouslySelectedAppFeature !== '') {
+    const selectedApp = getSelectedApp(previouslySelectedAppFeature)
+    selectedApp.unmountApp('appFeatureContainer')
+    selectedApp.unmountApp('popupCreateContentContainer')
+    selectedApp.isRendered = false
+    previouslySelectedAppFeature = ''
+  }
+}
+
+function unMountAppFullscreen () {
+  if (previouslySelectedAppFullScreen !== '') {
+    const selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
+    selectedApp.unmountApp('appFullscreenContainer')
+    selectedApp.isRendered = false
+    previouslySelectedAppFullScreen = ''
+  }
+}
+
+function unMountApp () {
+  unMountAppFeature()
+  unMountAppFullscreen()
+}
+
 globalThis.GLOBAL_eventReducer = function (event) {
   const type = event.detail.type
   const data = event.detail.data
 
-  const unMountAppFeature = function () {
-    if (previouslySelectedAppFeature !== '') {
-      const selectedApp = getSelectedApp(previouslySelectedAppFeature)
-      selectedApp.unmountApp('appFeatureContainer')
-      selectedApp.unmountApp('popupCreateContentContainer')
-      selectedApp.isRendered = false
-      previouslySelectedAppFeature = ''
-    }
-  }
-
-  const unMountAppFullscreen = function () {
-    if (previouslySelectedAppFullScreen !== '') {
-      const selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
-      selectedApp.unmountApp('appFullscreenContainer')
-      selectedApp.isRendered = false
-      previouslySelectedAppFullScreen = ''
-    }
-  }
-
   switch (type) {
-    case 'hide_popupCreateContent':
-    case 'hide_popupCreateWorkspace':
+    case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT:
+    case CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
       getSelectedApp(data.name).unmountApp('popupCreateContentContainer')
       break
-    case 'unmount_app':
+    case CUSTOM_EVENT.UNMOUNT_APP:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
-      unMountAppFeature()
-      unMountAppFullscreen()
+      unMountApp()
       break
-    case 'unmount_appFeature':
+    case CUSTOM_EVENT.UNMOUNT_APP_FEATURE:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
       unMountAppFeature()
       break

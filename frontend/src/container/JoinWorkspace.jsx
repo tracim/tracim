@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   PageWrapper,
@@ -66,9 +65,10 @@ export class JoinWorkspace extends React.Component {
     const { props } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: <Link to={PAGE.JOIN_WORKSPACE}>{props.t('Join a space')}</Link>,
+      link: PAGE.JOIN_WORKSPACE,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Join a space')
+      label: props.t('Join a space'),
+      isALink: true
     }]))
   }
 
