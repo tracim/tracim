@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
@@ -51,17 +50,15 @@ export class PublicProfile extends React.Component {
     const { props, state } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: (
-        <Link to={PAGE.HOME} title={props.t('Home')} className='primaryColorFont primaryColorFontDarkenHover'>
-          <i className='fa fa-home' />{props.t('Home')}
-        </Link>
-      ),
+      link: PAGE.HOME,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home')
+      label: props.t('Home'),
+      isALink: true
     }, {
-      link: <Link to={PAGE.SEARCH_RESULT}>{props.t("{{user}}'s profile", { user: state.displayedUser.publicName })}</Link>,
+      link: PAGE.PUBLIC_PROFILE,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName })
+      label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName }),
+      isALink: false
     }]))
   }
 
