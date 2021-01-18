@@ -1,0 +1,30 @@
+# Code
+*.py text eol=lf diff=python
+*.html text diff=html
+*.js text
+*.css text diff=css
+*.sh text eol=lf diff=bash
+*.mako text
+*.mak text linguist-language=Mako
+
+
+# Assets
+*.png binary
+
+# Configuration
+*.cfg text
+*.conf.sample
+*.yaml text
+*.yml text
+*.json text
+*.json.sample text
+*.toml text
+*.ini text
+*.ini.sample text
+*.in text
+requirements.txt text
+
+# Documentation
+LICENSE text
+CHANGELOG text
+*.md text diff=markdown
