@@ -44,7 +44,7 @@ describe('App File', () => {
 
         cy.get('.breadcrumbs__item')
           .its('length')
-          .should('eq', 3)
+          .should('eq', 4)
         cy.get('.breadcrumbs__item').last().contains(fileTitle_2)
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
@@ -55,7 +55,7 @@ describe('App File', () => {
 
         cy.get('.breadcrumbs__item')
           .its('length')
-          .should('eq', 2)
+          .should('eq', 3)
 
         cy.get('[data-cy="popinFixed"]')
           .should('not.be.visible')

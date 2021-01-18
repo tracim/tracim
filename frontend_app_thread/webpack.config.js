@@ -5,10 +5,10 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin')
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: './src/index.js', // only one instance of babel-polyfill is allowed
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'thread.app.js' : 'thread.app.dev.js',
+    filename: 'thread.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appThread',
     libraryTarget: isProduction ? 'var' : undefined

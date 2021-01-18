@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
@@ -128,7 +128,7 @@ class Folder extends React.Component {
                         e.stopPropagation()
                         props.onClickCreateContent(e, props.folderData.id, app.slug)
                       }}
-                      key={app.slug}
+                      key={`${props.folderData.id}__${app.slug}`}
                     >
                       <i
                         className={`fa fa-fw fa-${app.faIcon}`}

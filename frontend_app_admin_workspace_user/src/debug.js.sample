@@ -4,14 +4,16 @@ export const debug = {
   ...defaultDebug,
   config: {
     ...defaultDebug.config,
-    slug: 'workspace_advanced',
-    faIcon: 'bank',
+    slug: 'admin_workspace_user',
+    faIcon: 'paperclip',
     hexcolor: '#7d4e24',
-    creationLabel: '',
-    label: 'Advanced dashboard'
+    label: 'File',
+    workspace: {
+      downloadEnabled: true
+    }
   },
   content: {
-    ...defaultDebug.content,
-    workspace_id: 1
+    workspaceList: [],
+    userList: []
   }
 }

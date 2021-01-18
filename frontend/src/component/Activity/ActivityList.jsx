@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   BREADCRUMBS_TYPE,
@@ -51,9 +50,10 @@ const ActivityList = (props) => {
   const buildActivityBreadcrumbsList = (activity) => {
     const workspace = activity.newestMessage.fields.workspace
     const dashboardBreadcrumb = {
-      link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspace.workspace_id)}>{workspace.label}</Link>,
+      link: PAGE.WORKSPACE.DASHBOARD(workspace.workspace_id),
       type: BREADCRUMBS_TYPE.CORE,
-      label: workspace.label
+      label: workspace.label,
+      isALink: true
     }
 
     if (activity.contentPath.length > 0) {
@@ -61,8 +61,9 @@ const ActivityList = (props) => {
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
           label: crumb.label,
-          link: <Link to={PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id)}>{crumb.label}</Link>,
-          type: BREADCRUMBS_TYPE.APP_FEATURE
+          link: PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
+          type: BREADCRUMBS_TYPE.APP_FEATURE,
+          isALink: true
         }))
       ]
     } else {

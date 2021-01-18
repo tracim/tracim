@@ -4,5 +4,6 @@
 node_modules/
 dist/workspace.app.js
 dist/workspace.app.js.map
-dist/workspace.app.dev.js
-dist/workspace.app.dev.js.map
+dist/workspace.app.standalone.js
+dist/workspace.app.standalone.js.map
+src/debug.js

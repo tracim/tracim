@@ -367,8 +367,18 @@ export class File extends React.Component {
     }
   }
 
-  buildBreadcrumbs = (content) => {
-    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
+  buildBreadcrumbs = async (content) => {
+    try {
+      const contentBreadcrumbsList = await buildContentPathBreadcrumbs(this.state.config.apiUrl, content)
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+        data: {
+          breadcrumbs: contentBreadcrumbsList
+        }
+      })
+    } catch (e) {
+      console.error('Error in app file, count not build breadcrumbs', e)
+    }
   }
 
   handleClickBtnCloseApp = () => {

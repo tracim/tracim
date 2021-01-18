@@ -44,7 +44,7 @@ ConfirmPopup.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  msg: PropTypes.oneOfType([PropTypes.string, PropTypes.component])
+  msg: PropTypes.any
 }
 
 ConfirmPopup.defaultProps = {

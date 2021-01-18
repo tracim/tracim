@@ -130,26 +130,35 @@
 <body>
   <div id='content'></div>
 
-  <script type='text/javascript' src='/app/tracim_frontend_vendors.js'></script>
-  <script type='text/javascript' src='/app/tracim_frontend_lib.lib.js'></script>
+  <!--
+  INFO - CH - 2021-01-14
+  since servdev uses standalone frontend_lib build, you should not include frontend_lib directly in the page
+  it is already in the bundles
+  same for frontend_vendor
+  -->
+<!--  <script type='text/javascript' src='/app/tracim_frontend_vendors.js'></script>-->
+<!--  <script type='text/javascript' src='/app/tracim_frontend_lib.lib.js'></script>-->
+
   <script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
+
+  <script type='text/javascript' src='/app/file.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/html-document.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/thread.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/collaborative_document_edition.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/admin_workspace_user.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/agenda.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/folder.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/share_folder.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/workspace.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/workspace_advanced.app.standalone.js'></script>
+  <script type='text/javascript' src='/app/gallery.app.standalone.js'></script>
 
   <script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
   <script type='text/javascript' src='/assets/tracim.app.js'></script>
 
+  <!--
   <script type='text/javascript' src='/assets/custom_toolbox/customToolbox.js'></script>
-
-  <script type='text/javascript' src='/app/html-document.app.js'></script>
-  <script type='text/javascript' src='/app/collaborative_document_edition.app.js'></script>
-  <script type='text/javascript' src='/app/file.app.js'></script>
-  <script type='text/javascript' src='/app/thread.app.js'></script>
-  <script type='text/javascript' src='/app/workspace.app.js'></script>
-  <script type='text/javascript' src='/app/folder.app.js'></script>
-  <script type='text/javascript' src='/app/share_folder.app.js'></script>
-  <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
-  <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
-  <script type='text/javascript' src='/app/agenda.app.js'></script>
-  <script type='text/javascript' src='/app/gallery.app.js'></script>
+  -->
 
   <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
   <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>

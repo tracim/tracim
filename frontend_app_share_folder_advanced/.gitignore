@@ -3,5 +3,5 @@
 .git/
 node_modules/
 dist/share_folder.app.js
-dist/share_folder_advanced.app.dev.js
+dist/share_folder.app.standalone.js
 src/debug.js

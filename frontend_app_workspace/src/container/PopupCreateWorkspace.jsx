@@ -22,50 +22,27 @@ import {
   postSpace
 } from '../action.async.js'
 import i18n from '../i18n.js'
-
-// FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
-// https://github.com/tracim/tracim/issues/2066
-const debug = {
-  config: {
-    slug: 'workspace',
-    faIcon: 'users',
-    hexcolor: '#7d4e24',
-    creationLabel: 'Create a space',
-    domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543',
-    apiHeader: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    translation: {
-      en: {},
-      fr: {},
-      pt: {}
-    }
-  },
-  loggedUser: {
-    userId: 5,
-    username: '',
-    firstname: '',
-    lastname: '',
-    email: '',
-    avatar: ''
-  },
-  workspaceId: 1,
-  folderId: null
-}
+import { debug } from '../debug.js'
 
 export class PopupCreateWorkspace extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+
     this.state = {
       appName: 'workspace',
       allowedTypes: [],
-      config: props.data ? props.data.config : debug.config,
+      config: param.config,
       isFirstStep: true,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      loggedUser: param.loggedUser,
       newDefaultRole: '',
-      newParentSpace: { value: props.t('None'), label: props.t('None'), parentId: null, spaceId: null },
+      newParentSpace: {
+        value: props.t('None'),
+        label: props.t('None'),
+        parentId: null,
+        spaceId: null
+      },
       newType: '',
       newName: '',
       parentOptions: [],

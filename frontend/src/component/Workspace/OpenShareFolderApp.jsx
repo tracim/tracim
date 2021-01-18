@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import appFactory from '../../util/appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../util/helper.js'
 import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
