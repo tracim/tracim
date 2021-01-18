@@ -34,9 +34,9 @@
     }
   },
   "properties": {
-    "properties1": {
+    "property1": {
       "type": "string",
-      "title": "Properties1"
+      "title": "Property1"
     },
     "date": {
       "type": "string"

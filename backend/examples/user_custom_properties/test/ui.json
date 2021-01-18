@@ -10,9 +10,9 @@
         ]
       }
   },
-  "properties1": {
+  "property1": {
     "ui:widget": "textarea",
     "ui:help": "just some help",
-    "ui:placeholder": "write here!"
+    "ui:placeholder": "write here !"
   }
 }

@@ -348,7 +348,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema["description"] == "just test data"
         assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
         assert json_schema.get("properties")
-        assert json_schema["properties"].get("properties1")
+        assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
         assert json_schema["properties"].get("fields")
         assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
@@ -375,7 +375,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema["description"] == "juste des données de tests"
         assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
         assert json_schema.get("properties")
-        assert json_schema["properties"].get("properties1")
+        assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
         assert json_schema["properties"].get("fields")
         assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
@@ -422,7 +422,7 @@ class TestUserCustomPropertiesUISchema(object):
                 "ui:widget": "alt-date",
                 "ui:options": {"yearsRange": [1980, 2030]},
             },
-            "properties1": {
+            "property1": {
                 "ui:widget": "textarea",
                 "ui:help": "just some help",
                 "ui:placeholder": "write here !",
@@ -449,7 +449,7 @@ class TestUserCustomPropertiesUISchema(object):
                 "ui:widget": "alt-date",
                 "ui:options": {"yearsRange": [1980, 2030]},
             },
-            "properties1": {
+            "property1": {
                 "ui:widget": "textarea",
                 "ui:help": "un peu d'aide",
                 "ui:placeholder": "écrivez ici !",
