@@ -122,7 +122,9 @@ class Translator(object):
                 return trads
         except json.JSONDecodeError as exc:
             not_a_valid_json_file_msg = 'ERROR: "{}" is not a valid json file: {}'
-            raise TranslationConfigurationError(not_a_valid_json_file_msg.format(filepath, str(exc))) from exc
+            raise TranslationConfigurationError(
+                not_a_valid_json_file_msg.format(filepath, str(exc))
+            ) from exc
 
     def _get_translation(
         self, lang: str, message: str, source: TranslationSource
