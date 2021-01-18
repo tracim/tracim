@@ -69,7 +69,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const userId = props.match.params.userid
 
-    const fetchGetUser = await props.dispatch(getUserPublicInformation(userId))
+    const fetchGetUser = await props.dispatch(getAboutUser(userId))
 
     switch (fetchGetUser.status) {
       case 200:
