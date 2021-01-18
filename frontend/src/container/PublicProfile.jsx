@@ -12,7 +12,7 @@ import {
   newFlashMessage,
   setBreadcrumbs
 } from '../action-creator.sync.js'
-import { getUserPublicInformation } from '../action-creator.async'
+import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 
@@ -66,7 +66,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const userId = props.match.params.userid
 
-    const fetchGetUser = await props.dispatch(getUserPublicInformation(userId))
+    const fetchGetUser = await props.dispatch(getAboutUser(userId))
 
     switch (fetchGetUser.status) {
       case 200:

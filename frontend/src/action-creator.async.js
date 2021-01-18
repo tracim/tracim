@@ -210,7 +210,7 @@ export const getUser = userId => async dispatch => {
   })
 }
 
-export const getUserPublicInformation = userId => async dispatch => {
+export const getAboutUser = userId => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/about`,
     param: {
