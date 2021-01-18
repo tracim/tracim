@@ -254,7 +254,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 # Warning! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
-# in order to avoid security issues. See the Tracim settings documentation (available in source code, see "user_custom_properties.md").
+# in order to avoid security issues. See the Tracim settings documentation (available in source code, see "settings.md").
 
 ### pyramid_beaker parameters ###
 
@@ -363,7 +363,7 @@ api.key = %(basic_setup.api_key)s
 ####
 
 ## User custom properties: This features allows defining custom instance-global fields on users of this instance.
-# See the Tracim settings documentation (available in source code, see "settings.md") for more
+# See the Tracim settings documentation (available in source code, see "user_custom_properties.md") for more
 # informations about it. By default, Tracim doesn't use custom properties.
 ; user.custom_properties.json_schema_file_path =
 ; user.custom_properties.ui_schema_file_path =
