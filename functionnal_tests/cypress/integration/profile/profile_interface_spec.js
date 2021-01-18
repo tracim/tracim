@@ -20,8 +20,8 @@ describe('Profile', () => {
       .should('be.visible')
   })
 
-  it('should have the informations part', () => {
-    cy.contains('.profile__content__informations', 'Informations')
+  it('should have the information part', () => {
+    cy.contains('.profile__content__information', 'Information')
       .should('be.visible')
   })
 

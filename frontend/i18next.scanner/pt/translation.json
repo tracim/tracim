@@ -332,10 +332,8 @@
   "Account": "Conta",
   "User account management": "Gestão da conta de utilizador",
   "{{user}}'s profile": "Perfil de {{user}}",
-  "Unknown user": "Utilizador desconhecido",
   "Loading": "Carregando",
-  "Informations": "Informações",
+  "Information_plural": "Informações",
   "Personal page": "Página pessoal",
-  "My profile": "Meu perfil",
-  "unknown": "desconhecido"
+  "My profile": "Meu perfil"
 }

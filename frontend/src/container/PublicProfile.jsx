@@ -118,12 +118,26 @@ export class PublicProfile extends React.Component {
           />
 
           <div className='profile__content'>
-            <div className='profile__content__informations'>
-              {state.displayedUser ? props.t('Informations') : <div className='profile__text__loading' />}
+            <div className='profile__content__information'>
+              {state.displayedUser
+                ? props.t('Information_plural')
+                : (
+                  <>
+                    <div className='profile__text__loading' />
+                    <div className='profile__content__loading' />
+                  </>
+                )}
             </div>
 
             <div className='profile__content__page'>
-              {state.displayedUser ? props.t('Personal page') : <div className='profile__text__loading' />}
+              {state.displayedUser
+                ? props.t('Personal page')
+                : (
+                  <>
+                    <div className='profile__text__loading' />
+                    <div className='profile__content__loading' />
+                  </>
+                )}
             </div>
           </div>
         </div>

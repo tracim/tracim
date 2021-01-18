@@ -332,10 +332,8 @@
   "Account": "Account",
   "User account management": "User account management",
   "{{user}}'s profile": "{{user}}'s profile",
-  "Unknown user": "Unknown user",
   "Loading": "Loading",
-  "Informations": "Informations",
+  "Information_plural": "Information",
   "Personal page": "Personal page",
-  "My profile": "My profile",
-  "unknown": "unknown"
+  "My profile": "My profile"
 }
