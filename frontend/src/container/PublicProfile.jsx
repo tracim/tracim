@@ -13,7 +13,7 @@ import {
   newFlashMessage,
   setBreadcrumbs
 } from '../action-creator.sync.js'
-import { getUserPublicInformation } from '../action-creator.async'
+import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 
