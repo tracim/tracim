@@ -93,7 +93,6 @@ To generate translation for an existing schema, a tool is available, which does 
  'User Info': '',
  'address of the user': '',
  'info about a user in this organization': '',
- 'name': '',
  'roles in the organization': ''
 }`
 ```
