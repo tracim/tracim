@@ -61,7 +61,15 @@ export function appContentFactory (WrappedComponent) {
     // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
     appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
       if (newContent.content_id !== content.content_id) {
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type), data: newContent })
+        // RJ - 2020-01-13 - NOTE
+        // content corresponds to variable contentToOpen in OpenContentApp
+        // content.content_type is not defined there. I don't know if it is
+        // called from elsewhere, but content.content_type might always be
+        // undefined here https://github.com/tracim/tracim/issues/3742#issuecomment-759317358
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type || content.type),
+          data: newContent
+        })
         return
       }
       setState({ isVisible: true })
