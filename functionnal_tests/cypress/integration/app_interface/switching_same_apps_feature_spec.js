@@ -12,12 +12,17 @@ describe('Hot switching between the same app', () => {
   const anotherThreadTitle = 'second Thread'
   const anotherFileTitle = 'second File'
 
-  let workspaceId
+  const aThirdHtmlDocTitle = 'third Html Doc'
+  const aThirdThreadTitle = 'third Thread'
+  const aThirdFileTitle = 'third File'
+
+  let workspaceId, secondWorkspaceId
 
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
+
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
 
@@ -31,60 +36,138 @@ describe('Hot switching between the same app', () => {
       cy.createThread(anotherThreadTitle, workspaceId)
       cy.createFile(fullFilename, contentType, anotherFileTitle, workspaceId)
     })
-  })
 
-  beforeEach(() => {
-    cy.ignoreTinyMceError()
-    cy.loginAs('administrators')
-    cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
-  })
-
-  afterEach(() => {
-    cy.cancelXHR()
-  })
-
-  describe('From File to File', () => {
-    it('should close first file and open the second one', () => {
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle } })
-        .find('.content__item')
-        .click('left')
-
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(fileTitle)
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherFileTitle } })
-        .find('.content__item')
-        .click('left')
-
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherFileTitle)
+    cy.createWorkspace().then(workspace => {
+      secondWorkspaceId = workspace.workspace_id
+      cy.getUserByRole('users').then(user => {
+        cy.addUserToWorkspace(user.user_id, workspace.workspace_id)
+      })
+      cy.createHtmlDocument(aThirdHtmlDocTitle, secondWorkspaceId)
+      cy.createThread(aThirdThreadTitle, secondWorkspaceId)
+      cy.createFile(fullFilename, contentType, aThirdFileTitle, secondWorkspaceId)
     })
   })
 
-  describe('From HtmlDoc to HtmlDoc', () => {
-    it('should close first file and open the second one', () => {
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
-        .find('.content__item')
-        .click('left')
+  describe('In the same workspace', () => {
+    beforeEach(() => {
+      cy.ignoreTinyMceError()
+      cy.loginAs('administrators')
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
+    })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(htmlDocTitle)
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherHtmlDocTitle } })
-        .find('.content__item')
-        .click('left')
+    afterEach(() => {
+      cy.cancelXHR()
+    })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherHtmlDocTitle)
+    describe('From File to File', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(fileTitle)
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherFileTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherFileTitle)
+      })
+    })
+
+    describe('From HtmlDoc to HtmlDoc', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(htmlDocTitle)
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherHtmlDocTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherHtmlDocTitle)
+      })
+    })
+
+    describe('From Thread to Thread', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: threadTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(threadTitle)
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherThreadTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherThreadTitle)
+      })
     })
   })
 
-  describe('From Thread to Thread', () => {
-    it('should close first file and open the second one', () => {
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: threadTitle } })
-        .find('.content__item')
-        .click('left')
+  describe('In a different workspace', () => {
+    beforeEach(() => {
+      cy.ignoreTinyMceError()
+      cy.loginAs('users')
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
+    })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(threadTitle)
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: anotherThreadTitle } })
-        .find('.content__item')
-        .click('left')
+    afterEach(() => {
+      cy.cancelXHR()
+    })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(anotherThreadTitle)
+    describe('From File to File', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(fileTitle)
+
+        cy.get('.notificationButton__btn')
+          .click('left')
+
+        cy.contains(aThirdFileTitle)
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdFileTitle)
+      })
+    })
+
+    describe('From HtmlDoc to HtmlDoc', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(htmlDocTitle)
+
+        cy.get('.notificationButton__btn')
+          .click('left')
+
+        cy.contains(aThirdHtmlDocTitle)
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdHtmlDocTitle)
+      })
+    })
+
+    describe('From Thread to Thread', () => {
+      it('should close first file and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: threadTitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(threadTitle)
+
+        cy.get('.notificationButton__btn')
+          .click('left')
+
+        cy.contains(aThirdThreadTitle)
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdThreadTitle)
+      })
     })
   })
 })

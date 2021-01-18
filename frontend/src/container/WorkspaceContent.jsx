@@ -260,7 +260,7 @@ export class WorkspaceContent extends React.Component {
       type: BREADCRUMBS_TYPE.CORE,
       label: workspaceLabel
     }, {
-      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('Contents')}</Link>,
+      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}>{props.t('Contents')}</Link>,
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Contents')
     }]
@@ -528,7 +528,7 @@ export class WorkspaceContent extends React.Component {
     }
   }
 
-  handleUpdateAppOpenedType = openedAppType => this.setState({ appOpenedType: openedAppType })
+  handleUpdateAppOpenedType = appOpenedType => this.setState({ appOpenedType })
 
   handleSetFolderRead = async folderId => {
     const { props, state } = this

@@ -29,7 +29,7 @@ export class OpenShareFolderApp extends React.Component {
       dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
     } else { // open another app
       // if another app is already visible, hide it
-      if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+      if (appOpenedType) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
       // open app
       const shareConfig = {
         slug: 'share_folder',
@@ -63,9 +63,10 @@ export class OpenShareFolderApp extends React.Component {
     if (props.match && prevProps.match && props.match.params.idws !== prevProps.match.params.idws) {
       props.onUpdateAppOpenedType(false)
       props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
+      return
     }
 
-    this.openShareFolderAdvancedApp()
+    this.openShareFolderAdvancedApp(false)
   }
 
   render () {
