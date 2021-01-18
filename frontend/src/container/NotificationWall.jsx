@@ -345,7 +345,7 @@ export class NotificationWall extends React.Component {
 
   render () {
     const { props } = this
-    const unkownAuthor = props.t('unkown')
+    const unknownAuthor = props.t('unknown')
 
     if (!props.notificationPage.list) return null
 
@@ -396,7 +396,7 @@ export class NotificationWall extends React.Component {
                   <div className='notification__list__item__text'>
                     <Avatar
                       size={AVATAR_SIZE.MINI}
-                      publicName={notification.author ? notification.author.publicName : unkownAuthor}
+                      publicName={notification.author ? notification.author.publicName : unknownAuthor}
                       style={{ marginRight: '5px' }}
                     />
                     <span

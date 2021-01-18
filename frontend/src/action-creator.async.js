@@ -9,6 +9,7 @@ import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
   APP_LIST,
+  ABOUT_USER,
   CONFIG,
   CONTENT,
   CONTENT_TYPE_LIST,
@@ -25,7 +26,6 @@ import {
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
-  USER_INFORMATION,
   USER_KNOWN_MEMBER_LIST,
   USER_LANG,
   USER_LOGIN,
@@ -220,7 +220,7 @@ export const getUserPublicInformation = userId => async dispatch => {
       },
       method: 'GET'
     },
-    actionName: USER_INFORMATION,
+    actionName: ABOUT_USER,
     dispatch
   })
 }
