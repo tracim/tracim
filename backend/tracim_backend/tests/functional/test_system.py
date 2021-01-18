@@ -370,7 +370,7 @@ class TestUserCustomPropertiesSchema(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
         json_schema = res.json_body["json_schema"]
-        assert json_schema["title"] == "un Test"
+        assert json_schema["title"] == "Un Test"
         assert json_schema["type"] == "object"
         assert json_schema["description"] == "juste des données de tests"
         assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
@@ -380,7 +380,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema["properties"].get("fields")
         assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
             "type": "string",
-            "enumNames": ["1er", "Second", "Troisième"],
+            "enumNames": ["Premier", "Second", "Troisième"],
             "enum": ["first", "second", "third"],
         }
 
