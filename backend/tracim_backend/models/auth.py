@@ -16,6 +16,7 @@ import typing
 from typing import TYPE_CHECKING
 import uuid
 
+from depot.fields.sqlalchemy import UploadedFileField
 import sqlalchemy
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
@@ -83,9 +84,6 @@ class Profile(enum.Enum):
 class User(DeclarativeBase):
     """
     User definition.
-
-    This is the user definition used by :mod:`repoze.who`, which requires at
-    least the ``email`` column.
     """
 
     MIN_PASSWORD_LENGTH = 6
@@ -151,6 +149,10 @@ class User(DeclarativeBase):
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
+    avatar = Column(UploadedFileField, unique=False, nullable=True)
+    cropped_avatar = Column(UploadedFileField, unique=False, nullable=True)
+    cover = Column(UploadedFileField, unique=False, nullable=True)
+    cropped_cover = Column(UploadedFileField, unique=False, nullable=True)
 
     @hybrid_property
     def email_address(self):
