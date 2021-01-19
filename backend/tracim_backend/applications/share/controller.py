@@ -1,7 +1,6 @@
 from http import HTTPStatus
 import typing
 
-from depot.manager import DepotManager
 from hapic.data import HapicFile
 from pyramid.config import Configurator
 
@@ -28,6 +27,7 @@ from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.depot import StorageLib
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
@@ -239,8 +239,12 @@ class ShareController(Controller):
             raise ContentTypeNotAllowed()
 
         try:
-            file = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
-                content.depot_file
+            return StorageLib(request.app_config).get_raw_file(
+                depot_file=content.depot_file,
+                filename=hapic_data.path.filename,
+                default_filename=content.file_name,
+                force_download=True,
+                last_modified=content.updated,
             )
         except IOError as exc:
             raise TracimFileNotFound(
@@ -248,20 +252,6 @@ class ShareController(Controller):
                     content.cached_revision_id, content.content_id
                 )
             ) from exc
-        filename = hapic_data.path.filename
-
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", when filename returned will be original file one.
-        if not filename or filename == "raw":
-            filename = content.file_name
-        return HapicFile(
-            file_object=file,
-            mimetype=file.content_type,
-            filename=filename,
-            as_attachment=True,
-            content_length=file.content_length,
-            last_modified=content.updated,
-        )
 
     def bind(self, configurator: Configurator) -> None:
         """

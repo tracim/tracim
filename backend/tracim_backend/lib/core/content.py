@@ -2,13 +2,9 @@
 from contextlib import contextmanager
 import datetime
 import os
-import tempfile
 import typing
 
-from depot.io.interfaces import StoredFile
 from depot.io.utils import FileIntent
-from depot.manager import DepotManager
-import filelock
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
@@ -27,7 +23,6 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
-from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -49,6 +44,7 @@ from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.depot import StorageLib
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -736,66 +732,6 @@ class ContentApi(object):
             )
         return revision
 
-    def get_valid_content_filepath(self, depot_stored_file: StoredFile, file_extension: str = ""):
-        """
-        Generic way to get content filepath for all depot backend.
-        :param depot_stored_file: content as depot StoredFile
-        :param file_extension: extension of the file we expect
-        :return: content filepath
-        """
-
-        file_label = "tracim-revision-content-{file_id}".format(file_id=depot_stored_file.file_id,)
-        base_path = "{temp_dir}/{file_label}".format(
-            temp_dir=tempfile.gettempdir(), file_label=file_label,
-        )
-
-        file_path = "{base_path}{file_extension}".format(
-            base_path=base_path, file_extension=file_extension,
-        )
-
-        lockfile_path = "{base_path}{file_extension}".format(
-            base_path=base_path, file_extension=".lock",
-        )
-        # FIXME - G.M - 2020-01-05 - This will create a lockfile for
-        # each depot file we do need (each content revision)
-        # This file will NOT be removed at the end on Linux (FileLock use flock):
-        # see  https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
-        # some investigation needs to be conducted to see if another solution is possible avoiding creating
-        # too many files. See https://github.com/tracim/tracim/issues/4014
-        with filelock.FileLock(lockfile_path):
-            try:
-                # HACK - G.M - 2020-01-05 - This mechanism is inefficient because it
-                # generates a temporary file each time
-                # Improvements need to be made in preview_generator itself
-                # to handle more properly these issues.
-                # We do rely on consistent path based on gettemdir(),
-                # normally /tmp to give consistent path, this is a quick fix which does
-                # not need any change in preview-generator.
-                # note: this base path is configurable through an envirnoment var according
-                # to the Python doc:
-                # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
-                with open(file_path, "wb",) as tmp:
-                    tmp.write(depot_stored_file.read())
-                    yield file_path
-            finally:
-                try:
-                    os.unlink(file_path)
-                except FileNotFoundError:
-                    pass
-
-    def get_valid_content_filepath_legacy(
-        self, depot_stored_file: StoredFile
-    ) -> typing.Generator[str, None, None]:
-        """
-        Legacy way to get content filepath, only work for local file backend of depot
-        ("depot.io.local.LocalFileStorage", aka "local" in tracim config),
-        we keep it for now as this mecanism is the only that currently work with preview_generator
-        cache mecanism.
-        :param depot_stored_file: content as depot StoredFile
-        :return: content filepath
-        """
-        yield depot_stored_file._file_path  # type: str
-
     @contextmanager
     def get_one_revision_filepath(self, revision_id: int) -> typing.Generator[str, None, None]:
         """
@@ -806,20 +742,11 @@ class ContentApi(object):
         """
         try:
             revision = self.get_one_revision(revision_id)
-            depot = DepotManager.get(self._config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
-            depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
-            # FIXME - G.M - 2020-12-15 : Use legacy mecanism for local storage type for now as
-            # it's far more efficient now. standard mecanism should
-            # be improved with new preview_generator version.
-            if (
-                self._config.UPLOADED_FILES__STORAGE__STORAGE_TYPE
-                == DepotFileStorageType.LOCAL.slug
-            ):
-                return self.get_valid_content_filepath_legacy(depot_stored_file)
-            else:
-                return self.get_valid_content_filepath(
-                    depot_stored_file, file_extension=revision.file_extension
-                )
+            return StorageLib(app_config=self._config).get_filepath(
+                revision.depot_file,
+                file_extension=revision.file_extension,
+                temporary_prefix="tracim-revision-content",
+            )
         except IOError as exc:
             raise RevisionFilePathSearchFailedDepotCorrupted(
                 "IOError Unable to find Revision filepath." "File may be not available."

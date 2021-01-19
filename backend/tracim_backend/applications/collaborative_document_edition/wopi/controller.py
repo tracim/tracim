@@ -3,7 +3,6 @@ from datetime import timezone
 from http import HTTPStatus
 import typing
 
-from depot.manager import DepotManager
 from hapic.data import HapicData
 from hapic.data import HapicFile
 from pyramid.config import Configurator
@@ -39,6 +38,7 @@ from tracim_backend.applications.collaborative_document_edition.wopi.schema impo
 )
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.depot import StorageLib
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_current_content_contributor
 from tracim_backend.lib.utils.authorization import is_current_content_reader
@@ -73,9 +73,14 @@ class WOPIController(Controller):
         WOPI GetFile endpoint :
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/GetFile.html#getfile
         """
+        content = request.current_content
         try:
-            file_ = DepotManager.get(request.app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
-                request.current_content.depot_file
+            return StorageLib(request.app_config).get_raw_file(
+                depot_file=content.depot_file,
+                filename=content.file_name,
+                default_filename="raw",
+                force_download=True,
+                last_modified=content.updated,
             )
         except IOError as exc:
             raise TracimFileNotFound(
@@ -83,14 +88,6 @@ class WOPIController(Controller):
                     request.current_content.cached_revision_id, request.current_content.content_id
                 )
             ) from exc
-        return HapicFile(
-            file_object=file_,
-            mimetype=file_.content_type,
-            filename=request.current_content.file_name,
-            as_attachment=True,
-            content_length=file_.content_length,
-            last_modified=request.current_content.updated,
-        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
     @check_right(is_current_content_reader)

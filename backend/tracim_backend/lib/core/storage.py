@@ -12,7 +12,7 @@ from tracim_backend import CFG
 from tracim_backend.config import DepotFileStorageType
 
 
-class DepotLib:
+class StorageLib:
     """
     Helper class to handle more easily usage with depot stored file
     """
@@ -37,7 +37,6 @@ class DepotLib:
         file = self.uploaded_file_depot.get(
             depot_file
         )
-        filename = filename
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
         # "raw", where filename returned will be a custom one.
         if not filename or filename == "raw":

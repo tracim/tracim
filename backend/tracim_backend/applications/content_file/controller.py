@@ -1,7 +1,6 @@
 # coding=utf-8
 import typing
 
-from depot.manager import DepotManager
 from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
@@ -26,6 +25,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.depot import StorageLib
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
 from tracim_backend.lib.utils.authorization import check_right
@@ -203,8 +203,12 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         try:
-            file = DepotManager.get(request.app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
-                content.depot_file
+            return StorageLib(request.app_config).get_raw_file(
+                depot_file=content.depot_file,
+                filename=hapic_data.path.filename,
+                default_filename=content.file_name,
+                force_download=hapic_data.query.force_download,
+                last_modified=content.updated,
             )
         except IOError as exc:
             raise TracimFileNotFound(
@@ -212,20 +216,6 @@ class FileController(Controller):
                     content.cached_revision_id, content.content_id
                 )
             ) from exc
-        filename = hapic_data.path.filename
-
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will be original file one.
-        if not filename or filename == "raw":
-            filename = content.file_name
-        return HapicFile(
-            file_object=file,
-            mimetype=file.content_type,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
-            content_length=file.content_length,
-            last_modified=content.updated,
-        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
@@ -249,9 +239,19 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+
+        default_filename = "{label}_r{revision_id}{file_extension}".format(
+            label=revision.file_name,
+            revision_id=revision.revision_id,
+            file_extension=revision.file_extension,
+        )
         try:
-            file = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
-                revision.depot_file
+            return StorageLib(request.app_config).get_raw_file(
+                depot_file=revision.depot_file,
+                filename=hapic_data.path.filename,
+                default_filename=default_filename,
+                force_download=hapic_data.query.force_download,
+                last_modified=revision.updated,
             )
         except IOError as exc:
             raise TracimFileNotFound(
@@ -259,24 +259,6 @@ class FileController(Controller):
                     revision.revision_id, revision.content_id
                 )
             ) from exc
-
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will be a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_r{revision_id}{file_extension}".format(
-                label=revision.file_name,
-                revision_id=revision.revision_id,
-                file_extension=revision.file_extension,
-            )
-        return HapicFile(
-            file_object=file,
-            mimetype=file.content_type,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
-            content_length=file.content_length,
-            last_modified=revision.updated,
-        )
 
     # preview
     # pdf
