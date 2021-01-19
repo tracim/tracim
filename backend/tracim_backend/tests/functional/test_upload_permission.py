@@ -7,9 +7,6 @@ import transaction
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.rq import RqQueueName
-from tracim_backend.lib.rq import get_redis_connection
-from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.models.auth import User
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -376,6 +373,7 @@ class TestUploadPermissionWithNotification(object):
         admin_user,
         mailhog,
         app_config,
+        rq_mail_sender_worker: SimpleWorker,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -387,10 +385,7 @@ class TestUploadPermissionWithNotification(object):
 
         mailhog.cleanup_mailhog()
         # Send mail async from redis queue
-        redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
-        worker = SimpleWorker([queue], connection=queue.connection)
-        worker.work(burst=True)
+        rq_mail_sender_worker.work(burst=True)
 
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3

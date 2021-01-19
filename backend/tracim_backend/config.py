@@ -716,6 +716,10 @@ class CFG(object):
             self.get_raw_config("email.notification.activated", "False")
         )
 
+        self.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME = self.get_raw_config(
+            "email.notification.async_queue_name", "mail_sender"
+        )
+
         self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
             "email.notification.smtp.server"
         )

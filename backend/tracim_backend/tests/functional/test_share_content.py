@@ -1,13 +1,9 @@
 import pytest
-from rq import SimpleWorker
 import transaction
 
 from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.rq import RqQueueName
-from tracim_backend.lib.rq import get_redis_connection
-from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -610,6 +606,7 @@ class TestPrivateShareEndpointsWithNotification(object):
         admin_user,
         mailhog,
         app_config,
+        rq_mail_sender_worker,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -634,10 +631,7 @@ class TestPrivateShareEndpointsWithNotification(object):
 
         mailhog.cleanup_mailhog()
         # Send mail async from redis queue
-        redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
-        worker = SimpleWorker([queue], connection=queue.connection)
-        worker.work(burst=True)
+        rq_mail_sender_worker.work(burst=True)
 
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3

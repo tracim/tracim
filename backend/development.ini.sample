@@ -544,6 +544,8 @@ website.usage_conditions =
 ## on this space by default.
 ## NB: new users will not being notified until they login to Tracim a first time
 ; email.notification.enabled_on_invitation = True
+## Name of the RQ/redis queue used if async job processing is enabled
+; email.notification.async_queue_name = mail_sender
 # You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 

@@ -20,3 +20,7 @@ def pytest_collection_modifyitems(items):
             item.add_marker(pytest.mark.mail)
         if "elasticsearch" in item.fixturenames:
             item.add_marker(pytest.mark.elasticsearch)
+        if "pushpin_base_url" in item.fixturenames:
+            item.add_marker(pytest.mark.pushpin)
+        if "radicale_server" in item.fixturenames:
+            item.add_marker(pytest.mark.radicale)

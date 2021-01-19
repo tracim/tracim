@@ -23,7 +23,7 @@ class MailSenderDaemon(FakeDaemon):
         """
         super().__init__(*args, **kwargs)
         self.config = config
-        self.worker = None  # type: RQWorker
+        self.worker = None  # type: typing.Optional[RQWorker]
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
@@ -34,6 +34,8 @@ class MailSenderDaemon(FakeDaemon):
         # When _stop_requested at False, tracim.lib.daemons.RQWorker
         # will raise StopRequested exception in worker thread after receive a
         # job.
+        if not self.worker:
+            return
         self.worker._stop_requested = True
         redis_connection = get_redis_connection(self.config)
         queue = get_rq_queue(redis_connection, RqQueueName.MAIL_SENDER)

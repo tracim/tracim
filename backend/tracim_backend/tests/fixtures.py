@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+import re
 import subprocess
 import typing
 import unittest.mock
@@ -11,6 +12,7 @@ import plaster
 from pyramid import testing
 import pytest
 import requests
+from rq import SimpleWorker
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -148,7 +150,9 @@ def sqlalchemy_url(sqlalchemy_database, tmp_path, unique_name) -> str:
 
 
 @pytest.fixture
-def pushpin(tracim_webserver, tmp_path_factory, unique_name) -> str:
+def pushpin_base_url(
+    tracim_webserver, tmp_path_factory, unique_name
+) -> typing.Generator[str, None, None]:
     pushpin_base = "http://localhost:7999/{}".format(unique_name)
     wait_for_url(pushpin_base)
     yield pushpin_base
@@ -186,12 +190,43 @@ def tracim_webserver(
         "master": start,
     }
     WORKER_ID_PORTS.update({"gw{}".format(index): start + index + 1 for index in range(8)})
+=======
+    quit_process(worker_process, "rq worker")
+    queue.delete()
+
+
+@pytest.fixture
+def rq_mail_sender_worker(app_config: CFG) -> typing.Generator[SimpleWorker, None, None]:
+    redis = get_redis_connection(app_config)
+    queue = get_rq_queue(redis, app_config.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME)
+    queue.delete()
+    worker = SimpleWorker([queue], connection=queue.connection)
+    yield worker
+    queue.delete()
+
+
+@pytest.fixture
+def tracim_webserver(
+    settings, config_uri, engine, session_factory, worker_id
+) -> typing.Generator[subprocess.Popen, None, None]:
+    # NOTE SG 2020-12-22: read the pushpin routes file
+    # to find (pytest_worker_name, http_port) pairs defined in it.
+    test_routes_re = re.compile(r".*tracim_test__(\w+),.*localhost:(\d+)")
+    worker_id_ports = {}
+    with open(
+        pathlib.Path(__file__).parent.parent.parent / "pushpin_config/routes"
+    ) as pushpin_routes:
+        for line in pushpin_routes.readlines():
+            if line.startswith("#"):
+                continue
+            result = test_routes_re.match(line)
+            if not result:
+                continue
+            worker_id_ports[result.group(1)] = int(result.group(2))
     try:
-        port = WORKER_ID_PORTS[worker_id]
+        port = worker_id_ports[worker_id]
     except KeyError:
-        raise KeyError(
-            "No defined port for worker {}. Add it in backend/pushpin_config/routes AND in WORKER_ID_PORTS"
-        )
+        raise KeyError("No defined port for worker {}. Add it in backend/pushpin_config/routes")
     penv = os.environ.copy()
     penv["TRACIM_DEBUG"] = "1"
     listen = "localhost:{}".format(port)
@@ -256,8 +291,13 @@ def settings(config_uri, config_section, sqlalchemy_url, tmp_path, unique_name):
 
     _settings["search.elasticsearch.index_alias"] = unique_name
 
-    os.environ["TRACIM_LIVE_MESSAGES__ASYNC_QUEUE_NAME"] = unique_name
-    _settings["live_messages.async_queue_name"] = unique_name
+    live_messages_queue_name = "{}__event".format(unique_name)
+    os.environ["TRACIM_LIVE_MESSAGES__ASYNC_QUEUE_NAME"] = live_messages_queue_name
+    _settings["live_messages.async_queue_name"] = live_messages_queue_name
+
+    mail_sender_queue_name = "{}__mail_sender".format(unique_name)
+    os.environ["TRACIM_EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME"] = mail_sender_queue_name
+    _settings["email.notification.async_queue_name"] = mail_sender_queue_name
 
     return _settings
 
