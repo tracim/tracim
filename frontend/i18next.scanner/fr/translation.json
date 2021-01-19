@@ -288,9 +288,7 @@
   "You cannot remove this member because there are no other space managers.": "Vous ne pouvez pas supprimer ce membre parce qu'il n'y a pas d'autre responsable.",
   "Error while leaving the space": "Une erreur est survenue au moment de quitter l'espace",
   "{{author}} requested access to {{space}}": "{{author}} a demandé l'accès à {{space}}",
-  "{{author}} granted you access to {{space}}": "{{author}} vous a permis l'accès à {{space}}",
   "{{author}} rejected your access to {{space}}": "{{author}} vous a refusé l'accès à {{space}}",
-  "{{author}} granted access to {{space}} for {{user}}": "{{author}} a permis l'accès à {{space}} pour {{user}}",
   "{{author}} rejected access to {{space}} for {{user}}": "{{author}} a refusé l'accès à {{space}} pour {{user}}",
   "This notification has no associated content": "Cette notification n'a pas de contenu associé",
   "Join a space": "Rejoindre un espace",
@@ -332,6 +330,10 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
-  "unkown": "inconnu",
-  "User account management": "Gestion des comptes utilisateurs"
+  "User account management": "Gestion des comptes utilisateurs",
+  "{{user}}'s profile": "Profil de {{user}}",
+  "Loading": "Chargement",
+  "Information_plural": "Informations",
+  "Personal page": "Page personnelle",
+  "My profile": "Mon profil"
 }

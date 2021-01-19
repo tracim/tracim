@@ -25,6 +25,15 @@ export const MenuProfil = props => {
         buttonDataCy='menuprofil__dropdown__button'
       >
         <Link
+          to={PAGE.PUBLIC_PROFILE(props.user.userId)}
+          data-cy='menuprofil__dropdown__profile__link'
+          key='menuprofil__dropdown__profile__link'
+        >
+          <i className='fa fa-fw fa-user-o' />
+          {props.t('My profile')}
+        </Link>
+
+        <Link
           to={PAGE.ACCOUNT}
           data-cy='menuprofil__dropdown__account__link'
           key='menuprofil__dropdown__account__link'

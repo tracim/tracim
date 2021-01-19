@@ -43,7 +43,8 @@ export const PAGE = {
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
   ACTIVITY_FEED: '/ui/activity-feed',
-  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
+  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
 
 const dateFnsLocale = {
