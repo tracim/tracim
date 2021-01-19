@@ -1,0 +1,19 @@
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const debug = {
+  ...defaultDebug,
+  config: {
+    ...defaultDebug.config,
+    slug: 'admin_workspace_user',
+    faIcon: 'paperclip',
+    hexcolor: '#7d4e24',
+    label: 'File',
+    workspace: {
+      downloadEnabled: true
+    }
+  },
+  content: {
+    workspaceList: [],
+    userList: []
+  }
+}

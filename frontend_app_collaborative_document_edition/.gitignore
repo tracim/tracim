@@ -2,4 +2,5 @@
 .git/
 node_modules/
 dist/collaborative_document_edition.app.js
+dist/collaborative_document_edition.app.standalone.js
 src/debug.js

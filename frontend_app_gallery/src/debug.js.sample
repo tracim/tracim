@@ -9,8 +9,8 @@ export const debug = {
     hexcolor: '#ffa500',
     label: 'Gallery',
     history: { location: { search: '' } },
+    folderId: 0,
     appConfig: {
-      forceShowSidebar: false,
       workspaceId: '1'
     }
   },

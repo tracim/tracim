@@ -4,5 +4,6 @@
 dist/app
 dist/assets
 dist/agenda.app.js
-dist/agenda.bundle.app.js
+dist/agenda.app.standalone.js
 node_modules/
+src/debug.js

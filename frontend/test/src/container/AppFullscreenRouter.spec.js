@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 import { AppFullscreenRouter as AppFullscreenRouterWithoutHOC } from '../../../src/container/AppFullscreenRouter'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 import { PAGE, ROLE } from 'tracim_frontend_lib'
 
 describe('<AppFullscreenRouter />', () => {

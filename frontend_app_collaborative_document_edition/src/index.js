@@ -4,14 +4,9 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import PopupCreateOfficeDocument from './container/PopupCreateOfficeDocument.jsx'
 import CollaborativeEditionFrame from './container/CollaborativeEditionFrame.jsx'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import { CUSTOM_EVENT, ROLE } from 'tracim_frontend_lib'
 import i18n from './i18n.js'
-
-// @TODO make a file that contains all events implemented by this App.
-// @todo add this file to appInterface
-// @todo app shall make it's customReducer from the events of this app
-// so it will be testable by tracim_frontend
 
 require('./css/index.styl')
 

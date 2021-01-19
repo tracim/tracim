@@ -12,7 +12,6 @@ export const debug = {
   },
   content: {
     ...defaultDebug.content,
-    content_id: 0,
     content_type: 'folder',
     workspace_id: 0
   }

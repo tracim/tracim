@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link, withRouter, Route } from 'react-router-dom'
+import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
@@ -252,17 +252,15 @@ export class WorkspaceContent extends React.Component {
     const workspaceId = state.workspaceIdInUrl
     const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === workspaceId).label)
     const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
-          {workspaceLabel}
-        </Link>
-      ),
+      link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
       type: BREADCRUMBS_TYPE.CORE,
-      label: workspaceLabel
+      label: workspaceLabel,
+      isALink: true
     }, {
-      link: <Link to={PAGE.WORKSPACE.CONTENT_LIST(state.workspaceInInUrl)}>{props.t('Contents')}</Link>,
+      link: PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl),
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Contents')
+      label: props.t('Contents'),
+      isALink: true
     }]
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
@@ -528,7 +526,7 @@ export class WorkspaceContent extends React.Component {
     }
   }
 
-  handleUpdateAppOpenedType = openedAppType => this.setState({ appOpenedType: openedAppType })
+  handleUpdateAppOpenedType = appOpenedType => this.setState({ appOpenedType })
 
   handleSetFolderRead = async folderId => {
     const { props, state } = this

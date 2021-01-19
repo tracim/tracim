@@ -6,6 +6,7 @@ from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.lib.utils.app import TracimContentType
@@ -16,6 +17,7 @@ from tracim_backend.lib.utils.authorization import CandidateWorkspaceRoleChecker
 from tracim_backend.lib.utils.authorization import CommentOwnerChecker
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
+from tracim_backend.lib.utils.authorization import KnowsCandidateUserChecker
 from tracim_backend.lib.utils.authorization import OrAuthorizationChecker
 from tracim_backend.lib.utils.authorization import ProfileChecker
 from tracim_backend.lib.utils.authorization import RoleChecker
@@ -650,3 +652,62 @@ class TestAuthorizationChecker(object):
             assert ContentTypeCreationChecker(
                 FakeContentTypeList(), content_type_slug="test"
             ).check(FakeBaseFakeTracimContext())
+
+    def test_unit__KnowsCandidateUserChecker__ok__nominal_case(self, session, app_config) -> None:
+        cfg = app_config
+
+        class Context(BaseFakeTracimContext):
+            app_config = cfg
+            dbsession = session
+            current_user = User(user_id=1, email="toto@toto.toto")
+            candidate_user = User(user_id=2, email="foo@foo.fo")
+
+        workspace = Workspace(workspace_id=3, owner=Context.current_user)
+        current_user_role = UserRoleInWorkspace(
+            user_id=1, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
+        )
+        candidate_user_role = UserRoleInWorkspace(
+            user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
+        )
+        session.add_all(
+            [
+                Context.current_user,
+                Context.candidate_user,
+                workspace,
+                current_user_role,
+                candidate_user_role,
+            ]
+        )
+        session.flush()
+        transaction.commit()
+        assert KnowsCandidateUserChecker().check(Context())
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_known_member_filter_disabled"}], indirect=True,
+    )
+    def test_unit__KnowsCandidateUserChecker__ok__no_filter(self, session, app_config) -> None:
+        cfg = app_config
+
+        class Context(BaseFakeTracimContext):
+            app_config = cfg
+            dbsession = session
+            current_user = User(user_id=1, email="toto@toto.toto")
+            candidate_user = User(user_id=2, email="foo@foo.fo")
+
+        session.add_all([Context.current_user, Context.candidate_user])
+        assert KnowsCandidateUserChecker().check(Context())
+
+    def test_unit__KnowsCandidateUserChecker__err__no_common_workspace(
+        self, session, app_config
+    ) -> None:
+        cfg = app_config
+
+        class Context(BaseFakeTracimContext):
+            app_config = cfg
+            dbsession = session
+            current_user = User(user_id=1, email="toto@toto.toto")
+            candidate_user = User(user_id=2, email="foo@foo.fo")
+
+        session.add_all([Context.current_user, Context.candidate_user])
+        with pytest.raises(UserDoesNotExist):
+            KnowsCandidateUserChecker().check(Context())

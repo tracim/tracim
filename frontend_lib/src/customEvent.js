@@ -24,6 +24,7 @@ export const CUSTOM_EVENT = {
   SHOW_APP: type => `${type}_showApp`,
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
   UNMOUNT_APP: 'unmount_app',
+  UNMOUNT_APP_FEATURE: 'unmount_appFeature',
   USER_CONNECTED: 'userConnected',
   USER_DISCONNECTED: 'userDisconnected'
 }

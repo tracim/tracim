@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-export NODE_ENV=production
-PRODUCTION=true
 CONFIG=webpack.config.js
+BUILD_MODE=production
 
 while [ "$1" != "" ]; do
     case "$1" in
@@ -11,31 +10,21 @@ while [ "$1" != "" ]; do
         ;;
 
         dev)
-            PRODUCTION=false
-        ;;
-
-        optimized-dev)
-            PRODUCTION=false
+            BUILD_MODE=development
         ;;
 
         *)
-            2>&1 echo "Unknown parameter $1"
+            >&2 echo "Unknown parameter $1"
             exit 1
     esac
     shift
 done
 
-if [ "$PRODUCTION" = "true" ]; then
-    devext=""
-    NODE_ENV=production webpack-cli --config "$CONFIG" || exit 1
-else
-    devext=".dev"
-    NODE_ENV=development webpack-cli --config "$CONFIG" || exit 1
-fi
+NODE_ENV="$BUILD_MODE" webpack-cli --config "$CONFIG" || exit 1
 
-if [ "$CONFIG" = "webpack.optimized.config.js" ]; then
+if [ $CONFIG = "webpack.optimized.config.js" ]; then
     for i in lib style; do
-        cp "./dist/tracim_frontend_lib.tracim.$i$devext.js" "../frontend/dist/app/tracim_frontend_lib.$i.js" || exit 1
+        cp "./dist/tracim_frontend_lib.optimized.$i.js" "../frontend/dist/app/tracim_frontend_lib.$i.js" || exit 1
     done
 fi
 
