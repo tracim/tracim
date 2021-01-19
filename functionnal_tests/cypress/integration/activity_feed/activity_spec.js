@@ -32,7 +32,7 @@ describe('At the space activity feed page', () => {
   describe('at last change of one activity of any type', () => {
     it("should redirect to user's profile if click at author name", () => {
       cy.contains('[data-cy=contentActivityHeader__label]', fileTitle)
-      cy.get('.timedEvent__author').click()
+      cy.get('.timedEvent__author').first().click()
       cy.url().should('include', URLS[PAGES.PROFILE]({ userId: user.user_id }))
     })
   })
