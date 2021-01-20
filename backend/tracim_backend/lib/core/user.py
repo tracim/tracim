@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
 
+from depot.io.utils import FileIntent
+from hapic.data import HapicFile
 from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
@@ -52,6 +55,7 @@ from tracim_backend.exceptions import UnknownAuthType
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserAuthTypeDisabled
+from tracim_backend.exceptions import UserAvatarNotFound
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -63,6 +67,7 @@ from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
@@ -1227,3 +1232,105 @@ class UserApi(object):
             authored_content_revisions_count=content_revisions_infos.count,
             authored_content_revisions_space_count=content_revisions_infos.space_count,
         )
+
+    def get_avatar(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.avatar:
+            raise UserAvatarNotFound("avatar of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.avatar,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
+
+    def get_avatar_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cropped_avatar:
+            raise UserAvatarNotFound("cropped version of user {} avatar not found".format(user_id))
+        _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.avatar,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
+
+    def set_avatar(self, user_id: int, new_filename: str, new_mimetype: str, new_content: bytes):
+        user = self.get_one(user_id)
+        label, file_extension = os.path.splitext(new_filename)
+        user.avatar = FileIntent(new_content, new_filename, new_mimetype)
+        # TODO: Crop avatar ! Warning, need to do copy as current cropped avatar is empty
+        user.cropped_avatar = FileIntent(new_content, new_filename, new_mimetype)
+        self._session.add(user)
+        self._session.flush()
+
+    def get_cover(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        raise NotImplementedError()
+
+    def get_cover_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        raise NotImplementedError()
+
+    def set_cover(self, user_id: int, new_filename: str, new_mimetype: str, new_content: bytes):
+        raise NotImplementedError()
+
+    # @contextmanager
+    # def _get_cropped_picture_filepath(self, user_id: int, picture_type: UserProfilePicture) -> typing.Generator[str, None, None]:
+    #     """
+    #     This method allows us to directly get a file path from its
+    #     :param revision_id: The revision id of the filepath we want to return
+    #     :return: The corresponding filepath
+    #     """
+    #     try:
+    #         user = self.get_one(user_id)
+    #         if picture_type == UserProfilePicture.AVATAR:
+    #             depot_file = user.cropped_avatar
+    #         elif picture_type == UserProfilePicture.COVER:
+    #             depot_file = user.cropped_cover
+    #         else:
+    #             raise Exception() # todo better exception
+    #         return StorageLib(app_config=self._config).get_filepath(
+    #             user,
+    #             file_extension="", # todo: check if depot_file give use some information about this.
+    #             temporary_prefix="tracim-user-avatar",
+    #         )
+    #     except IOError as exc:
+    #         # TODO: better error exception
+    #         raise Exception(
+    #             "IOError Unable to find picture filepath." "File may be not available."
+    #         ) from exc
+
+    # def check_user_image_upload_size(self, image_length: int) -> None:
+    #     if self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE == 0:
+    #         return
+    #     elif image_length > self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE:
+    #         raise FileSizeOverMaxLimitation(
+    #             'File cannot be added because its size "{}" is higher than max allowed size : "{}"'.format(
+    #                 image_length,
+    #                 self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE,  # TODO add to config
+    #             )
+    #         )

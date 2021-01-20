@@ -72,6 +72,8 @@ from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
+from tracim_backend.models.context_models import UserPicturePath
+from tracim_backend.models.context_models import UserPreviewPicturePath
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -618,9 +620,21 @@ class FilenamePathSchema(marshmallow.Schema):
     filename = StrippedString("filename.ext")
 
 
+class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPicturePath(**data)
+
+
 class WidthAndHeightPathSchema(marshmallow.Schema):
     width = marshmallow.fields.Int(example=256)
     height = marshmallow.fields.Int(example=256)
+
+
+class UserPreviewPicturePathSchema(UserPicturePathSchema, WidthAndHeightPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPreviewPicturePath(**data)
 
 
 class AllowedJpgPreviewSizesSchema(marshmallow.Schema):

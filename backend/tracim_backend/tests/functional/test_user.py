@@ -2,9 +2,10 @@
 """
 Tests for /api/users subpath endpoints.
 """
-
+import io
 import typing
 
+from PIL import Image
 import pytest
 import transaction
 from webtest import TestApp
@@ -6122,3 +6123,84 @@ class TestAboutUserEndpoint(object):
         web_testapp.authorization = ("Basic", (riyad_user.email, "password"))
         res = web_testapp.get("/api/users/{}/about".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserAvatarEndpoints:
+    """
+    Tests for /api/users/{user_id}/avatar endpoints
+    """
+
+    def test_api__get_user_avatar__ok_200__nominal_case(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
+
+    def test_api__set_user_avatar(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.avatar is not None
+        assert admin_user.cropped_avatar is not None
+
+    def test_api__get_user_avatar_preview(self, admin_user: User, web_testapp):
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
+
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/256x256/{}".format(admin_user.user_id, image.name),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, image.name),
+            status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 256, 256 == new_image.size
