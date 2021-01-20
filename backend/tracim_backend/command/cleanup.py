@@ -283,8 +283,10 @@ class DeleteUserCommand(AppContextCommand):
             # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
             # delete_user_associated_data() in dry-run mode doesn't work
             user_config = user.config
+            user_custom_properties = user.custom_properties
             cleanup_lib.delete_user_associated_data(user)
             cleanup_lib.safe_delete(user_config)
+            cleanup_lib.safe_delete(user_custom_properties)
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
             )
@@ -298,8 +300,10 @@ class DeleteUserCommand(AppContextCommand):
             # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
             # delete_user_associated_data() in dry-run mode doesn't work
             user_config = user.config
+            user_custom_properties = user.custom_properties
             cleanup_lib.delete_user_associated_data(user)
             cleanup_lib.safe_delete(user_config)
+            cleanup_lib.safe_delete(user_custom_properties)
             cleanup_lib.safe_delete(user)
             print('user "{}" deleted'.format(user.user_id))
 

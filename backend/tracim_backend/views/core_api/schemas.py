@@ -298,6 +298,16 @@ class SetConfigSchema(marshmallow.Schema):
     )
 
 
+class SetCustomPropertiesSchema(marshmallow.Schema):
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True, example={"param1": "value1"}, description="custom_properties schema",
+    )
+
+
 class SetEmailSchema(LoggedInUserPasswordSchema):
     email = marshmallow.fields.Email(
         required=True, example="hello@tracim.fr", validate=user_email_validator
@@ -1142,6 +1152,18 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 class UserConfigSchema(marshmallow.Schema):
     parameters = marshmallow.fields.Dict(
         description="parameters present in the user's configuration."
+    )
+
+
+class UserCustomPropertiesSchema(marshmallow.Schema):
+    json_schema = marshmallow.fields.Dict(
+        description="json schema used for user custom properties", required=True, allow_none=False
+    )
+
+
+class UserCustomPropertiesUiSchema(marshmallow.Schema):
+    ui_schema = marshmallow.fields.Dict(
+        description="ui schema used for user custom properties", required=True, allow_none=False,
     )
 
 
