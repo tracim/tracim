@@ -50,7 +50,7 @@ export const ProfileMainBar = props => {
 export default ProfileMainBar
 
 ProfileMainBar.propTypes = {
-  breadcrumbsList: PropTypes.string,
+  breadcrumbsList: PropTypes.array,
   displayedUser: PropTypes.object
 }
 

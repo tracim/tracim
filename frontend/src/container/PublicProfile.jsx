@@ -15,6 +15,15 @@ import {
 import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
+import Information from '../component/PublicProfile/Information.jsx'
+import CustomFormManager from '../component/PublicProfile/CustomFormManager.jsx'
+
+// TODO: delete me before merge
+const wait = async (ms) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  })
+} // await (async () => new Promise(res => setTimeout(res, 100)))()
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -22,7 +31,11 @@ export class PublicProfile extends React.Component {
 
     this.state = {
       displayedUser: undefined,
-      coverImageUrl: undefined
+      coverImageUrl: undefined,
+      informationSchemaObject: {},
+      personalPageSchemaObject: {},
+      uiSchemaObject: {},
+      dataSchemaObject: {}
     }
 
     props.registerCustomEventHandlerList([
@@ -37,12 +50,14 @@ export class PublicProfile extends React.Component {
 
   componentDidMount () {
     this.getUser()
+    this.getUserCustomPropertiesAndSchema()
   }
 
   componentDidUpdate () {
     const { props, state } = this
     if (state.displayedUser && state.displayedUser.userId !== props.match.params.userid) {
       this.getUser()
+      this.getUserCustomPropertiesAndSchema()
     }
   }
 
@@ -96,6 +111,97 @@ export class PublicProfile extends React.Component {
     }
   }
 
+  getUserCustomPropertiesAndSchema = async () => {
+    // const { props, state } = this
+
+    const schemaObject = await this.getUserCustomPropertiesSchema()
+    const uiSchemaObject = await this.getUserCustomPropertiesUiSchema()
+    const customPropertiesObject = await this.getUserCustomProperties()
+
+    const [informationSchema, personalPageSchema] = this.splitSchema(schemaObject)
+
+    this.setState({
+      informationSchemaObject: informationSchema,
+      personalPageSchemaObject: personalPageSchema,
+      uiSchemaObject: uiSchemaObject,
+      dataSchemaObject: customPropertiesObject
+    })
+  }
+
+  // TODO: update this when we know how the backend handles it
+  splitSchema = schema => {
+    const informationSchema = {
+      ...schema,
+      properties: Object.fromEntries(
+        Object.entries(schema.properties).filter(([key, val]) => val.block === 'information')
+      )
+    }
+    const personalPageSchema = {
+      ...schema,
+      properties: Object.fromEntries(
+        Object.entries(schema.properties).filter(([key, val]) => val.block === 'personal')
+      )
+    }
+    return [informationSchema, personalPageSchema]
+  }
+
+  // TODO: update with real api call
+  getUserCustomPropertiesSchema = async () => {
+    await wait(600)
+    return JSON.parse(`{
+  "title": "am I useful ?",
+  "description": "am I useful ?",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "country": {
+      "type": "string",
+      "title": "Pays",
+      "block": "information"
+    },
+    "job": {
+      "type": "string",
+      "title": "Fonction",
+      "block": "information"
+    },
+    "activity": {
+      "type": "string",
+      "title": "Activité / compétences",
+      "block": "information"
+    },
+    "personal_page": {
+      "type": "string",
+      "title": "Page personelle",
+      "block": "personal"
+    }
+  }
+}`)
+  }
+
+  // TODO: update with real api call
+  getUserCustomPropertiesUiSchema = async () => {
+    await wait(300)
+    return JSON.parse(`{
+  "country": {},
+  "job": {},
+  "activity": {},
+  "personal_page": {
+    "ui:widget": "textarea"
+  }
+}`)
+  }
+
+  // TODO: update with real api call
+  getUserCustomProperties = async () => {
+    await wait(900)
+    return JSON.parse(`{
+  "country": "France",
+  "job": "Chief advocate market highlighter",
+  "activity": "making highlights of markets that seems ... dunno, don't care. It's bs anyway.",
+  "personal_page": "I feel the press on my chest from all the stress that I'm getting. The chatter, the clatter is getting fatter by the second. We boast the most as we approach armageddon. The city is a pity of the infinity we getting. So I zoom out and fall into a dream, my shadow shout and my eyes begin to scream ! But I just let go no need to intervene, the mother the colors combobulate into a dream"
+}`)
+  }
+
   render () {
     const { props, state } = this
 
@@ -120,7 +226,14 @@ export class PublicProfile extends React.Component {
           <div className='profile__content'>
             <div className='profile__content__information'>
               {state.displayedUser
-                ? props.t('Information_plural')
+                ? (
+                  <Information
+                    schemaObject={state.informationSchemaObject}
+                    uiSchemaObject={state.uiSchemaObject}
+                    dataSchemaObject={state.dataSchemaObject}
+                    onChangeDataSchema={() => {}}
+                  />
+                )
                 : (
                   <>
                     <div className='profile__text__loading' />
@@ -131,7 +244,15 @@ export class PublicProfile extends React.Component {
 
             <div className='profile__content__page'>
               {state.displayedUser
-                ? props.t('Personal page')
+                ? (
+                  <CustomFormManager
+                    title={props.t('Personal Page')}
+                    schemaObject={state.personalPageSchemaObject}
+                    uiSchemaObject={state.uiSchemaObject}
+                    dataSchemaObject={state.dataSchemaObject}
+                    onChangeDataSchema={() => {}}
+                  />
+                )
                 : (
                   <>
                     <div className='profile__text__loading' />

@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@rjsf/core": "^2.4.1",
     "broadcast-channel": "^3.1.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
