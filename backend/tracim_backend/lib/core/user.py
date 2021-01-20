@@ -1260,7 +1260,7 @@ class UserApi(object):
             raise UserAvatarNotFound("cropped version of user {} avatar not found".format(user_id))
         _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
-            depot_file=user.avatar,
+            depot_file=user.cropped_avatar,
             filename=filename,
             default_filename=default_filename,
             width=width,
@@ -1274,10 +1274,10 @@ class UserApi(object):
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
         user.avatar = FileIntent(new_content, new_filename, new_mimetype)
-        # TODO: Crop avatar ! Warning, need to do copy as current cropped avatar is empty
-        user.cropped_avatar = FileIntent(new_content, new_filename, new_mimetype)
         self._session.add(user)
         self._session.flush()
+
+        user.cropped_avatar = FileIntent(new_content, new_filename, new_mimetype)
 
     def get_cover(
         self, user_id: int, filename: str, default_filename: str, force_download: bool = False,

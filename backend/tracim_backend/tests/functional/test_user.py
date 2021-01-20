@@ -6158,7 +6158,7 @@ class TestUserAvatarEndpoints:
         )
         assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
 
-    def test_api__set_user_avatar(self, admin_user: User, web_testapp):
+    def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         image = create_1000px_png_test_image()
         web_testapp.put(
@@ -6170,7 +6170,28 @@ class TestUserAvatarEndpoints:
         assert admin_user.avatar is not None
         assert admin_user.cropped_avatar is not None
 
-    def test_api__get_user_avatar_preview(self, admin_user: User, web_testapp):
+    def test_api__set_user_avatar__err__no_file(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_avatar__err__wrong_mimetype(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_avatar_preview__ok__nominal_case(self, admin_user: User, web_testapp):
         """
         get 256x256 preview of a avatar
         """

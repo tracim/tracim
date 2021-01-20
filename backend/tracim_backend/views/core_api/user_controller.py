@@ -17,6 +17,7 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
+from tracim_backend.exceptions import MimetypeNotAllowed
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import PageOfPreviewNotFound
@@ -145,6 +146,8 @@ SWAGGER_TAG__USER_CONFIG_ENDPOINTS = generate_documentation_swagger_tag(
 SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 )
+
+ALLOWED_MIMETYPE_FOR_AVATAR = ["image/png", "image/jpeg", "image/webp", "image/bmp", "image/gif"]
 
 
 class UserController(Controller):
@@ -1083,21 +1086,26 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(MimetypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_files(SimpleFileSchema())
     @hapic.input_path(UserPicturePathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
         if hapic_data.files.files is None:
             raise NoFileValidationError('No file "files" given at input, validation failed.')
+        if hapic_data.files.files.type not in ALLOWED_MIMETYPE_FOR_AVATAR:
+            raise MimetypeNotAllowed(
+                "File mimetype {} is not allowed for avatar".format(hapic_data.files.files.type)
+            )
+
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
-        _file = hapic_data.files.files
         user_api.set_avatar(
             user_id=request.candidate_user.user_id,
-            new_filename=_file.filename,
-            new_mimetype=_file.type,
-            new_content=_file.file,
+            new_filename=hapic_data.files.files.filename,
+            new_mimetype=hapic_data.files.files.type,
+            new_content=hapic_data.files.files.file,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])

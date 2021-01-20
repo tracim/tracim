@@ -287,6 +287,10 @@ class ContentTypeNotAllowed(TracimException):
     error_code = ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
 
+class MimetypeNotAllowed(TracimException):
+    error_code = ErrorCode.MIMETYPE_NOT_ALLOWED
+
+
 class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
