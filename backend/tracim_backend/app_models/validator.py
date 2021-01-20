@@ -14,8 +14,8 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.lib.utils.dict_parsing import validate_simple_dict
 from tracim_backend.lib.utils.utils import validate_page_token
-from tracim_backend.lib.utils.utils import validate_simple_dict
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
