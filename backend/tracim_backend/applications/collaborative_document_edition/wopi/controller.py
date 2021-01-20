@@ -36,9 +36,10 @@ from tracim_backend.applications.collaborative_document_edition.wopi.schema impo
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPITokenQuerySchema,
 )
+from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.depot import StorageLib
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_current_content_contributor
 from tracim_backend.lib.utils.authorization import is_current_content_reader
@@ -82,7 +83,7 @@ class WOPIController(Controller):
                 force_download=True,
                 last_modified=content.updated,
             )
-        except IOError as exc:
+        except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
                     request.current_content.cached_revision_id, request.current_content.content_id

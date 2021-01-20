@@ -1,13 +1,13 @@
 # coding=utf-8
 import typing
 
-from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
@@ -25,7 +25,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.depot import StorageLib
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
 from tracim_backend.lib.utils.authorization import check_right
@@ -210,7 +210,7 @@ class FileController(Controller):
                 force_download=hapic_data.query.force_download,
                 last_modified=content.updated,
             )
-        except IOError as exc:
+        except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
                     content.cached_revision_id, content.content_id
@@ -253,7 +253,7 @@ class FileController(Controller):
                 force_download=hapic_data.query.force_download,
                 last_modified=revision.updated,
             )
-        except IOError as exc:
+        except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
                     revision.revision_id, revision.content_id
@@ -286,23 +286,15 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        pdf_preview_path = api.get_pdf_preview_path(
-            content.content_id,
-            content.cached_revision_id,
-            page_number=hapic_data.query.page,
-            file_extension=content.file_extension,
+        default_filename = "{label}_page_{page_number}.pdf".format(
+            label=content.label, page_number=hapic_data.query.page
         )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_page_{page_number}.pdf".format(
-                label=content.label, page_number=hapic_data.query.page
-            )
-        return HapicFile(
-            file_path=pdf_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+        return api.get_one_page_pdf_preview(
+            revision=content.revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            page_number=hapic_data.query.page,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -328,18 +320,12 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        pdf_preview_path = api.get_full_pdf_preview_path(
-            content.cached_revision_id, file_extension=content.file_extension
-        )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will be a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}.pdf".format(label=content.label)
-        return HapicFile(
-            file_path=pdf_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+        default_filename = "{label}.pdf".format(label=content.label)
+        return api.get_full_pdf_preview(
+            revision=content.revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -366,20 +352,14 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
-        pdf_preview_path = api.get_full_pdf_preview_path(
-            revision.revision_id, file_extension=revision.file_extension
+        default_filename = "{label}_r{revision_id}.pdf".format(
+            revision_id=revision.revision_id, label=revision.label
         )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will be a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_r{revision_id}.pdf".format(
-                revision_id=revision.revision_id, label=revision.label
-            )
-        return HapicFile(
-            file_path=pdf_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+        return api.get_full_pdf_preview(
+            revision=revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -406,24 +386,15 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
-        pdf_preview_path = api.get_pdf_preview_path(
-            revision.content_id,
-            revision.revision_id,
-            page_number=hapic_data.query.page,
-            file_extension=revision.file_extension,
+        default_filename = "{label}_page_{page_number}.pdf".format(
+            label=content.label, page_number=hapic_data.query.page
         )
-        filename = hapic_data.path.filename
-
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_page_{page_number}.pdf".format(
-                label=content.label, page_number=hapic_data.query.page
-            )
-        return HapicFile(
-            file_path=pdf_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+        return api.get_one_page_pdf_preview(
+            revision=revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            page_number=hapic_data.query.page,
+            force_download=hapic_data.query.force_download,
         )
 
     # jpg
@@ -451,25 +422,17 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         allowed_dim = api.get_jpg_preview_allowed_dim()
-        jpg_preview_path = api.get_jpg_preview_path(
-            content_id=content.content_id,
-            revision_id=content.cached_revision_id,
+        default_filename = "{label}_page_{page_number}.jpg".format(
+            label=content.label, page_number=hapic_data.query.page
+        )
+        return api.get_jpeg_preview(
+            revision=content.revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
             page_number=hapic_data.query.page,
-            file_extension=content.file_extension,
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
-        )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_page_{page_number}.jpg".format(
-                label=content.label, page_number=hapic_data.query.page
-            )
-        return HapicFile(
-            file_path=jpg_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -496,28 +459,20 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        jpg_preview_path = api.get_jpg_preview_path(
-            content_id=content.content_id,
-            revision_id=content.cached_revision_id,
-            file_extension=content.file_extension,
+        default_filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+            label=content.label,
+            page_number=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+        )
+        return api.get_jpeg_preview(
+            revision=content.revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
             page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
-        )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
-                label=content.label,
-                page_number=hapic_data.query.page,
-                width=hapic_data.path.width,
-                height=hapic_data.path.height,
-            )
-        return HapicFile(
-            file_path=jpg_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -545,29 +500,21 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
-        jpg_preview_path = api.get_jpg_preview_path(
-            content_id=content.content_id,
+        default_filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
             revision_id=revision.revision_id,
+            label=revision.label,
+            page_number=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+        )
+        return api.get_jpeg_preview(
+            revision=revision,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
             page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
-            file_extension=revision.file_extension,
-        )
-        filename = hapic_data.path.filename
-        # INFO - G.M - 2019-08-08 - use given filename in all case but none or
-        # "raw", where filename returned will a custom one.
-        if not filename or filename == "raw":
-            filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
-                revision_id=revision.revision_id,
-                label=revision.label,
-                page_number=hapic_data.query.page,
-                width=hapic_data.path.width,
-                height=hapic_data.path.height,
-            )
-        return HapicFile(
-            file_path=jpg_preview_path,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
+            force_download=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])

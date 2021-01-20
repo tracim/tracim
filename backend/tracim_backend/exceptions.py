@@ -467,7 +467,11 @@ class RevisionDoesNotMatchThisContent(TracimException):
     pass
 
 
-class PageOfPreviewNotFound(NotFound):
+class PreviewGeneratorPassthroughError(TracimException):
+    pass
+
+
+class PageOfPreviewNotFound(NotFound, PreviewGeneratorPassthroughError):
     error_code = ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
 
@@ -548,7 +552,7 @@ class DepotCorrupted(TracimException):
     pass
 
 
-class RevisionFilePathSearchFailedDepotCorrupted(DepotCorrupted):
+class CannotGetDepotFileDepotCorrupted(DepotCorrupted):
     pass
 
 

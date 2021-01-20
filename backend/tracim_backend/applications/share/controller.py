@@ -20,6 +20,7 @@ from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
@@ -27,7 +28,7 @@ from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.depot import StorageLib
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
@@ -246,7 +247,7 @@ class ShareController(Controller):
                 force_download=True,
                 last_modified=content.updated,
             )
-        except IOError as exc:
+        except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
                     content.cached_revision_id, content.content_id
