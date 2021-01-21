@@ -8,7 +8,6 @@ import {
   serialize,
   TracimComponent,
   PopupUploadFile,
-  IconButton,
   PROFILE
 } from 'tracim_frontend_lib'
 import {
@@ -27,8 +26,11 @@ const ALLOWED_IMAGE_MIMETYPES = [
   'image/gif',
   'image/webp'
 ]
-// 1 Mbyte
-const MAXIMUM_IMAGE_SIZE = 1 * 1024 * 1024
+const MAXIMUM_AVATAR_SIZE = 1 * 1024 * 1024 // 1 Mbyte
+const POPUP_DISPLAY_STATE = {
+  AVATAR: 'AVATAR',
+  COVER: 'COVER'
+}
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -37,7 +39,8 @@ export class PublicProfile extends React.Component {
     this.state = {
       displayedUser: undefined,
       coverImageUrl: undefined,
-      displayUploadPopup: undefined
+      displayUploadPopup: undefined,
+      changeImageCount: 0
     }
 
     props.registerCustomEventHandlerList([
@@ -108,11 +111,17 @@ export class PublicProfile extends React.Component {
   }
 
   onChangeAvatar = () => {
-    this.setState({ displayUploadPopup: 'AVATAR' })
+    this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
   }
 
   onCloseUploadPopup = () => {
     this.setState({ displayUploadPopup: undefined })
+  }
+
+  onChangeImageSuccess = () => {
+    this.setState((state) => {
+      return { changeImageCount: state.changeImageCount + 1, displayUploadPopup: undefined }
+    })
   }
 
   render () {
@@ -124,19 +133,19 @@ export class PublicProfile extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          {state.displayUploadPopup === 'AVATAR' && (
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
             <PopupUploadFile
-              title={props.t('Upload an image')}
+              label={props.t('Upload an image')}
               uploadUrl={uploadAvatarUrl}
               httpMethod='POST'
               color={GLOBAL_primaryColor}
               handleClose={this.onCloseUploadPopup}
-              handleSuccess={this.onCloseUploadPopup}
+              handleSuccess={this.onChangeImageSuccess}
               allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
-              maximumFileSize={MAXIMUM_IMAGE_SIZE}
+              maximumFileSize={MAXIMUM_AVATAR_SIZE}
             >
-              <i className='fa fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
-              <i className='fa fa-image' /> {props.t('Maximum size: {{size}}Mb', { size: 1 })}
+              <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
+              <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}}Mb', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
             </PopupUploadFile>
           )}
           <div className='profile__cover'>

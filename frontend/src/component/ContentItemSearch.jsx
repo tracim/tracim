@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { AVATAR_SIZE, Badge, Avatar } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../util/helper.js'
 
 require('./ContentItemSearch.styl')
 
@@ -41,11 +42,12 @@ export const ContentItemSearch = props => {
       <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
           size={AVATAR_SIZE.SMALL}
+          user={props.lastModificationAuthor}
+          apiUrl={FETCH_CONFIG.apiUrl}
           style={{
             display: 'inline-block',
             marginRight: '10px'
           }}
-          publicName={props.lastModificationAuthor}
         />
         {props.lastModificationTime}
       </div>

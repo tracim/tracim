@@ -20,11 +20,15 @@ const Comment = props => {
           className={classnames(`${props.customClass}__body`, 'comment__body')}
           style={props.fromMe ? styleSent : {}}
         >
-          <Avatar size={AVATAR_SIZE.MEDIUM} publicName={props.author} />
+          <Avatar
+            size={AVATAR_SIZE.MEDIUM}
+            user={props.author}
+            apiUrl={props.apiUrl}
+          />
 
           <div className='comment__body__content'>
             <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-              {props.author}
+              {props.author.public_name}
             </div>
 
             <div
@@ -50,7 +54,7 @@ export default Comment
 
 Comment.propTypes = {
   customClass: PropTypes.string,
-  author: PropTypes.string,
+  author: PropTypes.object,
   text: PropTypes.string,
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,

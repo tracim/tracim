@@ -62,7 +62,7 @@ class PopupUploadFile extends React.Component {
 
   isFileUploadAlreadyInList = (fileUpload, fileUploadList) => fileUploadList.some(fu => fu.file.name === fileUpload.file.name)
 
-  isFileUploadInError = (fileUpload) => fileUpload.errorMessage
+  isFileUploadInError = (fileUpload) => fileUpload.errorMessage.length > 0
 
   getFileErrorMessage = (file) => {
     const { props } = this
@@ -70,6 +70,7 @@ class PopupUploadFile extends React.Component {
         props.allowedMimeTypes.length > 0 &&
         !props.allowedMimeTypes.includes(file.type)) return props.t('The type of this file is not allowed')
     if (props.maximumFileSize && file.size > props.maximumFileSize) return props.t('The file is too big')
+    return ''
   }
 
   updateFileUploadProgress = (e, fileUpload) => {
@@ -81,33 +82,55 @@ class PopupUploadFile extends React.Component {
   }
 
   uploadFile = async (fileUpload) => {
-    const xhr = await new Promise((resolve, reject) => {
-      const { props } = this
+    const { props } = this
+    // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
+    const xhr = new XMLHttpRequest()
+    const formData = new FormData()
+    formData.append('files', fileUpload.file)
+    for (const entry of Object.entries(props.additionalFormData)) {
+      formData.append(entry[0], entry[1])
+    }
 
-      const formData = new FormData()
-      formData.append('files', fileUpload.file)
-      for (const entry of Object.entries(props.additionalFormData)) {
-        formData.append(entry[0], entry[1])
+    xhr.upload.addEventListener('progress', e => this.updateFileUploadProgress(e, fileUpload), false)
+
+    xhr.open(props.httpMethod, props.uploadUrl, true)
+    setupCommonRequestHeaders(xhr)
+    xhr.withCredentials = true
+
+    const defaultErrorMessage = props.t('Error while uploading file')
+    let jsonResponse
+    let errorMessage = ''
+    try {
+      await new Promise((resolve, reject) => {
+        xhr.onerror = () => reject(new Error())
+        xhr.onload = resolve
+        xhr.send(formData)
+      })
+    } catch {
+      errorMessage = defaultErrorMessage
+    }
+
+    switch (xhr.status) {
+      case 200:
+        jsonResponse = JSON.parse(xhr.responseText)
+        errorMessage = ''
+        break
+      case 204:
+        errorMessage = ''
+        break
+      case 400: {
+        jsonResponse = JSON.parse(xhr.responseText)
+        const errorMessageObject = props.uploadErrorMessageList.find(m => m.status === xhr.status && m.code === jsonResponse.code)
+        errorMessage = errorMessageObject ? errorMessageObject.message : defaultErrorMessage
       }
+        break
+      default:
+    }
 
-      // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
-      const xhr = new XMLHttpRequest()
-
-      xhr.upload.addEventListener('progress', e => this.updateFileUploadProgress(e, fileUpload), false)
-
-      xhr.open(props.httpMethod, props.uploadUrl, true)
-      setupCommonRequestHeaders(xhr)
-      xhr.withCredentials = true
-
-      xhr.onerror = () => reject(new Error())
-
-      xhr.onload = () => resolve(xhr)
-
-      xhr.send(formData)
-    })
     return {
       ...fileUpload,
-      json: JSON.parse(xhr.responseText),
+      errorMessage: errorMessage,
+      json: jsonResponse,
       status: xhr.status
     }
   }
@@ -116,22 +139,17 @@ class PopupUploadFile extends React.Component {
     const { state, props } = this
 
     this.setState({ uploadStarted: true })
-    try {
-      const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
-      const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !this.isFileUploadInError(fileUpload))
-      const failedFileUploadList = fileUploadDoneList.filter(this.isFileUploadInErrorStatus)
+    const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
+    const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !this.isFileUploadInError(fileUpload))
+    const failedFileUploadList = fileUploadDoneList.filter(this.isFileUploadInError)
 
-      if (failedFileUploadList.length >= 0) {
-        this.setState({
-          uploadFileList: failedFileUploadList
-        })
-        this.sendGlobalFlashMessage(props.t('Error while uploading file'))
-        props.handleFailure(failedFileUploadList)
-      } else props.handleSuccess(successfulFileUploadList)
-    } catch {
-      this.sendGlobalFlashMessage(props.t('Error while uploading file'))
-      props.handleFailure()
-    }
+    if (failedFileUploadList.length > 0) {
+      this.setState({
+        uploadFileList: failedFileUploadList
+      })
+      this.sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
+      props.handleFailure(failedFileUploadList)
+    } else props.handleSuccess(successfulFileUploadList)
     this.setState({ uploadStarted: false })
   }
 
@@ -219,7 +237,7 @@ class PopupUploadFile extends React.Component {
 }
 
 PopupUploadFile.propTypes = {
-  title: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   uploadUrl: PropTypes.string.isRequired,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,
@@ -230,7 +248,8 @@ PopupUploadFile.propTypes = {
   handleClose: PropTypes.func,
   additionalFormData: PropTypes.object,
   allowedMimeTypes: PropTypes.array,
-  maximumFileSize: PropTypes.int
+  maximumFileSize: PropTypes.number,
+  uploadErrorMessageList: PropTypes.array
 }
 
 PopupUploadFile.defaultProps = {
@@ -241,7 +260,8 @@ PopupUploadFile.defaultProps = {
   maximumFileSize: 0,
   handleSuccess: () => {},
   handleFailure: () => {},
-  handleClose: () => {}
+  handleClose: () => {},
+  uploadErrorMessageList: []
 }
 
 export default translate()(TracimComponent(PopupUploadFile))

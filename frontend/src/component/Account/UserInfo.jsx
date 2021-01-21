@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { getUserProfile } from '../../util/helper.js'
+import { getUserProfile, FETCH_CONFIG } from '../../util/helper.js'
 import { Avatar, AVATAR_SIZE } from 'tracim_frontend_lib'
 
 require('./UserInfo.styl')
@@ -8,7 +8,11 @@ require('./UserInfo.styl')
 export const UserInfo = props =>
   <div className='userinfo mr-5 ml-5 mb-5' data-cy='userinfo'>
     <div className='userinfo__avatar' data-cy='userinfo__avatar'>
-      <Avatar size={AVATAR_SIZE.BIG} publicName={props.user.publicName} />
+      <Avatar
+        size={AVATAR_SIZE.BIG}
+        user={props.user}
+        apiUrl={FETCH_CONFIG.apiUrl}
+      />
     </div>
 
     <div className='userinfo__wrapper'>

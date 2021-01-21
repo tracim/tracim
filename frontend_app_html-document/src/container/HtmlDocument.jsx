@@ -834,6 +834,7 @@ export class HtmlDocument extends React.Component {
           <HtmlDocumentComponent
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
+            apiUrl={state.config.apiUrl}
             customColor={state.config.hexcolor}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
@@ -880,6 +881,7 @@ export class HtmlDocument extends React.Component {
                   loggedUser={state.loggedUser}
                   timelineData={state.timeline}
                   newComment={state.newComment}
+                  apiUrl={state.config.apiUrl}
                   disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
                   availableStatusList={state.config.availableStatuses}
                   wysiwyg={state.timelineWysiwyg}

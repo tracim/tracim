@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { FETCH_CONFIG } from '../../../util/helper.js'
 import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
@@ -15,7 +16,8 @@ export const MenuProfil = props => {
         buttonOpts={
           <Avatar
             size={AVATAR_SIZE.SMALL}
-            publicName={props.user.publicName}
+            user={props.user}
+            apiUrl={FETCH_CONFIG.apiUrl}
             key='menuprofil__dropdown__avatar'
           />
         }

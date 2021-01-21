@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+
 import {
   Avatar,
   AVATAR_SIZE,
@@ -8,17 +9,24 @@ import {
   IconButton
 } from 'tracim_frontend_lib'
 
-export const ProfileMainBar = props => {
-  const hasUser = Object.keys(props.displayedUser).length !== 0
+import { FETCH_CONFIG } from '../../util/helper.js'
 
+export const ProfileMainBar = props => {
+  const hasUser = Object.keys(props.displayedUser).length > 0
   return (
     <div className='profile__mainBar'>
       <div className='profile__mainBar__avatar'>
         <Avatar
           customClass='profile__mainBar__avatar__big'
-          publicName={hasUser ? props.displayedUser.publicName : ''}
+          apiUrl={FETCH_CONFIG.apiUrl}
+          user={props.displayedUser}
           size={AVATAR_SIZE.BIG}
-          style={{ position: 'relative', top: '-15px' }}
+        />
+        <Avatar
+          customClass='profile__mainBar__avatar__medium'
+          publicName={hasUser ? props.displayedUser.publicName : ''}
+          user={props.displayedUser}
+          size={AVATAR_SIZE.MEDIUM}
         />
         {props.changeAvatarEnabled && (
           <IconButton
@@ -26,14 +34,9 @@ export const ProfileMainBar = props => {
             icon='upload'
             onClick={props.handleChangeAvatar}
             customClass='profile__mainBar__avatar__changeBtn'
-            intent='link'
+            intent='pins'
           />
         )}
-        <Avatar
-          customClass='profile__mainBar__avatar__medium'
-          publicName={hasUser ? props.displayedUser.publicName : ''}
-          size={AVATAR_SIZE.MEDIUM}
-        />
       </div>
       {hasUser
         ? (

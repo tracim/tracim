@@ -2,22 +2,24 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import UserInfo from '../../src/component/UserInfo/UserInfo.jsx'
-import Avatar from '../../src/component/Avatar/Avatar.jsx'
 
 describe('<UserInfo />', () => {
   const props = {
-    publicName: 'randomName',
-    username: 'randomUsername'
+    user: {
+      publicName: 'randomName',
+      username: 'randomUsername'
+    },
+    apiUrl: '/'
   }
 
   const wrapper = shallow(<UserInfo {...props} />)
 
   it(`should have the name: "${props.publicName}"`, () =>
-    expect(wrapper.find('.userInfo__name')).to.contain(props.publicName)
+    expect(wrapper.find('.userInfo__name')).to.contain(props.user.publicName)
   )
 
   it(`should have the username: "${props.username}"`, () =>
-    expect(wrapper.find('.userInfo__username')).to.contain(props.username)
+    expect(wrapper.find('.userInfo__username')).to.contain(props.user.username)
   )
 
   it('should have an @ if the username is not empty', () =>
@@ -25,11 +27,11 @@ describe('<UserInfo />', () => {
   )
 
   it('should not show the username if it is empty', () => {
-    wrapper.setProps({ username: '' })
+    wrapper.setProps({ user: { username: '' } })
     expect(wrapper.find('.userInfo__username').length).equal(0)
   })
 
   it('should have an Avatar', () =>
-    expect(wrapper.find('.userInfo').find(Avatar).length).equal(1)
+    expect(wrapper.find('.userInfo').find('Avatar').length).equal(1)
   )
 })
