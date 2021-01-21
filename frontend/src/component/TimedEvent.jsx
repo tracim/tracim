@@ -2,8 +2,11 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
-import { DistanceDate, DropdownMenu } from 'tracim_frontend_lib'
+import {
+  DistanceDate,
+  DropdownMenu,
+  ProfileNavigation
+} from 'tracim_frontend_lib'
 
 require('./TimedEvent.styl')
 
@@ -22,7 +25,10 @@ const TimedEvent = (props) => {
     <TimedEvent
       key={event.eventId}
       date={event.created}
-      authorName={event.author.public_name}
+      author={{
+        publicName: event.author.public_name,
+        userId: event.author.user_id
+      }}
       lang={props.lang}
       operation={event.eventType}
       t={props.t}
@@ -49,7 +55,9 @@ const TimedEvent = (props) => {
         : <div>{topContents}</div>}
       <div className='timedEvent__bottom'>
         {props.t('by')}&nbsp;
-        <span className='timedEvent__author' title={props.authorName}>{props.authorName}</span>
+        <ProfileNavigation user={props.author}>
+          <span className='timedEvent__author' title={props.author.publicName}>{props.author.publicName}</span>
+        </ProfileNavigation>
       </div>
     </div>
   )
@@ -57,7 +65,7 @@ const TimedEvent = (props) => {
 
 TimedEvent.propTypes = {
   date: PropTypes.string.isRequired,
-  authorName: PropTypes.string.isRequired,
+  author: PropTypes.object.isRequired,
   lang: PropTypes.string.isRequired,
   operation: PropTypes.string,
   customClass: PropTypes.string,
