@@ -1042,3 +1042,59 @@ export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
     method: 'GET'
   })
 }
+
+export const getCustomPropertiesSchema = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/user-custom-properties-schema`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: '',
+    dispatch
+  })
+}
+
+export const getCustomPropertiesUiSchema = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/user-custom-properties-ui-schema`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: '',
+    dispatch
+  })
+}
+
+export const getUserCustomPropertiesDataSchema = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/custom-properties`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: '',
+    dispatch
+  })
+}
+
+export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch => {
+  console.log('formData', formData)
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/custom-properties`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT',
+      body: JSON.stringify({
+        parameters: formData
+      })
+    },
+    actionName: '',
+    dispatch
+  })
+}

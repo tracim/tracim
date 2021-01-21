@@ -1,20 +1,69 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { IconButton } from 'tracim_frontend_lib'
-import Form from '@rjsf/core'
+// import Form from '@rjsf/core'
+import Form from 'react-jsonschema-form-bs4'
+
+require('./CustomFormManager.styl')
+
+const DisplaySchemaProperty = props => {
+  return (
+    <div
+      className='DisplaySchemaProperty'
+    >
+      <span
+        className={classnames(
+          'DisplaySchemaProperty__label',
+          { noLabel: !props.label }
+        )}
+      >
+        {props.label}
+      </span>
+      <span className='DisplaySchemaProperty__value'>{props.value}</span>
+    </div>
+  )
+}
+
+const DisplaySchemaObject = props => {
+  // if (props.schema.hasOwnProperty('properties')) {
+  //   return (
+  //     <>
+  //       <div className='title'>{props.schema.title}</div>
+  //       <DisplaySchemaObject schema={props.schema.properties} />
+  //     </>
+  //   )
+  // }
+  if (!props.schemaObject.properties) return null
+
+  return (
+    Object.entries(props.schemaObject.properties).map(([key, val]) => {
+      return (
+        <DisplaySchemaProperty
+          label={val.title}
+          value={props.dataSchemaObject[key]}
+          key={`schemaField_${key}`}
+        />
+      )
+    })
+  )
+}
 
 const SchemaAsView = props => {
-  if (!props.schemaObject.properties) return null
   return (
-    <div>
-      {Object.entries(props.schemaObject.properties).map(([key, val]) => {
-        return (
-          <div key={`viewInfoCustomProp_${key}`}>
-            <span>{val.title}</span><span>{props.dataSchemaObject[key]}</span>
-          </div>
-        )
-      })}
+    <div className='SchemaAsView'>
+      <DisplaySchemaObject
+        schemaObject={props.schemaObject}
+        dataSchemaObject={props.dataSchemaObject}
+      />
+
+      <IconButton
+        customClass={props.submitButtonClass}
+        icon='pencil-square-o'
+        onClick={props.onClickToggleButton}
+        text={props.validateLabel}
+      />
     </div>
   )
 }
@@ -25,8 +74,18 @@ const SchemaAsForm = props => {
       schema={props.schemaObject}
       uiSchema={props.uiSchemaObject}
       formData={props.dataSchemaObject}
-      onChange={props.onChangeDataSchema}
-    />
+      onSubmit={(formData, e) => {
+        props.onClickToggleButton()
+        props.onSubmitDataSchema(formData, e)
+      }}
+    >
+      <IconButton
+        customClass={props.submitButtonClass}
+        icon='check'
+        type='submit'
+        text={props.validateLabel}
+      />
+    </Form>
   )
 }
 
@@ -39,7 +98,7 @@ export class CustomFormManager extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      mode: MODE.VIEW
+      mode: MODE.EDIT
     }
   }
 
@@ -59,33 +118,17 @@ export class CustomFormManager extends React.Component {
     const { props, state } = this
 
     return (
-      <div>
+      <div style={{ position: 'relative' }}>
         <div>{props.title}</div>
-
-        {(state.mode === MODE.VIEW
-          ? (
-            <IconButton
-              customClass=''
-              icon='pencil-square-o'
-              onClick={this.handleClickToggleMode}
-              text={props.t('Edit')}
-            />
-          )
-          : (
-            <IconButton
-              customClass=''
-              icon='check'
-              onClick={this.handleClickToggleMode}
-              text={props.t('Validate')}
-            />
-          )
-        )}
 
         {(state.mode === MODE.VIEW
           ? (
             <SchemaAsView
               schemaObject={props.schemaObject}
               dataSchemaObject={props.dataSchemaObject}
+              validateLabel={props.t('Edit')}
+              submitButtonClass={props.submitButtonClass}
+              onClickToggleButton={this.handleClickToggleMode}
             />
           )
           : (
@@ -93,6 +136,10 @@ export class CustomFormManager extends React.Component {
               schemaObject={props.schemaObject}
               uiSchemaObject={props.uiSchemaObject}
               dataSchemaObject={props.dataSchemaObject}
+              onSubmitDataSchema={props.onSubmitDataSchema}
+              validateLabel={props.t('Validate')}
+              submitButtonClass={props.submitButtonClass}
+              onClickToggleButton={this.handleClickToggleMode}
             />
           )
         )}
@@ -108,7 +155,7 @@ CustomFormManager.propTypes = {
   schemaObject: PropTypes.object,
   uiSchemaObject: PropTypes.object,
   dataSchemaObject: PropTypes.object,
-  onChangeDataSchema: PropTypes.func
+  onSubmitDataSchema: PropTypes.func
 }
 
 CustomFormManager.defaultProps = {
@@ -116,5 +163,5 @@ CustomFormManager.defaultProps = {
   schemaObject: {},
   uiSchemaObject: {},
   dataSchemaObject: {},
-  onChangeDataSchema: () => {}
+  onSubmitDataSchema: () => {}
 }

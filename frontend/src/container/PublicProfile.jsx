@@ -10,20 +10,25 @@ import {
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  setBreadcrumbs, setHeadTitle
 } from '../action-creator.sync.js'
-import { getAboutUser } from '../action-creator.async'
+import {
+  getAboutUser,
+  getCustomPropertiesSchema,
+  getCustomPropertiesUiSchema,
+  getUserCustomPropertiesDataSchema,
+  putUserCustomPropertiesDataSchema
+} from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 import Information from '../component/PublicProfile/Information.jsx'
 import CustomFormManager from '../component/PublicProfile/CustomFormManager.jsx'
 
-// TODO: delete me before merge
-const wait = async (ms) => {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  })
-} // await (async () => new Promise(res => setTimeout(res, 100)))()
+const DISPLAY_GROUP_BACKEND_KEY = {
+  uiSchemaKey: 'tracim:display_group',
+  information: 'public_profile_first',
+  personalPage: 'public_profile_second'
+}
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -77,6 +82,10 @@ export class PublicProfile extends React.Component {
     }]))
   }
 
+  setHeadTitle = userPublicName => {
+    this.props.dispatch(setHeadTitle(userPublicName))
+  }
+
   getUser = async () => {
     const { props } = this
     const userId = props.match.params.userid
@@ -88,118 +97,134 @@ export class PublicProfile extends React.Component {
         this.setState({
           displayedUser: {
             ...serialize(fetchGetUser.json, serializeUserProps),
-            userId: userId
+            userId: userId,
+            authoredContentRevisionsCount: fetchGetUser.json.authored_content_revisions_count,
+            authoredContentRevisionsSpaceCount: fetchGetUser.json.authored_content_revisions_space_count,
+            leadersCount: fetchGetUser.json.leaders_count,
+            followersCount: fetchGetUser.json.followers_count
           },
           coverImageUrl: 'default'
         })
         this.buildBreadcrumbs()
+        this.setHeadTitle(fetchGetUser.json.public_name)
         break
       case 400:
         switch (fetchGetUser.json.code) {
           case 1001:
-            props.dispatch(newFlashMessage(props.t('Unknown user')))
+            props.dispatch(newFlashMessage(props.t('Unknown user', 'warning')))
             props.history.push(PAGE.HOME)
             break
           default:
-            props.dispatch(newFlashMessage(props.t('Error while loading user')))
+            props.dispatch(newFlashMessage(props.t('Error while loading user', 'warning')))
             props.history.push(PAGE.HOME)
         }
         break
       default:
-        props.dispatch(newFlashMessage(props.t('Error while loading user')))
+        props.dispatch(newFlashMessage(props.t('Error while loading user', 'warning')))
         props.history.push(PAGE.HOME)
     }
   }
 
   getUserCustomPropertiesAndSchema = async () => {
-    // const { props, state } = this
+    const { props } = this
 
-    const schemaObject = await this.getUserCustomPropertiesSchema()
-    const uiSchemaObject = await this.getUserCustomPropertiesUiSchema()
-    const customPropertiesObject = await this.getUserCustomProperties()
+    const userId = props.match.params.userid
 
-    const [informationSchema, personalPageSchema] = this.splitSchema(schemaObject)
+    const schemaObjectRequest = this.getUserCustomPropertiesSchema()
+    const uiSchemaObjectRequest = this.getUserCustomPropertiesUiSchema()
+    const dataSchemaObjectRequest = this.getUserCustomPropertiesDataSchema(userId)
+
+    const [schemaObject, uiSchemaObject, dataSchemaObject] = await Promise.all(
+      [schemaObjectRequest, uiSchemaObjectRequest, dataSchemaObjectRequest]
+    )
+
+    const [informationSchema, personalPageSchema] = this.splitSchema(schemaObject, uiSchemaObject)
 
     this.setState({
       informationSchemaObject: informationSchema,
       personalPageSchemaObject: personalPageSchema,
       uiSchemaObject: uiSchemaObject,
-      dataSchemaObject: customPropertiesObject
+      dataSchemaObject: dataSchemaObject
     })
   }
 
-  // TODO: update this when we know how the backend handles it
-  splitSchema = schema => {
+  splitSchema = (schema, uiSchema) => {
     const informationSchema = {
       ...schema,
+      required: schema.required.filter(field =>
+        this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+      ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) => val.block === 'information')
+        Object.entries(schema.properties).filter(([key, val]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+        )
       )
     }
     const personalPageSchema = {
       ...schema,
+      required: schema.required.filter(field =>
+        this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+      ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) => val.block === 'personal')
+        Object.entries(schema.properties).filter(([key, val]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+        )
       )
     }
     return [informationSchema, personalPageSchema]
   }
 
-  // TODO: update with real api call
+  findPropertyDisplayGroup = (property, uiSchema) => {
+    if (!property || !uiSchema || !uiSchema[property]) return ''
+    return uiSchema[property][DISPLAY_GROUP_BACKEND_KEY.uiSchemaKey]
+  }
+
   getUserCustomPropertiesSchema = async () => {
-    await wait(600)
-    return JSON.parse(`{
-  "title": "am I useful ?",
-  "description": "am I useful ?",
-  "type": "object",
-  "required": [],
-  "properties": {
-    "country": {
-      "type": "string",
-      "title": "Pays",
-      "block": "information"
-    },
-    "job": {
-      "type": "string",
-      "title": "Fonction",
-      "block": "information"
-    },
-    "activity": {
-      "type": "string",
-      "title": "Activité / compétences",
-      "block": "information"
-    },
-    "personal_page": {
-      "type": "string",
-      "title": "Page personelle",
-      "block": "personal"
+    const { props } = this
+    const result = await props.dispatch(getCustomPropertiesSchema())
+    switch (result.status) {
+      case 200: return result.json.json_schema
+      default: return {}
     }
   }
-}`)
-  }
 
-  // TODO: update with real api call
   getUserCustomPropertiesUiSchema = async () => {
-    await wait(300)
-    return JSON.parse(`{
-  "country": {},
-  "job": {},
-  "activity": {},
-  "personal_page": {
-    "ui:widget": "textarea"
-  }
-}`)
+    const { props } = this
+    const result = await props.dispatch(getCustomPropertiesUiSchema())
+    switch (result.status) {
+      case 200: return result.json.ui_schema
+      default: return {}
+    }
   }
 
-  // TODO: update with real api call
-  getUserCustomProperties = async () => {
-    await wait(900)
-    return JSON.parse(`{
-  "country": "France",
-  "job": "Chief advocate market highlighter",
-  "activity": "making highlights of markets that seems ... dunno, don't care. It's bs anyway.",
-  "personal_page": "I feel the press on my chest from all the stress that I'm getting. The chatter, the clatter is getting fatter by the second. We boast the most as we approach armageddon. The city is a pity of the infinity we getting. So I zoom out and fall into a dream, my shadow shout and my eyes begin to scream ! But I just let go no need to intervene, the mother the colors combobulate into a dream"
-}`)
+  getUserCustomPropertiesDataSchema = async userId => {
+    const { props } = this
+    const result = await props.dispatch(getUserCustomPropertiesDataSchema(userId))
+    switch (result.status) {
+      case 200: return result.json.parameters
+      default: return {}
+    }
+  }
+
+  handleSubmitDataSchema = async (dataSchemaObject, e, displayGroup) => {
+    const { props, state } = this
+
+    const userId = props.match.params.userid
+
+    const mergedDataSchemaObject = {
+      ...state.dataSchemaObject,
+      ...dataSchemaObject.formData
+    }
+
+    const result = await props.dispatch(putUserCustomPropertiesDataSchema(userId, mergedDataSchemaObject))
+    switch (result.status) {
+      case 204:
+        this.setState({ dataSchemaObject: mergedDataSchemaObject })
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while saving public profile', 'warning')))
+        break
+    }
   }
 
   render () {
@@ -231,7 +256,11 @@ export class PublicProfile extends React.Component {
                     schemaObject={state.informationSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.dataSchemaObject}
-                    onChangeDataSchema={() => {}}
+                    authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
+                    authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
+                    onSubmitDataSchema={
+                      (formData, e) => this.handleSubmitDataSchema(formData, e, DISPLAY_GROUP_BACKEND_KEY.information)
+                    }
                   />
                 )
                 : (
@@ -247,10 +276,13 @@ export class PublicProfile extends React.Component {
                 ? (
                   <CustomFormManager
                     title={props.t('Personal Page')}
+                    submitButtonClass='profile__customForm__submit primaryColorBorder'
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.dataSchemaObject}
-                    onChangeDataSchema={() => {}}
+                    onSubmitDataSchema={
+                      (formData, e) => this.handleSubmitDataSchema(formData, e, DISPLAY_GROUP_BACKEND_KEY.personalPage)
+                    }
                   />
                 )
                 : (

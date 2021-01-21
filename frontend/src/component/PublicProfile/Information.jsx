@@ -8,17 +8,22 @@ export const Information = props => {
     <div>
       <CustomFormManager
         title={props.t('Information_plural')}
+        submitButtonClass='profile__customForm__submit primaryColorBorder'
         schemaObject={props.schemaObject}
         uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}
+        onSubmitDataSchema={props.onSubmitDataSchema}
       />
 
       <div>
-        <div>{props.t('Registration date: ')}</div>
+        <div>{props.t('Registration date: ')}{props.registrationDate}</div>
         <div>
           {props.t(
-            '{{ actionNumber }} interventions in {{ spaceNumber }} spaces',
-            { actionNumber: 1337, spaceNumber: 42 }
+            '{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces',
+            {
+              authoredContentRevisionsCount: props.authoredContentRevisionsCount,
+              authoredContentRevisionsSpaceCount: props.authoredContentRevisionsSpaceCount
+            }
           )}
         </div>
       </div>
@@ -31,11 +36,19 @@ export default translate()(Information)
 Information.propTypes = {
   schemaObject: PropTypes.object,
   uiSchemaObject: PropTypes.object,
-  dataSchemaObject: PropTypes.object
+  dataSchemaObject: PropTypes.object,
+  registrationDate: PropTypes.string,
+  authoredContentRevisionsCount: PropTypes.number,
+  authoredContentRevisionsSpaceCount: PropTypes.number,
+  onSubmitDataSchema: PropTypes.func
 }
 
 Information.defaultProps = {
   schemaObject: {},
   uiSchemaObject: {},
-  dataSchemaObject: {}
+  dataSchemaObject: {},
+  registrationDate: '',
+  authoredContentRevisionsCount: 0,
+  authoredContentRevisionsSpaceCount: 0,
+  onSubmitDataSchema: () => {}
 }
