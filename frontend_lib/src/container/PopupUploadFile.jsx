@@ -8,9 +8,14 @@ import FileDropzone from '../component/FileDropzone/FileDropzone.jsx'
 import FileUploadList from '../component/FileDropzone/FileUploadList.jsx'
 import {
   computeProgressionPercentage,
-  setupCommonRequestHeaders,
   FILE_PREVIEW_STATE
 } from '../helper.js'
+import {
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
+} from '../fileUpload.js'
 import {
   CUSTOM_EVENT
 } from '../customEvent.js'
@@ -29,7 +34,7 @@ class PopupUploadFile extends React.Component {
     }
   }
 
-  handleDropFile = droppedFileList => {
+  handleDropFile = async droppedFileList => {
     const { props, state } = this
 
     if (!droppedFileList || droppedFileList.length === 0) return
@@ -39,13 +44,9 @@ class PopupUploadFile extends React.Component {
       return
     }
 
-    const droppedFileUploadList = droppedFileList.map(f => { return { file: f, progress: 0, errorMessage: this.getFileErrorMessage(f), status: null, json: null } })
+    const droppedFileUploadList = droppedFileList.map(file => createFileUpload(file, this.getFileErrorMessage(file)))
 
-    if (droppedFileUploadList.length === 1 && state.fileUploadList.length === 0) {
-      this.loadUploadFilePreview(droppedFileUploadList[0].file)
-    } else this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE })
-
-    const addedFileUploadList = droppedFileUploadList.filter((fileUpload) => !this.isFileUploadAlreadyInList(fileUpload, state.fileUploadList))
+    const addedFileUploadList = droppedFileUploadList.filter((fileUpload) => !isFileUploadInList(fileUpload, state.fileUploadList))
     if (addedFileUploadList.length !== droppedFileUploadList.length) {
       const alreadyPresentFilenameList = droppedFileUploadList
         .filter((fileUpload) => this.isFileUploadAlreadyInList(fileUpload, state.fileUploadList))
@@ -57,12 +58,9 @@ class PopupUploadFile extends React.Component {
         </div>
       )
     }
+    if (state.fileUploadList.length === 0) this.loadFileUploadPreview(droppedFileUploadList)
     this.setState({ fileUploadList: [...state.fileUploadList, ...addedFileUploadList] })
   }
-
-  isFileUploadAlreadyInList = (fileUpload, fileUploadList) => fileUploadList.some(fu => fu.file.name === fileUpload.file.name)
-
-  isFileUploadInError = (fileUpload) => fileUpload.errorMessage.length > 0
 
   getFileErrorMessage = (file) => {
     const { props } = this
@@ -81,58 +79,19 @@ class PopupUploadFile extends React.Component {
     this.setState({ fileUploadProgressPercentage })
   }
 
-  uploadFile = async (fileUpload) => {
+  uploadFile = (fileUpload) => {
     const { props } = this
-    // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
-    const xhr = new XMLHttpRequest()
-    const formData = new FormData()
-    formData.append('files', fileUpload.file)
-    for (const entry of Object.entries(props.additionalFormData)) {
-      formData.append(entry[0], entry[1])
-    }
-
-    xhr.upload.addEventListener('progress', e => this.updateFileUploadProgress(e, fileUpload), false)
-
-    xhr.open(props.httpMethod, props.uploadUrl, true)
-    setupCommonRequestHeaders(xhr)
-    xhr.withCredentials = true
-
-    const defaultErrorMessage = props.t('Error while uploading file')
-    let jsonResponse
-    let errorMessage = ''
-    try {
-      await new Promise((resolve, reject) => {
-        xhr.onerror = () => reject(new Error())
-        xhr.onload = resolve
-        xhr.send(formData)
-      })
-    } catch {
-      errorMessage = defaultErrorMessage
-    }
-
-    switch (xhr.status) {
-      case 200:
-        jsonResponse = JSON.parse(xhr.responseText)
-        errorMessage = ''
-        break
-      case 204:
-        errorMessage = ''
-        break
-      case 400: {
-        jsonResponse = JSON.parse(xhr.responseText)
-        const errorMessageObject = props.uploadErrorMessageList.find(m => m.status === xhr.status && m.code === jsonResponse.code)
-        errorMessage = errorMessageObject ? errorMessageObject.message : defaultErrorMessage
+    return uploadFile(
+      fileUpload,
+      props.uploadUrl,
+      {
+        additionalFormData: props.additionalFormData,
+        httpMethod: props.httpMethod,
+        progressEventHandler: this.updateFileUploadProgress,
+        errorMessageList: props.uploadErrorMessageList,
+        defaultErrorMessage: props.t('Error while uploading file')
       }
-        break
-      default:
-    }
-
-    return {
-      ...fileUpload,
-      errorMessage: errorMessage,
-      json: jsonResponse,
-      status: xhr.status
-    }
+    )
   }
 
   handleValidate = async () => {
@@ -140,8 +99,8 @@ class PopupUploadFile extends React.Component {
 
     this.setState({ uploadStarted: true })
     const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
-    const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !this.isFileUploadInError(fileUpload))
-    const failedFileUploadList = fileUploadDoneList.filter(this.isFileUploadInError)
+    const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !isFileUploadInErrorState(fileUpload))
+    const failedFileUploadList = fileUploadDoneList.filter(isFileUploadInErrorState)
 
     if (failedFileUploadList.length > 0) {
       this.setState({
@@ -153,37 +112,45 @@ class PopupUploadFile extends React.Component {
     this.setState({ uploadStarted: false })
   }
 
-  handleDeleteFileUpload = (fileUpload) => {
+  handleDeleteFileUpload = async fileUpload => {
     const { state } = this
-
     const updatedFileUploadList = state.fileUploadList.filter(fu => fu !== fileUpload)
-    switch (updatedFileUploadList.length) {
-      case 0:
-        this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE, fileUploadList: updatedFileUploadList })
-        return
-      case 1:
-        this.loadUploadFilePreview(updatedFileUploadList[0].file)
-        break
-    }
+    this.loadFileUploadPreview(updatedFileUploadList)
     this.setState({ fileUploadList: updatedFileUploadList })
   }
 
-  isValidateButtonDisabled = () => {
+  isValidateButtonDisabled = async () => {
     const { state } = this
-    return state.fileUploadList.length === 0 || state.uploadStarted || state.fileUploadList.some(this.isFileUploadInError)
+    return state.fileUploadList.length === 0 || state.uploadStarted || state.fileUploadList.some(isFileUploadInErrorState)
   }
 
-  loadUploadFilePreview = (file) => {
-    if (!file.type.includes('image') || file.size > MAX_PREVIEW_IMAGE_SIZE) return
-
-    const reader = new FileReader()
-    reader.onload = e => {
-      this.setState({ fileUploadPreview: e.total > 0 ? e.target.result : FILE_PREVIEW_STATE.NO_FILE })
-      const img = new Image()
-      img.src = e.target.result
-      img.onerror = () => this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE })
+  loadFileUploadPreview = async (fileUploadList) => {
+    const loadImage = (file) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      return new Promise((resolve, reject) => {
+        reader.onload = e => {
+          const img = new Image()
+          img.src = e.target.result
+          img.onerror = () => reject(new Error())
+          img.onload = () => {
+            if (e.total > 0) {
+              resolve(e.target.value)
+            } else reject(new Error())
+          }
+        }
+        reader.onerror = () => reject(new Error())
+      })
     }
-    reader.readAsDataURL(file)
+
+    try {
+      if (fileUploadList.length !== 1) throw new Error()
+      const file = fileUploadList[0].file
+      if (!file.type.includes('image') || file.size > MAX_PREVIEW_IMAGE_SIZE) throw new Error()
+      this.setState({ fileUploadPreview: await loadImage(file) })
+    } catch {
+      this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE })
+    }
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -237,7 +204,7 @@ class PopupUploadFile extends React.Component {
 }
 
 PopupUploadFile.propTypes = {
-  label: PropTypes.string.isRequired,
+  lab: PropTypes.string.isRequired,
   uploadUrl: PropTypes.string.isRequired,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,
