@@ -1226,6 +1226,7 @@ class UserApi(object):
             username=user.username,
             followers_count=followers_count,
             leaders_count=leaders_count,
+            created=user.created,
             authored_content_revisions_count=content_revisions_infos.count,
             authored_content_revisions_space_count=content_revisions_infos.space_count,
         )

@@ -1683,6 +1683,7 @@ class AboutUser(object):
         username: Optional[str],
         followers_count: int,
         leaders_count: int,
+        created: datetime,
         authored_content_revisions_count: int,
         authored_content_revisions_space_count: int,
     ) -> None:
@@ -1690,6 +1691,7 @@ class AboutUser(object):
         self.username = username
         self.followers_count = followers_count
         self.leaders_count = leaders_count
+        self.created = created
         self.authored_content_revisions_count = authored_content_revisions_count
         self.authored_content_revisions_space_count = authored_content_revisions_space_count
 

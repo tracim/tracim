@@ -1791,6 +1791,9 @@ class AboutUserSchema(UserDigestSchema):
         description="count of users followed by this user",
         validate=positive_int_validator,
     )
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="User registration date"
+    )
     authored_content_revisions_count = marshmallow.fields.Int(
         example=23,
         required=True,
