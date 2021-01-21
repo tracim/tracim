@@ -6211,13 +6211,13 @@ class TestUserAvatarEndpoints:
         ),
 
         res = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/256x256/{}".format(admin_user.user_id, "image.jpg"),
+            "/api/users/{}/avatar/preview/jpg/100x100/{}".format(admin_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
-        assert 256, 256 == new_image.size
+        assert 100, 100 == new_image.size
 
         res2 = web_testapp.get(
             "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
@@ -6226,4 +6226,107 @@ class TestUserAvatarEndpoints:
         assert res2.body == res.body
         assert res2.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res2.body))
-        assert 256, 256 == new_image.size
+        assert 100, 100 == new_image.size
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserCoverEndpoints:
+    """
+    Tests for /api/users/{user_id}/cover endpoints
+    """
+
+    def test_api__get_user_cover__ok_200__nominal_case(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_COVER_NOT_FOUND
+
+    def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.cover is not None
+        assert admin_user.cropped_cover is not None
+
+    def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_cover__err__wrong_mimetype(self, admin_user: User, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_cover_preview__ok__nominal_case(self, admin_user: User, web_testapp):
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_COVER_NOT_FOUND
+
+        image = create_png_test_image(1500, 1500)
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        ),
+
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1300, 150 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 1300, 150 == new_image.size

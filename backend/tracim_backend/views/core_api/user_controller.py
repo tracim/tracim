@@ -14,7 +14,6 @@ from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUse
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import MimetypeNotAllowed
@@ -33,6 +32,7 @@ from tracim_backend.exceptions import UserAvatarNotFound
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserCoverNotFound
 from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -42,6 +42,8 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.subscription import SubscriptionLib
+from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
+from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -1042,12 +1044,12 @@ class UserController(Controller):
     def get_preview_avatar(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> HapicFile:
-        width = 256
-        height = 256
+        width = DEFAULT_AVATAR_SIZE.width
+        height = DEFAULT_AVATAR_SIZE.height
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
-        default_filename = "avatar.jpg".format(width=width, height=height,)
+        default_filename = "avatar.jpg".format(width=width, height=height)
         return user_api.get_avatar_preview(
             request.candidate_user.user_id,
             filename=hapic_data.path.filename,
@@ -1084,13 +1086,12 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
-    @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(MimetypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_files(SimpleFileSchema())
     @hapic.input_path(UserPicturePathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
+    def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         if hapic_data.files.files is None:
             raise NoFileValidationError('No file "files" given at input, validation failed.')
         if hapic_data.files.files.type not in ALLOWED_MIMETYPE_FOR_AVATAR:
@@ -1110,33 +1111,107 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPreviewPicturePathSchema())
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
     def sized_preview_cover(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> HapicFile:
-        raise NotImplementedError()
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "cover_{width}x{height}.jpg".format(
+            width=hapic_data.path.width, height=hapic_data.path.height,
+        )
+        return user_api.get_cover_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+            force_download=hapic_data.query.force_download,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
     def get_preview_cover(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> HapicFile:
-        raise NotImplementedError()
+        width = DEFAULT_COVER_SIZE.width
+        height = DEFAULT_COVER_SIZE.height
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "cover.jpg".format(width=width, height=height)
+        return user_api.get_cover_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            force_download=hapic_data.query.force_download,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
     def get_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
-        raise NotImplementedError()
+        try:
+            user_api = UserApi(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=request.app_config,
+            )
+            default_filename = "cover.jpg"
+            return user_api.get_cover(
+                request.candidate_user.user_id,
+                filename=hapic_data.path.filename,
+                default_filename=default_filename,
+                force_download=hapic_data.query.force_download,
+            )
+        except CannotGetDepotFileDepotCorrupted as exc:
+            raise TracimFileNotFound(
+                "cover for user {} not found in depot.".format(request.candidate_user.user_id)
+            ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
-    def put_raw_cover(self):
-        raise NotImplementedError()
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(MimetypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_files(SimpleFileSchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def put_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
+        if hapic_data.files.files.type not in ALLOWED_MIMETYPE_FOR_AVATAR:
+            raise MimetypeNotAllowed(
+                "File mimetype {} is not allowed for cover".format(hapic_data.files.files.type)
+            )
+
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        user_api.set_cover(
+            user_id=request.candidate_user.user_id,
+            new_filename=hapic_data.files.files.filename,
+            new_mimetype=hapic_data.files.files.type,
+            new_content=hapic_data.files.files.file,
+        )
 
     def bind(self, configurator: Configurator) -> None:
         """

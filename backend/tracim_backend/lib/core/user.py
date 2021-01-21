@@ -60,6 +60,7 @@ from tracim_backend.exceptions import UserAvatarNotFound
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserCoverNotFound
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UsernameAlreadyExists
@@ -71,6 +72,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.image_process import ImageRatio
+from tracim_backend.lib.utils.image_process import ImageSize
 from tracim_backend.lib.utils.image_process import crop_image
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
@@ -86,6 +88,10 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 
 KNOWN_MEMBERS_ITEMS_LIMIT = 5
+AVATAR_RATIO = ImageRatio(1, 1)
+COVER_RATIO = ImageRatio(35, 4)
+DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
+DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 
 
 class UserApi(object):
@@ -1273,7 +1279,9 @@ class UserApi(object):
             page_number=1,
         )
 
-    def set_avatar(self, user_id: int, new_filename: str, new_mimetype: str, new_content: bytes):
+    def set_avatar(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ):
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
         with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
@@ -1284,7 +1292,7 @@ class UserApi(object):
             with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
                 # FIXME - G.M - 2021-01-21 - should we catch error here,
                 # what happened if pillow failed ?
-                crop_image(tmp_file, cropped_tmp_file, ratio=ImageRatio(1, 1))
+                crop_image(tmp_file, cropped_tmp_file, ratio=AVATAR_RATIO)
                 cropped_tmp_file.seek(0, 0)
                 user.cropped_avatar = FileIntent(
                     cropped_tmp_file.read(), new_filename, new_mimetype
@@ -1295,7 +1303,15 @@ class UserApi(object):
     def get_cover(
         self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
     ) -> HapicFile:
-        raise NotImplementedError()
+        user = self.get_one(user_id)
+        if not user.cover:
+            raise UserCoverNotFound("cover of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.cover,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
 
     def get_cover_preview(
         self,
@@ -1306,44 +1322,36 @@ class UserApi(object):
         height: int = None,
         force_download: bool = False,
     ) -> HapicFile:
-        raise NotImplementedError()
+        user = self.get_one(user_id)
+        if not user.cropped_cover:
+            raise UserCoverNotFound("cropped version of user {} cover not found".format(user_id))
+        _, original_file_extension = os.path.splitext(self._user.cropped_cover.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.cropped_cover,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
 
-    def set_cover(self, user_id: int, new_filename: str, new_mimetype: str, new_content: bytes):
-        raise NotImplementedError()
-
-    # @contextmanager
-    # def _get_cropped_picture_filepath(self, user_id: int, picture_type: UserProfilePicture) -> typing.Generator[str, None, None]:
-    #     """
-    #     This method allows us to directly get a file path from its
-    #     :param revision_id: The revision id of the filepath we want to return
-    #     :return: The corresponding filepath
-    #     """
-    #     try:
-    #         user = self.get_one(user_id)
-    #         if picture_type == UserProfilePicture.AVATAR:
-    #             depot_file = user.cropped_avatar
-    #         elif picture_type == UserProfilePicture.COVER:
-    #             depot_file = user.cropped_cover
-    #         else:
-    #             raise Exception() # todo better exception
-    #         return StorageLib(app_config=self._config).get_filepath(
-    #             user,
-    #             file_extension="", # todo: check if depot_file give use some information about this.
-    #             temporary_prefix="tracim-user-avatar",
-    #         )
-    #     except IOError as exc:
-    #         # TODO: better error exception
-    #         raise Exception(
-    #             "IOError Unable to find picture filepath." "File may be not available."
-    #         ) from exc
-
-    # def check_user_image_upload_size(self, image_length: int) -> None:
-    #     if self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE == 0:
-    #         return
-    #     elif image_length > self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE:
-    #         raise FileSizeOverMaxLimitation(
-    #             'File cannot be added because its size "{}" is higher than max allowed size : "{}"'.format(
-    #                 image_length,
-    #                 self._config.LIMITATION__USER_IMAGE_LENGTH_FILE_SIZE,  # TODO add to config
-    #             )
-    #         )
+    def set_cover(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ):
+        user = self.get_one(user_id)
+        label, file_extension = os.path.splitext(new_filename)
+        with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
+            tmp_file.write(new_content.read())
+            tmp_file.seek(0, 0)
+            user.cover = FileIntent(tmp_file.read(), new_filename, new_mimetype)
+            tmp_file.seek(0, 0)
+            with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
+                # FIXME - G.M - 2021-01-21 - should we catch error here,
+                # what happened if pillow failed ?
+                crop_image(tmp_file, cropped_tmp_file, ratio=COVER_RATIO)
+                cropped_tmp_file.seek(0, 0)
+                user.cropped_cover = FileIntent(cropped_tmp_file.read(), new_filename, new_mimetype)
+            self._session.add(user)
+            self._session.flush()

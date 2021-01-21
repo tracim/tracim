@@ -28,6 +28,9 @@ class TestImageProcess(object):
             ((100, 100), (100, 33), (3, 1)),
             # edge cases
             ((100, 1), (1, 1), (1, 100)),
+            # cover example
+            ((100, 10), (87, 10), (35, 4)),
+            ((1000, 100), (875, 100), (35, 4)),
         ],
     )
     def test__crop_image__nominal_case(self, original_size, destination_size, ratio):
