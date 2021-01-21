@@ -24,7 +24,7 @@ export const createFileUpload = (file, errorMessage = '') => {
  * @param httpMethod HTTP method to use in the request
  * @param progressEventHandler handler that will be called on XHR progress event with (event, fileUpload)
  * @param errorMessageList list of error message objects used to create errors messages for HTTP status/API error codes
-   The error message objects shall have a {status,code,message} structure.
+ The error message objects shall have a {status,code,message} structure.
  * @param additionalFormData object with data that will be added to the FormData()
  * @return a new file upload object with filled response fields.
  */
@@ -45,14 +45,12 @@ export const uploadFile = async (
   for (const entry of Object.entries(additionalFormData)) {
     formData.append(entry[0], entry[1])
   }
-
   if (progressEventHandler) xhr.upload.addEventListener('progress', progressEventHandler, false)
 
   xhr.open(httpMethod, uploadUrl, true)
   setupCommonRequestHeaders(xhr)
   xhr.withCredentials = true
 
-  let jsonResponse
   let errorMessage = ''
   try {
     await new Promise((resolve, reject) => {
@@ -63,29 +61,21 @@ export const uploadFile = async (
   } catch {
     errorMessage = defaultErrorMessage
   }
+  let jsonResponse
+  try {
+    jsonResponse = JSON.parse(xhr.responseText)
+  } catch {}
 
-  switch (xhr.status) {
-    case 200:
-      jsonResponse = JSON.parse(xhr.responseText)
-      errorMessage = ''
-      break
-    case 204:
-      errorMessage = ''
-      break
-    case 400: {
-      jsonResponse = JSON.parse(xhr.responseText)
-      const errorMessageObject = errorMessageList.find(m => m.status === xhr.status && m.code === jsonResponse.code)
-      errorMessage = errorMessageObject ? errorMessageObject.message : defaultErrorMessage
-    }
-      break
-    default:
+  if (xhr.status >= 400) {
+    const errorMessageObject = errorMessageList.find(m => m.status === xhr.status && m.code === jsonResponse.code)
+    errorMessage = errorMessageObject ? errorMessageObject.message : defaultErrorMessage
   }
 
   return {
     ...fileUpload,
     errorMessage: errorMessage,
-    json: jsonResponse,
-    status: xhr.status
+    responseJson: jsonResponse,
+    responseStatus: xhr.status
   }
 }
 

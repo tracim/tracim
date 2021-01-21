@@ -89,7 +89,7 @@ class PopupUploadFile extends React.Component {
         httpMethod: props.httpMethod,
         progressEventHandler: this.updateFileUploadProgress,
         errorMessageList: props.uploadErrorMessageList,
-        defaultErrorMessage: props.t('Error while uploading file')
+        defaultErrorMessage: props.defaultUploadErrorMessage || props.t('Error while uploading file')
       }
     )
   }
@@ -117,6 +117,15 @@ class PopupUploadFile extends React.Component {
     const updatedFileUploadList = state.fileUploadList.filter(fu => fu !== fileUpload)
     this.loadFileUploadPreview(updatedFileUploadList)
     this.setState({ fileUploadList: updatedFileUploadList })
+  }
+
+  handleClose = () => {
+    const { props, state } = this
+    if (state.uploadStarted) {
+      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      return
+    }
+    props.handleClose()
   }
 
   isValidateButtonDisabled = async () => {
@@ -167,14 +176,14 @@ class PopupUploadFile extends React.Component {
 
     return (
       <CardPopupCreateContent
-        onClose={props.handleClose}
+        onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={props.label}
         customColor={props.color}
         faIcon={props.faIcon}
         contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
-        btnValidateLabel={props.t('Validate')}
+        btnValidateLabel={props.validateLabel || props.t('Validate')}
         customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
       >
         <div>
@@ -216,7 +225,9 @@ PopupUploadFile.propTypes = {
   additionalFormData: PropTypes.object,
   allowedMimeTypes: PropTypes.array,
   maximumFileSize: PropTypes.number,
-  uploadErrorMessageList: PropTypes.array
+  uploadErrorMessageList: PropTypes.array,
+  defaultUploadErrorMessage: PropTypes.string,
+  validateLabel: PropTypes.string
 }
 
 PopupUploadFile.defaultProps = {
