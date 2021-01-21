@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
 
 import {
   BREADCRUMBS_TYPE,
@@ -45,13 +44,12 @@ export class PersonalActivityFeed extends React.Component {
   buildBreadcrumbs = () => {
     const { props } = this
 
-    const breadcrumbsList = [
-      {
-        link: <Link to={PAGE.ACTIVITY_FEED}>{props.t('Activity feed')}</Link>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Activity feed')
-      }
-    ]
+    const breadcrumbsList = [{
+      link: PAGE.ACTIVITY_FEED,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Activity feed'),
+      isALink: false
+    }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
@@ -95,4 +93,4 @@ const component = withActivity(
   resetUserActivity,
   setUserActivityEventList
 )
-export default connect(mapStateToProps)(withRouter(translate()(component)))
+export default connect(mapStateToProps)(translate()(component))

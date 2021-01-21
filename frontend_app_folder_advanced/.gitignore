@@ -4,4 +4,4 @@
 node_modules/
 src/debug.js
 dist/folder.app.js
-dist/folder_advanced.app.dev.js
+dist/folder.app.standalone.js

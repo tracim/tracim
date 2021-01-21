@@ -75,6 +75,7 @@ requires = [
     "gripcontrol",
     "tnetstring3",
     "pyzmq",
+    "jsonschema",
 ]
 
 tests_require = [
@@ -138,23 +139,30 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
+            "user delete = tracim_backend.command.cleanup:DeleteUserCommand",
+            "user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand",
+            # db
             "db_init = tracim_backend.command.database:InitializeDBCommand",
             "db_delete = tracim_backend.command.database:DeleteDBCommand",
             "db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command",
-            "webdav start = tracim_backend.command.webdav:WebdavRunnerCommand",
-            "caldav start = tracim_backend.command.caldav:CaldavRunnerCommand",
-            "caldav sync = tracim_backend.command.caldav:CaldavSyncCommand",
+            # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",
             "search index-upgrade-experimental = tracim_backend.command.search:SearchIndexUpgradeCommand",
             "search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand",
+            # webdav
+            "webdav start = tracim_backend.command.webdav:WebdavRunnerCommand",
+            # caldav
+            "caldav start = tracim_backend.command.caldav:CaldavRunnerCommand",
+            "caldav sync = tracim_backend.command.caldav:CaldavSyncCommand",
+            # devtool
             "dev parameters list = tracim_backend.command.devtools:ParametersListCommand",
             "dev parameters value = tracim_backend.command.devtools:ParametersValueCommand",
             "dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand",
-            "user delete = tracim_backend.command.cleanup:DeleteUserCommand",
-            "user anonymize = tracim_backend.command.cleanup:AnonymizeUserCommand",
+            "dev custom-properties extract-translation-source = tracim_backend.command.devtools:ExtractCustomPropertiesTranslationsCommand",
         ],
     },
     message_extractors={

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import Agenda from './container/Agenda.jsx'
 
 require('./css/index.styl')

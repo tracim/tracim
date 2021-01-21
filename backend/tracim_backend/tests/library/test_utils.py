@@ -1,4 +1,7 @@
+import pytest
+
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.utils.dict_parsing import translate_dict
 from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
@@ -84,6 +87,47 @@ class TestStringToList(object):
             3,
             4,
         ]
+
+
+class TestTranslateDict(object):
+    @pytest.mark.parametrize(
+        "data,result",
+        [
+            [
+                {"nomodify": "dontmodify", "modify": "modified"},
+                {"nomodify": "dontmodify", "modify": "MODIFIED"},
+            ],
+            [
+                {
+                    "nomodify": {"nomodify3": "dontmodify", "modify1": "modified"},
+                    "nomodify2": "dontmodify",
+                    "modify2": "MODIFIED",
+                },
+                {
+                    "nomodify": {"nomodify3": "dontmodify", "modify1": "MODIFIED"},
+                    "nomodify2": "dontmodify",
+                    "modify2": "MODIFIED",
+                },
+            ],
+            [
+                {"modify": ["this", "should", "be", "modified"]},
+                {"modify": ["THIS", "SHOULD", "BE", "MODIFIED"]},
+            ],
+            [{"nomodify": [{"modify": "modify"}]}, {"nomodify": [{"modify": "MODIFY"}]}],
+        ],
+    )
+    def test__unit_translate_dict__to_uppercase(self, data, result):
+        def to_upper(data: str):
+            return data.upper()
+
+        assert (
+            translate_dict(
+                keys_to_check=["modify", "modify1", "modify2", "modify3"],
+                data=data,
+                translation_method=to_upper,
+            )
+            == result
+        )
 
 
 class TestEmailAddress(object):

@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'share_folder.app.js' : 'share_folder.app.dev.js',
+    filename: 'share_folder.app.standalone.js',
     pathinfo: !isProduction,
     library: 'appShareFolderAdvanced',
     libraryTarget: isProduction ? 'var' : undefined

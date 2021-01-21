@@ -1,6 +1,7 @@
 # coding=utf-8
 from mock import patch
 import pytest
+import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
@@ -319,5 +320,151 @@ class TestWorkspaceAccessType(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestUserCustomPropertiesSchema(object):
+    """
+    Tests for GET /api/system/custom-user-properties-schema
+    """
+
+    def test_api__get_user_custom_properties_schema__ok_200__nominal_case(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
+        json_schema = res.json_body["json_schema"]
+        assert json_schema == {}
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_schema__ok_200__sample_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
+        json_schema = res.json_body["json_schema"]
+        assert json_schema["title"] == "Test"
+        assert json_schema["type"] == "object"
+        assert json_schema["description"] == "just test data"
+        assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
+        assert json_schema.get("properties")
+        assert json_schema["properties"].get("property1")
+        assert json_schema["properties"].get("date")
+        assert json_schema["properties"].get("fields")
+        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+            "type": "string",
+            "enumNames": ["First", "Second", "Third"],
+            "enum": ["first", "second", "third"],
+        }
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_schema__ok_200__sample_data_translated(
+        self, web_testapp, admin_user, session
+    ):
+        admin_user.lang = "fr"
+        session.add(admin_user)
+        session.flush()
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
+        json_schema = res.json_body["json_schema"]
+        assert json_schema["title"] == "Un Test"
+        assert json_schema["type"] == "object"
+        assert json_schema["description"] == "juste des données de tests"
+        assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
+        assert json_schema.get("properties")
+        assert json_schema["properties"].get("property1")
+        assert json_schema["properties"].get("date")
+        assert json_schema["properties"].get("fields")
+        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+            "type": "string",
+            "enumNames": ["Premier", "Second", "Troisième"],
+            "enum": ["first", "second", "third"],
+        }
+
+    def test_api__get_user_custom_properties_schema_err_401__unregistered_user(self, web_testapp):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/user-custom-properties-schema", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestUserCustomPropertiesUISchema(object):
+    """
+    Tests for GET /api/system/users-custom-properties-ui-schema
+    """
+
+    def test_api__get_user_custom_properties_ui_schema__ok_200__nominal_case(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
+        ui_schema = res.json_body["ui_schema"]
+        assert ui_schema == {}
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_ui_schema__ok_200__sample_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
+        ui_schema = res.json_body["ui_schema"]
+        assert ui_schema == {
+            "date": {
+                "ui:description": "just a date",
+                "ui:title": "Date",
+                "ui:widget": "alt-date",
+                "ui:options": {"yearsRange": [1980, 2030]},
+            },
+            "property1": {
+                "ui:widget": "textarea",
+                "ui:help": "just some help",
+                "ui:placeholder": "write here !",
+            },
+        }
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
+    )
+    def test_api__get_user_custom_properties_ui_schema__ok_200__sample_data_translated(
+        self, session, web_testapp, admin_user
+    ):
+        admin_user.lang = "fr"
+        session.add(admin_user)
+        session.flush()
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
+        ui_schema = res.json_body["ui_schema"]
+        assert ui_schema == {
+            "date": {
+                "ui:description": "juste une date",
+                "ui:title": "Date",
+                "ui:widget": "alt-date",
+                "ui:options": {"yearsRange": [1980, 2030]},
+            },
+            "property1": {
+                "ui:widget": "textarea",
+                "ui:help": "un peu d'aide",
+                "ui:placeholder": "écrivez ici !",
+            },
+        }
+
+    def test_api__get_user_custom_properties_ui_schema_err_401__unregistered_user(
+        self, web_testapp
+    ):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()

@@ -13,7 +13,9 @@ const PAGES = {
   CONTENT_OPEN: 'contentOpen',
   ACCOUNT: 'account',
   JOIN_WORKSPACE: 'join-workspace',
-  ACTIVITY_FEED: 'activity-feed'
+  ACTIVITY_FEED: 'activity-feed',
+  PROFILE: 'profile',
+  WORKSPACE_ACTIVITY_FEED: 'workspaceActivityFeed'
 }
 
 const URLS = {
@@ -33,6 +35,7 @@ const URLS = {
   [PAGES.ACCOUNT]: () => '/ui/account',
   [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace',
   [PAGES.ACTIVITY_FEED]: () => '/ui/activity-feed',
+  [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`
 }
 
 /**

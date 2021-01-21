@@ -7,11 +7,9 @@ import os
 from os.path import normpath as base_normpath
 import pkgutil
 import random
-import re
 import string
 import sys
 import types
-import typing
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -25,7 +23,6 @@ import uuid
 from colour import Color
 from git import InvalidGitRepositoryError
 from marshmallow import ValidationError
-from marshmallow.validate import Regexp
 import pytz
 from sqlakeyset import unserialize_bookmark
 
@@ -514,37 +511,3 @@ def validate_page_token(page_token: str) -> None:
         unserialize_bookmark(page_token)
     except Exception as e:
         raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e
-
-
-def validate_simple_dict(dict_: typing.Dict) -> None:
-    """
-    A simple dict validator with:
-    key as 0-9a-zA-Z-_. based string
-    value as either: string, int, bool, float types
-    """
-    for key in dict_.keys():
-        if not isinstance(key, str):
-            raise ValidationError('Dictionary key "{}" is not a string'.format(key))
-        regex_validator = Regexp(regex=(re.compile("^[0-9a-zA-Z-_.]+$")))
-        try:
-            regex_validator(key)
-        except ValidationError as exc:
-            raise ValidationError(
-                'Dictionary key "{}" incorrect : {}'.format(key, str(exc))
-            ) from exc
-
-    # INFO - G.M - We assume float is the type used for float conversion,
-    # this may change depending
-    # on how the json parser is configured.
-    float_type = float
-    invalid_key_value_pairs = [
-        (key, value)
-        for key, value in dict_.items()
-        if not isinstance(value, (str, int, bool, float_type, type(None)))
-    ]
-    if invalid_key_value_pairs:
-        raise ValidationError(
-            "Only string/number/null values are allowed as dictionary value. Invalid values: {}".format(
-                invalid_key_value_pairs
-            )
-        )

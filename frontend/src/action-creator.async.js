@@ -9,6 +9,7 @@ import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
   APP_LIST,
+  ABOUT_USER,
   CONFIG,
   CONTENT,
   CONTENT_TYPE_LIST,
@@ -205,6 +206,21 @@ export const getUser = userId => async dispatch => {
       method: 'GET'
     },
     actionName: USER,
+    dispatch
+  })
+}
+
+export const getAboutUser = userId => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/about`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: ABOUT_USER,
     dispatch
   })
 }

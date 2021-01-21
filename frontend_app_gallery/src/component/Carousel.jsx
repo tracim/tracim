@@ -6,7 +6,7 @@ import GallerySlider from './GallerySlider.jsx'
 import MainPreview from './MainPreview.jsx'
 import PropTypes from 'prop-types'
 import ThumbnailPreview from './ThumbnailPreview.jsx'
-import CarouselArrow from './CarouselArrow'
+import CarouselArrow from './CarouselArrow.jsx'
 import { DIRECTION } from '../helper'
 
 export class Carousel extends React.Component {

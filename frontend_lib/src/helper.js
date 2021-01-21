@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
-import { Link } from 'react-router-dom'
 import i18n from './i18n.js'
 import { distanceInWords, isAfter } from 'date-fns'
 import color from 'color'
@@ -44,7 +43,8 @@ export const PAGE = {
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
   ACTIVITY_FEED: '/ui/activity-feed',
-  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`
+  ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
+  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
 
 const dateFnsLocale = {
@@ -679,37 +679,21 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
-export const buildContentPathBreadcrumbs = async (apiUrl, content, props) => {
+export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const fetchGetContentPath = await handleFetchResult(
     await getContentPath(apiUrl, content.workspace_id, content.content_id)
   )
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
-        data: {
-          breadcrumbs: fetchGetContentPath.body.items.map(crumb => ({
-            url: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
-            label: crumb.label,
-            link: (
-              <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id)}>
-                {crumb.label}
-              </Link>
-            ),
-            type: BREADCRUMBS_TYPE.APP_FEATURE
-          }))
-        }
-      })
-      break
+      return fetchGetContentPath.body.items.map(crumb => ({
+        link: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+        label: crumb.label,
+        type: BREADCRUMBS_TYPE.APP_FEATURE,
+        isALink: true
+      }))
     default:
-      GLOBAL_dispatchEvent({
-        type: CUSTOM_EVENT.ADD_FLASH_MSG,
-        data: {
-          msg: props.t('Error while getting breadcrumbs'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      console.error('Error getting breadcrumbs data', fetchGetContentPath)
+      throw new Error('Error getting breadcrumbs data')
   }
 }

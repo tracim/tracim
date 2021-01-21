@@ -1,0 +1,14 @@
+{
+  "fields": {
+    "subfield5": [
+      "first",
+      "second"
+    ],
+    "subfield3": true,
+    "subfield4": null,
+    "subfield2": 3,
+    "subfield1": "text"
+  },
+  "date": "2021-01-13",
+  "custom": "toto"
+}

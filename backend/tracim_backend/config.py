@@ -5,25 +5,32 @@ import os
 import typing
 
 from depot.manager import DepotManager
+from jsonschema import SchemaError
+from jsonschema.validators import validator_for
 from paste.deploy.converters import asbool
 
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.apps import load_apps
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
+from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
+from tracim_backend.lib.utils.utils import is_file_exist
+from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -415,6 +422,15 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
+        self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH = self.get_raw_config(
+            "user.custom_properties.json_schema_file_path"
+        )
+        self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH = self.get_raw_config(
+            "user.custom_properties.ui_schema_file_path"
+        )
+        self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH = self.get_raw_config(
+            "user.custom_properties.translations_dir_path"
+        )
 
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
             self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
@@ -814,6 +830,8 @@ class CFG(object):
         for app in app_lib.get_all():
             app.check_config(self)
 
+        self.configure_translations()
+
     def _check_global_config_validity(self) -> None:
         """
         Check config for global stuff
@@ -854,20 +872,12 @@ class CFG(object):
             )
         # INFO - G.M - 2019-04-03 - check color file validity
         self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
-        if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
-            raise ConfigurationError(
-                "ERROR: {} file does not exist. "
-                'please create it or set "COLOR__CONFIG_FILE_PATH"'
-                "with a correct value".format(self.COLOR__CONFIG_FILE_PATH)
-            )
-
-        try:
-            with open(self.COLOR__CONFIG_FILE_PATH) as json_file:
-                self.APPS_COLORS = json.load(json_file)
-        except Exception as e:
-            raise ConfigurationError(
-                "Error: {} file could not be load as json".format(self.COLOR__CONFIG_FILE_PATH)
-            ) from e
+        self.check_file_path_param(
+            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH, readable=True
+        )
+        self.APPS_COLORS = self.load_and_check_json_file_path_param(
+            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
+        )
 
         try:
             self.APPS_COLORS["primary"]
@@ -913,6 +923,53 @@ class CFG(object):
                 'ERROR user.default_profile given "{}" is invalid,'
                 "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
+
+        json_schema = {}
+        ui_schema = {}
+        if self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH:
+            self.check_file_path_param(
+                "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
+                self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
+                readable=True,
+            )
+            json_schema = self.load_and_check_json_file_path_param(
+                "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH",
+                self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
+            )
+            try:
+                # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
+                # - prevent an invalid json-schema
+                # - ensure that validation of content will not failed due to invalid schema.
+                cls = validator_for(json_schema)
+                cls.check_schema(json_schema)
+            except SchemaError as exc:
+                raise ConfigurationError(
+                    'ERROR  "{}" is not a valid JSONSchema : {}'.format(
+                        "USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH", str(exc)
+                    )
+                ) from exc
+
+        if self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH:
+            self.check_file_path_param(
+                "USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH",
+                self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH,
+                readable=True,
+            )
+            ui_schema = self.load_and_check_json_file_path_param(
+                "USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH",
+                self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH,
+            )
+
+        if self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH:
+            self.check_directory_path_param(
+                "USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH",
+                self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH,
+                readable=True,
+                writable=False,
+            )
+
+        self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
+        self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
@@ -1161,6 +1218,10 @@ class CFG(object):
                     )
                 )
 
+    def configure_translations(self):
+        self.TRANSLATIONS = {}
+        Translator.init_translations(self)
+
     def configure_filedepot(self) -> None:
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
@@ -1221,6 +1282,53 @@ class CFG(object):
                 "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
+    def load_and_check_json_file_path_param(self, param_name: str, path: str,) -> dict:
+        """
+        Check if path is valid json file and load it
+        :param param_name: name of parameter to check
+        :param path: path (value of parameter) which is check as a file path
+        :return: json content as dictionnary
+        """
+        try:
+            with open(path) as json_file:
+                return json.load(json_file)
+        except json.JSONDecodeError as exc:
+            not_a_valid_json_file_msg = (
+                'ERROR: "{}" is not a valid json file path, '
+                'change "{}" content '
+                "to a valid json content."
+            )
+            raise ConfigurationError(not_a_valid_json_file_msg.format(path, param_name)) from exc
+
+    def check_file_path_param(self, param_name: str, path: str, readable: bool = True,) -> None:
+        """
+        Check if path exist and if it is a readable file.
+        if check fail, raise ConfigurationError
+        :param param_name: name of parameter to check
+        :param path: path (value of parameter) which is check as a file path
+        :param readable: check if directory(according to path) is readable
+        """
+        try:
+            is_file_exist(path)
+            if readable:
+                is_file_readable(path)
+        except NotAFileError as exc:
+            not_a_file_msg = (
+                'ERROR: "{}" is not a valid file path, '
+                'create it or change "{}" value in config '
+                "to a valid file path."
+            )
+            raise ConfigurationError(not_a_file_msg.format(path, param_name)) from exc
+        except NotReadableFile as exc:
+            file_not_writable_msg = (
+                "ERROR: current user as not enough right to read and/or open"
+                ' "{}" file.'
+                " Change permission of current user on this file,"
+                " change user running this code or change"
+                ' file path of parameter in config "{}" to solve this.'
+            )
+            raise ConfigurationError(file_not_writable_msg.format(path, param_name)) from exc
+
     def check_directory_path_param(
         self, param_name: str, path: str, writable: bool = False, readable: bool = True
     ) -> None:
@@ -1230,7 +1338,7 @@ class CFG(object):
         :param param_name: name of parameter to check
         :param path: path (value of parameter) which is check as a directory path
         :param writable: check if directory(according to path) is writable
-        :param readable: check if directory(according to path) is writable
+        :param readable: check if directory(according to path) is readable
         """
         try:
             is_dir_exist(path)

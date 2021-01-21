@@ -77,6 +77,7 @@ import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalActivityFeed from './PersonalActivityFeed.jsx'
 import WorkspaceActivityFeed from './WorkspaceActivityFeed.jsx'
+import PublicProfile from './PublicProfile.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -500,6 +501,12 @@ export class Tracim extends React.Component {
             exact
             path={PAGE.ADMIN.USER_EDIT(':userid')}
             render={() => <AdminAccount />}
+          />
+
+          <Route
+            exact
+            path={PAGE.PUBLIC_PROFILE(':userid')}
+            component={PublicProfile}
           />
 
           <Route

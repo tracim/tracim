@@ -95,9 +95,10 @@ export class MemberActivity extends React.Component {
     const workspaceLabel = newestMessage.fields.workspace.label
     const breadcrumbsList = [
       {
-        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
+        link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: workspaceLabel
+        label: workspaceLabel,
+        isALink: true
       }
     ]
 
@@ -112,7 +113,10 @@ export class MemberActivity extends React.Component {
           customClass='memberActivity__right'
           date={newestMessage.created}
           lang={props.user.lang}
-          authorName={newestMessage.fields.author.public_name}
+          author={{
+            publicName: newestMessage.fields.author.public_name,
+            userId: newestMessage.fields.author.user_id
+          }}
         />
       </div>
     )

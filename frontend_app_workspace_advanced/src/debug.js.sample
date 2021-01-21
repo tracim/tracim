@@ -1,45 +1,5 @@
 import { defaultDebug } from 'tracim_frontend_lib'
 
-const workspaceId = 1
-
-const SIDEBAR = [{
-  faIcon: 'home',
-  hexcolor: '#fdfdfd',
-  label: 'Dashboard',
-  route: `/ui/workspaces/${workspaceId}/dashboard`,
-  slug: 'dashboard'
-}, {
-  faIcon: 'th',
-  hexcolor: '#bbbbbb',
-  label: 'Contents',
-  route: `/ui/workspaces/${workspaceId}/contents`,
-  slug: 'contents/all'
-}, {
-  faIcon: 'comments-o',
-  hexcolor: '#428BCA',
-  label: 'Threads',
-  route: `/ui/workspaces/${workspaceId}/contents?type=thread`,
-  slug: 'contents/thread'
-}, {
-  faIcon: 'paperclip',
-  hexcolor: '#ffa500',
-  label: 'Files',
-  route: `/ui/workspaces/${workspaceId}/contents?type=file`,
-  slug: 'contents/file'
-}, {
-  faIcon: 'file-text-o',
-  hexcolor: '#00CC00',
-  label: 'Notes',
-  route: `/ui/workspaces/${workspaceId}/contents?type=html-document`,
-  slug: 'contents/html-document'
-}, {
-  faIcon: 'calendar',
-  hexcolor: '#ff4b3a',
-  label: 'Agenda',
-  route: `/ui/workspaces/${workspaceId}/agenda`,
-  slug: 'agenda'
-}]
-
 export const debug = {
   ...defaultDebug,
   config: {
@@ -52,34 +12,6 @@ export const debug = {
   },
   content: {
     ...defaultDebug.content,
-    agendaEnabled: true,
-    agendaUrl: '',
-    contentReadStatusList: [],
-    description: '',
-    id: workspaceId,
-    label: '',
-    memberList: [{
-      doNotify: true,
-      id: 0,
-      isActive: true,
-      publicName: '',
-      role: ''
-    }],
-    recentActivityList: [{
-      fileExtension: '',
-      id: 0,
-      idParent: null,
-      isArchived: true,
-      isDeleted: true,
-      label: '',
-      showInUi: true,
-      slug: '',
-      statusSlug: '',
-      subContentTypeSlug: [''],
-      type: ''
-    }],
-    sidebarEntryList: SIDEBAR,
-    slug: '',
-    workspace_id: workspaceId
+    workspace_id: 1
   }
 }

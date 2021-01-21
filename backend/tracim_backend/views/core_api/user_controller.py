@@ -45,6 +45,7 @@ from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
 from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -79,6 +80,7 @@ from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetConfigSchema
+from tracim_backend.views.core_api.schemas import SetCustomPropertiesSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
@@ -860,6 +862,46 @@ class UserController(Controller):
         config_api.set_params(params=hapic_data.body["parameters"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserConfigSchema())
+    def get_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.Dict:
+        """
+        get the custom properties parameters for the given user
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
+        )
+        return {"parameters": custom_properties_api.get_all_params()}
+
+    # TODO - G.M - 2021-01-13 - Permission should be adapted to be usable to all know_user
+    # as complex right rules will be delegated to properties, see #4004
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetCustomPropertiesSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Set or update the given custom_properties parameters for the given user
+        The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
+        whole configuration, so it's not possible to remove keys through this endpoint.
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
+        )
+        custom_properties_api.set_params(params=hapic_data.body["parameters"])
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceSchema(many=True))
@@ -1434,6 +1476,21 @@ class UserController(Controller):
             "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User custom properties
+        configurator.add_route(
+            "custom_properties_get",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
+
+        configurator.add_route(
+            "custom_properties_post",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
 
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(

@@ -286,9 +286,7 @@
   "You cannot remove this member because there are no other space managers.": "You cannot remove this member because there are no other space managers.",
   "Are you sure you want to remove this member from the space?": "Are you sure you want to remove this member from the space?",
   "{{author}} requested access to {{space}}": "{{author}} requested access to {{space}}",
-  "{{author}} granted you access to {{space}}": "{{author}} granted you access to {{space}}",
   "{{author}} rejected your access to {{space}}": "{{author}} rejected your access to {{space}}",
-  "{{author}} granted access to {{space}} for {{user}}": "{{author}} granted access to {{space}} for {{user}}",
   "{{author}} rejected access to {{space}} for {{user}}": "{{author}} rejected access to {{space}} for {{user}}",
   "Only an administrator can see this user's profile": "Only an administrator can see this user's profile",
   "This notification has no associated content": "This notification has no associated content",
@@ -332,6 +330,10 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>",
   "Account": "Account",
-  "unkown": "unkown",
-  "User account management": "User account management"
+  "User account management": "User account management",
+  "{{user}}'s profile": "{{user}}'s profile",
+  "Loading": "Loading",
+  "Information_plural": "Information",
+  "Personal page": "Personal page",
+  "My profile": "My profile"
 }
