@@ -489,8 +489,6 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
             "depot_storage_dir", default_depot_storage_path, deprecated=True
         )
-        if self.DEPOT_STORAGE_DIR:
-            self.DEPOT_STORAGE_DIR = os.path.abspath(self.DEPOT_STORAGE_DIR)
         self.DEPOT_STORAGE_NAME = self.get_raw_config(
             "depot_storage_name", "tracim", deprecated=True
         )
