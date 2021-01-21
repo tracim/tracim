@@ -121,7 +121,7 @@ class GuestUpload extends React.Component {
         data: {
           msg: (
             <div>
-              {props.t('Files already uploaded:')}
+              {props.t('Files already added:')}
               <br />
               <ul>
                 {alreadyUploadedList.map(file =>

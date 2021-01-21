@@ -12,9 +12,9 @@ import {
   FILE_PREVIEW_STATE,
   TracimComponent,
   setupCommonRequestHeaders,
-  putMyselfFileRead
+  putMyselfFileRead,
+  PopupProgressUpload
 } from 'tracim_frontend_lib'
-import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
 import { debug } from '../debug.js'
@@ -42,6 +42,7 @@ class PopupCreateFile extends React.Component {
     ])
   }
 
+  // File specific ??
   handleAllAppChangeLanguage = data => {
     const { state, props } = this
     console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
@@ -52,6 +53,7 @@ class PopupCreateFile extends React.Component {
     this.setHeadTitle()
   }
 
+  // File specific
   componentDidMount () {
     this.setHeadTitle()
   }
@@ -120,7 +122,7 @@ class PopupCreateFile extends React.Component {
     if (alreadyUploadedList.length > 0) {
       this.sendGlobalFlashMessage(
         <div>
-          {props.t('Files already uploaded:')}<br />
+          {props.t('Files already added:')}<br />
           <ul>{alreadyUploadedList.map(file => <li key={file.name}>{file.name}</li>)}</ul>
         </div>
       )

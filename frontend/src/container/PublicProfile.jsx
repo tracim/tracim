@@ -62,38 +62,34 @@ export class PublicProfile extends React.Component {
     }]))
   }
 
+  handleFetchErrors = (result, errorList, defaultErrorMessage) => {
+    if (result.status < 400) return false
+
+    const { props } = this
+    const code = result.json.code
+    const error = errorList.find(m => m.status === result.status && m.code === code) || { message: defaultErrorMessage }
+    props.dispatch(newFlashMessage(error.message))
+    props.history.push(PAGE.HOME)
+    return true
+  }
+
   getUser = async () => {
     const { props } = this
     const userId = props.match.params.userid
 
     const fetchGetUser = await props.dispatch(getAboutUser(userId))
+    if (this.handleFetchErrors(
+      fetchGetUser,
+      [{ status: 400, code: 1001, message: props.t('Unknown user') }],
+      props.t('Error while loading user')
+    )) return
 
-    switch (fetchGetUser.status) {
-      case 200:
-        this.setState({
-          displayedUser: {
-            ...serialize(fetchGetUser.json, serializeUserProps),
-            userId: userId
-          },
-          coverImageUrl: 'default'
-        })
-        this.buildBreadcrumbs()
-        break
-      case 400:
-        switch (fetchGetUser.json.code) {
-          case 1001:
-            props.dispatch(newFlashMessage(props.t('Unknown user')))
-            props.history.push(PAGE.HOME)
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while loading user')))
-            props.history.push(PAGE.HOME)
-        }
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading user')))
-        props.history.push(PAGE.HOME)
-    }
+    const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
+    this.setState({
+      displayedUser: apiUser,
+      coverImageUrl: 'default'
+    })
+    this.buildBreadcrumbs()
   }
 
   render () {

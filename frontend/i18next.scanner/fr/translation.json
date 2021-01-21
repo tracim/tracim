@@ -220,7 +220,7 @@
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
   "Error while loading file information": "Erreur lors du chargement du fichier",
-  "Files already uploaded:": "Fichiers déjà téléversés :",
+  "Files already added:": "Fichiers déjà ajoutés :",
   "Full name must be at least 1 character": "Le nom complet doit comporter au moins 1 caractère",
   "Full name must be less than 255 characters": "Le nom complet doit comporter moins de 255 caractères.",
   "Password must be at least 6 characters": "Le mot de passe doit comporter au moins 6 caractères",

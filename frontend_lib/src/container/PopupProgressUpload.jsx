@@ -1,5 +1,6 @@
 import React from 'react'
-import { CardPopup, ProgressBar } from 'tracim_frontend_lib'
+import { CardPopup } from '../component/CardPopup/CardPopup.jsx'
+import { ProgressBar } from '../component/ProgressBar/ProgressBar.jsx'
 
 require('./PopupProgressUpload.styl')
 

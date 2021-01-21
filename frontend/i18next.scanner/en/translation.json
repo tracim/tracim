@@ -217,7 +217,7 @@
   "Error while loading uploaded files": "Error while loading uploaded files",
   "Error while downloading file": "Error while downloading file",
   "Manage": "Manage",
-  "Files already uploaded:": "Files already uploaded:",
+  "Files already added:": "Files already added:",
   "Full name must be at least 1 character": "Full name must be at least 1 character",
   "Full name must be less than 255 characters": "Full name must be less than 255 characters",
   "Password must be at least 6 characters": "Password must be at least 6 characters",

@@ -3,11 +3,11 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
-import PopupProgressUpload from './PopupProgressUpload.jsx'
 import {
   APP_FEATURE_MODE,
   PromptMessage,
-  FileDropzone
+  FileDropzone,
+  PopupProgressUpload
 } from 'tracim_frontend_lib'
 
 const color = require('color')
