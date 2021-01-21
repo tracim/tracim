@@ -1284,7 +1284,7 @@ class UserApi(object):
 
     def set_avatar(
         self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
-    ):
+    ) -> None:
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
         with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
@@ -1342,7 +1342,7 @@ class UserApi(object):
 
     def set_cover(
         self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
-    ):
+    ) -> None:
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
         with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:

@@ -163,7 +163,7 @@ class StorageLib:
         original_file_extension: str = "",
         force_download: bool = None,
         last_modified: datetime = None,
-    ):
+    ) -> HapicFile:
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
@@ -195,7 +195,7 @@ class StorageLib:
         original_file_extension: str = "",
         force_download: bool = None,
         last_modified: datetime = None,
-    ):
+    ) -> HapicFile:
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
@@ -226,7 +226,7 @@ class StorageLib:
         file_path: str,
         original_file_extension: str,
         depot_file: UploadedFile,
-    ):
+    ) -> int:
 
         preview_generator_page_number = self._preview_manager_page_format(
             preview_generator_page_number
