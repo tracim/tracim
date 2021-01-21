@@ -1282,6 +1282,8 @@ class UserApi(object):
             user.avatar = FileIntent(tmp_file.read(), new_filename, new_mimetype)
             tmp_file.seek(0, 0)
             with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
+                # FIXME - G.M - 2021-01-21 - should we catch error here,
+                # what happened if pillow failed ?
                 crop_image(tmp_file, cropped_tmp_file, ratio=ImageRatio(1, 1))
                 cropped_tmp_file.seek(0, 0)
                 user.cropped_avatar = FileIntent(
