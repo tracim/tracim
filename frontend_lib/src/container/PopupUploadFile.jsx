@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
-import { CardPopupCreateContent } from '../component/CardPopup/CardPopupCreateContent.jsx'
+import CardPopupCreateContent from '../component/CardPopup/CardPopupCreateContent.jsx'
 import { TracimComponent } from '../tracimComponent.js'
-import { FileDropzone } from '../component/FileDropzone/FileDropzone.jsx'
-import { FileUploadList } from '../component/FileDropzone/FileUploadList.jsx'
+import FileDropzone from '../component/FileDropzone/FileDropzone.jsx'
+import FileUploadList from '../component/FileDropzone/FileUploadList.jsx'
 import {
   computeProgressionPercentage,
   setupCommonRequestHeaders,
@@ -15,6 +15,8 @@ import {
   CUSTOM_EVENT
 } from '../customEvent.js'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
+
+const MAX_PREVIEW_IMAGE_SIZE = 2000000
 
 class PopupUploadFile extends React.Component {
   constructor (props) {
@@ -32,7 +34,12 @@ class PopupUploadFile extends React.Component {
 
     if (!droppedFileList || droppedFileList.length === 0) return
 
-    const droppedFileUploadList = droppedFileList.map(f => { return { file: f, progress: 0, errorMessage: '', status: null, json: null } })
+    if (!props.multipleFiles && state.fileUploadList.length > 0) {
+      this.sendGlobalFlashMessage(props.t('Only one file is allowed'))
+      return
+    }
+
+    const droppedFileUploadList = droppedFileList.map(f => { return { file: f, progress: 0, errorMessage: this.getFileErrorMessage(f), status: null, json: null } })
 
     if (droppedFileUploadList.length === 1 && state.fileUploadList.length === 0) {
       this.loadUploadFilePreview(droppedFileUploadList[0].file)
@@ -55,7 +62,15 @@ class PopupUploadFile extends React.Component {
 
   isFileUploadAlreadyInList = (fileUpload, fileUploadList) => fileUploadList.some(fu => fu.file.name === fileUpload.file.name)
 
-  isFileUploadInErrorStatus = (fileUpload) => fileUpload.status && fileUpload.status >= 400
+  isFileUploadInError = (fileUpload) => fileUpload.errorMessage
+
+  getFileErrorMessage = (file) => {
+    const { props } = this
+    if (props.allowedMimeTypes &&
+        props.allowedMimeTypes.length > 0 &&
+        !props.allowedMimeTypes.includes(file.type)) return props.t('The type of this file is not allowed')
+    if (props.maximumFileSize && file.size > props.maximumFileSize) return props.t('The file is too big')
+  }
 
   updateFileUploadProgress = (e, fileUpload) => {
     const { state } = this
@@ -65,8 +80,8 @@ class PopupUploadFile extends React.Component {
     this.setState({ fileUploadProgressPercentage })
   }
 
-  postFile = async (fileUpload) => {
-    return new Promise((resolve, reject) => {
+  uploadFile = async (fileUpload) => {
+    const xhr = await new Promise((resolve, reject) => {
       const { props } = this
 
       const formData = new FormData()
@@ -80,7 +95,7 @@ class PopupUploadFile extends React.Component {
 
       xhr.upload.addEventListener('progress', e => this.updateFileUploadProgress(e, fileUpload), false)
 
-      xhr.open('POST', props.postFileUrl, true)
+      xhr.open(props.httpMethod, props.uploadUrl, true)
       setupCommonRequestHeaders(xhr)
       xhr.withCredentials = true
 
@@ -90,6 +105,11 @@ class PopupUploadFile extends React.Component {
 
       xhr.send(formData)
     })
+    return {
+      ...fileUpload,
+      json: JSON.parse(xhr.responseText),
+      status: xhr.status
+    }
   }
 
   handleValidate = async () => {
@@ -98,35 +118,27 @@ class PopupUploadFile extends React.Component {
     this.setState({ uploadStarted: true })
     try {
       const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
-      const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !this.isFileUploadInErrorStatus(fileUpload))
+      const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !this.isFileUploadInError(fileUpload))
       const failedFileUploadList = fileUploadDoneList.filter(this.isFileUploadInErrorStatus)
 
       if (failedFileUploadList.length >= 0) {
         this.setState({
           uploadFileList: failedFileUploadList
         })
+        this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         props.handleFailure(failedFileUploadList)
       } else props.handleSuccess(successfulFileUploadList)
     } catch {
-      this.sendGlobalFlashMessage(props.t('Error while creating file'))
+      this.sendGlobalFlashMessage(props.t('Error while uploading file'))
       props.handleFailure()
     }
     this.setState({ uploadStarted: false })
   }
 
-  uploadFile = async (fileUpload) => {
-    const xhr = await this.postFile(fileUpload)
-    return {
-      ...fileUpload,
-      json: JSON.parse(xhr.responseText),
-      status: xhr.status
-    }
-  }
-
   handleDeleteFileUpload = (fileUpload) => {
     const { state } = this
 
-    const updatedFileUploadList = state.fileUploadList.filter(fu => fu === fileUpload)
+    const updatedFileUploadList = state.fileUploadList.filter(fu => fu !== fileUpload)
     switch (updatedFileUploadList.length) {
       case 0:
         this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE, fileUploadList: updatedFileUploadList })
@@ -140,11 +152,11 @@ class PopupUploadFile extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { state } = this
-    return state.fileUploadList.length === 0 || state.uploadStarted || state.fileUploadList.some(this.isFileUploadInErrorStatus)
+    return state.fileUploadList.length === 0 || state.uploadStarted || state.fileUploadList.some(this.isFileUploadInError)
   }
 
   loadUploadFilePreview = (file) => {
-    if (!file.type.includes('image') || file.size > 2000000) return
+    if (!file.type.includes('image') || file.size > MAX_PREVIEW_IMAGE_SIZE) return
 
     const reader = new FileReader()
     reader.onload = e => {
@@ -174,32 +186,32 @@ class PopupUploadFile extends React.Component {
         onValidate={this.handleValidate}
         label={props.label}
         customColor={props.color}
-        faIcon={state.config.faIcon}
+        faIcon={props.faIcon}
         contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
-        btnValidateLabel={props.t('Validate and create')}
+        btnValidateLabel={props.t('Validate')}
         customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
       >
         <div>
           {state.uploadStarted && (
             <PopupProgressUpload
-              color={state.config.hexcolor}
+              color={props.color}
               percent={state.fileUploadProgressPercentage}
             />
           )}
           <FileDropzone
+            onClick={() => {}}
             onDrop={this.handleDropFile}
             hexcolor={props.color}
             preview={state.fileUploadPreview}
-            multipleFiles={props.multipleFilesUploadEnabled}
+            multipleFiles={props.multipleFiles}
           />
-
-          {props.multipleFileUploadEnabled} && (
+          {props.children}
           <FileUploadList
             fileUploadList={state.fileUploadList}
-            onDeleteFile={this.handleDeleteFile}
+            onDeleteFile={this.handleDeleteFileUpload}
             deleteFileDisabled={state.uploadStarted}
-          />)
+          />
         </div>
       </CardPopupCreateContent>
     )
@@ -207,19 +219,26 @@ class PopupUploadFile extends React.Component {
 }
 
 PopupUploadFile.propTypes = {
-  label: PropTypes.string.isRequired,
-  postFileUrl: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  uploadUrl: PropTypes.string.isRequired,
+  faIcon: PropTypes.string,
+  httpMethod: PropTypes.string,
   color: PropTypes.string.isRequired,
-  multipleFileUploadEnabled: PropTypes.boolean,
+  multipleFiles: PropTypes.bool,
   handleSuccess: PropTypes.func,
   handleFailure: PropTypes.func,
   handleClose: PropTypes.func,
-  additionalFormData: PropTypes.object
+  additionalFormData: PropTypes.object,
+  allowedMimeTypes: PropTypes.array,
+  maximumFileSize: PropTypes.int
 }
 
 PopupUploadFile.defaultProps = {
   additionalFormData: {},
-  multipleFileUploadEnabled: false,
+  multipleFiles: false,
+  faIcon: 'fa-upload',
+  httpMethod: 'POST',
+  maximumFileSize: 0,
   handleSuccess: () => {},
   handleFailure: () => {},
   handleClose: () => {}

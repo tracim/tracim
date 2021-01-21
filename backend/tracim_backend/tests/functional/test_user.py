@@ -6104,6 +6104,7 @@ class TestAboutUserEndpoint(object):
         )
 
         # Then
+        assert res.json_body["user_id"] == 1
         assert res.json_body["leaders_count"] == 1
         assert res.json_body["followers_count"] == 2
         assert res.json_body["public_name"] == admin_user.public_name

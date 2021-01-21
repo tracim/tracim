@@ -6,7 +6,10 @@ import {
   CUSTOM_EVENT,
   PAGE,
   serialize,
-  TracimComponent
+  TracimComponent,
+  PopupUploadFile,
+  IconButton,
+  PROFILE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -14,7 +17,18 @@ import {
 } from '../action-creator.sync.js'
 import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
+
+const ALLOWED_IMAGE_MIMETYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/bmp',
+  'image/gif',
+  'image/webp'
+]
+// 1 Mbyte
+const MAXIMUM_IMAGE_SIZE = 1 * 1024 * 1024
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -22,7 +36,8 @@ export class PublicProfile extends React.Component {
 
     this.state = {
       displayedUser: undefined,
-      coverImageUrl: undefined
+      coverImageUrl: undefined,
+      displayUploadPopup: undefined
     }
 
     props.registerCustomEventHandlerList([
@@ -41,7 +56,7 @@ export class PublicProfile extends React.Component {
 
   componentDidUpdate () {
     const { props, state } = this
-    if (state.displayedUser && state.displayedUser.userId !== props.match.params.userid) {
+    if (state.displayedUser && state.displayedUser.userId !== parseInt(props.match.params.userid)) {
       this.getUser()
     }
   }
@@ -92,12 +107,38 @@ export class PublicProfile extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  onChangeAvatar = () => {
+    this.setState({ displayUploadPopup: 'AVATAR' })
+  }
+
+  onCloseUploadPopup = () => {
+    this.setState({ displayUploadPopup: undefined })
+  }
+
   render () {
     const { props, state } = this
-
+    if (!state.displayedUser) return null
+    const changeImageEnabled = (state.displayedUser.userId === props.user.userId) || props.user.profile === PROFILE.ADMINISTRATOR
+    //const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/users/${state.displayedUser.userId}/avatar/raw`
+    const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/workspaces/1/files`
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
+          {state.displayUploadPopup === 'AVATAR' && (
+            <PopupUploadFile
+              title={props.t('Upload an image')}
+              uploadUrl={uploadAvatarUrl}
+              httpMethod='POST'
+              color={GLOBAL_primaryColor}
+              handleClose={this.onCloseUploadPopup}
+              handleSuccess={this.onCloseUploadPopup}
+              allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
+              maximumFileSize={MAXIMUM_IMAGE_SIZE}
+            >
+              <i className='fa fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
+              <i className='fa fa-image' /> {props.t('Maximum size: {{size}}Mb', { size: 1 })}
+            </PopupUploadFile>
+          )}
           <div className='profile__cover'>
             {state.coverImageUrl && <div className='profile__cover__default' />}
             {!state.coverImageUrl && (
@@ -111,6 +152,8 @@ export class PublicProfile extends React.Component {
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
+            handleChangeAvatar={this.onChangeAvatar}
+            changeAvatarEnabled={changeImageEnabled}
           />
 
           <div className='profile__content'>
@@ -142,5 +185,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs }) => ({ breadcrumbs })
+const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))

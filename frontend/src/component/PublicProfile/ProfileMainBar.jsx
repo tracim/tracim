@@ -1,27 +1,40 @@
 import React from 'react'
+import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 import {
   Avatar,
   AVATAR_SIZE,
-  Breadcrumbs
+  Breadcrumbs,
+  IconButton
 } from 'tracim_frontend_lib'
-import PropTypes from 'prop-types'
 
 export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length !== 0
 
   return (
     <div className='profile__mainBar'>
-      <Avatar
-        customClass='profile__mainBar__bigAvatar'
-        publicName={hasUser ? props.displayedUser.publicName : ''}
-        size={AVATAR_SIZE.BIG}
-        style={{ position: 'relative', top: '-15px' }}
-      />
-      <Avatar
-        customClass='profile__mainBar__mediumAvatar'
-        publicName={hasUser ? props.displayedUser.publicName : ''}
-        size={AVATAR_SIZE.MEDIUM}
-      />
+      <div className='profile__mainBar__avatar'>
+        <Avatar
+          customClass='profile__mainBar__avatar__big'
+          publicName={hasUser ? props.displayedUser.publicName : ''}
+          size={AVATAR_SIZE.BIG}
+          style={{ position: 'relative', top: '-15px' }}
+        />
+        {props.changeAvatarEnabled && (
+          <IconButton
+            text='' title={props.t('Change avatar')}
+            icon='upload'
+            onClick={props.handleChangeAvatar}
+            customClass='profile__mainBar__avatar__changeBtn'
+            intent='link'
+          />
+        )}
+        <Avatar
+          customClass='profile__mainBar__avatar__medium'
+          publicName={hasUser ? props.displayedUser.publicName : ''}
+          size={AVATAR_SIZE.MEDIUM}
+        />
+      </div>
       {hasUser
         ? (
           <div className='profile__mainBar__info'>
@@ -47,14 +60,17 @@ export const ProfileMainBar = props => {
   )
 }
 
-export default ProfileMainBar
-
 ProfileMainBar.propTypes = {
-  breadcrumbsList: PropTypes.string,
-  displayedUser: PropTypes.object
+  breadcrumbsList: PropTypes.array,
+  displayedUser: PropTypes.object,
+  handleChangeAvatar: PropTypes.func.isRequired,
+  changeAvatarEnabled: PropTypes.bool
 }
 
 ProfileMainBar.defaultProps = {
-  breadcrumbsList: '',
-  displayedUser: { }
+  breadcrumbsList: [],
+  displayedUser: { },
+  changeAvatarEnabled: false
 }
+
+export default translate()(ProfileMainBar)

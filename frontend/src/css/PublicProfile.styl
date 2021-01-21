@@ -25,8 +25,14 @@
     padding-left 30px
     background-color offWhite
     display flex
-    &__mediumAvatar
-      display none
+    &__avatar
+      position relative
+      &__medium
+        display none
+      &__changeBtn
+        position absolute
+        bottom -10px
+        right -10px
     &__info
       margin-left 10px
       font-size fontSizeTitle
@@ -62,10 +68,11 @@
     &__mainBar
       height 50px
       padding-left 10px
-      &__bigAvatar
-        display none
-      &__mediumAvatar
-        display unset
+      &__avatar
+        &__big
+          display none
+        &__medium
+          display unset
       &__info
         font-size fontSizeMedium
         & .breadcrumbs

@@ -1,6 +1,6 @@
 import React from 'react'
-import { CardPopup } from '../component/CardPopup/CardPopup.jsx'
-import { ProgressBar } from '../component/ProgressBar/ProgressBar.jsx'
+import CardPopup from '../component/CardPopup/CardPopup.jsx'
+import ProgressBar from '../component/ProgressBar/ProgressBar.jsx'
 
 require('./PopupProgressUpload.styl')
 

@@ -1220,6 +1220,7 @@ class UserApi(object):
         ).get_authored_content_revisions_infos(user_id)
 
         return AboutUser(
+            user_id=user.user_id,
             public_name=user.public_name,
             username=user.username,
             followers_count=followers_count,
