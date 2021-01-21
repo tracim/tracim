@@ -3,6 +3,7 @@ import datetime
 import os
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
+import tempfile
 import typing as typing
 
 from depot.io.utils import FileIntent
@@ -69,6 +70,8 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
+from tracim_backend.lib.utils.image_process import ImageRatio
+from tracim_backend.lib.utils.image_process import crop_image
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
@@ -1273,11 +1276,19 @@ class UserApi(object):
     def set_avatar(self, user_id: int, new_filename: str, new_mimetype: str, new_content: bytes):
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
-        user.avatar = FileIntent(new_content, new_filename, new_mimetype)
-        self._session.add(user)
-        self._session.flush()
-
-        user.cropped_avatar = FileIntent(new_content, new_filename, new_mimetype)
+        with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
+            tmp_file.write(new_content.read())
+            tmp_file.seek(0, 0)
+            user.avatar = FileIntent(tmp_file.read(), new_filename, new_mimetype)
+            tmp_file.seek(0, 0)
+            with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
+                crop_image(tmp_file, cropped_tmp_file, ratio=ImageRatio(1, 1))
+                cropped_tmp_file.seek(0, 0)
+                user.cropped_avatar = FileIntent(
+                    cropped_tmp_file.read(), new_filename, new_mimetype
+                )
+            self._session.add(user)
+            self._session.flush()
 
     def get_cover(
         self, user_id: int, filename: str, default_filename: str, force_download: bool = False,

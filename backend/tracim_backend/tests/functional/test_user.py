@@ -25,6 +25,7 @@ from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
+from tracim_backend.tests.utils import create_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -6202,14 +6203,15 @@ class TestUserAvatarEndpoints:
         )
         assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
 
-        image = create_1000px_png_test_image()
+        image = create_png_test_image(500, 100)
         web_testapp.put(
             "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
-        )
+        ),
+
         res = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/256x256/{}".format(admin_user.user_id, image.name),
+            "/api/users/{}/avatar/preview/jpg/256x256/{}".format(admin_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -6218,7 +6220,7 @@ class TestUserAvatarEndpoints:
         assert 256, 256 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, image.name),
+            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
             status=200,
         )
         assert res2.body == res.body
