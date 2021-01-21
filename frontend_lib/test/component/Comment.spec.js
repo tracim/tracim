@@ -6,7 +6,7 @@ import Comment from '../../src/component/Timeline/Comment.jsx'
 describe('<Comment />', () => {
   const props = {
     customClass: 'randomCustomClass',
-    author: 'randomAuthor',
+    author: { public_name: 'randomAuthor' },
     text: 'randomText',
     createdFormated: 'randomCreatedFormated',
     createdDistance: 'randomCreatedDistance',
@@ -30,8 +30,8 @@ describe('<Comment />', () => {
       expect(wrapper.find(`div.${props.customClass}__body`)).to.have.lengthOf(1)
     })
 
-    it(`should display the author ${props.author} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__author`)).to.have.text().equal(props.author)
+    it(`should display the author ${props.author.public_name} of the comment`, () => {
+      expect(wrapper.find(`div.${props.customClass}__body__author`)).to.have.text().equal(props.author.public_name)
     })
 
     it(`should display the created Distance ${props.createdDistance} of the comment`, () => {

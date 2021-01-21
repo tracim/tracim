@@ -16,7 +16,14 @@ export const MentionAutoComplete = props => {
             key={m.mention}
             onClick={() => props.onClickAutoCompleteItem(m)}
           >
-            {m.username && <Avatar size={AVATAR_SIZE.MINI} style={{ marginTop: '5px' }} publicName={m.detail} />}
+            {m.username && (
+              <Avatar
+                user={{ ...m, publicName: m.detail }}
+                apiUrl={props.apiUrl}
+                size={AVATAR_SIZE.MINI}
+                style={{ marginTop: '5px' }}
+              />
+            )}
             <b className='autocomplete__item__mention'>@{m.mention}</b>&nbsp;-&nbsp;{props.t(m.detail)}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (

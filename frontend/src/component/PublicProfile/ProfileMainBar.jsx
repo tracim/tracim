@@ -1,4 +1,5 @@
 import React from 'react'
+import { FETCH_CONFIG } from '../../util/helper.js'
 import {
   Avatar,
   AVATAR_SIZE,
@@ -7,22 +8,22 @@ import {
 import PropTypes from 'prop-types'
 
 export const ProfileMainBar = props => {
-  const hasUser = Object.keys(props.displayedUser).length !== 0
-
   return (
     <div className='profile__mainBar'>
       <Avatar
         customClass='profile__mainBar__bigAvatar'
-        publicName={hasUser ? props.displayedUser.publicName : ''}
+        apiUrl={FETCH_CONFIG.apiUrl}
+        user={props.displayedUser}
         size={AVATAR_SIZE.BIG}
         style={{ position: 'relative', top: '-15px' }}
       />
       <Avatar
         customClass='profile__mainBar__mediumAvatar'
-        publicName={hasUser ? props.displayedUser.publicName : ''}
+        apiUrl={FETCH_CONFIG.apiUrl}
+        user={props.displayedUser}
         size={AVATAR_SIZE.MEDIUM}
       />
-      {hasUser
+      {props.displayedUser
         ? (
           <div className='profile__mainBar__info'>
             <div className='profile__mainBar__info__user'>

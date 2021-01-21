@@ -15,6 +15,7 @@ import {
   readNotificationList,
   setNextPage
 } from '../action-creator.sync.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   AVATAR_SIZE,
   CONTENT_TYPE,
@@ -345,7 +346,6 @@ export class NotificationWall extends React.Component {
 
   render () {
     const { props } = this
-    const unknownAuthor = props.t('unknown')
 
     if (!props.notificationPage.list) return null
 
@@ -396,7 +396,8 @@ export class NotificationWall extends React.Component {
                   <div className='notification__list__item__text'>
                     <Avatar
                       size={AVATAR_SIZE.MINI}
-                      publicName={notification.author ? notification.author.publicName : unknownAuthor}
+                      apiUrl={FETCH_CONFIG.apiUrl}
+                      user={notification.author}
                       style={{ marginRight: '5px' }}
                     />
                     <span

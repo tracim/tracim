@@ -17,6 +17,7 @@ describe('<NewMemberForm />', () => {
   const props = {
     onClickCloseAddMemberBtn: onClickCloseAddMemberBtnCallBack,
     publicName: 'randomPersonalData',
+    apiUrl: '/',
     searchedKnownMemberList: [
       { public_name: 'random', username: 'random', user_id: 1 },
       { public_name: 'Searched', username: 'Searched', user_id: 2 },
@@ -40,11 +41,7 @@ describe('<NewMemberForm />', () => {
     role: 'randomRole'
   }
 
-  const wrapper = mount(
-    <NewMemberForm
-      {...props}
-    />
-  )
+  const wrapper = mount(<NewMemberForm {...props} />)
 
   describe('Static design', () => {
     it(`text input should have the value: ${props.publicName}`, () => {
@@ -59,8 +56,8 @@ describe('<NewMemberForm />', () => {
     it('should display the 5 first searched known Member of the list', () => {
       expect(wrapper.find('.autocomplete__item').length).equal(5)
       for (let i = 0; i < 5; i++) {
-        expect(wrapper.find('div.autocomplete__item__avatar > Avatar').at(i).prop('publicName'))
-          .to.equal(props.searchedKnownMemberList[i].public_name)
+        expect(wrapper.find('div.autocomplete__item__avatar Avatar').at(i).prop('user'))
+          .to.deep.equal(props.searchedKnownMemberList[i])
         expect(wrapper.find('div.autocomplete__item__name').at(i))
           .to.have.text().equal(`${props.searchedKnownMemberList[i].public_name}@${props.searchedKnownMemberList[i].username}`)
       }

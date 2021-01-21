@@ -433,6 +433,7 @@ export class Thread extends React.Component {
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
+            apiUrl={state.config.apiUrl}
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={!state.content.is_editable}

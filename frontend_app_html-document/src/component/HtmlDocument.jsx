@@ -115,6 +115,7 @@ export const HtmlDocument = props => {
           <div className='html-document__editionmode__container'>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
               <MentionAutoComplete
+                apiUrl={props.apiUrl}
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
@@ -149,6 +150,7 @@ export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   mode: PropTypes.string,
+  apiUrl: PropTypes.string.isRequired,
   customColor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
