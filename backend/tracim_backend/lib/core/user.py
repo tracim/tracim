@@ -1295,11 +1295,9 @@ class UserApi(object):
             with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
                 # FIXME - G.M - 2021-01-21 - should we catch error here,
                 # what happened if pillow failed ?
-                crop_image(tmp_file, cropped_tmp_file, ratio=AVATAR_RATIO)
+                crop_image(tmp_file, cropped_tmp_file, ratio=AVATAR_RATIO, format="png")
                 cropped_tmp_file.seek(0, 0)
-                user.cropped_avatar = FileIntent(
-                    cropped_tmp_file.read(), new_filename, new_mimetype
-                )
+                user.cropped_avatar = FileIntent(cropped_tmp_file.read(), "avatar.png", "image/png")
             self._session.add(user)
             self._session.flush()
 
@@ -1353,8 +1351,8 @@ class UserApi(object):
             with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
                 # FIXME - G.M - 2021-01-21 - should we catch error here,
                 # what happened if pillow failed ?
-                crop_image(tmp_file, cropped_tmp_file, ratio=COVER_RATIO)
+                crop_image(tmp_file, cropped_tmp_file, ratio=COVER_RATIO, format="png")
                 cropped_tmp_file.seek(0, 0)
-                user.cropped_cover = FileIntent(cropped_tmp_file.read(), new_filename, new_mimetype)
+                user.cropped_cover = FileIntent(cropped_tmp_file.read(), "cover.png", "image/png")
             self._session.add(user)
             self._session.flush()

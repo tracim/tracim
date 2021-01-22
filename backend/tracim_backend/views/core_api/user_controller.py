@@ -151,7 +151,14 @@ SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 )
 
-ALLOWED_MIMETYPE_FOR_AVATAR = ["image/png", "image/jpeg", "image/webp", "image/bmp", "image/gif"]
+ALLOWED_MIMETYPE_FOR_AVATAR = [
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "image/bmp",
+    "image/x-ms-bmp",
+    "image/gif",
+]
 
 
 class UserController(Controller):
