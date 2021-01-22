@@ -164,8 +164,11 @@ class User(DeclarativeBase):
 
     @property
     def has_avatar(self) -> bool:
-        # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return bool(self.avatar)
+
+    @property
+    def has_cover(self) -> bool:
+        return bool(self.cover)
 
     def __repr__(self):
         return "<User: email=%s, username=%s display=%s>" % (

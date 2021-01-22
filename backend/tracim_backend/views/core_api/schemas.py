@@ -200,7 +200,10 @@ class UserDigestSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     has_avatar = marshmallow.fields.Bool(
-        description="has the user an avatar ? (" "avatar need to be obtain with /avatar endpoint",
+        description="has the user an avatar ? avatar need to be obtain with /avatar endpoint",
+    )
+    has_cover = marshmallow.fields.Bool(
+        description="has the user a cover ? cover need to be obtain with /cover endpoint",
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(

@@ -6276,6 +6276,8 @@ class TestUserCoverEndpoints:
 
     def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is False
         image = create_1000px_png_test_image()
         web_testapp.put(
             "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
@@ -6285,6 +6287,8 @@ class TestUserCoverEndpoints:
         transaction.commit()
         assert admin_user.cover is not None
         assert admin_user.cropped_cover is not None
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is True
 
     def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

@@ -773,6 +773,10 @@ class UserInContext(object):
         return bool(self.user.avatar)
 
     @property
+    def has_cover(self) -> bool:
+        return bool(self.user.cover)
+
+    @property
     def auth_type(self) -> str:
         return self.user.auth_type.value
 
