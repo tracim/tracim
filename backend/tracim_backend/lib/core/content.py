@@ -737,7 +737,7 @@ class ContentApi(object):
         :return: The corresponding filepath
         """
         # TODO: - G.M - 2021-01-20 - remove this when direct specific method
-        #  of new StorageLib are used everywhere
+        #  of new StorageLib are used everywhere see #4079
         revision = self.get_one_revision(revision_id)
         yield from StorageLib(app_config=self._config).get_filepath(
             revision.depot_file,
@@ -1798,7 +1798,7 @@ class ContentApi(object):
         content.revision_type = ActionDescription.UNDELETION
 
     def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:
-        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib
+        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib, see #4079
         try:
             with self.get_one_revision_filepath(revision_id) as file_path:
                 nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
@@ -1815,7 +1815,7 @@ class ContentApi(object):
         return nb_pages
 
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
-        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib
+        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib, see #4079
         try:
             with self.get_one_revision_filepath(revision_id) as file_path:
                 return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
@@ -1831,7 +1831,7 @@ class ContentApi(object):
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
-        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib
+        # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib, see #4079
         try:
             with self.get_one_revision_filepath(revision_id) as file_path:
                 return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
