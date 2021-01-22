@@ -1,3 +1,32 @@
+## 3.5.0 / 2021-xx-xx
+
+### New Features
+
+- All user can now set a public user profil
+
+### Fixed Issues
+
+- Frontend: [#3578](https://github.com/tracim/tracim/issues/3578),
+[#3785](https://github.com/tracim/tracim/issues/3785),
+[#3790](https://github.com/tracim/tracim/issues/3790),
+[#3989](https://github.com/tracim/tracim/issues/3989),
+[#3999](https://github.com/tracim/tracim/issues/3999)
+- Other: [#4062](https://github.com/tracim/tracim/issues/4062)
+
+### Known Issues
+
+- SQLite: IDs of objects can be re-used on database (issue [#4016](https://github.com/tracim/tracim/issues/4016))
+
+### Breaking Changes
+
+- Some of renaming and wording changes in frontend (issue [#3901](https://github.com/tracim/tracim/issues/3901))
+
+### Others
+
+- Add backend code to create connection between users (follow user feature) (issue [#3916](https://github.com/tracim/tracim/issues/3916))
+- Running tests (backend/frontend) should be easier on the development environment installation (issue [#4020](https://github.com/tracim/tracim/issues/4020))
+
+
 ## 3.4.3 / 2021-01-11
 
 ### Fixed Issues
