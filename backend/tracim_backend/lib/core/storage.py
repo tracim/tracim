@@ -56,6 +56,16 @@ class StorageLib:
         force_download: bool = None,
         last_modified: datetime = None,
     ) -> HapicFile:
+        """
+        Helper to translate depot file into hapic file with
+        a similar logic than for content preview
+        :param depot_file: original depot file to send to client
+        :param filename: filename of the file to send
+        :param default_filename: if filename is empty or is "raw", use this name.
+        :param force_download: active or desactive attachment mode for file
+        :param last_modified: last modified date of the file.
+        :return: the file as full provided HapicFile
+        """
         file = self._get_depot_file(depot_file)
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
         # "raw", where filename returned will be a custom one.
@@ -76,6 +86,15 @@ class StorageLib:
         file_extension: str = "",
         temporary_prefix: str = TEMPORARY_PREFIX,
     ) -> typing.Generator[str, None, None]:
+        """
+        Helper to get a valid filepath for a depot stored file.
+
+        :param depot_file: the depot file where you want to try preview on
+        :param file_extension: the original file extension, useful to get better
+        previous result.
+        :param temporary_prefix: the prefix for temporary file created.
+        :return: a valid filepath for the content of depot_file
+        """
         depot_stored_file = self._get_depot_file(depot_file)  # type: StoredFile
         if self.app_config.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             yield from self._get_valid_content_filepath_legacy(depot_stored_file)
@@ -89,10 +108,17 @@ class StorageLib:
         self, depot_file: UploadedFile, original_file_extension: str
     ) -> typing.Generator[str, None, None]:
         """
+        Context preview generator, allowing to both have access to filepath needed for depot
+        stored file and catch all PreviewGenerator related error.
+        You should use this only if you expect to run preview_generator code inside.
+        In this context, all error are catched, so, if you want to return a specific exception
+        from inside this contextmanager, set your exception as children
+         of PreviewGeneratorPassthroughError
 
-        :param depot_file:
-        :param original_file_extension:
-        :return:
+        :param depot_file: the depot file where you want to try preview on
+        :param original_file_extension: the original file extension, useful to get better
+        previous result.
+        :return: a valid filepath for the content of depot_file, needed to generate preview.
         """
         try:
             yield from self.get_filepath(
@@ -128,6 +154,9 @@ class StorageLib:
         force_download: bool = None,
         last_modified: datetime = None,
     ) -> HapicFile:
+        """
+        Helper to get HapicFile jpeg preview for controller
+        """
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
@@ -165,6 +194,9 @@ class StorageLib:
         force_download: bool = None,
         last_modified: datetime = None,
     ) -> HapicFile:
+        """
+        Helper to get One page pdf preview for controller
+        """
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
@@ -197,6 +229,9 @@ class StorageLib:
         force_download: bool = None,
         last_modified: datetime = None,
     ) -> HapicFile:
+        """
+        Helper to get Full pdf preview for controller
+        """
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
@@ -228,7 +263,9 @@ class StorageLib:
         original_file_extension: str,
         depot_file: UploadedFile,
     ) -> int:
-
+        """
+        Validate if the page number given exist in the content given
+        """
         preview_generator_page_number = self._preview_manager_page_format(
             preview_generator_page_number
         )
