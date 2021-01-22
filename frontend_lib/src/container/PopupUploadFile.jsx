@@ -104,7 +104,7 @@ class PopupUploadFile extends React.Component {
 
     if (failedFileUploadList.length > 0) {
       this.setState({
-        uploadFileList: failedFileUploadList
+        fileUploadList: failedFileUploadList
       })
       this.sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
       props.handleFailure(failedFileUploadList)
@@ -128,9 +128,13 @@ class PopupUploadFile extends React.Component {
     props.handleClose()
   }
 
-  isValidateButtonDisabled = async () => {
+  isValidateButtonDisabled = () => {
     const { state } = this
-    return state.fileUploadList.length === 0 || state.uploadStarted || state.fileUploadList.some(isFileUploadInErrorState)
+    return (
+      state.uploadStarted ||
+      state.fileUploadList.length === 0 ||
+      state.fileUploadList.some(isFileUploadInErrorState)
+    )
   }
 
   loadFileUploadPreview = async (fileUploadList) => {
@@ -144,7 +148,7 @@ class PopupUploadFile extends React.Component {
           img.onerror = () => reject(new Error())
           img.onload = () => {
             if (e.total > 0) {
-              resolve(e.target.value)
+              resolve(e.target.result)
             } else reject(new Error())
           }
         }

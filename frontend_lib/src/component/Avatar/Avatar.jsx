@@ -47,6 +47,7 @@ export class Avatar extends React.Component {
     const { props } = this
 
     const publicName = props.user.publicName || props.user.public_name
+    const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
     const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
 
@@ -69,11 +70,13 @@ export class Avatar extends React.Component {
             fontSize: fontSize
           }}
         >
-          <img
-            className='avatar__img'
-            src={`${props.apiUrl}/workspaces/1/files/9/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/avatar`}
-            alt={letterAvatar}
-          />
+          {hasAvatar ? (
+            <img
+              className='avatar__img'
+              src={`${props.apiUrl}/workspaces/1/files/1/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${props.filenameInUrl}`}
+              alt={props.t('Avatar of {{publicName}}', { publicName })}
+            />
+          ) : <span>{letterAvatar}</span>}
         </div>
       </div>
     )
@@ -85,14 +88,16 @@ Avatar.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
-  style: PropTypes.object
+  style: PropTypes.object,
+  filenameInUrl: PropTypes.string
 }
 
 Avatar.defaultProps = {
   customClass: '',
   user: { publicName: '' },
   size: AVATAR_SIZE.MEDIUM,
-  style: {}
+  style: {},
+  filenameInUrl: 'avatar'
 }
 
 export default translate()(Avatar)

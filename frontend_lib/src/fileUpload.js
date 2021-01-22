@@ -45,7 +45,7 @@ export const uploadFile = async (
   for (const entry of Object.entries(additionalFormData)) {
     formData.append(entry[0], entry[1])
   }
-  if (progressEventHandler) xhr.upload.addEventListener('progress', progressEventHandler, false)
+  if (progressEventHandler) xhr.upload.addEventListener('progress', e => progressEventHandler(e, fileUpload), false)
 
   xhr.open(httpMethod, uploadUrl, true)
   setupCommonRequestHeaders(xhr)
@@ -61,20 +61,20 @@ export const uploadFile = async (
   } catch {
     errorMessage = defaultErrorMessage
   }
-  let jsonResponse
+  let responseJson
   try {
-    jsonResponse = JSON.parse(xhr.responseText)
+    responseJson = JSON.parse(xhr.responseText)
   } catch {}
 
   if (xhr.status >= 400) {
-    const errorMessageObject = errorMessageList.find(m => m.status === xhr.status && m.code === jsonResponse.code)
+    const errorMessageObject = errorMessageList.find(m => m.status === xhr.status && m.code === responseJson.code)
     errorMessage = errorMessageObject ? errorMessageObject.message : defaultErrorMessage
   }
 
   return {
     ...fileUpload,
     errorMessage: errorMessage,
-    responseJson: jsonResponse,
+    responseJson: responseJson,
     responseStatus: xhr.status
   }
 }
@@ -83,4 +83,6 @@ export const isFileUploadInList = (fileUpload, fileUploadList) => {
   return fileUploadList.some(fu => fu.file.name === fileUpload.file.name)
 }
 
-export const isFileUploadInErrorState = (fileUpload) => fileUpload.errorMessage.length > 0
+export const isFileUploadInErrorState = (fileUpload) => {
+  return fileUpload.responseStatus >= 400 || fileUpload.errorMessage.length > 0
+}

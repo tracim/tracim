@@ -81,14 +81,15 @@ class PopupCreateFile extends React.Component {
       )
     }))
 
+    this.handleClose()
     if (fileUploadList.length !== 1) return
 
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.OPEN_CONTENT_URL,
       data: {
-        workspaceId: fileUploadList[0].content.workspace_id,
+        workspaceId: fileUploadList[0].responseJson.workspace_id,
         contentType: state.appName,
-        contentId: fileUploadList[0].content.content_id
+        contentId: fileUploadList[0].responseJson.content_id
       }
     })
   }

@@ -12,7 +12,8 @@ import {
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  setBreadcrumbs,
+  updateUserProfileAvatarName
 } from '../action-creator.sync.js'
 import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
@@ -39,8 +40,7 @@ export class PublicProfile extends React.Component {
     this.state = {
       displayedUser: undefined,
       coverImageUrl: undefined,
-      displayUploadPopup: undefined,
-      changeImageCount: 0
+      displayUploadPopup: undefined
     }
 
     props.registerCustomEventHandlerList([
@@ -110,19 +110,11 @@ export class PublicProfile extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  onChangeAvatar = () => {
-    this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
-  }
+  onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  onCloseUploadPopup = () => {
-    this.setState({ displayUploadPopup: undefined })
-  }
+  onChangeAvatarSuccess = () => this.props.dispatch(updateUserProfileAvatarName(`avatar-${Date.now()}`))
 
-  onChangeImageSuccess = () => {
-    this.setState((state) => {
-      return { changeImageCount: state.changeImageCount + 1, displayUploadPopup: undefined }
-    })
-  }
+  onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
     const { props, state } = this
@@ -161,8 +153,9 @@ export class PublicProfile extends React.Component {
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
-            handleChangeAvatar={this.onChangeAvatar}
+            handleChangeAvatar={this.onChangeAvatarClick}
             changeAvatarEnabled={changeImageEnabled}
+            avatarFilenameInUrl={props.user.profileAvatarName}
           />
 
           <div className='profile__content'>
