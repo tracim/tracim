@@ -2,7 +2,7 @@
 
 ### New Features
 
-- All user can now set a public user profil
+- All users can now set a public user profil
 
 ### Fixed Issues
 
