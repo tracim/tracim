@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
+import io
 import os
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
-import tempfile
 import typing as typing
 
 from depot.io.utils import FileIntent
@@ -1287,17 +1287,17 @@ class UserApi(object):
     ) -> None:
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
-        with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
-            tmp_file.write(new_content.read())
-            tmp_file.seek(0, 0)
-            user.avatar = FileIntent(tmp_file.read(), new_filename, new_mimetype)
-            tmp_file.seek(0, 0)
-            with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
+        with io.BytesIO() as tmp_data:
+            tmp_data.write(new_content.read())
+            tmp_data.seek(0, 0)
+            user.avatar = FileIntent(tmp_data.read(), new_filename, new_mimetype)
+            tmp_data.seek(0, 0)
+            with io.BytesIO() as cropped_tmp_data:
                 # FIXME - G.M - 2021-01-21 - should we catch error here,
                 # what happened if pillow failed ?
-                crop_image(tmp_file, cropped_tmp_file, ratio=AVATAR_RATIO, format="png")
-                cropped_tmp_file.seek(0, 0)
-                user.cropped_avatar = FileIntent(cropped_tmp_file.read(), "avatar.png", "image/png")
+                crop_image(tmp_data, cropped_tmp_data, ratio=AVATAR_RATIO, format="png")
+                cropped_tmp_data.seek(0, 0)
+                user.cropped_avatar = FileIntent(cropped_tmp_data.read(), "avatar.png", "image/png")
             self._session.add(user)
             self._session.flush()
 
@@ -1343,16 +1343,16 @@ class UserApi(object):
     ) -> None:
         user = self.get_one(user_id)
         label, file_extension = os.path.splitext(new_filename)
-        with tempfile.SpooledTemporaryFile(mode="wb+") as tmp_file:
-            tmp_file.write(new_content.read())
-            tmp_file.seek(0, 0)
-            user.cover = FileIntent(tmp_file.read(), new_filename, new_mimetype)
-            tmp_file.seek(0, 0)
-            with tempfile.SpooledTemporaryFile(mode="wb+") as cropped_tmp_file:
+        with io.BytesIO() as tmp_data:
+            tmp_data.write(new_content.read())
+            tmp_data.seek(0, 0)
+            user.cover = FileIntent(tmp_data.read(), new_filename, new_mimetype)
+            tmp_data.seek(0, 0)
+            with io.BytesIO() as cropped_tmp_data:
                 # FIXME - G.M - 2021-01-21 - should we catch error here,
                 # what happened if pillow failed ?
-                crop_image(tmp_file, cropped_tmp_file, ratio=COVER_RATIO, format="png")
-                cropped_tmp_file.seek(0, 0)
-                user.cropped_cover = FileIntent(cropped_tmp_file.read(), "cover.png", "image/png")
+                crop_image(tmp_data, cropped_tmp_data, ratio=COVER_RATIO, format="png")
+                cropped_tmp_data.seek(0, 0)
+                user.cropped_cover = FileIntent(cropped_tmp_data.read(), "cover.png", "image/png")
             self._session.add(user)
             self._session.flush()
