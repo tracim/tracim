@@ -51,7 +51,10 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
-  WORKSPACE_SUBSCRIPTION_LIST
+  WORKSPACE_SUBSCRIPTION_LIST,
+  CUSTOM_PROPERTIES_UI_SCHEMA,
+  CUSTOM_PROPERTIES_SCHEMA,
+  USER_PUBLIC_PROFILE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -1051,7 +1054,7 @@ export const getCustomPropertiesSchema = () => dispatch => {
       headers: FETCH_CONFIG.headers,
       method: 'GET'
     },
-    actionName: '',
+    actionName: CUSTOM_PROPERTIES_SCHEMA,
     dispatch
   })
 }
@@ -1064,7 +1067,7 @@ export const getCustomPropertiesUiSchema = () => dispatch => {
       headers: FETCH_CONFIG.headers,
       method: 'GET'
     },
-    actionName: '',
+    actionName: CUSTOM_PROPERTIES_UI_SCHEMA,
     dispatch
   })
 }
@@ -1077,7 +1080,7 @@ export const getUserCustomPropertiesDataSchema = userId => dispatch => {
       headers: FETCH_CONFIG.headers,
       method: 'GET'
     },
-    actionName: '',
+    actionName: USER_PUBLIC_PROFILE,
     dispatch
   })
 }
@@ -1094,7 +1097,7 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
         parameters: formData
       })
     },
-    actionName: '',
+    actionName: USER_PUBLIC_PROFILE,
     dispatch
   })
 }

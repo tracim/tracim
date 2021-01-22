@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import CustomFormManager from './CustomFormManager.jsx'
 
+require('./Information.styl')
+
 export const Information = props => {
   return (
-    <div>
+    <div className='Information__dynamicData'>
       <CustomFormManager
         title={props.t('Information_plural')}
         submitButtonClass='profile__customForm__submit primaryColorBorder'
@@ -15,7 +17,7 @@ export const Information = props => {
         onSubmitDataSchema={props.onSubmitDataSchema}
       />
 
-      <div>
+      <div className='Information__staticData'>
         <div>{props.t('Registration date: ')}{props.registrationDate}</div>
         <div>
           {props.t(

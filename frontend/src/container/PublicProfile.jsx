@@ -6,7 +6,8 @@ import {
   CUSTOM_EVENT,
   PAGE,
   serialize,
-  TracimComponent
+  TracimComponent,
+  PROFILE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -40,6 +41,8 @@ export class PublicProfile extends React.Component {
       informationSchemaObject: {},
       personalPageSchemaObject: {},
       uiSchemaObject: {},
+      informationDataSchema: {},
+      personalPageDataSchema: {},
       dataSchemaObject: {}
     }
 
@@ -139,11 +142,14 @@ export class PublicProfile extends React.Component {
     )
 
     const [informationSchema, personalPageSchema] = this.splitSchema(schemaObject, uiSchemaObject)
+    const [informationDataSchema, personalPageDataSchema] = this.splitDataSchema(dataSchemaObject, uiSchemaObject)
 
     this.setState({
       informationSchemaObject: informationSchema,
       personalPageSchemaObject: personalPageSchema,
       uiSchemaObject: uiSchemaObject,
+      informationDataSchema: informationDataSchema,
+      personalPageDataSchema: personalPageDataSchema,
       dataSchemaObject: dataSchemaObject
     })
   }
@@ -162,6 +168,8 @@ export class PublicProfile extends React.Component {
     }
     const personalPageSchema = {
       ...schema,
+      title: '', // INFO - CH - 20210122 - reset title and description since they are used for first form
+      description: '',
       required: schema.required.filter(field =>
         this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
       ),
@@ -172,6 +180,26 @@ export class PublicProfile extends React.Component {
       )
     }
     return [informationSchema, personalPageSchema]
+  }
+
+  splitDataSchema = (dataSchema, uiSchema) => {
+    const informationDataSchema = {
+      ...Object.fromEntries(
+        Object.entries(dataSchema).filter(([key, value]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+        )
+      )
+    }
+    const personalPageDataSchema = {
+      ...Object.fromEntries(
+        Object.entries(dataSchema).filter(([key, value]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+        )
+      )
+    }
+    console.log('informationDataSchema', informationDataSchema)
+    console.log('personalPageDataSchema', personalPageDataSchema)
+    return [informationDataSchema, personalPageDataSchema]
   }
 
   findPropertyDisplayGroup = (property, uiSchema) => {
@@ -206,7 +234,7 @@ export class PublicProfile extends React.Component {
     }
   }
 
-  handleSubmitDataSchema = async (dataSchemaObject, e, displayGroup) => {
+  handleSubmitDataSchema = async (dataSchemaObject, e) => {
     const { props, state } = this
 
     const userId = props.match.params.userid
@@ -218,17 +246,32 @@ export class PublicProfile extends React.Component {
 
     const result = await props.dispatch(putUserCustomPropertiesDataSchema(userId, mergedDataSchemaObject))
     switch (result.status) {
-      case 204:
-        this.setState({ dataSchemaObject: mergedDataSchemaObject })
+      case 204: {
+        const [informationDataSchema, personalPageDataSchema] = this.splitDataSchema(mergedDataSchemaObject, state.uiSchemaObject)
+        this.setState({
+          informationDataSchema: informationDataSchema,
+          personalPageDataSchema: personalPageDataSchema,
+          dataSchemaObject: mergedDataSchemaObject
+        })
         break
+      }
       default:
         props.dispatch(newFlashMessage(props.t('Error while saving public profile', 'warning')))
         break
     }
   }
 
+  isPublicProfileEditable = (connectedUser, publicProfileId, profileObject) => {
+    const isConnectedUserOnHisOwnProfile = connectedUser.userId === publicProfileId
+    const isUserAdmin = connectedUser.profile === profileObject.administrator.slug
+
+    return isConnectedUserOnHisOwnProfile || isUserAdmin
+  }
+
   render () {
     const { props, state } = this
+
+    const isPublicProfileEditable = this.isPublicProfileEditable(props.user, props.match.params.userid, PROFILE)
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -249,18 +292,26 @@ export class PublicProfile extends React.Component {
           />
 
           <div className='profile__content'>
+            <div
+              className='DELETE_ME I_ONLY_HERE_FOR_DEBUG'
+              onClick={() => {
+                props.dispatch(putUserCustomPropertiesDataSchema(props.match.params.userid, {}))
+              }}
+              style={{ position: 'absolute', top: 0, left: 0, zIndex: 100, minHeight: '20px' }}
+            >
+              don't click me
+            </div>
             <div className='profile__content__information'>
               {state.displayedUser
                 ? (
                   <Information
                     schemaObject={state.informationSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
-                    dataSchemaObject={state.dataSchemaObject}
+                    dataSchemaObject={state.informationDataSchema}
+                    displayEditButton={isPublicProfileEditable}
                     authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
                     authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
-                    onSubmitDataSchema={
-                      (formData, e) => this.handleSubmitDataSchema(formData, e, DISPLAY_GROUP_BACKEND_KEY.information)
-                    }
+                    onSubmitDataSchema={this.handleSubmitDataSchema}
                   />
                 )
                 : (
@@ -279,10 +330,9 @@ export class PublicProfile extends React.Component {
                     submitButtonClass='profile__customForm__submit primaryColorBorder'
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
-                    dataSchemaObject={state.dataSchemaObject}
-                    onSubmitDataSchema={
-                      (formData, e) => this.handleSubmitDataSchema(formData, e, DISPLAY_GROUP_BACKEND_KEY.personalPage)
-                    }
+                    dataSchemaObject={state.personalPageDataSchema}
+                    displayEditButton={isPublicProfileEditable}
+                    onSubmitDataSchema={this.handleSubmitDataSchema}
                   />
                 )
                 : (
@@ -299,5 +349,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs }) => ({ breadcrumbs })
+const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))

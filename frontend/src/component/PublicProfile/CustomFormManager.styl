@@ -1,14 +1,25 @@
-// .CustomFormManager
+.CustomFormManager
+  &__title
+    margin-bottom 15px
+    font-size 24px
 
-.SchemaAsView
-  margin 20px 0
+.DisplayTitle
+  margin 15px 0 0
+  &:first-child
+    margin-top 0
 
-.DisplaySchemaProperty
+.DisplaySchemaPropertyString
   font-weight normal
   &__label
     margin-right 10px
+    &::after
+      content ':'
+      margin-left 3px
     &.noLabel
       margin-right 0
-      & ::after
-        content ':'
-        margin-left 3px
+      &::after
+        content ''
+        margin-left 0
+
+.DisplaySchemaArray
+  margin 0 0 14px 0
