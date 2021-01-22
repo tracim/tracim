@@ -19,12 +19,12 @@
 
 ### Breaking Changes
 
-- Some of renaming and wording changes in frontend (issue [#3901](https://github.com/tracim/tracim/issues/3901))
+- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901))
 
 ### Others
 
-- Add backend code to create connection between users (follow user feature) (issue [#3916](https://github.com/tracim/tracim/issues/3916))
-- Running tests (backend/frontend) should be easier on the development environment installation (issue [#4020](https://github.com/tracim/tracim/issues/4020))
+- Implemented an API for connecting users (follow user feature) (issue [#3916](https://github.com/tracim/tracim/issues/3916))
+- Simplified way to run tests (backend/frontend) on development environment (issue [#4020](https://github.com/tracim/tracim/issues/4020))
 
 
 ## 3.4.3 / 2021-01-11
