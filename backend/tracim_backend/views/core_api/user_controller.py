@@ -151,7 +151,7 @@ SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 )
 
-ALLOWED_MIMETYPE_FOR_AVATAR = [
+ALLOWED__AVATAR_MIMETYPES = [
     "image/png",
     "image/jpeg",
     "image/webp",
@@ -1143,7 +1143,7 @@ class UserController(Controller):
     def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         if hapic_data.files.files is None:
             raise NoFileValidationError('No file "files" given at input, validation failed.')
-        if hapic_data.files.files.type not in ALLOWED_MIMETYPE_FOR_AVATAR:
+        if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
             raise MimetypeNotAllowed(
                 "File mimetype {} is not allowed for avatar".format(hapic_data.files.files.type)
             )
@@ -1247,7 +1247,7 @@ class UserController(Controller):
     def put_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         if hapic_data.files.files is None:
             raise NoFileValidationError('No file "files" given at input, validation failed.')
-        if hapic_data.files.files.type not in ALLOWED_MIMETYPE_FOR_AVATAR:
+        if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
             raise MimetypeNotAllowed(
                 "File mimetype {} is not allowed for cover".format(hapic_data.files.files.type)
             )
