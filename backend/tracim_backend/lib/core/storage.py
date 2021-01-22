@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from datetime import datetime
 import os
 import tempfile
+import typing
 
 from depot.fields.upload import UploadedFile
 from depot.io.interfaces import StoredFile
@@ -29,7 +30,7 @@ class StorageLib:
     Helper class to handle more easily usage with depot stored file
     """
 
-    def __init__(self, app_config: CFG,) -> None:
+    def __init__(self, app_config: CFG) -> None:
         self.app_config = app_config
         self.uploaded_file_depot = DepotManager.get(
             app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME
@@ -74,7 +75,7 @@ class StorageLib:
         depot_file: UploadedFile,
         file_extension: str = "",
         temporary_prefix: str = TEMPORARY_PREFIX,
-    ):
+    ) -> typing.Generator[str, None, None]:
         depot_stored_file = self._get_depot_file(depot_file)  # type: StoredFile
         if self.app_config.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             yield from self._get_valid_content_filepath_legacy(depot_stored_file)
@@ -86,7 +87,7 @@ class StorageLib:
     @contextmanager
     def preview_generator_filepath_context(
         self, depot_file: UploadedFile, original_file_extension: str
-    ):
+    ) -> typing.Generator[str, None, None]:
         """
 
         :param depot_file:
@@ -246,7 +247,7 @@ class StorageLib:
         depot_stored_file: StoredFile,
         prefix: str = "tracim-undefined",
         file_extension: str = "",
-    ):
+    ) -> typing.Generator[int, None, None]:
         """
         Generic way to get content filepath for all depot backend.
         :param depot_stored_file: content as depot StoredFile
@@ -293,7 +294,9 @@ class StorageLib:
                 except FileNotFoundError:
                     pass
 
-    def _get_valid_content_filepath_legacy(self, depot_stored_file: StoredFile):
+    def _get_valid_content_filepath_legacy(
+        self, depot_stored_file: StoredFile
+    ) -> typing.Generator[int, None, None]:
         """
         Legacy way to get content filepath, only work for local file backend of depot
         ("depot.io.local.LocalFileStorage", aka "local" in tracim config),
