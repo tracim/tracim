@@ -507,7 +507,7 @@ After all these changes in the configuration, you should restart all  process (w
 ## User Custom Properties
 
 It's possible to configure custom properties attached to user per instance, [read specific documentation
-to know more about this feature]("./user_custom_properties.md").
+to know more about this feature](./user_custom_properties.md).
 
 ## Security settings
 
