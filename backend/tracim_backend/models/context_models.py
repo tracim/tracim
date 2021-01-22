@@ -769,8 +769,8 @@ class UserInContext(object):
     # Context related
 
     @property
-    def avatar_url(self) -> Optional[str]:
-        return self.user.avatar_url
+    def has_avatar(self) -> bool:
+        return bool(self.user.avatar)
 
     @property
     def auth_type(self) -> str:

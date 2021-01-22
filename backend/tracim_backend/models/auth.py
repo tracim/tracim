@@ -163,9 +163,9 @@ class User(DeclarativeBase):
         return self.display_name
 
     @property
-    def avatar_url(self) -> typing.Optional[str]:
+    def has_avatar(self) -> bool:
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
-        return None
+        return bool(self.avatar)
 
     def __repr__(self):
         return "<User: email=%s, username=%s display=%s>" % (
