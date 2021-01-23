@@ -167,7 +167,7 @@ export class PublicProfile extends React.Component {
                     <div className='profile__text__loading' />
                     <div className='profile__content__loading' />
                   </>
-                )}
+                  )}
             </div>
 
             <div className='profile__content__page'>
@@ -178,7 +178,7 @@ export class PublicProfile extends React.Component {
                     <div className='profile__text__loading' />
                     <div className='profile__content__loading' />
                   </>
-                )}
+                  )}
             </div>
           </div>
         </div>

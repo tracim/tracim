@@ -76,6 +76,13 @@ import {
 
 import { appContentFactory } from './appContentFactory.js'
 
+import {
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
+} from './fileUpload.js'
+
 import { defaultDebug } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
@@ -358,5 +365,9 @@ export {
   getWorkspaceContent,
   PAGE,
   PopupUploadFile,
-  PopupProgressUpload
+  PopupProgressUpload,
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
 }

@@ -51,8 +51,6 @@
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
   "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
   "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
-  "Some file(s) couldn't be uploaded": "Certains fichiers n'ont pas pu être téléversés",
-  "Files already added:": "Fichiers déjà ajoutés :",
   "Upload files": "Téléverser des fichiers",
   "New file": "Nouveau fichier",
   "Preview loading...": "Chargement de l'aperçu ...",

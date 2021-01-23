@@ -81,7 +81,7 @@ class PopupCreateFile extends React.Component {
       )
     }))
 
-    this.handleClose()
+    this.onClosePopup()
     if (fileUploadList.length !== 1) return
 
     GLOBAL_dispatchEvent({
@@ -94,7 +94,7 @@ class PopupCreateFile extends React.Component {
     })
   }
 
-  handleClose = () => {
+  onClosePopup = () => {
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
       data: {
@@ -129,6 +129,7 @@ class PopupCreateFile extends React.Component {
         uploadErrorMessageList={errorMessageList}
         defaultUploadErrorMessage={defaultErrorMessage}
         additionalFormData={additionalFormData}
+        multipleFiles
       />
     )
   }

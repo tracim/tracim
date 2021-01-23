@@ -123,5 +123,12 @@
   "Edit": "Editar",
   "Validate anyway": "Validar de qualquer forma",
   "Home": "Início",
-  "Error while getting breadcrumbs": "Erro ao obtenir a navegação estrutural"
+  "Only one file is allowed": "__NOT_TRANSLATED__",
+  "Files already added:": "Ficheiros já subidos:",
+  "The type of this file is not allowed": "__NOT_TRANSLATED__",
+  "The file is too big": "__NOT_TRANSLATED__",
+  "Error while uploading file": "__NOT_TRANSLATED__",
+  "Error while uploading file(s)": "__NOT_TRANSLATED__",
+  "Please wait until the upload ends": "__NOT_TRANSLATED__",
+  "Avatar of {{publicName}}": "__NOT_TRANSLATED__"
 }

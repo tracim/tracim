@@ -1,6 +1,4 @@
 {
-  "{{author}} added you to {{space}}": "{{author}} adicionou-o à {{space}}",
-  "{{author}} joined space {{space}}": "{{author}} juntou-se ao espaço {{space}}",
   "{{author}} removed you from {{space}}": "{{author}} eliminou-o de {{space}}",
   "{{author}} removed {{user}} from {{space}}": "{{author}} eliminou {{user}} de {{space}}",
   "{{author}} modified your role in {{space}}": "{{author}} modificou sua função em {{space}}",
@@ -268,7 +266,6 @@
   "Your username": "Seu identificador",
   "Your username has been set": "O seu identificador foi definido",
   "Unknown space": "Espaço desconhecido",
-  "{{author}} added {{user}} to {{space}}": "{{author}} acrescentou {{user}} à {{space}}",
   "Error loading unread notification number": "Erro ao carregar o número de notificações não lidas",
   "{{author}} deleted {{content}} from {{space}}": "{{author}} eliminou {{content}} de {{space}}",
   "{{author}} restored {{content}} in {{space}}": "{{author}} restaurou {{content}} no espaço {{space}}",
@@ -335,5 +332,9 @@
   "Loading": "Carregando",
   "Information_plural": "Informações",
   "Personal page": "Página pessoal",
-  "My profile": "Meu perfil"
+  "My profile": "Meu perfil",
+  "Upload an image": "Carregar imagem",
+  "Recommended dimensions:": "Dimensões recomendadas:",
+  "Maximum size: {{size}}Mb": "Tamanho máximo: {{size}}Mb",
+  "Change avatar": "Mudar avatar"
 }
