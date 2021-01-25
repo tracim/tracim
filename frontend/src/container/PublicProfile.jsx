@@ -122,14 +122,14 @@ export class PublicProfile extends React.Component {
 
   onChangeAvatarSuccess = () => this.onChangeImageSuccess(
     'avatar',
-    'profileAvatarImage',
+    'profileAvatarName',
     'hasAvatar',
     updateUserProfileAvatarName
   )
 
   onChangeCoverSuccess = () => this.onChangeImageSuccess(
     'cover',
-    'profileCoverImage',
+    'profileCoverName',
     'hasCover',
     updateUserProfileCoverName
   )
@@ -143,13 +143,13 @@ export class PublicProfile extends React.Component {
     this.setState(oldState => {
       return {
         ...oldState,
-        displayedUser: { ...oldState.displayedUser, nameStateKey: name, hasImageKey: true }
+        displayedUser: { ...oldState.displayedUser, [nameStateKey]: name, [hasImageKey]: true }
       }
     })
     this.onCloseUploadPopup()
   }
 
-  onChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
+  handleChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
 
   onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
@@ -179,13 +179,15 @@ export class PublicProfile extends React.Component {
 
   getCoverImageComponent = (changeEnabled) => {
     const { props, state } = this
-    const coverImageAlt = state.displayedUser ? props.t(
-      'Cover image of {{publicName}}',
-      { publicName: state.displayedUser.publicName }
-    ) : ''
-    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverImageName : 'cover'
-    const coverBaseUrl = props.displayedUser ? getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.displayedUser.userId) : ''
-    const coverUrl = `${coverBaseUrl}/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
+    const coverImageAlt = state.displayedUser
+      ? props.t(
+          'Cover image of {{publicName}}',
+          { publicName: state.displayedUser.publicName }
+        )
+      : ''
+    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverName : 'cover'
+    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.match.params.userid)
+    const coverUrl = `${coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
     return (
       <div className='profile__cover'>
         {state.displayedUser
@@ -202,7 +204,7 @@ export class PublicProfile extends React.Component {
                 <IconButton
                   text={props.t('Change cover')}
                   icon='upload'
-                  onClick={this.onChangeCoverClick}
+                  onClick={this.handleChangeCoverClick}
                   customClass='profile__cover__changeBtn'
                   intent='secondary'
                   dataCy='profile_cover_changeBtn'
