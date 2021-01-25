@@ -13,5 +13,7 @@ export const globalManagerFromApi = {
   username: 'global_manager',
   lang: 'en',
   agendaUrl: '',
-  is_deleted: false
+  is_deleted: false,
+  has_avatar: false,
+  has_cover: false
 }

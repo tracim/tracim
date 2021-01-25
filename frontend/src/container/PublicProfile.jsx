@@ -148,7 +148,7 @@ export class PublicProfile extends React.Component {
               label={props.t('Upload an image')}
               uploadUrl={`${avatarBaseUrl}/raw/avatar`}
               httpMethod='PUT'
-              color={GLOBAL_primaryColor}
+              color={GLOBAL_primaryColor} // eslint-disable-line
               handleClose={this.onCloseUploadPopup}
               handleSuccess={this.onChangeAvatarSuccess}
               allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
