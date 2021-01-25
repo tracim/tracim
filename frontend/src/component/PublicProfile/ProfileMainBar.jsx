@@ -21,17 +21,15 @@ export const ProfileMainBar = props => {
           apiUrl={FETCH_CONFIG.apiUrl}
           user={hasUser ? props.displayedUser : {}}
           size={AVATAR_SIZE.BIG}
-          filenameInUrl={props.avatarFilenameInUrl}
         />
         <Avatar
           customClass='profile__mainBar__avatar__medium'
+          apiUrl={FETCH_CONFIG.apiUrl}
           user={hasUser ? props.displayedUser : {}}
           size={AVATAR_SIZE.MEDIUM}
-          filenameInUrl={props.avatarFilenameInUrl}
         />
         {props.changeAvatarEnabled && (
           <IconButton
-            text='' 
             title={props.t('Change avatar')}
             icon='upload'
             onClick={props.handleChangeAvatar}

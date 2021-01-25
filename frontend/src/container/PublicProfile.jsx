@@ -104,34 +104,53 @@ export class PublicProfile extends React.Component {
     )) return
 
     const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
-    this.setState({
-      displayedUser: apiUser,
-      coverImageUrl: 'default'
+    this.setState(oldState => {
+      return {
+        displayedUser: apiUser,
+        coverImageUrl: 'default'
+      }
     })
     this.buildBreadcrumbs()
   }
 
   onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  onChangeAvatarSuccess = () => this.props.dispatch(updateUserProfileAvatarName(`avatar-${Date.now()}`))
+  onChangeAvatarSuccess = () => {
+    const { props, state } = this
+    const profileAvatarName = `avatar-${Date.now()}`
+    if (state.displayedUser.userId === props.user.userId) {
+      this.props.dispatch(updateUserProfileAvatarName(profileAvatarName))
+    }
+    this.setState(oldState => {
+      return {
+        ...oldState,
+        displayedUser: { ...oldState.displayedUser, profileAvatarName, hasAvatar: true }
+      }
+    })
+    this.onCloseUploadPopup()
+  }
 
   onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
     const { props, state } = this
-    const changeImageEnabled = (state.displayedUser.userId === props.user.userId) || props.user.profile === PROFILE.ADMINISTRATOR
-    const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, state.displayedUser.userId)
+    const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
+    const changeImageEnabled = (
+      (userId === props.user.userId) ||
+      props.user.profile === PROFILE.administrator.slug
+    )
+    const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
             <PopupUploadFile
               label={props.t('Upload an image')}
-              uploadUrl={`${avatarBaseUrl}/avatar/raw`}
+              uploadUrl={`${avatarBaseUrl}/raw/avatar`}
               httpMethod='PUT'
               color={GLOBAL_primaryColor}
               handleClose={this.onCloseUploadPopup}
-              handleSuccess={this.onChangeImageSuccess}
+              handleSuccess={this.onChangeAvatarSuccess}
               allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
               maximumFileSize={MAXIMUM_AVATAR_SIZE}
             >
@@ -154,7 +173,6 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             handleChangeAvatar={this.onChangeAvatarClick}
             changeAvatarEnabled={changeImageEnabled}
-            avatarFilenameInUrl={props.user.profileAvatarName}
           />
 
           <div className='profile__content'>
@@ -166,7 +184,7 @@ export class PublicProfile extends React.Component {
                     <div className='profile__text__loading' />
                     <div className='profile__content__loading' />
                   </>
-                  )}
+                )}
             </div>
 
             <div className='profile__content__page'>
@@ -177,7 +195,7 @@ export class PublicProfile extends React.Component {
                     <div className='profile__text__loading' />
                     <div className='profile__content__loading' />
                   </>
-                  )}
+                )}
             </div>
           </div>
         </div>

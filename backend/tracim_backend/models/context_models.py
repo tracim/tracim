@@ -1713,6 +1713,8 @@ class AboutUser(object):
         created: datetime,
         authored_content_revisions_count: int,
         authored_content_revisions_space_count: int,
+        has_avatar: bool,
+        has_cover: bool,
     ) -> None:
         self.user_id = user_id
         self.public_name = public_name
@@ -1722,6 +1724,8 @@ class AboutUser(object):
         self.created = created
         self.authored_content_revisions_count = authored_content_revisions_count
         self.authored_content_revisions_space_count = authored_content_revisions_space_count
+        self.has_avatar = has_avatar
+        self.has_cover = has_cover
 
 
 class AuthoredContentRevisionsInfos:

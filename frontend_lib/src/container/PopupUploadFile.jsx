@@ -217,7 +217,7 @@ class PopupUploadFile extends React.Component {
 }
 
 PopupUploadFile.propTypes = {
-  lab: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   uploadUrl: PropTypes.string.isRequired,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,

@@ -25,7 +25,7 @@ export class Avatar extends React.Component {
 
   generateColorFromName = publicName => {
     // INFO - G.B. - 20210112 - The default value is "lightGrey" at frontend_lib/css/Variable.styl
-    if (publicName.length === 0) return '#f0f0f0'
+    if (!publicName || publicName.length === 0) return '#f0f0f0'
     // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
     const str = this.intToRGB(this.stringToHashCode(publicName))
     return color('#' + str).desaturate(0.90).hex()
@@ -50,6 +50,7 @@ export class Avatar extends React.Component {
 
     const publicName = props.user.publicName || props.user.public_name
     const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
+    const filenameInUrl = props.user.profileAvatarName
     const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
     const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id)
@@ -76,7 +77,7 @@ export class Avatar extends React.Component {
           {hasAvatar ? (
             <img
               className='avatar__img'
-              src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${props.filenameInUrl}`}
+              src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
               alt={props.t('Avatar of {{publicName}}', { publicName })}
             />
           ) : <span>{letterAvatar}</span>}
@@ -91,16 +92,14 @@ Avatar.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
-  style: PropTypes.object,
-  filenameInUrl: PropTypes.string
+  style: PropTypes.object
 }
 
 Avatar.defaultProps = {
   customClass: '',
   user: { publicName: '' },
   size: AVATAR_SIZE.MEDIUM,
-  style: {},
-  filenameInUrl: 'avatar'
+  style: {}
 }
 
 export default translate()(Avatar)

@@ -84,10 +84,10 @@ export default function user (state = defaultUser, action) {
       return { ...state, config: action.userConfig }
 
     case `${SET}/${USER_PROFILE_AVATAR_NAME}`:
-      return { ...state, profileAvatarName: state.newAvatarName }
+      return { ...state, profileAvatarName: action.newAvatarName }
 
     case `${SET}/${USER_PROFILE_COVER_NAME}`:
-      return { ...state, profileCoverName: state.newCoverName }
+      return { ...state, profileCoverName: action.newCoverName }
 
     default:
       return state
