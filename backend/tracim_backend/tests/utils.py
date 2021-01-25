@@ -370,6 +370,15 @@ def create_1000px_png_test_image() -> BytesIO:
     return file
 
 
+def create_png_test_image(width: int, height: int) -> BytesIO:
+    file = BytesIO()
+    image = Image.new("RGBA", size=(width, height), color=(255, 255, 255))
+    image.save(file, "png")
+    file.name = "test_image.png"
+    file.seek(0)
+    return file
+
+
 TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
 
 

@@ -52,14 +52,6 @@ def generate_documentation_swagger_tag(*sections: str) -> str:
     return " > ".join(sections)
 
 
-def preview_manager_page_format(page_number: int) -> int:
-    """
-    Convert page real number of page(begin at 1) to preview_manager page
-    format(begin at 0)
-    """
-    return page_number - 1
-
-
 def get_root_frontend_url(config: "CFG") -> str:
     """
     Return website base url with always '/' at the end
