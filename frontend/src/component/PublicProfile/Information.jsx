@@ -14,6 +14,7 @@ export const Information = props => {
         schemaObject={props.schemaObject}
         uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}
+        displayEditButton={props.displayEditButton}
         onSubmitDataSchema={props.onSubmitDataSchema}
       />
 

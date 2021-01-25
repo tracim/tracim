@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { IconButton } from 'tracim_frontend_lib'
-import { Checkbox } from 'tracim_frontend_lib'
+import { IconButton, Checkbox } from 'tracim_frontend_lib'
 // import Form from '@rjsf/core'
 import Form from 'react-jsonschema-form-bs4'
+import TextareaRich from './TextareaRich.jsx'
 
 require('./CustomFormManager.styl')
 
@@ -30,7 +31,11 @@ const DisplaySchemaPropertyString = props => {
       >
         {props.label}
       </span>
-      <span className='DisplaySchemaPropertyString__value'>{props.value}</span>
+      <span
+        className='DisplaySchemaPropertyString__value'
+        dangerouslySetInnerHTML={{__html: props.value}}
+      >
+      </span>
     </div>
   )
 }
@@ -77,8 +82,9 @@ const DisplaySchemaArray = props => {
       key={props.label}
     />,
     props.valueList.map((value, i) => {
+      if (!value) return null
+
       const valueType = typeof value
-      if (Array.isArray(value)) return null // INFO - CH - 20210122 - I currently don't know if this case exists in Json schema spec
 
       if (valueType === 'object') {
         return (
@@ -117,53 +123,56 @@ const DisplaySchemaObject = props => {
 
   return [
     title,
-    Object.entries(props.dataSchemaObject).map(([key, value], i) => {
-      const valueType = typeof value
+    <div className='DisplaySchemaObject' key={`object_root_${props.nestedLevel}`}>
+      {Object.entries(props.dataSchemaObject).map(([key, value]) => {
+        const valueType = typeof value
 
-      if (Array.isArray(value)) {
-        return (
-          <DisplaySchemaArray
-            label={props.schemaObject.properties[key].title}
-            valueList={value}
-            currentKey={key}
-            schemaObject={props.schemaObject.properties[key].items}
-            key={`array_${key}_${i}`}
-          />
-        )
-      }
+        if (Array.isArray(value)) {
+          return (
+            <DisplaySchemaArray
+              label={props.schemaObject.properties[key].title}
+              valueList={value}
+              currentKey={key}
+              schemaObject={props.schemaObject.properties[key].items}
+              key={`array_${key}`}
+            />
+          )
+        }
 
-      if (valueType === 'object') {
-        return (
-          <DisplaySchemaObject
-            schemaObject={props.schemaObject.properties[key]}
-            dataSchemaObject={value}
-            key={`object_${key}_${i}`}
-          />
-        )
-      }
+        if (valueType === 'object') {
+          return (
+            <DisplaySchemaObject
+              schemaObject={props.schemaObject.properties[key]}
+              dataSchemaObject={value}
+              nestedLevel={props.nestedLevel + 1}
+              key={`object_${key}`}
+            />
+          )
+        }
 
-      if (valueType === 'string') {
-        return (
-          <DisplaySchemaPropertyString
-            label={props.schemaObject.properties[key].title}
-            value={value}
-            key={`property_string_${key}_${value}_${i}`}
-          />
-        )
-      }
+        if (valueType === 'string') {
+          return (
+            <DisplaySchemaPropertyString
+              label={props.schemaObject.properties[key].title}
+              value={value}
+              key={`property_string_${key}`}
+            />
+          )
+        }
 
-      if (valueType === 'boolean') {
-        return (
-          <DisplaySchemaPropertyBoolean
-            label={props.schemaObject.properties[key].title}
-            value={value}
-            key={`property_boolean_${key}_${value}_${i}`}
-          />
-        )
-      }
+        if (valueType === 'boolean') {
+          return (
+            <DisplaySchemaPropertyBoolean
+              label={props.schemaObject.properties[key].title}
+              value={value}
+              key={`property_boolean_${key}_${value}`}
+            />
+          )
+        }
 
-      return null
-    })
+        return null
+      })}
+    </div>
   ]
 }
 
@@ -173,6 +182,7 @@ const SchemaAsView = props => {
       <DisplaySchemaObject
         schemaObject={props.schemaObject}
         dataSchemaObject={props.dataSchemaObject}
+        nestedLevel={1}
       />
 
       {props.displayEditButton && (
@@ -187,12 +197,25 @@ const SchemaAsView = props => {
   )
 }
 
+const TextRichWidget = connect(({ user }) => ({ user }))(props => {
+  return (
+    <TextareaRich
+      onChangeText={props.onChange}
+      initializationLanguage={props.user.lang}
+      {...props}
+    />
+  )
+})
+
 const SchemaAsForm = props => {
   return (
     <Form
       schema={props.schemaObject}
       uiSchema={props.uiSchemaObject}
       formData={props.dataSchemaObject}
+      widgets={{
+        TextareaWidget: TextRichWidget
+      }}
       onSubmit={(formData, e) => {
         props.onClickToggleButton()
         props.onSubmitDataSchema(formData, e)
@@ -237,7 +260,7 @@ export class CustomFormManager extends React.Component {
     const { props, state } = this
 
     return (
-      <div style={{ position: 'relative' }}>
+      <div className='CustomFormManager'>
         <div className='CustomFormManager__title'>{props.title}</div>
 
         {(state.mode === MODE.VIEW

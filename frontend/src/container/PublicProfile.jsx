@@ -11,7 +11,8 @@ import {
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs, setHeadTitle
+  setBreadcrumbs,
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
   getAboutUser,
@@ -54,6 +55,7 @@ export class PublicProfile extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<Profile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     this.buildBreadcrumbs()
+    this.getUserCustomPropertiesAndSchema()
   }
 
   componentDidMount () {
@@ -197,8 +199,7 @@ export class PublicProfile extends React.Component {
         )
       )
     }
-    console.log('informationDataSchema', informationDataSchema)
-    console.log('personalPageDataSchema', personalPageDataSchema)
+
     return [informationDataSchema, personalPageDataSchema]
   }
 
@@ -292,15 +293,6 @@ export class PublicProfile extends React.Component {
           />
 
           <div className='profile__content'>
-            <div
-              className='DELETE_ME I_ONLY_HERE_FOR_DEBUG'
-              onClick={() => {
-                props.dispatch(putUserCustomPropertiesDataSchema(props.match.params.userid, {}))
-              }}
-              style={{ position: 'absolute', top: 0, left: 0, zIndex: 100, minHeight: '20px' }}
-            >
-              don't click me
-            </div>
             <div className='profile__content__information'>
               {state.displayedUser
                 ? (

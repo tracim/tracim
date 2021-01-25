@@ -1086,7 +1086,6 @@ export const getUserCustomPropertiesDataSchema = userId => dispatch => {
 }
 
 export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch => {
-  console.log('formData', formData)
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/custom-properties`,
     param: {
