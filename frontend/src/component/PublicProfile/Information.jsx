@@ -19,7 +19,14 @@ export const Information = props => {
       />
 
       <div className='Information__staticData'>
-        <div>{props.t('Registration date: ')}{props.registrationDate}</div>
+        <div className='Information__staticData__registrationDate'>
+          <div className='Information__staticData__registrationDate__label'>
+            {props.t('Registration date:')}
+          </div>
+          <div className='Information__staticData__registrationDate__value'>
+            {props.registrationDate}
+          </div>
+        </div>
         <div>
           {props.t(
             '{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces',

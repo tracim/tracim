@@ -4,7 +4,6 @@ import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { IconButton, Checkbox } from 'tracim_frontend_lib'
-// import Form from '@rjsf/core'
 import Form from 'react-jsonschema-form-bs4'
 import TextareaRich from './TextareaRich.jsx'
 
@@ -89,12 +88,11 @@ const DisplaySchemaArray = props => {
         return (
           <div
             className='DisplaySchemaArray'
-            key={`object_${props.currentKey}_${value.title}_${i}`}
+            key={`object_${props.parentKey}_${value.title}_${i}`}
           >
             <DisplaySchemaObject
               schemaObject={props.schemaObject}
               dataSchemaObject={value}
-              key={`object_${props.currentKey}_${value.title}__DisplaySchemaObject_${i}`}
             />
           </div>
         )
@@ -107,7 +105,7 @@ const DisplaySchemaArray = props => {
 
 const DisplaySchemaObject = props => {
   if (!props.dataSchemaObject || !props.schemaObject) {
-    console.log('Error in DisplaySchemaObject, null props', props)
+    console.error('Error in DisplaySchemaObject, null props', props)
     return null
   }
 
@@ -131,7 +129,7 @@ const DisplaySchemaObject = props => {
             <DisplaySchemaArray
               label={props.schemaObject.properties[key].title}
               valueList={value}
-              currentKey={key}
+              parentKey={key}
               schemaObject={props.schemaObject.properties[key].items}
               key={`array_${key}`}
             />
