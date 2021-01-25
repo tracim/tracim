@@ -33,9 +33,8 @@ const DisplaySchemaPropertyString = props => {
       </span>
       <span
         className='DisplaySchemaPropertyString__value'
-        dangerouslySetInnerHTML={{__html: props.value}}
-      >
-      </span>
+        dangerouslySetInnerHTML={{ __html: props.value }}
+      />
     </div>
   )
 }
