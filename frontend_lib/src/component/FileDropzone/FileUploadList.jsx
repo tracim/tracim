@@ -9,30 +9,30 @@ export const FileUploadList = (props) => {
   return (
     <div className='file__upload'>
       <div className='file__upload__title font-weight-bold'>
-        {props.fileToUploadList.length > 0
+        {props.fileUploadList.length > 0
           ? title
           : props.t('You have not yet chosen any files to upload.')}
       </div>
 
       <div className='file__upload__list'>
-        {props.fileToUploadList.map((file) =>
-          <div className='file__upload__list__item' key={file.name}>
+        {props.fileUploadList.map((fileUpload) =>
+          <div className='file__upload__list__item' key={fileUpload.file.name}>
             <i className='fa fa-fw fa-file-o m-1' />
             <div className='file__upload__list__item__label'>
-              {file.name} ({displayFileSize(file.size)})
+              {fileUpload.file.name} ({displayFileSize(fileUpload.file.size)})
             </div>
 
             <button
               className='iconBtn primaryColorFontHover'
-              onClick={() => props.onDeleteFile(file)}
+              onClick={() => props.onDeleteFile(fileUpload)}
               title={props.t('Delete')}
               disabled={props.deleteFileDisabled}
               data-cy='file__upload__list__item__delete'
             >
               <i className='fa fa-fw fa-trash-o' />
             </button>
-            {file.errorMessage && (
-              <i title={file.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle' />
+            {fileUpload.errorMessage && (
+              <i title={fileUpload.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle' />
             )}
           </div>
         )}
@@ -45,13 +45,13 @@ export default translate()(FileUploadList)
 
 FileUploadList.propTypes = {
   onDeleteFile: PropTypes.func.isRequired,
-  fileToUploadList: PropTypes.array,
+  fileUploadList: PropTypes.array,
   customTitle: PropTypes.string,
   deleteFileDisabled: PropTypes.bool
 }
 
 FileUploadList.defaultProps = {
-  fileToUploadList: [],
+  fileUploadList: [],
   deleteFileDisabled: false,
   customTitle: ''
 }

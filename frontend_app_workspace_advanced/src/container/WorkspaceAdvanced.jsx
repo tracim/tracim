@@ -608,6 +608,7 @@ export class WorkspaceAdvanced extends React.Component {
             displayFormNewMember={state.displayFormNewMember}
             memberList={state.content.memberList}
             roleList={state.config.roleList}
+            apiUrl={props.data.config.apiUrl}
             onClickNewRole={this.handleClickNewRole}
             loggedUser={state.loggedUser}
             onClickDeleteMember={this.handleClickDeleteMember}
@@ -641,6 +642,7 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Requests to join the space')}
         >
           <SpaceSubscriptionsRequests
+            apiUrl={state.config.apiUrl}
             subscriptionRequestList={state.subscriptionRequestList}
             onClickAcceptRequest={this.handleClickAcceptRequest}
             onClickRejectRequest={this.handleClickRejectRequest}

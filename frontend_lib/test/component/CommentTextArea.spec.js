@@ -9,6 +9,7 @@ describe('<CommentTextArea />', () => {
 
   const props = {
     newComment: '',
+    apiUrl: '/',
     onChangeNewComment: onChangeNewCommentSpy,
     disableComment: false,
     id: 'autoCompleteInputId',

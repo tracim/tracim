@@ -18,6 +18,7 @@ describe('<Timeline />', () => {
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
+    apiUrl: '/',
     onChangeNewComment: onChangeNewCommentCallBack,
     onClickValidateNewCommentBtn: onClickValidateNewCommentBtnCallBack,
     disableComment: false,

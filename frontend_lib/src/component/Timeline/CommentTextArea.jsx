@@ -207,6 +207,7 @@ export class CommentTextArea extends React.Component {
           <MentionAutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
             style={style}
+            apiUrl={props.apiUrl}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             onClickAutoCompleteItem={(m) => props.wysiwyg ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this)) : this.handleClickAutoCompleteItem(m)}
             delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
@@ -238,6 +239,7 @@ export default translate()(CommentTextArea)
 
 CommentTextArea.propTypes = {
   id: PropTypes.string.isRequired,
+  apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   disableComment: PropTypes.bool,

@@ -33,6 +33,7 @@
   "I know this user exists": "I know this user exists",
   "Cancel": "Cancel",
   "Search user...": "Search user...",
+  "Unknown": "Unknown",
   "Unknown error, please inform an administrator": "Unknown error, please inform an administrator",
   "Error detail": "Error detail",
   "This content is archived": "This content is archived",
@@ -123,5 +124,12 @@
   "Edit": "Edit",
   "Validate anyway": "Validate anyway",
   "Home": "Home",
-  "Error while getting breadcrumbs": "Error while getting breadcrumbs"
+  "Only one file is allowed": "Only one file is allowed",
+  "Files already added:": "Files already added:",
+  "The type of this file is not allowed": "The type of this file is not allowed",
+  "The file is too big": "The file is too big",
+  "Error while uploading file": "Error while uploading file",
+  "Error while uploading file(s)": "Error while uploading file(s)",
+  "Please wait until the upload ends": "Please wait until the upload ends",
+  "Avatar of {{publicName}}": "Avatar of {{publicName}}"
 }

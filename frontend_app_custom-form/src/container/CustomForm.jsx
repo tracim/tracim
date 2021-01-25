@@ -660,6 +660,7 @@ class CustomForm extends React.Component {
             customClass={`${config.slug}__contentpage`}
             customColor={this.state.hexcolor}
             loggedUser={loggedUser}
+            apiUrl={state.config.apiUrl}
             timelineData={timeline}
             showHeader
             newComment={newComment}

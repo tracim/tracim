@@ -6,15 +6,33 @@ import {
   CUSTOM_EVENT,
   PAGE,
   serialize,
-  TracimComponent
+  TracimComponent,
+  PopupUploadFile,
+  PROFILE,
+  getAvatarBaseUrl
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  setBreadcrumbs,
+  updateUserProfileAvatarName
 } from '../action-creator.sync.js'
 import { getAboutUser } from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
+
+const ALLOWED_IMAGE_MIMETYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/bmp',
+  'image/gif',
+  'image/webp'
+]
+const MAXIMUM_AVATAR_SIZE = 1 * 1024 * 1024 // 1 Mbyte
+const POPUP_DISPLAY_STATE = {
+  AVATAR: 'AVATAR',
+  COVER: 'COVER'
+}
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -22,7 +40,8 @@ export class PublicProfile extends React.Component {
 
     this.state = {
       displayedUser: undefined,
-      coverImageUrl: undefined
+      coverImageUrl: undefined,
+      displayUploadPopup: undefined
     }
 
     props.registerCustomEventHandlerList([
@@ -41,7 +60,7 @@ export class PublicProfile extends React.Component {
 
   componentDidUpdate () {
     const { props, state } = this
-    if (state.displayedUser && state.displayedUser.userId !== props.match.params.userid) {
+    if (state.displayedUser && state.displayedUser.userId !== parseInt(props.match.params.userid)) {
       this.getUser()
     }
   }
@@ -62,46 +81,83 @@ export class PublicProfile extends React.Component {
     }]))
   }
 
+  handleFetchErrors = (result, errorList, defaultErrorMessage) => {
+    if (result.status < 400) return false
+
+    const { props } = this
+    const code = result.json.code
+    const error = errorList.find(m => m.status === result.status && m.code === code) || { message: defaultErrorMessage }
+    props.dispatch(newFlashMessage(error.message))
+    props.history.push(PAGE.HOME)
+    return true
+  }
+
   getUser = async () => {
     const { props } = this
     const userId = props.match.params.userid
 
     const fetchGetUser = await props.dispatch(getAboutUser(userId))
+    if (this.handleFetchErrors(
+      fetchGetUser,
+      [{ status: 400, code: 1001, message: props.t('Unknown user') }],
+      props.t('Error while loading user')
+    )) return
 
-    switch (fetchGetUser.status) {
-      case 200:
-        this.setState({
-          displayedUser: {
-            ...serialize(fetchGetUser.json, serializeUserProps),
-            userId: userId
-          },
-          coverImageUrl: 'default'
-        })
-        this.buildBreadcrumbs()
-        break
-      case 400:
-        switch (fetchGetUser.json.code) {
-          case 1001:
-            props.dispatch(newFlashMessage(props.t('Unknown user')))
-            props.history.push(PAGE.HOME)
-            break
-          default:
-            props.dispatch(newFlashMessage(props.t('Error while loading user')))
-            props.history.push(PAGE.HOME)
-        }
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading user')))
-        props.history.push(PAGE.HOME)
-    }
+    const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
+    this.setState(oldState => {
+      return {
+        displayedUser: { ...oldState.displayedUser, ...apiUser },
+        coverImageUrl: 'default'
+      }
+    })
+    this.buildBreadcrumbs()
   }
+
+  onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
+
+  onChangeAvatarSuccess = () => {
+    const { props, state } = this
+    const profileAvatarName = `avatar-${Date.now()}`
+    if (state.displayedUser.userId === props.user.userId) {
+      this.props.dispatch(updateUserProfileAvatarName(profileAvatarName))
+    }
+    this.setState(oldState => {
+      return {
+        ...oldState,
+        displayedUser: { ...oldState.displayedUser, profileAvatarName, hasAvatar: true }
+      }
+    })
+    this.onCloseUploadPopup()
+  }
+
+  onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
     const { props, state } = this
-
+    const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
+    const changeImageEnabled = (
+      (userId === props.user.userId) ||
+      props.user.profile === PROFILE.administrator.slug
+    )
+    const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
+            <PopupUploadFile
+              label={props.t('Upload an image')}
+              uploadUrl={`${avatarBaseUrl}/raw/avatar`}
+              httpMethod='PUT'
+              color={GLOBAL_primaryColor} // eslint-disable-line
+              handleClose={this.onCloseUploadPopup}
+              handleSuccess={this.onChangeAvatarSuccess}
+              allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
+              maximumFileSize={MAXIMUM_AVATAR_SIZE}
+            >
+              <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
+              <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
+            </PopupUploadFile>
+          )}
           <div className='profile__cover'>
             {state.coverImageUrl && <div className='profile__cover__default' />}
             {!state.coverImageUrl && (
@@ -115,6 +171,8 @@ export class PublicProfile extends React.Component {
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
+            handleChangeAvatar={this.onChangeAvatarClick}
+            changeAvatarEnabled={changeImageEnabled}
           />
 
           <div className='profile__content'>
@@ -146,5 +204,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs }) => ({ breadcrumbs })
+const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))

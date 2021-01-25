@@ -1705,6 +1705,7 @@ class UserFollowQuery(BasePaginatedQuery):
 class AboutUser(object):
     def __init__(
         self,
+        user_id: int,
         public_name: str,
         username: Optional[str],
         followers_count: int,
@@ -1712,7 +1713,10 @@ class AboutUser(object):
         created: datetime,
         authored_content_revisions_count: int,
         authored_content_revisions_space_count: int,
+        has_avatar: bool,
+        has_cover: bool,
     ) -> None:
+        self.user_id = user_id
         self.public_name = public_name
         self.username = username
         self.followers_count = followers_count
@@ -1720,6 +1724,8 @@ class AboutUser(object):
         self.created = created
         self.authored_content_revisions_count = authored_content_revisions_count
         self.authored_content_revisions_space_count = authored_content_revisions_space_count
+        self.has_avatar = has_avatar
+        self.has_cover = has_cover
 
 
 class AuthoredContentRevisionsInfos:
