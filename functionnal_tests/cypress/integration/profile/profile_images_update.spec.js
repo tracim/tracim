@@ -10,7 +10,7 @@ describe('Profile Images (avatar & cover) update', () => {
   ]
   for (const user of allowedUserList) {
     describe(`As ${user.username} seeing ${baseUser.username}'s profile`, () => {
-      before(function () {
+      beforeEach(function () {
         cy.resetDB()
         cy.setupBaseDB()
         cy.login(user)
@@ -25,14 +25,14 @@ describe('Profile Images (avatar & cover) update', () => {
           cy.dropFixtureInDropZone('artikodin.png', 'image/png', '.filecontent__form', 'file_exemple1.png')
           cy.get('[data-cy=popup__createcontent__form__button]')
             .click()
-          cy.get(`[data-cy=${image}] > .${image}__img`)
+          cy.get(`[data-cy=profile-${image}] img`)
         })
       }
     })
   }
 
-  describe(`As ${baseUser.username} seeing a known user's profile}`, () => {
-    before(function () {
+  describe(`As ${baseUser.username} seeing a known user's profile`, () => {
+    beforeEach(function () {
       cy.resetDB()
       cy.setupBaseDB()
       cy.login(defaultAdmin)

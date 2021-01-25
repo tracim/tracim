@@ -240,9 +240,9 @@ PopupUploadFile.defaultProps = {
   faIcon: 'fa-upload',
   httpMethod: 'POST',
   maximumFileSize: 0,
-  handleSuccess: () => {},
-  handleFailure: () => {},
-  handleClose: () => {},
+  onSuccess: () => {},
+  onFailure: () => {},
+  onClose: () => {},
   uploadErrorMessageList: []
 }
 

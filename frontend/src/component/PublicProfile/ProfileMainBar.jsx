@@ -21,6 +21,7 @@ export const ProfileMainBar = props => {
           apiUrl={FETCH_CONFIG.apiUrl}
           user={hasUser ? props.displayedUser : {}}
           size={AVATAR_SIZE.BIG}
+          dataCy='profile-avatar'
         />
         <Avatar
           customClass='profile__mainBar__avatar__medium'
