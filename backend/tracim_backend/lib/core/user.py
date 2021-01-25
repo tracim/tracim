@@ -1286,16 +1286,11 @@ class UserApi(object):
         self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
     ) -> None:
         user = self.get_one(user_id)
-        label, file_extension = os.path.splitext(new_filename)
-        tmp_data = new_content.read()
-        user.avatar = FileIntent(tmp_data, new_filename, new_mimetype)
-        with io.BytesIO() as cropped_tmp_data:
-            # FIXME - G.M - 2021-01-21 - should we catch error here,
-            # what happened if pillow failed ?
-            crop_image(io.BytesIO(tmp_data), cropped_tmp_data, ratio=AVATAR_RATIO, format="png")
-            cropped_tmp_data.seek(0, 0)
-            user.cropped_avatar = FileIntent(cropped_tmp_data.read(), "avatar.png", "image/png")
+
         self._session.add(user)
+        (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "avatar", AVATAR_RATIO
+        )
         self._session.flush()
 
     def get_cover(
@@ -1339,14 +1334,32 @@ class UserApi(object):
         self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
     ) -> None:
         user = self.get_one(user_id)
-        label, file_extension = os.path.splitext(new_filename)
-        tmp_data = new_content.read()
-        user.cover = FileIntent(tmp_data, new_filename, new_mimetype)
-        with io.BytesIO() as cropped_tmp_data:
-            # FIXME - G.M - 2021-01-21 - should we catch error here,
-            # what happened if pillow failed ?
-            crop_image(io.BytesIO(tmp_data), cropped_tmp_data, ratio=COVER_RATIO, format="png")
-            cropped_tmp_data.seek(0, 0)
-            user.cropped_cover = FileIntent(cropped_tmp_data.read(), "cover.png", "image/png")
+        (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "cover", COVER_RATIO
+        )
         self._session.add(user)
         self._session.flush()
+
+    def _crop_and_prepare_depot_storage(
+        self,
+        filename: str,
+        mimetype: str,
+        content: bytes,
+        cropped_basename: str,
+        crop_ratio: ImageRatio,
+    ) -> typing.Tuple[FileIntent, FileIntent]:
+        """
+        Prepare depot storage of an image file: original + cropped image.
+        The cropped image is stored as a PNG file.
+        @return tuple with FileIntent objects for original, cropped images
+        """
+        label, extension = os.path.splitext(filename)
+        original = FileIntent(content, filename, mimetype)
+        with io.BytesIO() as cropped_io:
+            # FIXME - G.M - 2021-01-21 - should we catch error here,
+            # what happened if pillow failed ?
+            crop_image(io.BytesIO(content), cropped_io, ratio=crop_ratio, format="png")
+            cropped = FileIntent(
+                cropped_io.getvalue(), "{}.png".format(cropped_basename), "image/png"
+            )
+        return (original, cropped)
