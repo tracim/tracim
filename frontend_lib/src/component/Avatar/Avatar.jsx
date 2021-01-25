@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 
+import { getAvatarBaseUrl } from '../../helper.js'
+
 require('./Avatar.styl')
 const color = require('color')
 
@@ -50,8 +52,9 @@ export class Avatar extends React.Component {
     const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
     const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
+    const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id)
 
-    const generatedColor = publicName ? this.generateColorFromName(publicName) : '#000'
+    const generatedColor = this.generateColorFromName(publicName)
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2
 
     return (
@@ -73,7 +76,7 @@ export class Avatar extends React.Component {
           {hasAvatar ? (
             <img
               className='avatar__img'
-              src={`${props.apiUrl}/workspaces/1/files/1/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${props.filenameInUrl}`}
+              src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${props.filenameInUrl}`}
               alt={props.t('Avatar of {{publicName}}', { publicName })}
             />
           ) : <span>{letterAvatar}</span>}

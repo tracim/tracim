@@ -186,7 +186,7 @@ class GuestUpload extends React.Component {
 
     const formData = new FormData()
     // TODO - SG - 2021-01-22 - We really should use the uploadFile() function here
-    // But first check if guest-upload backend could be compatible to one FormData field for all files ('files)
+    // But first check if guest-upload backend could be compatible to one FormData field for all files (with the 'files' field)
     // Then create/refactor uploadFile() -> uploadFiles() accordingly
     state.fileUploadList.forEach((fileUpload, index) => {
       formData.append(`file_${index}`, fileUpload.file)

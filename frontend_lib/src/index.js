@@ -53,7 +53,8 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  PAGE
+  PAGE,
+  getAvatarBaseUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -369,5 +370,6 @@ export {
   createFileUpload,
   uploadFile,
   isFileUploadInList,
-  isFileUploadInErrorState
+  isFileUploadInErrorState,
+  getAvatarBaseUrl
 }

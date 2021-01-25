@@ -34,7 +34,6 @@ class PopupCreateFile extends React.Component {
     ])
   }
 
-  // File specific ??
   handleAllAppChangeLanguage = data => {
     const { state, props } = this
     console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
@@ -45,7 +44,6 @@ class PopupCreateFile extends React.Component {
     this.setHeadTitle()
   }
 
-  // File specific
   componentDidMount () {
     this.setHeadTitle()
   }

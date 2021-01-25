@@ -8,7 +8,8 @@ import {
   serialize,
   TracimComponent,
   PopupUploadFile,
-  PROFILE
+  PROFILE,
+  getAvatarBaseUrl
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -118,18 +119,16 @@ export class PublicProfile extends React.Component {
 
   render () {
     const { props, state } = this
-    if (!state.displayedUser) return null
     const changeImageEnabled = (state.displayedUser.userId === props.user.userId) || props.user.profile === PROFILE.ADMINISTRATOR
-    //const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/users/${state.displayedUser.userId}/avatar/raw`
-    const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/workspaces/1/files`
+    const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, state.displayedUser.userId)
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
             <PopupUploadFile
               label={props.t('Upload an image')}
-              uploadUrl={uploadAvatarUrl}
-              httpMethod='POST'
+              uploadUrl={`${avatarBaseUrl}/avatar/raw`}
+              httpMethod='PUT'
               color={GLOBAL_primaryColor}
               handleClose={this.onCloseUploadPopup}
               handleSuccess={this.onChangeImageSuccess}

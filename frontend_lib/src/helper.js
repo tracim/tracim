@@ -697,3 +697,5 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
       throw new Error('Error getting breadcrumbs data')
   }
 }
+
+export const getAvatarBaseUrl = (apiUrl, userId) =>  `${props.apiUrl}/users/${}/avatar`
