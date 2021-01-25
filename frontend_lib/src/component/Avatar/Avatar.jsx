@@ -50,10 +50,10 @@ export class Avatar extends React.Component {
 
     const publicName = props.user.publicName || props.user.public_name
     const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
-    const filenameInUrl = props.user.profileAvatarName
+    const filenameInUrl = props.user.profileAvatarName || 'avatar'
     const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
-    const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id)
+    const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id || props.user.id)
 
     const generatedColor = this.generateColorFromName(publicName)
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2

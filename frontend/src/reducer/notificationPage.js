@@ -28,7 +28,9 @@ export const serializeNotification = notification => {
   return {
     author: {
       publicName: notification.fields.author.public_name,
-      userId: notification.fields.author.user_id
+      userId: notification.fields.author.user_id,
+      hasAvatar: notification.fields.author.has_avatar,
+      hasCover: notification.fields.author.has_cover,
     },
     user: notification.fields.user ? serialize(notification.fields.user, serializeUserProps) : null,
     subscription: notification.fields.subscription ? {
