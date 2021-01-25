@@ -266,7 +266,7 @@ class StorageLib:
         depot_file: UploadedFile,
     ) -> int:
         """
-        Validate if the page number given exist in the content given
+        Validate if the given page number exist in the given content
         """
         preview_generator_page_number = self._preview_manager_page_format(
             preview_generator_page_number
