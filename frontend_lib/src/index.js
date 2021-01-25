@@ -142,6 +142,8 @@ import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
 import Icon from './component/Icon/Icon.jsx'
 
+import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -353,5 +355,6 @@ export {
   DistanceDate,
   Icon,
   getWorkspaceContent,
-  PAGE
+  PAGE,
+  ProfileNavigation
 }

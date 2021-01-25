@@ -72,6 +72,8 @@ from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
+from tracim_backend.models.context_models import UserPicturePath
+from tracim_backend.models.context_models import UserPreviewPicturePath
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -197,13 +199,11 @@ class UserDigestSchema(marshmallow.Schema):
     """
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
-    avatar_url = marshmallow.fields.Url(
-        allow_none=True,
-        example="/api/asset/avatars/john-doe.jpg",
-        description="avatar_url is the url of the image file. "
-        "If no avatar, then set it to an empty string "
-        "(frontend should interpret "
-        "an empty url as default avatar)",
+    has_avatar = marshmallow.fields.Bool(
+        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint",
+    )
+    has_cover = marshmallow.fields.Bool(
+        description="Does the user have a cover? cover need to be obtain with /cover endpoint",
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
@@ -628,9 +628,21 @@ class FilenamePathSchema(marshmallow.Schema):
     filename = StrippedString("filename.ext")
 
 
+class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPicturePath(**data)
+
+
 class WidthAndHeightPathSchema(marshmallow.Schema):
     width = marshmallow.fields.Int(example=256)
     height = marshmallow.fields.Int(example=256)
+
+
+class UserPreviewPicturePathSchema(UserPicturePathSchema, WidthAndHeightPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPreviewPicturePath(**data)
 
 
 class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
@@ -1790,6 +1802,9 @@ class AboutUserSchema(UserDigestSchema):
         required=True,
         description="count of users followed by this user",
         validate=positive_int_validator,
+    )
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="User registration date"
     )
     authored_content_revisions_count = marshmallow.fields.Int(
         example=23,

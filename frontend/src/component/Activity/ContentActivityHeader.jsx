@@ -70,7 +70,10 @@ export class ContentActivityHeader extends React.Component {
           operation={this.getDisplayOperation(newestMessage)}
           date={newestMessage.created}
           lang={props.user.lang}
-          authorName={newestMessage.fields.author.public_name}
+          author={{
+            publicName: newestMessage.fields.author.public_name,
+            userId: newestMessage.fields.author.user_id
+          }}
           eventList={props.eventList}
           onEventClicked={props.onEventClicked}
           dataCy='contentActivityTimedEvent'

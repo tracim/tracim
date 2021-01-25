@@ -2,9 +2,10 @@
 """
 Tests for /api/users subpath endpoints.
 """
-
+import io
 import typing
 
+from PIL import Image
 import pytest
 import transaction
 from webtest import TestApp
@@ -12,6 +13,7 @@ from webtest import TestApp
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import EmailAlreadyExists
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -24,6 +26,7 @@ from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
+from tracim_backend.tests.utils import create_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -3202,7 +3205,7 @@ class TestUserDiskSpace(object):
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
-        assert res["user"]["avatar_url"] is None
+        assert res["user"]["has_avatar"] is False
         assert res["allowed_space"] == 134217728
 
 
@@ -3747,12 +3750,12 @@ class TestUsersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["username"] == admin_user.username
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
@@ -3822,11 +3825,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
@@ -3868,7 +3871,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
         self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
@@ -3915,7 +3918,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -3977,7 +3980,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -4039,7 +4042,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
         self, admin_user, web_testapp
@@ -4095,7 +4098,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
@@ -4136,11 +4139,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
@@ -4235,11 +4238,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -4308,15 +4311,15 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         assert len(res) == 3
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
         assert res[2]["user_id"] == test_user3.user_id
         assert res[2]["public_name"] == test_user3.display_name
-        assert res[2]["avatar_url"] is None
+        assert res[2]["has_avatar"] is False
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -6108,6 +6111,7 @@ class TestAboutUserEndpoint(object):
         assert res.json_body["followers_count"] == 2
         assert res.json_body["public_name"] == admin_user.public_name
         assert res.json_body["username"] == admin_user.username
+        assert res.json_body["created"] == admin_user.created.strftime(DATETIME_FORMAT)
         assert res.json_body["authored_content_revisions_count"] == 3
         assert res.json_body["authored_content_revisions_space_count"] == 1
 
@@ -6122,3 +6126,225 @@ class TestAboutUserEndpoint(object):
         web_testapp.authorization = ("Basic", (riyad_user.email, "password"))
         res = web_testapp.get("/api/users/{}/about".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserAvatarEndpoints:
+    """
+    Tests for /api/users/{user_id}/avatar endpoints
+    """
+
+    def test_api__get_user_avatar__ok_200__nominal_case(
+        self, admin_user: User, web_testapp
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+    def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_avatar"] is False
+
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.avatar is not None
+        assert admin_user.cropped_avatar is not None
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_avatar"] is True
+
+    def test_api__set_user_avatar__err__no_file(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_avatar__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_avatar_preview__ok__nominal_case(
+        self, admin_user: User, web_testapp
+    ) -> None:
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+        image = create_png_test_image(500, 100)
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        ),
+
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/100x100/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 100, 100 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 100, 100 == new_image.size
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserCoverEndpoints:
+    """
+    Tests for /api/users/{user_id}/cover endpoints
+    """
+
+    def test_api__get_user_cover__ok_200__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+    def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is False
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.cover is not None
+        assert admin_user.cropped_cover is not None
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is True
+
+    def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_cover__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_cover_preview__ok__nominal_case(
+        self, admin_user: User, web_testapp
+    ) -> None:
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+        image = create_png_test_image(1500, 1500)
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        ),
+
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1300, 150 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 1300, 150 == new_image.size

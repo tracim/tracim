@@ -1,4 +1,4 @@
-import { PAGES, URLS } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands.js'
 
 const activityPages = [
   { name: 'Personal', page: PAGES.ACTIVITY_FEED, initialItemCount: 3 },
