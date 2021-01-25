@@ -136,7 +136,7 @@ export class PublicProfile extends React.Component {
               maximumFileSize={MAXIMUM_AVATAR_SIZE}
             >
               <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
-              <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}}Mb', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
+              <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
             </PopupUploadFile>
           )}
           <div className='profile__cover'>
