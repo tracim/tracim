@@ -327,12 +327,8 @@ class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
 
-class UserAvatarNotFound(NotFound):
-    error_code = ErrorCode.USER_AVATAR_NOT_FOUND
-
-
-class UserCoverNotFound(NotFound):
-    error_code = ErrorCode.USER_COVER_NOT_FOUND
+class UserImageNotFound(NotFound):
+    error_code = ErrorCode.USER_IMAGE_NOT_FOUND
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):

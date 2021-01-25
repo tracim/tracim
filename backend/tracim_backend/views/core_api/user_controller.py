@@ -28,12 +28,11 @@ from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnavailablePreview
-from tracim_backend.exceptions import UserAvatarNotFound
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
-from tracim_backend.exceptions import UserCoverNotFound
 from tracim_backend.exceptions import UserFollowAlreadyDefined
+from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
@@ -1061,7 +1060,7 @@ class UserController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserAvatarNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def sized_preview_avatar(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -1088,7 +1087,7 @@ class UserController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserAvatarNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def get_preview_avatar(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -1112,7 +1111,7 @@ class UserController(Controller):
     @check_right(knows_candidate_user)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(UserPicturePathSchema())
-    @hapic.handle_exception(UserAvatarNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def get_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
         try:
@@ -1165,7 +1164,7 @@ class UserController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def sized_preview_cover(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -1192,7 +1191,7 @@ class UserController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def get_preview_cover(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -1216,7 +1215,7 @@ class UserController(Controller):
     @check_right(knows_candidate_user)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(UserPicturePathSchema())
-    @hapic.handle_exception(UserCoverNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
     def get_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
         try:

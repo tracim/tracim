@@ -56,13 +56,12 @@ from tracim_backend.exceptions import UnknownAuthType
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserAuthTypeDisabled
-from tracim_backend.exceptions import UserAvatarNotFound
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
-from tracim_backend.exceptions import UserCoverNotFound
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserFollowAlreadyDefined
+from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
@@ -1250,7 +1249,7 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
-            raise UserAvatarNotFound("avatar of user {} not found".format(user_id))
+            raise UserImageNotFound("avatar of user {} not found".format(user_id))
         return StorageLib(self._config).get_raw_file(
             depot_file=user.avatar,
             filename=filename,
@@ -1269,7 +1268,7 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_avatar:
-            raise UserAvatarNotFound("cropped version of user {} avatar not found".format(user_id))
+            raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
         _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
@@ -1298,7 +1297,7 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cover:
-            raise UserCoverNotFound("cover of user {} not found".format(user_id))
+            raise UserImageNotFound("cover of user {} not found".format(user_id))
         return StorageLib(self._config).get_raw_file(
             depot_file=user.cover,
             filename=filename,
@@ -1317,7 +1316,7 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_cover:
-            raise UserCoverNotFound("cropped version of user {} cover not found".format(user_id))
+            raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
         _, original_file_extension = os.path.splitext(self._user.cropped_cover.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_cover,

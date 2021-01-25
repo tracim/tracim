@@ -6161,7 +6161,7 @@ class TestUserAvatarEndpoints:
         res = web_testapp.get(
             "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
         )
-        assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
     def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -6213,7 +6213,7 @@ class TestUserAvatarEndpoints:
             "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
             status=400,
         )
-        assert res.json_body["code"] == ErrorCode.USER_AVATAR_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(500, 100)
         web_testapp.put(
@@ -6272,7 +6272,7 @@ class TestUserCoverEndpoints:
         res = web_testapp.get(
             "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
         )
-        assert res.json_body["code"] == ErrorCode.USER_COVER_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
     def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -6322,7 +6322,7 @@ class TestUserCoverEndpoints:
             "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
             status=400,
         )
-        assert res.json_body["code"] == ErrorCode.USER_COVER_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(1500, 1500)
         web_testapp.put(
