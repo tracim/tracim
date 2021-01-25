@@ -154,7 +154,7 @@ export class PublicProfile extends React.Component {
     return (
       <PopupUploadFile
         label={props.t('Upload an image')}
-        uploadUrl={`${uploadBaseUrl}/raw`}
+        uploadUrl={`${uploadBaseUrl}/raw/cover`}
         httpMethod='PUT'
         color={GLOBAL_primaryColor} // eslint-disable-line
         handleClose={this.onCloseUploadPopup}
@@ -163,7 +163,7 @@ export class PublicProfile extends React.Component {
         maximumFileSize={MAXIMUM_IMAGE_SIZE}
       >
         <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {recommendedDimensions}<br />
-        <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}}Mb', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+        <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}}MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
       </PopupUploadFile>
     )
   }
@@ -175,12 +175,12 @@ export class PublicProfile extends React.Component {
 
   getCoverImageComponent = (changeEnabled) => {
     const { props, state } = this
-    const coverImageAlt = props.t(
+    const coverImageAlt = state.displayedUser ? props.t(
       'Cover image of {{publicName}}',
       { publicName: state.displayedUser.publicName }
-    )
-    const coverImageName = this.isProfileOfUser() ? props.user.coverImageName : 'cover'
-    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.props.displayedUser.userId)
+    ) : ''
+    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverImageName : 'cover'
+    const coverBaseUrl = props.displayedUser ? getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.displayedUser.userId) : ''
     const coverUrl = `${coverBaseUrl}/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
     return (
       <div className='profile__cover'>
