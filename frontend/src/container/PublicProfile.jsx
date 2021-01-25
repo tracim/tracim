@@ -106,7 +106,7 @@ export class PublicProfile extends React.Component {
     const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
     this.setState(oldState => {
       return {
-        displayedUser: apiUser,
+        displayedUser: { ...oldState.displayedUser, ...apiUser },
         coverImageUrl: 'default'
       }
     })
