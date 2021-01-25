@@ -2,6 +2,7 @@
 from tracim_backend.fixtures import Fixture
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 
 
@@ -16,6 +17,7 @@ class Base(Fixture):
         u.password = "admin@admin.admin"
         u.profile = Profile.ADMIN
         u.config = UserConfig()
+        u.custom_properties = UserCustomProperties()
         self._session.add(u)
 
 
@@ -30,6 +32,7 @@ class Test(Fixture):
         lawrence.password = "foobarbaz"
         lawrence.profile = Profile.TRUSTED_USER
         lawrence.config = UserConfig()
+        lawrence.custom_properties = UserCustomProperties()
         self._session.add(lawrence)
 
         bob = User()
@@ -39,6 +42,7 @@ class Test(Fixture):
         bob.password = "foobarbaz"
         bob.profile = Profile.TRUSTED_USER
         bob.config = UserConfig()
+        bob.custom_properties = UserCustomProperties()
         self._session.add(bob)
 
         reader = User()
@@ -47,4 +51,5 @@ class Test(Fixture):
         reader.password = "read"
         reader.profile = Profile.USER
         reader.config = UserConfig()
+        reader.custom_properties = UserCustomProperties()
         self._session.add(reader)

@@ -152,6 +152,7 @@ import Icon from './component/Icon/Icon.jsx'
 
 import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
+import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -371,5 +372,6 @@ export {
   uploadFile,
   isFileUploadInList,
   isFileUploadInErrorState,
-  getAvatarBaseUrl
+  getAvatarBaseUrl,
+  ProfileNavigation
 }

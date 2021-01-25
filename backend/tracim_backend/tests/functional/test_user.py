@@ -12,6 +12,7 @@ from webtest import TestApp
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import EmailAlreadyExists
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -6109,6 +6110,7 @@ class TestAboutUserEndpoint(object):
         assert res.json_body["followers_count"] == 2
         assert res.json_body["public_name"] == admin_user.public_name
         assert res.json_body["username"] == admin_user.username
+        assert res.json_body["created"] == admin_user.created.strftime(DATETIME_FORMAT)
         assert res.json_body["authored_content_revisions_count"] == 3
         assert res.json_body["authored_content_revisions_space_count"] == 1
 

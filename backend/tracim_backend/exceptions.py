@@ -46,6 +46,10 @@ class ConfigurationError(TracimError):
     pass
 
 
+class TranslationConfigurationError(ConfigurationError):
+    pass
+
+
 class ConfigCodeError(TracimError):
     pass
 

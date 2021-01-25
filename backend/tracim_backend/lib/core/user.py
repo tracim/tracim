@@ -75,6 +75,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 
 KNOWN_MEMBERS_ITEMS_LIMIT = 5
@@ -1021,6 +1022,7 @@ class UserApi(object):
 
         if is_new_user:
             self._session.add(UserConfig(user=user))
+            self._session.add(UserCustomProperties(user=user))
 
         self._session.flush()
 
@@ -1225,6 +1227,7 @@ class UserApi(object):
             username=user.username,
             followers_count=followers_count,
             leaders_count=leaders_count,
+            created=user.created,
             authored_content_revisions_count=content_revisions_infos.count,
             authored_content_revisions_space_count=content_revisions_infos.space_count,
         )
