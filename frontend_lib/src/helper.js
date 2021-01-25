@@ -698,4 +698,4 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
-export const getAvatarBaseUrl = (apiUrl, userId) =>  `${props.apiUrl}/users/${}/avatar`
+export const getAvatarBaseUrl = (apiUrl, userId) =>  `${props.apiUrl}/users/${userId}/avatar`
