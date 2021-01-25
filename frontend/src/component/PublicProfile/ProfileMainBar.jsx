@@ -31,7 +31,8 @@ export const ProfileMainBar = props => {
         />
         {props.changeAvatarEnabled && (
           <IconButton
-            text='' title={props.t('Change avatar')}
+            text='' 
+            title={props.t('Change avatar')}
             icon='upload'
             onClick={props.handleChangeAvatar}
             customClass='profile__mainBar__avatar__changeBtn'

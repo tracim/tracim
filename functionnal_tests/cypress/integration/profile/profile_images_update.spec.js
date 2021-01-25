@@ -15,7 +15,7 @@ describe('Profile Images (avatar & cover) update', () => {
         cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
       })
 
-      it("should have an avatar button which allows to change the avatar", () => {
+      it('should have an avatar button which allows to change the avatar', () => {
         cy.get('[data-cy=profile_avatar_changeBtn]')
           .should('be.visible')
           .click()

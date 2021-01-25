@@ -123,12 +123,12 @@
   "Edit": "Editar",
   "Validate anyway": "Validar de qualquer forma",
   "Home": "Início",
-  "Only one file is allowed": "__NOT_TRANSLATED__",
-  "Files already added:": "Ficheiros já subidos:",
-  "The type of this file is not allowed": "__NOT_TRANSLATED__",
-  "The file is too big": "__NOT_TRANSLATED__",
-  "Error while uploading file": "__NOT_TRANSLATED__",
-  "Error while uploading file(s)": "__NOT_TRANSLATED__",
-  "Please wait until the upload ends": "__NOT_TRANSLATED__",
-  "Avatar of {{publicName}}": "__NOT_TRANSLATED__"
+  "Only one file is allowed": "Só é permitido um ficheiro",
+  "Files already added:": "Ficheiros já adicionados:",
+  "The type of this file is not allowed": "O tipo deste ficheiro não é permitido",
+  "The file is too big": "O ficheiro é demasiado grande",
+  "Error while uploading file": "Erro ao carregar o ficheiro",
+  "Error while uploading file(s)": "Erro ao carregar o(s) ficheiro(s)",
+  "Please wait until the upload ends": "Por favor aguarde até que o carregamento termine",
+  "Avatar of {{publicName}}": "Avatar de {{publicName}}"
 }
