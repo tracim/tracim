@@ -107,8 +107,8 @@ class PopupUploadFile extends React.Component {
         fileUploadList: failedFileUploadList
       })
       this.sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
-      props.handleFailure(failedFileUploadList)
-    } else props.handleSuccess(successfulFileUploadList)
+      props.onFailure(failedFileUploadList)
+    } else props.onSuccess(successfulFileUploadList)
     this.setState({ uploadStarted: false })
   }
 
@@ -125,7 +125,7 @@ class PopupUploadFile extends React.Component {
       this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
       return
     }
-    props.handleClose()
+    props.onClose()
   }
 
   isValidateButtonDisabled = () => {
@@ -223,9 +223,9 @@ PopupUploadFile.propTypes = {
   httpMethod: PropTypes.string,
   color: PropTypes.string.isRequired,
   multipleFiles: PropTypes.bool,
-  handleSuccess: PropTypes.func,
-  handleFailure: PropTypes.func,
-  handleClose: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
+  onClose: PropTypes.func,
   additionalFormData: PropTypes.object,
   allowedMimeTypes: PropTypes.array,
   maximumFileSize: PropTypes.number,

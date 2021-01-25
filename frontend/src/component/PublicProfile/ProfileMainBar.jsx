@@ -32,7 +32,7 @@ export const ProfileMainBar = props => {
           <IconButton
             title={props.t('Change avatar')}
             icon='upload'
-            onClick={props.handleChangeAvatar}
+            onClick={props.onChangeAvatarClick}
             customClass='profile__mainBar__avatar__changeBtn'
             intent='pins'
             dataCy='profile_avatar_changeBtn'
@@ -67,7 +67,7 @@ export const ProfileMainBar = props => {
 ProfileMainBar.propTypes = {
   breadcrumbsList: PropTypes.array,
   displayedUser: PropTypes.object,
-  handleChangeAvatar: PropTypes.func.isRequired,
+  onChangeAvatarClick: PropTypes.func.isRequired,
   changeAvatarEnabled: PropTypes.bool
 }
 

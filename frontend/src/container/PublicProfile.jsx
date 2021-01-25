@@ -38,6 +38,60 @@ const POPUP_DISPLAY_STATE = {
 }
 const COVER_IMAGE_DIMENSIONS = '1300x150'
 
+const CoverImage = (props) => {
+  const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.match.params.userid)
+  const coverUrl = `${coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
+  return (
+    <div className='profile__cover'>
+      {props.displayedUser
+        ? (
+          <div className='profile__cover'>
+            {props.displayedUser.hasCover && (
+              <img
+                className='profile__cover__image'
+                src={coverUrl}
+                alt={props.coverImageAlt}
+              />
+            )}
+            {props.changeEnabled && (
+              <IconButton
+                text={props.t('Change cover')}
+                icon='upload'
+                onClick={this.handleChangeCoverClick}
+                customClass='profile__cover__changeBtn'
+                intent='secondary'
+                dataCy='profile_cover_changeBtn'
+              />
+            )}
+          </div>
+          )
+        : (
+          <div className='profile__cover__loading'>
+            <i className='fa fa-fw fa-spinner fa-spin' />
+            {props.t('Loading')}
+          </div>)}
+    </div>
+  )
+}
+
+const PopupUploadImage = translate()((props) => {
+  return (
+    <PopupUploadFile
+      label={props.t('Upload an image')}
+      uploadUrl={`${props.uploadBaseUrl}/raw/${props.imageName}`}
+      httpMethod='PUT'
+      color={GLOBAL_primaryColor}
+      onClose={props.onClose}
+      onSuccess={props.onSuccess}
+      allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
+      maximumFileSize={MAXIMUM_IMAGE_SIZE}
+    >
+      <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
+      <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+    </PopupUploadFile>
+  )
+})
+
 export class PublicProfile extends React.Component {
   constructor (props) {
     super(props)
@@ -118,23 +172,25 @@ export class PublicProfile extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
+  handleChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  onChangeAvatarSuccess = () => this.onChangeImageSuccess(
+  handleChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
+
+  handleChangeAvatarSuccess = () => this.handleChangeImageSuccess(
     'avatar',
     'profileAvatarName',
     'hasAvatar',
     updateUserProfileAvatarName
   )
 
-  onChangeCoverSuccess = () => this.onChangeImageSuccess(
+  handleChangeCoverSuccess = () => this.handleChangeImageSuccess(
     'cover',
     'profileCoverName',
     'hasCover',
     updateUserProfileCoverName
   )
 
-  onChangeImageSuccess = (basename, nameStateKey, hasImageKey, updateNameReducer) => {
+  handleChangeImageSuccess = (basename, nameStateKey, hasImageKey, updateNameReducer) => {
     const { props, state } = this
     const name = `${basename}-${Date.now()}`
     if (state.displayedUser.userId === props.user.userId) {
@@ -149,76 +205,11 @@ export class PublicProfile extends React.Component {
     this.onCloseUploadPopup()
   }
 
-  handleChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
-
-  onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
-
-  getPopupUploadImage = (uploadBaseUrl, onUploadSuccess, recommendedDimensions) => {
-    const { props } = this
-    return (
-      <PopupUploadFile
-        label={props.t('Upload an image')}
-        uploadUrl={`${uploadBaseUrl}/raw/cover`}
-        httpMethod='PUT'
-        color={GLOBAL_primaryColor} // eslint-disable-line
-        handleClose={this.onCloseUploadPopup}
-        handleSuccess={onUploadSuccess}
-        allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
-        maximumFileSize={MAXIMUM_IMAGE_SIZE}
-      >
-        <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {recommendedDimensions}<br />
-        <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}}MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
-      </PopupUploadFile>
-    )
-  }
+  handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   isProfileOfUser = () => {
     const { props, state } = this
     return state.displayedUser && state.displayedUser.userId === props.user.userId
-  }
-
-  getCoverImageComponent = (changeEnabled) => {
-    const { props, state } = this
-    const coverImageAlt = state.displayedUser
-      ? props.t(
-          'Cover image of {{publicName}}',
-          { publicName: state.displayedUser.publicName }
-        )
-      : ''
-    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverName : 'cover'
-    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.match.params.userid)
-    const coverUrl = `${coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
-    return (
-      <div className='profile__cover'>
-        {state.displayedUser
-          ? (
-            <div className='profile__cover'>
-              {state.displayedUser.hasCover && (
-                <img
-                  className='profile__cover__image'
-                  src={coverUrl}
-                  alt={coverImageAlt}
-                />
-              )}
-              {changeEnabled && (
-                <IconButton
-                  text={props.t('Change cover')}
-                  icon='upload'
-                  onClick={this.handleChangeCoverClick}
-                  customClass='profile__cover__changeBtn'
-                  intent='secondary'
-                  dataCy='profile_cover_changeBtn'
-                />
-              )}
-            </div>
-          )
-          : (
-            <div className='profile__cover__loading'>
-              <i className='fa fa-fw fa-spinner fa-spin' />
-              {props.t('Loading')}
-            </div>)}
-      </div>
-    )
   }
 
   render () {
@@ -231,24 +222,44 @@ export class PublicProfile extends React.Component {
     )
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
+    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverName : 'cover'
+    const coverImageAlt = props.displayedUser
+      ? props.t(
+          'Cover image of {{publicName}}',
+          { publicName: props.displayedUser.publicName }
+        )
+      : ''
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && this.getPopupUploadImage(
-            avatarBaseUrl,
-            this.onChangeAvatarSuccess,
-            '100x100px'
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
+            <PopupUploadImage
+              displayedUser={props.displayedUser}
+              imageBaseUrl={avatarBaseUrl}
+              onClose={this.handleCloseUploadPopup}
+              onSuccess={this.handleChangeAvatarSuccess}
+              recommendedDimensions='100x100px'
+            />
           )}
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && this.getPopupUploadImage(
-            coverBaseUrl,
-            this.onChangeCoverSuccess,
-            '1300x150px'
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && (
+            <PopupUploadImage
+              displayedUser={props.displayedUser}
+              imageBaseUrl={coverBaseUrl}
+              onClose={this.handleCloseUploadPopup}
+              onSuccess={this.handleChangeCoverSuccess}
+              recommendedDimensions='1300x150px'
+            />
           )}
-          {this.getCoverImageComponent(changeImageEnabled)}
+          <CoverImage
+            displayedUser={props.displayedUser}
+            changeEnabled={changeImageEnabled}
+            coverImageName={coverImageName}
+            coverImageAlt={coverImageAlt}
+          />
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
-            handleChangeAvatar={this.onChangeAvatarClick}
+            onChangeAvatar={this.handleChangeAvatarClick}
             changeAvatarEnabled={changeImageEnabled}
           />
 
