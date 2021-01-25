@@ -301,6 +301,7 @@ export class PublicProfile extends React.Component {
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.informationDataSchema}
                     displayEditButton={isPublicProfileEditable}
+                    registrationDate={(new Date(state.displayedUser.created).toLocaleDateString())}
                     authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
                     authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
                     onSubmitDataSchema={this.handleSubmitDataSchema}
