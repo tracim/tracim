@@ -59,6 +59,7 @@ class StorageLib:
         """
         Helper to translate depot file into hapic file with
         a similar logic than for content preview
+
         :param depot_file: original depot file to send to client
         :param filename: filename of the file to send
         :param default_filename: if filename is empty or is "raw", use this name.
@@ -114,6 +115,7 @@ class StorageLib:
         In this context, all error are catched, so, if you want to return a specific exception
         from inside this contextmanager, set your exception as children
          of PreviewGeneratorPassthroughError
+
 
         :param depot_file: the depot file where you want to try preview on
         :param original_file_extension: the original file extension, useful to get better
@@ -195,7 +197,7 @@ class StorageLib:
         last_modified: datetime = None,
     ) -> HapicFile:
         """
-        Helper to get One page pdf preview for controller
+        Helper to get one page pdf preview for controller
         """
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension

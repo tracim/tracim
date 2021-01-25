@@ -23,11 +23,11 @@ class ImageRatio:
 
     def sized_to_ratio(self, image_size: "ImageSize") -> "ImageSize":
         """
-        Apply this ratio to a given source ImageSize and return a result ImageSize
-        that fit in the source ImageSize and match the given ratio.
+        Apply this ratio to a given ImageSize source and return a result ImageSize
+        that fits the ImageSize source and match the given ratio.
 
-        This method does a better jobs with big image as it's not possible to match
-        some ratio with too small image (you can't divide pixel)
+        This method does a better job with big image as it's not possible to match
+        some ratios with too small image (you can't divide pixel)
         """
         width = image_size.width
         height = image_size.height
@@ -53,7 +53,7 @@ class ImageRatio:
 
 class ImageSize(ImageRatio):
     """
-    Image size, similar to ImageRatio but for real image pixel-sized.
+    Pixel-sized image size, similar to ImageRatio but for a real image
     """
 
     pass
