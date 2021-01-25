@@ -109,9 +109,9 @@ export class PublicProfile extends React.Component {
 
     const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
 
-    this.setState(oldState => {
+    this.setState(previousState => {
       return {
-        displayedUser: { ...oldState.displayedUser, ...apiUser },
+        displayedUser: { ...previousState.displayedUser, ...apiUser },
         coverImageUrl: 'default'
       }
     })
@@ -140,10 +140,10 @@ export class PublicProfile extends React.Component {
     if (state.displayedUser.userId === props.user.userId) {
       this.props.dispatch(updateNameReducer(name))
     }
-    this.setState(oldState => {
+    this.setState(previousState => {
       return {
-        ...oldState,
-        displayedUser: { ...oldState.displayedUser, [nameStateKey]: name, [hasImageKey]: true }
+        ...previousState,
+        displayedUser: { ...previousState.displayedUser, [nameStateKey]: name, [hasImageKey]: true }
       }
     })
     this.onCloseUploadPopup()
