@@ -31,7 +31,7 @@ describe('<UserInfo />', () => {
     expect(wrapper.find('.userInfo__username').length).equal(0)
   })
 
-  it('should have an Avatar', () =>
-    expect(wrapper.find('.userInfo').find('Avatar').length).equal(1)
-  )
+  it('should have an Avatar', () => {
+    expect(wrapper.find('.userInfo').find('Translate(Avatar)').length).equal(1)
+  })
 })

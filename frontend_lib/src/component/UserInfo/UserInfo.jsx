@@ -1,6 +1,5 @@
 import React from 'react'
-import Avatar from '../Avatar/Avatar.jsx'
-import { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
+import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import PropTypes from 'prop-types'
 
 const UserInfo = props => {
