@@ -45,13 +45,13 @@ export default translate()(FileUploadList)
 
 FileUploadList.propTypes = {
   onDeleteFile: PropTypes.func.isRequired,
-  fileToUploadList: PropTypes.array,
+  fileUploadList: PropTypes.array,
   customTitle: PropTypes.string,
   deleteFileDisabled: PropTypes.bool
 }
 
 FileUploadList.defaultProps = {
-  fileToUploadList: [],
+  fileUploadList: [],
   deleteFileDisabled: false,
   customTitle: ''
 }

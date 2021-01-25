@@ -9,7 +9,9 @@ import {
   TracimComponent,
   PopupUploadFile,
   PROFILE,
-  IconButton
+  IconButton,
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -108,29 +110,53 @@ export class PublicProfile extends React.Component {
     const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
     this.setState({
       displayedUser: { ...apiUser, hasCover: true },
-      coverImageLoaded: false
     })
     this.buildBreadcrumbs()
   }
 
   onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  onChangeAvatarSuccess = () => this.props.dispatch(updateUserProfileAvatarName(`avatar-${Date.now()}`))
+  onChangeAvatarSuccess = () => this.onChangeImageSuccess(
+    'avatar',
+    'profileAvatarImage',
+    'hasAvatar',
+    updateUserProfileAvatarName
+  )
+
+  onChangeCoverSuccess = () => this.onChangeImageSuccess(
+    'cover',
+    'profileCoverImage',
+    'hasCover',
+    updateUserProfileCoverName
+  )
+
+  onChangeImageSuccess = (basename, nameStateKey, hasImageKey, updateNameReducer) => {
+    const { props, state } = this
+    const name = `${basename}-${Date.now()}`
+    if (state.displayedUser.userId === props.user.userId) {
+      this.props.dispatch(updateNameReducer(name))
+    }
+    this.setState(oldState => {
+      return {
+        ...oldState,
+        displayedUser: { ...oldState.displayedUser, nameStateKey: name, hasImageKey: true }
+      }
+    })
+    this.onCloseUploadPopup()
+  }
 
   onChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
 
-  onChangeCoverSuccess = () => this.props.dispatch(updateUserProfileCoverName(`cover-${Date.now()}`))
-
   onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
-  getPopupUploadFile = (uploadUrl, onUploadSuccess, recommendedDimensions) => {
+  getPopupUploadImage = (uploadBaseUrl, onUploadSuccess, recommendedDimensions) => {
     const { props } = this
     return (
       <PopupUploadFile
         label={props.t('Upload an image')}
-        uploadUrl={uploadUrl}
-        httpMethod='POST'
-        color={GLOBAL_primaryColor}
+        uploadUrl={`${uploadBaseUrl}/raw`}
+        httpMethod='PUT'
+        color={GLOBAL_primaryColor} // eslint-disable-line
         handleClose={this.onCloseUploadPopup}
         handleSuccess={onUploadSuccess}
         allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
@@ -147,15 +173,15 @@ export class PublicProfile extends React.Component {
     return state.displayedUser && state.displayedUser.userId === props.user.userId
   }
 
-  getCoverImage = (changeEnabled) => {
+  getCoverImageComponent = (changeEnabled) => {
     const { props, state } = this
     const coverImageAlt = props.t(
       'Cover image of {{publicName}}',
       { publicName: state.displayedUser.publicName }
     )
     const coverImageName = this.isProfileOfUser() ? props.user.coverImageName : 'cover'
-    // const coverUrl = `${FETCH_CONFIG.apiUrl}/users/${state.displayedUser.userId}/cover/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
-    const coverUrl = `${FETCH_CONFIG.apiUrl}/workspaces/1/files/1/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
+    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, props.props.displayedUser.userId)
+    const coverUrl = `${coverBaseUrl}/${COVER_IMAGE_DIMENSIONS}/${coverImageName}`
     return (
       <div className='profile__cover'>
         {state.displayedUser
@@ -191,32 +217,33 @@ export class PublicProfile extends React.Component {
 
   render () {
     const { props, state } = this
-    if (!state.displayedUser) return null
-    const changeImageEnabled = (state.displayedUser.userId === props.user.userId) || props.user.profile === PROFILE.ADMINISTRATOR
-    // const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/users/${state.displayedUser.userId}/avatar/raw`
-    const uploadAvatarUrl = `${FETCH_CONFIG.apiUrl}/workspaces/1/files`
-    // const uploadCoverUrl = `${FETCH_CONFIG.apiUrl}/users/${state.displayedUser.userId}/cover/raw`
-    const uploadCoverUrl = `${FETCH_CONFIG.apiUrl}/workspaces/1/files`
+
+    const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
+    const changeImageEnabled = (
+      (userId === props.user.userId) ||
+      props.user.profile === PROFILE.administrator.slug
+    )
+    const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
+    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && this.getPopupUploadFile(
-            uploadAvatarUrl,
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && this.getPopupUploadImage(
+            avatarBaseUrl,
             this.onChangeAvatarSuccess,
             '100x100px'
           )}
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && this.getPopupUploadFile(
-            uploadCoverUrl,
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && this.getPopupUploadImage(
+            coverBaseUrl,
             this.onChangeCoverSuccess,
             '1300x150px'
           )}
-          {this.getCoverImage(changeImageEnabled)}
+          {this.getCoverImageComponent(changeImageEnabled)}
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
             handleChangeAvatar={this.onChangeAvatarClick}
             changeAvatarEnabled={changeImageEnabled}
-            avatarFilenameInUrl={this.isProfileOfUser() ? props.user.profileAvatarName : 'avatar'}
           />
 
           <div className='profile__content'>

@@ -34,7 +34,6 @@ class PopupCreateFile extends React.Component {
     ])
   }
 
-  // File specific ??
   handleAllAppChangeLanguage = data => {
     const { state, props } = this
     console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
@@ -45,7 +44,6 @@ class PopupCreateFile extends React.Component {
     this.setHeadTitle()
   }
 
-  // File specific
   componentDidMount () {
     this.setHeadTitle()
   }
@@ -81,7 +79,7 @@ class PopupCreateFile extends React.Component {
       )
     }))
 
-    this.handleClose()
+    this.onClosePopup()
     if (fileUploadList.length !== 1) return
 
     GLOBAL_dispatchEvent({
@@ -94,7 +92,7 @@ class PopupCreateFile extends React.Component {
     })
   }
 
-  handleClose = () => {
+  onClosePopup = () => {
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
       data: {
@@ -129,6 +127,7 @@ class PopupCreateFile extends React.Component {
         uploadErrorMessageList={errorMessageList}
         defaultUploadErrorMessage={defaultErrorMessage}
         additionalFormData={additionalFormData}
+        multipleFiles
       />
     )
   }

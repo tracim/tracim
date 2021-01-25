@@ -27,12 +27,12 @@ describe('Guest upload page', () => {
     cy.get('.guestupload__card__header')
   })
 
-  it('Send button should be disable', () => {
+  it('Send button should be disabled', () => {
     cy.visit(guestUploadUrl)
     cy.get('.guestupload__card__form__right__btn').should('be.disabled')
   })
 
-  it('Send button should be enable when all fields are filled', () => {
+  it('Send button should be functional when all fields are filled', () => {
     cy.visit(guestUploadUrl)
 
     cy.get('.guestupload__card__form__right__btn').should('be.disabled')
@@ -42,5 +42,8 @@ describe('Guest upload page', () => {
     cy.get('.guestupload__card__form__right__btn').should('be.disabled')
     cy.dropFixtureInDropZone('Linux-Free-PNG.png', 'image/png', '.filecontent__form', 'file_exemple.png')
     cy.get('.guestupload__card__form__right__btn').should('not.be.disabled')
+    cy.get('.guestupload__card__form__groupepw__input').clear().type(passwordForUploadLink)
+    cy.get('.guestupload__card__form__right__btn').click()
+    cy.get('.importConfirmation').should('be.visible')
   })
 })

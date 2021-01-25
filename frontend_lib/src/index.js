@@ -53,7 +53,9 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  PAGE
+  PAGE,
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -75,6 +77,13 @@ import {
 } from './LiveMessageManager.js'
 
 import { appContentFactory } from './appContentFactory.js'
+
+import {
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
+} from './fileUpload.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -144,6 +153,7 @@ import Icon from './component/Icon/Icon.jsx'
 
 import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
+import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -358,5 +368,12 @@ export {
   getWorkspaceContent,
   PAGE,
   PopupUploadFile,
-  PopupProgressUpload
+  PopupProgressUpload,
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState,
+  getAvatarBaseUrl,
+  ProfileNavigation,
+  getCoverBaseUrl
 }

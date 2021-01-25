@@ -51,8 +51,6 @@
   "The file is larger than the maximum file size allowed": "O ficheiro é maior que o tamanho máximo permitido",
   "Error, the space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
   "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
-  "Some file(s) couldn't be uploaded": "Algum(ns) ficheiro(s) não pode(m) ser subido(s)",
-  "Files already added:": "Ficheiros já subidos:",
   "Upload files": "Subir ficheiros",
   "New file": "Novo ficheiro",
   "Preview loading...": "Pré-visualização carregando...",

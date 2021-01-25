@@ -51,8 +51,6 @@
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
   "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
-  "Some file(s) couldn't be uploaded": "Some file(s) couldn't be uploaded",
-  "Files already added:": "Files already added:",
   "Upload files": "Upload files",
   "New file": "New file",
   "Preview loading...": "Preview loading...",

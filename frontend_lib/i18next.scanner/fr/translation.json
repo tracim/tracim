@@ -1,4 +1,5 @@
 {
+  "{{user}}'s profile": "Profil de {{user}}",
   "all": "tous",
   "Timeline": "Historique",
   "Restore": "Restaurer",
@@ -123,5 +124,12 @@
   "Edit": "Modifier",
   "Validate anyway": "Valider quand même",
   "Home": "Accueil",
-  "Error while getting breadcrumbs": "Erreur lors de l'obtention du fil d'ariane"
+  "Only one file is allowed": "Un seul fichier possible",
+  "Files already added:": "Fichiers déjà ajoutés :",
+  "The type of this file is not allowed": "Le type de ce fichier n'est pas géré",
+  "The file is too big": "Le fichier est trop gros",
+  "Error while uploading file": "Erreur pendant le téléversement du fichier",
+  "Error while uploading file(s)": "Erreur pendant le téléversement des fichiers",
+  "Please wait until the upload ends": "Veuillez patienter jusqu'à la fin du téléversement",
+  "Avatar of {{publicName}}": "Avatar de {{publicName}}"
 }

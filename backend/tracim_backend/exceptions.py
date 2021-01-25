@@ -46,6 +46,10 @@ class ConfigurationError(TracimError):
     pass
 
 
+class TranslationConfigurationError(ConfigurationError):
+    pass
+
+
 class ConfigCodeError(TracimError):
     pass
 
@@ -287,6 +291,10 @@ class ContentTypeNotAllowed(TracimException):
     error_code = ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
 
+class MimetypeNotAllowed(TracimException):
+    error_code = ErrorCode.MIMETYPE_NOT_ALLOWED
+
+
 class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
@@ -317,6 +325,10 @@ class FileSizeOverOwnerEmptySpace(TracimException):
 
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
+
+
+class UserImageNotFound(NotFound):
+    error_code = ErrorCode.USER_IMAGE_NOT_FOUND
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
@@ -467,7 +479,11 @@ class RevisionDoesNotMatchThisContent(TracimException):
     pass
 
 
-class PageOfPreviewNotFound(NotFound):
+class PreviewGeneratorPassthroughError(TracimException):
+    pass
+
+
+class PageOfPreviewNotFound(NotFound, PreviewGeneratorPassthroughError):
     error_code = ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
 
@@ -548,7 +564,7 @@ class DepotCorrupted(TracimException):
     pass
 
 
-class RevisionFilePathSearchFailedDepotCorrupted(DepotCorrupted):
+class CannotGetDepotFileDepotCorrupted(DepotCorrupted):
     pass
 
 

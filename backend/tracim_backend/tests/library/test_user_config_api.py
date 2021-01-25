@@ -14,6 +14,9 @@ class TestConfigApi:
         assert uapiconfig.get_all_params() == {}
 
     def test__user_config_add_parameters(self, session, app_config):
+        """
+        PATCH style mecanism, you can add parameters, but you are unable to remove parameters
+        """
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob", save_now=True)
         uapiconfig = UserConfigApi(session=session, current_user=u)

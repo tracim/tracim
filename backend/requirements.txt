@@ -8,7 +8,7 @@ alembic==1.0.5            # via tracim_backend (setup.py)
 anyascii==0.1.7           # via filedepot
 apispec-marshmallow-advanced==0.4  # via hapic, tracim_backend (setup.py)
 apispec==2.0.2            # via apispec-marshmallow-advanced, hapic
-attrs==18.2.0             # via cmd2
+attrs==18.2.0             # via cmd2, jsonschema
 babel==2.6.0              # via tracim_backend (setup.py)
 beaker==1.10.0            # via pyramid-beaker, tracim_backend (setup.py)
 beautifulsoup4==4.6.3     # via tracim_backend (setup.py)
@@ -42,8 +42,9 @@ humanize==0.5.1           # via tracim_backend (setup.py)
 hupper==1.4.2             # via pyramid
 idna==2.8                 # via requests
 imapclient==2.1.0         # via tracim_backend (setup.py)
-importlib-metadata==0.23  # via pluggy
+importlib-metadata==0.23  # via jsonschema, pluggy
 jsmin==2.2.2              # via wsgidav
+jsonschema==3.2.0         # via tracim_backend (setup.py)
 ldap3==2.5.1              # via pyramid-ldap3
 lxml==4.2.5               # via caldav, tracim_backend (setup.py)
 mako==1.0.7               # via alembic, pyramid-mako, tracim_backend (setup.py)
@@ -79,6 +80,7 @@ pyramid-multiauth==0.9.0  # via tracim_backend (setup.py)
 pyramid-retry==1.0        # via tracim_backend (setup.py)
 pyramid-tm==2.2.1         # via tracim_backend (setup.py)
 pyramid==1.10.1           # via pyramid-beaker, pyramid-debugtoolbar, pyramid-ldap3, pyramid-mako, pyramid-multiauth, pyramid-retry, pyramid-tm, tracim_backend (setup.py)
+pyrsistent==0.17.3        # via jsonschema
 python-dateutil==2.7.5    # via alembic, elasticsearch-dsl, radicale, sqlakeyset, tracim_backend (setup.py), vobject
 python-editor==1.0.3      # via alembic
 python-magic==0.4.15      # via preview-generator
@@ -91,7 +93,7 @@ redis==2.10.6             # via rq, tracim_backend (setup.py)
 repoze.lru==0.7           # via pyramid-debugtoolbar
 requests==2.25.0          # via caldav, pubcontrol, tracim_backend (setup.py)
 rq==0.12.0                # via tracim_backend (setup.py)
-six==1.11.0               # via caldav, cliff, elasticsearch-dsl, gripcontrol, imapclient, python-dateutil, stevedore
+six==1.11.0               # via caldav, cliff, elasticsearch-dsl, gripcontrol, imapclient, jsonschema, python-dateutil, stevedore
 smmap==3.0.4              # via gitdb
 sqlakeyset==1.0.1595476224  # via tracim_backend (setup.py)
 sqlalchemy==1.3.18        # via alembic, sqlakeyset, tracim_backend (setup.py), zope.sqlalchemy

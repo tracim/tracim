@@ -1,4 +1,5 @@
 {
+  "{{user}}'s profile": "Perfil de {{user}}",
   "all": "todos",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
@@ -123,5 +124,12 @@
   "Edit": "Editar",
   "Validate anyway": "Validar de qualquer forma",
   "Home": "Início",
-  "Error while getting breadcrumbs": "Erro ao obtenir a navegação estrutural"
+  "Only one file is allowed": "Só é permitido um ficheiro",
+  "Files already added:": "Ficheiros já adicionados:",
+  "The type of this file is not allowed": "O tipo deste ficheiro não é permitido",
+  "The file is too big": "O ficheiro é demasiado grande",
+  "Error while uploading file": "Erro ao carregar o ficheiro",
+  "Error while uploading file(s)": "Erro ao carregar o(s) ficheiro(s)",
+  "Please wait until the upload ends": "Por favor aguarde até que o carregamento termine",
+  "Avatar of {{publicName}}": "Avatar de {{publicName}}"
 }

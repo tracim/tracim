@@ -37,7 +37,8 @@ export const uploadFile = async (
     errorMessageList = [],
     additionalFormData = {},
     defaultErrorMessage = 'Error while uploading file'
-  }) => {
+  }
+) => {
   // INFO - CH - 2018-08-28 - fetch still doesn't handle event progress. So we need to use old school xhr object
   const xhr = new XMLHttpRequest()
   const formData = new FormData()

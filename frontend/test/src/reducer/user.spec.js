@@ -32,6 +32,8 @@ describe('user reducer', () => {
       )
     ).to.deep.equal({
       ...serialize(globalManagerFromApi, serializeUserProps),
+      profileAvatarName: defaultUser.profileAvatarName,
+      profileCoverName: defaultUser.profileCoverName,
       publicName: 'newPublicName'
     })
   })
@@ -68,7 +70,9 @@ describe('user reducer', () => {
       userReducer(defaultUser, setUserConnected({ ...globalManagerFromApi, logged: true }))
     ).to.deep.equal({
       ...serialize(globalManagerFromApi, serializeUserProps),
-      logged: true
+      logged: true,
+      profileAvatarName: defaultUser.profileAvatarName,
+      profileCoverName: defaultUser.profileCoverName
     })
   })
 

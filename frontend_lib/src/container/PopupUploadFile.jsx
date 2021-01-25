@@ -49,7 +49,7 @@ class PopupUploadFile extends React.Component {
     const addedFileUploadList = droppedFileUploadList.filter((fileUpload) => !isFileUploadInList(fileUpload, state.fileUploadList))
     if (addedFileUploadList.length !== droppedFileUploadList.length) {
       const alreadyPresentFilenameList = droppedFileUploadList
-        .filter((fileUpload) => this.isFileUploadAlreadyInList(fileUpload, state.fileUploadList))
+        .filter((fileUpload) => isFileUploadInList(fileUpload, state.fileUploadList))
         .map(fileUpload => fileUpload.file.name)
       this.sendGlobalFlashMessage(
         <div>
@@ -74,8 +74,8 @@ class PopupUploadFile extends React.Component {
   updateFileUploadProgress = (e, fileUpload) => {
     const { state } = this
     if (!e.lengthComputable) return
-    fileUpload.percent = computeProgressionPercentage(e.loaded, e.total, state.fileUploadList.length)
-    const fileUploadProgressPercentage = Math.round(state.fileUploadList.reduce((accumulator, fu) => accumulator + fu.percent, 0))
+    fileUpload.progress = computeProgressionPercentage(e.loaded, e.total, state.fileUploadList.length)
+    const fileUploadProgressPercentage = Math.round(state.fileUploadList.reduce((accumulator, fu) => accumulator + fu.progress, 0))
     this.setState({ fileUploadProgressPercentage })
   }
 
@@ -137,30 +137,30 @@ class PopupUploadFile extends React.Component {
     )
   }
 
-  loadFileUploadPreview = async (fileUploadList) => {
-    const loadImage = (file) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      return new Promise((resolve, reject) => {
-        reader.onload = e => {
-          const img = new Image()
-          img.src = e.target.result
-          img.onerror = () => reject(new Error())
-          img.onload = () => {
-            if (e.total > 0) {
-              resolve(e.target.result)
-            } else reject(new Error())
-          }
+  loadImage = file => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    return new Promise((resolve, reject) => {
+      reader.onload = e => {
+        const img = new Image()
+        img.src = e.target.result
+        img.onerror = () => reject(new Error())
+        img.onload = () => {
+          if (e.total > 0) {
+            resolve(e.target.result)
+          } else reject(new Error())
         }
-        reader.onerror = () => reject(new Error())
-      })
-    }
+      }
+      reader.onerror = () => reject(new Error())
+    })
+  }
 
+  loadFileUploadPreview = async (fileUploadList) => {
     try {
       if (fileUploadList.length !== 1) throw new Error()
       const file = fileUploadList[0].file
       if (!file.type.includes('image') || file.size > MAX_PREVIEW_IMAGE_SIZE) throw new Error()
-      this.setState({ fileUploadPreview: await loadImage(file) })
+      this.setState({ fileUploadPreview: await this.loadImage(file) })
     } catch {
       this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE })
     }
@@ -217,7 +217,7 @@ class PopupUploadFile extends React.Component {
 }
 
 PopupUploadFile.propTypes = {
-  lab: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   uploadUrl: PropTypes.string.isRequired,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,

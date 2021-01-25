@@ -36,10 +36,9 @@ describe('<Avatar />', () => {
       expect(wrapper.find('.avatar-wrapper').prop('style')).to.deep.equal(props.style)
     })
 
-    it(`should display its avatar in width, height and borderRadius: ${props.size}`, () => {
+    it('should display its avatar in width, height', () => {
       expect(wrapper.find('.avatar').prop('style').width).to.equal(props.size)
       expect(wrapper.find('.avatar').prop('style').height).to.equal(props.size)
-      expect(wrapper.find('.avatar').prop('style').borderRadius).to.equal(props.size)
     })
   })
 
