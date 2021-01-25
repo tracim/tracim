@@ -41,7 +41,7 @@ describe('Profile Images (avatar & cover) update', () => {
       })
     })
 
-    it("should NOT have a change avatar button", () => {
+    it('should NOT have a change avatar button', () => {
       cy.get('[data-cy=profile_avatar_changeBtn]')
         .should('not.exist')
     })
