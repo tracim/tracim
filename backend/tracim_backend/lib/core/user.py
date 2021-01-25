@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 import datetime
+import io
+import os
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
 
+from depot.io.utils import FileIntent
+from hapic.data import HapicFile
 from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
@@ -57,13 +61,18 @@ from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserFollowAlreadyDefined
+from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
+from tracim_backend.lib.utils.image_process import ImageRatio
+from tracim_backend.lib.utils.image_process import ImageSize
+from tracim_backend.lib.utils.image_process import crop_image
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
@@ -79,6 +88,10 @@ from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 
 KNOWN_MEMBERS_ITEMS_LIMIT = 5
+AVATAR_RATIO = ImageRatio(1, 1)
+COVER_RATIO = ImageRatio(35, 4)
+DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
+DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 
 
 class UserApi(object):
@@ -1231,3 +1244,122 @@ class UserApi(object):
             authored_content_revisions_count=content_revisions_infos.count,
             authored_content_revisions_space_count=content_revisions_infos.space_count,
         )
+
+    def get_avatar(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.avatar:
+            raise UserImageNotFound("avatar of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.avatar,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
+
+    def get_avatar_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cropped_avatar:
+            raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
+        _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.cropped_avatar,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
+
+    def set_avatar(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ) -> None:
+        user = self.get_one(user_id)
+
+        self._session.add(user)
+        (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "avatar", AVATAR_RATIO
+        )
+        self._session.flush()
+
+    def get_cover(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cover:
+            raise UserImageNotFound("cover of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.cover,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
+
+    def get_cover_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cropped_cover:
+            raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
+        _, original_file_extension = os.path.splitext(self._user.cropped_cover.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.cropped_cover,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
+
+    def set_cover(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ) -> None:
+        user = self.get_one(user_id)
+        (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "cover", COVER_RATIO
+        )
+        self._session.add(user)
+        self._session.flush()
+
+    def _crop_and_prepare_depot_storage(
+        self,
+        filename: str,
+        mimetype: str,
+        content: bytes,
+        cropped_basename: str,
+        crop_ratio: ImageRatio,
+    ) -> typing.Tuple[FileIntent, FileIntent]:
+        """
+        Prepare depot storage of an image file: original + cropped image.
+        The cropped image is stored as a PNG file.
+        @return tuple with FileIntent objects for original, cropped images
+        """
+        label, extension = os.path.splitext(filename)
+        original = FileIntent(content, filename, mimetype)
+        with io.BytesIO() as cropped_io:
+            # FIXME - G.M - 2021-01-21 - should we catch error here,
+            # what happened if pillow failed ?
+            crop_image(io.BytesIO(content), cropped_io, ratio=crop_ratio, format="png")
+            cropped = FileIntent(
+                cropped_io.getvalue(), "{}.png".format(cropped_basename), "image/png"
+            )
+        return (original, cropped)

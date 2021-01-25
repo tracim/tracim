@@ -272,6 +272,28 @@ class WorkspaceAndContentPath(object):
         self.workspace_id = workspace_id
 
 
+class UserPicturePath(object):
+    """
+    Paths params with user id and filename model
+    """
+
+    def __init__(self, user_id: int, filename: str) -> None:
+        self.user_id = user_id
+        self.filename = filename
+
+
+class UserPreviewPicturePath(object):
+    """
+    Paths params with user id and filename model + parameters for sized preview.
+    """
+
+    def __init__(self, user_id: int, filename: str, height: int, width: int) -> None:
+        self.user_id = user_id
+        self.filename = filename
+        self.height = height
+        self.width = width
+
+
 class WorkspaceAndContentRevisionPath(object):
     """
     Paths params with workspace id and content_id model
@@ -747,8 +769,12 @@ class UserInContext(object):
     # Context related
 
     @property
-    def avatar_url(self) -> Optional[str]:
-        return self.user.avatar_url
+    def has_avatar(self) -> bool:
+        return bool(self.user.avatar)
+
+    @property
+    def has_cover(self) -> bool:
+        return bool(self.user.cover)
 
     @property
     def auth_type(self) -> str:

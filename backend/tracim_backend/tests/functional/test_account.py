@@ -121,11 +121,11 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self,
@@ -177,7 +177,7 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self,
@@ -290,11 +290,11 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
 
 def follow_put_json(response: TestResponse, **kw):
