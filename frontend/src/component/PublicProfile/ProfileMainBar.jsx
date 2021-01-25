@@ -15,7 +15,7 @@ export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length > 0
   return (
     <div className='profile__mainBar'>
-      <div className='profile__mainBar__avatar' data-cy='profile_avatar'>
+      <div className='profile__mainBar__avatar' data-cy='profile-avatar'>
         <Avatar
           customClass='profile__mainBar__avatar__big'
           apiUrl={FETCH_CONFIG.apiUrl}
