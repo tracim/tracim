@@ -334,12 +334,10 @@
   "My profile": "My profile",
   "Error while saving public profile": "Error while saving public profile",
   "Personal Page": "Personal Page",
-  "Registration date: ": "Registration date: ",
   "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces",
-  "Personal page": "Personal page",
-  "My profile": "My profile",
   "Upload an image": "Upload an image",
   "Recommended dimensions:": "Recommended dimensions:",
   "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
-  "Change avatar": "Change avatar"
+  "Change avatar": "Change avatar",
+  "Registration date:": "Registration date:"
 }

@@ -334,12 +334,10 @@
   "My profile": "Mon profil",
   "Error while saving public profile": "Erreur lors de la sauvegarde du profil",
   "Personal Page": "Page personnelle",
-  "Registration date: ": "Date d'inscription :",
   "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions dans {{ authoredContentRevisionsSpaceCount }} espaces",
-  "Personal page": "Page personnelle",
-  "My profile": "Mon profil",
   "Upload an image": "Téléverser une image",
   "Recommended dimensions:": "Dimensions recommandées :",
   "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
-  "Change avatar": "Changer l'avatar"
+  "Change avatar": "Changer l'avatar",
+  "Registration date:": "Date d'inscription :"
 }

@@ -334,12 +334,10 @@
   "My profile": "Meu perfil",
   "Error while saving public profile": "Erro ao salvar o perfil público",
   "Personal Page": "Página pessoal",
-  "Registration date: ": "Data de subscrição",
   "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} intervenções em {{ authoredContentRevisionsSpaceCount }} espaços",
-  "Personal page": "Página pessoal",
-  "My profile": "Meu perfil",
   "Upload an image": "Carregar imagem",
   "Recommended dimensions:": "Dimensões recomendadas:",
   "Maximum size: {{size}} MB": "Tamanho máximo: {{size}} MB",
-  "Change avatar": "Mudar avatar"
+  "Change avatar": "Mudar avatar",
+  "Registration date:": "Data de subscrição"
 }

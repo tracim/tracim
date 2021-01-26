@@ -83,7 +83,7 @@ export class PublicProfile extends React.Component {
 
   componentDidUpdate () {
     const { props, state } = this
-    if (state.displayedUser && state.displayedUser.userId !== parseInt(props.match.params.userid)) {
+    if (state.displayedUser && parseInt(state.displayedUser.userId) !== parseInt(props.match.params.userid)) {
       this.getUser()
       this.getUserCustomPropertiesAndSchema()
     }
@@ -138,7 +138,7 @@ export class PublicProfile extends React.Component {
       leadersCount: fetchGetUser.json.leaders_count,
       followersCount: fetchGetUser.json.followers_count
     }
-    
+
     this.setState(oldState => {
       return {
         displayedUser: { ...oldState.displayedUser, ...apiUser },
@@ -146,6 +146,7 @@ export class PublicProfile extends React.Component {
       }
     })
     this.buildBreadcrumbs()
+    this.setHeadTitle(fetchGetUser.json.public_name)
   }
 
   onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
@@ -303,7 +304,7 @@ export class PublicProfile extends React.Component {
 
     return isConnectedUserOnHisOwnProfile || isUserAdmin
   }
-    
+
   onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
@@ -331,7 +332,7 @@ export class PublicProfile extends React.Component {
               <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
             </PopupUploadFile>
           )}
-          
+
           <div className='profile__cover'>
             {state.coverImageUrl && <div className='profile__cover__default' />}
             {!state.coverImageUrl && (
