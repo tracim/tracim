@@ -56,7 +56,7 @@
   &__content
     display flex
     & > div
-      font-size fontSizeMedium
+      overflow-wrap anywhere
       font-weight bold
       background-color offWhite
       height max-content
@@ -65,7 +65,7 @@
       border-radius 5px
       padding 20px
     &__information
-      margin 30px 0px 30px 30px
+      margin 30px 0 30px 30px
       width 30%
     &__page
       margin 30px
@@ -74,6 +74,12 @@
       background-color veryLightGrey
       height 200px
       margin 10px
+  &__customForm__submit
+    position absolute
+    top 0
+    right 0
+    padding 5px 8px
+
 
 @media (max-width: max-sm)
   .profile

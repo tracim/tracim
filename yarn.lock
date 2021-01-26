@@ -1684,6 +1684,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json-schema@npm:*":
+  version: 7.0.7
+  resolution: "@types/json-schema@npm:7.0.7"
+  checksum: b9d2c509fa4e0b82f58e73f5e6ab76c60ff1884ba41bb82f37fb1cece226d4a3e5a62fedf78a43da0005373a6713d9abe61c1e592906402c41c08ad6ab26d52b
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:^7.0.4":
   version: 7.0.5
   resolution: "@types/json-schema@npm:7.0.5"
@@ -8303,10 +8310,24 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"lodash.pick@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "lodash.pick@npm:4.4.0"
+  checksum: 3cf24484b1bd36652bfbe1e925e6955ee0332f1612919331a2d6115d5617bcaaf559e4fb21f4160d51eb2359f7a8dc0e478773da516b4ccc15ef261327064aab
+  languageName: node
+  linkType: hard
+
 "lodash.sortby@npm:^4.7.0":
   version: 4.7.0
   resolution: "lodash.sortby@npm:4.7.0"
   checksum: 43cde11276c66da7b3eda5e9f00dc6edc276d2bcf0a5969ffc62b612cd1c4baf2eff5e84cee11383005722c460a9ca0f521fad4fa1cd2dc1ef013ee4da2dfe63
+  languageName: node
+  linkType: hard
+
+"lodash.topath@npm:^4.5.2":
+  version: 4.5.2
+  resolution: "lodash.topath@npm:4.5.2"
+  checksum: c635ffd3586817e6beeff174d0e39015a1df88b885d9ba742587a2bd047af13cd9662870e0cce90ef706f6468127105488a96a8778d5d7c4af0358d025782c6b
   languageName: node
   linkType: hard
 
@@ -10881,6 +10902,28 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"react-jsonschema-form-bs4@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "react-jsonschema-form-bs4@npm:1.7.1"
+  dependencies:
+    "@babel/runtime-corejs2": ^7.4.5
+    "@types/json-schema": "*"
+    "@types/react": "*"
+    ajv: ^6.7.0
+    core-js: ^2.5.7
+    lodash.get: ^4.4.2
+    lodash.pick: ^4.4.0
+    lodash.topath: ^4.5.2
+    prop-types: ^15.5.8
+    react-is: ^16.8.4
+    react-lifecycles-compat: ^3.0.4
+    shortid: ^2.2.14
+  peerDependencies:
+    react: ">=15"
+  checksum: 58183f5dee1e417e9263e5536219842ba3da6fe5e89c72382140b7ea2c1189247c7dcb31f8e9a398a84df1685dce02012e2312fb029160b9943b4d12c383d30a
+  languageName: node
+  linkType: hard
+
 "react-jsonschema-form@npm:^1.6.1":
   version: 1.8.1
   resolution: "react-jsonschema-form@npm:1.8.1"
@@ -13185,6 +13228,7 @@ fsevents@^1.2.7:
     react-dnd-html5-backend: 7.4.4
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-jsonschema-form-bs4: ^1.7.1
     react-redux: 5.0.6
     react-router-dom: ^5.2.0
     react-select: ^3.0.4

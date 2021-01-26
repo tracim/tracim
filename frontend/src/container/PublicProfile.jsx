@@ -16,13 +16,28 @@ import {
 import {
   newFlashMessage,
   setBreadcrumbs,
+  setHeadTitle,
   updateUserProfileAvatarName,
   updateUserProfileCoverName
 } from '../action-creator.sync.js'
-import { getAboutUser } from '../action-creator.async'
+import {
+  getAboutUser,
+  getCustomPropertiesSchema,
+  getCustomPropertiesUiSchema,
+  getUserCustomPropertiesDataSchema,
+  putUserCustomPropertiesDataSchema
+} from '../action-creator.async'
 import { serializeUserProps } from '../reducer/user.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
+import Information from '../component/PublicProfile/Information.jsx'
+import CustomFormManager from '../component/PublicProfile/CustomFormManager.jsx'
+
+const DISPLAY_GROUP_BACKEND_KEY = {
+  uiSchemaKey: 'tracim:display_group',
+  information: 'public_profile_first',
+  personalPage: 'public_profile_second'
+}
 
 const ALLOWED_IMAGE_MIMETYPES = [
   'image/jpeg',
@@ -98,6 +113,13 @@ export class PublicProfile extends React.Component {
 
     this.state = {
       displayedUser: undefined,
+      coverImageUrl: undefined,
+      informationSchemaObject: {},
+      personalPageSchemaObject: {},
+      uiSchemaObject: {},
+      informationDataSchema: {},
+      personalPageDataSchema: {},
+      dataSchemaObject: {},
       displayUploadPopup: undefined
     }
 
@@ -109,16 +131,19 @@ export class PublicProfile extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<Profile> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     this.buildBreadcrumbs()
+    this.getUserCustomPropertiesAndSchema()
   }
 
   componentDidMount () {
     this.getUser()
+    this.getUserCustomPropertiesAndSchema()
   }
 
   componentDidUpdate () {
     const { props, state } = this
-    if (state.displayedUser && state.displayedUser.userId !== parseInt(props.match.params.userid)) {
+    if (state.displayedUser && parseInt(state.displayedUser.userId) !== parseInt(props.match.params.userid)) {
       this.getUser()
+      this.getUserCustomPropertiesAndSchema()
     }
   }
 
@@ -136,6 +161,10 @@ export class PublicProfile extends React.Component {
       label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName }),
       isALink: false
     }]))
+  }
+
+  setHeadTitle = userPublicName => {
+    this.props.dispatch(setHeadTitle(userPublicName))
   }
 
   handleFetchErrors = (result, errorList, defaultErrorMessage) => {
@@ -160,7 +189,13 @@ export class PublicProfile extends React.Component {
       props.t('Error while loading user')
     )) return
 
-    const apiUser = { ...serialize(fetchGetUser.json, serializeUserProps) }
+    const apiUser = {
+      ...serialize(fetchGetUser.json, serializeUserProps),
+      authoredContentRevisionsCount: fetchGetUser.json.authored_content_revisions_count,
+      authoredContentRevisionsSpaceCount: fetchGetUser.json.authored_content_revisions_space_count,
+      leadersCount: fetchGetUser.json.leaders_count,
+      followersCount: fetchGetUser.json.followers_count
+    }
 
     this.setState(previousState => {
       return {
@@ -168,6 +203,7 @@ export class PublicProfile extends React.Component {
       }
     })
     this.buildBreadcrumbs()
+    this.setHeadTitle(fetchGetUser.json.public_name)
   }
 
   handleChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
@@ -203,17 +239,154 @@ export class PublicProfile extends React.Component {
     this.handleCloseUploadPopup()
   }
 
+  getUserCustomPropertiesAndSchema = async () => {
+    const { props } = this
+
+    const userId = props.match.params.userid
+
+    const schemaObjectRequest = this.getUserCustomPropertiesSchema()
+    const uiSchemaObjectRequest = this.getUserCustomPropertiesUiSchema()
+    const dataSchemaObjectRequest = this.getUserCustomPropertiesDataSchema(userId)
+
+    const [schemaObject, uiSchemaObject, dataSchemaObject] = await Promise.all(
+      [schemaObjectRequest, uiSchemaObjectRequest, dataSchemaObjectRequest]
+    )
+
+    const [informationSchema, personalPageSchema] = this.splitSchema(schemaObject, uiSchemaObject)
+    const [informationDataSchema, personalPageDataSchema] = this.splitDataSchema(dataSchemaObject, uiSchemaObject)
+
+    this.setState({
+      informationSchemaObject: informationSchema,
+      personalPageSchemaObject: personalPageSchema,
+      uiSchemaObject: uiSchemaObject,
+      informationDataSchema: informationDataSchema,
+      personalPageDataSchema: personalPageDataSchema,
+      dataSchemaObject: dataSchemaObject
+    })
+  }
+
+  splitSchema = (schema, uiSchema) => {
+    const informationSchema = {
+      ...schema,
+      required: schema.required.filter(field =>
+        this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+      ),
+      properties: Object.fromEntries(
+        Object.entries(schema.properties).filter(([key, val]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+        )
+      )
+    }
+    const personalPageSchema = {
+      ...schema,
+      title: '', // INFO - CH - 20210122 - reset title and description since they are used for first form
+      description: '',
+      required: schema.required.filter(field =>
+        this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+      ),
+      properties: Object.fromEntries(
+        Object.entries(schema.properties).filter(([key, val]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+        )
+      )
+    }
+    return [informationSchema, personalPageSchema]
+  }
+
+  splitDataSchema = (dataSchema, uiSchema) => {
+    const informationDataSchema = {
+      ...Object.fromEntries(
+        Object.entries(dataSchema).filter(([key, value]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
+        )
+      )
+    }
+    const personalPageDataSchema = {
+      ...Object.fromEntries(
+        Object.entries(dataSchema).filter(([key, value]) =>
+          this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
+        )
+      )
+    }
+
+    return [informationDataSchema, personalPageDataSchema]
+  }
+
+  findPropertyDisplayGroup = (property, uiSchema) => {
+    if (!property || !uiSchema || !uiSchema[property]) return ''
+    return uiSchema[property][DISPLAY_GROUP_BACKEND_KEY.uiSchemaKey]
+  }
+
+  getUserCustomPropertiesSchema = async () => {
+    const { props } = this
+    const result = await props.dispatch(getCustomPropertiesSchema())
+    switch (result.status) {
+      case 200: return result.json.json_schema
+      default: return {}
+    }
+  }
+
+  getUserCustomPropertiesUiSchema = async () => {
+    const { props } = this
+    const result = await props.dispatch(getCustomPropertiesUiSchema())
+    switch (result.status) {
+      case 200: return result.json.ui_schema
+      default: return {}
+    }
+  }
+
+  getUserCustomPropertiesDataSchema = async userId => {
+    const { props } = this
+    const result = await props.dispatch(getUserCustomPropertiesDataSchema(userId))
+    switch (result.status) {
+      case 200: return result.json.parameters
+      default: return {}
+    }
+  }
+
+  handleSubmitDataSchema = async (dataSchemaObject, e) => {
+    const { props, state } = this
+
+    const userId = props.match.params.userid
+
+    const mergedDataSchemaObject = {
+      ...state.dataSchemaObject,
+      ...dataSchemaObject.formData
+    }
+
+    const result = await props.dispatch(putUserCustomPropertiesDataSchema(userId, mergedDataSchemaObject))
+    switch (result.status) {
+      case 204: {
+        const [informationDataSchema, personalPageDataSchema] = this.splitDataSchema(mergedDataSchemaObject, state.uiSchemaObject)
+        this.setState({
+          informationDataSchema: informationDataSchema,
+          personalPageDataSchema: personalPageDataSchema,
+          dataSchemaObject: mergedDataSchemaObject
+        })
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while saving public profile', 'warning')))
+        break
+    }
+  }
+
+  isPublicProfileEditable = (connectedUser, publicProfileId, profileObject) => {
+    const isConnectedUserOnHisOwnProfile = connectedUser.userId === publicProfileId
+    const isUserAdmin = connectedUser.profile === profileObject.administrator.slug
+
+    return isConnectedUserOnHisOwnProfile || isUserAdmin
+  }
+
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
     const { props, state } = this
 
     const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
-    const changeImageEnabled = (
-      (userId === props.user.userId) ||
-      props.user.profile === PROFILE.administrator.slug
-    )
+    const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE)
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
+
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
     const coverImageName = state.displayedUser && state.displayedUser.profileCoverName
       ? state.displayedUser.profileCoverName
@@ -224,6 +397,7 @@ export class PublicProfile extends React.Component {
         { publicName: props.displayedUser.publicName }
       )
       : ''
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -236,6 +410,7 @@ export class PublicProfile extends React.Component {
               recommendedDimensions={AVATAR_IMAGE_DIMENSIONS}
             />
           )}
+
           {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && (
             <PopupUploadImage
               imageBaseUrl={coverBaseUrl}
@@ -245,25 +420,38 @@ export class PublicProfile extends React.Component {
               recommendedDimensions={COVER_IMAGE_DIMENSIONS}
             />
           )}
+          
           <CoverImage
             displayedUser={state.displayedUser}
-            changeEnabled={changeImageEnabled}
+            changeEnabled={isPublicProfileEditable}
             onChangeCoverClick={this.handleChangeCoverClick}
             coverBaseUrl={coverBaseUrl}
             coverImageName={coverImageName}
             coverImageAlt={coverImageAlt}
           />
+          
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
-            changeAvatarEnabled={changeImageEnabled}
+            changeAvatarEnabled={isPublicProfileEditable}
           />
 
           <div className='profile__content'>
             <div className='profile__content__information'>
               {state.displayedUser
-                ? props.t('Information_plural')
+                ? (
+                  <Information
+                    schemaObject={state.informationSchemaObject}
+                    uiSchemaObject={state.uiSchemaObject}
+                    dataSchemaObject={state.informationDataSchema}
+                    displayEditButton={isPublicProfileEditable}
+                    registrationDate={(new Date(state.displayedUser.created).toLocaleDateString())}
+                    authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
+                    authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
+                    onSubmitDataSchema={this.handleSubmitDataSchema}
+                  />
+                )
                 : (
                   <>
                     <div className='profile__text__loading' />
@@ -274,7 +462,17 @@ export class PublicProfile extends React.Component {
 
             <div className='profile__content__page'>
               {state.displayedUser
-                ? props.t('Personal page')
+                ? (
+                  <CustomFormManager
+                    title={props.t('Personal Page')}
+                    submitButtonClass='profile__customForm__submit primaryColorBorder'
+                    schemaObject={state.personalPageSchemaObject}
+                    uiSchemaObject={state.uiSchemaObject}
+                    dataSchemaObject={state.personalPageDataSchema}
+                    displayEditButton={isPublicProfileEditable}
+                    onSubmitDataSchema={this.handleSubmitDataSchema}
+                  />
+                )
                 : (
                   <>
                     <div className='profile__text__loading' />

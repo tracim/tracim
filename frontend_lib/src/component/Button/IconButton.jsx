@@ -23,6 +23,7 @@ const IconButton = props => {
     <button
       className={className}
       style={style}
+      type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}
       title={props.title || props.text}
@@ -38,6 +39,7 @@ IconButton.propTypes = {
   text: PropTypes.string,
   icon: PropTypes.string,
   title: PropTypes.string,
+  type: PropTypes.string,
   color: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
@@ -53,6 +55,7 @@ IconButton.defaultProps = {
   onClick: undefined,
   disabled: false,
   title: undefined,
+  type: 'button',
   color: GLOBAL_primaryColor,
   intent: 'secondary',
   customClass: '',
