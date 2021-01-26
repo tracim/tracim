@@ -339,5 +339,9 @@
   "Recommended dimensions:": "Dimensions recommandées :",
   "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
   "Change avatar": "Changer l'avatar",
-  "Registration date:": "Date d'inscription :"
+  "Registration date:": "Date d'inscription :",
+  "Change avatar": "Changer l'avatar",
+  "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
+  "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
+  "Change cover": "Changer la couverture"
 }

@@ -15,12 +15,13 @@ export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length > 0
   return (
     <div className='profile__mainBar'>
-      <div className='profile__mainBar__avatar' data-cy='profile_avatar'>
+      <div className='profile__mainBar__avatar' data-cy='profile-avatar'>
         <Avatar
           customClass='profile__mainBar__avatar__big'
           apiUrl={FETCH_CONFIG.apiUrl}
           user={hasUser ? props.displayedUser : {}}
           size={AVATAR_SIZE.BIG}
+          dataCy='profile-avatar'
         />
         <Avatar
           customClass='profile__mainBar__avatar__medium'
@@ -32,7 +33,7 @@ export const ProfileMainBar = props => {
           <IconButton
             title={props.t('Change avatar')}
             icon='upload'
-            onClick={props.handleChangeAvatar}
+            onClick={props.onChangeAvatarClick}
             customClass='profile__mainBar__avatar__changeBtn'
             intent='pins'
             dataCy='profile_avatar_changeBtn'
@@ -67,7 +68,7 @@ export const ProfileMainBar = props => {
 ProfileMainBar.propTypes = {
   breadcrumbsList: PropTypes.array,
   displayedUser: PropTypes.object,
-  handleChangeAvatar: PropTypes.func.isRequired,
+  onChangeAvatarClick: PropTypes.func.isRequired,
   changeAvatarEnabled: PropTypes.bool
 }
 

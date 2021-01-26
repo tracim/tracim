@@ -9,13 +9,16 @@ import {
   TracimComponent,
   PopupUploadFile,
   PROFILE,
-  getAvatarBaseUrl
+  IconButton,
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setBreadcrumbs,
   setHeadTitle,
-  updateUserProfileAvatarName
+  updateUserProfileAvatarName,
+  updateUserProfileCoverName
 } from '../action-creator.sync.js'
 import {
   getAboutUser,
@@ -43,11 +46,66 @@ const ALLOWED_IMAGE_MIMETYPES = [
   'image/gif',
   'image/webp'
 ]
-const MAXIMUM_AVATAR_SIZE = 1 * 1024 * 1024 // 1 Mbyte
+const MAXIMUM_IMAGE_SIZE = 1 * 1024 * 1024 // 1 MByte
 const POPUP_DISPLAY_STATE = {
   AVATAR: 'AVATAR',
   COVER: 'COVER'
 }
+const AVATAR_IMAGE_DIMENSIONS = '100x100'
+const COVER_IMAGE_DIMENSIONS = '1300x150'
+
+const CoverImage = translate()((props) => {
+  const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
+  return (
+    <div className='profile__cover' data-cy='cover'>
+      {props.displayedUser
+        ? (
+          <div className='profile__cover' data-cy='profile-cover'>
+            {props.displayedUser.hasCover && (
+              <img
+                className='profile__cover__image'
+                src={coverImageUrl}
+                alt={props.coverImageAlt}
+              />
+            )}
+            {props.changeEnabled && (
+              <IconButton
+                text={props.t('Change cover')}
+                icon='upload'
+                onClick={props.onChangeCoverClick}
+                customClass='profile__cover__changeBtn'
+                intent='secondary'
+                dataCy='profile_cover_changeBtn'
+              />
+            )}
+          </div>
+        )
+        : (
+          <div className='profile__cover__loading'>
+            <i className='fa fa-fw fa-spinner fa-spin' />
+            {props.t('Loading')}
+          </div>)}
+    </div>
+  )
+})
+
+const PopupUploadImage = translate()((props) => {
+  return (
+    <PopupUploadFile
+      label={props.t('Upload an image')}
+      uploadUrl={`${props.imageBaseUrl}/raw/${props.imageName}`}
+      httpMethod='PUT'
+      color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+      onClose={props.onClose}
+      onSuccess={props.onSuccess}
+      allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
+      maximumFileSize={MAXIMUM_IMAGE_SIZE}
+    >
+      <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
+      <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+    </PopupUploadFile>
+  )
+})
 
 export class PublicProfile extends React.Component {
   constructor (props) {
@@ -139,31 +197,46 @@ export class PublicProfile extends React.Component {
       followersCount: fetchGetUser.json.followers_count
     }
 
-    this.setState(oldState => {
+    this.setState(previousState => {
       return {
-        displayedUser: { ...oldState.displayedUser, ...apiUser },
-        coverImageUrl: 'default'
+        displayedUser: { ...previousState.displayedUser, ...apiUser }
       }
     })
     this.buildBreadcrumbs()
     this.setHeadTitle(fetchGetUser.json.public_name)
   }
 
-  onChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
+  handleChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  onChangeAvatarSuccess = () => {
+  handleChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
+
+  handleChangeAvatarSuccess = () => this.handleChangeImageSuccess(
+    'avatar',
+    'profileAvatarName',
+    'hasAvatar',
+    updateUserProfileAvatarName
+  )
+
+  handleChangeCoverSuccess = () => this.handleChangeImageSuccess(
+    'cover',
+    'profileCoverName',
+    'hasCover',
+    updateUserProfileCoverName
+  )
+
+  handleChangeImageSuccess = (basename, nameStateKey, hasImageKey, updateNameReducer) => {
     const { props, state } = this
-    const profileAvatarName = `avatar-${Date.now()}`
+    const name = `${basename}-${Date.now()}`
     if (state.displayedUser.userId === props.user.userId) {
-      this.props.dispatch(updateUserProfileAvatarName(profileAvatarName))
+      this.props.dispatch(updateNameReducer(name))
     }
-    this.setState(oldState => {
+    this.setState(previousState => {
       return {
-        ...oldState,
-        displayedUser: { ...oldState.displayedUser, profileAvatarName, hasAvatar: true }
+        ...previousState,
+        displayedUser: { ...previousState.displayedUser, [nameStateKey]: name, [hasImageKey]: true }
       }
     })
-    this.onCloseUploadPopup()
+    this.handleCloseUploadPopup()
   }
 
   getUserCustomPropertiesAndSchema = async () => {
@@ -305,7 +378,7 @@ export class PublicProfile extends React.Component {
     return isConnectedUserOnHisOwnProfile || isUserAdmin
   }
 
-  onCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
+  handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
     const { props, state } = this
@@ -314,39 +387,53 @@ export class PublicProfile extends React.Component {
     const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE)
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
 
+    const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
+    const coverImageName = state.displayedUser && state.displayedUser.profileCoverName
+      ? state.displayedUser.profileCoverName
+      : 'cover'
+    const coverImageAlt = props.displayedUser
+      ? props.t(
+        'Cover image of {{publicName}}',
+        { publicName: props.displayedUser.publicName }
+      )
+      : ''
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
-            <PopupUploadFile
-              label={props.t('Upload an image')}
-              uploadUrl={`${avatarBaseUrl}/raw/avatar`}
-              httpMethod='PUT'
-              color={GLOBAL_primaryColor} // eslint-disable-line
-              handleClose={this.onCloseUploadPopup}
-              handleSuccess={this.onChangeAvatarSuccess}
-              allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
-              maximumFileSize={MAXIMUM_AVATAR_SIZE}
-            >
-              <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} 100x100px<br />
-              <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_AVATAR_SIZE / (1024 * 1024) })}
-            </PopupUploadFile>
+            <PopupUploadImage
+              imageBaseUrl={avatarBaseUrl}
+              imageName='avatar'
+              onClose={this.handleCloseUploadPopup}
+              onSuccess={this.handleChangeAvatarSuccess}
+              recommendedDimensions={AVATAR_IMAGE_DIMENSIONS}
+            />
           )}
 
-          <div className='profile__cover'>
-            {state.coverImageUrl && <div className='profile__cover__default' />}
-            {!state.coverImageUrl && (
-              <div className='profile__cover__loading'>
-                <i className='fa fa-fw fa-spinner fa-spin' />
-                {props.t('Loading')}
-              </div>
-            )}
-          </div>
-
+          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && (
+            <PopupUploadImage
+              imageBaseUrl={coverBaseUrl}
+              imageName='cover'
+              onClose={this.handleCloseUploadPopup}
+              onSuccess={this.handleChangeCoverSuccess}
+              recommendedDimensions={COVER_IMAGE_DIMENSIONS}
+            />
+          )}
+          
+          <CoverImage
+            displayedUser={state.displayedUser}
+            changeEnabled={isPublicProfileEditable}
+            onChangeCoverClick={this.handleChangeCoverClick}
+            coverBaseUrl={coverBaseUrl}
+            coverImageName={coverImageName}
+            coverImageAlt={coverImageAlt}
+          />
+          
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
-            handleChangeAvatar={this.onChangeAvatarClick}
+            onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
           />
 

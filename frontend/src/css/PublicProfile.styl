@@ -12,13 +12,23 @@
     display flex
     align-items flex-end
     justify-content center
-    &__default
-      background-image url('../img/default_cover_image.png')
-      background-repeat repeat
-      width 100%
-      height 100%
+    background-image url('../img/default_cover_image.png')
+    background-repeat repeat
+    position relative
+    &__changeBtn
+      position absolute
+      bottom 10px
+      right 10px
+      background-color offWhite
+      &:hover
+        background-color lightGrey
     &__loading
       margin 10px
+    &__image
+      width 100%
+      height 100%
+      object-position 50% 50%
+      object-fit fill
 
   &__mainBar
     height 70px
@@ -75,6 +85,8 @@
   .profile
     &__cover
       height 70px
+      &__changeBtn > span
+        display none
 
     &__mainBar
       height 50px

@@ -699,3 +699,5 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
 }
 
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
+
+export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`

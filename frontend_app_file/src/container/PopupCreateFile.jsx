@@ -68,7 +68,7 @@ class PopupCreateFile extends React.Component {
     }
   }
 
-  onUploadSuccess = async (fileUploadList) => {
+  handleUploadSuccess = async (fileUploadList) => {
     const { state } = this
 
     await Promise.all(fileUploadList.map(fileUpload => {
@@ -79,7 +79,7 @@ class PopupCreateFile extends React.Component {
       )
     }))
 
-    this.onClosePopup()
+    this.handleClosePopup()
     if (fileUploadList.length !== 1) return
 
     GLOBAL_dispatchEvent({
@@ -92,7 +92,7 @@ class PopupCreateFile extends React.Component {
     })
   }
 
-  onClosePopup = () => {
+  handleClosePopup = () => {
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
       data: {
@@ -122,8 +122,8 @@ class PopupCreateFile extends React.Component {
         uploadUrl={this.createFileUrl}
         color={state.config.hexcolor}
         icon={state.config.faIcon}
-        handleClose={this.onClosePopup}
-        handleSuccess={this.onUploadSuccess}
+        onClose={this.handleClosePopup}
+        onSuccess={this.handleUploadSuccess}
         uploadErrorMessageList={errorMessageList}
         defaultUploadErrorMessage={defaultErrorMessage}
         additionalFormData={additionalFormData}
