@@ -55,16 +55,13 @@ user.custom_properties.ui_schema_file_path
 
 This property is mandatory for properties to appear in the Tracim user interface.
 
-The frontend have two forms to display in the public profile page: Information and Personal data.  
-The data from the both forms come from the single json schema in backend.  
-The frontend then have to split the schema for each form.  
-To do so, the ui schema has a property to specify on which form, a given property belong to:  
+The Tracim user interface has two forms where user properties can be displayed in the public profile page: `Information` and `Personal data`.
 
-    tracim:display_group
+Each user property can be assigned to one or the other form using the special key `tracim:display_group` in the UI schema file.  
 
-The frontend currently expects two possible values:
-- `public_profile_first` to display in the Information box
-- `public_profile_second` to display in the Personal data box
+To display a property in the `Information` column, use `"tracim:display_group": "public_profile_first"`.
+
+To display a property in the `Personal data` column, use `"tracim:display_group": "public_profile_second"`.
 
 See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
 
