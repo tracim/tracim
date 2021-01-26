@@ -14,7 +14,7 @@ User-visible parts of these properties (title/description/…) can be translated
 these translations will allow the backend to automatically translate both the UI Schema and JSONSchema according
 to connected user lang.
 
-:warning: Tracim does not handle changes in the properties schema when custom property values are already existing in the database.
+:warning: Tracim does not handle changes in the property schema when custom property values are already existing in the database.
 If you want to change the schema in an incompatible way with the existing property values you'll have to update the `user_custom_properties` table manually.
 
 ## Configuration
@@ -51,7 +51,23 @@ user.custom_properties.ui_schema_file_path
 
 ### Tracim specific properties in ui schemas
 
-No specific properties for now in ui schema.
+#### The display_group property
+
+This property is mandatory.
+
+The frontend have two forms to display in the public profile page: Information and Personal data.  
+The data from the both forms come from the single json schema in backend.  
+The frontend then have to split the schema for each form.  
+To do so, the ui schema has a property to specify on which form, a given property belong to:  
+
+    tracim:display_group
+
+The frontend currently expects two possible values:
+- `public_profile_first`
+- `public_profile_second`
+
+see [ui schema](../examples/user_custom_properties/organization/ui.json) example
+
 
 ## Translations
 
