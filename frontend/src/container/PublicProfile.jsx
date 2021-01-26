@@ -98,8 +98,7 @@ export class PublicProfile extends React.Component {
 
     this.state = {
       displayedUser: undefined,
-      displayUploadPopup: undefined,
-      coverImageLoaded: false
+      displayUploadPopup: undefined
     }
 
     props.registerCustomEventHandlerList([
@@ -165,8 +164,7 @@ export class PublicProfile extends React.Component {
 
     this.setState(previousState => {
       return {
-        displayedUser: { ...previousState.displayedUser, ...apiUser },
-        coverImageUrl: 'default'
+        displayedUser: { ...previousState.displayedUser, ...apiUser }
       }
     })
     this.buildBreadcrumbs()
