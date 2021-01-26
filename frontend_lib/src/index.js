@@ -54,7 +54,8 @@ import {
   darkenColor,
   lightenColor,
   PAGE,
-  getAvatarBaseUrl
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -373,5 +374,6 @@ export {
   isFileUploadInList,
   isFileUploadInErrorState,
   getAvatarBaseUrl,
-  ProfileNavigation
+  ProfileNavigation,
+  getCoverBaseUrl
 }

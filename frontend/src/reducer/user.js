@@ -30,6 +30,7 @@ export const serializeUserProps = {
   username: 'username',
   is_deleted: 'isDeleted',
   has_avatar: 'hasAvatar',
+  has_cover: 'hasCover',
   profileAvatarName: 'profileAvatarName',
   profileCoverName: 'profileCoverName'
 }
@@ -50,6 +51,7 @@ export const defaultUser = {
   agendaUrl: '',
   username: '',
   hasAvatar: false,
+  hasCover: false,
   profileAvatarName: 'avatar',
   profileCoverName: 'cover'
 }

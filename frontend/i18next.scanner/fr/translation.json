@@ -335,6 +335,8 @@
   "My profile": "Mon profil",
   "Upload an image": "Téléverser une image",
   "Recommended dimensions:": "Dimensions recommandées :",
-  "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
-  "Change avatar": "Changer l'avatar"
+  "Change avatar": "Changer l'avatar",
+  "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
+  "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
+  "Change cover": "Changer la couverture"
 }

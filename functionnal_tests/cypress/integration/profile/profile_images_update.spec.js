@@ -10,27 +10,29 @@ describe('Profile Images (avatar & cover) update', () => {
   ]
   for (const user of allowedUserList) {
     describe(`As ${user.username} seeing ${baseUser.username}'s profile`, () => {
-      before(function () {
+      beforeEach(function () {
         cy.resetDB()
         cy.setupBaseDB()
         cy.login(user)
         cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
       })
 
-      it('should have an avatar button which allows to change the avatar', () => {
-        cy.get('[data-cy=profile_avatar_changeBtn]')
-          .should('be.visible')
-          .click()
-        cy.dropFixtureInDropZone('artikodin.png', 'image/png', '.filecontent__form', 'file_exemple1.png')
-        cy.get('[data-cy=popup__createcontent__form__button]')
-          .click()
-        cy.get('.profile__mainBar__avatar__big > [data-cy=avatar] > .avatar__img')
-      })
+      for (const image of ['avatar', 'cover']) {
+        it(`should have a change ${image} button which allows to change the ${image}`, () => {
+          cy.get(`[data-cy=profile_${image}_changeBtn]`)
+            .should('be.visible')
+            .click()
+          cy.dropFixtureInDropZone('artikodin.png', 'image/png', '.filecontent__form', 'file_exemple1.png')
+          cy.get('[data-cy=popup__createcontent__form__button]')
+            .click()
+          cy.get(`[data-cy=profile-${image}] img`)
+        })
+      }
     })
   }
 
-  describe(`As ${baseUser.username} seeing a known user's profile}`, () => {
-    before(function () {
+  describe(`As ${baseUser.username} seeing a known user's profile`, () => {
+    beforeEach(function () {
       cy.resetDB()
       cy.setupBaseDB()
       cy.login(defaultAdmin)
@@ -41,10 +43,12 @@ describe('Profile Images (avatar & cover) update', () => {
       })
     })
 
-    it('should NOT have a change avatar button', () => {
-      cy.get('[data-cy=profile_avatar_changeBtn]')
-        .should('not.exist')
-    })
+    for (const image of ['avatar', 'cover']) {
+      it(`should NOT have a change ${image} button`, () => {
+        cy.get(`[data-cy=profile_${image}_changeBtn]`)
+          .should('not.exist')
+      })
+    }
   })
 
 })
