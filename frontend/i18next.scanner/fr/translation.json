@@ -218,7 +218,7 @@
   "Error while downloading file": "Erreur lors du téléchargement du fichier",
   "Manage": "Paramétrer",
   "Error while loading file information": "Erreur lors du chargement du fichier",
-  "Files already uploaded:": "Fichiers déjà téléversés :",
+  "Files already added:": "Fichiers déjà ajoutés :",
   "Full name must be at least 1 character": "Le nom complet doit comporter au moins 1 caractère",
   "Full name must be less than 255 characters": "Le nom complet doit comporter moins de 255 caractères.",
   "Password must be at least 6 characters": "Le mot de passe doit comporter au moins 6 caractères",
@@ -335,5 +335,11 @@
   "Error while saving public profile": "Erreur lors de la sauvegarde du profil",
   "Personal Page": "Page personnelle",
   "Registration date: ": "Date d'inscription :",
-  "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions dans {{ authoredContentRevisionsSpaceCount }} espaces"
+  "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions dans {{ authoredContentRevisionsSpaceCount }} espaces",
+  "Personal page": "Page personnelle",
+  "My profile": "Mon profil",
+  "Upload an image": "Téléverser une image",
+  "Recommended dimensions:": "Dimensions recommandées :",
+  "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
+  "Change avatar": "Changer l'avatar"
 }

@@ -43,7 +43,10 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
-import { findUserRoleIdInWorkspace } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  findUserRoleIdInWorkspace
+} from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -588,6 +591,7 @@ export class Dashboard extends React.Component {
                 <MemberList
                   customClass='dashboard__memberlist'
                   loggedUser={props.user}
+                  apiUrl={FETCH_CONFIG.apiUrl}
                   memberList={props.curWs.memberList}
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}

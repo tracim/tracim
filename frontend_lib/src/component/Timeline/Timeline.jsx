@@ -128,7 +128,8 @@ export class Timeline extends React.Component {
                   <Comment
                     customClass={props.customClass}
                     customColor={props.customColor}
-                    author={content.author.public_name}
+                    apiUrl={props.apiUrl}
+                    author={content.author}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
@@ -185,6 +186,7 @@ export class Timeline extends React.Component {
             >
               <CommentTextArea
                 id='wysiwygTimelineComment'
+                apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
                 disableComment={props.disableComment}
@@ -244,6 +246,7 @@ export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
+  apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,

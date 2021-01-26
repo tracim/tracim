@@ -46,7 +46,11 @@ export const NewMemberForm = props => {
                     key={u.user_id}
                   >
                     <div className='autocomplete__item__avatar'>
-                      <Avatar size={AVATAR_SIZE.MEDIUM} publicName={u.public_name} />
+                      <Avatar
+                        user={u}
+                        apiUrl={props.apiUrl}
+                        size={AVATAR_SIZE.MEDIUM}
+                      />
                     </div>
 
                     <div
@@ -158,6 +162,7 @@ export default translate()(NewMemberForm)
 NewMemberForm.propTypes = {
   onClickCloseAddMemberBtn: PropTypes.func,
   publicName: PropTypes.string,
+  apiUrl: PropTypes.string.isRequired,
   searchedKnownMemberList: PropTypes.arrayOf(PropTypes.object),
   isEmail: PropTypes.bool,
   onClickAutoComplete: PropTypes.func,

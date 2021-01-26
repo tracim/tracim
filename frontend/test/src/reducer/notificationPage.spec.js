@@ -36,7 +36,9 @@ const TLM = {
 const notification = {
   author: {
     publicName: globalManagerFromApi.public_name,
-    userId: globalManagerFromApi.user_id
+    userId: globalManagerFromApi.user_id,
+    hasAvatar: false,
+    hasCover: false
   },
   content: null,
   created: '2020-07-23T12:44:50Z',

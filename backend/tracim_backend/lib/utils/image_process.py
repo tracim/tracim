@@ -42,7 +42,7 @@ class ImageRatio:
             # INFO - G.M - 2021-01-21 - we do not allow new height to be
             # bigger than previous one,
             # in that specific edge case, we do not render proper ratio.
-            height = min(int(Fraction(height, self.ratio())), height)
+            height = min(int((Fraction(width, self.ratio()))), height)
 
         # INFO - G.M - 2021-01-21 - if we get 0 width or height,
         # we should adjust to 1 to avoid error.

@@ -1235,6 +1235,7 @@ class UserApi(object):
         ).get_authored_content_revisions_infos(user_id)
 
         return AboutUser(
+            user_id=user.user_id,
             public_name=user.public_name,
             username=user.username,
             followers_count=followers_count,
@@ -1242,6 +1243,8 @@ class UserApi(object):
             created=user.created,
             authored_content_revisions_count=content_revisions_infos.count,
             authored_content_revisions_space_count=content_revisions_infos.space_count,
+            has_avatar=user.has_avatar,
+            has_cover=user.has_cover,
         )
 
     def get_avatar(

@@ -37,7 +37,11 @@ export const WorkspaceMembersList = props => {
                 data-cy={`workspace_advanced__member-${m.user_id}`}
               >
                 <div className='workspace_advanced__userlist__list__item__avatar'>
-                  <Avatar size={AVATAR_SIZE.MEDIUM} publicName={m.user.public_name} />
+                  <Avatar
+                    size={AVATAR_SIZE.MEDIUM}
+                    apiUrl={props.apiUrl}
+                    user={m.user}
+                  />
                 </div>
 
                 <div className='workspace_advanced__userlist__list__item__name' title={m.user.public_name}>
@@ -96,6 +100,7 @@ export const WorkspaceMembersList = props => {
         <NewMemberForm
           onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
           publicName={props.newMemberName}
+          apiUrl={props.apiUrl}
           isEmail={props.isEmail}
           onChangePersonalData={props.onChangeNewMemberName}
           searchedKnownMemberList={props.searchedKnownMemberList}

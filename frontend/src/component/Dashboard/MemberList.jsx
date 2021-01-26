@@ -33,6 +33,7 @@ export class MemberList extends React.Component {
                 onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
                 publicName={props.publicName}
                 isEmail={props.isEmail}
+                apiUrl={props.apiUrl}
                 onChangePersonalData={props.onChangePersonalData}
                 searchedKnownMemberList={props.searchedKnownMemberList}
                 autoCompleteActive={props.autoCompleteFormNewMemberActive}
@@ -76,7 +77,10 @@ export class MemberList extends React.Component {
                       key={m.id}
                     >
                       <div className='memberlist__list__item__avatar'>
-                        <Avatar publicName={m.publicName} />
+                        <Avatar
+                          user={m}
+                          apiUrl={props.apiUrl}
+                        />
                       </div>
 
                       <div className='memberlist__list__item__info'>

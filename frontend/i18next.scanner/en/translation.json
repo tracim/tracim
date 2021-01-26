@@ -215,7 +215,7 @@
   "Error while loading uploaded files": "Error while loading uploaded files",
   "Error while downloading file": "Error while downloading file",
   "Manage": "Manage",
-  "Files already uploaded:": "Files already uploaded:",
+  "Files already added:": "Files already added:",
   "Full name must be at least 1 character": "Full name must be at least 1 character",
   "Full name must be less than 255 characters": "Full name must be less than 255 characters",
   "Password must be at least 6 characters": "Password must be at least 6 characters",
@@ -335,5 +335,11 @@
   "Error while saving public profile": "Error while saving public profile",
   "Personal Page": "Personal Page",
   "Registration date: ": "Registration date: ",
-  "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces"
+  "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces": "{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces",
+  "Personal page": "Personal page",
+  "My profile": "My profile",
+  "Upload an image": "Upload an image",
+  "Recommended dimensions:": "Recommended dimensions:",
+  "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
+  "Change avatar": "Change avatar"
 }

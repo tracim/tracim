@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Avatar, AVATAR_SIZE } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 require('./Home.styl')
 
@@ -18,7 +19,11 @@ export const HomeHasWorkspace = props =>
 
     <div className='homepagecard__user'>
       <div className='homepagecard__user__avatar'>
-        <Avatar size={AVATAR_SIZE.BIG} publicName={props.user.publicName} />
+        <Avatar
+          size={AVATAR_SIZE.BIG}
+          apiUrl={FETCH_CONFIG.apiUrl}
+          user={props.user}
+        />
       </div>
 
       <div className='homepagecard__user__publicname'>

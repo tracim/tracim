@@ -19,8 +19,8 @@ export const SpaceSubscriptionsRequests = props => {
             >
               <span className='workspace_advanced__subscriptionRequests__userInfo'>
                 <UserInfo
-                  publicName={request.author.public_name}
-                  username={request.author.username}
+                  user={request.author}
+                  apiUrl={props.apiUrl}
                 />
               </span>
 
@@ -86,6 +86,7 @@ export const SpaceSubscriptionsRequests = props => {
 export default translate()(SpaceSubscriptionsRequests)
 
 SpaceSubscriptionsRequests.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
   subscriptionRequestList: PropTypes.array.isRequired,
   onClickAcceptRequest: PropTypes.func,
   onClickRejectRequest: PropTypes.func
