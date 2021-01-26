@@ -53,7 +53,7 @@ user.custom_properties.ui_schema_file_path
 
 #### The display_group property
 
-This property is mandatory.
+This property is mandatory for properties to appear in the Tracim user interface.
 
 The frontend have two forms to display in the public profile page: Information and Personal data.  
 The data from the both forms come from the single json schema in backend.  
