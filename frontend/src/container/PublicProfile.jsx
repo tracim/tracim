@@ -205,11 +205,6 @@ export class PublicProfile extends React.Component {
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
-  isProfileOfUser = () => {
-    const { props, state } = this
-    return state.displayedUser && state.displayedUser.userId === props.user.userId
-  }
-
   render () {
     const { props, state } = this
 
@@ -220,7 +215,9 @@ export class PublicProfile extends React.Component {
     )
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
-    const coverImageName = this.isProfileOfUser() ? props.user.profileCoverName : 'cover'
+    const coverImageName = state.displayedUser && state.displayedUser.coverImageName
+      ? state.displayedUser.coverImageName
+      : 'cover'
     const coverImageAlt = props.displayedUser
       ? props.t(
         'Cover image of {{publicName}}',
