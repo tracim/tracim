@@ -215,8 +215,8 @@ export class PublicProfile extends React.Component {
     )
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
-    const coverImageName = state.displayedUser && state.displayedUser.coverImageName
-      ? state.displayedUser.coverImageName
+    const coverImageName = state.displayedUser && state.displayedUser.profileCoverName
+      ? state.displayedUser.profileCoverName
       : 'cover'
     const coverImageAlt = props.displayedUser
       ? props.t(
