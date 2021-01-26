@@ -63,8 +63,8 @@ To do so, the ui schema has a property to specify on which form, a given propert
     tracim:display_group
 
 The frontend currently expects two possible values:
-- `public_profile_first`
-- `public_profile_second`
+- `public_profile_first` to display in the Information box
+- `public_profile_second` to display in the Personal data box
 
 See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
 
