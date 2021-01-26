@@ -66,7 +66,7 @@ The frontend currently expects two possible values:
 - `public_profile_first`
 - `public_profile_second`
 
-see [ui schema](../examples/user_custom_properties/organization/ui.json) example
+See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
 
 
 ## Translations
