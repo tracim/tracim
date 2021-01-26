@@ -82,6 +82,8 @@ const DisplaySchemaArray = props => {
     props.valueList.map((value, i) => {
       if (!value) return null
 
+      // INFO - CH - 20200126 - The use of the variable valueType is to match the process of DisplaySchemaObject (for consistency)
+      // It also will be easier to handle several cases of valueType later if required
       const valueType = typeof value
 
       if (valueType === 'object') {
