@@ -79,7 +79,7 @@ class PopupCreateFile extends React.Component {
       )
     }))
 
-    this.onClosePopup()
+    this.handleClosePopup()
     if (fileUploadList.length !== 1) return
 
     GLOBAL_dispatchEvent({
