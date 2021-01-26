@@ -336,7 +336,7 @@
   "Upload an image": "Carregar imagem",
   "Recommended dimensionè:": "Dimensões recomendadas:",
   "Change avatar": "Mudar avatar",
-  "Maximum size: {{size}}MB": "Tamanho máximo:",
+  "Maximum size: {{size}} MB": "Tamanho máximo: {{size}}MB",
   "Cover image of {{publicName}}": "__NOT_TRANSLATED__",
   "Change cover": "Mudar a capa"
 }
