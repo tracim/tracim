@@ -142,7 +142,7 @@ class PopupUploadFile extends React.Component {
     const blobUrl = URL.createObjectURL(file)
     img.src = blobUrl
     return new Promise((resolve, reject) => {
-      img.onerror = () => reject(new Error())
+      img.onerror = () => reject(new Error('Failed to load the image'))
       img.onload = () => {
         resolve(blobUrl)
       }
