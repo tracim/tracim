@@ -180,7 +180,7 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.USER) {
       const details = {
         url: (props.user.profile === PROFILE.administrator.slug) ? PAGE.ADMIN.USER_EDIT(notification.user.userId) : '',
-        emptyUrlMsg: props.t("Only an administrator can see this user's profile"),
+        emptyUrlMsg: props.t("Only an administrator can see this user's account"),
         msgType: 'info'
       }
 
@@ -188,22 +188,22 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.CREATED: return {
           ...details,
           icon: 'user-plus',
-          text: props.t("{{author}} created {{user}}'s profile", i18nOpts)
+          text: props.t("{{author}} created {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.MODIFIED: return {
           ...details,
           icon: 'user+history',
-          text: props.t("{{author}} modified {{user}}'s profile", i18nOpts)
+          text: props.t("{{author}} modified {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.DELETED: return {
           ...details,
           icon: 'user-times',
-          text: props.t("{{author}} deleted {{user}}'s profile", i18nOpts)
+          text: props.t("{{author}} deleted {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.UNDELETED: return {
           ...details,
           icon: 'user+undo',
-          text: props.t("{{author}} restored {{user}}'s profile", i18nOpts)
+          text: props.t("{{author}} restored {{user}}'s account", i18nOpts)
         }
       }
     }
