@@ -21,10 +21,9 @@ describe('<PublicProfile />', () => {
   const wrapper = shallow(<PublicProfile {...props} />)
 
   describe('isPublicProfileEditable()', () => {
-    it('should return false if informationSchemaObject is empty', () => {
-      wrapper.setState({ informationSchemaObject: {} })
+    it('should return false if schemaObject is empty', () => {
       expect(
-        wrapper.instance().isPublicProfileEditable(props.user, props.user.userId, PROFILE)
+        wrapper.instance().isPublicProfileEditable(props.user, props.user.userId, PROFILE, {})
       ).to.equal(false)
     })
   })
