@@ -211,7 +211,7 @@ class SchemaAsForm extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      // CH - INFO - 20200128 - we need to copy the props because <Form /> needs to be used as a controlled component
+      // CH - INFO - 20210128 - we need to copy the props because <Form /> needs to be used as a controlled component
       // see https://github.com/tracim/tracim/issues/4105
       dataSchema: props.dataSchemaObject
     }

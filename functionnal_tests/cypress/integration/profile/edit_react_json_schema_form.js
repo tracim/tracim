@@ -41,7 +41,7 @@ describe("Editing the user profile", () => {
               label: 'some note'
             }
           }).then(() => {
-            cy.wait(300) // INFO - CH - wait for the TLM to have been triggered
+            cy.wait(300) // INFO - CH - 20210128 - wait for the TLM to have been triggered
 
             cy.get('form.rjsf .form-group > input[type="text"]')
               .first()
@@ -54,5 +54,4 @@ describe("Editing the user profile", () => {
       })
     })
   })
-
 })
