@@ -206,28 +206,45 @@ const TextRichWidget = connect(({ user }) => ({ user }))(props => {
   )
 })
 
-const SchemaAsForm = props => {
-  return (
-    <Form
-      schema={props.schemaObject}
-      uiSchema={props.uiSchemaObject}
-      formData={props.dataSchemaObject}
-      widgets={{
-        TextareaWidget: TextRichWidget
-      }}
-      onSubmit={(formData, e) => {
-        props.onClickToggleButton()
-        props.onSubmitDataSchema(formData, e)
-      }}
-    >
-      <IconButton
-        customClass={props.submitButtonClass}
-        icon='check'
-        type='submit'
-        text={props.validateLabel}
-      />
-    </Form>
-  )
+class SchemaAsForm extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      // CH - INFO - 20200128 - we need to copy the props because <Form /> needs to be used as a controlled component
+      // see https://github.com/tracim/tracim/issues/4105
+      dataSchema: props.dataSchemaObject
+    }
+  }
+
+  handleChangeDataSchema = ({ formData }) => {
+    this.setState({ dataSchema: formData })
+  }
+
+  render () {
+    const { props, state } = this
+    return (
+      <Form
+        schema={props.schemaObject}
+        uiSchema={props.uiSchemaObject}
+        formData={state.dataSchema}
+        widgets={{
+          TextareaWidget: TextRichWidget
+        }}
+        onChange={this.handleChangeDataSchema}
+        onSubmit={(formData, e) => {
+          props.onClickToggleButton()
+          props.onSubmitDataSchema(formData, e)
+        }}
+      >
+        <IconButton
+          customClass={props.submitButtonClass}
+          icon='check'
+          type='submit'
+          text={props.validateLabel}
+        />
+      </Form>
+    )
+  }
 }
 
 const MODE = {
