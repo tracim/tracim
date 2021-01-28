@@ -21,7 +21,7 @@ import {
 } from '../customEvent.js'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
 
-const MAX_PREVIEW_IMAGE_SIZE = 2000000
+const MAX_PREVIEW_IMAGE_SIZE = 20 * 1024 * 1024 // 20 MBytes
 
 class PopupUploadFile extends React.Component {
   constructor (props) {
@@ -138,20 +138,14 @@ class PopupUploadFile extends React.Component {
   }
 
   loadImage = file => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
+    const img = new Image()
+    const blobUrl = URL.createObjectURL(file)
+    img.src = blobUrl
     return new Promise((resolve, reject) => {
-      reader.onload = e => {
-        const img = new Image()
-        img.src = e.target.result
-        img.onerror = () => reject(new Error())
-        img.onload = () => {
-          if (e.total > 0) {
-            resolve(e.target.result)
-          } else reject(new Error())
-        }
+      img.onerror = () => reject(new Error())
+      img.onload = () => {
+        resolve(blobUrl)
       }
-      reader.onerror = () => reject(new Error())
     })
   }
 
