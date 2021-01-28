@@ -374,8 +374,9 @@ export class PublicProfile extends React.Component {
   isPublicProfileEditable = (connectedUser, publicProfileId, profileObject) => {
     const isConnectedUserOnHisOwnProfile = connectedUser.userId === publicProfileId
     const isUserAdmin = connectedUser.profile === profileObject.administrator.slug
+    const isInformationSchemaObjectEmpty = Object.keys(this.state.informationSchemaObject).length === 0
 
-    return isConnectedUserOnHisOwnProfile || isUserAdmin
+    return (isConnectedUserOnHisOwnProfile || isUserAdmin) && !isInformationSchemaObjectEmpty
   }
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
@@ -420,7 +421,7 @@ export class PublicProfile extends React.Component {
               recommendedDimensions={COVER_IMAGE_DIMENSIONS}
             />
           )}
-          
+
           <CoverImage
             displayedUser={state.displayedUser}
             changeEnabled={isPublicProfileEditable}
@@ -429,7 +430,7 @@ export class PublicProfile extends React.Component {
             coverImageName={coverImageName}
             coverImageAlt={coverImageAlt}
           />
-          
+
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
