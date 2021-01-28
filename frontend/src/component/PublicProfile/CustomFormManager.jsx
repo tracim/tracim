@@ -190,6 +190,7 @@ const SchemaAsView = props => {
           icon='pencil-square-o'
           onClick={props.onClickToggleButton}
           text={props.validateLabel}
+          dataCy='CustomFormManager__updateProfile__edit__button'
         />
       )}
     </div>
@@ -241,6 +242,7 @@ class SchemaAsForm extends React.Component {
           icon='check'
           type='submit'
           text={props.validateLabel}
+          dataCy='CustomFormManager__updateProfile__validate__button'
         />
       </Form>
     )
