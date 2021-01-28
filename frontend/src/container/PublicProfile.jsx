@@ -420,7 +420,7 @@ export class PublicProfile extends React.Component {
               recommendedDimensions={COVER_IMAGE_DIMENSIONS}
             />
           )}
-          
+
           <CoverImage
             displayedUser={state.displayedUser}
             changeEnabled={isPublicProfileEditable}
@@ -429,7 +429,7 @@ export class PublicProfile extends React.Component {
             coverImageName={coverImageName}
             coverImageAlt={coverImageAlt}
           />
-          
+
           <ProfileMainBar
             displayedUser={state.displayedUser}
             breadcrumbsList={props.breadcrumbs}
