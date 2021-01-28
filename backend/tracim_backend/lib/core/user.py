@@ -286,9 +286,13 @@ class UserApi(object):
             )
         )
 
-        # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
-        # should show only user in same workspace as user
         assert not (filter_results and not self._user)
+        # INFO - G.M - 2021-01-28 - Warning ! Rule access here should be consistent
+        # with "knows_candidate_user" checker.
+        # A user "knows" another user when either of the following condition is true:
+        #  - filter of users is disabled
+        #  - User is trusted-user (or more)
+        #  - users have at least one common space
         if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
             users_in_workspaces = self._get_user_ids_in_same_workspace(self._user.user_id)
             query = query.filter(User.user_id.in_(users_in_workspaces))

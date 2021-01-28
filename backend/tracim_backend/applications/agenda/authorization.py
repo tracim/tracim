@@ -13,7 +13,7 @@ from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
-from tracim_backend.lib.utils.authorization import SameUserChecker
+from tracim_backend.lib.utils.authorization import CandidateIsCurrentUserChecker
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -136,5 +136,5 @@ class CaldavChecker(AuthorizationChecker):
 
 can_access_workspace_root_agenda = CaldavChecker(CanAccessWorkspaceRootAgendaChecker())
 can_access_workspace_event_agenda = CaldavChecker(CanAccessWorkspaceEventAgendaChecker())
-can_access_user_agenda = CaldavChecker(SameUserChecker())
+can_access_user_agenda = CaldavChecker(CandidateIsCurrentUserChecker())
 can_access_to_agenda_list = CaldavChecker(is_user)
