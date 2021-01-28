@@ -21,12 +21,12 @@ If you want to change the schema in an incompatible way with the existing proper
 
 You can set a schema for all users of the instance in the settings (`development.ini`):
 
-Simple example:
+Simple example with `user.custom_properties.dir` shortcut:
 ```ini
-user_custom_properties_dir = %(here)s/examples/user_custom_properties/organization
-user.custom_properties.json_schema_file_path = %(user_custom_properties_dir)s/schema.json
-user.custom_properties.ui_schema_file_path = %(user_custom_properties_dir)s/ui.json
-user.custom_properties.translations_dir_path = %(user_custom_properties_dir)s/locale
+user.custom_properties.dir = %(here)s/examples/user_custom_properties/organization
+user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
+user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
+user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 ```
 See [examples files related](../examples/user_custom_properties).
 
