@@ -335,7 +335,7 @@
   "Error while saving public profile": "Erro ao salvar o perfil público",
   "Personal Page": "Página pessoal",
   "{{ count }} intervention ": "{{ count }} intervenção ",
-  "{{ count }} contribution _plural": "{{ count }} intervenções ",
+  "{{ count }} intervention _plural": "{{ count }} intervenções ",
   "in {{ count }} space": "em {{ count }} espaço",
   "in {{ count }} space_plural": "em {{ count }} espaços",
   "Upload an image": "Carregar imagem",
