@@ -22,7 +22,7 @@
     },
     "website": {
       "type": "string",
-      "title": "Website"
+      "title": "Personal Website"
     },
     "birthday": {
       "type": "string",
