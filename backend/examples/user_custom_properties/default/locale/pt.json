@@ -1,10 +1,9 @@
 {
   "Tagline": "Slogan",
-  "Localization": "Localização",
+  "Location": "Localização",
   "Hobbies": "Passatempos",
   "Personal Website": "Website pessoal",
   "Birthday": "Data de nascimento",
   "Phone": "Telefone",
-  "Languages": "Línguas",
-  "Personal Page": "Página pessoal"
+  "Languages": "Línguas"
 }

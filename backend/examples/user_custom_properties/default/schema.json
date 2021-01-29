@@ -9,9 +9,9 @@
       "type": "string",
       "title": "Tagline"
     },
-    "localization": {
+    "location": {
       "type": "string",
-      "title": "Localization"
+      "title": "Location"
     },
     "hobbies": {
       "title": "Hobbies",
@@ -43,7 +43,7 @@
     },
     "personal_page": {
       "type": "string",
-      "title": "Personal Page"
+      "title": " "
     }
   }
 }
