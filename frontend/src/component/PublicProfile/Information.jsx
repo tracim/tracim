@@ -28,7 +28,7 @@ export const Information = props => {
           </div>
         </div>
         <div>
-          {props.t('{{ count }} contribution ', { count: props.authoredContentRevisionsCount })}
+          {props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })}
           {props.t('in {{ count }} space', { count: props.authoredContentRevisionsSpaceCount })}
         </div>
       </div>
