@@ -25,6 +25,8 @@ const DisplaySchemaPropertyString = props => {
       <span
         className={classnames(
           'DisplaySchemaPropertyString__label',
+          // INFO - GB - 20210129 - We check the space to not put : in the case of a fake empty label
+          // See https://github.com/tracim/tracim/issues/4123
           { noLabel: !props.label || props.label === ' ' }
         )}
       >
