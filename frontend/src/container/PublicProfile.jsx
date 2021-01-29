@@ -268,11 +268,11 @@ export class PublicProfile extends React.Component {
   splitSchema = (schema, uiSchema) => {
     const informationSchema = {
       ...schema,
-      required: schema.required.filter(field =>
+      required: (schema.required || []).filter(field =>
         this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
       ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) =>
+        Object.entries(schema.properties || {}).filter(([key, val]) =>
           this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
         )
       )
@@ -281,11 +281,11 @@ export class PublicProfile extends React.Component {
       ...schema,
       title: '', // INFO - CH - 20210122 - reset title and description since they are used for first form
       description: '',
-      required: schema.required.filter(field =>
+      required: (schema.required || []).filter(field =>
         this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
       ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) =>
+        Object.entries(schema.properties || {}).filter(([key, val]) =>
           this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
         )
       )
@@ -321,7 +321,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const result = await props.dispatch(getCustomPropertiesSchema())
     switch (result.status) {
-      case 200: return result.json.json_schema
+      case 200: return result.json.json_schema || {}
       default: return {}
     }
   }
@@ -330,7 +330,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const result = await props.dispatch(getCustomPropertiesUiSchema())
     switch (result.status) {
-      case 200: return result.json.ui_schema
+      case 200: return result.json.ui_schema || {}
       default: return {}
     }
   }
