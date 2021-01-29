@@ -23,7 +23,7 @@ You can set a schema for all users of the instance in the settings (`development
 
 Simple example with `user.custom_properties.dir` shortcut:
 ```ini
-user.custom_properties.dir = %(here)s/examples/user_custom_properties/organization
+user.custom_properties.dir = %(here)s/examples/user_custom_properties/default
 user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
 user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
 user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
