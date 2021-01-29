@@ -201,6 +201,9 @@ jobs:
       env:
         - TRAVIS_NODE_VERSION="10"
         - NO_VIRTUAL_ENV="1"
+        - TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/schema.json
+        - TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/ui.json
+        - TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/locale
       script:
         - ./run_dev_backend.sh cypress run
       if: commit_message !~ /(\[skip ci cypress\])/
