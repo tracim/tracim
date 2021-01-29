@@ -26,6 +26,7 @@
     },
     "birthday": {
       "type": "string",
+      "format": "date"
       "title": "Birthday"
     },
     "telephone": {
