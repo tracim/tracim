@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "",
-  "description": "Info about this user",
+  "description": "",
   "type": "object",
   "required": [],
   "properties": {
