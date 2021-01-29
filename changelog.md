@@ -1,4 +1,4 @@
-## 3.5.0 / 2021-xx-xx
+# 3.5.0 / 2021-xx-xx
 
 ### New Features
 
@@ -15,11 +15,11 @@
 
 ### Known Issues
 
-- SQLite: IDs of objects can be re-used on database (issue [#4016](https://github.com/tracim/tracim/issues/4016))
+- SQLite: After deleting a content/user/space directly in the database its id can be re-used (see details here). This can lead Tracim to display information referring to the wrong content/user/space in the notification wall and activity feed. (issue [#4016](https://github.com/tracim/tracim/issues/4016))
 
 ### Breaking Changes
 
-- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901))
+- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901) and issue [#4113](https://github.com/tracim/tracim/issues/4113))
 
 ### Others
 
