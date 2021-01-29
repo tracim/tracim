@@ -31,7 +31,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__profile__link'
           key='menuprofil__dropdown__profile__link'
         >
-          <i className='fa fa-fw fa-user-o' />
+          <i className='fas fa-fw fa-user-o' />
           {props.t('My profile')}
         </Link>
 
@@ -40,7 +40,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__account__link'
           key='menuprofil__dropdown__account__link'
         >
-          <i className='fa fa-fw fa-cogs' />
+          <i className='fas fa-fw fa-cogs' />
           {props.t('Account Settings')}
         </Link>
 
@@ -50,7 +50,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__logout__link'
           key='menuprofil__dropdown__logout__link'
         >
-          <i className='fa fa-fw fa-sign-out' />
+          <i className='fas fa-fw fa-sign-out' />
           {props.t('Logout')}
         </button>
       </DropdownMenu>

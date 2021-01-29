@@ -7,7 +7,7 @@ const PromptMessage = props => (
     data-cy='promptMessage'
   >
     <div className='promptMessage__msg'>
-      <i className={`fa fa-fw fa-${props.icon}`} />
+      <i className={`fas fa-fw fa-${props.icon}`} />
       {props.msg}
     </div>
 
@@ -17,7 +17,7 @@ const PromptMessage = props => (
         onClick={props.onClickBtn}
         title={props.tooltip}
       >
-        <i className={`fa fa-fw fa-${props.icon}`} />
+        <i className={`fas fa-fw fa-${props.icon}`} />
         {props.btnLabel}
       </button>
     )}

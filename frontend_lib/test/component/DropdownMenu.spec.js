@@ -24,7 +24,7 @@ describe('<DropdownMenu />', () => {
     it('if it has a buttonIcon prop, the dropdown button should have this icon', () => {
       const icon = 'fa-icon'
       wrapper.setProps({ buttonIcon: icon })
-      expect(wrapper.find('button.dropdown-toggle > i').prop('className')).to.equal(`fa fa-fw ${icon}`)
+      expect(wrapper.find('button.dropdown-toggle > i').prop('className')).to.equal(`fas fa-fw ${icon}`)
     })
 
     it('if it has not a buttonIcon prop, the dropdown button should not have a icon', () => {

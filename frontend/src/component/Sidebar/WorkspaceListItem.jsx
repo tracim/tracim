@@ -92,7 +92,7 @@ class WorkspaceListItem extends React.Component {
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
+            <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
           )}
 
           {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
@@ -131,7 +131,7 @@ class WorkspaceListItem extends React.Component {
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
-                <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
+                <i className={classnames(`fas fa-fw fa-${allowedApp.faIcon}`)} />
                 {props.t(allowedApp.label)}
               </Link>
             )}

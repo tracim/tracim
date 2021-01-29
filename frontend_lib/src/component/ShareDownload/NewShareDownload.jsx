@@ -70,7 +70,7 @@ export class NewShareDownload extends React.Component {
             key='share_emails'
             style={{ ':hover': { color: props.hexcolor } }}
           >
-            <i className='fa fa-fw fa-question-circle' />
+            <i className='fas fa-fw fa-question-circle' />
           </button>
 
           <Popover
@@ -89,7 +89,7 @@ export class NewShareDownload extends React.Component {
             <div className='shareDownload__password'>
               <div className='shareDownload__password__active'>
                 <div className='shareDownload__password__wrapper'>
-                  <i className='fa fa-fw fa-lock' />
+                  <i className='fas fa-fw fa-lock' />
 
                   <input
                     type={state.hidePassword ? 'password' : 'text'}
@@ -109,7 +109,7 @@ export class NewShareDownload extends React.Component {
                     data-cy='seePassword'
                     onClick={this.handleTogglePasswordVisibility}
                   >
-                    <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                    <i className={state.hidePassword ? 'fas fa-fw fa-eye' : 'fas fa-fw fa-eye-slash'} />
                   </button>
                 </div>
 
@@ -121,7 +121,7 @@ export class NewShareDownload extends React.Component {
                   style={{ ':hover': { color: props.hexcolor } }}
                   onClick={this.handleRandomPassword}
                 >
-                  <i className='fa fa-fw fa-repeat' />
+                  <i className='fas fa-fw fa-repeat' />
                 </button>
               </div>
               <span className='shareDownload__password__link' onClick={this.handleTogglePasswordActive}>

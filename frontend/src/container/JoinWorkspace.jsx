@@ -107,7 +107,7 @@ export class JoinWorkspace extends React.Component {
           icon = SUBSCRIPTION_TYPE.pending.faIcon
           break
       }
-      return <div><i className={`fa fa-${icon}`} /> {text}</div>
+      return <div><i className={`fas fa-${icon}`} /> {text}</div>
     }
 
     switch (workspace.accessType) {
@@ -133,8 +133,8 @@ export class JoinWorkspace extends React.Component {
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
-      : <i className='fa fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
+      ? <i className={`fas fa-fw fa-2x fa-${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
+      : <i className='fas fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
     // RJ - 2020-10-30 - NOTE
     // This code uses props.t on a key that is translated in frontend_lib (spaceType.tradKey[0]).
     // This works because translations are grouped during compilation.

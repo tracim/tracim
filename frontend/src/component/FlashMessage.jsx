@@ -33,13 +33,13 @@ export const FlashMessage = props => {
             {props.showCloseButton && (
               <div className='flashmessage__container__close'>
                 <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
-                  <i className='fa fa-times' />
+                  <i className='fas fa-times' />
                 </div>
               </div>
             )}
             <div className='flashmessage__container__content'>
               <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
-                <i className={classnames(`fa fa-${dataType.icon}`)} />
+                <i className={classnames(`fas fa-${dataType.icon}`)} />
               </div>
 
               <div className='flashmessage__container__content__text'>

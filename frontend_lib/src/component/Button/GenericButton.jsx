@@ -23,7 +23,7 @@ const GenericButton = props => {
       }}
     >
       {props.faIcon !== '' && (
-        <i className={`fa fa-${props.faIcon} genericButton__icon`} />
+        <i className={`fas fa-${props.faIcon} genericButton__icon`} />
       )}
       <span className='genericButton__label'>
         {props.label}

@@ -56,7 +56,7 @@ export class MemberList extends React.Component {
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>
                         <div className='memberlist__btnadd__button__avatar__icon'>
-                          <i className='fa fa-plus' />
+                          <i className='fas fa-plus' />
                         </div>
                       </div>
 
@@ -112,7 +112,7 @@ export class MemberList extends React.Component {
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
                         >
-                          <i className='fa fa-trash-o' />
+                          <i className='fas fa-trash-o' />
                         </div>
                       )}
                     </li>

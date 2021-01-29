@@ -70,7 +70,7 @@ export class NewUpload extends React.Component {
             key='uploadEmails'
             style={{ ':hover': { color: customColor } }}
           >
-            <i className='fa fa-fw fa-question-circle' />
+            <i className='fas fa-fw fa-question-circle' />
           </button>
           <Popover
             placement='bottom'
@@ -89,7 +89,7 @@ export class NewUpload extends React.Component {
             <div className='newUpload__password'>
               <div className='newUpload__password__active'>
                 <div className='newUpload__password__wrapper'>
-                  <i className='fa fa-fw fa-lock' />
+                  <i className='fas fa-fw fa-lock' />
 
                   <input
                     type={state.hidePassword ? 'password' : 'text'}
@@ -108,7 +108,7 @@ export class NewUpload extends React.Component {
                     data-cy='seePassword'
                     onClick={this.handleTogglePasswordVisibility}
                   >
-                    <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                    <i className={state.hidePassword ? 'fas fa-fw fa-eye' : 'fas fa-fw fa-eye-slash'} />
                   </button>
                 </div>
 
@@ -120,7 +120,7 @@ export class NewUpload extends React.Component {
                   style={{ ':hover': { color: customColor } }}
                   onClick={this.handleRandomPassword}
                 >
-                  <i className='fa fa-fw fa-repeat' />
+                  <i className='fas fa-fw fa-repeat' />
                 </button>
               </div>
 

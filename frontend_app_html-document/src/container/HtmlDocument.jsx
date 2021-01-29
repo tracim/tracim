@@ -788,7 +788,7 @@ export class HtmlDocument extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}

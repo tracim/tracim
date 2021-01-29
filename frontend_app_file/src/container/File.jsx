@@ -1018,7 +1018,7 @@ export class File extends React.Component {
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                   data-cy='appFileLastVersionBtn'
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}

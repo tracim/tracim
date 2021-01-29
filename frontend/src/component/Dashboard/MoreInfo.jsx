@@ -10,7 +10,7 @@ export const MoreInfo = props =>
         onClick={props.onClickToggleWebdav}
       >
         <div className='moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>
-          <i className='fa fa-windows' />
+          <i className='fas fa-windows' />
         </div>
 
         <div className='moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
@@ -38,7 +38,7 @@ export const MoreInfo = props =>
           onClick={props.onClickToggleCalendar}
         >
           <div className='moreinfo__calendar__btn__icon genericBtnInfoDashboard__btn__icon'>
-            <i className='fa fa-calendar' />
+            <i className='fas fa-calendar' />
           </div>
 
           <div className='moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text d-flex align-self-center'>

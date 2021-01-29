@@ -748,7 +748,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fas fa-fw fa-undo' />
               </button>
 
               <button
@@ -756,7 +756,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fas fa-fw fa-undo' />
               </button>
 
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
@@ -765,7 +765,7 @@ export class Gallery extends React.Component {
                   onClick={this.handleOpenDeleteFilePopup}
                   data-cy='gallery__action__button__delete'
                 >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fa fa-fw fa-trash' />
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fas fa-fw fa-trash' />
                 </button>
               )}
             </div>
@@ -783,7 +783,7 @@ export class Gallery extends React.Component {
                 />
               ) : (
                 <div className='gallery__loader'>
-                  <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+                  <i className='fas fa-spinner fa-spin gallery__loader__icon' />
                 </div>
               )
             )}
@@ -834,7 +834,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__rotation__left'
                         key='btn_rotate_left'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fas fa-fw fa-undo' />
                       </button>
                     ), (
                       <button
@@ -843,7 +843,7 @@ export class Gallery extends React.Component {
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fas fa-fw fa-undo' />
                       </button>
                     ), (
                       <a
@@ -854,7 +854,7 @@ export class Gallery extends React.Component {
                         rel='noopener noreferrer'
                         key='btn_open_raw'
                       >
-                        <i className='fa fa-fw fa-download' />
+                        <i className='fas fa-fw fa-download' />
                       </a>
                     )]}
                   />

@@ -163,8 +163,8 @@ export class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
-            ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
+            ? <i className={classnames('fas fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fas fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
         <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
@@ -172,7 +172,7 @@ export class Sidebar extends React.Component {
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
             see https://github.com/tracim/tracim/issues/1554
             <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
-              <i className='fa fa-chevron-up' />
+              <i className='fas fa-chevron-up' />
             </div>
             */}
 

@@ -29,7 +29,7 @@ export const RecentActivity = props =>
 
           const recentActivityItemIcon = (
             <div className='recentactivity__list__item__icon' style={{ color: contentType.hexcolor }}>
-              <i className={`fa fa-${contentType.faIcon}`} />
+              <i className={`fas fa-${contentType.faIcon}`} />
             </div>
           )
 

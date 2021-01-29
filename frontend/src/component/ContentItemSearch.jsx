@@ -21,7 +21,7 @@ export const ContentItemSearch = props => {
         title={props.t(props.contentType.label)}
         style={{ color: props.contentType.hexcolor }}
       >
-        <i className={`fa fa-fw fa-${props.faIcon}`} />
+        <i className={`fas fa-fw fa-${props.faIcon}`} />
       </div>
 
       <div
@@ -61,7 +61,7 @@ export const ContentItemSearch = props => {
           {props.t(status.label)}
         </div>
         <div className='content__status__icon'>
-          <i className={`fa fa-fw fa-${status.faIcon}`} />
+          <i className={`fas fa-fw fa-${status.faIcon}`} />
         </div>
       </div>
     </Link>

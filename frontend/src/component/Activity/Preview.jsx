@@ -203,7 +203,7 @@ class Preview extends React.Component {
   noPreviewComponent (details) {
     return (
       <>
-        <i className='fa fa-eye-slash' />
+        <i className='fas fa-eye-slash' />
         <span>{details}</span>
       </>
     )

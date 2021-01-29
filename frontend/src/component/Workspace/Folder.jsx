@@ -94,7 +94,7 @@ class Folder extends React.Component {
               title={props.t('Folder')}
               style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
-              <i className={classnames('fa fa-fw', this.calculateIcon())} />
+              <i className={classnames('fas fa-fw', this.calculateIcon())} />
             </div>
 
             <div className='folder__header__name'>
@@ -112,7 +112,7 @@ class Folder extends React.Component {
                         {`${props.t('Create in folder')}...`}
                       </span>
                       <span className='folder__header__button__addbtn__text-responsive'>
-                        <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
+                        <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
                       </span>
                     </span>
                   }
@@ -131,7 +131,7 @@ class Folder extends React.Component {
                       key={`${props.folderData.id}__${app.slug}`}
                     >
                       <i
-                        className={`fa fa-fw fa-${app.faIcon}`}
+                        className={`fas fa-fw fa-${app.faIcon}`}
                         style={{ color: app.hexcolor }}
                       />
                       {props.t(app.creationLabel)}

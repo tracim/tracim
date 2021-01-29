@@ -23,7 +23,7 @@ class UserSpacesConfigLine extends React.Component {
         <td>
           <div className='spaceconfig__table__role'>
             <div className='spaceconfig__table__role__icon'>
-              <i className={`fa fa-fw fa-${memberRole.faIcon}`} style={{ color: memberRole.hexcolor }} />
+              <i className={`fas fa-fw fa-${memberRole.faIcon}`} style={{ color: memberRole.hexcolor }} />
             </div>
             <div className='spaceconfig__table__role__text d-none d-sm-flex'>
               {props.t(memberRole.label)}

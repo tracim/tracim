@@ -97,7 +97,7 @@ export class ContentActivityHeader extends React.Component {
             to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
             key={`open-${contentId}`}
           >
-            <i className={`fa fa-fw fa-${app.faIcon}`} />
+            <i className={`fas fa-fw fa-${app.faIcon}`} />
             {props.t('Open content')}
           </Link>
         </DropdownMenu>

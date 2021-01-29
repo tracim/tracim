@@ -13,7 +13,7 @@ export const Tab = props => {
       title={props.label}
       to={props.page}
     >
-      <i className={`fa fa-fw fa-${props.icon}`} />
+      <i className={`fas fa-fw fa-${props.icon}`} />
       <span className='tab__label'>{props.label}</span>
     </Link>
   )

@@ -10,7 +10,7 @@ export const DragHandle = props => (
     ref={props.connectDragSource}
     style={props.style}
   >
-    <i className='fa fa-arrows' />
+    <i className='fas fa-arrows' />
   </div>
 )
 

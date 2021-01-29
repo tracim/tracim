@@ -20,7 +20,7 @@ export const ContentTypeBtn = props =>
   >
     <div className={classnames(`${props.customClass}__text`)}>
       <div className={classnames(`${props.customClass}__text__icon`)}>
-        <i className={`fa fa-${props.faIcon}`} />
+        <i className={`fas fa-${props.faIcon}`} />
       </div>
       <div className={classnames(`${props.customClass}__text__title`)}>
         {props.creationLabel}

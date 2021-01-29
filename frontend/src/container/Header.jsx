@@ -163,7 +163,7 @@ export class Header extends React.Component {
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     to={PAGE.AGENDA}
                   >
-                    <i className='fa fa-fw fa-calendar' />
+                    <i className='fas fa-fw fa-calendar' />
                     {props.t('Agendas')}
                   </Link>
                 </li>

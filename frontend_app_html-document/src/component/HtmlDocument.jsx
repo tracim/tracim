@@ -27,7 +27,7 @@ export const HtmlDocument = props => {
           }
           btnType='link'
           icon='hand-o-right'
-          btnLabel={<i className='fa fa-times' />}
+          btnLabel={<i className='fas fa-times' />}
           onClickBtn={props.onClickCloseNotifyAllMessage}
         />
       )}

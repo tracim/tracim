@@ -89,9 +89,9 @@ describe('<PopupCreateWorkspace />', () => {
             expect(wrapper.update().state('parentOptions')).to.deep.equal(
               [
                 { value: 'None', label: 'None', spaceId: null, parentId: null },
-                { value: 'a', label: <span title='a'>{''} <i className='fa fa-fw fa-user-secret' /> {'a'}</span>, spaceId: 1, parentId: null },
-                { value: 'b', label: <span title='b'>{'-'} <i className='fa fa-fw fa-user-secret' /> {'b'}</span>, spaceId: 2, parentId: 1 },
-                { value: 'c', label: <span title='c'>{'--'} <i className='fa fa-fw fa-user-secret' /> {'c'}</span>, spaceId: 3, parentId: 2 }
+                { value: 'a', label: <span title='a'>{''} <i className='fas fa-fw fa-user-secret' /> {'a'}</span>, spaceId: 1, parentId: null },
+                { value: 'b', label: <span title='b'>{'-'} <i className='fas fa-fw fa-user-secret' /> {'b'}</span>, spaceId: 2, parentId: 1 },
+                { value: 'c', label: <span title='c'>{'--'} <i className='fas fa-fw fa-user-secret' /> {'c'}</span>, spaceId: 3, parentId: 2 }
               ]
             )
           }).then(done, done)

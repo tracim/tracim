@@ -20,7 +20,7 @@ const AdminLink = props => {
         data-cy='adminlink__workspace__link'
         key='adminlink__workspace__link'
       >
-        <i className={`fa fa-fw fa-${workspaceConfig.faIcon}`} />
+        <i className={`fas fa-fw fa-${workspaceConfig.faIcon}`} />
         {props.t('Spaces')}
       </Link>
 
@@ -29,7 +29,7 @@ const AdminLink = props => {
         data-cy='adminlink__user__link'
         key='adminlink__user__link'
       >
-        <i className='fa fa-fw fa-user-o' />
+        <i className='fas fa-fw fa-user-o' />
         {props.t('Users')}
       </Link>
     </DropdownMenu>

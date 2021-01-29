@@ -82,7 +82,7 @@ const CoverImage = translate()((props) => {
         )
         : (
           <div className='profile__cover__loading'>
-            <i className='fa fa-fw fa-spinner fa-spin' />
+            <i className='fas fa-fw fa-spinner fa-spin' />
             {props.t('Loading')}
           </div>)}
     </div>
@@ -101,8 +101,8 @@ const PopupUploadImage = translate()((props) => {
       allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
       maximumFileSize={MAXIMUM_IMAGE_SIZE}
     >
-      <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
-      <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+      <i className='fas fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
+      <i className='fas fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
     </PopupUploadFile>
   )
 })

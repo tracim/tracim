@@ -6,7 +6,7 @@ const WsContent = props => {
   return (
     <div className='wscontent p-3'>
       <div className='wscontent__close d-flex justify-content-end'>
-        <i className='fa fa-times' />
+        <i className='fas fa-times' />
       </div>
 
       <div className='wscontent__contentname d-flex align-items-center mb-4'>

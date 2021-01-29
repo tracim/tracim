@@ -9,7 +9,7 @@ const RefreshWarningMessage = props => (
     title={props.tooltip}
   >
     <i
-      className='fa fa-repeat'
+      className='fas fa-repeat'
       onClick={props.onClickRefresh}
     />
     <div className='refreshWarningMessage__text'>

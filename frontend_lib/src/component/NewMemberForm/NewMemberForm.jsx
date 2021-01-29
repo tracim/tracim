@@ -12,7 +12,7 @@ export const NewMemberForm = props => {
   return (
     <div className='memberlist__form'>
       <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>
-        <i className='fa fa-times' />
+        <i className='fas fa-times' />
       </div>
 
       <div className='memberlist__form__member'>
@@ -79,7 +79,7 @@ export const NewMemberForm = props => {
                       onClick={props.onClickAutoComplete}
                     >
                       <div className='autocomplete__item__icon'>
-                        <i className='fa fa-fw fa-user-plus' />
+                        <i className='fas fa-fw fa-user-plus' />
                       </div>
 
                       <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
@@ -93,7 +93,7 @@ export const NewMemberForm = props => {
                       onClick={props.onClickAutoComplete}
                     >
                       <div className='autocomplete__item__icon'>
-                        <i className='fa fa-fw fa-user-secret' />
+                        <i className='fas fa-fw fa-user-secret' />
                       </div>
 
                       <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
@@ -113,7 +113,7 @@ export const NewMemberForm = props => {
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+                  <i className='name__adminmsg__icon fas fa-fw fa-lightbulb-o' />
                   {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
                 </div>
               )
@@ -150,7 +150,7 @@ export const NewMemberForm = props => {
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
-          <i className='fa fa-fw fa-check' />
+          <i className='fas fa-fw fa-check' />
         </button>
       </div>
     </div>

@@ -39,7 +39,7 @@ class PopinFixedRightPart extends React.Component {
                 style={{ borderColor: isMenuActive ? props.customColor : 'transparent' }}
                 data-cy={`popin_right_part_${menuItem.id}`}
               >
-                <i className={`fa fa-fw ${menuItem.icon}`} />
+                <i className={`fas fa-fw ${menuItem.icon}`} />
               </button>
             )
           })}
@@ -48,7 +48,7 @@ class PopinFixedRightPart extends React.Component {
             className='wsContentGeneric__content__right__header__icon__close'
             title={props.rightPartOpen ? props.t('Hide') : props.t('Show')}
           >
-            <i className={classnames('fa fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
+            <i className={classnames('fas fa-fw', { 'fa-chevron-right': props.rightPartOpen, 'fa-chevron-left': !props.rightPartOpen })} />
           </div>
         </div>
 

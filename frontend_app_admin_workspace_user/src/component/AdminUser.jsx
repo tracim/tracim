@@ -188,7 +188,7 @@ export class AdminUser extends React.Component {
 
                       <td>
                         <i
-                          className={`fa fa-fw fa-2x fa-${userProfile.faIcon}`}
+                          className={`fas fa-fw fa-2x fa-${userProfile.faIcon}`}
                           style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />

@@ -6,12 +6,12 @@ const GenericContent = props => {
   return (
     <div className='genericcontent p-3'>
       <div className='genericcontent__close d-flex justify-content-end'>
-        <i className='fa fa-times' />
+        <i className='fas fa-times' />
       </div>
 
       <div className='genericcontent__contentname d-flex align-items-center mb-4'>
         <div className='genericcontent__contentname__icon mr-3'>
-          <i className='fa fa-file-word-o' />
+          <i className='fas fa-file-word-o' />
         </div>
 
         <div className='genericcontent__contentname__title'>

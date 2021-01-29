@@ -23,7 +23,7 @@ export const SingleChoiceList = props => {
 
             <div className='singleChoiceList__item__text'>
               <div className='singleChoiceList__item__text__icon' style={{ color: listItem.hexcolor }}>
-                <i className={`fa fa-fw fa-${listItem.faIcon}`} />
+                <i className={`fas fa-fw fa-${listItem.faIcon}`} />
               </div>
 
               <div className='singleChoiceList__item__text__content'>

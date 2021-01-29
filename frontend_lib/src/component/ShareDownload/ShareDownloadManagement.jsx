@@ -51,7 +51,7 @@ class ShareDownloadManagement extends React.Component {
               }}
             >
               {props.t('New')}
-              <i className='fa fa-fw fa-plus-circle' />
+              <i className='fas fa-fw fa-plus-circle' />
             </button>}
         </div>
 

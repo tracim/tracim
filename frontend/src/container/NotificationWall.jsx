@@ -374,7 +374,7 @@ export class NotificationWall extends React.Component {
             const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
-                ? <i className={`fa fa-fw fa-${icons[0]}`} />
+                ? <i className={`fas fa-fw fa-${icons[0]}`} />
                 : <ComposedIcon mainIcon={icons[0]} smallIcon={icons[1]} />
             )
 
@@ -411,7 +411,7 @@ export class NotificationWall extends React.Component {
                       }}
                     />
                   </div>
-                  {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
+                  {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
                 </Link>
               </ListItemWrapper>
             )

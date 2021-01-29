@@ -490,10 +490,10 @@ class ActionDescription(object):
 #     #                 'closed-deprecated': l_('deprecated')}
 #     #
 #     # _ICONS = {
-#     #     'open': 'fa fa-square-o',
-#     #     'closed-validated': 'fa fa-check-square-o',
-#     #     'closed-unvalidated': 'fa fa-close',
-#     #     'closed-deprecated': 'fa fa-warning',
+#     #     'open': 'fas fa-square-o',
+#     #     'closed-validated': 'fas fa-check-square-o',
+#     #     'closed-unvalidated': 'fas fa-close',
+#     #     'closed-deprecated': 'fas fa-warning',
 #     # }
 #     #
 #     # _CSS = {
@@ -564,23 +564,23 @@ class ActionDescription(object):
 #     # _ICONS = {  # Deprecated
 #     #     'dashboard': 'fa-home',
 #     #     'workspace': 'fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
+#     #     'folder': 'fas fa-folder-open-o',
+#     #     'file': 'fas fa-paperclip',
+#     #     'page': 'fas fa-file-text-o',
+#     #     'thread': 'fas fa-comments-o',
+#     #     'comment': 'fas fa-comment-o',
+#     #     'event': 'fas fa-agenda-o',
 #     # }
 #     #
 #     # _CSS_ICONS = {
-#     #     'dashboard': 'fa fa-home',
-#     #     'workspace': 'fa fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
+#     #     'dashboard': 'fas fa-home',
+#     #     'workspace': 'fas fa-bank',
+#     #     'folder': 'fas fa-folder-open-o',
+#     #     'file': 'fas fa-paperclip',
+#     #     'page': 'fas fa-file-text-o',
+#     #     'thread': 'fas fa-comments-o',
+#     #     'comment': 'fas fa-comment-o',
+#     #     'event': 'fas fa-agenda-o',
 #     # }
 #     #
 #     # _CSS_COLORS = {
