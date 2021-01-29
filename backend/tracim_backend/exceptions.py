@@ -536,6 +536,10 @@ class UnknownAuthType(TracimException):
     pass
 
 
+class AllUsersAreNotKnown(TracimException):
+    pass
+
+
 class MissingLDAPConnector(TracimException):
     pass
 
