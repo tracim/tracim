@@ -14,7 +14,7 @@
   "birthday": {
     "tracim:display_group": "public_profile_first"
   },
-  "telephone": {
+  "phone": {
     "ui:options": {
       "inputType": "tel"
     },

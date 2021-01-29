@@ -29,9 +29,9 @@
       "format": "date",
       "title": "Birthday"
     },
-    "telephone": {
+    "phone": {
       "type": "string",
-      "title": "Telephone",
+      "title": "Phone",
       "minLength": 10
     },
     "languages": {
