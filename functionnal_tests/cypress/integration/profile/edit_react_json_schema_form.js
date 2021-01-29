@@ -1,3 +1,6 @@
+/*
+FIXME - GB - 20210129 - This file is commented because tehir tests are unstable
+See  https://github.com/tracim/tracim/issues/4131
 import { PAGES } from '../../support/urls_commands'
 import baseWorkspace from '../../fixtures/baseWorkspace.json'
 import baseOtherUser from '../../fixtures/baseOtherUser.json'
@@ -55,3 +58,4 @@ describe("Editing the user profile", () => {
     })
   })
 })
+*/
