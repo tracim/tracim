@@ -15,7 +15,7 @@
 
 ### Known Issues
 
-- SQLite: After deleting a content/user/space directly in the database its id can be re-used (see details here). This can lead Tracim to display information referring to the wrong content/user/space in the notification wall and activity feed. (issue [#4016](https://github.com/tracim/tracim/issues/4016))
+- SQLite: After deleting a content/user/space directly in the database its id can be re-used (see details [here](https://sqlite.org/autoinc.html)). This can lead Tracim to display information referring to the wrong content/user/space in the notification wall and activity feed. (issue [#4016](https://github.com/tracim/tracim/issues/4016))
 
 ### Breaking Changes
 
