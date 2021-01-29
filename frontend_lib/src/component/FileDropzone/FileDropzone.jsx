@@ -6,12 +6,14 @@ import { FILE_PREVIEW_STATE } from '../../helper.js'
 
 export const FileDropzone = props => {
   const isPreviewObjectUrl = props.preview.startsWith('blob:')
-  if (isPreviewObjectUrl) {
-    React.useEffect(() => {
-      console.log(`Revoking object URL ${props.preview}`)
-      URL.revokeObjectURL(props.preview)
-    })
-  }
+  React.useEffect(() => {
+    return () => {
+      if (isPreviewObjectUrl) {
+        console.log(`Revoking object URL ${props.preview}`)
+        URL.revokeObjectURL(props.preview)
+      }
+    }
+  })
   return (
     <Dropzone
       onDrop={props.onDrop}
