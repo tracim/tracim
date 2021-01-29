@@ -19,7 +19,7 @@
 
 ### Breaking Changes
 
-- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901) and issue [#4113](https://github.com/tracim/tracim/issues/4113))
+- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901) and [#4113](https://github.com/tracim/tracim/issues/4113))
 
 ### Others
 
