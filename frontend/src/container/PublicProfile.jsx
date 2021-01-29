@@ -378,6 +378,13 @@ export class PublicProfile extends React.Component {
     return isConnectedUserOnHisOwnProfile || isUserAdmin
   }
 
+  isSchemaObjectEmpty = (schemaObject) => {
+    return (
+      (schemaObject && Object.keys(schemaObject).length === 0) ||
+      (schemaObject && schemaObject.properties && Object.keys(schemaObject.properties).length === 0)
+    )
+  }
+
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
@@ -385,6 +392,7 @@ export class PublicProfile extends React.Component {
 
     const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
     const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE)
+    const isFieldEditable = schemaObject => isPublicProfileEditable && !this.isSchemaObjectEmpty(schemaObject)
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
 
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
@@ -445,7 +453,7 @@ export class PublicProfile extends React.Component {
                     schemaObject={state.informationSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.informationDataSchema}
-                    displayEditButton={isPublicProfileEditable}
+                    displayEditButton={isFieldEditable(state.informationSchemaObject)}
                     registrationDate={(new Date(state.displayedUser.created).toLocaleDateString())}
                     authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
                     authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
@@ -469,7 +477,7 @@ export class PublicProfile extends React.Component {
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.personalPageDataSchema}
-                    displayEditButton={isPublicProfileEditable}
+                    displayEditButton={isFieldEditable(state.personalPageSchemaObject)}
                     onSubmitDataSchema={this.handleSubmitDataSchema}
                   />
                 )
