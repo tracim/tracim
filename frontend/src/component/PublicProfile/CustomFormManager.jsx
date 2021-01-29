@@ -25,7 +25,7 @@ const DisplaySchemaPropertyString = props => {
       <span
         className={classnames(
           'DisplaySchemaPropertyString__label',
-          { noLabel: !props.label }
+          { noLabel: !props.label || props.label === ' ' }
         )}
       >
         {props.label}
