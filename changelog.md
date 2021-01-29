@@ -10,7 +10,8 @@
 [#3785](https://github.com/tracim/tracim/issues/3785),
 [#3790](https://github.com/tracim/tracim/issues/3790),
 [#3989](https://github.com/tracim/tracim/issues/3989),
-[#3999](https://github.com/tracim/tracim/issues/3999)
+[#3999](https://github.com/tracim/tracim/issues/3999),
+[#4109](https://github.com/tracim/tracim/issues/4109)
 - Other: [#4062](https://github.com/tracim/tracim/issues/4062)
 
 ### Known Issues
@@ -19,7 +20,7 @@
 
 ### Breaking Changes
 
-- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901) and [#4113](https://github.com/tracim/tracim/issues/4113))
+- Some wording in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
 
 ### Others
 
