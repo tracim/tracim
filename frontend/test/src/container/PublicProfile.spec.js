@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { PublicProfile } from '../../../src/container/PublicProfile.jsx'
 import { user } from '../../hocMock/redux/user/user'
-import { PROFILE } from 'tracim_frontend_lib'
 
 describe('<PublicProfile />', () => {
   const props = {
@@ -20,10 +19,22 @@ describe('<PublicProfile />', () => {
 
   const wrapper = shallow(<PublicProfile {...props} />)
 
-  describe('isPublicProfileEditable()', () => {
-    it('should return false if schemaObject is empty', () => {
+  describe('isSchemaObjectEmpty()', () => {
+    it('should return true if schemaObject is empty', () => {
       expect(
-        wrapper.instance().isPublicProfileEditable(props.user, props.user.userId, PROFILE, {})
+        wrapper.instance().isSchemaObjectEmpty({})
+      ).to.equal(true)
+    })
+
+    it('should return true if the properties of schemaObject are empty', () => {
+      expect(
+        wrapper.instance().isSchemaObjectEmpty({ properties: {} })
+      ).to.equal(true)
+    })
+
+    it('should return false if the properties of schemaObject are not empty', () => {
+      expect(
+        wrapper.instance().isSchemaObjectEmpty({ properties: { att: 'notEmpty' } })
       ).to.equal(false)
     })
   })
