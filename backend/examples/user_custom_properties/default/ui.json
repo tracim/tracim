@@ -12,7 +12,6 @@
     "tracim:display_group": "public_profile_first"
   },
   "birthday": {
-    "ui:widget": "alt-date",
     "tracim:display_group": "public_profile_first"
   },
   "telephone": {
