@@ -384,7 +384,7 @@ export class PublicProfile extends React.Component {
     const { props, state } = this
 
     const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
-    const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE) && state.dataSchemaObject.properties
+    const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE)
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
 
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
