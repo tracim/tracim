@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  CUSTOM_EVENT,
   PAGE,
   PageTitle,
   TracimComponent
@@ -27,12 +28,20 @@ export class PersonalActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(props.handleTlm)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
     this.setHeadTitle()
     this.buildBreadcrumbs()
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   setHeadTitle = () => {
