@@ -28,9 +28,9 @@ BASE_CSP_DIRECTIVES = (
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
-    ("font-src", "data: *"),
-    ("img-src", "data: *"),
-    ("media-src", "data: *"),
+    ("font-src", "data: blob: *"),
+    ("img-src", "data: blob: *"),
+    ("media-src", "data: blob: *"),
     ("object-src", "'none'"),
     ("default-src", "'self'"),
 )

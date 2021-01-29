@@ -46,7 +46,7 @@ const ALLOWED_IMAGE_MIMETYPES = [
   'image/gif',
   'image/webp'
 ]
-const MAXIMUM_IMAGE_SIZE = 1 * 1024 * 1024 // 1 MByte
+const MAXIMUM_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MBytes
 const POPUP_DISPLAY_STATE = {
   AVATAR: 'AVATAR',
   COVER: 'COVER'
