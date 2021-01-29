@@ -287,7 +287,7 @@ class UserApi(object):
         )
 
         assert not (filter_results and not self._user)
-        # INFO - G.M - 2021-01-28 - Warning ! Rule access here should be consistent
+        # INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
         # with "knows_candidate_user" checker.
         # A user "knows" another user when either of the following condition is true:
         #  - filter of users is disabled

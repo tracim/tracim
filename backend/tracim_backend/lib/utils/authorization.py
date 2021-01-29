@@ -276,7 +276,7 @@ class AllUsersAreKnownChecker(AuthorizationChecker):
 
 class OneCommonWorkspaceUserChecker(AuthorizationChecker):
     """
-    Check that the current user has common space with the candidate user.
+    Check that the current user has a common space with the candidate user.
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
@@ -305,7 +305,7 @@ is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
 has_personal_access = OrAuthorizationChecker(CandidateIsCurrentUserChecker(), is_administrator)
 # knows candidate user
-# INFO - G.M - 2021-01-28 - Warning ! Rule access here should be consistent
+# INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
 # with UserApi.get_known_users method.
 # A user "knows" another when either of the following condition is true:
 #  - KNOWN_MEMBERS__FILTER is False
