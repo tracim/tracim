@@ -15,7 +15,7 @@ export const sidebarEntryList = [
     slug: 'contents/thread',
     route: '/ui/workspaces/6/contents?type=thread',
     hexcolor: '#428BCA',
-    fa_icon: 'comments-o',
+    fa_icon: 'comments',
     label: 'Threads'
   }, {
     slug: 'contents/file',
@@ -27,7 +27,7 @@ export const sidebarEntryList = [
     slug: 'contents/html-document',
     route: '/ui/workspaces/6/contents?type=html-document',
     hexcolor: '#00CC00',
-    fa_icon: 'file-text-o',
+    fa_icon: 'file-text',
     label: 'Notes'
   }, {
     slug: 'agenda',
@@ -39,7 +39,7 @@ export const sidebarEntryList = [
     slug: 'gallery',
     route: '/ui/workspaces/6/gallery',
     hexcolor: '#7d4e24',
-    fa_icon: 'picture-o',
+    fa_icon: 'picture',
     label: 'Gallery'
   }
 ]

@@ -31,7 +31,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__profile__link'
           key='menuprofil__dropdown__profile__link'
         >
-          <i className='fas fa-fw fa-user-o' />
+          <i className='fas fa-fw fa-user' />
           {props.t('My profile')}
         </Link>
 

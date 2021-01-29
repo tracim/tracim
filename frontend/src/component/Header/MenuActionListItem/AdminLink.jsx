@@ -29,7 +29,7 @@ const AdminLink = props => {
         data-cy='adminlink__user__link'
         key='adminlink__user__link'
       >
-        <i className='fas fa-fw fa-user-o' />
+        <i className='fas fa-fw fa-user' />
         {props.t('Users')}
       </Link>
     </DropdownMenu>

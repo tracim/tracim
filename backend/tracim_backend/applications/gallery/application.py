@@ -30,7 +30,7 @@ def create_app() -> TracimApplication:
     return GalleryApp(
         label="Gallery",
         slug="gallery",
-        fa_icon="picture-o",
+        fa_icon="picture",
         config={},
         main_route="/ui/workspaces/{workspace_id}/gallery",
     )

@@ -1,7 +1,7 @@
 export const validated = {
   label: 'Validated',
   slug: 'closed-validated',
-  faIcon: 'check-square-o',
+  faIcon: 'check-square',
   hexcolor: '#008000',
   globalStatus: 'closed'
 }

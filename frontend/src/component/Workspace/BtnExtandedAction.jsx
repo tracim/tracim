@@ -54,7 +54,7 @@ export const ExtandedAction = props => {
           data-cy='extended_action_delete'
           key='extended_action_delete'
         >
-          <i className='fas fa-fw fa-trash-o' />
+          <i className='fas fa-fw fa-trash' />
           {props.onClickExtendedAction.delete.label}
         </button>
       )}
@@ -67,7 +67,7 @@ export const ExtandedAction = props => {
           to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
           key='extended_action_gallery'
         >
-          <i className='fas fa-fw fa-picture-o' />
+          <i className='fas fa-fw fa-picture' />
           {props.t('Gallery')}
         </Link>
       )}

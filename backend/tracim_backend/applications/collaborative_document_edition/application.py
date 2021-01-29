@@ -72,7 +72,7 @@ def create_app() -> TracimApplication:
     return CollaborativeDocumentEditionApp(
         label="Collaborative Document Edition",
         slug="collaborative_document_edition",
-        fa_icon="file-o",
+        fa_icon="file",
         config={},
         main_route="",
     )

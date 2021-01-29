@@ -22,6 +22,6 @@ describe('content :: workspace > dashboard', function () {
     cy.get('.memberlist .memberlist__list__item__info__role').should('be.visible')
     cy.get('.memberlist').scrollIntoView({ offset: { bottom: 0 } })
     cy.get('.memberlist .memberlist__list__item__delete').should('be.visible')
-    cy.get('.memberlist .fa-trash-o').should('be.visible')
+    cy.get('.memberlist .fa-trash').should('be.visible')
   })
 })

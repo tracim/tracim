@@ -32,7 +32,7 @@ export const TabBar = props => {
 
       <Tab
         page={PAGE.WORKSPACE.ACTIVITY_FEED(props.currentSpace.id)}
-        icon='newspaper-o'
+        icon='newspaper'
         label={props.t('Activity feed')}
       />
 

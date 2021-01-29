@@ -32,7 +32,7 @@
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
     "customClass": "wsContentPageHtml",
-    "icon": "fas fa-fw fa-file-text-o",
+    "icon": "fas fa-fw fa-file-text",
     "color": "#3f52e3",
     "domContainer": "appFeatureContainer"
   }, {
@@ -44,7 +44,7 @@
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",
     "customClass": "wsContentPageMarkdown",
-    "icon": "fas fa-fw fa-file-code-o",
+    "icon": "fas fa-fw fa-file-code",
     "color": "#e0082b",
     "domContainer": "appFeatureContainer"
   }, {
@@ -56,7 +56,7 @@
     "componentLeft": "File",
     "componentRight": "undefined",
     "customClass": "wsContentFile",
-    "icon": "fas fa-fw fa-file-image-o",
+    "icon": "fas fa-fw fa-file-image",
     "color": "#263462",
     "domContainer": "appFeatureContainer"
   }, {
@@ -68,7 +68,7 @@
     "componentLeft": "Thread",
     "componentRight": "undefined",
     "customClass": "wsContentThread",
-    "icon": "fas fa-fw fa-comments-o",
+    "icon": "fas fa-fw fa-comments",
     "color": "#2674d3",
     "domContainer": "appFeatureContainer"
   }, {

@@ -13,7 +13,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
   it('Checks if creation popup opens and closes', function () {
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
-    cy.get('.show .fa-file-text-o').should('be.visible').click()
+    cy.get('.show .fa-file-text').should('be.visible').click()
     const title = 'document1'
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__header').should('be.visible')

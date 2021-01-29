@@ -26,8 +26,8 @@ class Folder extends React.Component {
     const isHoveringSelf = props.draggedItem && props.draggedItem.contentId === props.folderData.id
 
     if (!isDropActive || isHoveringSelf) {
-      if (props.folderData.isOpen) return 'fa-folder-open-o'
-      return 'fa-folder-o'
+      if (props.folderData.isOpen) return 'fa-folder-open'
+      return 'fa-folder'
     }
 
     if (props.folderData.parentId === SHARE_FOLDER_ID) return 'fa-times-circle primaryColorFont'

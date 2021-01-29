@@ -99,7 +99,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download current page as PDF')}
               key='file_btn_dl_pdfall'
             >
-              <i className='fas fa-file-o' />
+              <i className='fas fa-file' />
             </a>
           )}
 
@@ -114,7 +114,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download as PDF')}
               key='file_btn_dl_pdfpage'
             >
-              <i className='fas fa-file-pdf-o' />
+              <i className='fas fa-file-pdf' />
             </a>
           )}
 

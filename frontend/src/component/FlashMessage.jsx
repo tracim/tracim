@@ -9,7 +9,7 @@ export const FlashMessage = props => {
 
   const dataTypeArray = [{
     id: 'info',
-    icon: 'lightbulb-o',
+    icon: 'lightbulb',
     label: props.t('Information')
   }, {
     id: 'warning',

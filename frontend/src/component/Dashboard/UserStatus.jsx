@@ -33,7 +33,7 @@ export const UserStatus = props => {
           onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
         >
           <div className='userstatus__notification__icon'>
-            <i className={`fas fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
+            <i className={`fas fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}`} />
           </div>
 
           <div

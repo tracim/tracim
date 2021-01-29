@@ -45,7 +45,7 @@ open_status = ContentStatus(
     slug="open",
     global_status=GlobalStatus.OPEN.value,
     label=_("Opened"),
-    fa_icon="square-o",
+    fa_icon="square",
     hexcolor="#3f52e3",
 )
 
@@ -53,7 +53,7 @@ closed_validated_status = ContentStatus(
     slug="closed-validated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Validated"),
-    fa_icon="check-square-o",
+    fa_icon="check-square",
     hexcolor="#008000",
 )
 

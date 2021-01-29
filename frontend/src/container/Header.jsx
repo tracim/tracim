@@ -120,7 +120,7 @@ export class Header extends React.Component {
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
                       mainIcon='envelope'
-                      smallIcon='warning'
+                      smallIcon='exclamation-triangle'
                       mainIconCustomClass='slowblink'
                       smallIconCustomClass='text-danger'
                     />

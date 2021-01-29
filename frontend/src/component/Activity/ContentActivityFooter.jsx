@@ -24,7 +24,7 @@ export class ContentActivityFooter extends React.Component {
         <div className='contentActivityFooter__right'>
           {props.commentList.length}
           <IconButton
-            icon='comment-o'
+            icon='comment'
             text={props.t('Comment')}
             intent='link'
             onClick={this.handleCommentClicked.bind(this)}
