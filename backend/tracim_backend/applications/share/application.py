@@ -70,5 +70,5 @@ def create_app() -> TracimApplication:
         slug="share_content",
         fa_icon="fas fa-share-alt",
         config={},
-        main_route=""
+        main_route="",
     )
