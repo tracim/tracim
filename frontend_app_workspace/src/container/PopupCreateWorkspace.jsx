@@ -110,7 +110,7 @@ export class PopupCreateWorkspace extends React.Component {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
               const spaceLabel = (
                 <span title={space.label}>
-                  {'-'.repeat(level)} <i className={`fas fa-fw fa-${spaceType.faIcon}`} /> {space.label}
+                  {'-'.repeat(level)} <i className={`fa-fw ${spaceType.faIcon}`} /> {space.label}
                 </span>
               )
               spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })

@@ -102,7 +102,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-trash-alt')
+          .have.html().to.contains('fa-trash')
       )
     })
 

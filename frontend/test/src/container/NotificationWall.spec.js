@@ -79,7 +79,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon: 'comments-o',
+            icon: 'far fa-comments',
             text: '{{author}} commented on {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
           })
@@ -91,7 +91,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'magic',
+            icon: 'fas fa-magic',
             text: '{{author}} created {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
@@ -103,7 +103,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'history',
+            icon: 'fas fa-history',
             text: '{{author}} updated {{content}} in {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
@@ -116,7 +116,7 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'user-plus',
+            icon: 'fas fa-user-plus',
             text: '{{author}} added you to {{space}}',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })

@@ -182,7 +182,7 @@ const CONTENT_MANAGER = {
 const CONTRIBUTOR = {
   id: 2,
   slug: 'contributor',
-  faIcon: 'fas pencil-alt',
+  faIcon: 'fas fa-pencil-alt',
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('Contributor'),
