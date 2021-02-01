@@ -28,13 +28,8 @@ export const Information = props => {
           </div>
         </div>
         <div>
-          {props.t(
-            '{{ authoredContentRevisionsCount }} interventions in {{ authoredContentRevisionsSpaceCount }} spaces',
-            {
-              authoredContentRevisionsCount: props.authoredContentRevisionsCount,
-              authoredContentRevisionsSpaceCount: props.authoredContentRevisionsSpaceCount
-            }
-          )}
+          {props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })}
+          {props.t('in {{ count }} space', { count: props.authoredContentRevisionsSpaceCount })}
         </div>
       </div>
     </div>

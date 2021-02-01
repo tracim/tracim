@@ -7,6 +7,7 @@ import {
   TracimComponent,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  CUSTOM_EVENT,
   PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
@@ -33,6 +34,9 @@ export class WorkspaceActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
@@ -48,6 +52,11 @@ export class WorkspaceActivityFeed extends React.Component {
     this.loadWorkspaceDetail()
     this.setHeadTitle()
     this.buildBreadcrumbs()
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   handleTlm = (data) => {

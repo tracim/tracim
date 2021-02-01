@@ -46,7 +46,7 @@ const ALLOWED_IMAGE_MIMETYPES = [
   'image/gif',
   'image/webp'
 ]
-const MAXIMUM_IMAGE_SIZE = 1 * 1024 * 1024 // 1 MByte
+const MAXIMUM_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MBytes
 const POPUP_DISPLAY_STATE = {
   AVATAR: 'AVATAR',
   COVER: 'COVER'
@@ -268,11 +268,11 @@ export class PublicProfile extends React.Component {
   splitSchema = (schema, uiSchema) => {
     const informationSchema = {
       ...schema,
-      required: schema.required.filter(field =>
+      required: (schema.required || []).filter(field =>
         this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
       ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) =>
+        Object.entries(schema.properties || {}).filter(([key, val]) =>
           this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.information
         )
       )
@@ -281,11 +281,11 @@ export class PublicProfile extends React.Component {
       ...schema,
       title: '', // INFO - CH - 20210122 - reset title and description since they are used for first form
       description: '',
-      required: schema.required.filter(field =>
+      required: (schema.required || []).filter(field =>
         this.findPropertyDisplayGroup(field, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
       ),
       properties: Object.fromEntries(
-        Object.entries(schema.properties).filter(([key, val]) =>
+        Object.entries(schema.properties || {}).filter(([key, val]) =>
           this.findPropertyDisplayGroup(key, uiSchema) === DISPLAY_GROUP_BACKEND_KEY.personalPage
         )
       )
@@ -321,7 +321,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const result = await props.dispatch(getCustomPropertiesSchema())
     switch (result.status) {
-      case 200: return result.json.json_schema
+      case 200: return result.json.json_schema || {}
       default: return {}
     }
   }
@@ -330,7 +330,7 @@ export class PublicProfile extends React.Component {
     const { props } = this
     const result = await props.dispatch(getCustomPropertiesUiSchema())
     switch (result.status) {
-      case 200: return result.json.ui_schema
+      case 200: return result.json.ui_schema || {}
       default: return {}
     }
   }
@@ -378,6 +378,13 @@ export class PublicProfile extends React.Component {
     return isConnectedUserOnHisOwnProfile || isUserAdmin
   }
 
+  isSchemaObjectEmpty = (schemaObject) => {
+    return (
+      (schemaObject && Object.keys(schemaObject).length === 0) ||
+      (schemaObject && schemaObject.properties && Object.keys(schemaObject.properties).length === 0)
+    )
+  }
+
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
   render () {
@@ -385,6 +392,7 @@ export class PublicProfile extends React.Component {
 
     const userId = state.displayedUser ? state.displayedUser.userId : props.match.params.userid
     const isPublicProfileEditable = this.isPublicProfileEditable(props.user, userId, PROFILE)
+    const isFieldEditable = schemaObject => isPublicProfileEditable && !this.isSchemaObjectEmpty(schemaObject)
     const avatarBaseUrl = getAvatarBaseUrl(FETCH_CONFIG.apiUrl, userId)
 
     const coverBaseUrl = getCoverBaseUrl(FETCH_CONFIG.apiUrl, userId)
@@ -445,7 +453,7 @@ export class PublicProfile extends React.Component {
                     schemaObject={state.informationSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.informationDataSchema}
-                    displayEditButton={isPublicProfileEditable}
+                    displayEditButton={isFieldEditable(state.informationSchemaObject)}
                     registrationDate={(new Date(state.displayedUser.created).toLocaleDateString())}
                     authoredContentRevisionsCount={state.displayedUser.authoredContentRevisionsCount}
                     authoredContentRevisionsSpaceCount={state.displayedUser.authoredContentRevisionsSpaceCount}
@@ -469,7 +477,7 @@ export class PublicProfile extends React.Component {
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.personalPageDataSchema}
-                    displayEditButton={isPublicProfileEditable}
+                    displayEditButton={isFieldEditable(state.personalPageSchemaObject)}
                     onSubmitDataSchema={this.handleSubmitDataSchema}
                   />
                 )

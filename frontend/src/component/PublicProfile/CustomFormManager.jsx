@@ -25,7 +25,9 @@ const DisplaySchemaPropertyString = props => {
       <span
         className={classnames(
           'DisplaySchemaPropertyString__label',
-          { noLabel: !props.label }
+          // INFO - GB - 20210129 - We check the space to not put : in the case of a fake empty label
+          // See https://github.com/tracim/tracim/issues/4123
+          { noLabel: !props.label || props.label === ' ' }
         )}
       >
         {props.label}
@@ -190,6 +192,7 @@ const SchemaAsView = props => {
           icon='pencil-square-o'
           onClick={props.onClickToggleButton}
           text={props.validateLabel}
+          dataCy='CustomFormManager__updateProfile__edit__button'
         />
       )}
     </div>
@@ -206,28 +209,46 @@ const TextRichWidget = connect(({ user }) => ({ user }))(props => {
   )
 })
 
-const SchemaAsForm = props => {
-  return (
-    <Form
-      schema={props.schemaObject}
-      uiSchema={props.uiSchemaObject}
-      formData={props.dataSchemaObject}
-      widgets={{
-        TextareaWidget: TextRichWidget
-      }}
-      onSubmit={(formData, e) => {
-        props.onClickToggleButton()
-        props.onSubmitDataSchema(formData, e)
-      }}
-    >
-      <IconButton
-        customClass={props.submitButtonClass}
-        icon='check'
-        type='submit'
-        text={props.validateLabel}
-      />
-    </Form>
-  )
+class SchemaAsForm extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      // CH - INFO - 20210128 - we need to copy the props because <Form /> needs to be used as a controlled component
+      // see https://github.com/tracim/tracim/issues/4105
+      dataSchema: props.dataSchemaObject
+    }
+  }
+
+  handleChangeDataSchema = ({ formData }) => {
+    this.setState({ dataSchema: formData })
+  }
+
+  render () {
+    const { props, state } = this
+    return (
+      <Form
+        schema={props.schemaObject}
+        uiSchema={props.uiSchemaObject}
+        formData={state.dataSchema}
+        widgets={{
+          TextareaWidget: TextRichWidget
+        }}
+        onChange={this.handleChangeDataSchema}
+        onSubmit={(formData, e) => {
+          props.onClickToggleButton()
+          props.onSubmitDataSchema(formData, e)
+        }}
+      >
+        <IconButton
+          customClass={props.submitButtonClass}
+          icon='check'
+          type='submit'
+          text={props.validateLabel}
+          dataCy='CustomFormManager__updateProfile__validate__button'
+        />
+      </Form>
+    )
+  }
 }
 
 const MODE = {
