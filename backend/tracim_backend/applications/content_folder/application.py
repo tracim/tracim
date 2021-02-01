@@ -43,5 +43,9 @@ class ContentFolderApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ContentFolderApp(
-        label="Folder", slug="contents/folder", fa_icon="far fa-folder", config={}, main_route=""
+        label="Folder",
+        slug="contents/folder",
+        fa_icon="far fa-folder",
+        config={},
+        main_route=""
     )
