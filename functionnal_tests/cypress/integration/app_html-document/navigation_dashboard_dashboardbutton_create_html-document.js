@@ -10,8 +10,8 @@ describe('navigate :: workspace > create_new > html-document_dashboard', functio
   it('dashboard > button', function () {
     cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text').click()
+    cy.get('.dashboard__calltoaction .fa-file-alt').should('be.visible')
+    cy.get('.dashboard__calltoaction .fa-file-alt').click()
     var titre1 = 'document1'
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__header').should('be.visible')

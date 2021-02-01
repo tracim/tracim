@@ -30,6 +30,6 @@ describe('content :: workspace > dashboard', function () {
     cy.get('.dashboard__calltoaction > div:nth-child(3) .dashboard__calltoaction__button__text__title').should('be.visible')
     cy.get('.dashboard__calltoaction__button i.fa-comments').should('be.visible')
     cy.get('.dashboard__calltoaction__button i.fa-paperclip').should('be.visible')
-    cy.get('.dashboard__calltoaction__button i.fa-file-text').should('be.visible')
+    cy.get('.dashboard__calltoaction__button i.fa-file-alt').should('be.visible')
   })
 })

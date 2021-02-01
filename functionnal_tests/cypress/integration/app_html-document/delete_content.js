@@ -21,8 +21,8 @@ describe('delete a html-document content', function () {
 
   it('should show the content as deleted and remove it from the content list', function () {
     cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text').click()
+    cy.get('.dashboard__calltoaction .fa-file-alt').should('be.visible')
+    cy.get('.dashboard__calltoaction .fa-file-alt').click()
     cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
