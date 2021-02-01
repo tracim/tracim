@@ -53,7 +53,7 @@ def create_app() -> TracimApplication:
     return ContentHTMLDocumentApp(
         label="Notes",  # TODO - G.M - 24-05-2018 - Check label
         slug="contents/{}".format(HTML_DOCUMENTS_TYPE),
-        fa_icon="fas fa-file-alt",
+        fa_icon="far fa-file-alt",
         config={},
         main_route="",
     )

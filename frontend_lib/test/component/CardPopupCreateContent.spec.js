@@ -53,7 +53,7 @@ describe('<CardPopupCreateContent />', () => {
     )
 
     it(`should display the icon "${props.faIcon}"`, () =>
-      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it('CardPopup should have the good custom style', () =>

@@ -42,15 +42,13 @@ describe('<SelectStatus />', () => {
     })
 
     it(`first submenu_item should have its icon: "${props.availableStatus[0].faIcon}"`, () => {
-      expect(wrapper.find('button.selectStatus__submenu__item').at(0)
-        .find(`i.fa-${props.availableStatus[0].faIcon}`))
-        .to.have.lengthOf(1)
+      expect(wrapper.find('button.selectStatus__submenu__item').at(0).children('i').prop('className'))
+        .to.equal(`fa-fw ${props.availableStatus[0].faIcon}`)
     })
 
     it(`second submenu_item should have its icon: "${props.availableStatus[1].faIcon}"`, () => {
-      expect(wrapper.find('button.selectStatus__submenu__item').at(1)
-        .find(`i.fa-${props.availableStatus[1].faIcon}`))
-        .to.have.lengthOf(1)
+      expect(wrapper.find('button.selectStatus__submenu__item').at(1).children('i').prop('className'))
+        .to.equal(`fa-fw ${props.availableStatus[1].faIcon}`)
     })
   })
 
