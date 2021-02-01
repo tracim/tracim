@@ -44,7 +44,7 @@ export class PageTitle extends React.Component {
           data-cy='layoutPageTitle'
         >
           <div className='pageTitleGeneric__title__icon' title={props.iconTooltip}>
-            <i className={`${props.icon}`} />
+            <i className={`fa-fw ${props.icon}`} />
           </div>
 
           <div className='pageTitleGeneric__title__label' id='popoverSpaceTitle'>

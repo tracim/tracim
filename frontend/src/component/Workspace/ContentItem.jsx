@@ -127,7 +127,7 @@ class ContentItem extends React.Component {
               {props.t(status.label)}
             </div>
             <div className='content__status__icon'>
-              <i className={`${status.faIcon}`} />
+              <i className={`fa-fw ${status.faIcon}`} />
             </div>
           </div>
         </Link>

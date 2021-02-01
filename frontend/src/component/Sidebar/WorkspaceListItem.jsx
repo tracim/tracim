@@ -129,7 +129,7 @@ class WorkspaceListItem extends React.Component {
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
-                <i className={`${allowedApp.faIcon}`} />
+                <i className={`fa-fw ${allowedApp.faIcon}`} />
                 {props.t(allowedApp.label)}
               </Link>
             ))}
