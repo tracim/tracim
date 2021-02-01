@@ -280,7 +280,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     # ICON = dict()
     # ICON[0] = ''
     # ICON[1] = 'fa-eye'
-    # ICON[2] = 'fa-pencil'
+    # ICON[2] = 'fa-pencil-alt'
     # ICON[4] = 'fa-graduation-cap'
     # ICON[8] = 'fa-legal'
     #
@@ -397,17 +397,17 @@ class ActionDescription(object):
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        "archiving": "archive",
-        "content-comment": "comment-o",
-        "creation": "magic",
-        "deletion": "trash",
-        "edition": "edit",
-        "revision": "history",
-        "status-update": "random",
-        "unarchiving": "file-archive-o",
-        "undeletion": "trash-o",
-        "move": "arrows",
-        "copy": "files-o",
+        "archiving": "fas fa-archive",
+        "content-comment": "far fa-comment",
+        "creation": "fas fa-magic",
+        "deletion": "fas trash-alt",
+        "edition": "fas fa-edit",
+        "revision": "fas fa-history",
+        "status-update": "fas fa-random",
+        "unarchiving": "far file-archive",
+        "undeletion": "far fa-trash-alt",
+        "move": "fas fa-arrows-alt",
+        "copy": "far fa-copy",
     }
     #
     # _LABELS = {
@@ -562,13 +562,13 @@ class ActionDescription(object):
 #
 #     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 #     # _ICONS = {  # Deprecated
-#     #     'dashboard': 'fa-home',
-#     #     'workspace': 'fa-bank',
+#     #     'dashboard': 'fas fa-home',
+#     #     'workspace': 'fas fa-university',
 #     #     'folder': 'fas fa-folder-open-o',
 #     #     'file': 'fas fa-paperclip',
 #     #     'page': 'fas fa-file-text-o',
-#     #     'thread': 'fas fa-comments-o',
-#     #     'comment': 'fas fa-comment-o',
+#     #     'thread': 'fas fa-comments',
+#     #     'comment': 'fas fa-comment',
 #     #     'event': 'fas fa-agenda-o',
 #     # }
 #     #
@@ -578,8 +578,8 @@ class ActionDescription(object):
 #     #     'folder': 'fas fa-folder-open-o',
 #     #     'file': 'fas fa-paperclip',
 #     #     'page': 'fas fa-file-text-o',
-#     #     'thread': 'fas fa-comments-o',
-#     #     'comment': 'fas fa-comment-o',
+#     #     'thread': 'far fa-comments',
+#     #     'comment': 'far fa-comment',
 #     #     'event': 'fas fa-agenda-o',
 #     # }
 #     #

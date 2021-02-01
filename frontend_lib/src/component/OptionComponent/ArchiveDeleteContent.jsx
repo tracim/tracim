@@ -40,7 +40,7 @@ const ArchiveDeleteContent = props => {
         key='archiveDeleteContent__delete'
         data-cy='delete__button'
       >
-        <i className='fas fa-fw fa-trash' />
+        <i className='far fa-fw fa-trash-alt' />
       </button>
     </div>
   )

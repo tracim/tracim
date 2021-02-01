@@ -23,7 +23,7 @@ export const DropdownCreateButton = props => {
           key={app.slug}
         >
           <i
-            className={`fas fa-fw fa-${app.faIcon}`}
+            className={`fa-fw ${app.faIcon}`}
             style={{ color: app.hexcolor }}
           />
           {props.t(app.creationLabel)}

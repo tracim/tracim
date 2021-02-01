@@ -76,7 +76,7 @@ class ShareLink extends React.Component {
             onClick={() => props.onClickDeleteShareLink(props.id)}
             data-cy='deleteShareLink'
           >
-            <i className='fas fa-fw fa-trash-o' />
+            <i className='far fa-fw fa-trash-' />
           </button>}
       </div>
     )

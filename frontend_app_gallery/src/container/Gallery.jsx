@@ -725,7 +725,7 @@ export class Gallery extends React.Component {
         <PageWrapper customClass='gallery'>
           <PageTitle
             title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
-            icon='picture-o'
+            icon='far fa-image'
             breadcrumbsList={state.breadcrumbsList}
             parentClass='gallery__header'
           />
@@ -740,7 +740,7 @@ export class Gallery extends React.Component {
                 <span className='gallery__action__button__text'>
                   {state.autoPlay ? props.t('Pause') : props.t('Play')}
                 </span>
-                <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                <i className={classnames('fas fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
               </button>
 
               <button
@@ -765,7 +765,8 @@ export class Gallery extends React.Component {
                   onClick={this.handleOpenDeleteFilePopup}
                   data-cy='gallery__action__button__delete'
                 >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fas fa-fw fa-trash' />
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span>
+                  <i className='far fa-fw fa-trash-alt' />
                 </button>
               )}
             </div>
@@ -814,7 +815,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__auto__play'
                         key='btn_autoplay'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                        <i className={classnames('fas fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                       </button>
                     ), (
                       <button
@@ -824,7 +825,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__fullscreen'
                         key='btn_fullscreen'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                        <i className={classnames('fas fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                       </button>
                     ), (
                       <button

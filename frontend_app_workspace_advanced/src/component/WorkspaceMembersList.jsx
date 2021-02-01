@@ -85,7 +85,7 @@ export const WorkspaceMembersList = props => {
                       className='workspace_advanced__userlist__list__item__delete'
                       onClick={() => props.onClickDeleteMember(m.user_id)}
                     >
-                      <i className='fas fa-trash-o' />
+                      <i className='far fa-trash-alt' />
                     </div>
                   )
                   : <div className='workspace_advanced__userlist__list__item__delete' />

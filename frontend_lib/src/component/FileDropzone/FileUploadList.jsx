@@ -29,7 +29,7 @@ export const FileUploadList = (props) => {
               disabled={props.deleteFileDisabled}
               data-cy='file__upload__list__item__delete'
             >
-              <i className='fas fa-fw fa-trash-o' />
+              <i className='far fa-fw fa-trash-alt' />
             </button>
             {fileUpload.errorMessage && (
               <i title={fileUpload.errorMessage} className='file__upload__list__item__error fas fa-fw fa-exclamation-triangle' />

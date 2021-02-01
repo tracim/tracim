@@ -115,7 +115,7 @@ def create_app() -> TracimApplication:
     return AgendaApp(
         label="Agenda",
         slug="agenda",
-        fa_icon="calendar",
+        fa_icon="far fa-calendar-alt",
         config={},
         main_route="/ui/workspaces/{workspace_id}/agenda",
     )

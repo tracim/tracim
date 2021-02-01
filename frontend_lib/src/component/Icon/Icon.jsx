@@ -1,8 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Icon = props =>
-  <i title={props.title} className={`icon fas fa-fw fa-${props.icon} ${props.customClass}`} style={{ color: props.color }}>{props.children}</i>
+const Icon = props => (
+  <i
+    title={props.title}
+    className={`icon ${props.icon} ${props.customClass}`}
+    style={{ color: props.color }}
+  >
+    {props.children}
+  </i>
+)
 
 Icon.propTypes = {
   icon: PropTypes.string.isRequired,

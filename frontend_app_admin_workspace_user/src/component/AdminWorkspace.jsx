@@ -74,7 +74,7 @@ const AdminWorkspace = props =>
                         className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover mr-3'
                         onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                       >
-                        <i className='fas fa-fw fa-trash-o' />
+                        <i className='far fa-fw fa-trash-alt' />
                       </button>
                     </div>
                   </td>

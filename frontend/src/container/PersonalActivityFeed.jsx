@@ -60,7 +60,7 @@ export class PersonalActivityFeed extends React.Component {
       <div className='personalActivityFeed'>
         <PageTitle
           title={props.t('Activity feed')}
-          icon='newspaper-o'
+          icon='far fa-newspaper'
           iconTooltip={props.t('Activity feed')}
           breadcrumbsList={props.breadcrumbs}
         />

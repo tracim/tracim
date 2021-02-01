@@ -88,7 +88,7 @@ export class FileComponent extends React.Component {
               </span>
             }
             btnType='link'
-            icon='hand-o-right'
+            icon='far fa-hand-point-right'
             btnLabel={<i className='fas fa-times' />}
             onClickBtn={props.onClickCloseNotifyAllMessage}
           />

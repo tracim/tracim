@@ -66,5 +66,5 @@ class ShareApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ShareApp(
-        label="Share Content", slug="share_content", fa_icon="share", config={}, main_route=""
+        label="Share Content", slug="share_content", fa_icon="fas fa-share-alt", config={}, main_route=""
     )

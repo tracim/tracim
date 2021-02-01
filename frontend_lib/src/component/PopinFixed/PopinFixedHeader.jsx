@@ -57,7 +57,7 @@ class PopinFixedHeader extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`fas fa-${faIcon}`} />
+          <i className={`${faIcon}`} />
         </div>
 
         <div
@@ -94,7 +94,7 @@ class PopinFixedHeader extends React.Component {
           >
             {state.editTitle
               ? <i className='fas fa-check' title={t('Validate the title')} />
-              : <i className='fas fa-pencil' title={t('Edit title')} />}
+              : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
           </button>}
 
         {this.props.children}

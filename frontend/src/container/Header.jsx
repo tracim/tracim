@@ -119,8 +119,8 @@ export class Header extends React.Component {
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
-                      mainIcon='envelope'
-                      smallIcon='exclamation-triangle'
+                      mainIcon='fas fa-envelope'
+                      smallIcon='fas fa-exclamation-triangle'
                       mainIconCustomClass='slowblink'
                       smallIconCustomClass='text-danger'
                     />
@@ -163,7 +163,7 @@ export class Header extends React.Component {
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     to={PAGE.AGENDA}
                   >
-                    <i className='fas fa-fw fa-calendar' />
+                    <i className='far fa-fw fa-calendar-alt' />
                     {props.t('Agendas')}
                   </Link>
                 </li>

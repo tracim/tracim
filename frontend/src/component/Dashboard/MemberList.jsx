@@ -112,7 +112,7 @@ export class MemberList extends React.Component {
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
                         >
-                          <i className='fas fa-trash-o' />
+                          <i className='far fa-trash-alt' />
                         </div>
                       )}
                     </li>

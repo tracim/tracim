@@ -3,7 +3,7 @@ export const sidebarEntryList = [
     slug: 'dashboard',
     route: '/ui/workspaces/6/dashboard',
     hexcolor: '#fdfdfd',
-    fa_icon: 'home',
+    fa_icon: 'fas fa-home',
     label: 'Dashboard'
   }, {
     slug: 'contents/all',

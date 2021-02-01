@@ -105,7 +105,12 @@ export class Sidebar extends React.Component {
           className='sidebar__content__navigation__item__name'
           title={label}
         >
-          <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
+          <Icon
+            icon='far fa-fw fa-newspaper'
+            title={label}
+            color='white'
+          />
+          &nbsp;{label}
         </div>
       </Link>
     )
@@ -193,7 +198,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickNewWorkspace}
                     dataCy='sidebarCreateWorkspaceBtn'
-                    icon='plus'
+                    icon='fas fa-plus'
                     text={props.t('Create a space')}
                     mode='light'
                   />
@@ -202,7 +207,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickJoinWorkspace}
                     dataCy='sidebarJoinWorkspaceBtn'
-                    icon='users'
+                    icon='fas fa-users'
                     text={props.t('Join a space')}
                     intent='primary'
                     mode='light'

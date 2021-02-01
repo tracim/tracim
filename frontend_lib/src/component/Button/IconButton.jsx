@@ -29,7 +29,7 @@ const IconButton = props => {
       title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      {props.icon && <i className={`fas fa-fw fa-${props.icon} iconbutton__icon`} />}
+      {props.icon && <i className={`fa-fw ${props.icon} iconbutton__icon`} />}
       {props.text && <span className='iconbutton__text'>{props.text}</span>}
     </button>
   )

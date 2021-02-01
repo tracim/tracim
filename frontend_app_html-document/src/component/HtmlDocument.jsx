@@ -26,7 +26,7 @@ export const HtmlDocument = props => {
             </span>
           }
           btnType='link'
-          icon='hand-o-right'
+          icon='far fa-hand-point-right'
           btnLabel={<i className='fas fa-times' />}
           onClickBtn={props.onClickCloseNotifyAllMessage}
         />
@@ -64,7 +64,7 @@ export const HtmlDocument = props => {
           <PromptMessage
             msg={props.t('You have a pending draft')}
             btnType='link'
-            icon='hand-o-right'
+            icon='far fa-hand-point-right'
             btnLabel={props.t('Resume writing')}
             onClickBtn={props.onClickShowDraft}
           />

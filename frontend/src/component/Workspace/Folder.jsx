@@ -26,20 +26,20 @@ class Folder extends React.Component {
     const isHoveringSelf = props.draggedItem && props.draggedItem.contentId === props.folderData.id
 
     if (!isDropActive || isHoveringSelf) {
-      if (props.folderData.isOpen) return 'fa-folder-open'
-      return 'fa-folder'
+      if (props.folderData.isOpen) return 'far fa-folder-open'
+      return 'far fa-folder'
     }
 
-    if (props.folderData.parentId === SHARE_FOLDER_ID) return 'fa-times-circle primaryColorFont'
+    if (props.folderData.parentId === SHARE_FOLDER_ID) return 'fas fa-times-circle primaryColorFont'
 
     const isHoveringSelfParent = props.draggedItem && props.draggedItem.parentId === props.folderData.id
-    if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
+    if (isHoveringSelfParent) return 'fas fa-times-circle primaryColorFont'
 
     const parentIdList = props.getContentParentList(props.folderData, props.workspaceContentList)
     const isHoveringChildrenFolder = parentIdList.includes(props.draggedItem.contentId)
-    if (isHoveringChildrenFolder) return 'fa-times-circle primaryColorFont'
+    if (isHoveringChildrenFolder) return 'fas fa-times-circle primaryColorFont'
 
-    return 'fa-arrow-circle-down primaryColorFont'
+    return 'fas fa-arrow-circle-down primaryColorFont'
   }
 
   render () {
@@ -94,7 +94,7 @@ class Folder extends React.Component {
               title={props.t('Folder')}
               style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
-              <i className={classnames('fas fa-fw', this.calculateIcon())} />
+              <i className={classnames('fa-fw', this.calculateIcon())} />
             </div>
 
             <div className='folder__header__name'>
@@ -131,7 +131,7 @@ class Folder extends React.Component {
                       key={`${props.folderData.id}__${app.slug}`}
                     >
                       <i
-                        className={`fas fa-fw fa-${app.faIcon}`}
+                        className={`fa-fw ${app.faIcon}`}
                         style={{ color: app.hexcolor }}
                       />
                       {props.t(app.creationLabel)}

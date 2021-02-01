@@ -22,12 +22,12 @@ const FolderAdvanced = props => {
       {props.isDeleted && (
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
-            <i className='fas fa-fw fa-trash' />
+            <i className='far fa-fw fa-trash-alt' />
             {props.t('This folder is deleted')}
           </div>
 
           <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
-            <i className='fas fa-fw fa-trash' />
+            <i className='far fa-fw fa-trash-alt' />
             {props.t('Restore')}
           </button>
         </div>

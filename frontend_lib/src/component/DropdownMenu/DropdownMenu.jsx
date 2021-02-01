@@ -23,7 +23,7 @@ const DropdownMenu = props => {
         type='button'
       >
         {props.buttonOpts}
-        {props.buttonIcon && <i className={`fas fa-fw ${props.buttonIcon}`} />}
+        {props.buttonIcon && <i className={`${props.buttonIcon}`} />}
         {props.buttonImage && <img className='dropdownMenu__image' src={props.buttonImage} />}
         {props.buttonLabel && <span>{props.buttonLabel}</span>}
       </button>

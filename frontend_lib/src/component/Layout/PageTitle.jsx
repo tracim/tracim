@@ -32,7 +32,7 @@ export class PageTitle extends React.Component {
     const breadcrumbsRoot = {
       link: PAGE.HOME,
       label: title,
-      icon: 'home',
+      icon: 'fas fa-home',
       type: BREADCRUMBS_TYPE.CORE,
       isALink: true
     }
@@ -44,7 +44,7 @@ export class PageTitle extends React.Component {
           data-cy='layoutPageTitle'
         >
           <div className='pageTitleGeneric__title__icon' title={props.iconTooltip}>
-            <i className={`fas fa-fw fa-${props.icon}`} />
+            <i className={`${props.icon}`} />
           </div>
 
           <div className='pageTitleGeneric__title__label' id='popoverSpaceTitle'>

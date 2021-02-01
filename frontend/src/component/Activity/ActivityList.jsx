@@ -112,7 +112,7 @@ const ActivityList = (props) => {
         <IconButton
           customClass='activityList__refresh'
           text={props.t('Refresh')}
-          intent='link'
+          intent='fas fa-link'
           onClick={props.onRefreshClicked}
           dataCy='activityList__refresh'
         />
@@ -127,7 +127,7 @@ const ActivityList = (props) => {
       {props.activity.list.length > 0 && props.activity.hasNextPage && (
         <IconButton
           text={props.t('See more')}
-          icon='chevron-down'
+          icon='fas fa-chevron-down'
           onClick={props.onLoadMoreClicked}
           dataCy='activityList__more'
         />

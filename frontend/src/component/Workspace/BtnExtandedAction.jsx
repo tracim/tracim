@@ -10,7 +10,7 @@ require('./BtnExtandedAction.styl')
 export const ExtandedAction = props => {
   return (
     <DropdownMenu
-      buttonIcon='fa-ellipsis-h'
+      buttonIcon='fas fa-ellipsis-h'
       buttonTooltip={props.t('Actions')}
       buttonCustomClass='extandedaction outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
       buttonDataCy='extended_action'
@@ -23,7 +23,7 @@ export const ExtandedAction = props => {
           data-cy='extended_action_edit'
           key='extended_action_edit'
         >
-          <i className='fas fa-fw fa-pencil' />
+          <i className='fas fa-fw fa-pencil-alt' />
           {props.onClickExtendedAction.edit.label}
         </button>
       )}
@@ -54,7 +54,7 @@ export const ExtandedAction = props => {
           data-cy='extended_action_delete'
           key='extended_action_delete'
         >
-          <i className='fas fa-fw fa-trash' />
+          <i className='far fa-fw fa-trash-alt' />
           {props.onClickExtendedAction.delete.label}
         </button>
       )}

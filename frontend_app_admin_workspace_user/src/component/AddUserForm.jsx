@@ -211,7 +211,7 @@ export class AddUserForm extends React.Component {
                   </div>
 
                   <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
-                    <i className={`fas fa-fw fa-${p.faIcon}`} />
+                    <i className={`fa-fw ${p.faIcon}`} />
                   </div>
 
                   <div className='profile__list__item__content'>

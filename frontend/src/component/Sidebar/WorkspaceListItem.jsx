@@ -100,9 +100,7 @@ class WorkspaceListItem extends React.Component {
             props.level > 0 && (
               <div
                 style={{
-                  marginLeft:
-                  `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN
-                  }px`
+                  marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
                 }}
               >
                 &#8735;
@@ -120,21 +118,21 @@ class WorkspaceListItem extends React.Component {
 
         {state.showDropdownMenuButton && (
           <DropdownMenu
-            buttonIcon='fa-ellipsis-v'
+            buttonIcon='fas fa-ellipsis-v'
             buttonCustomClass='sidebar__content__navigation__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >
-            {props.allowedAppList.map(allowedApp =>
+            {props.allowedAppList.map(allowedApp => (
               <Link
                 to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
-                <i className={classnames(`fas fa-fw fa-${allowedApp.faIcon}`)} />
+                <i className={`${allowedApp.faIcon}`} />
                 {props.t(allowedApp.label)}
               </Link>
-            )}
+            ))}
           </DropdownMenu>
         )}
       </li>

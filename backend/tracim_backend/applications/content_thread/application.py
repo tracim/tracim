@@ -50,7 +50,7 @@ def create_app() -> TracimApplication:
     return ContentThreadApp(
         label="Threads",
         slug="contents/{}".format(THREAD_TYPE),
-        fa_icon="comments",
+        fa_icon="far fa-comments",
         config={},
         main_route="",
     )

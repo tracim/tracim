@@ -41,7 +41,7 @@ export const Breadcrumbs = props => {
               to={props.root.link}
               className='breadcrumbs__item root primaryColorFont primaryColorFontDarkenHover'
             >
-              {props.root.icon && <i className={`fas fa-${props.root.icon}`} />}
+              {props.root.icon && <i className={`${props.root.icon}`} />}
               <span className='breadcrumbs__item__text'>{props.root.label}</span>
             </Link>
           </li>
