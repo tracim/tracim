@@ -19,19 +19,20 @@ const DisplayTitle = props => {
   )
 }
 
+const labelComponent = props => (
+  (props.label && props.label.trim())
+    ? (
+      <span className='DisplaySchemaPropertyString__label'>
+        {props.t('{{label}}: ', { label: props.label })}
+      </span>
+    )
+    : undefined
+)
+
 const DisplaySchemaPropertyString = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          // INFO - GB - 20210129 - We check the space to not put : in the case of a fake empty label
-          // See https://github.com/tracim/tracim/issues/4123
-          { noLabel: !props.label || props.label === ' ' }
-        )}
-      >
-        {props.label}
-      </span>
+      {labelComponent(props)}
       <span
         className='DisplaySchemaPropertyString__value'
         dangerouslySetInnerHTML={{ __html: props.value }}
@@ -43,14 +44,7 @@ const DisplaySchemaPropertyString = props => {
 const DisplaySchemaPropertyBoolean = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          { noLabel: !props.label }
-        )}
-      >
-        {props.label}
-      </span>
+      {labelComponent(props)}
       <span className='DisplaySchemaPropertyString__value'>
         <Checkbox
           name={props.label}
@@ -71,6 +65,7 @@ const DisplaySchemaArray = props => {
     return (
       <DisplaySchemaPropertyString
         label={props.label}
+        t={props.t}
         value={props.valueList.join(', ')}
       />
     )
@@ -96,6 +91,7 @@ const DisplaySchemaArray = props => {
           >
             <DisplaySchemaObject
               schemaObject={props.schemaObject}
+              t={props.t}
               dataSchemaObject={value}
             />
           </div>
@@ -132,6 +128,7 @@ const DisplaySchemaObject = props => {
           return (
             <DisplaySchemaArray
               label={props.schemaObject.properties[key].title}
+              t={props.t}
               valueList={value}
               parentKey={key}
               schemaObject={props.schemaObject.properties[key].items}
@@ -145,6 +142,7 @@ const DisplaySchemaObject = props => {
             <DisplaySchemaObject
               schemaObject={props.schemaObject.properties[key]}
               dataSchemaObject={value}
+              t={props.t}
               nestedLevel={props.nestedLevel + 1}
               key={`object_${key}`}
             />
@@ -156,6 +154,7 @@ const DisplaySchemaObject = props => {
             <DisplaySchemaPropertyString
               label={props.schemaObject.properties[key].title}
               value={value}
+              t={props.t}
               key={`property_string_${key}`}
             />
           )
@@ -183,6 +182,7 @@ const SchemaAsView = props => {
       <DisplaySchemaObject
         schemaObject={props.schemaObject}
         dataSchemaObject={props.dataSchemaObject}
+        t={props.t}
         nestedLevel={1}
       />
 
@@ -289,6 +289,7 @@ export class CustomFormManager extends React.Component {
               schemaObject={props.schemaObject}
               dataSchemaObject={props.dataSchemaObject}
               validateLabel={props.t('Edit')}
+              t={props.t}
               submitButtonClass={props.submitButtonClass}
               displayEditButton={props.displayEditButton}
               onClickToggleButton={this.handleClickToggleMode}

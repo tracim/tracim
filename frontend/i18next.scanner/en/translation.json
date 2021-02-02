@@ -1,4 +1,5 @@
 {
+  "{{label}}: ": "{{label}}: ",
   "{{author}} commented on {{content}} in {{space}}": "{{author}} commented on {{content}} in {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} changed the status of {{content}} in {{space}}",
   "{{author}} updated {{content}} in {{space}}": "{{author}} updated {{content}} in {{space}}",

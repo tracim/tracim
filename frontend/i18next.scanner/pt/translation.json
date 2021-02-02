@@ -1,4 +1,5 @@
 {
+  "{{label}}: ": "{{label}}: ",
   "{{author}} removed you from {{space}}": "{{author}} eliminou-o de {{space}}",
   "{{author}} removed {{user}} from {{space}}": "{{author}} eliminou {{user}} de {{space}}",
   "{{author}} added you to {{space}}": "{{author}} adicionou-o à {{space}}",
