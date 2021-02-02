@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
+from tracim_backend import UserDoesNotExist
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
@@ -164,8 +165,12 @@ class MentionBuilder:
         else:
             # send to mentioned user
             user_api = UserApi(session=session, config=config, current_user=None)
-            user = user_api.get_one_by_username(recipient)
-            return [user.user_id]
+            try:
+                user = user_api.get_one_by_username(recipient)
+                return [user.user_id]
+            except UserDoesNotExist:
+                logger.warning(cls, "user of username {} could not been found !".format(recipient))
+                return []
 
     @classmethod
     def _create_mention_events(
