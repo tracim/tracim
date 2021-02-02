@@ -26,7 +26,7 @@ const DisplaySchemaPropertyLabel = translate()(props => (
         {props.t('{{label}}: ', { label: props.label })}
       </span>
     )
-    : undefined
+    : null
 ))
 
 const DisplaySchemaPropertyString = props => {
