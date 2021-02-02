@@ -490,7 +490,7 @@ class ActionDescription(object):
 #     #                 'closed-deprecated': l_('deprecated')}
 #     #
 #     # _ICONS = {
-#     #     'open': 'fas fa-square-o',
+#     #     'open': 'far fa-square',
 #     #     'closed-validated': 'far fa-check-square',
 #     #     'closed-unvalidated': 'fas fa-times',
 #     #     'closed-deprecated': 'fas fa-warning',
