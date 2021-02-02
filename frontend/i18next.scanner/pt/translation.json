@@ -1,6 +1,9 @@
 {
   "{{author}} removed you from {{space}}": "{{author}} eliminou-o de {{space}}",
   "{{author}} removed {{user}} from {{space}}": "{{author}} eliminou {{user}} de {{space}}",
+  "{{author}} added you to {{space}}": "{{author}} adicionou-o à {{space}}",
+  "{{author}} added {{user}} to {{space}}": "{{author}} acrescentou {{user}} à {{space}}",
+  "{{author}} joined space {{space}}": "{{author}} juntou-se ao espaço {{space}}",
   "{{author}} modified your role in {{space}}": "{{author}} modificou sua função em {{space}}",
   "{{author}} modified {{user}}'s role in {{space}}": "{{author}} modificou a função de {{user}} em {{space}}",
   "{{author}} created {{content}} in {{space}}": "{{author}} criou {{content}} em {{space}}",
