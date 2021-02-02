@@ -9,7 +9,7 @@
   "Add a member": "Acrescentar um membro",
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
-  "Error while saving new description": "Erro ao salvar a nova descrição",
+  "Error while saving the new description": "Erro ao salvar a nova descrição",
   "Error while saving new role for member": "Erro ao salvar a nova função para o membro",
   "Error while fetching known members list": "Erro ao buscar a lista de membros conhecidos",
   "Please set a name, an email or a username": "Defina um nome, um e-mail ou um identificador",

@@ -210,7 +210,7 @@ class TestSimpleSearch(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
-                content, new_label=created_content_name, new_content=created_content_body
+                content, new_label=created_content_name, new_raw_content=created_content_body
             )
             api.save(content)
         api.create(

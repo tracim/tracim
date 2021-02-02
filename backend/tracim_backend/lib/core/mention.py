@@ -70,7 +70,7 @@ class DescriptionMentionParser(BaseMentionParser):
     MENTION_TAG_NAME = "span"
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
-        return self.get_mentions_from_html(revision.description)
+        return self.get_mentions_from_html(revision.raw_content)
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:

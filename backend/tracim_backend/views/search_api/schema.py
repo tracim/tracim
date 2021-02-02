@@ -10,8 +10,9 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import string_to_list
-from tracim_backend.views.core_api.schemas import ContentSchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import StrippedString
+from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
 
 class SearchFilterQuery(object):
@@ -98,7 +99,7 @@ class ContentDigestSearchSchema(marshmallow.Schema):
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 
-class ContentSearchSchema(ContentSchema):
+class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     score = marshmallow.fields.Float()
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
     parents = marshmallow.fields.List(marshmallow.fields.Nested(ContentDigestSearchSchema))

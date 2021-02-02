@@ -582,7 +582,7 @@ class ContentApi(object):
             do_save=False,
             label="",
         )
-        item.description = content
+        item.raw_content = content
         item.revision_type = ActionDescription.COMMENT
         if do_save:
             self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
@@ -1594,14 +1594,16 @@ class ContentApi(object):
         item: Content,
         allowed_content_type_slug_list: typing.List[str],
         new_label: str,
-        new_content: str = None,
+        new_description: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
     ):
         """
         Update a container content like folder
         :param item: content
         :param item: content
         :param new_label: new label of content
-        :param new_content: new raw text content/description of content
+        :param new_description: description of content
+        :param new_raw_content: raw content of this content
         :param allowed_content_type_slug_list: list of allowed subcontent type
          of content.
         :return:
@@ -1611,18 +1613,30 @@ class ContentApi(object):
             content_has_changed = True
         except SameValueError:
             content_has_changed = False
-        item = self.update_content(item, new_label, new_content, force_update=content_has_changed)
+        item = self.update_content(
+            item,
+            new_label,
+            new_description=new_description,
+            new_raw_content=new_raw_content,
+            force_update=content_has_changed,
+        )
 
         return item
 
     def update_content(
-        self, item: Content, new_label: str, new_content: str = None, force_update=False
+        self,
+        item: Content,
+        new_label: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
+        new_description: typing.Optional[str] = None,
+        force_update=False,
     ) -> Content:
         """
         Update a content
         :param item: content
         :param new_label: new label of content
-        :param new_content: new raw text content/description of content
+        :param new_raw_content: new raw text content of content
+        :param new_description: new description of content
         :param force_update: don't raise SameValueError if value does not change
         :return: updated content
         """
@@ -1630,16 +1644,24 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
             )
+
+        if new_label is None:
+            new_label = item.label
+        if new_raw_content is None:
+            new_raw_content = item.raw_content
+        if new_description is None:
+            new_description = item.description
         if not force_update:
-            if item.label == new_label and item.description == new_content:
+            if (
+                item.label == new_label
+                and item.raw_content == new_raw_content
+                and item.description == new_description
+            ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
                 raise SameValueError("The content did not changed")
-        if not new_label:
-            raise EmptyLabelNotAllowed()
 
-        label = new_label or item.label
-        filename = self._prepare_filename(label, item.file_extension)
+        filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
         if filename:
             self._is_filename_available_or_raise(
@@ -1656,12 +1678,12 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
+
         if self._user:
             item.owner = self._user
         item.label = new_label
-        item.description = (
-            new_content if new_content else item.description
-        )  # TODO: convert urls into links
+        item.raw_content = new_raw_content
+        item.description = new_description
         item.revision_type = ActionDescription.EDITION
         return item
 

@@ -751,6 +751,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
+    raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
     file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
     #  INFO - A.P - 2017-07-03 - Depot Doc
@@ -790,27 +791,30 @@ class ContentRevisionRO(DeclarativeBase):
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
+        # db_column
         "content_id",
+        "content_namespace",
         "created",
         "description",
-        "file_mimetype",
         "file_extension",
+        "file_mimetype",
         "is_archived",
         "is_deleted",
+        "is_temporary",
         "label",
-        "owner",
         "owner_id",
-        "parent",
         "parent_id",
         "properties",
+        "raw_content",
         "revision_type",
         "status",
         "type",
         "updated",
-        "workspace",
         "workspace_id",
-        "is_temporary",
-        "content_namespace",
+        # object
+        "owner",
+        "parent",
+        "workspace",
     )
 
     # Read by must be used like this:
@@ -1114,6 +1118,18 @@ class Content(DeclarativeBase):
     @description.expression
     def description(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.description
+
+    @hybrid_property
+    def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @raw_content.setter
+    def raw_content(self, value: str) -> None:
+        self.revision.raw_content = value
+
+    @raw_content.expression
+    def raw_content(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.raw_content
 
     @hybrid_property
     def file_name(self) -> str:
@@ -1575,10 +1591,10 @@ class Content(DeclarativeBase):
 
         return None
 
-    def description_as_raw_text(self) -> str:
+    def raw_content_as_raw_text(self) -> str:
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        return BeautifulSoup(self.description, "html.parser").text
+        return BeautifulSoup(self.raw_content, "html.parser").text
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
