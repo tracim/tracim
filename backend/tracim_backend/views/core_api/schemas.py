@@ -1104,8 +1104,8 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         "(the route must be ready-to-use)",
     )
     fa_icon = StrippedString(
-        example="file-text-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon",
+        example="far fa-file-alt",
+        description="CSS class of the icon. Example: file-o for using Fontawesome far fa-file-alt icon",
     )
     hexcolor = StrippedString(example="#F0F9DC", description="Hexadecimal color of the entry.")
 
@@ -1300,7 +1300,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = StrippedString(example="pagehtml", validate=all_content_types_validator)
     fa_icon = StrippedString(
-        example="fa-file-text-o",
+        example="far fa-file-alt",
         description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
     )
     hexcolor = StrippedString(

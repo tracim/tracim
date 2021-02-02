@@ -569,7 +569,7 @@ class ActionDescription(object):
 #     #     'page': 'far fa-file-alt',
 #     #     'thread': 'fas fa-comments',
 #     #     'comment': 'fas fa-comment',
-#     #     'event': 'far fa-calendar',
+#     #     'event': 'far fa-calendar-alt',
 #     # }
 #     #
 #     # _CSS_ICONS = {
@@ -580,7 +580,7 @@ class ActionDescription(object):
 #     #     'page': 'far fa-file-alt',
 #     #     'thread': 'far fa-comments',
 #     #     'comment': 'far fa-comment',
-#     #     'event': 'far fa-calendar',
+#     #     'event': 'far fa-calendar-alt',
 #     # }
 #     #
 #     # _CSS_COLORS = {
