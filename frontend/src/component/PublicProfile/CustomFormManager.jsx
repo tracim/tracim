@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { IconButton, Checkbox } from 'tracim_frontend_lib'
