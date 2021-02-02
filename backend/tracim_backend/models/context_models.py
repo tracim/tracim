@@ -621,9 +621,10 @@ class TextBasedContentUpdate(object):
     TextBasedContent update model
     """
 
-    def __init__(self, label: str, raw_content: str) -> None:
+    def __init__(self, label: str, raw_content: str, description: str) -> None:
         self.label = label
         self.raw_content = raw_content
+        self.description = description
 
 
 class BasePaginatedQuery(object):
@@ -1185,7 +1186,7 @@ class ContentInContext(object):
 
     @property
     def raw_content(self) -> str:
-        return self.content.description
+        return self.content.raw_content
 
     @property
     def author(self) -> UserInContext:
@@ -1460,7 +1461,7 @@ class RevisionInContext(object):
 
     @property
     def raw_content(self) -> str:
-        return self.revision.description
+        return self.revision.raw_content
 
     @property
     def author(self) -> UserInContext:

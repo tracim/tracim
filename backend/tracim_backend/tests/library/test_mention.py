@@ -36,7 +36,7 @@ html_with_several_mentions = '<span id="mention-foo">@bar</span><span id="mentio
 
 
 def create_content(
-    description: str,
+    raw_content: str,
     user_api_factory,
     workspace_api_factory,
     session,
@@ -68,7 +68,7 @@ def create_content(
         )
 
         with new_revision(session=session, tm=transaction.manager, content=content):
-            content.description = description
+            content.raw_content = raw_content
             api.update_content(content, new_label=content.label)
             api.save(content)
     return content
@@ -130,7 +130,7 @@ def one_updated_content_with_one_new_mention(
         app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
-        content.description = content.description + '<span id="mention-bar">@bar</span>'
+        content.raw_content = content.raw_content + '<span id="mention-bar">@bar</span>'
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
         api.update_content(content, new_label=content.label)
         api.save(content)
@@ -149,7 +149,7 @@ def one_updated_content_with_no_new_mention(
         app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
-        content.description = content.description + "<p>Hello, world</p>"
+        content.raw_content = content.raw_content + "<p>Hello, world</p>"
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
         api.update_content(content, new_label=content.label)
         api.save(content)
@@ -164,7 +164,7 @@ def one_updated_content_with_new_mention_all(
         "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
-        content.description = content.description + "<span id='mention-all'>@all</span>"
+        content.raw_content = content.raw_content + "<span id='mention-all'>@all</span>"
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
         api.update_content(content, new_label=content.label)
         api.save(content)
@@ -183,7 +183,7 @@ def one_updated_content_with_a_new_nasty_mention(
         app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
-        content.description = content.description + '<span id="mention-nasty">@nasty</span>'
+        content.raw_content = content.raw_content + '<span id="mention-nasty">@nasty</span>'
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
         api.update_content(content, new_label=content.label)
         api.save(content)

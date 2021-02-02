@@ -751,6 +751,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
+    raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
     file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
     #  INFO - A.P - 2017-07-03 - Depot Doc
@@ -1114,6 +1115,18 @@ class Content(DeclarativeBase):
     @description.expression
     def description(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.description
+
+    @hybrid_property
+    def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @raw_content.setter
+    def raw_content(self, value: str) -> None:
+        self.revision.raw_content = value
+
+    @raw_content.expression
+    def raw_content(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.raw_content
 
     @hybrid_property
     def file_name(self) -> str:

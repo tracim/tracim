@@ -1390,7 +1390,7 @@ class TestContentApi(object):
             workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
         )
         with new_revision(session, transaction.manager, content=text_file):
-            api.update_content(text_file, text_file.label, new_content="just a description")
+            api.update_content(text_file, text_file.label, new_raw_content="just a description")
             api.save(
                 content=text_file, action_description=ActionDescription.EDITION, do_notify=False
             )

@@ -88,7 +88,7 @@ class FolderController(Controller):
             api.update_container_content(
                 item=content,
                 new_label=hapic_data.body.label,
-                new_content=hapic_data.body.raw_content,
+                new_description=hapic_data.body.raw_content,
                 allowed_content_type_slug_list=hapic_data.body.sub_content_types,
             )
             api.save(content)
