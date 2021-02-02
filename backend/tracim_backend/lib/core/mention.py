@@ -171,8 +171,8 @@ class MentionBuilder:
             except UserDoesNotExist:
                 logger.warning(
                     cls,
-                    "user of username {} could not been found to obtain receivers list of event {}, "
-                    "user may have changed his username.".format(recipient, event.event_id),
+                    "Could not find user with username {} while obtaining the receiver list of event {}, "
+                    "user may have changed their username.".format(recipient, event.event_id),
                 )
                 return []
 
