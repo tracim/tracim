@@ -45,7 +45,7 @@ class UserSpacesConfigLine extends React.Component {
             intent='secondary'
             disabled={props.onlyManager}
             onClick={(() => props.onLeaveSpace(space.workspace_id))}
-            icon='sign-out'
+            icon='fas fa-sign-out-alt'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
             title={
               props.onlyManager

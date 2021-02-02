@@ -120,8 +120,8 @@ export const NewMemberForm = props => {
               : (
                 <div className='name__adminmsg'>
                   <ComposedIcon
-                    mainIcon='envelope'
-                    smallIcon='warning'
+                    mainIcon='far fa-envelope'
+                    smallIcon='fas fa-exclamation-triangle'
                     smallIconCustomClass='text-danger'
                   />
                   {props.t("Email notifications are disabled, you can't create new users from here")}

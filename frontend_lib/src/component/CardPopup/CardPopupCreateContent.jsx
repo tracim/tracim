@@ -99,7 +99,8 @@ PopupCreateContent.defaultProps = {
   label: '',
   customColor: '#333',
   inputPlaceHolder: '',
-  btnValidateLabel: ''
+  btnValidateLabel: '',
+  faIcon: ''
 }
 
 export default Radium(PopupCreateContent)

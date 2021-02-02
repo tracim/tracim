@@ -119,7 +119,7 @@ export class Header extends React.Component {
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
-                      mainIcon='fas fa-envelope'
+                      mainIcon='far fa-envelope'
                       smallIcon='fas fa-exclamation-triangle'
                       mainIconCustomClass='slowblink'
                       smallIconCustomClass='text-danger'

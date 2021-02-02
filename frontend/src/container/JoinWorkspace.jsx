@@ -114,14 +114,14 @@ export class JoinWorkspace extends React.Component {
       case SPACE_TYPE.onRequest.slug:
         return (
           <IconButton
-            icon='share'
+            icon='fas fa-share'
             text={props.t('Request access')}
             onClick={() => this.handleClickRequestAccess(workspace, props.user.userId)}
           />)
       case SPACE_TYPE.open.slug:
         return (
           <IconButton
-            icon='sign-in'
+            icon='fas fa-sign-in-alt'
             text={props.t('Join the space')}
             onClick={() => this.joinWorkspace(workspace)}
           />)
@@ -133,7 +133,7 @@ export class JoinWorkspace extends React.Component {
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fas fa-fw fa-2x fa-${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
+      ? <i className={`fas fa-fw fa-2x ${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
       : <i className='fas fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
     // RJ - 2020-10-30 - NOTE
     // This code uses props.t on a key that is translated in frontend_lib (spaceType.tradKey[0]).

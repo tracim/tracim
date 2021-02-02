@@ -224,7 +224,7 @@ export class SearchResult extends React.Component {
                 ? props.t('Search result')
                 : props.t('Search results')
               )}
-              icon='search'
+              icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
             />
 

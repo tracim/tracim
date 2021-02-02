@@ -58,7 +58,7 @@ const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
   return (
     <div className='profile__cover' data-cy='cover'>
-      {props.displayedUser
+      {(props.displayedUser
         ? (
           <div className='profile__cover' data-cy='profile-cover'>
             {props.displayedUser.hasCover && (
@@ -71,7 +71,7 @@ const CoverImage = translate()((props) => {
             {props.changeEnabled && (
               <IconButton
                 text={props.t('Change cover')}
-                icon='upload'
+                icon='fas fa-upload'
                 onClick={props.onChangeCoverClick}
                 customClass='profile__cover__changeBtn'
                 intent='secondary'
@@ -84,7 +84,9 @@ const CoverImage = translate()((props) => {
           <div className='profile__cover__loading'>
             <i className='fas fa-fw fa-spinner fa-spin' />
             {props.t('Loading')}
-          </div>)}
+          </div>
+        )
+      )}
     </div>
   )
 })

@@ -46,7 +46,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is deleted')}
           btnType='button'
-          icon='trash'
+          icon='far fa-trash-alt'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreDeleted}
         />

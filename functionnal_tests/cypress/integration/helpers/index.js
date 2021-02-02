@@ -10,7 +10,7 @@ export function login (cy) {
 
 export function logout (cy) {
   cy.get('#dropdownMenuButton.profilgroup__name.btn').click()
-  cy.get('div.setting__link .fa-sign-out').click()
+  cy.get('div.setting__link .fa-sign-out-alt').click()
 }
 
 export function create_file (cy) {

@@ -362,7 +362,7 @@ export class NotificationWall extends React.Component {
             customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickMarkAllAsRead}
             label={props.t('Mark all as read')}
-            faIcon='far envelope-open'
+            faIcon='far fa-envelope-open'
             dataCy='markAllAsReadButton'
           />
         </PopinFixedHeader>

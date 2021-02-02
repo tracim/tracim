@@ -121,7 +121,7 @@ class PopupCreateFile extends React.Component {
         validateLabel={props.t('Validate and create')}
         uploadUrl={this.createFileUrl}
         color={state.config.hexcolor}
-        icon={state.config.faIcon}
+        faIcon={state.config.faIcon}
         onClose={this.handleClosePopup}
         onSuccess={this.handleUploadSuccess}
         uploadErrorMessageList={errorMessageList}

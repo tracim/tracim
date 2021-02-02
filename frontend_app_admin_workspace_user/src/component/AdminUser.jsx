@@ -129,8 +129,8 @@ export class AdminUser extends React.Component {
               {!props.emailNotifActivated && (
                 <div>
                   <ComposedIcon
-                    mainIcon='envelope'
-                    smallIcon='warning'
+                    mainIcon='far fa-envelope'
+                    smallIcon='fas fa-exclamation-triangle'
                     mainIconCustomClass='primaryColorFont'
                     smallIconCustomClass='text-danger'
                   />

@@ -112,7 +112,7 @@ const ActivityList = (props) => {
         <IconButton
           customClass='activityList__refresh'
           text={props.t('Refresh')}
-          intent='fas fa-link'
+          intent='link'
           onClick={props.onRefreshClicked}
           dataCy='activityList__refresh'
         />

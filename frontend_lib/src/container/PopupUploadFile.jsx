@@ -231,7 +231,7 @@ PopupUploadFile.propTypes = {
 PopupUploadFile.defaultProps = {
   additionalFormData: {},
   multipleFiles: false,
-  faIcon: 'fa-upload',
+  faIcon: 'fas fa-upload',
   httpMethod: 'POST',
   maximumFileSize: 0,
   onSuccess: () => {},

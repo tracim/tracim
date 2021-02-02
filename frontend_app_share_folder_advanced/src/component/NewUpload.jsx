@@ -171,8 +171,8 @@ export class NewUpload extends React.Component {
         {!props.emailNotifActivated && (
           <div className='newUpload__emailWarning'>
             <ComposedIcon
-              mainIcon='envelope'
-              smallIcon='warning'
+              mainIcon='far fa-envelope'
+              smallIcon='fas fa-exclamation-triangle'
               smallIconCustomClass='text-danger'
             />
             {props.t('Email notification are disabled, please manually share the link')}
