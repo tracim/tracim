@@ -766,7 +766,7 @@ export class Gallery extends React.Component {
                   data-cy='gallery__action__button__delete'
                 >
                   <span className='gallery__action__button__text'>{props.t('Delete')}</span>
-                  <i className='far fa-fw fa-trash-alt' />
+                  <i className='fas fa-fw fa-trash-alt' />
                 </button>
               )}
             </div>

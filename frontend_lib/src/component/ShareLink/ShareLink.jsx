@@ -60,7 +60,7 @@ class ShareLink extends React.Component {
           title={props.t('Copy link')}
           onClick={this.handleCopyToClipboard}
         >
-          <i className='fas fa-fw fa-files-o' />
+          <i className='far fa-fw fa-copy' />
         </button>
 
         {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
@@ -76,7 +76,7 @@ class ShareLink extends React.Component {
             onClick={() => props.onClickDeleteShareLink(props.id)}
             data-cy='deleteShareLink'
           >
-            <i className='far fa-fw fa-trash-' />
+            <i className='far fa-fw fa-trash-alt' />
           </button>}
       </div>
     )

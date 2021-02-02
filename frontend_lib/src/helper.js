@@ -115,7 +115,7 @@ export const revisionTypeList = [{
   label: i18n.t('Item archived')
 }, {
   id: 'content-comment',
-  faIcon: 'fas fa-comment',
+  faIcon: 'far fa-comment',
   label: i18n.t('Comment')
 }, {
   id: 'creation',
@@ -123,7 +123,7 @@ export const revisionTypeList = [{
   label: i18n.t('Item created')
 }, {
   id: 'deletion',
-  faIcon: 'fas fa-trash-alt',
+  faIcon: 'far fa-trash-alt',
   label: i18n.t('Item deleted')
 }, {
   id: 'edition',
@@ -139,11 +139,11 @@ export const revisionTypeList = [{
   label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
-  faIcon: 'fas fa-file-archive',
+  faIcon: 'far fa-file-archive',
   label: i18n.t('Item unarchived')
 }, {
   id: 'undeletion',
-  faIcon: 'fas fa-trash-alt',
+  faIcon: 'far fa-trash-alt',
   label: i18n.t('Item restored')
 }, {
   id: 'move',
@@ -151,7 +151,7 @@ export const revisionTypeList = [{
   label: i18n.t('Item moved')
 }, {
   id: 'copy',
-  faIcon: 'fas fa-files',
+  faIcon: 'far fa-copy',
   label: i18n.t('Item copied')
 }]
 
@@ -257,7 +257,7 @@ export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 const OPEN = {
   id: 2,
   slug: 'open',
-  faIcon: 'fas fa-sun',
+  faIcon: 'far fa-sun',
   tradKey: [
     i18n.t('Open'),
     i18n.t('Any user will be able to see, join and open this space.')

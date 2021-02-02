@@ -1,14 +1,14 @@
 const OPEN = {
   slug: 'open',
   label: 'Opened',
-  faIcon: 'fas fa-square',
+  faIcon: 'far fa-square',
   hexcolor: '#3f52e3',
   globalStatus: 'open'
 }
 const VALIDATED = {
   slug: 'closed-validated',
   label: 'Validated',
-  faIcon: 'fas fa-check-square',
+  faIcon: 'far fa-check-square',
   hexcolor: '#008000',
   globalStatus: 'closed'
 }

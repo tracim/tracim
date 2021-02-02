@@ -110,7 +110,7 @@ class UploadForm extends React.Component {
             onClick={props.onClickSend}
             disabled={this.sendButtonIsDisabled()}
           >
-            {props.t('Send')} <i className='fas fa-fw fa-paper-plane' />
+            {props.t('Send')} <i className='far fa-fw fa-paper-plane' />
           </button>
         </div>
       </form>

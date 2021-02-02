@@ -9,15 +9,15 @@ export const FlashMessage = props => {
 
   const dataTypeArray = [{
     id: 'info',
-    icon: 'lightbulb',
+    icon: 'far fa-lightbulb',
     label: props.t('Information')
   }, {
     id: 'warning',
-    icon: 'exclamation-circle',
+    icon: 'fas fa-exclamation-circle',
     label: props.t('Warning')
   }, {
     id: 'danger',
-    icon: 'minus-circle',
+    icon: 'fas fa-minus-circle',
     label: props.t('Error')
   }]
 
@@ -39,7 +39,7 @@ export const FlashMessage = props => {
             )}
             <div className='flashmessage__container__content'>
               <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
-                <i className={classnames(`fas fa-${dataType.icon}`)} />
+                <i className={classnames(`${dataType.icon}`)} />
               </div>
 
               <div className='flashmessage__container__content__text'>

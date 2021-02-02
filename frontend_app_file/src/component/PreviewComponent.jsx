@@ -99,7 +99,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download current page as PDF')}
               key='file_btn_dl_pdfall'
             >
-              <i className='fas fa-file' />
+              <i className='far fa-file' />
             </a>
           )}
 
@@ -114,7 +114,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download as PDF')}
               key='file_btn_dl_pdfpage'
             >
-              <i className='fas fa-file-pdf' />
+              <i className='far fa-file-pdf' />
             </a>
           )}
 
@@ -168,7 +168,7 @@ export class PreviewComponent extends React.Component {
                     )
                     : (
                       <>
-                        <i className='previewcomponent__fileimg__text-icon fas fa-eye-slash' style={{ color: props.color }} />
+                        <i className='previewcomponent__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
                         <div className='previewcomponent__fileimg__text-msg'>
                           {props.t('No preview available')}
                         </div>

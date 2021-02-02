@@ -101,8 +101,8 @@ const PopupUploadImage = translate()((props) => {
       allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
       maximumFileSize={MAXIMUM_IMAGE_SIZE}
     >
-      <i className='fas fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
-      <i className='fas fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+      <i className='fas fa-fw fa-expand-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
+      <i className='far fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
     </PopupUploadFile>
   )
 })

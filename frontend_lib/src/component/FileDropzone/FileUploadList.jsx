@@ -17,7 +17,7 @@ export const FileUploadList = (props) => {
       <div className='file__upload__list'>
         {props.fileUploadList.map((fileUpload) =>
           <div className='file__upload__list__item' key={fileUpload.file.name}>
-            <i className='fas fa-fw fa-file-o m-1' />
+            <i className='far fa-fw fa-file-o m-1' />
             <div className='file__upload__list__item__label'>
               {fileUpload.file.name} ({displayFileSize(fileUpload.file.size)})
             </div>

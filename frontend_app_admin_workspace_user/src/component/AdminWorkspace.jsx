@@ -61,7 +61,7 @@ const AdminWorkspace = props =>
                   {/*
                     <td className='d-flex align-items-center flex-wrap'>
                       <div className='adminWorkspace__workspaceTable__calendaricon mr-2'>
-                        <i className='fas fa-fw fa-check-square-o' />
+                        <i className='far fa-fw fa-check-square' />
                       </div>
                       Enable
                     </td>

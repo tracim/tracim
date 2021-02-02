@@ -113,7 +113,7 @@ export const NewMemberForm = props => {
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fas fa-fw fa-lightbulb-o' />
+                  <i className='name__adminmsg__icon far fa-fw fa-lightbulb-o' />
                   {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
                 </div>
               )

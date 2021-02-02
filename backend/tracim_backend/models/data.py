@@ -400,7 +400,7 @@ class ActionDescription(object):
         "archiving": "fas fa-archive",
         "content-comment": "far fa-comment",
         "creation": "fas fa-magic",
-        "deletion": "fas trash-alt",
+        "deletion": "far trash-alt",
         "edition": "fas fa-edit",
         "revision": "fas fa-history",
         "status-update": "fas fa-random",
@@ -491,8 +491,8 @@ class ActionDescription(object):
 #     #
 #     # _ICONS = {
 #     #     'open': 'fas fa-square-o',
-#     #     'closed-validated': 'fas fa-check-square-o',
-#     #     'closed-unvalidated': 'fas fa-close',
+#     #     'closed-validated': 'far fa-check-square',
+#     #     'closed-unvalidated': 'fas fa-times',
 #     #     'closed-deprecated': 'fas fa-warning',
 #     # }
 #     #
@@ -563,24 +563,24 @@ class ActionDescription(object):
 #     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 #     # _ICONS = {  # Deprecated
 #     #     'dashboard': 'fas fa-home',
-#     #     'workspace': 'fas fa-university',
-#     #     'folder': 'fas fa-folder-open-o',
+#     #     'workspace': 'fas fa-users',
+#     #     'folder': 'far fa-folder-open',
 #     #     'file': 'fas fa-paperclip',
-#     #     'page': 'fas fa-file-text-o',
+#     #     'page': 'far fa-file-alt',
 #     #     'thread': 'fas fa-comments',
 #     #     'comment': 'fas fa-comment',
-#     #     'event': 'fas fa-agenda-o',
+#     #     'event': 'far fa-calendar',
 #     # }
 #     #
 #     # _CSS_ICONS = {
 #     #     'dashboard': 'fas fa-home',
-#     #     'workspace': 'fas fa-bank',
-#     #     'folder': 'fas fa-folder-open-o',
+#     #     'workspace': 'fas fa-users',
+#     #     'folder': 'far fa-folder-open',
 #     #     'file': 'fas fa-paperclip',
-#     #     'page': 'fas fa-file-text-o',
+#     #     'page': 'far fa-file-alt',
 #     #     'thread': 'far fa-comments',
 #     #     'comment': 'far fa-comment',
-#     #     'event': 'fas fa-agenda-o',
+#     #     'event': 'far fa-calendar',
 #     # }
 #     #
 #     # _CSS_COLORS = {

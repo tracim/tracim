@@ -108,7 +108,7 @@ export class NewUpload extends React.Component {
                     data-cy='seePassword'
                     onClick={this.handleTogglePasswordVisibility}
                   >
-                    <i className={state.hidePassword ? 'fas fa-fw fa-eye' : 'fas fa-fw fa-eye-slash'} />
+                    <i className={state.hidePassword ? 'far fa-fw fa-eye' : 'far fa-fw fa-eye-slash'} />
                   </button>
                 </div>
 
@@ -120,7 +120,7 @@ export class NewUpload extends React.Component {
                   style={{ ':hover': { color: customColor } }}
                   onClick={this.handleRandomPassword}
                 >
-                  <i className='fas fa-fw fa-repeat' />
+                  <i className='fas fa-fw fa-redo' />
                 </button>
               </div>
 

@@ -5,7 +5,7 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'folder',
-    faIcon: 'folder',
+    faIcon: 'far fa-folder',
     hexcolor: '#414548',
     creationLabel: 'Create a folder',
     label: 'Folder'

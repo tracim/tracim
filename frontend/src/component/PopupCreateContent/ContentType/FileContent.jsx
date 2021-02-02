@@ -11,7 +11,7 @@ const FileContent = props => {
 
       <div className='filecontent__contentname d-flex align-items-center mb-4'>
         <div className='filecontent__contentname__icon mr-3'>
-          <i className='fas fa-file-text-o' />
+          <i className='fas fa-file-alt' />
         </div>
 
         <div className='filecontent__contentname__title'>

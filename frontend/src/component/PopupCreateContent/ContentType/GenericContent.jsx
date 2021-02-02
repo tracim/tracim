@@ -11,7 +11,7 @@ const GenericContent = props => {
 
       <div className='genericcontent__contentname d-flex align-items-center mb-4'>
         <div className='genericcontent__contentname__icon mr-3'>
-          <i className='fas fa-file-word-o' />
+          <i className='far fa-file-word' />
         </div>
 
         <div className='genericcontent__contentname__title'>

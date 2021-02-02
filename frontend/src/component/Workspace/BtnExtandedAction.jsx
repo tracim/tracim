@@ -67,7 +67,7 @@ export const ExtandedAction = props => {
           to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
           key='extended_action_gallery'
         >
-          <i className='fas fa-fw fa-picture' />
+          <i className='far fa-fw image' />
           {props.t('Gallery')}
         </Link>
       )}

@@ -230,7 +230,7 @@ export class Timeline extends React.Component {
                   <div
                     className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
                   >
-                    <i className='fas fa-paper-plane' />
+                    <i className='far fa-paper-plane' />
                   </div>
                 </button>
               </div>

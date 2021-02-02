@@ -32,7 +32,7 @@
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
     "customClass": "wsContentPageHtml",
-    "icon": "fas fa-fw fa-file-text",
+    "icon": "far fa-fw fa-file-alt",
     "color": "#3f52e3",
     "domContainer": "appFeatureContainer"
   }, {
@@ -44,7 +44,7 @@
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",
     "customClass": "wsContentPageMarkdown",
-    "icon": "fas fa-fw fa-file-code",
+    "icon": "far fa-fw fa-file-code",
     "color": "#e0082b",
     "domContainer": "appFeatureContainer"
   }, {
@@ -56,7 +56,7 @@
     "componentLeft": "File",
     "componentRight": "undefined",
     "customClass": "wsContentFile",
-    "icon": "fas fa-fw fa-file-image",
+    "icon": "far fa-fw fa-file-image",
     "color": "#263462",
     "domContainer": "appFeatureContainer"
   }, {
@@ -68,7 +68,7 @@
     "componentLeft": "Thread",
     "componentRight": "undefined",
     "customClass": "wsContentThread",
-    "icon": "fas fa-fw fa-comments",
+    "icon": "far fa-fw fa-comments",
     "color": "#2674d3",
     "domContainer": "appFeatureContainer"
   }, {
@@ -92,7 +92,7 @@
     "componentLeft": "Issue",
     "componentRight": "undefined",
     "customClass": "wsContentIssue",
-    "icon": "fas fa-fw fa-ticket",
+    "icon": "fas fa-fw fa-ticket-alt",
     "color": "#a4835e",
     "domContainer": "appFeatureContainer"
   }],
@@ -281,7 +281,7 @@
     "type": "pageHtml",
     "title": "Modification Design v2",
     "status": "validated",
-    "icon": "fas fa-fw fa-code-fork",
+    "icon": "fas fa-fw fa-code-branch",
     "version": "version n°5",
     "text": " <center><b>Design V2</b></center><br/><br/><br/> Suite à la réunion tenue ce vendredi, je mets à jour ce document concernant le futur design de notre interface. Comme convenue nous aurons un dashboard qui va résumer toute l'activité présente sur le site ainsi que toutes les personnes qui auront participer au projet. De plus il y aura la présence d'un historique pour permettre à tout le monde de voir, qui a modifié, créé ou contribué aux documents. Mais aussi savoir qui a déposé ou envoyé un message dans le canal de discussion. <br/><br/><br/><br/><br/> Deuxième point évoqué: Le fait de pouvoir modifier l'interface et la couleur pour les futurs utilisateurs. On devra donc avoir accés à différents thémes d'interface et de couleurs prédéfinis mais aussi le possibilité de pouvoir créer ces propres thémes. Des maquettes devront bientôt être disponible pour nous donner un aperçu de ce que pourra être l'outil final. <br/><br/><br/><br/> Nécesité pas à rajouter,modifier ce que j'ai écrit, il doit surêment y avoir des manques. ",
     "workspace": {

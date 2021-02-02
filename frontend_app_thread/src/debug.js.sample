@@ -5,7 +5,7 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'thread',
-    faIcon: 'comments',
+    faIcon: 'far fa-comments',
     hexcolor: '#428BCA',
     creationLabel: 'Start a topic',
     label: 'Thread'
