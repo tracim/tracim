@@ -42,7 +42,7 @@ describe('<ContentItemSearch />', () => {
     )
 
     it(`should display the status icon: ${status.faIcon}`, () =>
-      expect(wrapper.find(`div.content__status__icon > i.${status.faIcon}`).length).to.equal(1)
+      expect(wrapper.find('div.content__status__icon').children('i').prop('className')).include(status.faIcon)
     )
 
     it(`should display the icon: ${props.faIcon}`, () =>
