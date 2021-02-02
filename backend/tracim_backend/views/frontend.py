@@ -31,6 +31,9 @@ BASE_CSP_DIRECTIVES = (
     ("font-src", "data: blob: *"),
     ("img-src", "data: blob: *"),
     ("media-src", "data: blob: *"),
+    # NOTE R.J. - 2020-02-02 - frame-src: * is needed for video integration from services
+    # like YouTube or PeerTube in HTML documents (tinyMce has a media button for this)
+    ("frame-src", "*"),
     ("object-src", "'none'"),
     ("default-src", "'self'"),
 )
