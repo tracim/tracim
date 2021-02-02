@@ -585,7 +585,8 @@ class FileController(Controller):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
-                new_content=hapic_data.body.raw_content,
+                new_raw_content=hapic_data.body.raw_content,
+                new_description=hapic_data.body.raw_description,
             )
             api.save(content)
             api.execute_update_content_actions(content)

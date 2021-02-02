@@ -1432,6 +1432,9 @@ class ReadStatusSchema(marshmallow.Schema):
 class ContentSchema(ContentDigestSchema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+    description = StrippedString(
+        required=True, description="raw text or html description of the contnet"
+    )
 
 
 class TextBasedDataAbstractSchema(marshmallow.Schema):
@@ -1442,7 +1445,6 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
-    raw_content = StrippedString(description="raw text or html description of the file")
     page_nb = marshmallow.fields.Int(
         description="number of pages, return null value if unaivalable", example=1, allow_none=True
     )
@@ -1511,6 +1513,7 @@ class CommentSchema(marshmallow.Schema):
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    description = StrippedString(example="This is a description")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
@@ -1535,6 +1538,9 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
         example="contract for client XXX",
         description="New title of the content",
         validate=not_empty_string_validator,
+    )
+    description = StrippedString(
+        required=True, description="raw text or html description of the contnet"
     )
 
 

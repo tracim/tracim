@@ -677,7 +677,7 @@ class TestFolder(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.update_content(
-                folder, new_label="test-folder-updated", new_content="Just a test"
+                folder, new_label="test-folder-updated", new_raw_content="Just a test"
             )
         content_api.save(folder)
         with new_revision(session=session, tm=transaction.manager, content=folder):
@@ -4358,7 +4358,7 @@ class TestThreads(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         content_api.save(test_thread)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
