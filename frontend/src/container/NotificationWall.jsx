@@ -215,17 +215,17 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.CREATED: {
           let notificationText
           if (props.user.userId === notification.user.userId) {
-            notificationText = '{{author}} added you to {{space}}'
+            notificationText = props.t('{{author}} added you to {{space}}', i18nOpts)
           } else {
             if (notification.author.userId === notification.user.userId) {
-              notificationText = '{{author}} joined space {{space}}'
+              notificationText = props.t('{{author}} joined space {{space}}', i18nOpts)
             } else {
-              notificationText = '{{author}} added {{user}} to {{space}}'
+              notificationText = props.t('{{author}} added {{user}} to {{space}}', i18nOpts)
             }
           }
           return {
             icon: 'user-plus',
-            text: props.t(notificationText, i18nOpts),
+            text: notificationText,
             url: dashboardUrl
           }
         }
