@@ -169,7 +169,11 @@ class MentionBuilder:
                 user = user_api.get_one_by_username(recipient)
                 return [user.user_id]
             except UserDoesNotExist:
-                logger.warning(cls, "user of username {} could not been found !".format(recipient))
+                logger.warning(
+                    cls,
+                    "user of username {} could not been found to get receivers of event {},"
+                    "user may have changed his username.".format(recipient, event.event_id),
+                )
                 return []
 
     @classmethod
