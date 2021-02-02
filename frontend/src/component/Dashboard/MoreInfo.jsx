@@ -10,7 +10,7 @@ export const MoreInfo = props =>
         onClick={props.onClickToggleWebdav}
       >
         <div className='moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>
-          <i className='fas=b fa-windows' />
+          <i className='fab fa-windows' />
         </div>
 
         <div className='moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
