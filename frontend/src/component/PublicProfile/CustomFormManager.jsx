@@ -22,7 +22,7 @@ const DisplaySchemaPropertyLabel = translate()(props => (
   (props.label && props.label.trim())
     ? (
       <span className='DisplaySchemaPropertyString__label'>
-        {props.t('{{label}}: ', { label: props.label })}
+        {props.t('{{label}}: ', { label: props.label, interpolation: { escapeValue: false } })}
       </span>
     )
     : null
