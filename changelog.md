@@ -3,6 +3,7 @@
 ### New Features
 
 - All users have a parameterizable public profile
+- User interface now use font awesome 5+ icon
 
 ### Fixed Issues
 
@@ -12,6 +13,8 @@
 [#3989](https://github.com/tracim/tracim/issues/3989),
 [#3999](https://github.com/tracim/tracim/issues/3999),
 [#4109](https://github.com/tracim/tracim/issues/4109)
+- Backend: [#4137](https://github.com/tracim/tracim/issues/4137),
+[#4142](https://github.com/tracim/tracim/issues/4142)
 - Other: [#4062](https://github.com/tracim/tracim/issues/4062)
 
 ### Known Issues
