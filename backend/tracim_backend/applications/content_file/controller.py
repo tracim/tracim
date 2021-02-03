@@ -40,7 +40,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import FileContentModifySchema
+from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
@@ -564,7 +564,7 @@ class FileController(Controller):
     @check_right(is_contributor)
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(FileContentModifySchema())
+    @hapic.input_body(ContentModifySchema())
     @hapic.output_body(FileContentSchema())
     def update_file_info(
         self, context, request: TracimRequest, hapic_data=None

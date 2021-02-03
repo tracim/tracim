@@ -26,11 +26,11 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentModifySchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
@@ -122,7 +122,7 @@ class ThreadController(Controller):
     @check_right(is_contributor)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(TextBasedContentModifySchema())
+    @hapic.input_body(ContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
     def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """

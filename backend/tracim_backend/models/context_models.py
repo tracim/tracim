@@ -616,7 +616,7 @@ class SetContentStatus(object):
         self.status = status
 
 
-class TextBasedContentUpdate(object):
+class ContentUpdate(object):
     """
     TextBasedContent update model
     """
@@ -1189,6 +1189,10 @@ class ContentInContext(object):
         return self.content.raw_content
 
     @property
+    def description(self) -> str:
+        return self.content.description
+
+    @property
     def author(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
@@ -1462,6 +1466,10 @@ class RevisionInContext(object):
     @property
     def raw_content(self) -> str:
         return self.revision.raw_content
+
+    @property
+    def description(self) -> str:
+        return self.content.description
 
     @property
     def author(self) -> UserInContext:

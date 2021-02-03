@@ -43,6 +43,7 @@ from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
@@ -66,7 +67,6 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
-from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -1433,15 +1433,16 @@ class ContentSchema(ContentDigestSchema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
     description = StrippedString(
-        required=True, description="raw text or html description of the contnet"
+        required=True, description="raw text or html description of the content"
     )
-
-
-class TextBasedDataAbstractSchema(marshmallow.Schema):
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
+
+
+class TextBasedContentSchema(ContentSchema):
+    pass
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
@@ -1462,10 +1463,6 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     has_jpeg_preview = marshmallow.fields.Bool(
         description="true if a jpeg preview is available or false", example=True
     )
-
-
-class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
-    pass
 
 
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
@@ -1489,9 +1486,16 @@ class RevisionSchema(ContentDigestSchema):
         format=DATETIME_FORMAT, description="Content creation date"
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
+    description = StrippedString(
+        required=True, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
 
 
-class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+class TextBasedRevisionSchema(ContentSchema):
     pass
 
 
@@ -1540,17 +1544,21 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
         validate=not_empty_string_validator,
     )
     description = StrippedString(
-        required=True, description="raw text or html description of the contnet"
+        required=True, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
-class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
-        return TextBasedContentUpdate(**data)
+        return ContentUpdate(**data)
 
 
-class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
         description="list of content types allowed as sub contents. "
@@ -1562,10 +1570,6 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     @post_load
     def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return FolderContentUpdate(**data)
-
-
-class FileContentModifySchema(TextBasedContentModifySchema):
-    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):
