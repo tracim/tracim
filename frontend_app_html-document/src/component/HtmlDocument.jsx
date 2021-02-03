@@ -36,7 +36,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is archived')}
           btnType='button'
-          icon='archive'
+          icon='fas fa-archive'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreArchived}
         />

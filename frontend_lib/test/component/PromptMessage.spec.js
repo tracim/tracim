@@ -37,7 +37,7 @@ describe('<PromptMessage />', function () {
     })
 
     it(`should display 2 icon "${props.icon}"`, () => {
-      expect(wrapper.find(`i.fa-${props.icon}`)).to.have.lengthOf(2)
+      expect(wrapper.find(`i.${props.icon}`)).to.have.lengthOf(2)
     })
 
     it('should only display the buttonLink when the btnType is set to link"', () => {
@@ -45,9 +45,9 @@ describe('<PromptMessage />', function () {
       expect(wrapper.find('button.promptMessage__btn')).to.have.lengthOf(1)
     })
 
-    it(`should display 1 icon when the btnType is set to link"${props.icon}"`, () => {
+    it(`should display 1 icon when the btnType is set to link "${props.icon}"`, () => {
       wrapper.setProps({ btnType: 'link' })
-      expect(wrapper.find(`.fa-${props.icon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`.${props.icon}`)).to.have.lengthOf(1)
     })
   })
 
