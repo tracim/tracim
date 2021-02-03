@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { IconButton, Checkbox } from 'tracim_frontend_lib'
@@ -19,19 +18,20 @@ const DisplayTitle = props => {
   )
 }
 
+const DisplaySchemaPropertyLabel = translate()(props => (
+  (props.label && props.label.trim())
+    ? (
+      <span className='DisplaySchemaPropertyString__label'>
+        {props.t('{{label}}: ', { label: props.label, interpolation: { escapeValue: false } })}
+      </span>
+    )
+    : null
+))
+
 const DisplaySchemaPropertyString = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          // INFO - GB - 20210129 - We check the space to not put : in the case of a fake empty label
-          // See https://github.com/tracim/tracim/issues/4123
-          { noLabel: !props.label || props.label === ' ' }
-        )}
-      >
-        {props.label}
-      </span>
+      <DisplaySchemaPropertyLabel {...props} />
       <span
         className='DisplaySchemaPropertyString__value'
         dangerouslySetInnerHTML={{ __html: props.value }}
@@ -43,14 +43,7 @@ const DisplaySchemaPropertyString = props => {
 const DisplaySchemaPropertyBoolean = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          { noLabel: !props.label }
-        )}
-      >
-        {props.label}
-      </span>
+      <DisplaySchemaPropertyLabel {...props} />
       <span className='DisplaySchemaPropertyString__value'>
         <Checkbox
           name={props.label}
