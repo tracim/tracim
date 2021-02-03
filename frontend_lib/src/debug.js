@@ -8,25 +8,25 @@ import {
 const STATUSES = [{
   label: 'Opened',
   slug: 'open',
-  faIcon: 'square-o',
+  faIcon: 'far fa-square',
   hexcolor: '#3f52e3',
   globalStatus: 'open'
 }, {
   label: 'Validated',
   slug: 'closed-validated',
-  faIcon: 'check-square-o',
+  faIcon: 'far fa-check-square',
   hexcolor: '#008000',
   globalStatus: 'closed'
 }, {
   label: 'Cancelled',
   slug: 'closed-unvalidated',
-  faIcon: 'close',
+  faIcon: 'fas fa-times',
   hexcolor: '#f63434',
   globalStatus: 'closed'
 }, {
   label: 'Deprecated',
   slug: 'closed-deprecated',
-  faIcon: 'warning',
+  faIcon: 'fas fa-exclamation-triangle',
   hexcolor: '#ababab',
   globalStatus: 'closed'
 }]

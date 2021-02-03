@@ -109,7 +109,7 @@ export class AddUserForm extends React.Component {
             />
             {!props.isUsernameValid && state.newUserUsername !== '' && (
               <div className='userData__input__username__errorMsg'>
-                <i className='userData__input__username__errorIcon fa fa-times' />
+                <i className='userData__input__username__errorIcon fas fa-times' />
                 {props.usernameInvalidMsg}
               </div>
             )}
@@ -132,7 +132,7 @@ export class AddUserForm extends React.Component {
                   className='userData__email__info'
                   id='popoverEmailInfo'
                 >
-                  <i className='fa fa-fw fa-question-circle' />
+                  <i className='fas fa-fw fa-question-circle' />
                 </button>
 
                 <Popover
@@ -179,7 +179,7 @@ export class AddUserForm extends React.Component {
 
           {(props.emailNotifActivated && state.newUserEmail === '') && (
             <div className='userData__info'>
-              <i className='fa fa-exclamation-triangle userData__info__icon' />
+              <i className='fas fa-exclamation-triangle userData__info__icon' />
               {props.t('If you do not link an email to this new user, please notify manually the username and password.')}
             </div>
           )}
@@ -211,7 +211,7 @@ export class AddUserForm extends React.Component {
                   </div>
 
                   <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
-                    <i className={`fa fa-fw fa-${p.faIcon}`} />
+                    <i className={`fa-fw ${p.faIcon}`} />
                   </div>
 
                   <div className='profile__list__item__content'>
@@ -236,7 +236,7 @@ export class AddUserForm extends React.Component {
             disabled={this.isValidateButtonDisabled()}
           >
             {props.t('Create the user')}
-            <i className='fa fa-fw fa-check' />
+            <i className='fas fa-fw fa-check' />
           </button>
         </div>
       </form>

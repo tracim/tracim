@@ -21,15 +21,19 @@ APP_FRONTEND_PATH = "app/{minislug}.app.js"
 # INFO S.G - 2020-12-10 - minimum recommended size is 128bits = 16bytes, doubling this
 CSP_NONCE_SIZE = 32
 BASE_CSP_DIRECTIVES = (
-    # NOTE S.G - 2020-12-14 - unsafe-eval will be needed for custom forms app
+    # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
+    # custom forms app and user profile page
     # (react-jsonschema-form/ajv dependency)
-    ("script-src", "'nonce-{nonce}'"),
+    ("script-src", "'unsafe-eval' 'nonce-{nonce}'"),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
-    ("font-src", "data: *"),
-    ("img-src", "data: *"),
-    ("media-src", "data: *"),
+    ("font-src", "data: blob: *"),
+    ("img-src", "data: blob: *"),
+    ("media-src", "data: blob: *"),
+    # NOTE R.J. - 2020-02-02 - frame-src: * is needed for video integration from services
+    # like YouTube or PeerTube in HTML documents (tinyMce has a media button for this)
+    ("frame-src", "*"),
     ("object-src", "'none'"),
     ("default-src", "'self'"),
 )

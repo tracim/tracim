@@ -224,7 +224,7 @@ export class SearchResult extends React.Component {
                 ? props.t('Search result')
                 : props.t('Search results')
               )}
-              icon='search'
+              icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
             />
 
@@ -253,7 +253,7 @@ export class SearchResult extends React.Component {
                     <ContentItemSearch
                       label={searchItem.label}
                       path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
-                      lastModificationAuthor={searchItem.lastModifier.public_name}
+                      lastModificationAuthor={searchItem.lastModifier}
                       lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
                       fileExtension={searchItem.fileExtension}

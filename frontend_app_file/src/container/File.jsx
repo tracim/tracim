@@ -818,6 +818,7 @@ export class File extends React.Component {
         <Timeline
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
+          apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
           newComment={state.newComment}
@@ -991,7 +992,7 @@ export class File extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Upload a new version')}
-                  icon='upload'
+                  icon='fas fa-upload'
                 />
               )}
 
@@ -1006,7 +1007,7 @@ export class File extends React.Component {
                   style={{
                     marginLeft: '5px'
                   }}
-                  faIcon='edit'
+                  faIcon='fas fa-edit'
                 />
               )}
 
@@ -1017,7 +1018,7 @@ export class File extends React.Component {
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                   data-cy='appFileLastVersionBtn'
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -1028,7 +1029,7 @@ export class File extends React.Component {
                   customColor={state.config.hexcolor}
                   label={props.t('Play video')}
                   onClick={() => this.setState({ previewVideo: true })}
-                  faIcon='play'
+                  faIcon='fas fa-play'
                   style={{ marginLeft: '5px' }}
                 />
               )}

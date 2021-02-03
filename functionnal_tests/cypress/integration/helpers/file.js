@@ -12,6 +12,6 @@ export const create_file = (cy, fileTitle = 'newFile') => {
   cy.get('[data-cy="popinFixed"].file')
     .should('be.visible')
 
-  cy.get(`.workspace__content__fileandfolder > .content[title="${fileTitle}"] .fa.fa-paperclip`)
+  cy.get(`.workspace__content__fileandfolder > .content[title="${fileTitle}"] .fas.fa-paperclip`)
     .should('be.visible')
 }

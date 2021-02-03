@@ -180,6 +180,7 @@ const updateActivity = (message, activity) => {
  */
 export const addMessageToActivityList = async (message, activityList, apiUrl) => {
   const activityParams = getActivityParams(message)
+  if (!activityParams) return activityList
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
     const activity = await createActivity(activityParams, [message], apiUrl)

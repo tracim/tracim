@@ -5,7 +5,7 @@ export const ImportConfirmation = props => {
   return (
     <div className='importConfirmation'>
       <h4>{props.title}</h4>
-      <i className='importConfirmation__icon fa fa-fw fa-check' />
+      <i className='importConfirmation__icon fas fa-fw fa-check' />
       <p>{props.text}</p>
     </div>
   )

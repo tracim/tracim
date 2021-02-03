@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { FETCH_CONFIG } from '../../../util/helper.js'
 import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
@@ -15,7 +16,8 @@ export const MenuProfil = props => {
         buttonOpts={
           <Avatar
             size={AVATAR_SIZE.SMALL}
-            publicName={props.user.publicName}
+            user={props.user}
+            apiUrl={FETCH_CONFIG.apiUrl}
             key='menuprofil__dropdown__avatar'
           />
         }
@@ -29,7 +31,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__profile__link'
           key='menuprofil__dropdown__profile__link'
         >
-          <i className='fa fa-fw fa-user-o' />
+          <i className='far fa-fw fa-user' />
           {props.t('My profile')}
         </Link>
 
@@ -38,7 +40,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__account__link'
           key='menuprofil__dropdown__account__link'
         >
-          <i className='fa fa-fw fa-cogs' />
+          <i className='fas fa-fw fa-cogs' />
           {props.t('Account Settings')}
         </Link>
 
@@ -48,7 +50,7 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__logout__link'
           key='menuprofil__dropdown__logout__link'
         >
-          <i className='fa fa-fw fa-sign-out' />
+          <i className='fas fa-fw fa-sign-out-alt' />
           {props.t('Logout')}
         </button>
       </DropdownMenu>

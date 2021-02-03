@@ -725,7 +725,7 @@ export class Gallery extends React.Component {
         <PageWrapper customClass='gallery'>
           <PageTitle
             title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
-            icon='picture-o'
+            icon='far fa-image'
             breadcrumbsList={state.breadcrumbsList}
             parentClass='gallery__header'
           />
@@ -740,7 +740,7 @@ export class Gallery extends React.Component {
                 <span className='gallery__action__button__text'>
                   {state.autoPlay ? props.t('Pause') : props.t('Play')}
                 </span>
-                <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                <i className={classnames('fa-fw fas', state.autoPlay ? 'fa-pause' : 'fa-play')} />
               </button>
 
               <button
@@ -748,7 +748,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fa-fw fas fa-undo' />
               </button>
 
               <button
@@ -756,7 +756,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fa-fw fas fa-undo' />
               </button>
 
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
@@ -765,7 +765,8 @@ export class Gallery extends React.Component {
                   onClick={this.handleOpenDeleteFilePopup}
                   data-cy='gallery__action__button__delete'
                 >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fa fa-fw fa-trash' />
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span>
+                  <i className='far fa-fw fa-trash-alt' />
                 </button>
               )}
             </div>
@@ -783,7 +784,7 @@ export class Gallery extends React.Component {
                 />
               ) : (
                 <div className='gallery__loader'>
-                  <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+                  <i className='fas fa-spinner fa-spin gallery__loader__icon' />
                 </div>
               )
             )}
@@ -814,7 +815,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__auto__play'
                         key='btn_autoplay'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                        <i className={classnames('fa-fw fas', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                       </button>
                     ), (
                       <button
@@ -824,7 +825,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__fullscreen'
                         key='btn_fullscreen'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                        <i className={classnames('fa-fw fas', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                       </button>
                     ), (
                       <button
@@ -834,7 +835,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__rotation__left'
                         key='btn_rotate_left'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fa-fw fas fa-undo' />
                       </button>
                     ), (
                       <button
@@ -843,7 +844,7 @@ export class Gallery extends React.Component {
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fa-fw fas fa-undo' />
                       </button>
                     ), (
                       <a
@@ -854,7 +855,7 @@ export class Gallery extends React.Component {
                         rel='noopener noreferrer'
                         key='btn_open_raw'
                       >
-                        <i className='fa fa-fw fa-download' />
+                        <i className='fa-fw fas fa-download' />
                       </a>
                     )]}
                   />

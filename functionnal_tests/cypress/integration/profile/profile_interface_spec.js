@@ -26,7 +26,7 @@ describe('Profile', () => {
   })
 
   it('should have the personal page part', () => {
-    cy.contains('.profile__content__page', 'Personal page')
+    cy.contains('.profile__content__page', 'Personal Page')
       .should('be.visible')
   })
 })

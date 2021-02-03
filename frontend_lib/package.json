@@ -94,7 +94,11 @@
       "HTMLElement",
       "DOMParser",
       "globalThis",
-      "GLOBAL_primaryColor"
+      "GLOBAL_primaryColor",
+      "FormData",
+      "XMLHttpRequest",
+      "Image",
+      "FileReader"
     ],
     "parser": "babel-eslint",
     "ignore": []

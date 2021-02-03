@@ -35,7 +35,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "Global manager"
         assert comment["author"]["username"] == "TheAdmin"
 
@@ -46,7 +46,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "Bob i."
         assert comment["author"]["username"] == "TheBobi"
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -61,7 +61,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "John Reader"
         assert comment["author"]["username"] is None
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -113,7 +113,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == admin_user.user_id
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == admin_user.display_name
         assert comment["author"]["username"] == admin_user.username
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -231,7 +231,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "Global manager"
         assert comment["author"]["username"] == "TheAdmin"
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -258,7 +258,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "Bob i."
         assert comment["author"]["username"] == "TheBobi"
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -285,7 +285,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "Bob i."
         assert comment["author"]["username"] == "TheBobi"
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -314,7 +314,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "John Reader"
         assert comment["author"]["username"] is None
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -343,7 +343,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "John Reader"
         assert comment["author"]["username"] is None
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -370,7 +370,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] is None
+        assert comment["author"]["has_avatar"] is False
         assert comment["author"]["public_name"] == "John Reader"
         assert comment["author"]["username"] is None
         # TODO - G.M - 2018-06-179 - better check for datetime

@@ -14,19 +14,19 @@ User-visible parts of these properties (title/description/…) can be translated
 these translations will allow the backend to automatically translate both the UI Schema and JSONSchema according
 to connected user lang.
 
-:warning: Tracim does not handle changes in the properties schema when custom property values are already existing in the database.
+:warning: Tracim does not handle changes in the property schema when custom property values are already existing in the database.
 If you want to change the schema in an incompatible way with the existing property values you'll have to update the `user_custom_properties` table manually.
 
 ## Configuration
 
 You can set a schema for all users of the instance in the settings (`development.ini`):
 
-Simple example:
+Simple example with `user.custom_properties.dir` shortcut:
 ```ini
-user_custom_properties_dir = %(here)s/examples/user_custom_properties/organization
-user.custom_properties.json_schema_file_path = %(user_custom_properties_dir)s/schema.json
-user.custom_properties.ui_schema_file_path = %(user_custom_properties_dir)s/ui.json
-user.custom_properties.translations_dir_path = %(user_custom_properties_dir)s/locale
+user.custom_properties.dir = %(here)s/examples/user_custom_properties/default
+user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
+user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
+user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 ```
 See [examples files related](../examples/user_custom_properties).
 
@@ -51,7 +51,20 @@ user.custom_properties.ui_schema_file_path
 
 ### Tracim specific properties in ui schemas
 
-No specific properties for now in ui schema.
+#### The display_group property
+
+This property is mandatory for properties to appear in the Tracim user interface.
+
+The Tracim user interface has two forms where user properties can be displayed in the public profile page: `Information` and `Personal data`.
+
+Each user property can be assigned to one or the other form using the special key `tracim:display_group` in the UI schema file.  
+
+To display a property in the `Information` column, use `"tracim:display_group": "public_profile_first"`.
+
+To display a property in the `Personal data` column, use `"tracim:display_group": "public_profile_second"`.
+
+See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
+
 
 ## Translations
 

@@ -12,21 +12,42 @@
     display flex
     align-items flex-end
     justify-content center
-    &__default
-      background-image url('../img/default_cover_image.png')
-      background-repeat repeat
-      width 100%
-      height 100%
+    background-image url('../img/default_cover_image.png')
+    background-repeat repeat
+    position relative
+    &__changeBtn
+      position absolute
+      bottom 10px
+      right 10px
+      background-color offWhite
+      &:hover
+        background-color lightGrey
     &__loading
       margin 10px
+    &__image
+      width 100%
+      height 100%
+      object-position 50% 50%
+      object-fit fill
 
   &__mainBar
     height 70px
     padding-left 30px
     background-color offWhite
     display flex
-    &__mediumAvatar
-      display none
+    &__avatar
+      position relative
+      &__medium
+        display none
+      &__big
+        position relative
+        top -15px
+      &__changeBtn
+        position absolute
+        bottom -15px
+        right -5px
+        width 25px
+        height 25px
     &__info
       margin-left 10px
       font-size fontSizeTitle
@@ -35,7 +56,7 @@
   &__content
     display flex
     & > div
-      font-size fontSizeMedium
+      overflow-wrap anywhere
       font-weight bold
       background-color offWhite
       height max-content
@@ -44,7 +65,7 @@
       border-radius 5px
       padding 20px
     &__information
-      margin 30px 0px 30px 30px
+      margin 30px 0 30px 30px
       width 30%
     &__page
       margin 30px
@@ -53,19 +74,28 @@
       background-color veryLightGrey
       height 200px
       margin 10px
+  &__customForm__submit
+    position absolute
+    top 0
+    right 0
+    padding 5px 8px
+
 
 @media (max-width: max-sm)
   .profile
     &__cover
       height 70px
+      &__changeBtn > span
+        display none
 
     &__mainBar
       height 50px
       padding-left 10px
-      &__bigAvatar
-        display none
-      &__mediumAvatar
-        display unset
+      &__avatar
+        &__big
+          display none
+        &__medium
+          display unset
       &__info
         font-size fontSizeMedium
         & .breadcrumbs

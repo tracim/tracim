@@ -6,7 +6,9 @@ import {
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
-  USER_AGENDA_URL
+  USER_AGENDA_URL,
+  USER_PROFILE_AVATAR_NAME,
+  USER_PROFILE_COVER_NAME
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../util/helper.js'
 import { PROFILE, serialize } from 'tracim_frontend_lib'
@@ -26,7 +28,11 @@ export const serializeUserProps = {
   lang: 'lang',
   agendaUrl: 'agendaUrl',
   username: 'username',
-  is_deleted: 'isDeleted'
+  is_deleted: 'isDeleted',
+  has_avatar: 'hasAvatar',
+  has_cover: 'hasCover',
+  profileAvatarName: 'profileAvatarName',
+  profileCoverName: 'profileCoverName'
 }
 
 export const defaultUser = {
@@ -43,7 +49,11 @@ export const defaultUser = {
   publicName: '',
   lang: getBrowserLang(),
   agendaUrl: '',
-  username: ''
+  username: '',
+  hasAvatar: false,
+  hasCover: false,
+  profileAvatarName: 'avatar',
+  profileCoverName: 'cover'
 }
 
 export default function user (state = defaultUser, action) {
@@ -74,6 +84,12 @@ export default function user (state = defaultUser, action) {
 
     case `${SET}/${USER_CONFIGURATION}`:
       return { ...state, config: action.userConfig }
+
+    case `${SET}/${USER_PROFILE_AVATAR_NAME}`:
+      return { ...state, profileAvatarName: action.newAvatarName }
+
+    case `${SET}/${USER_PROFILE_COVER_NAME}`:
+      return { ...state, profileCoverName: action.newCoverName }
 
     default:
       return state

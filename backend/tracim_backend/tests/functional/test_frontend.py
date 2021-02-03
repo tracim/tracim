@@ -21,7 +21,7 @@ class TestContentSecurityPolicy:
         assert res.headers["Content-Security-Policy"]
         content_security_policy = res.headers["Content-Security-Policy"]
         directives = content_security_policy.split(";")
-        assert any(("script-src 'nonce-" in d) for d in directives)
+        assert any(("script-src 'unsafe-eval' 'nonce-" in d) for d in directives)
 
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_test_csp_disabled"}], indirect=True
@@ -51,7 +51,7 @@ class TestContentSecurityPolicy:
     def test_api__csp_header__ok_200__with_collabora(self, web_testapp):
         res = web_testapp.get("/", status=200)
         csp = res.headers.get("Content-Security-Policy")
-        assert "frame-src http://localhost:9980" in csp
+        assert "frame-src * http://localhost:9980" in csp
 
 
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)

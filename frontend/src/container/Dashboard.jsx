@@ -43,7 +43,10 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
-import { findUserRoleIdInWorkspace } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  findUserRoleIdInWorkspace
+} from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -406,7 +409,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },
@@ -555,7 +558,7 @@ export class Dashboard extends React.Component {
                       className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                       onClick={this.handleClickOpenAdvancedDashboard}
                     >
-                      <i className='fa fa-fw fa-cog' />
+                      <i className='fas fa-fw fa-cog' />
                       {props.t('Open advanced Dashboard')}
                     </button>
                   )}
@@ -588,6 +591,7 @@ export class Dashboard extends React.Component {
                 <MemberList
                   customClass='dashboard__memberlist'
                   loggedUser={props.user}
+                  apiUrl={FETCH_CONFIG.apiUrl}
                   memberList={props.curWs.memberList}
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}

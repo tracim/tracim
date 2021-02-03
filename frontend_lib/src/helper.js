@@ -111,54 +111,54 @@ export const BREADCRUMBS_TYPE = {
 
 export const revisionTypeList = [{
   id: 'archiving',
-  faIcon: 'archive',
+  faIcon: 'fas fa-archive',
   label: i18n.t('Item archived')
 }, {
   id: 'content-comment',
-  faIcon: 'comment-o',
+  faIcon: 'far fa-comment',
   label: i18n.t('Comment')
 }, {
   id: 'creation',
-  faIcon: 'magic',
+  faIcon: 'fas fa-magic',
   label: i18n.t('Item created')
 }, {
   id: 'deletion',
-  faIcon: 'trash',
+  faIcon: 'far fa-trash-alt',
   label: i18n.t('Item deleted')
 }, {
   id: 'edition',
-  faIcon: 'edit',
+  faIcon: 'fas fa-edit',
   label: i18n.t('New revision')
 }, {
   id: 'revision',
-  faIcon: 'history',
+  faIcon: 'fas fa-history',
   label: i18n.t('New revision')
 }, {
   id: 'status-update',
-  faIcon: 'random',
+  faIcon: 'fas fa-random',
   label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
-  faIcon: 'file-archive-o',
+  faIcon: 'far fa-file-archive',
   label: i18n.t('Item unarchived')
 }, {
   id: 'undeletion',
-  faIcon: 'trash-o',
+  faIcon: 'far fa-trash-alt',
   label: i18n.t('Item restored')
 }, {
   id: 'move',
-  faIcon: 'arrows',
+  faIcon: 'fas arrows-alt',
   label: i18n.t('Item moved')
 }, {
   id: 'copy',
-  faIcon: 'files-o',
+  faIcon: 'far fa-copy',
   label: i18n.t('Item copied')
 }]
 
 const WORKSPACE_MANAGER = {
   id: 8,
   slug: 'workspace-manager',
-  faIcon: 'gavel',
+  faIcon: 'fas fa-gavel',
   hexcolor: '#ed0007',
   tradKey: [
     i18n.t('Space manager'),
@@ -170,7 +170,7 @@ const WORKSPACE_MANAGER = {
 const CONTENT_MANAGER = {
   id: 4,
   slug: 'content-manager',
-  faIcon: 'graduation-cap',
+  faIcon: 'fas fa-graduation-cap',
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Content manager'),
@@ -182,7 +182,7 @@ const CONTENT_MANAGER = {
 const CONTRIBUTOR = {
   id: 2,
   slug: 'contributor',
-  faIcon: 'pencil',
+  faIcon: 'fas fa-pencil-alt',
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('Contributor'),
@@ -194,7 +194,7 @@ const CONTRIBUTOR = {
 const READER = {
   id: 1,
   slug: 'reader',
-  faIcon: 'eye',
+  faIcon: 'far fa-eye',
   hexcolor: '#15d948',
   tradKey: [
     i18n.t('Reader'),
@@ -214,7 +214,7 @@ export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READE
 const ADMINISTRATOR = {
   id: 3,
   slug: 'administrators',
-  faIcon: 'shield',
+  faIcon: 'fas fa-shield-alt',
   hexcolor: '#ed0007',
   tradKey: [
     i18n.t('Administrator'),
@@ -226,7 +226,7 @@ const ADMINISTRATOR = {
 const MANAGER = {
   id: 2,
   slug: 'trusted-users',
-  faIcon: 'graduation-cap',
+  faIcon: 'fas fa-graduation-cap',
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Trusted user'),
@@ -238,7 +238,7 @@ const MANAGER = {
 const USER = {
   id: 1,
   slug: 'users',
-  faIcon: 'user',
+  faIcon: 'fas fa-user',
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
@@ -257,7 +257,7 @@ export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 const OPEN = {
   id: 2,
   slug: 'open',
-  faIcon: 'sun-o',
+  faIcon: 'far fa-sun',
   tradKey: [
     i18n.t('Open'),
     i18n.t('Any user will be able to see, join and open this space.')
@@ -268,7 +268,7 @@ const OPEN = {
 const ON_REQUEST = {
   id: 3,
   slug: 'on_request',
-  faIcon: 'handshake-o',
+  faIcon: 'far fa-handshake',
   tradKey: [
     i18n.t('On request'),
     i18n.t('Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.')
@@ -279,7 +279,7 @@ const ON_REQUEST = {
 const CONFIDENTIAL = {
   id: 4,
   slug: 'confidential',
-  faIcon: 'user-secret',
+  faIcon: 'fas fa-user-secret',
   tradKey: [
     i18n.t('Confidential'),
     i18n.t('Only invited users will be able to see and open this space, invitation is sent by space managers.')
@@ -300,7 +300,7 @@ export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'sign-in',
+  faIcon: 'fas fa-sign-in-alt',
   tradKey: [
     i18n.t('pending')
   ], // trad key allow the parser to generate an entry in the json file
@@ -309,7 +309,7 @@ const SUBSCRIPTION_PENDING = {
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
-  faIcon: 'times',
+  faIcon: 'fas fa-times',
   tradKey: [
     i18n.t('rejected')
   ], // trad key allow the parser to generate an entry in the json file
@@ -318,7 +318,7 @@ const SUBSCRIPTION_REJECTED = {
 const SUBSCRIPTION_ACCEPTED = {
   id: 3,
   slug: 'accepted',
-  faIcon: 'check',
+  faIcon: 'fas fa-check',
   tradKey: [
     i18n.t('accepted')
   ], // trad key allow the parser to generate an entry in the json file
@@ -697,3 +697,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
       throw new Error('Error getting breadcrumbs data')
   }
 }
+
+export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
+
+export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`

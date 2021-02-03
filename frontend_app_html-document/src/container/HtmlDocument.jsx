@@ -778,7 +778,7 @@ export class HtmlDocument extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
-                  icon='plus-circle'
+                  icon='fas fa-plus-circle'
                 />
               )}
 
@@ -788,7 +788,7 @@ export class HtmlDocument extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -834,6 +834,7 @@ export class HtmlDocument extends React.Component {
           <HtmlDocumentComponent
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
+            apiUrl={state.config.apiUrl}
             customColor={state.config.hexcolor}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
@@ -872,7 +873,7 @@ export class HtmlDocument extends React.Component {
             menuItemList={[{
               id: 'timeline',
               label: props.t('Timeline'),
-              icon: 'fa-history',
+              icon: 'fas fa-history',
               children: (
                 <Timeline
                   customClass={`${state.config.slug}__contentpage`}
@@ -880,6 +881,7 @@ export class HtmlDocument extends React.Component {
                   loggedUser={state.loggedUser}
                   timelineData={state.timeline}
                   newComment={state.newComment}
+                  apiUrl={state.config.apiUrl}
                   disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
                   availableStatusList={state.config.availableStatuses}
                   wysiwyg={state.timelineWysiwyg}

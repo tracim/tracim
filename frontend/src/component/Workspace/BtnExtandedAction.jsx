@@ -10,7 +10,7 @@ require('./BtnExtandedAction.styl')
 export const ExtandedAction = props => {
   return (
     <DropdownMenu
-      buttonIcon='fa-ellipsis-h'
+      buttonIcon='fas fa-ellipsis-h'
       buttonTooltip={props.t('Actions')}
       buttonCustomClass='extandedaction outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
       buttonDataCy='extended_action'
@@ -23,14 +23,14 @@ export const ExtandedAction = props => {
           data-cy='extended_action_edit'
           key='extended_action_edit'
         >
-          <i className='fa fa-fw fa-pencil' />
+          <i className='fas fa-fw fa-pencil-alt' />
           {props.onClickExtendedAction.edit.label}
         </button>
       )}
 
       {/*
       <button className='transparentButton' onClick={props.onClickExtendedAction.download.callback}>
-        <i className='fa fa-fw fa-download' />
+        <i className='fas fa-fw fa-download' />
         {props.onClickExtendedAction.download.label}
       </button>
       */}
@@ -42,7 +42,7 @@ export const ExtandedAction = props => {
           onClick={props.onClickExtendedAction.archive.callback}
           data-cy='extended_action_archive'
         >
-          <i className='fa fa-fw fa-archive' />
+          <i className='fas fa-fw fa-archive' />
           {props.onClickExtendedAction.archive.label}
         </button>
       )} */}
@@ -54,7 +54,7 @@ export const ExtandedAction = props => {
           data-cy='extended_action_delete'
           key='extended_action_delete'
         >
-          <i className='fa fa-fw fa-trash-o' />
+          <i className='far fa-fw fa-trash-alt' />
           {props.onClickExtendedAction.delete.label}
         </button>
       )}
@@ -67,7 +67,7 @@ export const ExtandedAction = props => {
           to={`${PAGE.WORKSPACE.GALLERY(props.folderData.workspaceId)}?folder_ids=${props.folderData.id}`}
           key='extended_action_gallery'
         >
-          <i className='fa fa-fw fa-picture-o' />
+          <i className='far fa-fw fa-image' />
           {props.t('Gallery')}
         </Link>
       )}

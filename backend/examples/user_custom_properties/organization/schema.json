@@ -1,25 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "User Info",
+  "title": "",
   "description": "Info about a user in this organization",
   "type": "object",
-  "definitions": {
-    "address": {
-      "title": "Address",
-      "description": "Address of the user",
-      "type": "object",
-      "properties": {
-        "street_address": { "type": "string" },
-        "city":           { "type": "string" },
-        "state":          { "type": "string" }
-      },
-      "required": ["street_address", "city", "state"]
-    }
-  },
-  "required": [
-    "firstName",
-    "lastName"
-  ],
+  "required": [],
   "properties": {
     "first_name": {
       "type": "string",
@@ -43,7 +27,6 @@
       "title": "Biography",
       "type": "string"
     },
-    "address": { "$ref": "#/definitions/address"},
     "organization": {
       "title": "Organization",
       "type": "object",
@@ -73,6 +56,35 @@
               "administrator",
               "designer"
             ]
+          }
+        }
+      }
+    },
+    "personal_page": {
+      "title": " ",
+      "type": "string"
+    },
+    "tasks": {
+      "type": "array",
+      "title": "Tasks",
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "A sample title"
+          },
+          "details": {
+            "type": "string",
+            "title": "Task details",
+            "description": "Enter the task details"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done?",
+            "default": false
           }
         }
       }

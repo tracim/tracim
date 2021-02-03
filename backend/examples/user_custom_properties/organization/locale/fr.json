@@ -9,11 +9,12 @@
   "Birthday date": "Date de naissance",
   "Biography": "Biographie",
   "Organization": "Organisation",
-  "Roles in the organization": "Role dans l'organisation",
+  "Roles in the organization": "Rôles dans l'organisation",
   "Developer": "Développeur",
   "System Administrator": "Administrateur système",
   "Manager": "Manager",
   "Administrator": "Administrateur",
   "Designer": "Designeur",
-  "Write something about you.": "Parlez nous de vous."
+  "Write something about you.": "Parlez nous de vous.",
+  "Name": "Nom"
 }

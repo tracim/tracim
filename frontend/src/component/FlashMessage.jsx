@@ -9,15 +9,15 @@ export const FlashMessage = props => {
 
   const dataTypeArray = [{
     id: 'info',
-    icon: 'lightbulb-o',
+    icon: 'far fa-lightbulb',
     label: props.t('Information')
   }, {
     id: 'warning',
-    icon: 'exclamation-circle',
+    icon: 'fas fa-exclamation-circle',
     label: props.t('Warning')
   }, {
     id: 'danger',
-    icon: 'minus-circle',
+    icon: 'fas fa-minus-circle',
     label: props.t('Error')
   }]
 
@@ -33,13 +33,13 @@ export const FlashMessage = props => {
             {props.showCloseButton && (
               <div className='flashmessage__container__close'>
                 <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
-                  <i className='fa fa-times' />
+                  <i className='fas fa-times' />
                 </div>
               </div>
             )}
             <div className='flashmessage__container__content'>
               <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
-                <i className={classnames(`fa fa-${dataType.icon}`)} />
+                <i className={classnames(`${dataType.icon}`)} />
               </div>
 
               <div className='flashmessage__container__content__text'>

@@ -70,7 +70,7 @@ export class NewUpload extends React.Component {
             key='uploadEmails'
             style={{ ':hover': { color: customColor } }}
           >
-            <i className='fa fa-fw fa-question-circle' />
+            <i className='fas fa-fw fa-question-circle' />
           </button>
           <Popover
             placement='bottom'
@@ -89,7 +89,7 @@ export class NewUpload extends React.Component {
             <div className='newUpload__password'>
               <div className='newUpload__password__active'>
                 <div className='newUpload__password__wrapper'>
-                  <i className='fa fa-fw fa-lock' />
+                  <i className='fas fa-fw fa-lock' />
 
                   <input
                     type={state.hidePassword ? 'password' : 'text'}
@@ -108,7 +108,7 @@ export class NewUpload extends React.Component {
                     data-cy='seePassword'
                     onClick={this.handleTogglePasswordVisibility}
                   >
-                    <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+                    <i className={state.hidePassword ? 'far fa-fw fa-eye' : 'far fa-fw fa-eye-slash'} />
                   </button>
                 </div>
 
@@ -120,7 +120,7 @@ export class NewUpload extends React.Component {
                   style={{ ':hover': { color: customColor } }}
                   onClick={this.handleRandomPassword}
                 >
-                  <i className='fa fa-fw fa-repeat' />
+                  <i className='fas fa-fw fa-redo' />
                 </button>
               </div>
 
@@ -171,8 +171,8 @@ export class NewUpload extends React.Component {
         {!props.emailNotifActivated && (
           <div className='newUpload__emailWarning'>
             <ComposedIcon
-              mainIcon='envelope'
-              smallIcon='warning'
+              mainIcon='far fa-envelope'
+              smallIcon='fas fa-exclamation-triangle'
               smallIconCustomClass='text-danger'
             />
             {props.t('Email notification are disabled, please manually share the link')}

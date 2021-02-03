@@ -757,9 +757,7 @@ class TestUserApi(object):
         assert new_user.email == "admin@tracim.tracim"
         assert new_user.display_name == "Admin"
         assert new_user.is_active is True
-        # TODO - G.M - 03-05-2018 - [avatar][agenda] Should test this
-        # with true value when those param will be available.
-        assert new_user.avatar_url is None
+        assert new_user.has_avatar is False
 
     def test_unit__get_current_user_ok__nominal_case(self, session, app_config):
         user = User(email="admin@tracim.tracim")

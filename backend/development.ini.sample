@@ -364,15 +364,15 @@ api.key = %(basic_setup.api_key)s
 
 ## User custom properties: This features allows defining custom instance-global fields on users of this instance.
 # See the Tracim settings documentation (available in source code, see "user_custom_properties.md") for more
-# informations about it. By default, Tracim doesn't use custom properties.
+# information about it. By default, Tracim doesn't use custom properties.
 ; user.custom_properties.json_schema_file_path =
 ; user.custom_properties.ui_schema_file_path =
 ; user.custom_properties.translations_dir_path =
-## example:
-# user_custom_properties_dir = %(here)s/examples/user_custom_properties/organization
-# user.custom_properties.json_schema_file_path = %(user_custom_properties_dir)s/schema.json
-# user.custom_properties.ui_schema_file_path = %(user_custom_properties_dir)s/ui.json
-# user.custom_properties.translations_dir_path = %(user_custom_properties_dir)s/locale
+## example with user.custom_properties.dir shortcut:
+# user.custom_properties.dir = %(here)s/examples/user_custom_properties/default
+# user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
+# user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
+# user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 
 ####
 # IHM

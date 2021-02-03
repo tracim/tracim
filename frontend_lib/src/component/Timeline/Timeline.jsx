@@ -113,7 +113,7 @@ export class Timeline extends React.Component {
             <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
-              icon='trash'
+              icon='far fa-trash-alt'
               btnLabel={props.t('Restore')}
               onClickBtn={props.onClickRestoreDeleted}
             />
@@ -128,7 +128,8 @@ export class Timeline extends React.Component {
                   <Comment
                     customClass={props.customClass}
                     customColor={props.customColor}
-                    author={content.author.public_name}
+                    apiUrl={props.apiUrl}
+                    author={content.author}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
@@ -185,6 +186,7 @@ export class Timeline extends React.Component {
             >
               <CommentTextArea
                 id='wysiwygTimelineComment'
+                apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
                 disableComment={props.disableComment}
@@ -228,7 +230,7 @@ export class Timeline extends React.Component {
                   <div
                     className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
                   >
-                    <i className='fa fa-paper-plane-o' />
+                    <i className='far fa-paper-plane' />
                   </div>
                 </button>
               </div>
@@ -244,6 +246,7 @@ export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
+  apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,

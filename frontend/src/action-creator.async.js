@@ -51,7 +51,10 @@ import {
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
-  WORKSPACE_SUBSCRIPTION_LIST
+  WORKSPACE_SUBSCRIPTION_LIST,
+  CUSTOM_PROPERTIES_UI_SCHEMA,
+  CUSTOM_PROPERTIES_SCHEMA,
+  USER_PUBLIC_PROFILE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -1040,5 +1043,60 @@ export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
+  })
+}
+
+export const getCustomPropertiesSchema = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/user-custom-properties-schema`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: CUSTOM_PROPERTIES_SCHEMA,
+    dispatch
+  })
+}
+
+export const getCustomPropertiesUiSchema = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/user-custom-properties-ui-schema`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: CUSTOM_PROPERTIES_UI_SCHEMA,
+    dispatch
+  })
+}
+
+export const getUserCustomPropertiesDataSchema = userId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/custom-properties`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: USER_PUBLIC_PROFILE,
+    dispatch
+  })
+}
+
+export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/custom-properties`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT',
+      body: JSON.stringify({
+        parameters: formData
+      })
+    },
+    actionName: USER_PUBLIC_PROFILE,
+    dispatch
   })
 }

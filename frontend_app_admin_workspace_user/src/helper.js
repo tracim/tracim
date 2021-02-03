@@ -10,7 +10,7 @@ export const debug = {
     ...defaultDebug.config,
     label: 'Admin workspace user',
     slug: 'admin_workspace_user',
-    faIcon: 'file-text-o',
+    faIcon: 'far fa-file-alt',
     hexcolor: '#7d4e24',
     type: 'user', // 'user' or 'workspace'
     translation: { en: {}, fr: {} },

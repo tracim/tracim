@@ -11,7 +11,7 @@ export const NotificationButton = props => {
         type='button'
         onClick={props.onClickNotification}
       >
-        <i className='fa fa-fw fa-bell-o' />
+        <i className='far fa-fw fa-bell' />
         {props.t('Notifications')}
         {props.notificationNotReadCount > 0 && (
           <div

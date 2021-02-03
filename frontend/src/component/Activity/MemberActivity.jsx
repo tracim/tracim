@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 import {
   Avatar,
@@ -104,7 +105,12 @@ export class MemberActivity extends React.Component {
 
     return (
       <div className='memberActivity'>
-        <Avatar size={AVATAR_SIZE.SMALL} publicName={newestMessage.fields.user.public_name} style={{ marginRight: '5px' }} />
+        <Avatar
+          size={AVATAR_SIZE.SMALL}
+          user={newestMessage.fields.user}
+          apiUrl={FETCH_CONFIG.apiUrl}
+          style={{ marginRight: '5px' }}
+        />
         <div className='memberActivity__title'>
           {this.getText()}
           <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />

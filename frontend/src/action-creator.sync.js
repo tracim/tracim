@@ -29,6 +29,8 @@ export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const USER_CONFIGURATION = `${USER}/Configuration`
+export const PUBLIC_PROFILE = 'PublicProfile'
+export const USER_PUBLIC_PROFILE = `${USER}/${PUBLIC_PROFILE}`
 export const setUserConfiguration = userConfig => ({ type: `${SET}/${USER_CONFIGURATION}`, userConfig })
 export const setUserConnected = user => ({ type: `${SET}/${USER_CONNECTED}`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER_DISCONNECTED}` })
@@ -46,6 +48,10 @@ export const USER_EMAIL = `${USER}/Email`
 export const USER_PASSWORD = `${USER}/Password`
 export const USER_AGENDA_URL = `${USER}/Agenda`
 export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })
+export const USER_PROFILE_AVATAR_NAME = `${USER}/ProfileAvatarName`
+export const USER_PROFILE_COVER_NAME = `${USER}/ProfileCoverName`
+export const updateUserProfileAvatarName = newAvatarName => ({ type: `${SET}/${USER_PROFILE_AVATAR_NAME}`, newAvatarName })
+export const updateUserProfileCoverName = newCoverName => ({ type: `${SET}/${USER_PROFILE_COVER_NAME}`, newCoverName })
 
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
@@ -145,6 +151,10 @@ export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_
 
 export const CONFIG = 'Config'
 export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
+
+export const CUSTOM_PROPERTIES = 'CustomProperties'
+export const CUSTOM_PROPERTIES_SCHEMA = `${CUSTOM_PROPERTIES}/Schema`
+export const CUSTOM_PROPERTIES_UI_SCHEMA = `${CUSTOM_PROPERTIES}/UiSchema`
 
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })

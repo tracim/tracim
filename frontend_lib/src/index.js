@@ -53,7 +53,9 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  PAGE
+  PAGE,
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -75,6 +77,13 @@ import {
 } from './LiveMessageManager.js'
 
 import { appContentFactory } from './appContentFactory.js'
+
+import {
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
+} from './fileUpload.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -142,6 +151,8 @@ import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
 import Icon from './component/Icon/Icon.jsx'
 
+import PopupUploadFile from './container/PopupUploadFile.jsx'
+import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
 import {
@@ -356,5 +367,13 @@ export {
   Icon,
   getWorkspaceContent,
   PAGE,
-  ProfileNavigation
+  PopupUploadFile,
+  PopupProgressUpload,
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState,
+  getAvatarBaseUrl,
+  ProfileNavigation,
+  getCoverBaseUrl
 }

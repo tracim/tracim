@@ -323,7 +323,7 @@ export class Agenda extends React.Component {
         <PageTitle
           parentClass='agendaPage'
           title={pageTitle}
-          icon='calendar'
+          icon='fas fa-calendar-alt'
           breadcrumbsList={state.breadcrumbsList}
         />
 

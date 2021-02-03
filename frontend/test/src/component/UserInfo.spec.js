@@ -34,11 +34,12 @@ describe('<UserInfo />', () => {
     )
 
     it('should display the administrator icon', () =>
-      expect(wrapper.find(`div.userinfo__profile > i.fa.fa-${PROFILE.administrator.faIcon}`).length).to.equal(1)
+      expect(wrapper.find('div.userinfo__profile').children('i').prop('className'))
+        .include(`${PROFILE.administrator.faIcon}`)
     )
 
     it('the icon should have the administrator hexcolor', () => {
-      expect(wrapper.find(`i.fa.fa-${PROFILE.administrator.faIcon}`).prop('style').color).to.equal(PROFILE.administrator.hexcolor)
+      expect(wrapper.find('div.userinfo__profile').children('i').prop('style').color).to.equal(PROFILE.administrator.hexcolor)
     })
   })
 })
