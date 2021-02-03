@@ -1,7 +1,7 @@
 export const deprecated = {
   label: 'Deprecated',
   slug: 'closed-deprecated',
-  faIcon: 'warning',
+  faIcon: 'fas fa-exclamation-triangle',
   hexcolor: '#ababab',
   globalStatus: 'closed'
 }

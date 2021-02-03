@@ -32,7 +32,7 @@ export const ProfileMainBar = props => {
         {props.changeAvatarEnabled && (
           <IconButton
             title={props.t('Change avatar')}
-            icon='upload'
+            icon='fas fa-upload'
             onClick={props.onChangeAvatarClick}
             customClass='profile__mainBar__avatar__changeBtn'
             intent='pins'

@@ -105,7 +105,12 @@ export class Sidebar extends React.Component {
           className='sidebar__content__navigation__item__name'
           title={label}
         >
-          <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
+          <Icon
+            icon='far fa-fw fa-newspaper'
+            title={label}
+            color='white'
+          />
+          &nbsp;{label}
         </div>
       </Link>
     )
@@ -163,8 +168,8 @@ export class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
-            ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
+            ? <i className={classnames('fas fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fas fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
         <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
@@ -172,7 +177,7 @@ export class Sidebar extends React.Component {
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
             see https://github.com/tracim/tracim/issues/1554
             <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
-              <i className='fa fa-chevron-up' />
+              <i className='fas fa-chevron-up' />
             </div>
             */}
 
@@ -193,7 +198,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickNewWorkspace}
                     dataCy='sidebarCreateWorkspaceBtn'
-                    icon='plus'
+                    icon='fas fa-plus'
                     text={props.t('Create a space')}
                     mode='light'
                   />
@@ -202,7 +207,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickJoinWorkspace}
                     dataCy='sidebarJoinWorkspaceBtn'
-                    icon='users'
+                    icon='fas fa-users'
                     text={props.t('Join a space')}
                     intent='primary'
                     mode='light'

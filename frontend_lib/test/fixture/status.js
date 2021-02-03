@@ -1,28 +1,28 @@
 const OPEN = {
   slug: 'open',
   label: 'Opened',
-  faIcon: 'square-o',
+  faIcon: 'far fa-square',
   hexcolor: '#3f52e3',
   globalStatus: 'open'
 }
 const VALIDATED = {
   slug: 'closed-validated',
   label: 'Validated',
-  faIcon: 'check-square-o',
+  faIcon: 'far fa-check-square',
   hexcolor: '#008000',
   globalStatus: 'closed'
 }
 const CLOSED = {
   slug: 'closed-unvalidated',
   label: 'Cancelled',
-  faIcon: 'close',
+  faIcon: 'fas fa-times',
   hexcolor: '#f63434',
   globalStatus: 'closed'
 }
 const DEPRECATED = {
   slug: 'closed-deprecated',
   label: 'Deprecated',
-  faIcon: 'warning',
+  faIcon: 'fas fa-exclamation-triangle',
   hexcolor: '#ababab',
   globalStatus: 'closed'
 }

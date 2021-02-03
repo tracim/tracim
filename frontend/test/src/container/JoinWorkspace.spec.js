@@ -29,12 +29,12 @@ describe('<JoinWorkspace />', () => {
   const createRequestComponentTestCases = [
     {
       workspace: { accessType: SPACE_TYPE.open.slug },
-      expectedIcon: 'sign-in',
+      expectedIcon: 'fas fa-sign-in-alt',
       expectedText: 'Join the space'
     },
     {
       workspace: { accessType: SPACE_TYPE.onRequest.slug },
-      expectedIcon: 'share',
+      expectedIcon: 'fas fa-share',
       expectedText: 'Request access'
     }
   ]

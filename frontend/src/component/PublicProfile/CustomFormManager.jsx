@@ -189,7 +189,7 @@ const SchemaAsView = props => {
       {props.displayEditButton && (
         <IconButton
           customClass={props.submitButtonClass}
-          icon='pencil-square-o'
+          icon='fas fa-edit'
           onClick={props.onClickToggleButton}
           text={props.validateLabel}
           dataCy='CustomFormManager__updateProfile__edit__button'
@@ -241,7 +241,7 @@ class SchemaAsForm extends React.Component {
       >
         <IconButton
           customClass={props.submitButtonClass}
-          icon='check'
+          icon='fas fa-check'
           type='submit'
           text={props.validateLabel}
           dataCy='CustomFormManager__updateProfile__validate__button'

@@ -636,7 +636,7 @@ export class WorkspaceAdvanced extends React.Component {
     const subscriptionObject = {
       id: 'subscriptions_requests',
       label: props.t('Requests to join the space'),
-      icon: 'fa-sign-in',
+      icon: 'fas fa-sign-in-alt',
       children: (
         <PopinFixedRightPartContent
           label={props.t('Requests to join the space')}

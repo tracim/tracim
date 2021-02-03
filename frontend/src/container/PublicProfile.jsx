@@ -58,7 +58,7 @@ const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
   return (
     <div className='profile__cover' data-cy='cover'>
-      {props.displayedUser
+      {(props.displayedUser
         ? (
           <div className='profile__cover' data-cy='profile-cover'>
             {props.displayedUser.hasCover && (
@@ -71,7 +71,7 @@ const CoverImage = translate()((props) => {
             {props.changeEnabled && (
               <IconButton
                 text={props.t('Change cover')}
-                icon='upload'
+                icon='fas fa-upload'
                 onClick={props.onChangeCoverClick}
                 customClass='profile__cover__changeBtn'
                 intent='secondary'
@@ -82,9 +82,11 @@ const CoverImage = translate()((props) => {
         )
         : (
           <div className='profile__cover__loading'>
-            <i className='fa fa-fw fa-spinner fa-spin' />
+            <i className='fas fa-fw fa-spinner fa-spin' />
             {props.t('Loading')}
-          </div>)}
+          </div>
+        )
+      )}
     </div>
   )
 })
@@ -101,8 +103,8 @@ const PopupUploadImage = translate()((props) => {
       allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
       maximumFileSize={MAXIMUM_IMAGE_SIZE}
     >
-      <i className='fa fa-fw fa-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
-      <i className='fa fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
+      <i className='fas fa-fw fa-expand-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
+      <i className='far fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
     </PopupUploadFile>
   )
 })

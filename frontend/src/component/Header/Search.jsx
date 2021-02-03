@@ -39,7 +39,7 @@ export class Search extends React.Component {
           onClick={this.handleClickSearch}
           disabled={state.searchedKeywords === ''}
         >
-          <i className='fa fa-search' />
+          <i className='fas fa-search' />
         </button>
       </div>
     )

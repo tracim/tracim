@@ -70,7 +70,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-hand-o-right')
+          .have.html().to.contains('far fa-hand-point-right')
       )
     })
 
@@ -102,7 +102,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-trash')
+          .have.html().to.contains('fa-trash-alt')
       )
     })
 
@@ -118,7 +118,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
+          .have.html().to.contains(`${props.deprecatedStatus.faIcon}`)
       )
     })
 
@@ -134,7 +134,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__textnote'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-hand-o-right')
+          .have.html().to.contains('far fa-hand-point-right')
       )
     })
   })

@@ -35,7 +35,8 @@ describe('<UserStatus />', () => {
     )
 
     it(`should display his role icon: ${testRole.faIcon}`, () =>
-      expect(wrapper.find(`div.userstatus__role__icon > i.fa.fa-${testRole.faIcon}`).length).to.equal(1)
+      expect(wrapper.find('div.userstatus__role__icon').children('i').prop('className'))
+        .include(testRole.faIcon)
     )
 
     it(`should display his role label: ${testRole.label}`, () =>
@@ -47,7 +48,7 @@ describe('<UserStatus />', () => {
     )
 
     it(`role icon should have the color: ${testRole.hexcolor}`, () =>
-      expect(wrapper.find(`div.userstatus__role__icon > i.fa.fa-${testRole.faIcon}`).prop('style').color).to.equal(testRole.hexcolor)
+      expect(wrapper.find('div.userstatus__role__icon').children('i').prop('style').color).to.equal(testRole.hexcolor)
     )
 
     it('should not display the notification button when displayNotifBtn is false', () => {

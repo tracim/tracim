@@ -57,7 +57,7 @@ class PopinFixedHeader extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`fa fa-${faIcon}`} />
+          <i className={`${faIcon}`} />
         </div>
 
         <div
@@ -83,7 +83,7 @@ class PopinFixedHeader extends React.Component {
             onClick={this.handleClickUndoChangeTitleBtn}
             disabled={disableChangeTitle}
           >
-            <i className='fa fa-undo' title={t('Undo change in title')} />
+            <i className='fas fa-undo' title={t('Undo change in title')} />
           </button>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton &&
@@ -93,8 +93,8 @@ class PopinFixedHeader extends React.Component {
             disabled={disableChangeTitle}
           >
             {state.editTitle
-              ? <i className='fa fa-check' title={t('Validate the title')} />
-              : <i className='fa fa-pencil' title={t('Edit title')} />}
+              ? <i className='fas fa-check' title={t('Validate the title')} />
+              : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
           </button>}
 
         {this.props.children}
@@ -104,7 +104,7 @@ class PopinFixedHeader extends React.Component {
           onClick={onClickCloseBtn}
           data-cy='popinFixed__header__button__close'
         >
-          <i className='fa fa-times' />
+          <i className='fas fa-times' />
         </div>
       </div>
     )

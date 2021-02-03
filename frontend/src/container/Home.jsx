@@ -231,7 +231,7 @@ export class Home extends React.Component {
 
                   {!this.state.isUsernameValid && (
                     <div className='homepage__usernamePopup__errorMsg'>
-                      <i className='homepage__usernamePopup__errorIcon fa fa-times' />
+                      <i className='homepage__usernamePopup__errorIcon fas fa-times' />
                       {this.state.usernameInvalidMsg}
                     </div>
                   )}

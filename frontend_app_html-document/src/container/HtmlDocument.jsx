@@ -778,7 +778,7 @@ export class HtmlDocument extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
-                  icon='plus-circle'
+                  icon='fas fa-plus-circle'
                 />
               )}
 
@@ -788,7 +788,7 @@ export class HtmlDocument extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -873,7 +873,7 @@ export class HtmlDocument extends React.Component {
             menuItemList={[{
               id: 'timeline',
               label: props.t('Timeline'),
-              icon: 'fa-history',
+              icon: 'fas fa-history',
               children: (
                 <Timeline
                   customClass={`${state.config.slug}__contentpage`}

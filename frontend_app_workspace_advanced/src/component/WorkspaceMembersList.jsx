@@ -19,7 +19,7 @@ export const WorkspaceMembersList = props => {
             <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
               <div className='workspace_advanced__userlist__adduser__button__avatar'>
                 <div className='workspace_advanced__userlist__adduser__button__avatar__icon'>
-                  <i className='fa fa-plus' />
+                  <i className='fas fa-plus' />
                 </div>
               </div>
 
@@ -59,7 +59,7 @@ export const WorkspaceMembersList = props => {
                     const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                     return (
                       <DropdownMenu
-                        buttonOpts={<i className={`fa fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
+                        buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
                         buttonLabel={props.t(role.label)}
                         buttonCustomClass='nohover btndropdown transparentButton'
                         isButton
@@ -70,7 +70,7 @@ export const WorkspaceMembersList = props => {
                             onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                             key={r.id}
                           >
-                            <i className={`fa fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                            <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
                             {props.t(r.label)}
                           </button>
                         )}
@@ -85,7 +85,7 @@ export const WorkspaceMembersList = props => {
                       className='workspace_advanced__userlist__list__item__delete'
                       onClick={() => props.onClickDeleteMember(m.user_id)}
                     >
-                      <i className='fa fa-trash-o' />
+                      <i className='far fa-trash-alt' />
                     </div>
                   )
                   : <div className='workspace_advanced__userlist__list__item__delete' />

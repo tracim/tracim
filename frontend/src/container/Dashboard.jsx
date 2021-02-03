@@ -409,7 +409,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },
@@ -558,7 +558,7 @@ export class Dashboard extends React.Component {
                       className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                       onClick={this.handleClickOpenAdvancedDashboard}
                     >
-                      <i className='fa fa-fw fa-cog' />
+                      <i className='fas fa-fw fa-cog' />
                       {props.t('Open advanced Dashboard')}
                     </button>
                   )}

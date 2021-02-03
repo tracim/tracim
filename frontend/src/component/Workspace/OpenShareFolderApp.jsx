@@ -33,7 +33,7 @@ export class OpenShareFolderApp extends React.Component {
       // open app
       const shareConfig = {
         slug: 'share_folder',
-        faIcon: 'share-alt',
+        faIcon: 'fas fa-share-alt',
         hexcolor: '#414548',
         label: 'Share folder',
         workspace: {

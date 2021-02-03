@@ -280,7 +280,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     # ICON = dict()
     # ICON[0] = ''
     # ICON[1] = 'fa-eye'
-    # ICON[2] = 'fa-pencil'
+    # ICON[2] = 'fa-pencil-alt'
     # ICON[4] = 'fa-graduation-cap'
     # ICON[8] = 'fa-legal'
     #
@@ -397,17 +397,17 @@ class ActionDescription(object):
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        "archiving": "archive",
-        "content-comment": "comment-o",
-        "creation": "magic",
-        "deletion": "trash",
-        "edition": "edit",
-        "revision": "history",
-        "status-update": "random",
-        "unarchiving": "file-archive-o",
-        "undeletion": "trash-o",
-        "move": "arrows",
-        "copy": "files-o",
+        "archiving": "fas fa-archive",
+        "content-comment": "far fa-comment",
+        "creation": "fas fa-magic",
+        "deletion": "far trash-alt",
+        "edition": "fas fa-edit",
+        "revision": "fas fa-history",
+        "status-update": "fas fa-random",
+        "unarchiving": "far file-archive",
+        "undeletion": "far fa-trash-alt",
+        "move": "fas fa-arrows-alt",
+        "copy": "far fa-copy",
     }
     #
     # _LABELS = {
@@ -490,10 +490,10 @@ class ActionDescription(object):
 #     #                 'closed-deprecated': l_('deprecated')}
 #     #
 #     # _ICONS = {
-#     #     'open': 'fa fa-square-o',
-#     #     'closed-validated': 'fa fa-check-square-o',
-#     #     'closed-unvalidated': 'fa fa-close',
-#     #     'closed-deprecated': 'fa fa-warning',
+#     #     'open': 'far fa-square',
+#     #     'closed-validated': 'far fa-check-square',
+#     #     'closed-unvalidated': 'fas fa-times',
+#     #     'closed-deprecated': 'fas fa-warning',
 #     # }
 #     #
 #     # _CSS = {
@@ -562,25 +562,25 @@ class ActionDescription(object):
 #
 #     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 #     # _ICONS = {  # Deprecated
-#     #     'dashboard': 'fa-home',
-#     #     'workspace': 'fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
+#     #     'dashboard': 'fas fa-home',
+#     #     'workspace': 'fas fa-users',
+#     #     'folder': 'far fa-folder-open',
+#     #     'file': 'fas fa-paperclip',
+#     #     'page': 'far fa-file-alt',
+#     #     'thread': 'fas fa-comments',
+#     #     'comment': 'fas fa-comment',
+#     #     'event': 'far fa-calendar-alt',
 #     # }
 #     #
 #     # _CSS_ICONS = {
-#     #     'dashboard': 'fa fa-home',
-#     #     'workspace': 'fa fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
+#     #     'dashboard': 'fas fa-home',
+#     #     'workspace': 'fas fa-users',
+#     #     'folder': 'far fa-folder-open',
+#     #     'file': 'fas fa-paperclip',
+#     #     'page': 'far fa-file-alt',
+#     #     'thread': 'far fa-comments',
+#     #     'comment': 'far fa-comment',
+#     #     'event': 'far fa-calendar-alt',
 #     # }
 #     #
 #     # _CSS_COLORS = {

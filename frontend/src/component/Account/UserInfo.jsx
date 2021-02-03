@@ -34,7 +34,7 @@ export const UserInfo = props =>
 
       <div className='userinfo__profile mt-3 mb-3' data-cy='userinfo__profile'>
         <i
-          className={`fa fa-${getUserProfile(props.user.profile).faIcon} mr-2`}
+          className={`${getUserProfile(props.user.profile).faIcon} mr-2`}
           style={{ color: getUserProfile(props.user.profile).hexcolor }}
         />
         {props.t(getUserProfile(props.user.profile).label)}

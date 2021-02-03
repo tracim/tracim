@@ -45,7 +45,7 @@ open_status = ContentStatus(
     slug="open",
     global_status=GlobalStatus.OPEN.value,
     label=_("Opened"),
-    fa_icon="square-o",
+    fa_icon="far fa-square",
     hexcolor="#3f52e3",
 )
 
@@ -53,7 +53,7 @@ closed_validated_status = ContentStatus(
     slug="closed-validated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Validated"),
-    fa_icon="check-square-o",
+    fa_icon="far fa-check-square",
     hexcolor="#008000",
 )
 
@@ -61,7 +61,7 @@ closed_unvalidated_status = ContentStatus(
     slug="closed-unvalidated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Cancelled"),
-    fa_icon="close",
+    fa_icon="fas fa-times",
     hexcolor="#f63434",
 )
 
@@ -69,7 +69,7 @@ closed_deprecated_status = ContentStatus(
     slug="closed-deprecated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Deprecated"),
-    fa_icon="warning",
+    fa_icon="fas fa-exclamation-triangle",
     hexcolor="#ababab",
 )
 

@@ -17,7 +17,7 @@ export const FileUploadList = (props) => {
       <div className='file__upload__list'>
         {props.fileUploadList.map((fileUpload) =>
           <div className='file__upload__list__item' key={fileUpload.file.name}>
-            <i className='fa fa-fw fa-file-o m-1' />
+            <i className='far fa-fw fa-file m-1' />
             <div className='file__upload__list__item__label'>
               {fileUpload.file.name} ({displayFileSize(fileUpload.file.size)})
             </div>
@@ -29,10 +29,10 @@ export const FileUploadList = (props) => {
               disabled={props.deleteFileDisabled}
               data-cy='file__upload__list__item__delete'
             >
-              <i className='fa fa-fw fa-trash-o' />
+              <i className='far fa-fw fa-trash-alt' />
             </button>
             {fileUpload.errorMessage && (
-              <i title={fileUpload.errorMessage} className='file__upload__list__item__error fa fa-fw fa-exclamation-triangle' />
+              <i title={fileUpload.errorMessage} className='file__upload__list__item__error fas fa-fw fa-exclamation-triangle' />
             )}
           </div>
         )}

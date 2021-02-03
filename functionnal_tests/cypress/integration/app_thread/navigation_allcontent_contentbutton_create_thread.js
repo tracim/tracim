@@ -11,7 +11,7 @@ describe('navigate :: workspace > create_new > thread', function () {
   it('content button', function () {
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     cy.get('[data-cy=dropdownCreateBtn]').click()
-    cy.get('.show .fa-comments-o').click()
+    cy.get('.show .fa-comments').click()
     var titre1 = 'thread1'
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__header').should('be.visible')

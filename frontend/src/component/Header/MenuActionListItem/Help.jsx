@@ -9,7 +9,7 @@ const Help = props => {
         className='header__menu__rightside__itemquestion__btnquestion btnnavbar btn btn-outline-primary'
         onClick={props.onClickHelp}
       >
-        <i className='btnquestion__icon fa fa-question' />
+        <i className='btnquestion__icon fas fa-question' />
       </button>
     </li>
   )

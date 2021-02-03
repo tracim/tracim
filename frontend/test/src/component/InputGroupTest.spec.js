@@ -44,7 +44,7 @@ describe('<InputGroupText />', () => {
     )
 
     it(`should display the icon: ${props.icon}`, () =>
-      expect(wrapper.find(`i.fa.${props.icon}`).length).to.equal(1)
+      expect(wrapper.find(`i.${props.icon}`).length).to.equal(1)
     )
 
     it(`the input should have the value: ${props.value}`, () =>

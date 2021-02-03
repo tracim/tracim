@@ -35,7 +35,7 @@ const Revision = props => {
 
         <span className='revision__data__nb'>{props.number}</span>
 
-        <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} />
+        <i className={`fa-fw ${revisionType.faIcon} revision__data__icon`} />
 
         <div className='revision__data__infos'>
           <div className='d-flex'>

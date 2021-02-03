@@ -38,11 +38,11 @@ describe('<GenericButton />', () => {
     )
 
     it(`should have the icon: ${props.faIcon}`, () =>
-      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it(`should have the icon: ${props.faIcon}`, () =>
-      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it('the button should be disabled when disabled is set to true', () => {

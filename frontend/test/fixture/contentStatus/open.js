@@ -1,7 +1,7 @@
 export const open = {
   label: 'Opened',
   slug: 'open',
-  faIcon: 'square-o',
+  faIcon: 'far fa-square',
   hexcolor: '#3f52e3',
   globalStatus: 'open'
 }

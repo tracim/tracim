@@ -99,7 +99,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download current page as PDF')}
               key='file_btn_dl_pdfall'
             >
-              <i className='fa fa-file-o' />
+              <i className='far fa-file' />
             </a>
           )}
 
@@ -114,7 +114,7 @@ export class PreviewComponent extends React.Component {
               title={props.t('Download as PDF')}
               key='file_btn_dl_pdfpage'
             >
-              <i className='fa fa-file-pdf-o' />
+              <i className='far fa-file-pdf' />
             </a>
           )}
 
@@ -128,7 +128,7 @@ export class PreviewComponent extends React.Component {
             title={props.t('Download file')}
             key='file_btn_dl_raw'
           >
-            <i className='fa fa-download' />
+            <i className='fas fa-download' />
           </a>
         </div>
 
@@ -143,7 +143,7 @@ export class PreviewComponent extends React.Component {
               disabled={props.fileCurrentPage === 1}
               key='file_btn_previouspage'
             >
-              <i className='fa fa-chevron-left' />
+              <i className='fas fa-chevron-left' />
             </button>
           )}
 
@@ -168,7 +168,7 @@ export class PreviewComponent extends React.Component {
                     )
                     : (
                       <>
-                        <i className='previewcomponent__fileimg__text-icon fa fa-eye-slash' style={{ color: props.color }} />
+                        <i className='previewcomponent__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
                         <div className='previewcomponent__fileimg__text-msg'>
                           {props.t('No preview available')}
                         </div>
@@ -205,7 +205,7 @@ export class PreviewComponent extends React.Component {
               disabled={props.fileCurrentPage === props.filePageNb}
               key='file_btn_nextpage'
             >
-              <i className='fa fa-chevron-right' />
+              <i className='fas fa-chevron-right' />
             </button>
           )}
         </div>

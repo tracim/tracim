@@ -11,8 +11,8 @@ describe('operation :: workspace > create_new > thread', function () {
 
   it('dashboard > button', function () {
     cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments-o').click()
+    cy.get('.dashboard__calltoaction .fa-comments').should('be.visible')
+    cy.get('.dashboard__calltoaction .fa-comments').click()
     var titre1 = 'dashboard button thread'
     cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')

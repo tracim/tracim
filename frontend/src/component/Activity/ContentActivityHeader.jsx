@@ -48,7 +48,7 @@ export class ContentActivityHeader extends React.Component {
     const newestMessage = props.newestMessage
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
-      { label: props.t(`No App for content-type ${contentType}`), faIcon: 'question', hexcolor: '#000000' }
+      { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
     )
 
     return (
@@ -57,7 +57,7 @@ export class ContentActivityHeader extends React.Component {
           customClass='contentActivityHeader__icon'
           color={app.hexcolor}
           title={app.label}
-          icon={app.faIcon}
+          icon={`fa-fw ${app.faIcon}`}
         />
         <div className='contentActivityHeader__title'>
           <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
@@ -80,12 +80,12 @@ export class ContentActivityHeader extends React.Component {
         />
         <DropdownMenu
           buttonCustomClass='contentActivityHeader__actionMenu'
-          buttonIcon='fa-ellipsis-v'
+          buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
         >
           <IconButton
             customClass='contentActivityHeader__actionMenu__item'
-            icon='link'
+            icon='fas fa-link'
             onClick={props.onClickCopyLink}
             text={props.t('Copy content link')}
             key={`link-${contentId}`}
@@ -97,7 +97,7 @@ export class ContentActivityHeader extends React.Component {
             to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
             key={`open-${contentId}`}
           >
-            <i className={`fa fa-fw fa-${app.faIcon}`} />
+            <i className={`fa-fw ${app.faIcon}`} />
             {props.t('Open content')}
           </Link>
         </DropdownMenu>

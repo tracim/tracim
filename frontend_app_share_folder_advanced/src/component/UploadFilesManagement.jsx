@@ -26,7 +26,7 @@ const UploadFilesManagement = props => {
           data-cy='share_folder_advanced__content__btnupload'
         >
           {props.t('New')}
-          <i className='fa fa-fw fa-plus-circle' />
+          <i className='fas fa-fw fa-plus-circle' />
         </button>
       </div>
 
