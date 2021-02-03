@@ -21,11 +21,11 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FolderContentModifySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import RevisionSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -47,7 +47,7 @@ class FolderController(Controller):
     @check_right(is_reader)
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.output_body(ContentSchema())
     def get_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get folder info
@@ -70,7 +70,7 @@ class FolderController(Controller):
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FolderContentModifySchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.output_body(ContentSchema())
     def update_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         update folder
@@ -99,7 +99,7 @@ class FolderController(Controller):
     @check_right(is_reader)
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedRevisionSchema(many=True))
+    @hapic.output_body(RevisionSchema(many=True))
     def get_folder_revisions(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[RevisionInContext]:

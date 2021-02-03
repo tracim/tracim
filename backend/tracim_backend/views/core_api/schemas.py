@@ -1442,10 +1442,6 @@ class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     )
 
 
-class TextBasedContentSchema(ContentSchema):
-    pass
-
-
 class FileInfoAbstractSchema(marshmallow.Schema):
     page_nb = marshmallow.fields.Int(
         description="number of pages, return null value if unaivalable", example=1, allow_none=True
@@ -1494,10 +1490,6 @@ class RevisionSchema(ContentDigestSchema):
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
-
-
-class TextBasedRevisionSchema(RevisionSchema):
-    pass
 
 
 class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):

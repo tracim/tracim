@@ -67,7 +67,6 @@ from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -85,10 +84,10 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        HTML_DOCUMENTS_TYPE: ContentSchema(),
         FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: TextBasedContentSchema(),
-        THREAD_TYPE: TextBasedContentSchema(),
+        FOLDER_TYPE: ContentSchema(),
+        THREAD_TYPE: ContentSchema(),
     }
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()

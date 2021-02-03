@@ -618,7 +618,7 @@ class SetContentStatus(object):
 
 class ContentUpdate(object):
     """
-    TextBasedContent update model
+    Content update model
     """
 
     def __init__(self, label: str, raw_content: str, description: str) -> None:

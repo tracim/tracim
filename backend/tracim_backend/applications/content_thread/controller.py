@@ -27,12 +27,12 @@ from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentModifySchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import RevisionSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -55,7 +55,7 @@ class ThreadController(Controller):
     @check_right(is_reader)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.output_body(ContentSchema())
     def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get thread content
@@ -123,7 +123,7 @@ class ThreadController(Controller):
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentModifySchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.output_body(ContentSchema())
     def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         update thread
@@ -152,7 +152,7 @@ class ThreadController(Controller):
     @check_right(is_reader)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedRevisionSchema(many=True))
+    @hapic.output_body(RevisionSchema(many=True))
     def get_thread_revisions(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[RevisionInContext]:
