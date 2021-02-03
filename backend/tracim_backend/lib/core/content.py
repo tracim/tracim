@@ -1620,9 +1620,9 @@ class ContentApi(object):
     def update_content(
         self,
         item: Content,
-        new_label: str,
-        new_raw_content: str = None,
-        new_description: str = None,
+        new_label: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
+        new_description: typing.Optional[str] = None,
         force_update=False,
     ) -> Content:
         """
@@ -1638,12 +1638,13 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
             )
-        if not new_label:
-            raise EmptyLabelNotAllowed()
 
-        label = new_label or item.label
-        new_raw_content = new_raw_content or item.raw_content
-        new_description = new_description or item.description
+        if new_label is None:
+            new_label = item.label
+        if new_raw_content is None:
+            new_raw_content = item.raw_content
+        if new_description is None:
+            new_description = item.description
         if not force_update:
             if (
                 item.label == new_label
@@ -1654,7 +1655,7 @@ class ContentApi(object):
                 # Internatization disabled in libcontent for now.
                 raise SameValueError("The content did not changed")
 
-        filename = self._prepare_filename(label, item.file_extension)
+        filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
         if filename:
             self._is_filename_available_or_raise(

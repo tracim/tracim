@@ -1531,16 +1531,16 @@ class SetCommentSchema(marshmallow.Schema):
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True,
+        required=False,
         example="contract for client XXX",
         description="New title of the content",
         validate=not_empty_string_validator,
     )
     description = StrippedString(
-        required=True, description="raw text or html description of the content"
+        required=False, description="raw text or html description of the content"
     )
     raw_content = StrippedString(
-        required=True,
+        required=False,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
@@ -1557,7 +1557,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema):
         description="list of content types allowed as sub contents. "
         "This field is required for folder contents, "
         "set it to empty list in other cases",
-        required=True,
+        required=False,
     )
 
     @post_load

@@ -621,7 +621,12 @@ class ContentUpdate(object):
     Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, description: str) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.description = description
@@ -691,7 +696,12 @@ class FolderContentUpdate(object):
     Folder Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, sub_content_types: List[str]) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        sub_content_types: Optional[List[str]] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
