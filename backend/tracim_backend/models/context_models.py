@@ -1469,7 +1469,7 @@ class RevisionInContext(object):
 
     @property
     def description(self) -> str:
-        return self.content.description
+        return self.revision.description
 
     @property
     def author(self) -> UserInContext:

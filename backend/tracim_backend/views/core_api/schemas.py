@@ -1427,11 +1427,12 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-
-
-class ContentSchema(ContentDigestSchema):
+class UserInfoContentAbstractSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     description = StrippedString(
         required=True, description="raw text or html description of the content"
     )
@@ -1495,7 +1496,7 @@ class RevisionSchema(ContentDigestSchema):
     )
 
 
-class TextBasedRevisionSchema(ContentSchema):
+class TextBasedRevisionSchema(RevisionSchema):
     pass
 
 

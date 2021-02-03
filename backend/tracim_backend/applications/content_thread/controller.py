@@ -99,7 +99,7 @@ class ThreadController(Controller):
                 'No preview available for thread of content id "{}"'.format(content.content_id)
             )
         file = BytesIO()
-        byte_size = file.write(first_comment.description.encode("utf-8"))
+        byte_size = file.write(first_comment.raw_content.encode("utf-8"))
         file.seek(0)
         filename = hapic_data.path.filename
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
