@@ -27,7 +27,7 @@
 
 ### Others
 
-- Implemented an API for connecting users (follow user feature) (issue [#3916](https://github.com/tracim/tracim/issues/3916))
+- Implemented an API to allow users to follow each other (issue [#3916](https://github.com/tracim/tracim/issues/3916))
 - Simplified way to run tests (backend/frontend) on development environment (issue [#4020](https://github.com/tracim/tracim/issues/4020))
 
 
