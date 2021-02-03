@@ -3,7 +3,7 @@
 ### New Features
 
 - All users have a parameterizable public profile
-- User interface now use font awesome 5+ icon
+- The user interface now uses icons from Font Awesome 5
 
 ### Fixed Issues
 
