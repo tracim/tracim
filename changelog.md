@@ -28,7 +28,7 @@
 ### Others
 
 - Implemented an API to allow users to follow each other (issue [#3916](https://github.com/tracim/tracim/issues/3916))
-- Simplified way to run tests (backend/frontend) on development environment (issue [#4020](https://github.com/tracim/tracim/issues/4020))
+- Simplified way to run tests (backend/frontend) in development environments (issue [#4020](https://github.com/tracim/tracim/issues/4020))
 
 
 ## 3.4.3 / 2021-01-11
