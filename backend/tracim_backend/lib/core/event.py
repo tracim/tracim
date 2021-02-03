@@ -364,10 +364,10 @@ class EventApi:
             try:
                 receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
             except KeyError as exc:
-                # NOTE - 2021/02/03 - S.G.
+                # NOTE - 2021-02-03 - S.G.
                 # Safeguard easy mistakes due to changing JSON structure of fields
                 msg = (
-                    "Event {} is missing the key '{}' in one of its fields, "
+                    "Event {} is missing key '{}' in one of its fields, "
                     "ignoring it during historic messages creation"
                 ).format(event.event_id, exc)
                 logger.warning(self, msg)
