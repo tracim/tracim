@@ -1591,10 +1591,10 @@ class Content(DeclarativeBase):
 
         return None
 
-    def description_as_raw_text(self) -> str:
+    def raw_content_as_raw_text(self) -> str:
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        return BeautifulSoup(self.description, "html.parser").text
+        return BeautifulSoup(self.raw_content, "html.parser").text
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
