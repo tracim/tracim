@@ -15,13 +15,13 @@ down_revision = "7c6641d4f934"
 set_comment_html_document_raw_content = """
 update content_revisions
 set raw_content = description, description = ''
-where type in ('html-document', 'comment')
+where type in ('html-document', 'comment', 'thread')
 """
 
 unset_comment_html_document_raw_content = """
 update content_revisions
 set description = raw_content
-where type in ('html-document', 'comment')
+where type in ('html-document', 'comment', 'thread')
 """
 
 
