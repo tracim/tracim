@@ -570,7 +570,7 @@ class FileController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> ContentInContext:
         """
-        update thread
+        update file
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
