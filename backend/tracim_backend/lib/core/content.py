@@ -1595,13 +1595,15 @@ class ContentApi(object):
         allowed_content_type_slug_list: typing.List[str],
         new_label: str,
         new_description: str = None,
+        new_raw_content: str = None,
     ):
         """
         Update a container content like folder
         :param item: content
         :param item: content
         :param new_label: new label of content
-        :param new_description: new raw text content/description of content
+        :param new_description: description of content
+        :param new_raw_content: raw content of this content
         :param allowed_content_type_slug_list: list of allowed subcontent type
          of content.
         :return:
@@ -1612,7 +1614,11 @@ class ContentApi(object):
         except SameValueError:
             content_has_changed = False
         item = self.update_content(
-            item, new_label, new_description=new_description, force_update=content_has_changed
+            item,
+            new_label,
+            new_description=new_description,
+            new_raw_content=new_raw_content,
+            force_update=content_has_changed,
         )
 
         return item

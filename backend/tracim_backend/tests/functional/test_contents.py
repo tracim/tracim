@@ -342,7 +342,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         modified_event = event_helper.last_event
@@ -408,7 +408,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         res = web_testapp.put_json(
@@ -476,7 +476,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -515,7 +515,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set(
             [content_type_list.Folder.slug, content_type_list.Thread.slug]
         )
@@ -574,7 +574,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -613,7 +613,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])
 
     def test_api__update_folder__err_400__label_already_used(

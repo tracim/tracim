@@ -701,10 +701,12 @@ class FolderContentUpdate(object):
         label: Optional[str] = None,
         raw_content: Optional[str] = None,
         sub_content_types: Optional[List[str]] = None,
+        description: Optional[str] = None,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
+        self.description = description
 
 
 class Agenda(object):
