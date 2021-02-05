@@ -37,7 +37,7 @@ export class Search extends React.Component {
           className='search__btn'
           data-cy='search__btn'
           onClick={this.handleClickSearch}
-          disabled={state.searchedKeywords === ''}
+          title={props.t('Search')}
         >
           <i className='fas fa-search' />
         </button>

@@ -69,6 +69,7 @@ import {
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
+import AdvancedSearch from './AdvancedSearch.jsx'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
@@ -523,7 +524,12 @@ export class Tracim extends React.Component {
 
           <Route path='/wip/:cp' component={WIPcomponent} /> {/* for testing purpose only */}
 
-          <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
+          <Route
+            path={PAGE.SEARCH_RESULT}
+            component={true // TODO - props.system.config.search_engine === 'elasticsearch'
+              ? AdvancedSearch
+              : SearchResult}
+          />
 
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
