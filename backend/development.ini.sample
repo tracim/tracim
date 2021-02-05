@@ -709,7 +709,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; search.elasticsearch.request_timeout = 60
 
 # prefix of the index aliases that will be used to store Tracim users, contents and workspaces for searching
-; search.elasticsearch.index_alias_prefix = tracim
+; search.elasticsearch.index_alias_prefix =
 # example:
 # search.elasticsearch.index_alias_prefix = my-tracim
 
