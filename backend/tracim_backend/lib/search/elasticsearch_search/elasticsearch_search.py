@@ -333,6 +333,11 @@ class ESSearchApi(SearchApi):
         size: typing.Optional[int],
         page_nb: typing.Optional[int],
         content_types: typing.Optional[typing.List[str]] = None,
+        workspace_names: typing.Optional[typing.List[str]] = None,
+        author_public_names: typing.Optional[typing.List[str]] = None,
+        last_modified_public_names: typing.Optional[typing.List[str]] = None,
+        file_extensions: typing.Optional[typing.List[str]] = None,
+        statuses: typing.Optional[typing.List[str]] = None,
         show_deleted: bool = False,
         show_archived: bool = False,
         show_active: bool = True,
@@ -397,8 +402,30 @@ class ESSearchApi(SearchApi):
             search = search.extra(from_=self.offset_from_pagination(size, page_nb))
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
+
+        # Simple Facets:
         if content_types:
             search = search.filter("terms", content_type=content_types)
+        search.aggs.bucket("content_types", "terms", field="content_type")
+        if workspace_names:
+            search = search.filter("terms", workspace__label__exact=workspace_names)
+        search.aggs.bucket("workspace_names", "terms", field="workspace.label.exact")
+        if author_public_names:
+            search = search.filter("terms", author__public_name__exact=author_public_names)
+        search.aggs.bucket("author__public_names", "terms", field="author.public_name.exact")
+        if last_modified_public_names:
+            search = search.filter(
+                "terms", last_modified__public_name__exact=last_modified_public_names
+            )
+        search.aggs.bucket(
+            "last_modifier__public_names", "terms", field="last_modifier.public_name.exact"
+        )
+        if file_extensions:
+            search = search.filter("terms", file_extension=file_extensions)
+        search.aggs.bucket("file_extensions", "terms", field="file_extension.exact")
+        if statuses:
+            search = search.filter("terms", status=statuses)
+        search.aggs.bucket("statuses", "terms", field="status")
         res = search.execute()
         return res
 

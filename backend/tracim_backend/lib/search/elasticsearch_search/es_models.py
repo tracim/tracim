@@ -42,12 +42,12 @@ html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_f
 
 class DigestUser(InnerDoc):
     user_id = Integer()
-    public_name = Text()
+    public_name = Text(fields={"exact": Keyword()})
 
 
 class DigestWorkspace(InnerDoc):
     workspace_id = Integer()
-    label = Text()
+    label = Text(fields={"exact": Keyword()})
 
 
 class DigestContent(InnerDoc):
