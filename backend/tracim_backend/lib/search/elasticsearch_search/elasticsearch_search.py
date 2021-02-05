@@ -67,7 +67,7 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
-        logger.info(self, "Create ES indices...")
+        logger.info(self, "Creating ES indices...")
         if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             self._create_ingest_pipeline()
 
@@ -144,7 +144,7 @@ class ESSearchApi(SearchApi):
         for parameters in self._get_indices_parameters():
             new_index_name = self._get_index_name(parameters)
 
-            logger.info(self, 'create new index "{}"'.format(new_index_name))
+            logger.info(self, 'Creating new index "{}"'.format(new_index_name))
             # create new index, it will use the settings from the template
             self.es.indices.create(index=new_index_name)
 
@@ -161,7 +161,7 @@ class ESSearchApi(SearchApi):
 
             logger.info(
                 self,
-                'set alias "{}" to point on index "{}"'.format(parameters.alias, new_index_name),
+                'Setting alias "{}" to point on index "{}"'.format(parameters.alias, new_index_name),
             )
             # move the alias to point to the newly created index
             self.set_alias(parameters, new_index_name)

@@ -28,10 +28,10 @@ class IndexingCommand(AppContextCommand):
         nb_index_errors = index_contents_result.get_nb_index_errors()
         nb_contents_to_index = index_contents_result.get_nb_contents_to_index()
         if nb_index_errors == 0:
-            print("All {} content(s) were indexed".format(nb_contents_to_index))
+            print("{} content(s) were indexed".format(nb_contents_to_index))
         else:
             print(
-                "Warning ! {}/{} content(s) cannot be indexed properly.".format(
+                "Warning! Failed to index {}/{} content(s)".format(
                     nb_index_errors, nb_contents_to_index
                 )
             )
@@ -134,4 +134,4 @@ class SearchIndexDeleteCommand(AppContextCommand):
         )
         print("delete index")
         self.search_api.delete_index()
-        print("Index were deleted")
+        print("Indices were deleted")
