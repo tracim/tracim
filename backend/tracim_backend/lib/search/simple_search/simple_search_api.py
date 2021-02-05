@@ -27,13 +27,13 @@ class SimpleSearchApi(SearchApi):
     - limited feature (no ranking, no search into content, etc...)
     """
 
-    def create_index(self):
+    def create_indices(self):
         pass
 
-    def migrate_index(self, move_data=True, update_alias=True):
+    def migrate_indices(self):
         pass
 
-    def delete_index(self):
+    def delete_indices(self):
         pass
 
     def index_content(self, content: ContentInContext):

@@ -61,8 +61,8 @@ class SearchIndexInitCommand(IndexingCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.create_index()
-        print("Index template was created")
+        self.search_api.create_indices()
+        print("Index templates were created")
         if parsed_args.index_all:
             self._index_all_contents()
 

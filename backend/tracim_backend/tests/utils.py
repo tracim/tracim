@@ -238,13 +238,13 @@ class MailHogHelper(object):
 class ElasticSearchHelper(object):
     def __init__(self, app_config, session):
         self.elastic_search_api = ESSearchApi(config=app_config, current_user=None, session=session)
-        self.elastic_search_api.create_index()
+        self.elastic_search_api.create_indices()
 
     def refresh_elasticsearch(self) -> None:
-        self.elastic_search_api.refresh_index()
+        self.elastic_search_api.refresh_indices()
 
     def delete_index(self) -> None:
-        self.elastic_search_api.delete_index()
+        self.elastic_search_api.delete_indices()
 
 
 class RadicaleServerHelper(object):

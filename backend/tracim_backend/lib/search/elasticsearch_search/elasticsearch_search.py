@@ -63,7 +63,7 @@ class ESSearchApi(SearchApi):
             ]
         )
 
-    def create_index(self) -> None:
+    def create_indices(self) -> None:
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
@@ -110,7 +110,7 @@ class ESSearchApi(SearchApi):
             }
         )
 
-    def refresh_index(self) -> None:
+    def refresh_indices(self) -> None:
         """
         refresh index to obtain up to date information instead of relying on
         periodical refresh, useful for automated tests.
@@ -119,7 +119,7 @@ class ESSearchApi(SearchApi):
         for parameters in self._get_indices_parameters():
             self.es.indices.refresh(parameters.alias)
 
-    def delete_index(self) -> None:
+    def delete_indices(self) -> None:
 
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
@@ -129,7 +129,7 @@ class ESSearchApi(SearchApi):
             self.es.indices.delete(index_pattern, allow_no_indices=True)
             self.es.indices.delete_template(parameters.alias)
 
-    def migrate_index(self) -> None:
+    def migrate_indices(self) -> None:
         """
         Upgrade function that creates a new index for the data and re-index
         the previous copy of the data into the new index.
@@ -161,7 +161,9 @@ class ESSearchApi(SearchApi):
 
             logger.info(
                 self,
-                'Setting alias "{}" to point on index "{}"'.format(parameters.alias, new_index_name),
+                'Setting alias "{}" to point on index "{}"'.format(
+                    parameters.alias, new_index_name
+                ),
             )
             # move the alias to point to the newly created index
             self.set_alias(parameters, new_index_name)

@@ -45,15 +45,15 @@ class SearchApi(ABC):
         self._config = config
 
     @abstractmethod
-    def create_index(self) -> None:
+    def create_indices(self) -> None:
         pass
 
     @abstractmethod
-    def migrate_index(self) -> None:
+    def migrate_indices(self) -> None:
         pass
 
     @abstractmethod
-    def delete_index(self) -> None:
+    def delete_indices(self) -> None:
         pass
 
     @abstractmethod
