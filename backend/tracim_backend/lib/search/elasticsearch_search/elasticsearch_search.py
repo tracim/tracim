@@ -337,6 +337,12 @@ class ESSearchApi(SearchApi):
         author_public_names: typing.Optional[typing.List[str]] = None,
         last_modified_public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
+        search_fields: typing.Optional[typing.List[str]] = (
+            "label",
+            "raw_content",
+            "comments",
+            "description",
+        ),
         statuses: typing.Optional[typing.List[str]] = None,
         created_from: typing.Optional[datetime] = None,
         created_to: typing.Optional[datetime] = None,
@@ -360,6 +366,25 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
         # syntax to match complex case,
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+        es_search_fields = []
+        if "label" in search_fields:
+            # TODO : we may want to split exact and not exact search to allow doing exact search efficiently.
+            es_search_fields.extend(
+                ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
+            )
+        if "raw_content" in search_fields:
+            es_search_fields.extend(
+                [
+                    "raw_content.exact^3",
+                    "raw_content^3",
+                    "file_data.content^3",
+                    "file_data.title^4",
+                    "file_data.author",
+                    "file_data.keywords",
+                ]
+            )
+        if "comments" in search_fields:
+            es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
         search = Search(
             using=self.es, doc_type=IndexedContent, index=self.index_document_alias
         ).query(
@@ -369,24 +394,7 @@ class ESSearchApi(SearchApi):
             # change score according to this boost. label is the most important, content is
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
-            fields=[
-                # TODO: make this list of field configurable by searcher, the relation from
-                # frontend is not 1 for 1 as frontend should not known the exact version and
-                # how data is indexed.
-                "label.exact^8",
-                "label^5",
-                "filename.exact",
-                "filename",
-                "file_extension",
-                "raw_content.exact^3",
-                "raw_content^3",
-                "comments.raw_content.exact",
-                "comments.raw_content",
-                "file_data.content^3",
-                "file_data.title^4",
-                "file_data.author",
-                "file_data.keywords",
-            ],
+            fields=es_search_fields,
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         if not show_active:
