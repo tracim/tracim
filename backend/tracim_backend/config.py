@@ -422,14 +422,22 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
+
+        default_user_custom_properties_path = self.here_macro_replace(
+            "%(here)s/tracim_backend/templates/user_custom_properties/default/"
+        )
+
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.json_schema_file_path"
+            "user.custom_properties.json_schema_file_path",
+            default_user_custom_properties_path + "schema.json",
         )
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.ui_schema_file_path"
+            "user.custom_properties.ui_schema_file_path",
+            default_user_custom_properties_path + "ui.json",
         )
         self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH = self.get_raw_config(
-            "user.custom_properties.translations_dir_path"
+            "user.custom_properties.translations_dir_path",
+            default_user_custom_properties_path + "locale",
         )
 
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
