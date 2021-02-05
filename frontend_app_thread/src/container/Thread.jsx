@@ -461,7 +461,7 @@ export class Thread extends React.Component {
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
               searchForMentionInQuery={this.searchForMentionInQuery}
             />
-        ) : null}
+          ) : null}
         </PopinFixedContent>
       </PopinFixed>
     )
