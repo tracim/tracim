@@ -25,6 +25,10 @@
 ### Breaking Changes
 
 - Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
+- On existing Tracim installation running with docker image: Its necessary to update your development.ini (use this file [development.ini.sample](.backend/development.ini.sample) to compare). This three new parameter need to be added with this default path on your config file:
+  - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
+  - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
+  - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`
 
 ### Others
 
