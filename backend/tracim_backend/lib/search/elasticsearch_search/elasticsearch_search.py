@@ -338,6 +338,10 @@ class ESSearchApi(SearchApi):
         last_modified_public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
         statuses: typing.Optional[typing.List[str]] = None,
+        created_from: typing.Optional[datetime] = None,
+        created_to: typing.Optional[datetime] = None,
+        updated_from: typing.Optional[datetime] = None,
+        updated_to: typing.Optional[datetime] = None,
         show_deleted: bool = False,
         show_archived: bool = False,
         show_active: bool = True,
@@ -366,6 +370,9 @@ class ESSearchApi(SearchApi):
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=[
+                # TODO: make this list of field configurable by searcher, the relation from
+                # frontend is not 1 for 1 as frontend should not known the exact version and
+                # how data is indexed.
                 "label.exact^8",
                 "label^5",
                 "filename.exact",
@@ -404,6 +411,7 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
         # Simple Facets:
+        # TODO: do refactor to simplify the code
         if content_types:
             search = search.filter("terms", content_type=content_types)
         search.aggs.bucket("content_types", "terms", field="content_type")
@@ -426,6 +434,23 @@ class ESSearchApi(SearchApi):
         if statuses:
             search = search.filter("terms", status=statuses)
         search.aggs.bucket("statuses", "terms", field="status")
+
+        # simple date/number facet (no histogram)
+        # TODO: do refactor to handle modified the same way
+        if created_from and created_to:
+            created_range = {"gte": created_from, "lte": created_to}
+        elif created_from:
+            created_range = {"gte", created_from}
+        elif created_to:
+            created_range = {"lte", created_to}
+        else:
+            created_range = None
+        if created_range:
+            search = search.filter("range", created=created_range)
+        # possible to use aggregate histogram with just one bucket here ?
+        search.aggs.metric("created_from", "min", field="created")
+        search.aggs.metric("created_to", "max", field="created")
+
         res = search.execute()
         return res
 
