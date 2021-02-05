@@ -44,7 +44,7 @@ export const AdvancedSearchLoader = props =>
               />
               <rect x='1015' y='90' width='100' className='advancedSearchLoader__svg__rectangle__text' />
               {itemList.map(index =>
-                <>
+                <React.Fragment key={`list-item-${index}`}>
                   <rect y={125 + index * itemHeight} className='advancedSearchLoader__svg__rectangle__list' />
 
                   <rect y={140 + index * itemHeight} className='advancedSearchLoader__svg__rectangle__icon' />
@@ -79,7 +79,7 @@ export const AdvancedSearchLoader = props =>
                     width='170'
                     className='advancedSearchLoader__svg__rectangle__text'
                   />
-                </>
+                </React.Fragment>
               )}
             </svg>
           </div>
