@@ -84,7 +84,7 @@ class TestElasticSearchSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content", status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -153,7 +153,7 @@ class TestElasticSearchSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content", status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result

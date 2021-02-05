@@ -49,7 +49,7 @@ class SearchApi(ABC):
         pass
 
     @abstractmethod
-    def migrate_index(self, move_data=True, update_alias=True) -> None:
+    def migrate_index(self) -> None:
         pass
 
     @abstractmethod
