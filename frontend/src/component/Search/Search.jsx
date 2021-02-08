@@ -21,7 +21,7 @@ export class Search extends React.Component {
   handleKeyDown = e => e.key === 'Enter' && this.state.searchedKeywords !== '' && this.handleClickSearch()
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     return (
       <div className='search primaryColorBorder'>

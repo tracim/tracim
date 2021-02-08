@@ -14,7 +14,7 @@ import {
   PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
-import ContentItemSearch from '../component/ContentItemSearch.jsx'
+import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
@@ -27,6 +27,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
+import { parseSearchUrl } from '../util/helper.js'
 
 const qs = require('query-string')
 
@@ -50,21 +51,6 @@ export class SearchResult extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  parseUrl () {
-    const parsed = qs.parse(this.props.location.search)
-    const searchObject = {}
-
-    searchObject.contentTypes = parsed.t
-    searchObject.searchedKeywords = parsed.q
-    searchObject.numberResultsByPage = parseInt(parsed.nr)
-    searchObject.currentPage = parseInt(parsed.p)
-    searchObject.showArchived = !!(parseInt(parsed.arc))
-    searchObject.showDeleted = !!(parseInt(parsed.del))
-    searchObject.showActive = !!(parseInt(parsed.act))
-
-    return searchObject
-  }
-
   componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
@@ -73,7 +59,7 @@ export class SearchResult extends React.Component {
 
   componentDidUpdate (prevProps) {
     const prevSearchedKeywords = qs.parse(prevProps.location.search).q
-    const currentSearchedKeywords = this.parseUrl().searchedKeywords
+    const currentSearchedKeywords = parseSearchUrl(qs.parse(this.props.location.search)).searchedKeywords
 
     if (prevSearchedKeywords !== currentSearchedKeywords) {
       this.loadSearchUrl()
@@ -86,7 +72,7 @@ export class SearchResult extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`]
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedKeywords}`]
     )
 
     props.dispatch(setHeadTitle(headTitle))
@@ -94,7 +80,7 @@ export class SearchResult extends React.Component {
 
   loadSearchUrl = async () => {
     const { props } = this
-    const searchObject = this.parseUrl()
+    const searchObject = parseSearchUrl(qs.parse(props.location.search))
     const FIRST_PAGE = 1
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
@@ -146,7 +132,7 @@ export class SearchResult extends React.Component {
   handleClickSeeMore = async () => {
     const { props } = this
     const NEXT_PAGE = props.searchResult.currentNumberPage + 1
-    const searchObject = this.parseUrl()
+    const searchObject = parseSearchUrl(qs.parse(props.location.search))
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
       searchObject.contentTypes,

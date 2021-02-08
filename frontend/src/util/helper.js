@@ -143,3 +143,17 @@ export const toggleFavicon = (hasNewNotification) => {
     }
   })
 }
+
+export const parseSearchUrl = (parsedQuery) => {
+  const searchObject = {}
+
+  searchObject.contentTypes = parsedQuery.t
+  searchObject.searchedKeywords = parsedQuery.q
+  searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
+  searchObject.currentPage = parseInt(parsedQuery.p)
+  searchObject.showArchived = !!(parseInt(parsedQuery.arc))
+  searchObject.showDeleted = !!(parseInt(parsedQuery.del))
+  searchObject.showActive = !!(parseInt(parsedQuery.act))
+
+  return searchObject
+}

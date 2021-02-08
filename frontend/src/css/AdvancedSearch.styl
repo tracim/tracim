@@ -1,13 +1,26 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .advancedSearch
-  &__description
-    margin 10px 25px
-    color lightDarkGrey
+  padding-right 0px
+  &__page
+    display flex
+  & .search
+    margin-right 30px
   &__content
+    flex 1
+    margin-right 30px
+    &__detail
+      display flex
+      margin-top 15px
+      margin-left 25px
+      color lightDarkGrey
+      height 45px
+      align-items center
+      &__filter
+        margin-right 0px
     &__empty
       margin-top 50px
       font-weight bold
-  &__btnSeeMore
-    text-align center
-    padding 25px
+    &__btnSeeMore
+      text-align center
+      padding 25px

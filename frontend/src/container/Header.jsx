@@ -27,7 +27,7 @@ import {
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
-import Search from '../component/Header/Search.jsx'
+import Search from '../component/Search/Search.jsx'
 import {
   PROFILE,
   ComposedIcon,
