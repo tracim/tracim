@@ -243,7 +243,7 @@ class ElasticSearchHelper(object):
     def refresh_elasticsearch(self) -> None:
         self.elastic_search_api.refresh_indices()
 
-    def delete_index(self) -> None:
+    def delete_indices(self) -> None:
         self.elastic_search_api.delete_indices()
 
 

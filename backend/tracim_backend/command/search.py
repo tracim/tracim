@@ -133,5 +133,5 @@ class SearchIndexDeleteCommand(AppContextCommand):
             current_user=None, session=self._session, config=self._app_config
         )
         print("delete index")
-        self.search_api.delete_index()
+        self.search_api.delete_indices()
         print("Indices were deleted")
