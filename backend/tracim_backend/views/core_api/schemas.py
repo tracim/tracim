@@ -1592,6 +1592,7 @@ class ConfigSchema(marshmallow.Schema):
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
+    search_engine = marshmallow.fields.String()
 
 
 class EventSchema(marshmallow.Schema):
