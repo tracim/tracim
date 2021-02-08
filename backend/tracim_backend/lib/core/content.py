@@ -1594,8 +1594,8 @@ class ContentApi(object):
         item: Content,
         allowed_content_type_slug_list: typing.List[str],
         new_label: str,
-        new_description: str = None,
-        new_raw_content: str = None,
+        new_description: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
     ):
         """
         Update a container content like folder
