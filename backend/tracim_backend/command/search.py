@@ -79,7 +79,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.migrate_index()
+        self.search_api.migrate_indices()
 
 
 class SearchIndexIndexCommand(IndexingCommand):
