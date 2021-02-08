@@ -360,5 +360,22 @@
   "Registration date:": "Registration date:",
   "Cover image of {{publicName}}": "Cover image of {{publicName}}",
   "Change cover": "Change cover",
-  "{{numberComments}} comments": "{{numberComments}} comments"
+  "{{numberComments}} comments": "{{numberComments}} comments",
+  "Comment_sub": "Comment",
+  "New space": "New space",
+  "Space updated": "Space updated",
+  "Space deleted": "Space deleted",
+  "Space restored": "Space restored",
+  "Status updated": "Status updated",
+  "Content updated": "Content updated",
+  "Item deleted": "Item deleted",
+  "Item restored": "Item restored",
+  "Mention": "Mention",
+  "Account created": "Account created",
+  "Account updated": "Account updated",
+  "Account deleted": "Account deleted",
+  "Account restored": "Account restored",
+  "New access": "New access",
+  "Access removed": "Access removed",
+  "Requested access": "Requested access"
 }

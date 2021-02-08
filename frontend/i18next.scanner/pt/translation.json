@@ -360,5 +360,22 @@
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{pubblicName}}",
   "Change cover": "Mudar a capa",
-  "{{numberComments}} comments": "{{numberComments}} comentários"
+  "{{numberComments}} comments": "{{numberComments}} comentários",
+  "Comment_sub": "Comentário",
+  "New space": "Novo espaço",
+  "Space updated": "Espaço actualizado",
+  "Space deleted": "Espaço eliminado",
+  "Space restored": "Espaço restaurado",
+  "Status updated": "Status actualizado",
+  "Content updated": "Conteúdo actualizado",
+  "Item deleted": "Elemento eliminado",
+  "Item restored": "Elemento restaurado",
+  "Mention": "Menção",
+  "Account created": "Nova conta",
+  "Account updated": "Conta actualizada",
+  "Account deleted": "Conta eliminada",
+  "Account restored": "Conta restaurada",
+  "New access": "Novo acesso",
+  "Access removed": "Acesso rejeitado",
+  "Requested access": "Acesso solicitado"
 }

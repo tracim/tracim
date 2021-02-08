@@ -360,5 +360,22 @@
   "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
   "Change cover": "Changer la couverture",
-  "{{numberComments}} comments": "{{numberComments}} commentaires"
+  "{{numberComments}} comments": "{{numberComments}} commentaires",
+  "Comment_sub": "Commentaire",
+  "New space": "Nouvel espace",
+  "Space updated": "Espace mis à jour",
+  "Space deleted": "Espace supprimé",
+  "Space restored": "Espace restauré",
+  "Status updated": "Changement de statut",
+  "Content updated": "Changement de contenu",
+  "Item deleted": "Élément supprimé",
+  "Item restored": "Élément restauré",
+  "Mention": "Mention",
+  "Account created": "Nouveau compte",
+  "Account updated": "Compte mis à jour",
+  "Account deleted": "Compte supprimé",
+  "Account restored": "Compte restauré",
+  "New access": "Nouvel accès",
+  "Access removed": "Accès retiré",
+  "Requested access": "Accès demandé"
 }

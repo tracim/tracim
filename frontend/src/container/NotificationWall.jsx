@@ -118,6 +118,7 @@ export class NotificationWall extends React.Component {
           if (contentType === TLM_SUB.COMMENT) {
             return {
               icon: 'far fa-comments',
+              title: props.t('Comment_sub'),
               text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
               url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
             }
@@ -125,6 +126,7 @@ export class NotificationWall extends React.Component {
 
           return {
             icon: 'fas fa-magic',
+            title: props.t('New space'),
             text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -132,7 +134,8 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
-              icon: 'fas fa-random',
+              icon: 'fas fa-random', 
+              title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
               url: contentUrl
             }
@@ -140,6 +143,7 @@ export class NotificationWall extends React.Component {
 
           return {
             icon: 'fas fa-history',
+            title: props.t('Content updated'),
             text: props.t('{{author}} updated {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -147,6 +151,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.DELETED: {
           return {
             icon: 'fas fa-magic',
+            title: props.t('Item deleted'),
             text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -154,6 +159,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.UNDELETED: {
           return {
             icon: 'fas fa-magic',
+            title: props.t('Item restored'),
             text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -165,6 +171,7 @@ export class NotificationWall extends React.Component {
       if (notification.content.type === CONTENT_TYPE.COMMENT) {
         return {
           icon: 'far fa-comment',
+          title: props.t('Mention'),
           text: props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts),
           url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
         }
@@ -172,6 +179,7 @@ export class NotificationWall extends React.Component {
 
       return {
         icon: 'fas fa-at',
+        title: props.t('Mention'),
         text: props.t('{{author}} mentioned you in {{content}} in {{space}}', i18nOpts),
         url: contentUrl
       }
@@ -188,21 +196,25 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.CREATED: return {
           ...details,
           icon: 'fas fa-user-plus',
+          title: props.t('Account created'),
           text: props.t("{{author}} created {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.MODIFIED: return {
           ...details,
           icon: 'fas fa-user+fas fa-history',
+          title: props.t('Account updated'),
           text: props.t("{{author}} modified {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.DELETED: return {
           ...details,
           icon: 'fas fa-user-times',
+          title: props.t('Account deleted'),
           text: props.t("{{author}} deleted {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.UNDELETED: return {
           ...details,
           icon: 'fas fa-user+fas fa-undo',
+          title: props.t('Account restored'),
           text: props.t("{{author}} restored {{user}}'s account", i18nOpts)
         }
       }
@@ -225,12 +237,14 @@ export class NotificationWall extends React.Component {
           }
           return {
             icon: 'fas fa-user-plus',
+            title: props.t('New access'),
             text: notificationText,
             url: dashboardUrl
           }
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'far fa-user+fas fa-history',
+          title: props.t('Status updated'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} modified your role in {{space}}', i18nOpts)
             : props.t("{{author}} modified {{user}}'s role in {{space}}", i18nOpts),
@@ -238,6 +252,7 @@ export class NotificationWall extends React.Component {
         }
         case TLM_EVENT.DELETED: return {
           icon: 'fas fa-user-times',
+          title: props.t('Access removed'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} removed you from {{space}}', i18nOpts)
             : props.t('{{author}} removed {{user}} from {{space}}', i18nOpts),
@@ -250,21 +265,25 @@ export class NotificationWall extends React.Component {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
           icon: 'fas fa-users+fas fa-plus',
+          title: props.t('New space'),
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
           icon: 'fas fa-users+fas fa-history',
+          title: props.t('Space updated'),
           text: props.t('{{author}} modified the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
           icon: 'fas fa-users+fas fa-times',
+          title: props.t('Space deleted'),
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
           icon: 'fas fa-users+fas fa-undo',
+          title: props.t('Space restored'),
           text: props.t('{{author}} restored the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
@@ -287,6 +306,7 @@ export class NotificationWall extends React.Component {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
               icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+              title: props.t('Access removed'),             
               text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
               url: subscriptionPageURL,
               emptyUrlMsg: defaultEmptyUrlMsg
@@ -297,6 +317,7 @@ export class NotificationWall extends React.Component {
         switch (eventType) {
           case TLM_EVENT.CREATED: return {
             icon: SUBSCRIPTION_TYPE.pending.faIcon,
+            title: props.t('Requested access'),             
             text: props.t('{{author}} requested access to {{space}}', i18nOpts),
             url: dashboardUrl
           }
@@ -305,6 +326,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+                title: props.t('Access removed'),             
                 text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
                 url: defaultEmptyUrlMsg
               }
@@ -313,6 +335,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.pending.faIcon,
+                title: props.t('Requested access'),             
                 text: props.t('{{author}} requested access to {{space}}', i18nOpts),
                 url: dashboardUrl
               }
