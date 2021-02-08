@@ -374,8 +374,8 @@ export class NotificationWall extends React.Component {
             const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
-                ? <i className={`fa-fw ${icons[0]}`} />
-                : <ComposedIcon mainIcon={icons[0]} smallIcon={icons[1]} />
+                ? <i title={notificationDetails.title} className={`fa-fw ${icons[0]}`} />
+                : <ComposedIcon titleIcon={notificationDetails.title} mainIcon={icons[0]} smallIcon={icons[1]} />
             )
 
             return (
