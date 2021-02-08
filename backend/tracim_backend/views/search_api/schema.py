@@ -80,6 +80,43 @@ class SearchFilterQuerySchema(marshmallow.Schema):
     def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return SearchFilterQuery(**data)
 
+class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
+    workspace_names = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="select contents in these workspaces"
+    )
+    author_public_names = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="select contents by these authors"
+    )
+    last_modifier_public_names = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="select contents by these authors"
+    )
+    file_extensions = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="select contents with these file extensions"
+    )
+    search_fields = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="search within these fields"
+        # FIXME restrict to "label", "raw_content", "comments", "description",
+    )
+    statuses = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="select contents with these statuses"
+    )
+    created_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    updated_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    updated_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+
 
 class WorkspaceSearchSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)

@@ -13,12 +13,43 @@ from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearc
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
+from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
+
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
+class AdvancedSearchParameters:
+    def __init__(
+        workspace_names: typing.Optional[typing.List[str]] = None,
+        author_public_names: typing.Optional[typing.List[str]] = None,
+        last_modified_public_names: typing.Optional[typing.List[str]] = None,
+        file_extensions: typing.Optional[typing.List[str]] = None,
+        search_fields: typing.Optional[typing.List[str]] = (
+            "label",
+            "raw_content",
+            "comments",
+            "description",
+        ),
+        statuses: typing.Optional[typing.List[str]] = None,
+        created_from: typing.Optional[datetime] = None,
+        created_to: typing.Optional[datetime] = None,
+        updated_from: typing.Optional[datetime] = None,
+        updated_to: typing.Optional[datetime] = None
+    ):
+        self.workspace_names = workspace_names
+        self.author_public_names = author_public_names
+        self.last_modified_public_names = last_modified_public_names
+        self.file_extensions = file_extensions
+        self.search_fields = search_fields
+        self.statuses = statuses
+        self.created_from = created_from
+        self.created_to = created_to
+        self.updated_from = updated_from
+        self.updated_to = updated_to
+)
 
 class ESSearchApi(SearchApi):
     """
@@ -327,30 +358,24 @@ class ESSearchApi(SearchApi):
 
         return True
 
+    @classmethod
+    def create_es_range(cls, range_from, range_to):
+        # simple date/number facet (no histogram)
+        if range_from and range_to:
+            return {"gte": range_from, "lte": range_to}
+
+        if range_from:
+           return {"gte", range_from}
+
+        if range_to:
+            return {"lte", range_to}
+
+        return None
+
     def search_content(
         self,
-        search_string: str,
-        size: typing.Optional[int],
-        page_nb: typing.Optional[int],
-        content_types: typing.Optional[typing.List[str]] = None,
-        workspace_names: typing.Optional[typing.List[str]] = None,
-        author_public_names: typing.Optional[typing.List[str]] = None,
-        last_modified_public_names: typing.Optional[typing.List[str]] = None,
-        file_extensions: typing.Optional[typing.List[str]] = None,
-        search_fields: typing.Optional[typing.List[str]] = (
-            "label",
-            "raw_content",
-            "comments",
-            "description",
-        ),
-        statuses: typing.Optional[typing.List[str]] = None,
-        created_from: typing.Optional[datetime] = None,
-        created_to: typing.Optional[datetime] = None,
-        updated_from: typing.Optional[datetime] = None,
-        updated_to: typing.Optional[datetime] = None,
-        show_deleted: bool = False,
-        show_archived: bool = False,
-        show_active: bool = True,
+        simple_parameters: SearchFilterQuerySchema,
+        advanced_parameters: typing.Optional[AdvancedSearchParameters] = None
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
@@ -363,101 +388,124 @@ class ESSearchApi(SearchApi):
         if not search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
+
         # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
         # syntax to match complex case,
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
         es_search_fields = []
-        if "label" in search_fields:
-            # TODO : we may want to split exact and not exact search to allow doing exact search efficiently.
-            es_search_fields.extend(
-                ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
-            )
-        if "raw_content" in search_fields:
-            es_search_fields.extend(
-                [
-                    "raw_content.exact^3",
-                    "raw_content^3",
-                    "file_data.content^3",
-                    "file_data.title^4",
-                    "file_data.author",
-                    "file_data.keywords",
-                ]
-            )
-        if "comments" in search_fields:
-            es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
+
+        if advanced_parameters:
+            if "label" in advanced_parameters.search_fields:
+                # TODO : we may want to split exact and not exact search to allow doing exact search efficiently.
+                es_search_fields.extend(
+                    ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
+                )
+            if "raw_content" in advanced_parameters.search_fields:
+                es_search_fields.extend(
+                    [
+                        "raw_content.exact^3",
+                        "raw_content^3",
+                        "file_data.content^3",
+                        "file_data.title^4",
+                        "file_data.author",
+                        "file_data.keywords",
+                    ]
+                )
+            if "comments" in advanced_parameters.search_fields:
+                es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
+
         search = Search(
             using=self.es, doc_type=IndexedContent, index=self.index_document_alias
         ).query(
             "simple_query_string",
-            query=search_string,
+            query=simple_parameters.search_string,
             # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
             # change score according to this boost. label is the most important, content is
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=es_search_fields,
         )
+
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
-        if not show_active:
+        if not simple_parameters.show_active:
             search = search.exclude("term", is_active=True)
-        if not show_deleted:
+
+        if not simple_parameters.show_deleted:
             search = search.exclude("term", is_deleted=True)
             search = search.filter("term", deleted_through_parent_id=0)
-        if not show_archived:
+
+        if not simple_parameters.show_archived:
             search = search.exclude("term", is_archived=True)
             search = search.filter("term", archived_through_parent_id=0)
+
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result, because we do not need them and for performance reasons.
         search = search.source(exclude=["raw_content", "*.raw_content", "file_data.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
-        if size:
+
+        if simple_parameters.size:
             search = search.extra(size=size)
-        if page_nb:
+
+        if simple_parameters.page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb))
-        if filtered_workspace_ids is not None:
+
+        if simple_parameters.filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
         # Simple Facets:
         # TODO: do refactor to simplify the code
-        if content_types:
-            search = search.filter("terms", content_type=content_types)
+        if simple_parameters.content_types:
+            search = search.filter("terms", content_type=simple_parameters.content_types)
         search.aggs.bucket("content_types", "terms", field="content_type")
-        if workspace_names:
-            search = search.filter("terms", workspace__label__exact=workspace_names)
-        search.aggs.bucket("workspace_names", "terms", field="workspace.label.exact")
-        if author_public_names:
-            search = search.filter("terms", author__public_name__exact=author_public_names)
-        search.aggs.bucket("author__public_names", "terms", field="author.public_name.exact")
-        if last_modified_public_names:
-            search = search.filter(
-                "terms", last_modified__public_name__exact=last_modified_public_names
-            )
-        search.aggs.bucket(
-            "last_modifier__public_names", "terms", field="last_modifier.public_name.exact"
-        )
-        if file_extensions:
-            search = search.filter("terms", file_extension=file_extensions)
-        search.aggs.bucket("file_extensions", "terms", field="file_extension.exact")
-        if statuses:
-            search = search.filter("terms", status=statuses)
-        search.aggs.bucket("statuses", "terms", field="status")
 
-        # simple date/number facet (no histogram)
-        # TODO: do refactor to handle modified the same way
-        if created_from and created_to:
-            created_range = {"gte": created_from, "lte": created_to}
-        elif created_from:
-            created_range = {"gte", created_from}
-        elif created_to:
-            created_range = {"lte", created_to}
-        else:
-            created_range = None
-        if created_range:
-            search = search.filter("range", created=created_range)
-        # possible to use aggregate histogram with just one bucket here ?
+        if advanced_parameters:
+            if advanced_parameters.workspace_names:
+                search = search.filter("terms", workspace__label__exact=advanced_parameters.workspace_names)
+            search.aggs.bucket("workspace_names", "terms", field="workspace.label.exact")
+
+            if advanced_parameters.author_public_names:
+                search = search.filter("terms", author__public_name__exact=advanced_parameters.author_public_names)
+
+            search.aggs.bucket("author__public_names", "terms", field="author.public_name.exact")
+            if advanced_parameters.last_modified_public_names:
+                search = search.filter(
+                    "terms", last_modified__public_name__exact=advanced_parameters.last_modified_public_names
+                )
+            search.aggs.bucket(
+                "last_modifier__public_names", "terms", field="last_modifier.public_name.exact"
+            )
+
+            if advanced_parameters.file_extensions:
+                search = search.filter("terms", file_extension=advanced_parameters.file_extensions)
+            search.aggs.bucket("file_extensions", "terms", field="file_extension.exact")
+
+            if advanced_parameters.statuses:
+                search = search.filter("terms", status=advanced_parameters.statuses)
+            search.aggs.bucket("statuses", "terms", field="status")
+
+            created_range = self.create_es_range(
+                advanced_parameters.created_from,
+                advanced_parameters.created_to
+            )
+
+            if created_range:
+                search = search.filter("range", created=created_range)
+
+            modified_range = self.create_es_range(
+                advanced_parameters.modified_from,
+                advanced_parameters.modified_to
+            )
+
+            if modified_range:
+                search = search.filter("range", modified=modified_range)
+
+        # possible to use aggregate histogram with just one bucket here?
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
+        search.aggs.metric("modified_from", "min", field="modified")
+        search.aggs.metric("modified_to", "max", field="modified")
 
         res = search.execute()
         return res

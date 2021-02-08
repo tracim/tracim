@@ -14,6 +14,7 @@ from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Content
+from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
 
 SEARCH_SEPARATORS = ",| "
 SEARCH_DEFAULT_RESULT_NB = 10
@@ -141,37 +142,31 @@ class SimpleSearchApi(SearchApi):
 
         return title_keyworded_items
 
-    def search_content(
-        self,
-        search_string: str,
-        size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
-        page_nb: typing.Optional[int] = 1,
-        content_types: typing.Optional[typing.List[str]] = None,
-        show_deleted: bool = False,
-        show_archived: bool = False,
-        show_active: bool = True,
-    ) -> ContentSearchResponse:
+    def search_content(self, search_parameters: SearchFilterQuery) -> ContentSearchResponse:
         """
         Search content with sql
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
-        if not search_string:
+        if not search_parameters.search_string:
             return EmptyContentSearchResponse()
+
         content_api = ContentApi(
             session=self._session,
             current_user=self._user,
             config=self._config,
-            show_deleted=show_deleted,
-            show_archived=show_archived,
-            show_active=show_active,
+            show_deleted=search_parameters.show_deleted,
+            show_archived=search_parameters.show_archived,
+            show_active=search_parameters.show_active,
         )
-        keywords = self.get_keywords(search_string)
-        offset = self.offset_from_pagination(size, page_nb)
+
+        keywords = self.get_keywords(search_parameters.search_string)
+        offset = self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
+
         return self.search(
             keywords=keywords,
-            size=size,
+            size=search_parameters.size,
             offset=offset,
-            content_types=content_types,
+            content_types=search_parameters.content_types,
             content_api=content_api,
         )
