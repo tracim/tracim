@@ -22,7 +22,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 
 class ESSearchApi(SearchApi):
     """
-    Search using ElasticSearch :
+    Search using ElasticSearch:
     - need indexing content first
     - allow pagination and filtering by content_type, deleted, archived
     - support ranking
@@ -33,7 +33,7 @@ class ESSearchApi(SearchApi):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
-        # TODO - G.M - 2019-05-31 - we do support only "one elasticsearch server case here in config,
+        # TODO - G.M - 2019-05-31 - we support only one elasticsearch server case here in config,
         # check how to support more complex case.
         self.es = Elasticsearch(
             hosts=[
@@ -63,7 +63,7 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
-        logger.info(self, "Create index settings ...")
+        logger.info(self, "Creating index settings ...")
         if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             self._create_ingest_pipeline()
         # create an index template
