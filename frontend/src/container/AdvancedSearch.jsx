@@ -222,22 +222,24 @@ export class AdvancedSearch extends React.Component {
 
               <div className='advancedSearch__page'>
                 <div className='advancedSearch__content'>
-                  <div className='advancedSearch__content__detail'>
-                    {this.getDisplayDetail()}
-
-                    {!state.isFilterMenuOpen && (
-                      <IconButton
-                        customClass='advancedSearch__content__detail__filter'
-                        icon='fas fa-sliders-h'
-                        onClick={this.handleClickFilterMenu}
-                        text={props.t('Filter')}
-                        title={props.t('Search filters')}
-                      />
-                    )}
-                  </div>
-
                   {currentNumberSearchResults > 0 && (
-                    <ContentItemHeader showSearchDetails />
+                    <>
+                      <div className='advancedSearch__content__detail'>
+                        {this.getDisplayDetail()}
+
+                        {!state.isFilterMenuOpen && (
+                          <IconButton
+                            customClass='advancedSearch__content__detail__filter'
+                            icon='fas fa-sliders-h'
+                            onClick={this.handleClickFilterMenu}
+                            text={props.t('Filter')}
+                            title={props.t('Search filters')}
+                          />
+                        )}
+                      </div>
+
+                      <ContentItemHeader showSearchDetails />
+                    </>
                   )}
 
                   {currentNumberSearchResults === 0 && (
