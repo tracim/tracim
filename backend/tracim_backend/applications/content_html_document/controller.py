@@ -95,9 +95,8 @@ class HTMLDocumentController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        file = BytesIO()
-        byte_size = file.write(content.raw_content.encode("utf-8"))
-        file.seek(0)
+        file = BytesIO(content.raw_content.encode("utf-8"))
+        byte_size = len(file.getvalue())
         filename = hapic_data.path.filename
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
         # "raw", where filename returned will be original file one.
