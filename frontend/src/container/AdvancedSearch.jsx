@@ -30,6 +30,7 @@ import { getSearchedKeywords } from '../action-creator.async.js'
 import Search from '../component/Search/Search.jsx'
 import { parseSearchUrl } from '../util/helper.js'
 import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
+import classnames from 'classnames'
 
 const qs = require('query-string')
 
@@ -38,7 +39,7 @@ export class AdvancedSearch extends React.Component {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: true
+      isFilterMenuOpen: false
     }
 
     props.registerCustomEventHandlerList([
@@ -213,9 +214,10 @@ export class AdvancedSearch extends React.Component {
               breadcrumbsList={props.breadcrumbs}
             />
 
-            <PageContent parentClass='advancedSearch'>
+            <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
               <Search
                 onClickSearch={this.handleClickSearch}
+                searchedKeywords={props.searchResult.searchedKeywords}
               />
 
               <div className='advancedSearch__page'>

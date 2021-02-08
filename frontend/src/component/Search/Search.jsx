@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 require('./Search.styl')
 
@@ -9,6 +10,12 @@ export class Search extends React.Component {
 
     this.state = {
       searchedKeywords: ''
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.searchedKeywords !== this.props.searchedKeywords) {
+      this.setState({ searchedKeywords: this.props.searchedKeywords })
     }
   }
 
@@ -32,6 +39,7 @@ export class Search extends React.Component {
           placeholder={props.t('Search')}
           onChange={this.handleNewSearch}
           onKeyDown={this.handleKeyDown}
+          value={this.state.searchedKeywords}
         />
         <button
           className='search__btn'
@@ -46,3 +54,11 @@ export class Search extends React.Component {
   }
 }
 export default translate()(Search)
+
+Search.propTypes = {
+  searchedKeywords: PropTypes.string
+}
+
+Search.defaultProps = {
+  searchedKeywords: ''
+}

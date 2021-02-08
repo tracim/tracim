@@ -2,6 +2,7 @@
 
 .advancedSearch
   padding-right 0px
+  overflow-x hidden
   &__page
     display flex
   & .search
@@ -24,3 +25,16 @@
     &__btnSeeMore
       text-align center
       padding 25px
+
+@media (max-width: max-md)
+  .advancedSearch__openMenu
+    padding 0px
+    & > .search
+      display none
+    & .advancedSearch__content
+      display none
+
+@media (max-width: max-sm)
+  .advancedSearch__content__detail__filter
+    & > .iconbutton__text
+      display none

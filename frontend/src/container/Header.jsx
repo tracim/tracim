@@ -138,6 +138,7 @@ export class Header extends React.Component {
                   <Search
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
+                    searchedKeywords={props.searchResult.searchedKeywords}
                   />
                 </li>
               )}
