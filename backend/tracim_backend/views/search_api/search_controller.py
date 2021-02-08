@@ -4,23 +4,22 @@ from pyramid.config import Configurator
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.search.models import ContentSearchResponse
-from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
+from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.search_api.schema import AdvancedSearchFilterQuerySchema
 from tracim_backend.views.search_api.schema import ContentSearchResultSchema
 from tracim_backend.views.search_api.schema import ContentSearchResultWithFacetsSchema
 from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
-from tracim_backend.views.search_api.schema import AdvancedSearchFilterQuerySchema
 
 SWAGGER_TAG__SEARCH_SECTION = "Search"
 
 
 class SearchController(Controller):
     @classmethod
-
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
     @check_right(is_user)
     @hapic.input_query(SearchFilterQuerySchema())
@@ -45,17 +44,13 @@ class SearchController(Controller):
     ) -> ContentSearchResponse:
         app_config = request.registry.settings["CFG"]  # type: CFG
         if app_config.SEARCH__ENGINE != ELASTICSEARCH__SEARCH_ENGINE_SLUG:
-            raise AdvancedSearchNotEnabled('Advanced search is not enabled on this instance')
+            raise AdvancedSearchNotEnabled("Advanced search is not enabled on this instance")
 
         search_api = SearchFactory.get_elastic_search_api(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        search = search_api.search_content(
-            SearchFilterQuery(**hapic_data),
-
-        )
+        search = search_api.search_content(SearchFilterQuery(**hapic_data),)
         return search
-
 
     def bind(self, configurator: Configurator) -> None:
         """

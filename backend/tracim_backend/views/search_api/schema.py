@@ -80,26 +80,27 @@ class SearchFilterQuerySchema(marshmallow.Schema):
     def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return SearchFilterQuery(**data)
 
+
 class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
     workspace_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
-        description="select contents in these workspaces"
+        description="select contents in these workspaces",
     )
     author_public_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
-        description="select contents by these authors"
+        description="select contents by these authors",
     )
     last_modifier_public_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
-        description="select contents by these authors"
+        description="select contents by these authors",
     )
     file_extensions = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
-        description="select contents with these file extensions"
+        description="select contents with these file extensions",
     )
     search_fields = StrippedString(
         required=False,
@@ -110,7 +111,7 @@ class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
     statuses = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
-        description="select contents with these statuses"
+        description="select contents with these statuses",
     )
     created_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
     created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)

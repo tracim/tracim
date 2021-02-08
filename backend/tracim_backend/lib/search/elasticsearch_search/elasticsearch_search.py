@@ -25,7 +25,7 @@ class AdvancedSearchParameters:
     def __init__(
         workspace_names: typing.Optional[typing.List[str]] = None,
         author_public_names: typing.Optional[typing.List[str]] = None,
-        last_modified_public_names: typing.Optional[typing.List[str]] = None,
+        last_modifier_public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
         search_fields: typing.Optional[typing.List[str]] = (
             "label",
