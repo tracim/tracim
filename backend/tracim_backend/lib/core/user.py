@@ -1276,7 +1276,7 @@ class UserApi(object):
         user = self.get_one(user_id)
         if not user.cropped_avatar:
             raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
-        _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
+        _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
             filename=filename,
@@ -1324,7 +1324,7 @@ class UserApi(object):
         user = self.get_one(user_id)
         if not user.cropped_cover:
             raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
-        _, original_file_extension = os.path.splitext(self._user.cropped_cover.filename)
+        _, original_file_extension = os.path.splitext(user.cropped_cover.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_cover,
             filename=filename,
