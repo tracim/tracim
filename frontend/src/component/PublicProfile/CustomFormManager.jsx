@@ -100,6 +100,35 @@ const DisplaySchemaArray = props => {
   ]
 }
 
+const orderedDataEntries = (dataSchema, uiSchema) => {
+  let uiOrderList = uiSchema && uiSchema['ui:order']
+
+  if (!uiOrderList) {
+    return Object.entries(dataSchema)
+  }
+
+  if (!uiOrderList.includes('*')) {
+    uiOrderList = [...uiOrderList, '*']
+  }
+
+  const entries = []
+
+  for (const uiKey of uiOrderList) {
+    const schemaItem = dataSchema[uiKey]
+    if (schemaItem) {
+      entries.push([uiKey, schemaItem])
+    } else if (uiKey === '*') {
+      for (const dataKey of Object.keys(dataSchema)) {
+        if (!uiOrderList.includes(dataKey)) {
+          entries.push([dataKey, dataSchema[dataKey]])
+        }
+      }
+    }
+  }
+
+  return entries
+}
+
 const DisplaySchemaObject = props => {
   if (!props.dataSchemaObject || !props.schemaObject) {
     console.error('Error in DisplaySchemaObject, null props', props)
@@ -115,37 +144,12 @@ const DisplaySchemaObject = props => {
     )
     : null
 
-  let dataSchema
-
-  let uiOrderList = props.uiSchemaObject && props.uiSchemaObject['ui:order']
-
-  if (uiOrderList) {
-    if (!uiOrderList.includes('*')) {
-      uiOrderList = [...uiOrderList, '*']
-    }
-
-    dataSchema = []
-
-    for (const uiKey of uiOrderList) {
-      const schemaItem = props.dataSchemaObject[uiKey]
-      if (schemaItem) {
-        dataSchema.push([uiKey, schemaItem])
-      } else if (uiKey === '*') {
-        for (const dataKey of Object.keys(props.dataSchemaObject)) {
-          if (!uiOrderList.includes(dataKey)) {
-            dataSchema.push([dataKey, props.dataSchemaObject[dataKey]])
-          }
-        }
-      }
-    }
-  } else {
-    dataSchema = Object.entries(props.dataSchemaObject)
-  }
+  const dataEntries = orderedDataEntries(props.dataSchemaObject, props.uiSchemaObject)
 
   return [
     title,
     <div className='DisplaySchemaObject' key={`object_root_${props.nestedLevel}`}>
-      {dataSchema.map(([key, value]) => {
+      {dataEntries.map(([key, value]) => {
         const schemaItemProperties = props.schemaObject.properties[key]
         if (!schemaItemProperties) {
           console.error(`Key ${key} is missing in the JSON schema object`)
