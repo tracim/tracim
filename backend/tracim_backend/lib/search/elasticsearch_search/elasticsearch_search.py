@@ -6,10 +6,14 @@ from elasticsearch import RequestError
 from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Document
 from elasticsearch_dsl import Search
+import pluggy
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
@@ -23,18 +27,31 @@ from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
+
+FILE_PIPELINE_ID = "attachment"
+FILE_PIPELINE_SOURCE_FIELD = "b64_file"
+FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 
 
 class IndexParameters:
     def __init__(
-        self, alias: str, document_class: typing.Type[Document], index_name_template: str
+        self,
+        alias: str,
+        document_class: typing.Type[Document],
+        index_name_template: str,
+        indexer: object,
     ) -> None:
         self.alias = alias
         self.document_class = document_class
         self.index_name_template = index_name_template
+        self.indexer = indexer
 
 
 class ESSearchApi(SearchApi):
@@ -112,7 +129,7 @@ class ESSearchApi(SearchApi):
 
     def refresh_indices(self) -> None:
         """
-        refresh index to obtain up to date information instead of relying on
+        refresh indices to obtain up to date information instead of relying on
         periodical refresh, useful for automated tests.
         see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
         """
@@ -131,8 +148,8 @@ class ESSearchApi(SearchApi):
 
     def migrate_indices(self) -> None:
         """
-        Upgrade function that creates a new index for the data and re-index
-        the previous copy of the data into the new index.
+        Upgrade function that creates new indices for the data and re-index
+        the previous copy of the data into the new indices.
 
         Note that while this function is running the application can still perform
         any and all searches without any loss of functionality. It should, however,
@@ -168,105 +185,103 @@ class ESSearchApi(SearchApi):
             # move the alias to point to the newly created index
             self.set_alias(parameters, new_index_name)
 
-    def index_content(self, content: ContentInContext) -> None:
+    def index_content(self, content: Content) -> None:
         """
         Index/update a content into elastic_search engine
         """
-        if content.content_type == content_type_list.Comment.slug:
-            content = content.parent
-            # INFO - G.M - 2019-05-20 - we currently do not support comment without parent
-            assert content
-        logger.info(self, "Indexing content {}".format(content.content_id))
-        author = DigestUser(user_id=content.author.user_id, public_name=content.author.public_name)
+        content_in_context = ContentInContext(content, config=self._config, dbsession=self._session)
+        logger.info(self, "Indexing content {}".format(content_in_context.content_id))
+        author = DigestUser(
+            user_id=content_in_context.author.user_id,
+            public_name=content_in_context.author.public_name,
+            has_avatar=content_in_context.author.has_avatar,
+            has_cover=content_in_context.author.has_cover,
+        )
         last_modifier = DigestUser(
-            user_id=content.last_modifier.user_id, public_name=content.last_modifier.public_name
+            user_id=content_in_context.last_modifier.user_id,
+            public_name=content_in_context.last_modifier.public_name,
+            has_avatar=content_in_context.last_modifier.has_avatar,
+            has_cover=content_in_context.last_modifier.has_cover,
         )
         workspace = DigestWorkspace(
-            workspace_id=content.workspace.workspace_id, label=content.workspace.label
+            workspace_id=content_in_context.workspace.workspace_id,
+            label=content_in_context.workspace.label,
         )
-        parents = []
-        parent = None
-        if content.parent:
-            parent = DigestContent(
-                content_id=content.parent.content_id,
-                parent_id=content.parent.parent_id,
-                label=content.parent.label,
-                slug=content.parent.slug,
-                content_type=content.parent.content_type,
+        path = [
+            DigestContent(
+                content_id=component.content_id,
+                label=component.label,
+                slug=component.slug,
+                content_type=component.content_type,
             )
-            for parent_ in content.parents:
-                digest_parent = DigestContent(
-                    content_id=parent_.content_id,
-                    parent_id=parent_.parent_id,
-                    label=parent_.label,
-                    slug=parent_.slug,
-                    content_type=parent_.content_type,
-                )
-                parents.append(digest_parent)
-        comments = []
-        for comment in content.comments:
-            digest_comment = DigestComments(
+            for component in content_in_context.content_path
+        ]
+        comments = [
+            DigestComments(
                 content_id=comment.content_id,
                 parent_id=comment.parent_id,
                 content_type=comment.content_type,
                 raw_content=comment.raw_content,
             )
-            comments.append(digest_comment)
+            for comment in content_in_context.comments
+        ]
+
         indexed_content = IndexedContent(
-            content_id=content.content_id,
-            label=content.label,
-            slug=content.slug,
-            status=content.status,
-            workspace_id=content.workspace_id,
+            content_namespace=content_in_context.content_namespace,
+            content_id=content_in_context.content_id,
+            current_revision_id=content_in_context.current_revision_id,
+            current_revision_type=content_in_context.current_revision_type,
+            slug=content_in_context.slug,
+            parent_id=content_in_context.parent_id,
+            workspace_id=content_in_context.workspace_id,
             workspace=workspace,
-            parent_id=content.parent_id or None,
-            parent=parent,
-            parents=parents or None,
+            label=content_in_context.label,
+            content_type=content_in_context.content_type,
+            sub_content_types=content_in_context.sub_content_types,
+            status=content_in_context.status,
+            is_archived=content_in_context.is_archived,
+            is_deleted=content_in_context.is_deleted,
+            is_editable=content_in_context.is_editable,
+            is_active=content_in_context.is_active,
+            show_in_ui=content_in_context.show_in_ui,
+            file_extension=content_in_context.file_extension,
+            filename=content_in_context.filename,
+            modified=content_in_context.modified,
+            created=content_in_context.created,
+            active_shares=content_in_context.actives_shares,
+            path=path,
+            comments=comments,
+            comments_count=len(comments),
             author=author,
-            comments=comments or None,
             last_modifier=last_modifier,
-            content_type=content.content_type,
-            sub_content_types=content.sub_content_types,
-            is_deleted=content.is_deleted,
-            deleted_through_parent_id=content.deleted_through_parent_id,
-            is_archived=content.is_archived,
-            archived_through_parent_id=content.archived_through_parent_id,
-            is_editable=content.is_editable,
-            is_active=content.is_active,
-            show_in_ui=content.show_in_ui,
-            file_extension=content.file_extension,
-            filename=content.filename,
-            modified=content.modified,
-            created=content.created,
-            raw_content=content.raw_content,
-            current_revision_id=content.current_revision_id,
+            archived_through_parent_id=content_in_context.archived_through_parent_id,
+            deleted_through_parent_id=content_in_context.deleted_through_parent_id,
+            raw_content=content_in_context.raw_content,
+            content_size=content_in_context.size,
         )
-        indexed_content.meta.id = content.content_id
+        indexed_content.meta.id = content_in_context.content_id
         content_index_alias = self._get_index_parameters(IndexedContent).alias
-        if self._can_index_content(content):
-            file_ = content.get_b64_file()
-            if file_:
-                indexed_content.b64_file = file_
-                indexed_content.save(
-                    using=self.es,
-                    pipeline="attachment",
-                    index=content_index_alias,
-                    request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
-                )
-                return
-            logger.debug(
-                self,
-                'Skip binary content file of content "{}": no binary content'.format(
-                    content.content_id
-                ),
-            )
+        pipeline_id = None  # type: typing.Optional[str]
+        if self._should_index_depot_file(content):
+            indexed_content.b64_file = content_in_context.get_b64_file()
+            pipeline_id = FILE_PIPELINE_ID
         indexed_content.save(
             using=self.es,
+            pipeline=pipeline_id,
             index=content_index_alias,
             request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
         )
 
-    def _can_index_content(self, content: ContentInContext) -> bool:
+    def index_contents(self, contents: typing.Iterable[Content]) -> None:
+        """Index the given contents."""
+        for content in contents:
+            self.index_content(content)
+
+    def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
+        for parameters in self._get_indices_parameters():
+            plugin_manager.register(parameters.indexer)
+
+    def _should_index_depot_file(self, content: ContentInContext) -> bool:
         if not self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             logger.debug(
                 self,
@@ -368,17 +383,17 @@ class ESSearchApi(SearchApi):
             fields=[
                 "label.exact^8",
                 "label^5",
+                "{}.title^4".format(FILE_PIPELINE_DESTINATION_FIELD),
+                "{}.content^3".format(FILE_PIPELINE_DESTINATION_FIELD),
+                "raw_content.exact^3",
+                "raw_content^3",
                 "filename.exact",
                 "filename",
                 "file_extension",
-                "raw_content.exact^3",
-                "raw_content^3",
                 "comments.raw_content.exact",
                 "comments.raw_content",
-                "file_data.content^3",
-                "file_data.title^4",
-                "file_data.author",
-                "file_data.keywords",
+                "{}.author".format(FILE_PIPELINE_DESTINATION_FIELD),
+                "{}.keywords".format(FILE_PIPELINE_DESTINATION_FIELD),
             ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -391,9 +406,17 @@ class ESSearchApi(SearchApi):
             search = search.exclude("term", is_archived=True)
             search = search.filter("term", archived_through_parent_id=0)
         search = search.response_class(ESContentSearchResponse)
-        # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
-        # result, because we do not need them and for performance reasons.
-        search = search.source(exclude=["raw_content", "*.raw_content", "file_data.*", "file"])
+        # INFO - G.M - 2019-05-21 - remove some unneeded fields from results.
+        # As they are useful only for searching.
+        search = search.source(
+            exclude=[
+                "raw_content",
+                "{}.*".format(FILE_PIPELINE_DESTINATION_FIELD),
+                "deleted_through_parent_id",
+                "archived_through_parent_id",
+                "is_active",
+            ]
+        )
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
         if size:
@@ -426,11 +449,13 @@ class ESSearchApi(SearchApi):
                 alias=prefix + "-content",
                 index_name_template=template.format(index_alias=prefix + "-content", date="{date}"),
                 document_class=IndexedContent,
+                indexer=ESContentIndexer(),
             ),
             IndexParameters(
                 alias=prefix + "-user",
                 index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
                 document_class=IndexedUser,
+                indexer=object(),
             ),
             IndexParameters(
                 alias=prefix + "-workspace",
@@ -438,6 +463,7 @@ class ESSearchApi(SearchApi):
                     index_alias=prefix + "-workspace", date="{date}"
                 ),
                 document_class=IndexedWorkspace,
+                indexer=object(),
             ),
         ]
 
@@ -457,12 +483,132 @@ class ESSearchApi(SearchApi):
         # attachment content parameters. Goal :
         # allow ngram or lang specific indexing for "in file search"
         p.put_pipeline(
-            id="attachment",
+            id=FILE_PIPELINE_ID,
             body={
                 "description": "Extract attachment information",
                 "processors": [
-                    {"attachment": {"field": "b64_file", "target_field": "file_data"}},
-                    {"remove": {"field": "b64_file"}},
+                    {
+                        "attachment": {
+                            "field": FILE_PIPELINE_SOURCE_FIELD,
+                            "target_field": FILE_PIPELINE_DESTINATION_FIELD,
+                        }
+                    },
+                    {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
                 ],
             },
         )
+
+
+class ESContentIndexer:
+    """Listen for events and trigger re-indexing of contents when needed."""
+
+    # content types which won't be indexed directly. Instead their main content will be indexed
+    # when they are created/modified.
+    EXCLUDED_CONTENT_TYPES = (content_type_list.Comment.slug,)
+
+    @hookimpl
+    def on_content_created(self, content: Content, context: TracimContext) -> None:
+        """Index the given content"""
+        content = self._get_main_content(content)
+        try:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            search_api.index_content(content)
+        except Exception:
+            logger.exception(
+                self, "Exception while indexing created content {}".format(content.content_id)
+            )
+
+    @hookimpl
+    def on_content_modified(self, content: Content, context: TracimContext) -> None:
+        """Index the given content and its children.
+
+        Children are indexed only if the content has changes influencing their index."""
+        content = self._get_main_content(content)
+        try:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            search_api.index_content(content)
+            if self._should_reindex_children(content.current_revision):
+                search_api.index_contents(
+                    self._filter_excluded_content_types(content.recursive_children)
+                )
+
+        except Exception:
+            logger.exception(
+                self, "Exception while indexing modified content {}".format(content.content_id)
+            )
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        """Index the contents of the given workspace
+
+        Contents are indexed only if the workspace has changes influencing their index."""
+        if not self._should_reindex_children(workspace):
+            return
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        content_api = ContentApi(
+            session=context.dbsession,
+            current_user=None,
+            config=context.app_config,
+            show_deleted=True,
+            show_archived=True,
+        )
+        search_api.index_contents(
+            self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace))
+        )
+
+    @hookimpl
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
+        """Index contents whose author/last_modifier is the given user.
+
+        'author' is the author/owner of a content's first revision.
+        """
+        if not inspect(user).attrs.display_name.history.has_changes():
+            return
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        content_api = ContentApi(
+            session=context.dbsession,
+            current_user=None,
+            config=context.app_config,
+            show_deleted=True,
+            show_archived=True,
+        )
+        search_api.index_contents(content_api.get_all_query(user=user))
+
+    @classmethod
+    def _get_main_content(cls, content: Content) -> Content:
+        """Find the first ancestor which has a type to be indexed."""
+        while content and content.type in cls.EXCLUDED_CONTENT_TYPES:
+            content = content.parent
+        assert content, "Got a sub-content without main content!"
+        return content
+
+    @classmethod
+    def _should_reindex_children(cls, obj: typing.Union[ContentRevisionRO, Workspace]) -> bool:
+        """Changes on a content/workspace only have effect on their children if:
+          - their 'label' has changed
+          - their 'is_deleted' state has changed
+          - (for contents) their 'is_archived' state has changed
+        """
+        attribute_state = inspect(obj).attrs
+        return (
+            attribute_state.label.history.has_changes()
+            or attribute_state.is_deleted.history.has_changes()
+            or (isinstance(obj, Content) and attribute_state.is_archived.history.has_changes())
+        )
+
+    @classmethod
+    def _filter_excluded_content_types(
+        cls, contents: typing.Iterable[Content]
+    ) -> typing.Generator[Content, None, None]:
+        """Generate the contents which should be indexed directly."""
+        for content in contents:
+            if content.type not in cls.EXCLUDED_CONTENT_TYPES:
+                yield content

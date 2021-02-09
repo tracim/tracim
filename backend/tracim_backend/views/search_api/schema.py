@@ -4,13 +4,17 @@ import marshmallow
 from marshmallow import post_load
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import string_to_list
+<<<<<<< HEAD
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
+=======
+from tracim_backend.views.core_api.schemas import ContentMinimalSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
+>>>>>>> c678206bb... refactor(backend): modify ES indexed model for content
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
@@ -88,23 +92,15 @@ class WorkspaceSearchSchema(marshmallow.Schema):
     label = StrippedString(example="Intranet")
 
 
-class ContentDigestSearchSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    slug = StrippedString(example="intervention-report-12")
-    parent_id = marshmallow.fields.Int(
-        example=34, allow_none=True, default=None, validate=positive_int_validator
-    )
-    workspace_id = marshmallow.fields.Int(example=19, validate=strictly_positive_int_validator)
-    label = StrippedString(example="Intervention Report 12")
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
-
-
-class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
+class ContentSearchSchema(ContentSchema):
     score = marshmallow.fields.Float()
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
-    parents = marshmallow.fields.List(marshmallow.fields.Nested(ContentDigestSearchSchema))
-    parent = marshmallow.fields.Nested(ContentDigestSearchSchema, allow_none=True)
+    path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
+    comments_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
+    content_size = marshmallow.fields.Integer(
+        example=1200, description="Content size in bytes", validate=positive_int_validator
+    )
 
 
 class ContentSearchResultSchema(marshmallow.Schema):

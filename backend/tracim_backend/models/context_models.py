@@ -1302,7 +1302,7 @@ class ContentInContext(object):
         :return: size of content if available, None if unavailable
         """
         if not self.content.depot_file:
-            return None
+            return len(self.raw_content)
         try:
             return self.content.depot_file.file.content_length
         except IOError:
@@ -1388,6 +1388,15 @@ class ContentInContext(object):
 
         api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
         return len(api.get_content_shares(self.content))
+
+    @property
+    def content_path(self) -> List["ContentInContext"]:
+        return [
+            ContentInContext(
+                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
+            )
+            for component in self.content.content_path
+        ]
 
 
 class RevisionInContext(object):

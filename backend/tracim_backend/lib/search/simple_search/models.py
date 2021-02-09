@@ -16,60 +16,53 @@ class SimpleContentSearchResponse(ContentSearchResponse):
     def __init__(self, content_list: typing.List[ContentInContext], total_hits: int):
         contents = []
         for content in content_list:
-            parent = None
-            parents = []
-            if content.parent:
-                parent = SearchedDigestContent(
-                    content_id=content.parent.content_id,
-                    parent_id=content.parent.parent_id,
-                    label=content.parent.label,
-                    slug=content.parent.slug,
-                    content_type=content.parent.content_type,
+            path = [
+                SearchedDigestContent(
+                    content_id=component.content_id,
+                    label=component.label,
+                    slug=component.slug,
+                    content_type=component.content_type,
                 )
-                for parent_ in content.parents:
-                    digest_parent = SearchedDigestContent(
-                        content_id=parent_.content_id,
-                        parent_id=parent_.parent_id,
-                        label=parent_.label,
-                        slug=parent_.slug,
-                        content_type=parent_.content_type,
-                    )
-                    parents.append(digest_parent)
-            comments = []
-            for comment in content.comments:
-                digest_comment = SearchedDigestComment(
-                    content_id=comment.content_id, parent_id=comment.parent_id
-                )
-                comments.append(digest_comment)
+                for component in content.content_path
+            ]
+
+            comments = [
+                SearchedDigestComment(content_id=comment.content_id, parent_id=comment.parent_id)
+                for comment in content.comments
+            ]
 
             workspace = SearchedWorkspace(
                 workspace_id=content.workspace.workspace_id, label=content.workspace.label
             )
             last_modifier = SearchedDigestUser(
-                user_id=content.last_modifier.user_id, public_name=content.last_modifier.public_name
+                user_id=content.last_modifier.user_id,
+                public_name=content.last_modifier.public_name,
+                has_avatar=content.last_modifier.has_avatar,
+                has_cover=content.last_modifier.has_cover,
             )
             author = SearchedDigestUser(
-                user_id=content.author.user_id, public_name=content.author.public_name
+                user_id=content.author.user_id,
+                public_name=content.author.public_name,
+                has_avatar=content.author.has_avatar,
+                has_cover=content.author.has_cover,
             )
             content = SearchedContent(
+                content_namespace=content.content_namespace,
                 content_id=content.content_id,
                 label=content.label,
                 slug=content.slug,
                 status=content.status,
                 content_type=content.content_type,
                 workspace=workspace,
-                workspace_id=content.workspace_id,
-                parent=parent,
-                parent_id=content.parent_id,
-                parents=parents,
+                path=path,
                 comments=comments,
+                comments_count=len(comments),
                 author=author,
                 last_modifier=last_modifier,
                 sub_content_types=content.sub_content_types,
                 is_archived=content.is_archived,
                 is_deleted=content.is_deleted,
                 is_editable=content.is_editable,
-                is_active=content.is_active,
                 show_in_ui=content.show_in_ui,
                 file_extension=content.file_extension,
                 filename=content.filename,
@@ -77,6 +70,11 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 created=content.created,
                 score=self.DEFAULT_SCORE,
                 current_revision_id=content.current_revision_id,
+                current_revision_type=content.current_revision_type,
+                workspace_id=content.workspace_id,
+                active_shares=content.actives_shares,
+                content_size=content.size,
+                parent_id=content.parent_id,
             )
             contents.append(content)
         super().__init__(contents=contents, total_hits=total_hits, is_total_hits_accurate=False)

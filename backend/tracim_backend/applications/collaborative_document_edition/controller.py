@@ -124,7 +124,6 @@ class CollaborativeDocumentEditionController(Controller):
             collaborative_document_edition_api.update_content_from_template(
                 content=content, template_filename=hapic_data.body.template
             )
-        api.execute_created_content_actions(content)
         return api.get_content_in_context(content)
 
     def bind(self, configurator: Configurator) -> None:
