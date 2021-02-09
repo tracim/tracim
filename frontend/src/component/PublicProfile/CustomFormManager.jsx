@@ -100,33 +100,33 @@ const DisplaySchemaArray = props => {
   ]
 }
 
-const orderedDataEntries = (dataSchema, uiSchema) => {
-  let uiOrderList = uiSchema && uiSchema['ui:order']
+const orderDataSchema = (dataSchemaObject, uiSchemaObject) => {
+  let uiOrderList = uiSchemaObject && uiSchemaObject['ui:order']
 
   if (!uiOrderList) {
-    return Object.entries(dataSchema)
+    return Object.entries(dataSchemaObject)
   }
 
   if (!uiOrderList.includes('*')) {
     uiOrderList = [...uiOrderList, '*']
   }
 
-  const entries = []
+  const dataSchema = []
 
   for (const uiKey of uiOrderList) {
-    const schemaItem = dataSchema[uiKey]
+    const schemaItem = dataSchemaObject[uiKey]
     if (schemaItem) {
-      entries.push([uiKey, schemaItem])
+      dataSchema.push([uiKey, schemaItem])
     } else if (uiKey === '*') {
-      for (const dataKey of Object.keys(dataSchema)) {
+      for (const dataKey of Object.keys(dataSchemaObject)) {
         if (!uiOrderList.includes(dataKey)) {
-          entries.push([dataKey, dataSchema[dataKey]])
+          dataSchema.push([dataKey, dataSchemaObject[dataKey]])
         }
       }
     }
   }
 
-  return entries
+  return dataSchema
 }
 
 const DisplaySchemaObject = props => {
@@ -144,12 +144,12 @@ const DisplaySchemaObject = props => {
     )
     : null
 
-  const dataEntries = orderedDataEntries(props.dataSchemaObject, props.uiSchemaObject)
+  const orderedDataSchema = orderDataSchema(props.dataSchemaObject, props.uiSchemaObject)
 
   return [
     title,
     <div className='DisplaySchemaObject' key={`object_root_${props.nestedLevel}`}>
-      {dataEntries.map(([key, value]) => {
+      {orderedDataSchema.map(([key, value]) => {
         const schemaItemProperties = props.schemaObject.properties[key]
         if (!schemaItemProperties) {
           console.error(`Key ${key} is missing in the JSON schema object`)
