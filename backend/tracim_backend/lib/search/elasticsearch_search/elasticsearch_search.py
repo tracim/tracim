@@ -49,7 +49,6 @@ class AdvancedSearchParameters:
         self.created_to = created_to
         self.updated_from = updated_from
         self.updated_to = updated_to
-)
 
 class ESSearchApi(SearchApi):
     """

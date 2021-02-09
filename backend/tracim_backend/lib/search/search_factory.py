@@ -39,7 +39,7 @@ class SearchFactory(object):
     @classmethod
     def get_elastic_search_api(
         cls, session: Session, current_user: typing.Optional[User], config: CFG
-    ) -> ESSearchApi:
+    ) -> "ESSearchApi":
         # TODO - G.M - 2019-05-22 - fix circular import
         from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
 
@@ -48,7 +48,7 @@ class SearchFactory(object):
     @classmethod
     def get_simple_search_api(
         cls, session: Session, current_user: typing.Optional[User], config: CFG
-    ) -> SimpleSearchApi:
+    ) -> "SimpleSearchApi":
         # TODO - G.M - 2019-05-22 - fix circular import
         from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
 
@@ -57,7 +57,7 @@ class SearchFactory(object):
     @classmethod
     def get_search_lib(
         cls, session: Session, current_user: typing.Optional[User], config: CFG
-    ) -> typing.Union[ESSearchApi, SimpleSearchApi]:
+    ) -> typing.Union["ESSearchApi", "SimpleSearchApi"]:
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
             return self.get_elastic_search_api(session, current_user, config)
 
