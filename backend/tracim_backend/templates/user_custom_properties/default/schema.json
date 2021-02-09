@@ -28,7 +28,7 @@
       "title": "Personal Website"
     },
 
-    "birth": {
+    "birth_date": {
       "type": "string",
       "format": "date",
       "title": "Date of birth"

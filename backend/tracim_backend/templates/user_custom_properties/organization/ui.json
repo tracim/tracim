@@ -1,5 +1,5 @@
 {
-  "ui:order": ["first_name", "last_name", "bio", "birth", "phone_number", "organization", "personal_page", "task"],
+  "ui:order": ["first_name", "last_name", "bio", "birth_date", "phone_number", "organization", "personal_page", "task"],
   "first_name": {
     "ui:autofocus": true,
     "ui:emptyValue": "",
@@ -16,7 +16,7 @@
     "ui:help": "Write something about you.",
     "tracim:display_group": "public_profile_first"
   },
-  "birth": {
+  "birth_date": {
     "ui:widget": "alt-date",
     "tracim:display_group": "public_profile_first"
   },

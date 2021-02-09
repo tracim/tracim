@@ -117,22 +117,22 @@ const DisplaySchemaObject = props => {
 
   let dataSchema
 
-  let uiOrder = props.uiSchemaObject && props.uiSchemaObject['ui:order']
+  let uiOrderList = props.uiSchemaObject && props.uiSchemaObject['ui:order']
 
-  if (uiOrder) {
-    if (!uiOrder.includes('*')) {
-      uiOrder = [...uiOrder, '*']
+  if (uiOrderList) {
+    if (!uiOrderList.includes('*')) {
+      uiOrderList = [...uiOrderList, '*']
     }
 
     dataSchema = []
 
-    for (const uiKey of uiOrder) {
+    for (const uiKey of uiOrderList) {
       const schemaItem = props.dataSchemaObject[uiKey]
       if (schemaItem) {
         dataSchema.push([uiKey, schemaItem])
       } else if (uiKey === '*') {
         for (const dataKey of Object.keys(props.dataSchemaObject)) {
-          if (!uiOrder.includes(dataKey)) {
+          if (!uiOrderList.includes(dataKey)) {
             dataSchema.push([dataKey, props.dataSchemaObject[dataKey]])
           }
         }

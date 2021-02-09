@@ -1,5 +1,5 @@
 {
-  "ui:order": ["tagline", "location", "hobbies", "website", "birth", "phone", "languages", "personal_page"],
+  "ui:order": ["tagline", "location", "hobbies", "website", "birth_date", "phone", "languages", "personal_page"],
 
   "tagline": {
     "tracim:display_group": "public_profile_first"
@@ -17,7 +17,7 @@
     "tracim:display_group": "public_profile_first"
   },
 
-  "birth": {
+  "birth_date": {
     "tracim:display_group": "public_profile_first"
   },
 
