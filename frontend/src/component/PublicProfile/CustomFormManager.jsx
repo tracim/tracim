@@ -115,7 +115,6 @@ const DisplaySchemaObject = props => {
     )
     : null
 
-  console.log('RENDER DisplaySchemaObject', props, props.uiSchemaObject)
   let dataSchema
 
   let uiOrder = props.uiSchemaObject && props.uiSchemaObject['ui:order']
