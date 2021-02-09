@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { Search as SearchWithoutHOC } from '../../../src/component/Header/Search.jsx'
+import { Search as SearchWithoutHOC } from '../../../src/component/Search/Search.jsx'
 import sinon from 'sinon'
 
 describe('<Search />', () => {

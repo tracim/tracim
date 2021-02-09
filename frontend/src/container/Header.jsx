@@ -27,7 +27,7 @@ import {
   unLoggedAllowedPageList,
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
-import Search from '../component/Header/Search.jsx'
+import Search from '../component/Search/Search.jsx'
 import {
   PROFILE,
   ComposedIcon,
@@ -138,6 +138,7 @@ export class Header extends React.Component {
                   <Search
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
+                    searchedKeywords={props.searchResult.searchedKeywords}
                   />
                 </li>
               )}

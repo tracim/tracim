@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 require('./Search.styl')
 
@@ -12,6 +13,12 @@ export class Search extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    if (prevProps.searchedKeywords !== this.props.searchedKeywords) {
+      this.setState({ searchedKeywords: this.props.searchedKeywords })
+    }
+  }
+
   handleNewSearch = e => this.setState({ searchedKeywords: e.target.value })
 
   handleClickSearch = () => {
@@ -21,7 +28,7 @@ export class Search extends React.Component {
   handleKeyDown = e => e.key === 'Enter' && this.state.searchedKeywords !== '' && this.handleClickSearch()
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     return (
       <div className='search primaryColorBorder'>
@@ -32,12 +39,13 @@ export class Search extends React.Component {
           placeholder={props.t('Search')}
           onChange={this.handleNewSearch}
           onKeyDown={this.handleKeyDown}
+          value={this.state.searchedKeywords}
         />
         <button
           className='search__btn'
           data-cy='search__btn'
           onClick={this.handleClickSearch}
-          disabled={state.searchedKeywords === ''}
+          title={props.t('Search')}
         >
           <i className='fas fa-search' />
         </button>
@@ -46,3 +54,11 @@ export class Search extends React.Component {
   }
 }
 export default translate()(Search)
+
+Search.propTypes = {
+  searchedKeywords: PropTypes.string
+}
+
+Search.defaultProps = {
+  searchedKeywords: ''
+}

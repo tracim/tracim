@@ -27,17 +27,19 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
+import Search from '../component/Search/Search.jsx'
 import { parseSearchUrl } from '../util/helper.js'
+import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
+import classnames from 'classnames'
 
 const qs = require('query-string')
 
-export class SearchResult extends React.Component {
+export class AdvancedSearch extends React.Component {
   constructor (props) {
     super(props)
-    // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
-    // https://github.com/tracim/tracim/issues/1973
     this.state = {
-      totalHits: 0
+      totalHits: 0,
+      isFilterMenuOpen: false
     }
 
     props.registerCustomEventHandlerList([
@@ -45,8 +47,7 @@ export class SearchResult extends React.Component {
     ])
   }
 
-  handleAllAppChangeLanguage = data => {
-    console.log('%c<Search> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
+  handleAllAppChangeLanguage = () => {
     this.setHeadTitle()
     this.buildBreadcrumbs()
   }
@@ -123,14 +124,6 @@ export class SearchResult extends React.Component {
     }
   }
 
-  getPath = (parentsList) => {
-    let parentPath = ''
-    if (parentsList.length > 0) {
-      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label} / ${acc}`, '')
-    }
-    return parentPath
-  }
-
   getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
     // https://github.com/tracim/tracim/issues/1840
@@ -153,29 +146,32 @@ export class SearchResult extends React.Component {
     )
   }
 
-  setSubtitle () {
+  handleClickFilterMenu = () => this.setState(prev => ({ isFilterMenuOpen: !prev.isFilterMenuOpen }))
+
+  handleClickSearch = searchedKeywords => {
     const { props } = this
-    const { searchResult } = props
-
-    const numberResults = searchResult.resultsList.length
-    const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
-
-    const subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
-
-    return subtitle
+    const FIRST_PAGE = 1
+    props.history.push(`${PAGE.SEARCH_RESULT}?${qs.stringify({
+      ...qs.parse(props.location.search),
+      q: searchedKeywords,
+      p: FIRST_PAGE
+    }, { encode: true })}`)
   }
 
-  getSubtitle () {
-    let subtitle = ''
-    const currentNumberSearchResults = this.props.searchResult.resultsList.length
-    if (currentNumberSearchResults > 0) {
-      subtitle = this.setSubtitle()
-    }
+  getDisplayDetail () {
+    const { props } = this
+    const totalResultsNumber = 10 // TODO - update after backend
 
-    return subtitle
+    if (totalResultsNumber <= 0) return ''
+
+    const displayedResultsNumber = props.searchResult.resultsList.length
+    return props.t('Showing {{displayedResults}} of {{totalResults}} results', {
+      displayedResults: displayedResultsNumber,
+      totalResults: totalResultsNumber
+    })
   }
 
-  hasMoreResults () {
+  hasMoreResults () { // TODO - after backend, update to display < total
     const { props } = this
     const currentNumberSearchResults = this.state.totalHits
     return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
@@ -193,72 +189,98 @@ export class SearchResult extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const currentNumberSearchResults = props.searchResult.resultsList.length
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper customClass='searchResult'>
+          <PageWrapper customClass='advancedSearch'>
             <PageTitle
-              parentClass='searchResult'
+              parentClass='advancedSearch'
               title={(currentNumberSearchResults === 1
-                ? props.t('Search result')
-                : props.t('Search results')
+                ? props.t('Result for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
+                : props.t('Results for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
             />
 
-            <PageContent parentClass='searchResult'>
-              <div>{this.getSubtitle()}</div>
+            <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
+              <Search
+                onClickSearch={this.handleClickSearch}
+                searchedKeywords={props.searchResult.searchedKeywords}
+              />
 
-              <div className='folder__content' data-cy='search__content'>
-                {currentNumberSearchResults > 0 && (
-                  <ContentItemHeader showSearchDetails />
-                )}
+              <div className='advancedSearch__page'>
+                <div className='advancedSearch__content'>
+                  {currentNumberSearchResults > 0 && (
+                    <>
+                      <div className='advancedSearch__content__detail'>
+                        {this.getDisplayDetail()}
 
-                {currentNumberSearchResults === 0 && (
-                  <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
-                  </div>
-                )}
+                        {!state.isFilterMenuOpen && (
+                          <IconButton
+                            customClass='advancedSearch__content__detail__filter'
+                            icon='fas fa-sliders-h'
+                            onClick={this.handleClickFilterMenu}
+                            text={props.t('Filter')}
+                            title={props.t('Search filters')}
+                          />
+                        )}
+                      </div>
 
-                {props.searchResult.resultsList.map((searchItem, index) => (
-                  <ListItemWrapper
-                    label={searchItem.label}
-                    read
-                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                    isLast={index === props.searchResult.resultsList.length - 1}
-                    key={searchItem.contentId}
-                  >
-                    <ContentItemSearch
+                      <ContentItemHeader showSearchDetails />
+                    </>
+                  )}
+
+                  {currentNumberSearchResults === 0 && (
+                    <div className='advancedSearch__content__empty'>
+                      {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
+                    </div>
+                  )}
+
+                  {props.searchResult.resultsList.map((searchItem, index) => (
+                    <ListItemWrapper
                       label={searchItem.label}
-                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
-                      lastModificationAuthor={searchItem.lastModifier}
-                      lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                      lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                      fileExtension={searchItem.fileExtension}
-                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-                      statusSlug={searchItem.status}
+                      read
                       contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                      isLast={index === props.searchResult.resultsList.length - 1}
                       key={searchItem.contentId}
-                    />
-                  </ListItemWrapper>
-                ))}
-              </div>
-              <div className='searchResult__btnSeeMore'>
-                {(this.hasMoreResults()
-                  ? (
-                    <IconButton
-                      onClick={this.handleClickSeeMore}
-                      icon='chevron-down'
-                      text={props.t('See more')}
-                    />
-                  )
-                  : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
-                    props.t('No more results')
+                    >
+                      <ContentItemSearch
+                        label={searchItem.label}
+                        path={searchItem.workspace.label}
+                        lastModificationAuthor={searchItem.lastModifier}
+                        lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
+                        lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
+                        fileExtension={searchItem.fileExtension}
+                        faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
+                        statusSlug={searchItem.status}
+                        contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                        urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                        key={searchItem.contentId}
+                      />
+                    </ListItemWrapper>
+                  ))}
+                  <div className='advancedSearch__content__btnSeeMore'>
+                    {(this.hasMoreResults()
+                      ? (
+                        <IconButton
+                          onClick={this.handleClickSeeMore}
+                          icon='fas fa-chevron-down'
+                          text={props.t('See more')}
+                        />
+                      )
+                      : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
+                      props.t('No more results')
+                    )}
+                  </div>
+                </div>
+                {state.isFilterMenuOpen && (
+                  <SearchFilterMenu
+                    onClickSearchFilterMenu={this.handleClickFilterMenu}
+                  />
                 )}
               </div>
             </PageContent>
@@ -270,4 +292,4 @@ export class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
-export default connect(mapStateToProps)(translate()(TracimComponent(SearchResult)))
+export default connect(mapStateToProps)(translate()(TracimComponent(AdvancedSearch)))
