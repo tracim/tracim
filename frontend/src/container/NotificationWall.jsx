@@ -118,7 +118,7 @@ export class NotificationWall extends React.Component {
           if (contentType === TLM_SUB.COMMENT) {
             return {
               icon: 'far fa-comments',
-              title: props.t('Comment_sub'),
+              title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
               url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
             }
@@ -134,7 +134,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
-              icon: 'fas fa-random', 
+              icon: 'fas fa-random',
               title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
               url: contentUrl
@@ -151,7 +151,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.DELETED: {
           return {
             icon: 'fas fa-magic',
-            title: props.t('Item deleted'),
+            title: props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -159,7 +159,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.UNDELETED: {
           return {
             icon: 'fas fa-magic',
-            title: props.t('Item restored'),
+            title: props.t('Content restored'),
             text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -306,7 +306,7 @@ export class NotificationWall extends React.Component {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
               icon: SUBSCRIPTION_TYPE.rejected.faIcon,
-              title: props.t('Access removed'),             
+              title: props.t('Access removed'),
               text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
               url: subscriptionPageURL,
               emptyUrlMsg: defaultEmptyUrlMsg
@@ -317,7 +317,7 @@ export class NotificationWall extends React.Component {
         switch (eventType) {
           case TLM_EVENT.CREATED: return {
             icon: SUBSCRIPTION_TYPE.pending.faIcon,
-            title: props.t('Requested access'),             
+            title: props.t('Requested access'),
             text: props.t('{{author}} requested access to {{space}}', i18nOpts),
             url: dashboardUrl
           }
@@ -326,7 +326,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.rejected.faIcon,
-                title: props.t('Access removed'),             
+                title: props.t('Access removed'),
                 text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
                 url: defaultEmptyUrlMsg
               }
@@ -335,7 +335,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.pending.faIcon,
-                title: props.t('Requested access'),             
+                title: props.t('Requested access'),
                 text: props.t('{{author}} requested access to {{space}}', i18nOpts),
                 url: dashboardUrl
               }
