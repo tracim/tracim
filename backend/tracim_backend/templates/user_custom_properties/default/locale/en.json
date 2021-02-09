@@ -1,9 +1,9 @@
 {
   "Tagline": "Tagline",
-  "Location": "Location",
+  "City/Country": "City/Country",
   "Hobbies": "Hobbies",
   "Personal Website": "Personal Website",
-  "Birthday": "Birthday",
+  "Date of birth": "Date of birth",
   "Phone": "Phone",
   "Languages": "Languages"
 }

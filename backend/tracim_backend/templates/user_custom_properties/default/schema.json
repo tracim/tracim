@@ -9,10 +9,12 @@
       "type": "string",
       "title": "Tagline"
     },
+
     "location": {
       "type": "string",
-      "title": "Location"
+      "title": "City/Country"
     },
+
     "hobbies": {
       "title": "Hobbies",
       "type": "array",
@@ -20,20 +22,24 @@
         "type": "string"
       }
     },
+
     "website": {
       "type": "string",
       "title": "Personal Website"
     },
-    "birthday": {
+
+    "birth": {
       "type": "string",
       "format": "date",
-      "title": "Birthday"
+      "title": "Date of birth"
     },
+
     "phone": {
       "type": "string",
       "title": "Phone",
       "minLength": 10
     },
+
     "languages": {
       "title": "Languages",
       "type": "array",
@@ -41,6 +47,7 @@
         "type": "string"
       }
     },
+
     "personal_page": {
       "type": "string",
       "title": " "

@@ -18,8 +18,8 @@
       "title": "Phone number",
       "minLength": 10
     },
-    "birthday_date": {
-      "title": "Birthday date",
+    "birth": {
+      "title": "Date of birth",
       "type": "string",
       "format": "date"
     },
