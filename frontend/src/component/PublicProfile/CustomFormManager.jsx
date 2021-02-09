@@ -100,6 +100,35 @@ const DisplaySchemaArray = props => {
   ]
 }
 
+const orderDataSchema = (dataSchemaObject, uiSchemaObject) => {
+  let uiOrderList = uiSchemaObject && uiSchemaObject['ui:order']
+
+  if (!uiOrderList) {
+    return Object.entries(dataSchemaObject)
+  }
+
+  if (!uiOrderList.includes('*')) {
+    uiOrderList = [...uiOrderList, '*']
+  }
+
+  const orderedDataSchema = []
+
+  for (const uiKey of uiOrderList) {
+    const schemaItem = dataSchemaObject[uiKey]
+    if (schemaItem) {
+      orderedDataSchema.push([uiKey, schemaItem])
+    } else if (uiKey === '*') {
+      for (const dataKey of Object.keys(dataSchemaObject)) {
+        if (!uiOrderList.includes(dataKey)) {
+          orderedDataSchema.push([dataKey, dataSchemaObject[dataKey]])
+        }
+      }
+    }
+  }
+
+  return orderedDataSchema
+}
+
 const DisplaySchemaObject = props => {
   if (!props.dataSchemaObject || !props.schemaObject) {
     console.error('Error in DisplaySchemaObject, null props', props)
@@ -115,19 +144,27 @@ const DisplaySchemaObject = props => {
     )
     : null
 
+  const orderedDataSchema = orderDataSchema(props.dataSchemaObject, props.uiSchemaObject)
+
   return [
     title,
     <div className='DisplaySchemaObject' key={`object_root_${props.nestedLevel}`}>
-      {Object.entries(props.dataSchemaObject).map(([key, value]) => {
+      {orderedDataSchema.map(([key, value]) => {
+        const schemaItemProperties = props.schemaObject.properties[key]
+        if (!schemaItemProperties) {
+          console.error(`Key ${key} is missing in the JSON schema object`)
+          return <div>Error loading field {key}</div>
+        }
+
         const valueType = typeof value
 
         if (Array.isArray(value)) {
           return (
             <DisplaySchemaArray
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               valueList={value}
               parentKey={key}
-              schemaObject={props.schemaObject.properties[key].items}
+              schemaObject={schemaItemProperties.items}
               key={`array_${key}`}
             />
           )
@@ -136,7 +173,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'object') {
           return (
             <DisplaySchemaObject
-              schemaObject={props.schemaObject.properties[key]}
+              schemaObject={schemaItemProperties}
               dataSchemaObject={value}
               nestedLevel={props.nestedLevel + 1}
               key={`object_${key}`}
@@ -147,7 +184,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'string') {
           return (
             <DisplaySchemaPropertyString
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               value={value}
               key={`property_string_${key}`}
             />
@@ -157,7 +194,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'boolean') {
           return (
             <DisplaySchemaPropertyBoolean
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               value={value}
               key={`property_boolean_${key}_${value}`}
             />
@@ -175,6 +212,7 @@ const SchemaAsView = props => {
     <div className='SchemaAsView'>
       <DisplaySchemaObject
         schemaObject={props.schemaObject}
+        uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}
         nestedLevel={1}
       />
@@ -280,6 +318,7 @@ export class CustomFormManager extends React.Component {
           ? (
             <SchemaAsView
               schemaObject={props.schemaObject}
+              uiSchemaObject={props.uiSchemaObject}
               dataSchemaObject={props.dataSchemaObject}
               validateLabel={props.t('Edit')}
               submitButtonClass={props.submitButtonClass}

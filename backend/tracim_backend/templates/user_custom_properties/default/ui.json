@@ -1,29 +1,38 @@
 {
-  "tagline":{
+  "ui:order": ["tagline", "location", "hobbies", "website", "birth_date", "phone", "languages", "personal_page"],
+
+  "tagline": {
     "tracim:display_group": "public_profile_first"
   },
-  "location":{
+
+  "location": {
     "tracim:display_group": "public_profile_first"
   },
-  "hobbies":{
+
+  "hobbies": {
     "tracim:display_group": "public_profile_first"
   },
-  "website":{
+
+  "website": {
     "tracim:display_group": "public_profile_first"
   },
-  "birthday": {
+
+  "birth_date": {
     "tracim:display_group": "public_profile_first"
   },
+
   "phone": {
     "ui:options": {
       "inputType": "tel"
     },
     "tracim:display_group": "public_profile_first"
   },
+
   "languages": {
     "tracim:display_group": "public_profile_first"
   },
-    "personal_page": {
+
+  "personal_page": {
     "ui:widget": "textarea",
     "tracim:display_group": "public_profile_second"
   }
