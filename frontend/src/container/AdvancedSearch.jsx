@@ -60,13 +60,19 @@ export class AdvancedSearch extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { props } = this
-    const prevSearchedKeywords = qs.parse(prevProps.location.search).q
-    const currentSearchedKeywords = parseSearchUrl(qs.parse(props.location.search)).searchedKeywords
+    const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
+    const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
-    if (prevSearchedKeywords !== currentSearchedKeywords) {
+    if (
+      prevSearch.searchedKeywords !== currentSearch.searchedKeywords ||
+      prevSearch.currentPage !== currentSearch.currentPage
+    ) {
       this.loadSearchUrl()
     }
-    if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevSearchedKeywords !== currentSearchedKeywords) {
+    if (
+      prevProps.system.config.instance_name !== props.system.config.instance_name ||
+      prevSearch.searchedKeywords !== currentSearch.searchedKeywords
+    ) {
       this.setHeadTitle()
     }
   }
@@ -88,8 +94,8 @@ export class AdvancedSearch extends React.Component {
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
       searchObject.contentTypes,
       searchObject.searchedKeywords,
-      FIRST_PAGE,
-      (searchObject.numberResultsByPage * searchObject.currentPage),
+      searchObject.currentPage,
+      searchObject.numberResultsByPage,
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive
@@ -98,9 +104,18 @@ export class AdvancedSearch extends React.Component {
     switch (fetchGetSearchedKeywords.status) {
       case 200:
         props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
-        props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
+        if (searchObject.currentPage === FIRST_PAGE) {
+          props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
+        } else {
+          // INFO - G.B. - 20210209 - if the user comes to the page through an url, he is placed on the first page
+          if (props.searchResult.resultsList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1)) {
+            props.history.push(
+              `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: FIRST_PAGE }, { encode: true })}`
+            )
+          } else props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
+        }
         this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
         break
       default:
@@ -126,29 +141,9 @@ export class AdvancedSearch extends React.Component {
   handleClickSeeMore = async () => {
     const { props } = this
     const NEXT_PAGE = props.searchResult.currentNumberPage + 1
-    const searchObject = parseSearchUrl(qs.parse(props.location.search))
-
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      searchObject.contentTypes,
-      props.searchResult.searchedKeywords,
-      NEXT_PAGE,
-      props.searchResult.numberResultsByPage,
-      searchObject.showArchived,
-      searchObject.showDeleted,
-      searchObject.showActive
-    ))
-
-    switch (fetchGetSearchedKeywords.status) {
-      case 200:
-        props.dispatch(setCurrentNumberPage(NEXT_PAGE))
-        props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
-        props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true }))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
-        break
-    }
+    props.history.push(
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true })}`
+    )
   }
 
   handleClickFilterMenu = () => this.setState(prev => ({ isFilterMenuOpen: !prev.isFilterMenuOpen }))
@@ -156,14 +151,11 @@ export class AdvancedSearch extends React.Component {
   handleClickSearch = searchedKeywords => {
     const { props } = this
     const FIRST_PAGE = 1
-
-    props.dispatch(setSearchedKeywords(searchedKeywords))
-    props.dispatch(setCurrentNumberPage(FIRST_PAGE))
-    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({
+    props.history.push(`${PAGE.SEARCH_RESULT}?${qs.stringify({
       ...qs.parse(props.location.search),
       q: searchedKeywords,
       p: FIRST_PAGE
-    }, { encode: true }))
+    }, { encode: true })}`)
   }
 
   getDisplayDetail () {
