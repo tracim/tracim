@@ -111,22 +111,22 @@ const orderDataSchema = (dataSchemaObject, uiSchemaObject) => {
     uiOrderList = [...uiOrderList, '*']
   }
 
-  const dataSchema = []
+  const orderedDataSchema = []
 
   for (const uiKey of uiOrderList) {
     const schemaItem = dataSchemaObject[uiKey]
     if (schemaItem) {
-      dataSchema.push([uiKey, schemaItem])
+      orderedDataSchema.push([uiKey, schemaItem])
     } else if (uiKey === '*') {
       for (const dataKey of Object.keys(dataSchemaObject)) {
         if (!uiOrderList.includes(dataKey)) {
-          dataSchema.push([dataKey, dataSchemaObject[dataKey]])
+          orderedDataSchema.push([dataKey, dataSchemaObject[dataKey]])
         }
       }
     }
   }
 
-  return dataSchema
+  return orderedDataSchema
 }
 
 const DisplaySchemaObject = props => {
