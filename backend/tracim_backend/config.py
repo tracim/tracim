@@ -344,6 +344,9 @@ class CFG(object):
         """
         "replace "%(here)s" by localisation of the config file.
         """
+        if "TRACIM_HERE_PATH" in os.environ:
+            return value.replace("%(here)s", os.environ["TRACIM_HERE_PATH"])
+
         return value.replace("%(here)s", self.settings["here"])
 
     def _load_global_config(self) -> None:
