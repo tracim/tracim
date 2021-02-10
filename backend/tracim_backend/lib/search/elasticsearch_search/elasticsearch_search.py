@@ -526,10 +526,10 @@ class ESContentIndexer:
 
         Children are indexed only if the content has changes influencing their index."""
         content = self._get_main_content(content)
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
         try:
-            search_api = ESSearchApi(
-                session=context.dbsession, config=context.app_config, current_user=None
-            )
             search_api.index_content(content)
             if self._should_reindex_children(content.current_revision):
                 search_api.index_contents(
@@ -558,9 +558,17 @@ class ESContentIndexer:
             show_deleted=True,
             show_archived=True,
         )
-        search_api.index_contents(
-            self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace))
-        )
+        try:
+            search_api.index_contents(
+                self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace))
+            )
+        except Exception:
+            logger.exception(
+                self,
+                "Exception while indexing modified contents of workspace {}".format(
+                    workspace.workspace_id
+                ),
+            )
 
     @hookimpl
     def on_user_modified(self, user: User, context: TracimContext) -> None:
@@ -580,7 +588,15 @@ class ESContentIndexer:
             show_deleted=True,
             show_archived=True,
         )
-        search_api.index_contents(content_api.get_all_query(user=user))
+        try:
+            search_api.index_contents(content_api.get_all_query(user=user))
+        except Exception:
+            logger.exception(
+                self,
+                "Exception while indexing contents authored/modified by user {}".format(
+                    user.user_id
+                ),
+            )
 
     @classmethod
     def _get_main_content(cls, content: Content) -> Content:

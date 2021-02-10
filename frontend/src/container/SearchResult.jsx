@@ -121,13 +121,7 @@ export class SearchResult extends React.Component {
     }
   }
 
-  getPath = (parentsList) => {
-    let parentPath = ''
-    if (parentsList.length > 0) {
-      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label} / ${acc}`, '')
-    }
-    return parentPath
-  }
+  getPath = (path) => path.map(c => c.label).join('/')
 
   getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
@@ -252,7 +246,7 @@ export class SearchResult extends React.Component {
                   >
                     <ContentItemSearch
                       label={searchItem.label}
-                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
+                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
                       lastModificationAuthor={searchItem.lastModifier}
                       lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
