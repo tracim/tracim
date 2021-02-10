@@ -12,9 +12,6 @@ env:
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
-    - TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/default/schema.json
-    - TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/default/ui.json
-    - TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/default/locale
     # generated using the guide at https://docs.travis-ci.com/user/encryption-keys/
     - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
