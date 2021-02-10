@@ -5,8 +5,6 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  ListItemWrapper,
-  displayDistanceDate,
   IconButton,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
@@ -14,7 +12,6 @@ import {
   PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
-import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
@@ -27,19 +24,28 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
-import Search from '../component/Search/Search.jsx'
+import SearchInput from '../component/Search/SearchInput.jsx'
 import { parseSearchUrl } from '../util/helper.js'
 import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
+import AdvancedSearchContentList from '../component/Search/AdvancedSearchContentList.jsx'
+import AdvancedSearchUserList from '../component/Search/AdvancedSearchUserList.jsx'
+import AdvancedSearchSpaceList from '../component/Search/AdvancedSearchSpaceList.jsx'
 import classnames from 'classnames'
 
 const qs = require('query-string')
+const searchType = {
+  content: 'content',
+  user: 'user',
+  space: 'space'
+}
 
 export class AdvancedSearch extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: false
+      isFilterMenuOpen: false,
+      searchType: searchType.content
     }
 
     props.registerCustomEventHandlerList([
@@ -177,6 +183,8 @@ export class AdvancedSearch extends React.Component {
     return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
   }
 
+  handleChangeSearchType = (e) => this.setState({ searchType: e.currentTarget.value })
+
   buildBreadcrumbs = () => {
     const { props } = this
 
@@ -207,31 +215,52 @@ export class AdvancedSearch extends React.Component {
             />
 
             <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
-              <Search
-                onClickSearch={this.handleClickSearch}
-                searchedKeywords={props.searchResult.searchedKeywords}
-              />
+              <div className='advancedSearch__input'>
+                <div className='advancedSearch__input__type'>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={searchType.content}
+                    checked={state.searchType === searchType.content}
+                    type='radio'
+                  />
+                  <span>{props.t('Contents')}</span>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={searchType.space}
+                    checked={state.searchType === searchType.space}
+                    type='radio'
+                  />
+                  <span>{props.t('Spaces')}</span>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={searchType.user}
+                    checked={state.searchType === searchType.user}
+                    type='radio'
+                  />
+                  <span>{props.t('Users')}</span>
+                </div>
+                <SearchInput
+                  onClickSearch={this.handleClickSearch}
+                  searchedKeywords={props.searchResult.searchedKeywords}
+                />
+              </div>
 
               <div className='advancedSearch__page'>
                 <div className='advancedSearch__content'>
                   {currentNumberSearchResults > 0 && (
-                    <>
-                      <div className='advancedSearch__content__detail'>
-                        {this.getDisplayDetail()}
+                    <div className='advancedSearch__content__detail'>
+                      {this.getDisplayDetail()}
 
-                        {!state.isFilterMenuOpen && (
-                          <IconButton
-                            customClass='advancedSearch__content__detail__filter'
-                            icon='fas fa-sliders-h'
-                            onClick={this.handleClickFilterMenu}
-                            text={props.t('Filter')}
-                            title={props.t('Search filters')}
-                          />
-                        )}
-                      </div>
-
-                      <ContentItemHeader showSearchDetails />
-                    </>
+                      {!state.isFilterMenuOpen && (
+                        <IconButton
+                          customClass='advancedSearch__content__detail__filter'
+                          icon='fas fa-sliders-h'
+                          onClick={this.handleClickFilterMenu}
+                          text={props.t('Filter')}
+                          title={props.t('Search filters')}
+                        />
+                      )}
+                    </div>
                   )}
 
                   {currentNumberSearchResults === 0 && (
@@ -240,29 +269,30 @@ export class AdvancedSearch extends React.Component {
                     </div>
                   )}
 
-                  {props.searchResult.resultsList.map((searchItem, index) => (
-                    <ListItemWrapper
-                      label={searchItem.label}
-                      read
-                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                      isLast={index === props.searchResult.resultsList.length - 1}
-                      key={searchItem.contentId}
-                    >
-                      <ContentItemSearch
-                        label={searchItem.label}
-                        path={searchItem.workspace.label}
-                        lastModificationAuthor={searchItem.lastModifier}
-                        lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                        lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                        fileExtension={searchItem.fileExtension}
-                        faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-                        statusSlug={searchItem.status}
-                        contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                        urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
-                        key={searchItem.contentId}
-                      />
-                    </ListItemWrapper>
-                  ))}
+                  {state.searchType === searchType.content && (
+                    <AdvancedSearchContentList
+                      searchResult={props.searchResult}
+                      contentType={props.contentType}
+                      user={props.user}
+                    />
+                  )}
+
+                  {state.searchType === searchType.user && (
+                    <AdvancedSearchUserList
+                      searchResult={props.searchResult}
+                      contentType={props.contentType}
+                      user={props.user}
+                    />
+                  )}
+
+                  {state.searchType === searchType.space && (
+                    <AdvancedSearchSpaceList
+                      searchResult={props.searchResult}
+                      contentType={props.contentType}
+                      user={props.user}
+                    />
+                  )}
+
                   <div className='advancedSearch__content__btnSeeMore'>
                     {(this.hasMoreResults()
                       ? (

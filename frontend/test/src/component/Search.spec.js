@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { Search as SearchWithoutHOC } from '../../../src/component/Search/Search.jsx'
+import { SearchInput as SearchWithoutHOC } from '../../../src/component/Search/SearchInput.jsx'
 import sinon from 'sinon'
 
-describe('<Search />', () => {
+describe('<SearchInput />', () => {
   const onClickSearchCallBack = sinon.spy()
 
   const props = {

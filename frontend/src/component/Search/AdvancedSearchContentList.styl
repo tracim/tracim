@@ -1,0 +1,122 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.advancedSearchContent
+  height 65px
+  width 100%
+  display flex
+  align-items center
+  &__typeAndTitle
+    display none
+  &__content__type
+    font-size fontSizeTitle
+    display flex
+    flex-direction column
+    align-items center
+    width 90px
+    place-content center
+    & > span
+      font-size fontSizeSmall
+  &__header__type
+    margin 15px 20px
+    width 50px
+    text-align center
+    align-self center
+  &__title
+    padding 0px 5px
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    color fontColor
+    align-self center
+    flex 1
+  &__modification
+    align-self center
+    margin-inline-end 80px
+  &__information
+    color fontColor
+    align-self center
+    margin-inline-end 5px
+    width 190px
+    & > *
+      font-size fontSizeSmall
+    & > i
+      margin-inline-end 5px
+
+.advancedSearch__openMenu
+  .timedEvent.advancedSearchContent__modification .timedEvent__operation
+    display none
+
+// INFO - G.B. - 20210210 - The rules below (and its media queries) are in absolute position because they come from code that would have nested links.
+// To avoid this, the components have been placed outside the top link and displayed in the right place using absolute.
+.timedEvent.advancedSearchContent__modification
+  position absolute
+  top 15px
+  right 280px
+  align-items flex-end
+  margin 0
+.advancedSearch__content .content .breadcrumbs
+  position absolute
+  top 35px
+  left 95px
+.advancedSearchContent .advancedSearchContent__title
+  padding-bottom 15px
+
+
+@media (max-width: max-lg)
+  .content__header
+    & .advancedSearchContent
+      &__title
+        display none
+  .advancedSearchContent
+    &__typeAndTitle
+      display unset
+      padding 15px 50px
+      flex 1
+    &__header__type
+      display none
+    &__content__type
+      width 50px
+      & > span
+        display none
+    &__information
+      width 160px
+    &__modification
+      margin-inline-end 30px
+  .advancedSearch__content .content .breadcrumbs
+    left 55px
+  .timedEvent.advancedSearchContent__modification
+    right 195px
+    & .timedEvent__operation
+      display none
+  .advancedSearch__openMenu
+    & .advancedSearchContent
+      &__information
+        display none
+      &__modification
+        margin-inline-end 15px
+    & .timedEvent.advancedSearchContent__modification
+      right 0px
+
+@media (max-width: max-md)
+  .advancedSearchContent
+    &__information
+      display none
+    &__modification
+      margin-inline-end 15px
+  .timedEvent.advancedSearchContent__modification
+    right 15px
+
+@media (max-width: max-sm)
+  .advancedSearchContent
+    & .advancedSearchContent
+      &__content__type
+        font-size unset
+        width 40px
+      &__title
+        padding 0
+    &__modification
+      display none
+    &__typeAndTitle
+      padding 15px 25px
+  .advancedSearch__content .content .breadcrumbs
+      display none

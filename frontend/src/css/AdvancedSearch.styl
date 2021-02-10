@@ -7,9 +7,18 @@
     display flex
   & .search
     margin-inline-end 30px
+    width 100%
+  &__input
+    display flex
+    &__type
+      display inline-flex
+      align-items center
+      & > span
+        margin 0px 10px
   &__content
     flex 1
-    margin-inline-end 30px
+    padding-inline-end 30px
+    width 100%
     &__detail
       display flex
       margin-top 15px
@@ -29,12 +38,18 @@
 @media (max-width: max-md)
   .advancedSearch__openMenu
     padding 0px
-    & > .search
+    & > .advancedSearch__input
       display none
     & .advancedSearch__content
       display none
 
 @media (max-width: max-sm)
-  .advancedSearch__content__detail__filter
-    & > .iconbutton__text
-      display none
+  .advancedSearch
+    &__content__detail__filter
+      & > .iconbutton__text
+        display none
+    &__input
+      flex-direction column-reverse
+      margin-inline-end 30px
+      &__type
+        margin-top 15px

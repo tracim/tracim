@@ -2,9 +2,9 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-require('./Search.styl')
+require('./SearchInput.styl')
 
-export class Search extends React.Component {
+export class SearchInput extends React.Component {
   constructor (props) {
     super(props)
 
@@ -53,12 +53,12 @@ export class Search extends React.Component {
     )
   }
 }
-export default translate()(Search)
+export default translate()(SearchInput)
 
-Search.propTypes = {
+SearchInput.propTypes = {
   searchedKeywords: PropTypes.string
 }
 
-Search.defaultProps = {
+SearchInput.defaultProps = {
   searchedKeywords: ''
 }
