@@ -107,7 +107,7 @@ _backend_test: &_backend_test
     # NOTE - S.G - 2021-01-08 - need to sleep to wait for database (especially mysql)
     - sleep 2
   script:
-    - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/development.ini sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
+    - TEST_CONFIG_FILE_PATH="$(realpath development.ini)" sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
 
 
 jobs:
