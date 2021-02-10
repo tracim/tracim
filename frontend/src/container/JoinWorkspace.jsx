@@ -171,9 +171,12 @@ export class JoinWorkspace extends React.Component {
     )
   }
 
+  htmlToText = (parser, htmlString) => parser.parseFromString(htmlString, 'text/html').documentElement.textContent
+
   render () {
     const { props } = this
     const className = 'joinWorkspace'
+    const parser = new DOMParser()
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -209,7 +212,7 @@ export class JoinWorkspace extends React.Component {
                         className={`${className}__content__workspaceList__item__description`}
                         title={workspace.description}
                       >
-                        {workspace.description}
+                        {this.htmlToText(parser, workspace.description)}
                       </span>
                     </div>
                     {this.createRequestComponent(workspace)}

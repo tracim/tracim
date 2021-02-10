@@ -1,5 +1,5 @@
 {
-    "description": "A super description of my space.",
+    "description": "<b>A super description of my space.</b>",
     "label": "My OPEN space",
     "access_type": "open",
     "default_user_role": "reader",
