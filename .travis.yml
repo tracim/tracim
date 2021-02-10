@@ -12,6 +12,7 @@ env:
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
+    - TRACIM_HERE_PATH=$TRAVIS_BUILD_DIR/backend
     # generated using the guide at https://docs.travis-ci.com/user/encryption-keys/
     - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
@@ -107,7 +108,7 @@ _backend_test: &_backend_test
     # NOTE - S.G - 2021-01-08 - need to sleep to wait for database (especially mysql)
     - sleep 2
   script:
-    - TEST_CONFIG_FILE_PATH="$TRAVIS_BUILD_DIR/backend/tests_configs.ini" sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
+    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --database=$DB --cov=tracim_backend; else pytest --database=$DB; fi"
 
 
 jobs:
