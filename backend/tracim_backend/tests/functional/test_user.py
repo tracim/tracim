@@ -6313,27 +6313,28 @@ class TestUserCoverEndpoints:
         assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
 
     def test_api__get_user_cover_preview__ok__nominal_case(
-        self, admin_user: User, web_testapp
+        self, admin_user: User, bob_user: User, web_testapp
     ) -> None:
         """
         get 256x256 preview of a avatar
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(bob_user.user_id),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(1500, 1500)
         web_testapp.put(
-            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            "/api/users/{}/cover/raw/{}".format(bob_user.user_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         ),
 
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(admin_user.user_id, "image.jpg"),
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(bob_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -6342,8 +6343,7 @@ class TestUserCoverEndpoints:
         assert 1300, 150 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
-            status=200,
+            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"), status=200,
         )
         assert res2.body == res.body
         assert res2.content_type == "image/jpeg"
