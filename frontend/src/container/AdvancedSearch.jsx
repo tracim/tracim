@@ -12,7 +12,6 @@ import {
   PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
-import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
   setCurrentNumberPage,

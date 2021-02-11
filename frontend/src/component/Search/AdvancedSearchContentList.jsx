@@ -4,6 +4,7 @@ import {
   Badge,
   Breadcrumbs,
   BREADCRUMBS_TYPE,
+  CONTENT_TYPE,
   Icon,
   ListItemWrapper,
   PAGE
@@ -28,11 +29,11 @@ export const AdvancedSearchContentList = props => {
   return (
     <>
       <div className='content__header'>
-        <div className='advancedSearchContent__header__type'>
+        <div className='advancedSearchContent__type__header'>
           {props.t('Type')}
         </div>
         <div className='advancedSearchContent__title'>
-          {props.t('Title')}
+          {props.t('Title and path')}
         </div>
         <div className='advancedSearchContent__typeAndTitle'>
           {props.t('Type and title')}
@@ -41,7 +42,7 @@ export const AdvancedSearchContentList = props => {
           {props.t('Last modification')}
         </div>
         <div className='advancedSearchContent__information'>
-          {props.t('Information')}
+          {props.t('Information_plural')}
         </div>
       </div>
 
@@ -58,7 +59,7 @@ export const AdvancedSearchContentList = props => {
             className='advancedSearchContent'
           >
             <div
-              className='advancedSearchContent__content__type'
+              className='advancedSearchContent__type__content'
               style={{ color: searchItem.contentType.hexcolor }}
             >
               <Icon
@@ -74,20 +75,28 @@ export const AdvancedSearchContentList = props => {
               title={searchItem.label}
             >
               {searchItem.label}
-              {searchItem.contentType.slug === 'file' && (
+              {searchItem.contentType.slug === CONTENT_TYPE.FILE && (
                 <Badge text={searchItem.fileExtension} customClass='badgeBackgroundColor' />
               )}
             </div>
 
-            <div
-              className='advancedSearchContent__information'
-              title={props.t(searchItem.contentType.status.label)}
-            >
-              <span>{props.t(searchItem.contentType.status.label)}</span>
-              <i className={`fa-fw ${searchItem.contentType.status.faIcon}`} style={{ color: searchItem.contentType.status.hexcolor }} />
-              <span>3333</span> {/*TODO - Change after backend*/}
-              <i className='fa-fw far fa-comment' />
-            </div>
+            {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
+              <div className='advancedSearchContent__information'>
+                <span title={props.t(searchItem.contentType.status.label)}>
+                  {props.t(searchItem.contentType.status.label)}
+                </span>
+                <i
+                  className={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                  style={{ color: searchItem.contentType.status.hexcolor }}
+                  title={props.t(searchItem.contentType.status.label)}
+                />
+                <span>3333</span> {/*TODO - Change after backend with title*/}
+                <i
+                  className='fa-fw far fa-comment'
+                  /*title="N comments"*/
+                />
+              </div>
+            )}
           </Link>
 
           <Breadcrumbs breadcrumbsList={[{

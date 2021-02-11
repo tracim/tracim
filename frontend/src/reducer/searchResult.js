@@ -32,7 +32,6 @@ export const serializeSearchItemProps = {
   last_modifier: 'lastModifier',
   modified: 'modified',
   parent: 'parent',
-  parent_id: 'parentId',
   parents: 'parents',
   score: 'score',
   show_in_ui: 'showInUi',

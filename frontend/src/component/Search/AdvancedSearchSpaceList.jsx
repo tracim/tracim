@@ -1,40 +1,82 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  Icon,
   ListItemWrapper,
-  displayDistanceDate,
   PAGE
 } from 'tracim_frontend_lib'
-import ContentItemSearch from './ContentItemSearch.jsx'
+import { Link } from 'react-router-dom'
 // import PropTypes from 'prop-types'
 
-// require('./AdvancedSearchSpaceList.styl')
+require('./AdvancedSearchSpaceList.styl')
 
 export const AdvancedSearchSpaceList = props => {
+  const resultList = props.searchResult.resultsList.map((searchItem) => {
+    return {
+      ...searchItem,
+      contentType: {
+        ...props.contentType.find(ct => ct.slug === searchItem.contentType) || { hexcolor: '', label: '', faIcon: '' },
+        status: props.contentType.find(ct => ct.slug === searchItem.contentType).availableStatuses.find(s => s.slug === searchItem.status) || { hexcolor: '', label: '', faIcon: '' }
+      }
+    }
+  })
+
   return (
-    props.searchResult.resultsList.map((searchItem, index) => (
-      <ListItemWrapper
-        label={searchItem.label}
-        read
-        contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-        isLast={index === props.searchResult.resultsList.length - 1}
-        key={searchItem.contentId}
-      >
-        <ContentItemSearch
+    <>
+      <div className='content__header'>
+        <div className='advancedSearchSpace__type__header'>
+          {props.t('Type')}
+        </div>
+        <div className='advancedSearchSpace__name'>
+          {props.t('Name')}
+        </div>
+        <div className='advancedSearchSpace__information'>
+          {props.t('Information_plural')}
+        </div>
+      </div>
+
+      {resultList.map((searchItem, index) => (
+        <ListItemWrapper
           label={searchItem.label}
-          path={searchItem.workspace.label}
-          lastModificationAuthor={searchItem.lastModifier}
-          lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-          lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-          fileExtension={searchItem.fileExtension}
-          faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-          statusSlug={searchItem.status}
-          contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-          urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+          read
+          contentType={searchItem.contentType}
+          isLast={index === resultList.length - 1}
           key={searchItem.contentId}
-        />
-      </ListItemWrapper>
-    ))
+        >
+          <Link
+            to={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType.slug, searchItem.contentId)}`}
+            className='advancedSearchSpace'
+          >
+            <div
+              className='advancedSearchSpace__type__content'
+              style={{ color: searchItem.contentType.slug !== CONTENT_TYPE.FILE ? searchItem.contentType.hexcolor : undefined }}
+            >
+              <Icon
+                icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                title={props.t(searchItem.contentType.label)}
+                color={searchItem.contentType.slug !== CONTENT_TYPE.FILE ? searchItem.contentType.hexcolor : undefined}
+              />
+              <span>{props.t(searchItem.contentType.label)}</span>
+            </div>
+
+            <div
+              className='advancedSearchSpace__name'
+              title={searchItem.label}
+            >
+              {searchItem.label}
+            </div>
+
+            <div className='advancedSearchSpace__information'>
+              <span>3333</span> {/*TODO - Change after backend with title*/}
+              <i className='fa-fw fas fa-th' />
+              <span>3333</span> {/*TODO - Change after backend with title*/}
+              <i className='fa-fw far fa-user' />
+            </div>
+          </Link>
+        </ListItemWrapper>
+      ))}
+    </>
   )
 }
 

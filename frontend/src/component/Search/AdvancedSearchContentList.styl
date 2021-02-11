@@ -7,20 +7,21 @@
   align-items center
   &__typeAndTitle
     display none
-  &__content__type
-    font-size fontSizeTitle
-    display flex
-    flex-direction column
-    align-items center
-    width 90px
-    place-content center
-    & > span
-      font-size fontSizeSmall
-  &__header__type
-    margin 15px 20px
-    width 50px
-    text-align center
-    align-self center
+  &__type
+    &__content
+      font-size fontSizeTitle
+      display flex
+      flex-direction column
+      align-items center
+      width 90px
+      place-content center
+      & > span
+        font-size fontSizeSmall
+    &__header
+      margin 15px 20px
+      width 50px
+      text-align center
+      align-self center
   &__title
     padding 0px 5px
     white-space nowrap
@@ -31,19 +32,19 @@
     flex 1
   &__modification
     align-self center
-    margin-inline-end 80px
+    margin-inline-end 90px
   &__information
     color fontColor
     align-self center
     margin-inline-end 5px
-    width 190px
+    width 160px
     & > *
       font-size fontSizeSmall
     & > i
       margin-inline-end 5px
 
 .advancedSearch__openMenu
-  .timedEvent.advancedSearchContent__modification .timedEvent__operation
+  & .timedEvent.advancedSearchContent__modification .timedEvent__operation
     display none
 
 // INFO - G.B. - 20210210 - The rules below (and its media queries) are in absolute position because they come from code that would have nested links.
@@ -51,7 +52,7 @@
 .timedEvent.advancedSearchContent__modification
   position absolute
   top 15px
-  right 280px
+  right 250px
   align-items flex-end
   margin 0
 .advancedSearch__content .content .breadcrumbs
@@ -72,14 +73,13 @@
       display unset
       padding 15px 50px
       flex 1
-    &__header__type
-      display none
-    &__content__type
-      width 50px
-      & > span
+    &__type
+      &__header
         display none
-    &__information
-      width 160px
+      &__content
+        width 50px
+        & > span
+          display none
     &__modification
       margin-inline-end 30px
   .advancedSearch__content .content .breadcrumbs
@@ -109,9 +109,8 @@
 @media (max-width: max-sm)
   .advancedSearchContent
     & .advancedSearchContent
-      &__content__type
-        font-size unset
-        width 40px
+      &__type__content
+        width 50px
       &__title
         padding 0
     &__modification
