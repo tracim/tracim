@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for /api/users subpath endpoints.
+Tests for /api/users config related subpath endpoints.
 """
 
 import json

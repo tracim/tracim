@@ -30,13 +30,13 @@ export const HomeNoWorkspace = props =>
       </div>
       {getWorkspaceMessage(props.canCreateWorkspace, props.canJoinWorkspace, props.t)}
     </div>
-    <span class='homepagecard__buttons'>
+    <span className='homepagecard__buttons'>
       {props.canCreateWorkspace && (
         <IconButton
           dataCy='homepagecard__create_btn'
           onClick={props.onClickCreateWorkspace}
           text={props.t('Create a space')}
-          icon='plus'
+          icon='fas fa-plus'
         />
       )}
 
@@ -44,7 +44,7 @@ export const HomeNoWorkspace = props =>
         <IconButton
           dataCy='homepagecard__join_btn'
           onClick={props.onClickJoinWorkspace}
-          icon='users'
+          icon='fas fa-users'
           text={props.t('Join a space')}
           intent='primary'
           mode='light'

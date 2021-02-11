@@ -13,7 +13,7 @@ describe('App HTML Document', function () {
       })
     })
     cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
-    cy.get('.show .fa-file-text-o').should('be.visible').click()
+    cy.get('.show .fa-file-alt').should('be.visible').click()
     cy.get('.createcontent__form__input').type('test')
     cy.get('[data-cy="popup__createcontent__form__button"]').click()
   })

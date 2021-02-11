@@ -9,7 +9,6 @@ import {
   convertBackslashNToBr,
   naturalCompareLabels,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,
@@ -54,7 +53,9 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  PAGE
+  PAGE,
+  getAvatarBaseUrl,
+  getCoverBaseUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -76,6 +77,13 @@ import {
 } from './LiveMessageManager.js'
 
 import { appContentFactory } from './appContentFactory.js'
+
+import {
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState
+} from './fileUpload.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -143,6 +151,10 @@ import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
 import Icon from './component/Icon/Icon.jsx'
 
+import PopupUploadFile from './container/PopupUploadFile.jsx'
+import PopupProgressUpload from './container/PopupProgressUpload.jsx'
+import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -203,6 +215,13 @@ export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
 
 export {
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
+
+export {
   appContentFactory,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -219,7 +238,6 @@ export {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
-  generateLocalStorageContentId,
   generateRandomPassword,
   getCurrentContentVersionNumber,
   hasSpaces,
@@ -348,5 +366,14 @@ export {
   DistanceDate,
   Icon,
   getWorkspaceContent,
-  PAGE
+  PAGE,
+  PopupUploadFile,
+  PopupProgressUpload,
+  createFileUpload,
+  uploadFile,
+  isFileUploadInList,
+  isFileUploadInErrorState,
+  getAvatarBaseUrl,
+  ProfileNavigation,
+  getCoverBaseUrl
 }

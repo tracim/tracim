@@ -23,7 +23,8 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  generateLocalStorageContentId,
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
   Badge,
   CUSTOM_EVENT,
   ShareDownload,
@@ -236,19 +237,24 @@ export class File extends React.Component {
 
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
-
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
-
-    await this.loadContent()
-    this.loadTimeline()
-    if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+    this.updateTimelineAndContent()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async updateTimelineAndContent (pageToLoad = null) {
+    this.setState({
+      newComment: getLocalStorageItem(
+        this.state.appName,
+        this.state.content,
+        LOCAL_STORAGE_FIELD.COMMENT
+      ) || ''
+    })
+
+    await this.loadContent(pageToLoad)
+    this.loadTimeline()
+    if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -256,12 +262,7 @@ export class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.setState({ fileCurrentPage: 1 })
-      await this.loadContent(1)
-      this.loadTimeline()
-      if (state.config.workspace.downloadEnabled) {
-        this.setState({})
-        this.loadShareLinkList()
-      }
+      this.updateTimelineAndContent(1)
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -366,8 +367,18 @@ export class File extends React.Component {
     }
   }
 
-  buildBreadcrumbs = (content) => {
-    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
+  buildBreadcrumbs = async (content) => {
+    try {
+      const contentBreadcrumbsList = await buildContentPathBreadcrumbs(this.state.config.apiUrl, content)
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+        data: {
+          breadcrumbs: contentBreadcrumbsList
+        }
+      })
+    } catch (e) {
+      console.error('Error in app file, count not build breadcrumbs', e)
+    }
   }
 
   handleClickBtnCloseApp = () => {
@@ -807,6 +818,7 @@ export class File extends React.Component {
         <Timeline
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
+          apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
           newComment={state.newComment}
@@ -980,7 +992,7 @@ export class File extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Upload a new version')}
-                  icon='upload'
+                  icon='fas fa-upload'
                 />
               )}
 
@@ -995,7 +1007,7 @@ export class File extends React.Component {
                   style={{
                     marginLeft: '5px'
                   }}
-                  faIcon='edit'
+                  faIcon='fas fa-edit'
                 />
               )}
 
@@ -1006,7 +1018,7 @@ export class File extends React.Component {
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                   data-cy='appFileLastVersionBtn'
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -1017,7 +1029,7 @@ export class File extends React.Component {
                   customColor={state.config.hexcolor}
                   label={props.t('Play video')}
                   onClick={() => this.setState({ previewVideo: true })}
-                  faIcon='play'
+                  faIcon='fas fa-play'
                   style={{ marginLeft: '5px' }}
                 />
               )}

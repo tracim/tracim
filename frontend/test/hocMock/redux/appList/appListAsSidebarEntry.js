@@ -9,7 +9,7 @@ import { serialize } from 'tracim_frontend_lib'
 export const sidebarEntryDashboardFromApi = {
   slug: 'dashboard',
   route: '/ui/workspaces/1/dashboard',
-  fa_icon: 'tachometer',
+  fa_icon: 'tachometer-alt',
   hexcolor: '#fdfdfd',
   label: 'Dashboard'
 }
@@ -18,7 +18,7 @@ export const sidebarEntryAllContentFromApi = {
   route: '/ui/workspaces/1/contents',
   fa_icon: 'th',
   hexcolor: '#bbbbbb',
-  label: 'All Contents'
+  label: 'Contents'
 }
 export const appListAsSidebarEntry = workspaceId => [
   serialize(sidebarEntryDashboardFromApi, serializeSidebarEntryProps),

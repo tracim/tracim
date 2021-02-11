@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "",
+  "description": "Info about a user in this organization",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "title": "First name"
+    },
+    "last_name": {
+      "type": "string",
+      "title": "Last name"
+    },
+    "phone_number": {
+      "type": "string",
+      "title": "Phone number",
+      "minLength": 10
+    },
+    "birth_date": {
+      "title": "Date of birth",
+      "type": "string",
+      "format": "date"
+    },
+    "bio": {
+      "title": "Biography",
+      "type": "string"
+    },
+    "organization": {
+      "title": "Organization",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "default": "Tracim"
+        },
+        "roles": {
+          "title": "Roles in the organization",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enumNames":
+              [
+                "Developer",
+                "System Administrator",
+                "Manager",
+                "Administrator",
+                "Designer"
+              ],
+            "enum": [
+              "developer",
+              "sysadmin",
+              "manager",
+              "administrator",
+              "designer"
+            ]
+          }
+        }
+      }
+    },
+    "personal_page": {
+      "title": " ",
+      "type": "string"
+    },
+    "tasks": {
+      "type": "array",
+      "title": "Tasks",
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "A sample title"
+          },
+          "details": {
+            "type": "string",
+            "title": "Task details",
+            "description": "Enter the task details"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done?",
+            "default": false
+          }
+        }
+      }
+    }
+  }
+}

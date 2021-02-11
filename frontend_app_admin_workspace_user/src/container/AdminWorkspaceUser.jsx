@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import debounce from 'lodash/debounce'
@@ -219,25 +218,22 @@ export class AdminWorkspaceUser extends React.Component {
 
     const breadcrumbsList = []
 
-    let page = null
+    let pageUrl = null
     let label = null
     if (state.config.type === 'workspace') {
-      page = PAGE.ADMIN.WORKSPACE
+      pageUrl = PAGE.ADMIN.WORKSPACE
       label = props.t('Space management')
     } else if (state.config.type === 'user') {
-      page = PAGE.ADMIN.USER
+      pageUrl = PAGE.ADMIN.USER
       label = props.t('User account management')
     }
     breadcrumbsList.push({
-      link: <Link to={page}>{label}</Link>,
+      link: pageUrl,
       type: BREADCRUMBS_TYPE.CORE,
-      label: label
+      label: label,
+      isALink: true
     })
 
-    // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
-    // app crash telling it cannot render a Link outside a router
-    // see https://github.com/tracim/tracim/issues/1637
-    // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
     this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
@@ -545,7 +541,7 @@ export class AdminWorkspaceUser extends React.Component {
         config: {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: '',
           domContainer: 'appFeatureContainer',

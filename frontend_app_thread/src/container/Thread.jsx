@@ -15,9 +15,10 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  generateLocalStorageContentId,
   ROLE,
   CUSTOM_EVENT,
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
   buildHeadTitle,
   addRevisionFromTLM,
   RefreshWarningMessage,
@@ -160,28 +161,32 @@ export class Thread extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
-    const { state } = this
+    this.updateTimelineAndContent()
+  }
 
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
+  async updateTimelineAndContent () {
+    this.setState({
+      newComment: getLocalStorageItem(
+        this.state.appName,
+        this.state.content,
+        LOCAL_STORAGE_FIELD.COMMENT
+      ) || ''
+    })
 
     await this.loadContent()
     this.loadTimeline()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
     console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      await this.loadContent()
-      this.loadTimeline()
+      this.updateTimelineAndContent()
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -257,8 +262,18 @@ export class Thread extends React.Component {
     this.setState({ timeline: revisionWithComment })
   }
 
-  buildBreadcrumbs = (content) => {
-    buildContentPathBreadcrumbs(this.state.config.apiUrl, content, this.props)
+  buildBreadcrumbs = async content => {
+    try {
+      const contentBreadcrumbsList = await buildContentPathBreadcrumbs(this.state.config.apiUrl, content)
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
+        data: {
+          breadcrumbs: contentBreadcrumbsList
+        }
+      })
+    } catch (e) {
+      console.error('Error in app thread, count not build breadcrumbs', e)
+    }
   }
 
   handleClickBtnCloseApp = () => {
@@ -418,6 +433,7 @@ export class Thread extends React.Component {
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
+            apiUrl={state.config.apiUrl}
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={!state.content.is_editable}

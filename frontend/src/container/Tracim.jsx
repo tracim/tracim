@@ -77,6 +77,7 @@ import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalActivityFeed from './PersonalActivityFeed.jsx'
 import WorkspaceActivityFeed from './WorkspaceActivityFeed.jsx'
+import PublicProfile from './PublicProfile.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -434,7 +435,14 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />} />
+          <Route
+            exact
+            path={PAGE.HOME}
+            component={() => {
+              if (!props.workspaceList.length) return <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />
+              return <Redirect to={{ pathname: PAGE.ACTIVITY_FEED, state: { from: props.location } }} />
+            }}
+          />
 
           <Route
             path='/ui/workspaces/:idws?'
@@ -493,6 +501,12 @@ export class Tracim extends React.Component {
             exact
             path={PAGE.ADMIN.USER_EDIT(':userid')}
             render={() => <AdminAccount />}
+          />
+
+          <Route
+            exact
+            path={PAGE.PUBLIC_PROFILE(':userid')}
+            component={PublicProfile}
           />
 
           <Route

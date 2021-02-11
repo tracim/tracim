@@ -24,7 +24,7 @@ class UploadForm extends React.Component {
     const { props } = this
     const guestFullnameIsValid = props.guestFullname.value.length && !props.guestFullname.isInvalid
     const guestPasswordIsValid = !props.hasPassword || (props.guestPassword.value.length && !props.guestPassword.isInvalid)
-    const uploadListIsValid = props.fileToUploadList.length > 0
+    const uploadListIsValid = props.fileUploadList.length > 0
     return !(guestPasswordIsValid && guestFullnameIsValid && uploadListIsValid)
   }
 
@@ -64,7 +64,7 @@ class UploadForm extends React.Component {
                 className='guestupload__card__form__groupepw__question'
                 id='popoverPasswordInfo'
               >
-                <i className='fa fa-fw fa-question-circle' />
+                <i className='fas fa-fw fa-question-circle' />
               </button>
 
               <Popover
@@ -84,7 +84,7 @@ class UploadForm extends React.Component {
 
           <InputTextArea
             placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-            numberRows={props.fileToUploadList.length > 4 ? '20' : '15'}
+            numberRows={props.fileUploadList.length > 4 ? '20' : '15'}
             value={props.guestComment}
             onChange={props.onChangeComment}
           />
@@ -99,7 +99,7 @@ class UploadForm extends React.Component {
           />
 
           <FileUploadList
-            fileToUploadList={props.fileToUploadList}
+            fileUploadList={props.fileUploadList}
             onDeleteFile={props.onDeleteFile}
             customTitle={props.t('Attached files')}
           />
@@ -110,7 +110,7 @@ class UploadForm extends React.Component {
             onClick={props.onClickSend}
             disabled={this.sendButtonIsDisabled()}
           >
-            {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
+            {props.t('Send')} <i className='far fa-fw fa-paper-plane' />
           </button>
         </div>
       </form>

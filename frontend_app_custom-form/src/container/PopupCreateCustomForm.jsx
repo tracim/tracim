@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
+  CUSTOM_EVENT,
   CardPopupCreateContent,
   handleFetchResult,
   addAllResourceI18n
@@ -80,7 +81,7 @@ class PopupCreateCustomForm extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }

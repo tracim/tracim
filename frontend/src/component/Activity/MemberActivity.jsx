@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { translate, Trans } from 'react-i18next'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 import {
   Avatar,
@@ -95,15 +96,21 @@ export class MemberActivity extends React.Component {
     const workspaceLabel = newestMessage.fields.workspace.label
     const breadcrumbsList = [
       {
-        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{workspaceLabel}</Link>,
+        link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: workspaceLabel
+        label: workspaceLabel,
+        isALink: true
       }
     ]
 
     return (
       <div className='memberActivity'>
-        <Avatar size={AVATAR_SIZE.SMALL} publicName={newestMessage.fields.user.public_name} style={{ marginRight: '5px' }} />
+        <Avatar
+          size={AVATAR_SIZE.SMALL}
+          user={newestMessage.fields.user}
+          apiUrl={FETCH_CONFIG.apiUrl}
+          style={{ marginRight: '5px' }}
+        />
         <div className='memberActivity__title'>
           {this.getText()}
           <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />
@@ -112,7 +119,10 @@ export class MemberActivity extends React.Component {
           customClass='memberActivity__right'
           date={newestMessage.created}
           lang={props.user.lang}
-          authorName={newestMessage.fields.author.public_name}
+          author={{
+            publicName: newestMessage.fields.author.public_name,
+            userId: newestMessage.fields.author.user_id
+          }}
         />
       </div>
     )

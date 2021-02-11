@@ -26,7 +26,6 @@ import {
   PAGE,
   ROLE
 } from 'tracim_frontend_lib'
-import { Link } from 'react-router-dom'
 import Carousel from '../component/Carousel.jsx'
 import { DIRECTION, buildRawFileUrl } from '../helper.js'
 import { debug } from '../debug.js'
@@ -51,7 +50,9 @@ export class Gallery extends React.Component {
       content: param.content,
       breadcrumbsList: [],
       appMounted: false,
-      folderId: props.data ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined) : debug.config.folderId,
+      folderId: props.data
+        ? (qs.parse(props.data.config.history.location.search).folder_ids || undefined)
+        : debug.config.folderId,
       folderDetail: {
         fileName: '',
         folderParentIdList: []
@@ -299,34 +300,32 @@ export class Gallery extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: <Link to={PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId)}>{workspaceLabel}</Link>,
+      link: PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId),
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-      label: workspaceLabel
+      label: workspaceLabel,
+      isALink: true
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`}>{folderDetail.fileName}</Link>,
+        link: `/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-        label: folderDetail.fileName
+        label: folderDetail.fileName,
+        isALink: true
       })
     }
     breadcrumbsList.push({
-      link: <Link to={PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId)}>{props.t('Gallery')}</Link>,
+      link: PAGE.WORKSPACE.GALLERY(state.config.appConfig.workspaceId),
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-      label: props.t('Gallery')
+      label: props.t('Gallery'),
+      isALink: true
     })
     if (includeFile && state.imagePreviewList && state.imagePreviewList.length > 0) {
       const fileName = this.displayedPicture().fileName
       breadcrumbsList.push({
-        link: (
-          <Link
-            to={PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId())}
-          >
-            {fileName}
-          </Link>
-        ),
+        link: PAGE.WORKSPACE.CONTENT(state.config.appConfig.workspaceId, 'file', this.displayedPictureId()),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-        label: fileName
+        label: fileName,
+        isALink: true
       })
     }
 
@@ -726,7 +725,7 @@ export class Gallery extends React.Component {
         <PageWrapper customClass='gallery'>
           <PageTitle
             title={state.folderId ? state.folderDetail.fileName : state.workspaceLabel}
-            icon='picture-o'
+            icon='far fa-image'
             breadcrumbsList={state.breadcrumbsList}
             parentClass='gallery__header'
           />
@@ -741,7 +740,7 @@ export class Gallery extends React.Component {
                 <span className='gallery__action__button__text'>
                   {state.autoPlay ? props.t('Pause') : props.t('Play')}
                 </span>
-                <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                <i className={classnames('fa-fw fas', state.autoPlay ? 'fa-pause' : 'fa-play')} />
               </button>
 
               <button
@@ -749,7 +748,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fa-fw fas fa-undo' />
               </button>
 
               <button
@@ -757,7 +756,7 @@ export class Gallery extends React.Component {
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
               >
                 <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-                <i className='fa fa-fw fa-undo' />
+                <i className='fa-fw fas fa-undo' />
               </button>
 
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
@@ -766,7 +765,8 @@ export class Gallery extends React.Component {
                   onClick={this.handleOpenDeleteFilePopup}
                   data-cy='gallery__action__button__delete'
                 >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span><i className='fa fa-fw fa-trash' />
+                  <span className='gallery__action__button__text'>{props.t('Delete')}</span>
+                  <i className='far fa-fw fa-trash-alt' />
                 </button>
               )}
             </div>
@@ -784,7 +784,7 @@ export class Gallery extends React.Component {
                 />
               ) : (
                 <div className='gallery__loader'>
-                  <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+                  <i className='fas fa-spinner fa-spin gallery__loader__icon' />
                 </div>
               )
             )}
@@ -815,7 +815,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__auto__play'
                         key='btn_autoplay'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.autoPlay ? 'fa-pause' : 'fa-play')} />
+                        <i className={classnames('fa-fw fas', state.autoPlay ? 'fa-pause' : 'fa-play')} />
                       </button>
                     ), (
                       <button
@@ -825,7 +825,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__fullscreen'
                         key='btn_fullscreen'
                       >
-                        <i className={classnames('fa', 'fa-fw', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                        <i className={classnames('fa-fw fas', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
                       </button>
                     ), (
                       <button
@@ -835,7 +835,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__rotation__left'
                         key='btn_rotate_left'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fa-fw fas fa-undo' />
                       </button>
                     ), (
                       <button
@@ -844,7 +844,7 @@ export class Gallery extends React.Component {
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
                       >
-                        <i className='fa fa-fw fa-undo' />
+                        <i className='fa-fw fas fa-undo' />
                       </button>
                     ), (
                       <a
@@ -855,7 +855,7 @@ export class Gallery extends React.Component {
                         rel='noopener noreferrer'
                         key='btn_open_raw'
                       >
-                        <i className='fa fa-fw fa-download' />
+                        <i className='fa-fw fas fa-download' />
                       </a>
                     )]}
                   />

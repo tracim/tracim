@@ -62,7 +62,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               className='btn transparentButton workspace_advanced__defaultRole__info'
               id='popoverDefaultRoleInfo'
             >
-              <i className='fa fa-fw fa-question-circle' />
+              <i className='fas fa-fw fa-question-circle' />
             </button>
 
             <Popover
@@ -74,7 +74,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               trigger={isMobile ? 'focus' : 'hover'}
             >
               <PopoverBody>
-                {props.t('This is the role that members will have by default when they join your space.')}
+                {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
               </PopoverBody>
             </Popover>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { Link, withRouter } from 'react-router-dom'
 import i18n from '../util/i18n.js'
 import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
@@ -28,7 +28,6 @@ import {
   ALL_CONTENT_TYPES
 } from '../util/helper.js'
 import Search from '../component/Header/Search.jsx'
-import { Link } from 'react-router-dom'
 import {
   PROFILE,
   ComposedIcon,
@@ -120,8 +119,8 @@ export class Header extends React.Component {
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
-                      mainIcon='envelope'
-                      smallIcon='warning'
+                      mainIcon='far fa-envelope'
+                      smallIcon='fas fa-exclamation-triangle'
                       mainIconCustomClass='slowblink'
                       smallIconCustomClass='text-danger'
                     />
@@ -164,7 +163,7 @@ export class Header extends React.Component {
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     to={PAGE.AGENDA}
                   >
-                    <i className='fa fa-fw fa-calendar' />
+                    <i className='fas fa-fw fa-calendar-alt' />
                     {props.t('Agendas')}
                   </Link>
                 </li>

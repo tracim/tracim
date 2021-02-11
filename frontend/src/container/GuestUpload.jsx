@@ -11,7 +11,9 @@ import {
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
   PAGE,
-  setupCommonRequestHeaders
+  setupCommonRequestHeaders,
+  createFileUpload,
+  isFileUploadInList
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -41,7 +43,7 @@ class GuestUpload extends React.Component {
         isInvalid: false
       },
       appName: 'file',
-      fileToUploadList: [],
+      fileUploadList: [],
       uploadFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       progressUpload: {
         display: this.UPLOAD_STATUS.BEFORE_LOAD,
@@ -114,17 +116,19 @@ class GuestUpload extends React.Component {
 
     if (!Array.isArray(newFileList) || (newFileList.length === 0)) return
 
-    const alreadyUploadedList = newFileList.filter(newFile => state.fileToUploadList.some(stateFile => stateFile.name === newFile.name))
-    if (alreadyUploadedList.length) {
+    const droppedFileUploadList = newFileList.map(file => createFileUpload(file))
+    const alreadyPresentList = droppedFileUploadList.filter(newFileUpload => isFileUploadInList(newFileUpload, state.fileUploadList))
+    const newFileUploadList = droppedFileUploadList.filter(newFileUpload => !isFileUploadInList(newFileUpload, state.fileUploadList))
+    if (alreadyPresentList.length) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: (
             <div>
-              {props.t('Files already uploaded:')}
+              {props.t('Files already added:')}
               <br />
               <ul>
-                {alreadyUploadedList.map(file =>
+                {alreadyPresentList.map(file =>
                   <li key={file.name}>{file.name}</li>
                 )}
               </ul>
@@ -137,16 +141,16 @@ class GuestUpload extends React.Component {
     }
 
     this.setState(previousState => ({
-      fileToUploadList: [
-        ...previousState.fileToUploadList,
-        ...newFileList.filter(newFile => !state.fileToUploadList.some(stateFile => stateFile.name === newFile.name))
+      fileUploadList: [
+        ...previousState.fileUploadList,
+        ...newFileUploadList
       ]
     }))
   }
 
-  handleDeleteFile = deletedFile => {
+  handleDeleteFileUpload = deletedFileUpload => {
     this.setState(previousState => ({
-      fileToUploadList: previousState.fileToUploadList.filter(file => file.name !== deletedFile.name)
+      fileUploadList: previousState.fileUploadList.filter(fileUpload => fileUpload !== deletedFileUpload)
     }))
   }
 
@@ -157,7 +161,7 @@ class GuestUpload extends React.Component {
     if (state.guestFullname.value.length > 255) errors.push({ field: 'guestFullname', msg: props.t('Full name must be less than 255 characters') })
     if (state.hasPassword && (state.guestPassword.value.length < 6)) errors.push({ field: 'guestPassword', msg: props.t('Password must be at least 6 characters') })
     if (state.hasPassword && (state.guestPassword.value.length > 255)) errors.push({ field: 'guestPassword', msg: props.t('Password must be less than 255 characters') })
-    if (state.fileToUploadList.length === 0) errors.push({ field: 'fileToUploadList', msg: props.t('You must select at least 1 file to upload') })
+    if (state.fileUploadList.length === 0) errors.push({ field: 'fileUploadList', msg: props.t('You must select at least 1 file to upload') })
     if (errors.length) {
       // INFO - B.L - Not used now because form's css isn't ready for it use flash message instead
       // this.setState({
@@ -181,9 +185,12 @@ class GuestUpload extends React.Component {
     if (!this.validateForm()) return false
 
     const formData = new FormData()
-
-    state.fileToUploadList.forEach((uploadFile, index) => {
-      formData.append(`file_${index}`, uploadFile)
+    // TODO - SG - 2021-01-22 - We really should use the uploadFile() function here
+    // But first check if guest-upload backend could be compatible to one FormData field for all files (with the 'files' field)
+    // Then create/refactor uploadFile() -> uploadFiles() accordingly
+    // See https://github.com/tracim/tracim/issues/4090 for more details
+    state.fileUploadList.forEach((fileUpload, index) => {
+      formData.append(`file_${index}`, fileUpload.file)
       formData.append('username', state.guestFullname.value)
       formData.append('message', state.guestComment)
       if (state.guestPassword.value !== '') formData.append('password', state.guestPassword.value)
@@ -203,7 +210,7 @@ class GuestUpload extends React.Component {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 204:
-            this.setState({ fileToUploadList: [] })
+            this.setState({ fileUploadList: [] })
             break
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -263,9 +270,9 @@ class GuestUpload extends React.Component {
                       guestComment={state.guestComment}
                       onChangeComment={this.handleChangeComment}
                       onAddFile={this.handleAddFile}
-                      onDeleteFile={this.handleDeleteFile}
+                      onDeleteFile={this.handleDeleteFileUpload}
                       onClickSend={this.handleClickSend}
-                      fileToUploadList={state.fileToUploadList}
+                      fileUploadList={state.fileUploadList}
                       uploadFilePreview={state.uploadFilePreview}
                     />
                   )

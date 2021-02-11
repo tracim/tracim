@@ -2,7 +2,10 @@
 """
 Tests for /api/users subpath endpoints.
 """
+import io
+import typing
 
+from PIL import Image
 import pytest
 import transaction
 from webtest import TestApp
@@ -10,14 +13,20 @@ from webtest import TestApp
 from tracim_backend import AuthType
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import EmailAlreadyExists
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
+from tracim_backend.tests.utils import create_png_test_image
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2718,9 +2727,7 @@ class TestUserWorkspaceEndpoint(object):
             "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
-        assert set(workspaces_ids) == {
-            owned_and_role_workspace.workspace_id,
-        }
+        assert set(workspaces_ids) == {owned_and_role_workspace.workspace_id}
         params = {
             "show_workspace_with_role": "1",
             "show_owned_workspace": "1",
@@ -2753,9 +2760,7 @@ class TestUserWorkspaceEndpoint(object):
             "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
-        assert set(workspaces_ids) == {
-            role_only_workspace.workspace_id,
-        }
+        assert set(workspaces_ids) == {role_only_workspace.workspace_id}
 
     def test_api__get_users_workspaces__ok_200__with_parent_ids_as_admin(
         self, workspace_api_factory, web_testapp, admin_user
@@ -2917,10 +2922,10 @@ class TestUserWorkspaceEndpoint(object):
     @pytest.mark.parametrize(
         "workspace_access_type, accessible_workspaces_count, user_credentials",
         [
-            (WorkspaceAccessType.CONFIDENTIAL, 0, "foo@bar.par",),
+            (WorkspaceAccessType.CONFIDENTIAL, 0, "foo@bar.par"),
             (WorkspaceAccessType.OPEN, 1, "foo@bar.par"),
-            (WorkspaceAccessType.ON_REQUEST, 1, "foo@bar.par",),
-            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin",),
+            (WorkspaceAccessType.ON_REQUEST, 1, "foo@bar.par"),
+            (WorkspaceAccessType.OPEN, 0, "admin@admin.admin"),
         ],
     )
     def test_api__get_accessible_workspaces__ok__200__nominal_cases(
@@ -2965,7 +2970,7 @@ class TestUserWorkspaceEndpoint(object):
         )
 
     def test_api__get_accessible_workspaces__ok__403__other_user(
-        self, web_testapp, user_api_factory,
+        self, web_testapp, user_api_factory
     ):
         """
         Check that accessible workspaces of a given user is not authorized for another.
@@ -3017,7 +3022,7 @@ class TestUserWorkspaceEndpoint(object):
         assert member["role"] == default_user_role.label
 
     @pytest.mark.parametrize(
-        "access_type", [WorkspaceAccessType.ON_REQUEST, WorkspaceAccessType.CONFIDENTIAL],
+        "access_type", [WorkspaceAccessType.ON_REQUEST, WorkspaceAccessType.CONFIDENTIAL]
     )
     def test_api__join_workspace__ok_400__wrong_access_type(
         self,
@@ -3200,7 +3205,7 @@ class TestUserDiskSpace(object):
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
-        assert res["user"]["avatar_url"] is None
+        assert res["user"]["has_avatar"] is False
         assert res["allowed_space"] == 134217728
 
 
@@ -3745,12 +3750,12 @@ class TestUsersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["username"] == admin_user.username
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
@@ -3814,17 +3819,17 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
@@ -3860,13 +3865,13 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
         self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
@@ -3907,13 +3912,13 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -3969,13 +3974,13 @@ class TestKnownMembersEndpoint(object):
             "exclude_user_ids": str(test_user3.user_id),
         }
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -4031,13 +4036,13 @@ class TestKnownMembersEndpoint(object):
             "exclude_user_ids": str(test_user3.user_id),
         }
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
         self, admin_user, web_testapp
@@ -4087,13 +4092,13 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
@@ -4128,17 +4133,17 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
@@ -4172,7 +4177,7 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=400, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=400, params=params
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -4227,22 +4232,22 @@ class TestKnownMembersEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_known_member_filter_disabled"}], indirect=True
+    "config_section", [{"name": "test_known_member_filter_disabled"}], indirect=True
 )
 class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     # -*- coding: utf-8 -*-
@@ -4299,22 +4304,22 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params,
+            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
         )
         res = res.json_body
 
         assert len(res) == 3
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["avatar_url"] is None
+        assert res[0]["has_avatar"] is False
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["avatar_url"] is None
+        assert res[1]["has_avatar"] is False
 
         assert res[2]["user_id"] == test_user3.user_id
         assert res[2]["public_name"] == test_user3.display_name
-        assert res[2]["avatar_url"] is None
+        assert res[2]["has_avatar"] is False
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -5669,3 +5674,678 @@ class TestUserEnpointsLDAPAuth(object):
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
         assert res["profile"] == "users"
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserFollowerEndpoint(object):
+    """
+    Tests for GET /api/users/{user_id}/following and /api/users/{user_id}/followers
+    """
+
+    def test_api__create_follower__ok_201__nominal_case(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
+            params={"user_id": bob_user.user_id},
+            status=201,
+        )
+
+    def test_api__create_follower__ok_400__already_exist(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        # With
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
+            params={"user_id": bob_user.user_id},
+            status=201,
+        )
+
+        # When
+        res = web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
+            params={"user_id": bob_user.user_id},
+            status=400,
+        )
+
+        # Then
+        assert res.json_body["code"] == ErrorCode.USER_FOLLOW_ALREADY_DEFINED
+
+    def test_api__create_follower__ok_201__on_himself(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # user can set following on himself
+        web_testapp.authorization = ("Basic", ("bob@test.test", "password"))
+        web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id),
+            params={"user_id": riyad_user.user_id},
+            status=201,
+        )
+
+    def test_api__create_follower__error_403__on_other_user(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # user can set following on himself
+        web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
+        web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id),
+            params={"user_id": riyad_user.user_id},
+            status=403,
+        )
+
+    def test_api__get_user_following__ok_200__nominal_case(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id), status=200
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 10
+        assert res["has_previous"] is False
+        assert res["has_next"] is False
+        assert res["previous_page_token"] == "<i:2"
+        assert res["next_page_token"] == ">i:2"
+        assert res["items"]
+        assert len(res["items"]) == 1
+        assert res["items"][0] == {"user_id": bob_user.user_id}
+
+    def test_api__get_user_following__ok_200__filter_on_user_id(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/following?user_id={followed_id}".format(
+                user_id=admin_user.user_id, followed_id=riyad_user.user_id
+            ),
+            status=200,
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 10
+        assert res["has_previous"] is False
+        assert res["has_next"] is False
+        assert res["previous_page_token"] == "<i:3"
+        assert res["next_page_token"] == ">i:3"
+        assert res["items"]
+        assert len(res["items"]) == 1
+        assert res["items"][0] == {"user_id": riyad_user.user_id}
+
+    def test_api__get_user_following__ok_200__pagination(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp, admin_user: User
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        users_to_follow: typing.List[User] = []
+        for i in range(10):
+            users_to_follow.append(
+                user_api_factory.get().create_user(
+                    email="user{i}@test.test".format(i=i),
+                    username="riyad{i}".format(i=i),
+                    password="password",
+                    name="riyad{i}".format(i=i),
+                    profile=Profile.USER,
+                    timezone="Europe/Paris",
+                    lang="fr",
+                    do_save=True,
+                    do_notify=False,
+                )
+            )
+            user_api.create_follower(
+                follower_id=admin_user.user_id, leader_id=users_to_follow[-1].user_id
+            )
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/following?count=5".format(user_id=admin_user.user_id), status=200
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 5
+        assert res["has_previous"] is False
+        assert res["has_next"] is True
+        assert res["previous_page_token"] == "<i:2"
+        assert res["next_page_token"] == ">i:6"
+        assert res["items"]
+        assert len(res["items"]) == 5
+
+    def test_api__get_user_following__various__access(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # With bob follow riyad
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
+        transaction.commit()
+
+        # When admin read api it is ok
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=200
+        )
+
+        # When bob read api it is ok
+        web_testapp.authorization = ("Basic", ("bob@test.test", "password"))
+        web_testapp.get(
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=200
+        )
+
+        # When riyad read api it is forbidden
+        web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
+        web_testapp.get(
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=403
+        )
+
+    def test_api__delete_follower__ok_201__nominal_case(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        # With
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.post_json(
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
+            params={"user_id": bob_user.user_id},
+            status=201,
+        )
+
+        # When Then
+        web_testapp.delete(
+            "/api/users/{user_id}/following/{leader_id}".format(
+                user_id=admin_user.user_id, leader_id=bob_user.user_id
+            ),
+            status=204,
+        )
+
+    def test_api__delete_follower__err_400__not_found(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        # When Then
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.delete(
+            "/api/users/{user_id}/following/{leader_id}".format(
+                user_id=admin_user.user_id, leader_id=bob_user.user_id
+            ),
+            status=400,
+        )
+
+    def test_api__get_user_followers__ok_200__nominal_case(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/followers".format(user_id=bob_user.user_id), status=200
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 10
+        assert res["has_previous"] is False
+        assert res["has_next"] is False
+        assert res["previous_page_token"] == "<i:1"
+        assert res["next_page_token"] == ">i:1"
+        assert res["items"]
+        assert len(res["items"]) == 1
+        assert res["items"][0] == {"user_id": admin_user.user_id}
+
+    def test_api__get_user_followers__ok_200__filter_on_user_id(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=bob_user.user_id)
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/followers?user_id={follower_id}".format(
+                user_id=bob_user.user_id, follower_id=riyad_user.user_id
+            ),
+            status=200,
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 10
+        assert res["has_previous"] is False
+        assert res["has_next"] is False
+        assert res["previous_page_token"] == "<i:3"
+        assert res["next_page_token"] == ">i:3"
+        assert res["items"]
+        assert len(res["items"]) == 1
+        assert res["items"][0] == {"user_id": riyad_user.user_id}
+
+    def test_api__get_user_followers__ok_200__pagination(
+        self, user_api_factory: UserApiFactory, web_testapp: TestApp, admin_user: User
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        users_followers: typing.List[User] = []
+        for i in range(10):
+            users_followers.append(
+                user_api_factory.get().create_user(
+                    email="user{i}@test.test".format(i=i),
+                    username="riyad{i}".format(i=i),
+                    password="password",
+                    name="riyad{i}".format(i=i),
+                    profile=Profile.USER,
+                    timezone="Europe/Paris",
+                    lang="fr",
+                    do_save=True,
+                    do_notify=False,
+                )
+            )
+            user_api.create_follower(
+                follower_id=users_followers[-1].user_id, leader_id=admin_user.user_id
+            )
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/followers?count=5".format(user_id=admin_user.user_id), status=200
+        )
+
+        # Then
+        res = res.json_body
+        assert res["per_page"] == 5
+        assert res["has_previous"] is False
+        assert res["has_next"] is True
+        assert res["previous_page_token"] == "<i:2"
+        assert res["next_page_token"] == ">i:6"
+        assert res["items"]
+        assert len(res["items"]) == 5
+
+    def test_api__get_user_followers__various__access(
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+        riyad_user: User,
+    ) -> None:
+        # With bob follow riyad
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
+        transaction.commit()
+
+        # When admin read api it is ok
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=200
+        )
+
+        # When riyad read api it is forbidden
+        web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
+        web_testapp.get(
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=200
+        )
+
+        # When bob read api it is ok
+        web_testapp.authorization = ("Basic", ("bob@test.test", "password"))
+        web_testapp.get(
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=403
+        )
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestAboutUserEndpoint(object):
+    """
+    Tests for GET /api/users/{user_id}/about
+    """
+
+    def test_api__get_about_user__ok__nominal_case(
+        self,
+        user_api_factory: UserApiFactory,
+        content_api_factory: ContentApiFactory,
+        workspace_api_factory: WorkspaceApiFactory,
+        web_testapp: TestApp,
+        admin_user: User,
+        bob_user: User,
+        riyad_user: User,
+        session: TracimSession,
+        content_type_list: typing.List[str],
+    ) -> None:
+        # With
+        user_api = user_api_factory.get()
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test workspace", save_now=True)
+        content_api = content_api_factory.get()
+        content_api.create(
+            content_type_list.Page.slug, workspace, None, "creation_order_test", "", True
+        )
+        content = content_api.create(
+            content_type_list.Page.slug, workspace, None, "another creation_order_test", "", True,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "Just an update"
+        content_api.save(content)
+        transaction.commit()
+
+        # When
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/about".format(user_id=admin_user.user_id), status=200
+        )
+
+        # Then
+        assert res.json_body["user_id"] == 1
+        assert res.json_body["leaders_count"] == 1
+        assert res.json_body["followers_count"] == 2
+        assert res.json_body["public_name"] == admin_user.public_name
+        assert res.json_body["username"] == admin_user.username
+        assert res.json_body["created"] == admin_user.created.strftime(DATETIME_FORMAT)
+        assert res.json_body["authored_content_revisions_count"] == 3
+        assert res.json_body["authored_content_revisions_space_count"] == 1
+
+    def test_api__get_about_user__err_user_not_existing(self, web_testapp: TestApp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/users/2/about", status=400)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+
+    def test_api__get_about_user__err_user_not_known(
+        self, admin_user: User, web_testapp: TestApp, riyad_user: User
+    ) -> None:
+        web_testapp.authorization = ("Basic", (riyad_user.email, "password"))
+        res = web_testapp.get("/api/users/{}/about".format(admin_user.user_id), status=400)
+        assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserAvatarEndpoints:
+    """
+    Tests for /api/users/{user_id}/avatar endpoints
+    """
+
+    def test_api__get_user_avatar__ok_200__nominal_case(
+        self, admin_user: User, web_testapp
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+    def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_avatar"] is False
+
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.avatar is not None
+        assert admin_user.cropped_avatar is not None
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_avatar"] is True
+
+    def test_api__set_user_avatar__err__no_file(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_avatar__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_avatar_preview__ok__nominal_case(
+        self, admin_user: User, web_testapp
+    ) -> None:
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+        image = create_png_test_image(500, 100)
+        web_testapp.put(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        ),
+
+        res = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/100x100/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 100, 100 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 100, 100 == new_image.size
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestUserCoverEndpoints:
+    """
+    Tests for /api/users/{user_id}/cover endpoints
+    """
+
+    def test_api__get_user_cover__ok_200__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name), status=200,
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == "image/png"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1000, 1000 == new_image.size
+
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+    def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is False
+        image = create_1000px_png_test_image()
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        )
+        transaction.commit()
+        assert admin_user.cover is not None
+        assert admin_user.cropped_cover is not None
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
+        assert res.json_body["has_cover"] is True
+
+    def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
+
+    def test_api__set_user_cover__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        image = create_1000px_png_test_image()
+        image.name = "test.ogg"  # we say the content we give is ogg.
+        res = web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
+
+    def test_api__get_user_cover_preview__ok__nominal_case(
+        self, admin_user: User, bob_user: User, web_testapp
+    ) -> None:
+        """
+        get 256x256 preview of a avatar
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(bob_user.user_id),
+            status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+
+        image = create_png_test_image(1500, 1500)
+        web_testapp.put(
+            "/api/users/{}/cover/raw/{}".format(bob_user.user_id, image.name),
+            upload_files=[("files", image.name, image.getvalue())],
+            status=204,
+        ),
+
+        res = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(bob_user.user_id, "image.jpg"),
+            status=200,
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 1300, 150 == new_image.size
+
+        res2 = web_testapp.get(
+            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"), status=200,
+        )
+        assert res2.body == res.body
+        assert res2.content_type == "image/jpeg"
+        new_image = Image.open(io.BytesIO(res2.body))
+        assert 1300, 150 == new_image.size

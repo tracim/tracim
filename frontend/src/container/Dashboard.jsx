@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -43,7 +43,10 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
-import { findUserRoleIdInWorkspace } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  findUserRoleIdInWorkspace
+} from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -220,21 +223,15 @@ export class Dashboard extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.curWs.label}
-        </Link>
-      ),
+      link: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.curWs.label
+      label: props.curWs.label,
+      isALink: true
     }, {
-      link: (
-        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
-          {props.t('Dashboard')}
-        </Link>
-      ),
+      link: '',
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Dashboard')
+      label: props.t('Dashboard'),
+      isALink: false
     }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
@@ -412,7 +409,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },
@@ -561,7 +558,7 @@ export class Dashboard extends React.Component {
                       className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                       onClick={this.handleClickOpenAdvancedDashboard}
                     >
-                      <i className='fa fa-fw fa-cog' />
+                      <i className='fas fa-fw fa-cog' />
                       {props.t('Open advanced Dashboard')}
                     </button>
                   )}
@@ -594,6 +591,7 @@ export class Dashboard extends React.Component {
                 <MemberList
                   customClass='dashboard__memberlist'
                   loggedUser={props.user}
+                  apiUrl={FETCH_CONFIG.apiUrl}
                   memberList={props.curWs.memberList}
                   roleList={ROLE_LIST}
                   searchedKnownMemberList={state.searchedKnownMemberList}

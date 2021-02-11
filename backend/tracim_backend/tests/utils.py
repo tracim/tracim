@@ -3,7 +3,6 @@ import importlib
 from io import BytesIO
 import multiprocessing
 import os
-import subprocess
 import sys
 import typing
 from typing import Any
@@ -299,27 +298,6 @@ class MessageHelper(object):
         return sorted(messages, key=lambda e: e.event_id)
 
 
-class DockerCompose:
-    command = [
-        "docker-compose",
-        "-f",
-        os.path.join(os.path.dirname(__file__), "..", "..", "docker-compose.yml"),
-    ]
-
-    def up(self, *names: str, env: dict = None) -> None:
-        self.execute("up", "-d", *names, env=env)
-
-    def down(self) -> None:
-        self.execute("down")
-
-    def execute(self, *arguments: str, env: dict = None) -> None:
-        if env:
-            env.update(os.environ)
-        subprocess.run(
-            self.command + list(arguments), env=env, check=True, stdout=subprocess.DEVNULL,
-        )
-
-
 class TracimTestContext(TracimContext):
     def __init__(
         self, app_config: CFG, session_factory, user: typing.Optional[User] = None,
@@ -392,8 +370,16 @@ def create_1000px_png_test_image() -> BytesIO:
     return file
 
 
+def create_png_test_image(width: int, height: int) -> BytesIO:
+    file = BytesIO()
+    image = Image.new("RGBA", size=(width, height), color=(255, 255, 255))
+    image.save(file, "png")
+    file.name = "test_image.png"
+    file.seek(0)
+    return file
+
+
 TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
-TEST_PUSHPIN_FILE_PATH = os.environ.get("TEST_PUSHPIN_FILE_PATH")
 
 
 @contextlib.contextmanager

@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
 
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  CUSTOM_EVENT,
   PAGE,
   PageTitle,
   TracimComponent
@@ -28,12 +28,20 @@ export class PersonalActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(props.handleTlm)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
     this.setHeadTitle()
     this.buildBreadcrumbs()
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   setHeadTitle = () => {
@@ -45,13 +53,12 @@ export class PersonalActivityFeed extends React.Component {
   buildBreadcrumbs = () => {
     const { props } = this
 
-    const breadcrumbsList = [
-      {
-        link: <Link to={PAGE.ACTIVITY_FEED}>{props.t('Activity feed')}</Link>,
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Activity feed')
-      }
-    ]
+    const breadcrumbsList = [{
+      link: PAGE.ACTIVITY_FEED,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Activity feed'),
+      isALink: false
+    }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
@@ -62,7 +69,7 @@ export class PersonalActivityFeed extends React.Component {
       <div className='personalActivityFeed'>
         <PageTitle
           title={props.t('Activity feed')}
-          icon='newspaper-o'
+          icon='far fa-newspaper'
           iconTooltip={props.t('Activity feed')}
           breadcrumbsList={props.breadcrumbs}
         />
@@ -95,4 +102,4 @@ const component = withActivity(
   resetUserActivity,
   setUserActivityEventList
 )
-export default connect(mapStateToProps)(withRouter(translate()(component)))
+export default connect(mapStateToProps)(translate()(component))

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -18,19 +17,21 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
+import { debug } from '../debug.js'
 import { getAgendaList } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {
     super(props)
 
+    const param = props.data || debug
+
     this.state = {
       appName: 'agenda',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: param.config,
+      loggedUser: param.loggedUser,
+      content: param.content,
       userWorkspaceList: [],
       userWorkspaceListLoaded: false,
       breadcrumbsList: [],
@@ -234,19 +235,22 @@ export class Agenda extends React.Component {
     const workspaceId = state.config.appConfig.workspaceId
     if (workspaceId) {
       breadcrumbsList.push({
-        link: <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>{state.content.workspaceLabel}</Link>,
+        link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-        label: state.content.workspaceLabel
+        label: state.content.workspaceLabel,
+        isALink: true
       }, {
-        link: <Link to={PAGE.WORKSPACE.AGENDA(workspaceId)}>{props.t('Agenda')}</Link>,
+        link: PAGE.WORKSPACE.AGENDA(workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Agenda')
+        label: props.t('Agenda'),
+        isALink: true
       })
     } else {
       breadcrumbsList.push({
-        link: <Link to={PAGE.AGENDA}>{props.t('All my agendas')}</Link>,
+        link: PAGE.AGENDA,
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('All my agendas')
+        label: props.t('All my agendas'),
+        isALink: true
       })
     }
 
@@ -319,7 +323,7 @@ export class Agenda extends React.Component {
         <PageTitle
           parentClass='agendaPage'
           title={pageTitle}
-          icon='calendar'
+          icon='fas fa-calendar-alt'
           breadcrumbsList={state.breadcrumbsList}
         />
 

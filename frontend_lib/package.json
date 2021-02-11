@@ -19,16 +19,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
-    "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/preset-env": "^7.9.5",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/register": "^7.9.0",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/plugin-transform-object-assign": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/register": "^7.12.10",
     "autolinker": "^3.13.0",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.2.2",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.6.4",
@@ -41,6 +41,7 @@
     "react-device-detect": "^1.7.5",
     "react-dropzone": "^7.0.1",
     "react-i18next": "7.4.0",
+    "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.2",
     "uuid": "^8.1.0"
   },
@@ -71,7 +72,7 @@
     "react-dom": "^16.13.1",
     "reactstrap": "^8.0.0",
     "sinon": "^7.4.1",
-    "standard": "^14.3.3",
+    "standard": "^14",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
@@ -79,7 +80,7 @@
     "url-loader": "^2.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.11.0"
   },
   "standard": {
     "globals": [
@@ -93,7 +94,11 @@
       "HTMLElement",
       "DOMParser",
       "globalThis",
-      "GLOBAL_primaryColor"
+      "GLOBAL_primaryColor",
+      "FormData",
+      "XMLHttpRequest",
+      "Image",
+      "FileReader"
     ],
     "parser": "babel-eslint",
     "ignore": []

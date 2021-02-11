@@ -6,12 +6,12 @@ const FileContent = props => {
   return (
     <div className='filecontent p-3'>
       <div className='filecontent__close d-flex justify-content-end'>
-        <i className='fa fa-times' />
+        <i className='fas fa-times' />
       </div>
 
       <div className='filecontent__contentname d-flex align-items-center mb-4'>
         <div className='filecontent__contentname__icon mr-3'>
-          <i className='fa fa-file-text-o' />
+          <i className='far fa-file-alt' />
         </div>
 
         <div className='filecontent__contentname__title'>
@@ -24,7 +24,7 @@ const FileContent = props => {
       <div className='filecontent__form mb-4' drop='true'>
         <div className='filecontent__form__icon d-flex justify-content-center'>
           <label htmlFor='filecontentUpload' type='file'>
-            <i className='fa fa-download' />
+            <i className='fas fa-download' />
           </label>
 
           <input type='file' className='d-none' id='filecontentUpload' />

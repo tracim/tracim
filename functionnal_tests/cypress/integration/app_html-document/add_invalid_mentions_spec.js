@@ -5,7 +5,7 @@ const noteContent = 'the mention @nothing is invalid'
 let noteId
 let workspaceId
 
-describe('At a note', function () {
+describe('In a note', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -34,7 +34,7 @@ describe('At a note', function () {
       cy.contains('.html-document__contentpage__textnote__mentions', '@nothing')
     })
 
-    it('should remain in edition mode if user clicks at "Edit" in the popup', () => {
+    it('should remain in edition mode if user clicks on "Edit" in the popup', () => {
       cy.waitForTinyMCELoaded()
         .then(() => cy.typeInTinyMCE(noteContent))
       cy.get('button.html-document__editionmode__submit.editionmode__button__submit')
@@ -47,7 +47,7 @@ describe('At a note', function () {
         .should('be.visible')
     })
 
-    it('should save the document if user clicks at "Validate anyway" in the popup', () => {
+    it('should save the document if user clicks on "Validate anyway" in the popup', () => {
       cy.waitForTinyMCELoaded()
         .then(() => cy.typeInTinyMCE(noteContent))
       cy.get('button.html-document__editionmode__submit.editionmode__button__submit')
@@ -60,7 +60,7 @@ describe('At a note', function () {
     })
   })
 
-  describe('an invalid mention in the comment at simple edition mode', () => {
+  describe('an invalid mention in the comment in simple edition mode', () => {
     it('should open a popup that contains this mention', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
@@ -71,7 +71,7 @@ describe('At a note', function () {
       cy.contains('.timeline__texteditor__mentions', '@nothing')
     })
 
-    it('should remain in edition mode if user clicks at "Edit" in the popup', () => {
+    it('should remain in edition mode if user clicks on "Edit" in the popup', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(noteContent)
@@ -84,7 +84,7 @@ describe('At a note', function () {
       cy.contains('.timeline__texteditor__textinput', noteContent)
     })
 
-    it('should save the document if user clicks at "Validate anyway" in the popup', () => {
+    it('should save the document if user clicks on "Validate anyway" in the popup', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(noteContent)
@@ -98,7 +98,8 @@ describe('At a note', function () {
     })
   })
 
-  describe('an invalid mention in the comment at advanced edition mode', () => {
+  describe.skip('an invalid mention in the comment in advanced edition mode', () => {
+    // RJ - 2020-12-28 - FIXME - See issue #3986
     it('should open a popup that contains this mention', () => {
       cy.get('.timeline__texteditor__advancedtext__btn')
         .should('be.visible')
@@ -111,7 +112,7 @@ describe('At a note', function () {
       cy.contains('.timeline__texteditor__mentions', '@nothing')
     })
 
-    it('should remain in edition mode if user clicks at "Edit" in the popup', () => {
+    it('should remain in edition mode if user clicks on "Edit" in the popup', () => {
       cy.get('.timeline__texteditor__advancedtext__btn')
         .should('be.visible')
         .click()
@@ -126,7 +127,7 @@ describe('At a note', function () {
       cy.contains('.timeline__texteditor__textinput', noteContent)
     })
 
-    it('should save the document if user clicks at "Validate anyway" in the popup', () => {
+    it('should save the document if user clicks on "Validate anyway" in the popup', () => {
       cy.get('.timeline__texteditor__advancedtext__btn')
         .should('be.visible')
         .click()

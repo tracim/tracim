@@ -80,6 +80,7 @@ describe('In activity.js module', () => {
     commentList: [],
     newestMessage: messageList[0]
   }
+
   const contentActivity = {
     id: 'content-42',
     contentPath: [],
@@ -90,6 +91,7 @@ describe('In activity.js module', () => {
     newestMessage: messageList[1],
     content: fileContent
   }
+
   const subscriptionActivity = {
     id: 'workspace_subscription-e4',
     entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION,
@@ -99,6 +101,8 @@ describe('In activity.js module', () => {
     newestMessage: messageList[2]
   }
 
+  const fixtureActivityList = [memberActivity, contentActivity, subscriptionActivity]
+
   describe('mergeWithActivityList() function', () => {
     it('should build an activity list', async () => {
       const mock = mockGetContentComments200(apiUrl, fileContent.workspace_id, fileContent.content_id, [])
@@ -106,7 +110,7 @@ describe('In activity.js module', () => {
       const resultActivityList = await mergeWithActivityList(messageList, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(mockContentPath.isDone()).to.equal(true)
-      expect(resultActivityList).to.be.deep.equal([memberActivity, contentActivity, subscriptionActivity])
+      expect(resultActivityList).to.be.deep.equal(fixtureActivityList)
     })
 
     it('should ignore comment messages which cannot retrieve their parent content', async () => {
@@ -157,17 +161,23 @@ describe('In activity.js module', () => {
         }
       }
     ]
+
     for (const testCase of messageTestCases) {
       const { message, expectedContentActivity } = testCase
       it(`should add the message in the right activity (${message.event_type})`, async () => {
         const resultActivityList = await addMessageToActivityList(
           message,
-          [memberActivity, contentActivity, subscriptionActivity],
+          fixtureActivityList,
           apiUrl
         )
         expect(resultActivityList).to.be.deep.equal([memberActivity, expectedContentActivity, subscriptionActivity])
       })
     }
+
+    it('should ignore messages with unhandled types', async () => {
+      const resultActivityList = await addMessageToActivityList({ event_type: '' }, fixtureActivityList, apiUrl)
+      expect(resultActivityList).to.be.deep.equal(fixtureActivityList)
+    })
 
     it('should create a new activity if the message is not part of any activity', async () => {
       const otherFileContent = { workspace_id: 54, content_id: 12 }
@@ -189,7 +199,7 @@ describe('In activity.js module', () => {
       }
       const resultActivityList = await addMessageToActivityList(
         message,
-        [memberActivity, contentActivity, subscriptionActivity],
+        fixtureActivityList,
         apiUrl
       )
       expect(mock.isDone()).to.equal(true)

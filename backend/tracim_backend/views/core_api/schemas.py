@@ -69,8 +69,11 @@ from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
+from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
+from tracim_backend.models.context_models import UserPicturePath
+from tracim_backend.models.context_models import UserPreviewPicturePath
 from tracim_backend.models.context_models import UserProfile
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
@@ -196,13 +199,11 @@ class UserDigestSchema(marshmallow.Schema):
     """
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
-    avatar_url = marshmallow.fields.Url(
-        allow_none=True,
-        example="/api/asset/avatars/john-doe.jpg",
-        description="avatar_url is the url of the image file. "
-        "If no avatar, then set it to an empty string "
-        "(frontend should interpret "
-        "an empty url as default avatar)",
+    has_avatar = marshmallow.fields.Bool(
+        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint",
+    )
+    has_cover = marshmallow.fields.Bool(
+        description="Does the user have a cover? cover need to be obtain with /cover endpoint",
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
@@ -294,6 +295,16 @@ class SetConfigSchema(marshmallow.Schema):
         'You can use "." to create a hierarchy in the configuration parameters. '
         "Valid values only allow primitive types: numbers, bool, null, and do not accept "
         "complex types such dictionaries or lists.",
+    )
+
+
+class SetCustomPropertiesSchema(marshmallow.Schema):
+    """
+    Change the user config
+    """
+
+    parameters = marshmallow.fields.Dict(
+        required=True, example={"param1": "value1"}, description="custom_properties schema",
     )
 
 
@@ -617,9 +628,21 @@ class FilenamePathSchema(marshmallow.Schema):
     filename = StrippedString("filename.ext")
 
 
+class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPicturePath(**data)
+
+
 class WidthAndHeightPathSchema(marshmallow.Schema):
     width = marshmallow.fields.Int(example=256)
     height = marshmallow.fields.Int(example=256)
+
+
+class UserPreviewPicturePathSchema(UserPicturePathSchema, WidthAndHeightPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserPreviewPicturePath(**data)
 
 
 class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
@@ -1081,8 +1104,8 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         "(the route must be ready-to-use)",
     )
     fa_icon = StrippedString(
-        example="file-text-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon",
+        example="far fa-file-alt",
+        description="CSS class of the icon. Example: far fa-file-alt for using Fontawesome far fa-file-alt icon",
     )
     hexcolor = StrippedString(example="#F0F9DC", description="Hexadecimal color of the entry.")
 
@@ -1141,6 +1164,18 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 class UserConfigSchema(marshmallow.Schema):
     parameters = marshmallow.fields.Dict(
         description="parameters present in the user's configuration."
+    )
+
+
+class UserCustomPropertiesSchema(marshmallow.Schema):
+    json_schema = marshmallow.fields.Dict(
+        description="json schema used for user custom properties", required=True, allow_none=False
+    )
+
+
+class UserCustomPropertiesUiSchema(marshmallow.Schema):
+    ui_schema = marshmallow.fields.Dict(
+        description="ui schema used for user custom properties", required=True, allow_none=False,
     )
 
 
@@ -1230,8 +1265,8 @@ class ApplicationSchema(marshmallow.Schema):
     label = StrippedString(example="Agenda")
     slug = StrippedString(example="agenda")
     fa_icon = StrippedString(
-        example="file-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
+        example="far fa-file",
+        description="CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
     )
     hexcolor = StrippedString(
         example="#FF0000",
@@ -1265,8 +1300,8 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = StrippedString(example="pagehtml", validate=all_content_types_validator)
     fa_icon = StrippedString(
-        example="fa-file-text-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
+        example="far fa-file-alt",
+        description="CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
     )
     hexcolor = StrippedString(
         example="#FF0000",
@@ -1584,12 +1619,15 @@ class LiveMessageSchema(marshmallow.Schema):
     )
 
 
-class LiveMessageSchemaPage(marshmallow.Schema):
+class BasePaginatedSchemaPage(marshmallow.Schema):
     previous_page_token = marshmallow.fields.String()
     next_page_token = marshmallow.fields.String()
     has_next = marshmallow.fields.Bool()
     has_previous = marshmallow.fields.Bool()
     per_page = marshmallow.fields.Int()
+
+
+class LiveMessageSchemaPage(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(LiveMessageSchema, many=True)
 
 
@@ -1597,8 +1635,8 @@ class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
 
 
-class GetLiveMessageQuerySchema(marshmallow.Schema):
-    """Possible query parameters for the GET messages endpoint."""
+class BasePaginatedQuerySchema(marshmallow.Schema):
+    """Base query parameters for a paginated query"""
 
     count = marshmallow.fields.Int(
         example=10,
@@ -1611,6 +1649,11 @@ class GetLiveMessageQuerySchema(marshmallow.Schema):
         description="token of the page wanted, if not provided get first" "elements",
         validate=page_token_validator,
     )
+
+
+class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
+    """Possible query parameters for the GET messages endpoint."""
+
     read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
@@ -1712,3 +1755,66 @@ class WorkspaceSubscriptionSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="evaluation date", allow_none=True
     )
     evaluator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+
+
+class UserIdSchema(marshmallow.Schema):
+    """
+    Simple user id schema
+    """
+
+    user_id = marshmallow.fields.Int(example=3, required=True)
+
+
+class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
+    """Possible query parameters for the GET following and followers endpoint."""
+
+    user_id = marshmallow.fields.Int(
+        example=42, validate=strictly_positive_int_validator, allow_none=True, default=None
+    )
+
+    @post_load
+    def user_follow_query(self, data: typing.Dict[str, typing.Any]) -> UserFollowQuery:
+        return UserFollowQuery(**data)
+
+
+class FollowedUsersSchemaPage(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(UserIdSchema, many=True)
+
+
+class DeleteFollowedUserPathSchema(UserIdPathSchema):
+    leader_id = marshmallow.fields.Int(
+        example=4,
+        required=True,
+        description="id of a valid user",
+        validate=strictly_positive_int_validator,
+    )
+
+
+class AboutUserSchema(UserDigestSchema):
+    followers_count = marshmallow.fields.Int(
+        example=42,
+        required=True,
+        description="count of users following this user",
+        validate=positive_int_validator,
+    )
+    leaders_count = marshmallow.fields.Int(
+        example=42,
+        required=True,
+        description="count of users followed by this user",
+        validate=positive_int_validator,
+    )
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="User registration date"
+    )
+    authored_content_revisions_count = marshmallow.fields.Int(
+        example=23,
+        required=True,
+        description="count of revisions whose author is this user",
+        validate=positive_int_validator,
+    )
+    authored_content_revisions_space_count = marshmallow.fields.Int(
+        example=12,
+        required=True,
+        description="count of spaces where this user authored at least one content revision",
+        validate=positive_int_validator,
+    )

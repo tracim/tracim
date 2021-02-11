@@ -9,7 +9,7 @@ require('./AdminLink.styl')
 const AdminLink = props => {
   return (
     <DropdownMenu
-      buttonIcon='fa-cog'
+      buttonIcon='fas fa-cog'
       buttonLabel={props.t('Administration')}
       buttonCustomClass='adminlink__btn outlineTextBtn nohover'
       buttonDataCy='adminlink__dropdown__btn'
@@ -20,7 +20,7 @@ const AdminLink = props => {
         data-cy='adminlink__workspace__link'
         key='adminlink__workspace__link'
       >
-        <i className={`fa fa-fw fa-${workspaceConfig.faIcon}`} />
+        <i className={`fa-fw ${workspaceConfig.faIcon}`} />
         {props.t('Spaces')}
       </Link>
 
@@ -29,7 +29,7 @@ const AdminLink = props => {
         data-cy='adminlink__user__link'
         key='adminlink__user__link'
       >
-        <i className='fa fa-fw fa-user-o' />
+        <i className='far fa-fw fa-user' />
         {props.t('Users')}
       </Link>
     </DropdownMenu>

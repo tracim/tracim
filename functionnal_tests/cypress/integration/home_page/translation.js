@@ -4,6 +4,7 @@ describe('content :: home_page', function () {
   it('should have translations when no workspace is present', () => {
     cy.resetDB()
     cy.loginAs('administrators')
+    cy.createRandomUser('administrators').then(user => cy.login(user))
     cy.visitPage({ pageName: PAGES.HOME })
 
     cy.get('#content').contains('Create a space')
@@ -18,7 +19,8 @@ describe('content :: home_page', function () {
   it('should have translations', () => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('users')
+    cy.loginAs('administrators')
+    cy.createRandomUser().then(user => cy.login(user))
     cy.visitPage({ pageName: PAGES.HOME })
 
     cy.get('#content').contains('Welcome to Tracim')

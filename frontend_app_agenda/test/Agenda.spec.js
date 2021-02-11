@@ -3,7 +3,7 @@ import { shallow } from 'enzyme'
 import { expect } from 'chai'
 import { Agenda } from '../src/container/Agenda.jsx'
 import { user, workspace } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
-import { debug } from '../src/helper.js'
+import { debug } from '../src/debug.js'
 import {
   mockGetAgendaList200,
   mockGetWorkspaceDetail200,
@@ -11,13 +11,6 @@ import {
 } from './apiMock.js'
 
 describe('<Agenda />', () => {
-  const props = {
-    i18n: {},
-    registerLiveMessageHandlerList: () => { },
-    registerCustomEventHandlerList: () => { },
-    t: key => key
-  }
-
   const userWorkspaceList = [{
     workspace_id: workspace.workspace_id,
     with_credentials: true,
@@ -25,11 +18,27 @@ describe('<Agenda />', () => {
     agenda_type: 'workspace'
   }]
 
-  mockGetAgendaList200(debug.config.apiUrl, workspace.workspace_id, userWorkspaceList)
-  mockGetWorkspaceDetail200(debug.config.apiUrl, workspace.workspace_id, workspace)
-  mockGetWorkspaceMemberList200(debug.config.apiUrl, workspace.workspace_id, [user])
+  const props = {
+    ...debug,
+    config: {
+      ...debug.config,
+      apiUrl: 'http://localhost'
+    }
+  }
 
-  const wrapper = shallow(<Agenda {...props} />)
+  mockGetAgendaList200(props.config.apiUrl, workspace.workspace_id, userWorkspaceList)
+  mockGetWorkspaceDetail200(props.config.apiUrl, workspace.workspace_id, workspace)
+  mockGetWorkspaceMemberList200(props.config.apiUrl, workspace.workspace_id, [user])
+
+  const wrapper = shallow(
+    <Agenda
+      i18n={{}}
+      registerLiveMessageHandlerList={() => { }}
+      registerCustomEventHandlerList={() => { }}
+      t={key => key}
+      data={props}
+    />
+  )
 
   describe('TLM Handlers', () => {
     describe('eventType user', () => {

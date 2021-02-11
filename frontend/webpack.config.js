@@ -35,7 +35,7 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'eval-cheap-mobule-source-map ',
+  devtool: isProduction ? false : 'eval-cheap-module-source-map',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
     fs: 'empty'
   },
@@ -54,7 +54,7 @@ module.exports = {
       loader: 'babel-loader',
       options: {
         presets: [
-          ['@babel/preset-env', { targets: { firefox: 83, chrome: 86 }  } ],
+          '@babel/preset-env',
           '@babel/preset-react'
         ],
         plugins: [

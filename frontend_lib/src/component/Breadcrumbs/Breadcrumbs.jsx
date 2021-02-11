@@ -1,5 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
+
+require('./Breadcrumbs.styl')
 
 export const Breadcrumbs = props => {
   const MAX_NUMBER_OF_LEVELS = 6
@@ -10,9 +13,10 @@ export const Breadcrumbs = props => {
     breadcrumbsList = [
       props.breadcrumbsList[0],
       {
-        label: props.breadcrumbsList.map(crumb => crumb.label).join(' > '),
-        link: <span>…</span>,
-        notALink: true
+        label: '…',
+        htmlTitle: props.breadcrumbsList.map(crumb => crumb.label).join(' > '),
+        link: '',
+        isALink: false
       },
       ...props.breadcrumbsList.slice(Math.max(props.breadcrumbsList.length - LAST_VISIBLE_LEVELS, 0))
     ]
@@ -22,21 +26,46 @@ export const Breadcrumbs = props => {
   if (!props.keepLastBreadcrumbAsLink && breadcrumbsList.length > 0) {
     const lastBreadcrumb = {
       ...breadcrumbsList[breadcrumbsList.length - 1],
-      link: <span>{breadcrumbsList[breadcrumbsList.length - 1].label}</span>,
-      notALink: true
+      link: '',
+      isALink: false
     }
     breadcrumbsList[breadcrumbsList.length - 1] = lastBreadcrumb
   }
+
   return (
     <ul className='breadcrumbs'>
-      {props.root && <li key='root'>{props.root}</li>}
+      {props.root && (props.root.isALink
+        ? (
+          <li key='root'>
+            <Link
+              to={props.root.link}
+              className='breadcrumbs__item root primaryColorFont primaryColorFontDarkenHover'
+            >
+              {props.root.icon && <i className={`${props.root.icon}`} />}
+              <span className='breadcrumbs__item__text'>{props.root.label}</span>
+            </Link>
+          </li>
+        )
+        : (
+          <li>
+            <span>
+              {props.root.icon && <i className={`fas fa-${props.root.icon}`} />}
+              {props.root.label}
+            </span>
+          </li>
+        )
+      )}
+
       {breadcrumbsList.map((crumb, i) =>
         <li
-          className={`breadcrumbs__item ${crumb.notALink ? '' : 'primaryColorFont primaryColorFontDarkenHover'}`}
+          className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
           key={`breadcrumbs_${i}`}
-          title={crumb.label || ''}
+          title={crumb.htmlTitle || crumb.label || ''}
         >
-          {crumb.link}
+          {(crumb.isALink
+            ? <Link to={crumb.link}>{crumb.label}</Link>
+            : <span>{crumb.label}</span>
+          )}
         </li>
       )}
     </ul>
@@ -46,7 +75,7 @@ export const Breadcrumbs = props => {
 export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
-  root: PropTypes.node,
+  root: PropTypes.object,
   breadcrumbsList: PropTypes.array.isRequired,
   keepLastBreadcrumbAsLink: PropTypes.bool
 }

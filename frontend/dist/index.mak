@@ -10,7 +10,9 @@
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="manifest" href="/assets/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
-    <link rel="stylesheet" type="text/css" href="/assets/font/font-awesome-4.7.0/css/font-awesome.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
 
     <style nonce="${csp_nonce}">
@@ -114,11 +116,14 @@
     <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/themes/modern/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+
     % for plugin in glob("assets/tinymce-4.7.13/js/tinymce/plugins/*/plugin.min.js"):
     <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
+
     % for lang in glob("assets/tinymce-4.7.13/js/tinymce/langs/*.js"):
     <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
+
   </body>
 </html>

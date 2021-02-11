@@ -105,7 +105,7 @@ class DownloadForm extends React.Component {
                 className='guestdownload__card__form__groupepw__question'
                 id='popoverPasswordInfo'
               >
-                <i className='fa fa-fw fa-question-circle' />
+                <i className='fas fa-fw fa-question-circle' />
               </button>
 
               <Popover

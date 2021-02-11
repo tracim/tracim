@@ -146,18 +146,12 @@ class EventApi:
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
-            query = query.filter(
-                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
-            )
+            query = query.filter(Event.workspace["workspace_id"].as_integer().in_(workspace_ids))
         if related_to_content_ids:
             query = query.filter(
                 or_(
-                    Event.fields[Event.CONTENT_FIELD]["content_id"]
-                    .as_integer()
-                    .in_(related_to_content_ids),
-                    Event.fields[Event.CONTENT_FIELD]["parent_id"]
-                    .as_integer()
-                    .in_(related_to_content_ids),
+                    Event.content["content_id"].as_integer().in_(related_to_content_ids),
+                    Event.content["parent_id"].as_integer().in_(related_to_content_ids),
                 )
             )
         if not include_not_sent:
@@ -202,15 +196,15 @@ class EventApi:
         if exclude_author_ids:
             for author_id in exclude_author_ids:
                 # RJ & SG - 2020-09-11 - HACK
-                # We wanted to use Event.fields["author"] == JSON.NULL instead of this
+                # We wanted to use Event.author == JSON.NULL instead of this
                 # soup involving a cast and a get out of my way text("'null'") to
                 # know whether a JSON field is null. However, this does not work on
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
                 query = query.filter(
                     or_(
-                        cast(Event.fields["author"], String) == text("'null'"),
-                        Event.fields["author"]["user_id"].as_integer() != author_id,
+                        cast(Event.author, String) == text("'null'"),
+                        Event.author["user_id"].as_integer() != author_id,
                     )
                 )
 
@@ -350,7 +344,7 @@ class EventApi:
             Message.receiver_id == user_id
         )
         workspace_event_ids_query = session.query(Event.event_id).filter(
-            Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+            Event.workspace["workspace_id"].as_integer().in_(workspace_ids)
         )
         if max_messages_count >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
@@ -367,9 +361,17 @@ class EventApi:
         )
         messages = []
         for event in event_query:
-            receiver_ids = BaseLiveMessageBuilder._get_receiver_ids_callables[event.entity_type](
-                event, session, self._config
-            )
+            try:
+                receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
+            except KeyError as exc:
+                # NOTE - 2021-02-03 - S.G.
+                # Safeguard easy mistakes due to changing JSON structure of fields
+                msg = (
+                    "Event {} is missing key '{}' in one of its fields, "
+                    "ignoring it during historic messages creation"
+                ).format(event.event_id, exc)
+                logger.warning(self, msg)
+                receiver_ids = []
             if user_id in receiver_ids:
                 messages.append(
                     Message(
@@ -748,7 +750,13 @@ def _get_workspace_event_receiver_ids(
 ) -> Set[int]:
     # Two cases: if workspace is accessible every user should get a message
     # If not, only administrators + members + user subject of the action (for user role events)
-    if WorkspaceAccessType(event.workspace["access_type"]) in Workspace.ACCESSIBLE_TYPES:
+    try:
+        access_type = WorkspaceAccessType(event.workspace["access_type"])
+    except KeyError:
+        # NOTE 2021/01/10 - S.G
+        # Spaces without access_type are necessarily CONFIDENTIAL
+        access_type = WorkspaceAccessType.CONFIDENTIAL
+    if access_type in Workspace.ACCESSIBLE_TYPES:
         user_api = UserApi(current_user=None, session=session, config=config)
         receiver_ids = set(user.user_id for user in user_api.get_all())
     else:
@@ -801,6 +809,15 @@ class BaseLiveMessageBuilder(abc.ABC):
         """Register a function used to get receiver user ids for a given entity type."""
         cls._get_receiver_ids_callables[entity_type] = get_receiver_ids_callable
 
+    @classmethod
+    def get_receiver_ids(cls, event: Event, session: Session, config: CFG) -> Iterable[int]:
+        """Get the list of user ids that should recieve the given event."""
+        try:
+            get_receiver_ids = cls._get_receiver_ids_callables[event.entity_type]
+        except KeyError:
+            raise ValueError("Unknown entity type {}".format(event.entity_type))
+        return get_receiver_ids(event, session, config)
+
     @contextlib.contextmanager
     @abc.abstractmethod
     def context(self) -> Generator[TracimContext, None, None]:
@@ -814,7 +831,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            receiver_ids = self._get_receiver_ids(event, session)
+            receiver_ids = self.get_receiver_ids(event, session, self._config)
 
             messages = [
                 Message(
@@ -829,13 +846,6 @@ class BaseLiveMessageBuilder(abc.ABC):
             live_message_lib = LiveMessagesLib(self._config)
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
-
-    def _get_receiver_ids(self, event: Event, session: Session) -> Iterable[int]:
-        try:
-            get_receiver_ids = self._get_receiver_ids_callables[event.entity_type]
-            return get_receiver_ids(event, session, self._config)
-        except KeyError:
-            raise ValueError("Unknown entity type {}".format(event.entity_type))
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):

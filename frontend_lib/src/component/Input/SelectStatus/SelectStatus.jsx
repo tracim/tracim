@@ -23,7 +23,7 @@ export const SelectStatus = props => {
             </span>
 
             <div className='selectStatus__dropdownbtn__icon'>
-              <i className={`fa fa-${props.selectedStatus ? props.selectedStatus.faIcon : ''}`} />
+              <i className={`${props.selectedStatus ? props.selectedStatus.faIcon : ''}`} />
             </div>
           </span>
         }
@@ -41,7 +41,7 @@ export const SelectStatus = props => {
           >
             {props.t(s.label)}
             <i
-              className={`fa fa-fw fa-${s.faIcon}`}
+              className={`fa-fw ${s.faIcon}`}
               style={{ color: s.hexcolor }}
             />
           </button>

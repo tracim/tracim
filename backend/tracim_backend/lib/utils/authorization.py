@@ -10,12 +10,15 @@ from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import AllUsersAreNotKnown
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
@@ -69,7 +72,7 @@ class AuthorizationChecker(ABC):
         pass
 
 
-class SameUserChecker(AuthorizationChecker):
+class CandidateIsCurrentUserChecker(AuthorizationChecker):
     """
     Check if candidate_user is same as current_user
     """
@@ -185,7 +188,7 @@ class ContentTypeCreationChecker(AuthorizationChecker):
     """
 
     def __init__(
-        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None
+        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None,
     ):
         """
         :param content_type_slug: force to check a content_type, if not provided,
@@ -218,8 +221,8 @@ class CommentOwnerChecker(AuthorizationChecker):
         if tracim_context.current_comment.owner.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
-            "user {} is not owner of comment  {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_comment.content_id
+            "user {} is not owner of comment {}".format(
+                tracim_context.current_user.user_id, tracim_context.current_comment.content_id,
             )
         )
 
@@ -260,6 +263,33 @@ class AndAuthorizationChecker(AuthorizationChecker):
         return True
 
 
+class AllUsersAreKnownChecker(AuthorizationChecker):
+    """
+    Check that KNOWN_MEMBERS__FILTER is False
+    """
+
+    def check(self, tracim_context: TracimContext):
+        if tracim_context.app_config.KNOWN_MEMBERS__FILTER:
+            raise AllUsersAreNotKnown()
+        return True
+
+
+class OneCommonWorkspaceUserChecker(AuthorizationChecker):
+    """
+    Check that the current user has a common space with the candidate user.
+    """
+
+    def check(self, tracim_context: TracimContext) -> bool:
+        role_api = RoleApi(
+            tracim_context.dbsession, tracim_context.current_user, tracim_context.app_config,
+        )
+        if not role_api.get_common_workspace_ids(tracim_context.candidate_user.user_id):
+            raise UserDoesNotExist(
+                "User {} not found or not known".format(tracim_context.candidate_user.user_id)
+            )
+        return True
+
+
 # Useful Authorization Checker
 # profile
 is_administrator = ProfileChecker(Profile.ADMIN)
@@ -273,7 +303,22 @@ is_current_content_reader = CurrentContentRoleChecker(WorkspaceRoles.READER.leve
 is_current_content_contributor = CurrentContentRoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
-has_personal_access = OrAuthorizationChecker(SameUserChecker(), is_administrator)
+has_personal_access = OrAuthorizationChecker(CandidateIsCurrentUserChecker(), is_administrator)
+# knows candidate user
+# INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
+# with UserApi.get_known_users method.
+# A user "knows" another when either of the following condition is true:
+#  - KNOWN_MEMBERS__FILTER is False
+#  - the user ids are the same (captain obvious inside)
+#  - User is trusted-user (or more)
+#  - current and candidate user are member of at least one common space
+knows_candidate_user = OrAuthorizationChecker(
+    AllUsersAreKnownChecker(),
+    CandidateIsCurrentUserChecker(),
+    is_trusted_user,
+    OneCommonWorkspaceUserChecker(),
+)
+
 # workspace
 can_see_workspace_information = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_reader, is_user)
@@ -281,13 +326,13 @@ can_see_workspace_information = OrAuthorizationChecker(
 can_modify_workspace = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_workspace_manager, is_user)
 )
-can_leave_workspace = OrAuthorizationChecker(SameUserChecker(), can_modify_workspace)
+can_leave_workspace = OrAuthorizationChecker(CandidateIsCurrentUserChecker(), can_modify_workspace)
 can_delete_workspace = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
 )
 # content
 can_move_content = AndAuthorizationChecker(
-    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level),
 )
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments

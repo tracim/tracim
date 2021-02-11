@@ -5,7 +5,7 @@ const commentContent = 'the mention @nothing is invalid'
 let threadId
 let workspaceId
 
-describe('At a thread', function () {
+describe('In a thread', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -24,7 +24,7 @@ describe('At a thread', function () {
     })
   })
 
-  describe('an invalid mention in the comment at simple edition mode', () => {
+  describe('an invalid mention in the comment in simple edition mode', () => {
     it('should open a popup that contains this mention', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
@@ -35,7 +35,7 @@ describe('At a thread', function () {
       cy.contains('.timeline__texteditor__mentions', '@nothing')
     })
 
-    it('should remain in edition mode if user clicks at "Edit" in the popup', () => {
+    it('should remain in edition mode if user clicks on "Edit" in the popup', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(commentContent)
@@ -48,7 +48,7 @@ describe('At a thread', function () {
       cy.contains('.timeline__texteditor__textinput', commentContent)
     })
 
-    it('should save the document if user clicks at "Validate anyway" in the popup', () => {
+    it('should save the document if user clicks on "Validate anyway" in the popup', () => {
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(commentContent)
@@ -62,7 +62,8 @@ describe('At a thread', function () {
     })
   })
 
-  describe('an invalid mention in the comment at advanced edition mode', () => {
+  describe.skip('an invalid mention in the comment in advanced edition mode', () => {
+    // RJ - 2020-12-28 - FIXME - See issue #3986
     it('should open a popup that contains this mention', () => {
       cy.get('.timeline__texteditor__advancedtext__btn')
         .should('be.visible')

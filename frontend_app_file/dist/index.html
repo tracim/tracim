@@ -6,7 +6,9 @@
   <title>File App Tracim</title>
   <link rel='shortcut icon' href='favicon.ico'>
 
-  <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/all.css'>
+  <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/regular.css'>
+
   <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
 
   <style>
@@ -119,17 +121,20 @@
 
   <div id='content'></div>
 
-  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>
-  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>
-
-  <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
-  <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
+  <!--
+  INFO - CH - 2021-01-14
+  since servdev uses standalone frontend_lib build, you should not include frontend_lib directly in the page
+  it is already in the bundles
+  same for frontend_vendor
+  -->
+<!--  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>-->
+<!--  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>-->
 
   <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
 
-  <script src='./file.app.dev.js'></script>
+  <script src='./file.app.standalone.js'></script>
 
-  <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
-  <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
+  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
+  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
 </body>
 </html>

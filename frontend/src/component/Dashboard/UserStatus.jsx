@@ -15,7 +15,7 @@ export const UserStatus = props => {
 
       <div className='userstatus__role'>
         <div className='userstatus__role__icon'>
-          <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
+          <i className={`fa-fw ${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
         </div>
 
         <div
@@ -33,7 +33,7 @@ export const UserStatus = props => {
           onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
         >
           <div className='userstatus__notification__icon'>
-            <i className={`fa fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
+            <i className={`far fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}`} />
           </div>
 
           <div

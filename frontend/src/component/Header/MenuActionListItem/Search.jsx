@@ -20,7 +20,7 @@ const Search = props => {
           id='headerInputSearch'
           onClick={props.onClickSubmit}
         >
-          <i className='fa fa-search' />
+          <i className='fas fa-search' />
         </button>
       </div>
     </li>

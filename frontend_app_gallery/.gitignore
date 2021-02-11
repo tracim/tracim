@@ -2,6 +2,6 @@
 .idea/
 .git/
 dist/gallery.app.js
-dist/gallery.bundle.app.js
+dist/gallery.app.standalone.js
 node_modules/
 src/debug.js

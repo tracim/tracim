@@ -1,7 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
+import { translate } from 'react-i18next'
 
-// require('./Avatar.styl') // see https://github.com/tracim/tracim/issues/1156
+import { getAvatarBaseUrl } from '../../helper.js'
+
+require('./Avatar.styl')
 const color = require('color')
 
 export const AVATAR_SIZE = {
@@ -20,12 +24,14 @@ export class Avatar extends React.Component {
   }
 
   generateColorFromName = publicName => {
+    // INFO - G.B. - 20210112 - The default value is "lightGrey" at frontend_lib/css/Variable.styl
+    if (!publicName || publicName.length === 0) return '#f0f0f0'
     // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
     const str = this.intToRGB(this.stringToHashCode(publicName))
     return color('#' + str).desaturate(0.90).hex()
   }
 
-  getTwoLetter = name => {
+  getTwoLetters = name => {
     const trimedName = name.trim()
     const splitSpace = trimedName.split(' ')
     if (splitSpace.length >= 2) return `${splitSpace[0].substr(0, 1)}${splitSpace[1].substr(0, 1)}`
@@ -42,23 +48,39 @@ export class Avatar extends React.Component {
   render () {
     const { props } = this
 
-    const generatedColor = this.generateColorFromName(props.publicName)
+    const publicName = props.user.publicName || props.user.public_name
+    const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
+    const filenameInUrl = props.user.profileAvatarName || 'avatar'
+    const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
+    const sizeAsNumber = parseInt(props.size.replace('px', ''))
+    const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id || props.user.id)
+
+    const generatedColor = this.generateColorFromName(publicName)
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2
 
     return (
-      <div className='avatar-wrapper' style={{ ...props.style }} title={props.publicName}>
+      <div
+        className={classnames('avatar-wrapper', props.customClass)}
+        style={{ ...props.style }}
+        title={publicName || props.t('Unknown')}
+      >
         <div
           className='avatar'
           data-cy='avatar'
           style={{
             width: props.size,
             height: props.size,
-            borderRadius: props.size,
             backgroundColor: generatedColor,
             fontSize: fontSize
           }}
         >
-          {this.getTwoLetter(props.publicName.toUpperCase())}
+          {hasAvatar ? (
+            <img
+              className='avatar__img'
+              src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
+              alt={props.t('Avatar of {{publicName}}', { publicName })}
+            />
+          ) : <span>{letterAvatar}</span>}
         </div>
       </div>
     )
@@ -66,14 +88,18 @@ export class Avatar extends React.Component {
 }
 
 Avatar.propTypes = {
-  publicName: PropTypes.string.isRequired,
+  user: PropTypes.object,
+  apiUrl: PropTypes.string.isRequired,
+  customClass: PropTypes.string,
   size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
   style: PropTypes.object
 }
 
 Avatar.defaultProps = {
+  customClass: '',
+  user: { publicName: '' },
   size: AVATAR_SIZE.MEDIUM,
   style: {}
 }
 
-export default Avatar
+export default translate()(Avatar)

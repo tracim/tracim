@@ -3,38 +3,88 @@
 <head>
   <meta charset='utf-8' />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <title>Workspace Advanced App Tracim</title>
+  <title>Advanced Space App Tracim</title>
   <link rel='shortcut icon' href='favicon.ico'>
 
-  <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
+  <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/all.css'>
+  <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/regular.css'>
+
   <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
 
   <style>
-    .primaryColorFont { color: #7d4e24; }
-    .primaryColorFontDarken { color: #522c00; }
-    .primaryColorFontLighten { color: #a37346; }
+    .primaryColorFont {
+      color: #7d4e24;
+    }
 
-    .primaryColorFontHover:hover { color: #7d4e24; }
-    .primaryColorFontDarkenHover:hover { color: #522c00; }
-    .primaryColorFontLightenHover:hover { color: #a37346; }
+    .primaryColorFontDarken {
+      color: #522c00;
+    }
+
+    .primaryColorFontLighten {
+      color: #a37346;
+    }
+
+    .primaryColorFontHover:hover {
+      color: #7d4e24;
+    }
+
+    .primaryColorFontDarkenHover:hover {
+      color: #522c00;
+    }
+
+    .primaryColorFontLightenHover:hover {
+      color: #a37346;
+    }
 
 
-    .primaryColorBg { background-color: #7d4e24; }
-    .primaryColorBgDarken { background-color: #522c00; }
-    .primaryColorBgLighten { background-color: #a37346; }
+    .primaryColorBg {
+      background-color: #7d4e24;
+    }
 
-    .primaryColorBgHover:hover { background-color: #7d4e24; }
-    .primaryColorBgDarkenHover:hover { background-color: #522c00; }
-    .primaryColorBgLightenHover:hover { background-color: #a37346; }
+    .primaryColorBgDarken {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLighten {
+      background-color: #a37346;
+    }
+
+    .primaryColorBgHover:hover {
+      background-color: #7d4e24;
+    }
+
+    .primaryColorBgDarkenHover:hover {
+      background-color: #522c00;
+    }
+
+    .primaryColorBgLightenHover:hover {
+      background-color: #a37346;
+    }
 
 
-    .primaryColorBorder { border-color: #7d4e24; }
-    .primaryColorBorderDarken { border-color: #522c00; }
-    .primaryColorBorderLighten { border-color: #a37346; }
+    .primaryColorBorder {
+      border-color: #7d4e24;
+    }
 
-    .primaryColorBorderHover:hover { border-color: #7d4e24; }
-    .primaryColorBorderDarkenHover:hover { border-color: #522c00; }
-    .primaryColorBorderLightenHover:hover { border-color: #a37346; }
+    .primaryColorBorderDarken {
+      border-color: #522c00;
+    }
+
+    .primaryColorBorderLighten {
+      border-color: #a37346;
+    }
+
+    .primaryColorBorderHover:hover {
+      border-color: #7d4e24;
+    }
+
+    .primaryColorBorderDarkenHover:hover {
+      border-color: #522c00;
+    }
+
+    .primaryColorBorderLightenHover:hover {
+      border-color: #a37346;
+    }
   </style>
 
   <style>
@@ -42,6 +92,7 @@
       font-family: 'Quicksand';
       src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
     }
+
     @font-face {
       font-family: 'Quicksand';
       src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
@@ -55,20 +106,35 @@
 
   <script type='text/javascript'>
     GLOBAL_primaryColor = '#7d4e24'
-    GLOBAL_dispatchEvent = () => {}
+    GLOBAL_dispatchEvent = () => { }
+    tinymce = {
+      remove: () => { }
+    }
+    wysiwyg = () => { }
   </script>
 </head>
+
 <body>
-<script src="./assets/bootstrap/jquery-3.2.1.js"></script>
-<script src="./assets/bootstrap/popper-1.12.3.js"></script>
-<script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+  <script src="./assets/bootstrap/jquery-3.2.1.js"></script>
+  <script src="./assets/bootstrap/popper-1.12.3.js"></script>
+  <script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
 
-<div id='content'></div>
+  <div id='content'></div>
 
-<script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>
-<script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>
-<script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+  <!--
+  INFO - CH - 2021-01-14
+  since servdev uses standalone frontend_lib build, you should not include frontend_lib directly in the page
+  it is already in the bundles
+  same for frontend_vendor
+  -->
+  <!--  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>-->
+  <!--  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>-->
 
-<script src='./workspace_advanced.app.dev.js'></script>
+  <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+
+  <script src='./workspace_advanced.app.standalone.js'></script>
+
+  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
+  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
 </body>
 </html>

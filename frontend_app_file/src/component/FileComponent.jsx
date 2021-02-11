@@ -3,11 +3,11 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
-import PopupProgressUpload from './PopupProgressUpload.jsx'
 import {
   APP_FEATURE_MODE,
   PromptMessage,
-  FileDropzone
+  FileDropzone,
+  PopupProgressUpload
 } from 'tracim_frontend_lib'
 
 const color = require('color')
@@ -49,7 +49,7 @@ export class FileComponent extends React.Component {
           <br />
           ${this.props.t('In that case, you can download the video and try opening it manually.')}
           <br />
-          ${this.props.t('To download the video, leave the fullscreen mode and click on download button {{icon}}.', { icon: '<i class="fa fa-download"></i>', interpolation: { escapeValue: false } })}
+          ${this.props.t('To download the video, leave the fullscreen mode and click on download button {{icon}}.', { icon: '<i class="fas fa-download"></i>', interpolation: { escapeValue: false } })}
         </div>
       `
       videoWrapper.appendChild(warningMsg)
@@ -88,8 +88,8 @@ export class FileComponent extends React.Component {
               </span>
             }
             btnType='link'
-            icon='hand-o-right'
-            btnLabel={<i className='fa fa-times' />}
+            icon='far fa-hand-point-right'
+            btnLabel={<i className='fas fa-times' />}
             onClickBtn={props.onClickCloseNotifyAllMessage}
           />
         )}
@@ -108,7 +108,7 @@ export class FileComponent extends React.Component {
           <PromptMessage
             msg={props.t('This content is deleted')}
             btnType='button'
-            icon='trash'
+            icon='far fa-trash-alt'
             btnLabel={props.t('Restore')}
             onClickBtn={props.onClickRestoreDeleted}
           />

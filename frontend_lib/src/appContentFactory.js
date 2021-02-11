@@ -4,11 +4,18 @@ import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  generateLocalStorageContentId,
   convertBackslashNToBr,
   displayDistanceDate,
   sortTimelineByDate
 } from './helper.js'
+
+import {
+  LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem
+} from './localStorage.js'
+
 import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
@@ -54,7 +61,15 @@ export function appContentFactory (WrappedComponent) {
     // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
     appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
       if (newContent.content_id !== content.content_id) {
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type), data: newContent })
+        // RJ - 2020-01-13 - NOTE
+        // content corresponds to variable contentToOpen in OpenContentApp
+        // content.content_type is not defined there. I don't know if it is
+        // called from elsewhere, but content.content_type might always be
+        // undefined here https://github.com/tracim/tracim/issues/3742#issuecomment-759317358
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.RELOAD_CONTENT(content.content_type || content.type),
+          data: newContent
+        })
         return
       }
       setState({ isVisible: true })
@@ -74,17 +89,17 @@ export function appContentFactory (WrappedComponent) {
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
 
-      const previouslyUnsavedComment = localStorage.getItem(
-        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appSlug, 'comment')
-      )
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
         timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
-          : (previouslyUnsavedComment || '')
+          : getLocalStorageItem(
+            appSlug,
+            newContent,
+            LOCAL_STORAGE_FIELD.COMMENT
+          ) || ''
       }))
     }
 
@@ -139,8 +154,10 @@ export function appContentFactory (WrappedComponent) {
       const newComment = e.target.value
       setState({ newComment: newComment })
 
-      localStorage.setItem(
-        generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment'),
+      setLocalStorageItem(
+        appSlug,
+        content,
+        LOCAL_STORAGE_FIELD.COMMENT,
         newComment
       )
     }
@@ -173,8 +190,10 @@ export function appContentFactory (WrappedComponent) {
           setState({ newComment: '', showInvalidMentionPopupInComment: false })
           if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
 
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appSlug, 'comment')
+          removeLocalStorageItem(
+            appSlug,
+            content,
+            LOCAL_STORAGE_FIELD.COMMENT
           )
           break
         case 400:

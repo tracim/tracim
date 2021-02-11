@@ -19,8 +19,8 @@ export const SpaceSubscriptionsRequests = props => {
             >
               <span className='workspace_advanced__subscriptionRequests__userInfo'>
                 <UserInfo
-                  publicName={request.author.public_name}
-                  username={request.author.username}
+                  user={request.author}
+                  apiUrl={props.apiUrl}
                 />
               </span>
 
@@ -34,7 +34,7 @@ export const SpaceSubscriptionsRequests = props => {
                     className='transparentButton'
                     onClick={() => props.onClickAcceptRequest(request.author.user_id)}
                   >
-                    <i className='fa fa-fw fa-check' />
+                    <i className='fas fa-fw fa-check' />
                     {props.t('Accept request')}
                   </button>
 
@@ -42,7 +42,7 @@ export const SpaceSubscriptionsRequests = props => {
                     className='transparentButton'
                     onClick={() => props.onClickRejectRequest(request.author.user_id)}
                   >
-                    <i className='fa fa-fw fa-times' />
+                    <i className='fas fa-fw fa-times' />
                     {props.t('Reject request')}
                   </button>
                 </DropdownMenu>
@@ -57,7 +57,7 @@ export const SpaceSubscriptionsRequests = props => {
                     interpolation: { escapeValue: false }
                   })}
                 >
-                  <i className='fa fa-fw fa-check' />
+                  <i className='fas fa-fw fa-check' />
                   {props.t('Request accepted')}
                 </div>
               )}
@@ -71,7 +71,7 @@ export const SpaceSubscriptionsRequests = props => {
                     interpolation: { escapeValue: false }
                   })}
                 >
-                  <i className='fa fa-fw fa-times' />
+                  <i className='fas fa-fw fa-times' />
                   {props.t('Request rejected')}
                 </div>
               )}
@@ -86,6 +86,7 @@ export const SpaceSubscriptionsRequests = props => {
 export default translate()(SpaceSubscriptionsRequests)
 
 SpaceSubscriptionsRequests.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
   subscriptionRequestList: PropTypes.array.isRequired,
   onClickAcceptRequest: PropTypes.func,
   onClickRejectRequest: PropTypes.func

@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 import datetime
+import io
+import os
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
 
+from depot.io.utils import FileIntent
+from hapic.data import HapicFile
 from pyramid_ldap3 import Connector
+from sqlakeyset import Page
+from sqlakeyset import get_page
+from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
@@ -35,6 +42,7 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
+from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
@@ -52,23 +60,38 @@ from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserFollowAlreadyDefined
+from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
+from tracim_backend.lib.utils.image_process import ImageRatio
+from tracim_backend.lib.utils.image_process import ImageSize
+from tracim_backend.lib.utils.image_process import crop_image
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 
 KNOWN_MEMBERS_ITEMS_LIMIT = 5
+AVATAR_RATIO = ImageRatio(1, 1)
+COVER_RATIO = ImageRatio(35, 4)
+DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
+DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 
 
 class UserApi(object):
@@ -263,9 +286,13 @@ class UserApi(object):
             )
         )
 
-        # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
-        # should show only user in same workspace as user
         assert not (filter_results and not self._user)
+        # INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
+        # with "knows_candidate_user" checker.
+        # A user "knows" another user when either of the following condition is true:
+        #  - filter of users is disabled
+        #  - User is trusted-user (or more)
+        #  - users have at least one common space
         if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
             users_in_workspaces = self._get_user_ids_in_same_workspace(self._user.user_id)
             query = query.filter(User.user_id.in_(users_in_workspaces))
@@ -310,7 +337,7 @@ class UserApi(object):
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector",
+        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector"
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -513,7 +540,7 @@ class UserApi(object):
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None,) -> User:
+    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
@@ -729,10 +756,10 @@ class UserApi(object):
 
     def _check_email_correctness(self, email: str) -> bool:
         """
-           Verify if given email is correct:
-           - check format
-           - futur active check for email ? (dns based ?)
-           """
+        Verify if given email is correct:
+        - check format
+        - futur active check for email ? (dns based ?)
+        """
         # TODO - G.M - 2018-07-05 - find a better way to check email
         if not email:
             return False
@@ -827,10 +854,7 @@ class UserApi(object):
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [
-            AuthType.INTERNAL,
-            AuthType.UNKNOWN,
-        ]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
                 "password modification disallowed".format(user.login, user.auth_type)
@@ -838,10 +862,7 @@ class UserApi(object):
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [
-            AuthType.INTERNAL,
-            AuthType.UNKNOWN,
-        ]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
                 "email modification disallowed".format(user.login, user.auth_type)
@@ -983,7 +1004,7 @@ class UserApi(object):
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
+            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME
         )
 
     def enable(self, user: User, do_save=False):
@@ -1018,6 +1039,7 @@ class UserApi(object):
 
         if is_new_user:
             self._session.add(UserConfig(user=user))
+            self._session.add(UserCustomProperties(user=user))
 
         self._session.flush()
 
@@ -1121,3 +1143,229 @@ class UserApi(object):
             return False
 
         return True
+
+    def create_follower(
+        self,
+        follower_id: int,
+        leader_id: int,
+        created_date: typing.Optional[datetime.datetime] = None,
+        do_save: bool = True,
+    ) -> UserFollower:
+        # NOTE BS 20201229: sqlalchemy raise database specific error. In addition, error is
+        # raised at commit, so after view execution (so we can't catch it with hapic view
+        # decorators). So check if row exist before try to insert.
+        if (
+            self._session.query(UserFollower)
+            .filter(
+                and_(UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id)
+            )
+            .count()
+        ):
+            raise UserFollowAlreadyDefined("User follow already defined")
+
+        user_follower = UserFollower(
+            follower_id=follower_id, leader_id=leader_id, created_date=created_date
+        )
+        self._session.add(user_follower)
+
+        if do_save:
+            self._session.flush()
+
+        return user_follower
+
+    def delete_follower(self, follower_id: int, leader_id: int) -> None:
+        try:
+            user_follow = (
+                self._session.query(UserFollower)
+                .filter(
+                    and_(
+                        UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id
+                    )
+                )
+                .one()
+            )
+            self._session.delete(user_follow)
+        except NoResultFound:
+            raise NotFound("User following does not exist")
+
+    def get_paginated_leaders_for_user(
+        self,
+        user_id: int,
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+        filter_leader_id: typing.Optional[int] = None,
+    ) -> Page:
+        query = (
+            self._session.query(UserFollower.leader_id.label("user_id"))
+            .filter(UserFollower.follower_id == user_id)
+            .order_by(UserFollower.leader_id)
+        )
+        if filter_leader_id is not None:
+            query = query.filter(UserFollower.leader_id == filter_leader_id)
+        return get_page(query, per_page=count, page=page_token or False)
+
+    def get_paginated_followers_for_leader(
+        self,
+        user_id: int,
+        count: typing.Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
+        page_token: typing.Optional[int] = None,
+        filter_user_id: typing.Optional[int] = None,
+    ) -> Page:
+        query = (
+            self._session.query(UserFollower.follower_id.label("user_id"))
+            .filter(UserFollower.leader_id == user_id)
+            .order_by(UserFollower.follower_id)
+        )
+        if filter_user_id is not None:
+            query = query.filter(UserFollower.follower_id == filter_user_id)
+        return get_page(query, per_page=count, page=page_token or False)
+
+    def get_followers_count(self, leader_id: int) -> int:
+        return self._session.query(UserFollower).filter(UserFollower.leader_id == leader_id).count()
+
+    def get_leaders_count(self, user_id: int) -> int:
+        return self._session.query(UserFollower).filter(UserFollower.follower_id == user_id).count()
+
+    def get_about_user(self, user_id: int) -> AboutUser:
+        """
+        Return general user informations.
+        """
+        followers_count = self.get_followers_count(user_id)
+        leaders_count = self.get_leaders_count(user_id)
+        user = self.get_one(user_id)
+
+        content_revisions_infos = ContentApi(
+            self._session, self._user, self._config
+        ).get_authored_content_revisions_infos(user_id)
+
+        return AboutUser(
+            user_id=user.user_id,
+            public_name=user.public_name,
+            username=user.username,
+            followers_count=followers_count,
+            leaders_count=leaders_count,
+            created=user.created,
+            authored_content_revisions_count=content_revisions_infos.count,
+            authored_content_revisions_space_count=content_revisions_infos.space_count,
+            has_avatar=user.has_avatar,
+            has_cover=user.has_cover,
+        )
+
+    def get_avatar(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.avatar:
+            raise UserImageNotFound("avatar of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.avatar,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
+
+    def get_avatar_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cropped_avatar:
+            raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
+        _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.cropped_avatar,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
+
+    def set_avatar(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ) -> None:
+        user = self.get_one(user_id)
+
+        self._session.add(user)
+        (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "avatar", AVATAR_RATIO
+        )
+        self._session.flush()
+
+    def get_cover(
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cover:
+            raise UserImageNotFound("cover of user {} not found".format(user_id))
+        return StorageLib(self._config).get_raw_file(
+            depot_file=user.cover,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+        )
+
+    def get_cover_preview(
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        width: int = None,
+        height: int = None,
+        force_download: bool = False,
+    ) -> HapicFile:
+        user = self.get_one(user_id)
+        if not user.cropped_cover:
+            raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
+        _, original_file_extension = os.path.splitext(user.cropped_cover.filename)
+        return StorageLib(self._config).get_jpeg_preview(
+            depot_file=user.cropped_cover,
+            filename=filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            original_file_extension=original_file_extension,
+            force_download=force_download,
+            page_number=1,
+        )
+
+    def set_cover(
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+    ) -> None:
+        user = self.get_one(user_id)
+        (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(
+            new_filename, new_mimetype, new_content.read(), "cover", COVER_RATIO
+        )
+        self._session.add(user)
+        self._session.flush()
+
+    def _crop_and_prepare_depot_storage(
+        self,
+        filename: str,
+        mimetype: str,
+        content: bytes,
+        cropped_basename: str,
+        crop_ratio: ImageRatio,
+    ) -> typing.Tuple[FileIntent, FileIntent]:
+        """
+        Prepare depot storage of an image file: original + cropped image.
+        The cropped image is stored as a PNG file.
+        @return tuple with FileIntent objects for original, cropped images
+        """
+        label, extension = os.path.splitext(filename)
+        original = FileIntent(content, filename, mimetype)
+        with io.BytesIO() as cropped_io:
+            # FIXME - G.M - 2021-01-21 - should we catch error here,
+            # what happened if pillow failed ?
+            crop_image(io.BytesIO(content), cropped_io, ratio=crop_ratio, format="png")
+            cropped = FileIntent(
+                cropped_io.getvalue(), "{}.png".format(cropped_basename), "image/png"
+            )
+        return (original, cropped)

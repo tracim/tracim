@@ -8,8 +8,8 @@ import transaction
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.plugins import init_plugin_manager
-from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.daemon import initialize_config_from_environment
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory

@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { Link, withRouter } from 'react-router-dom'
 
 import {
   TracimComponent,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
+  CUSTOM_EVENT,
   PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
@@ -34,6 +34,9 @@ export class WorkspaceActivityFeed extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
@@ -49,6 +52,11 @@ export class WorkspaceActivityFeed extends React.Component {
     this.loadWorkspaceDetail()
     this.setHeadTitle()
     this.buildBreadcrumbs()
+  }
+
+  handleAllAppChangeLanguage = () => {
+    this.buildBreadcrumbs()
+    this.setHeadTitle()
   }
 
   handleTlm = (data) => {
@@ -80,18 +88,16 @@ export class WorkspaceActivityFeed extends React.Component {
 
     const breadcrumbsList = [
       {
-        link: (
-          <Link to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}>
-            {props.currentWorkspace.label}
-          </Link>
-        ),
+        link: PAGE.WORKSPACE.DASHBOARD(props.workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.currentWorkspace.label
+        label: props.currentWorkspace.label,
+        isALink: true
       },
       {
-        link: <Link to={PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId)}>{props.t('Activity feed')}</Link>,
+        link: PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Activity feed')
+        label: props.t('Activity feed'),
+        isALink: false
       }
     ]
 
@@ -153,4 +159,4 @@ const component = withActivity(
   resetWorkspaceActivity,
   setWorkspaceActivityEventList
 )
-export default connect(mapStateToProps)(withRouter(translate()(component)))
+export default connect(mapStateToProps)(translate()(component))

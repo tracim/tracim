@@ -17,8 +17,8 @@ describe('operation :: workspace > create_new > html-document', function () {
       params: { workspaceId: 1 }
     })
     cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text-o').click()
+    cy.get('.dashboard__calltoaction .fa-file-alt').should('be.visible')
+    cy.get('.dashboard__calltoaction .fa-file-alt').click()
     cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)

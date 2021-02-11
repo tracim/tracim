@@ -1,3 +1,5 @@
+import typing
+
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
@@ -60,12 +62,17 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         )
         configurator.include(collaborative_document_edition_controller.bind, route_prefix=BASE_API)
 
+    def get_content_security_policy_directives(
+        self, app_config: CFG
+    ) -> typing.Tuple[typing.Tuple[str, str], ...]:
+        return (("frame-src", app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL),)
+
 
 def create_app() -> TracimApplication:
     return CollaborativeDocumentEditionApp(
         label="Collaborative Document Edition",
         slug="collaborative_document_edition",
-        fa_icon="file-o",
+        fa_icon="far fa-file",
         config={},
         main_route="",
     )

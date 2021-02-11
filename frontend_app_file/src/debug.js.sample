@@ -5,7 +5,7 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'file',
-    faIcon: 'paperclip',
+    faIcon: 'fas fa-paperclip',
     hexcolor: '#ffa500',
     creationLabel: 'Upload files',
     label: 'File',

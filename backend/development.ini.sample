@@ -254,8 +254,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 
 # Warning! if you decide to change the session parameters, we strongly encourage you to delete existing sessions
-# in order to avoid security issues. See the Tracim settings documentation (available in source
-code, see "settings.md").
+# in order to avoid security issues. See the Tracim settings documentation (available in source code, see "settings.md").
 
 ### pyramid_beaker parameters ###
 
@@ -358,6 +357,22 @@ api.key = %(basic_setup.api_key)s
 ## member with no common space. If False, it can access to these informations.
 ## This is used by search mechanism for invitation of user in space.
 ; known_members.filter = True
+
+####
+# CUSTOM PROPERTIES
+####
+
+## User custom properties: This features allows defining custom instance-global fields on users of this instance.
+# See the Tracim settings documentation (available in source code, see "user_custom_properties.md") for more
+# information about it.
+; user.custom_properties.json_schema_file_path = %(here)s/tracim_backend/templates/user_custom_properties/default/schema.json
+; user.custom_properties.ui_schema_file_path = %(here)s/tracim_backend/templates/user_custom_properties/default/ui.json
+; user.custom_properties.translations_dir_path = %(here)s/tracim_backend/templates/user_custom_properties/default/locale
+## example with user.custom_properties.dir shortcut:
+# user.custom_properties.dir = %(here)s/tracim_backend/templates/user_custom_properties/default
+# user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
+# user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
+# user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 
 ####
 # IHM

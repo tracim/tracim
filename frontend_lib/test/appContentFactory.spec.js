@@ -17,7 +17,7 @@ import {
   mockPutContentArchiveRestore204,
   mockPutContentDeleteRestore204
 } from './apiMock.js'
-import { generateLocalStorageContentId } from '../src/helper.js'
+import { generateLocalStorageContentId } from '../src/localStorage.js'
 
 describe('appContentFactory.js', () => {
   const fakeCheckApiUrl = sinon.spy()
@@ -153,12 +153,18 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerReloadContent', () => {
-    const newContent = { ...fakeContent }
+    const newContent = { ...fakeContent, content_id: fakeContent.content_id + 1 }
+    const initialState = { content: fakeContent }
     const fakeTinymceRemove = sinon.spy()
 
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
+      wrapper.instance().setState(initialState)
       wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
+      const lastSetStateArg = fakeSetState.lastCall.args[0]
+      if (typeof lastSetStateArg === 'function') {
+        lastSetStateArg(initialState)
+      }
     })
 
     after(() => {
@@ -174,7 +180,7 @@ describe('appContentFactory.js', () => {
     it('should get the localStorage value', () => {
       sinon.assert.calledWith(
         global.localStorage.getItem,
-        generateLocalStorageContentId(fakeContent.workspace_id, fakeContent.content_id, appContentSlug, 'comment')
+        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appContentSlug, 'comment')
       )
     })
 

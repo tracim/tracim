@@ -5,7 +5,7 @@ import 'regenerator-runtime/runtime'
 import { Provider } from 'react-redux'
 import { store } from './store.js'
 import Tracim from './container/Tracim.jsx'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import { I18nextProvider } from 'react-i18next'
 import i18n from './util/i18n.js'
 import { DragDropContextProvider } from 'react-dnd'
@@ -16,8 +16,6 @@ require('./css/index.styl')
 
 require('./util/appInterface.js')
 require('./util/tinymceInit.js')
-
-// export const history = require('history').createBrowserHistory()
 
 ReactDOM.render(
   <Provider store={store}>

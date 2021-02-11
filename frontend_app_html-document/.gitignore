@@ -7,3 +7,4 @@ dist/html-document.app.js
 dist/html-document.app.js.map
 dist/html-document.app.dev.js
 dist/html-document.app.dev.js.map
+dist/html-document.app.standalone.js

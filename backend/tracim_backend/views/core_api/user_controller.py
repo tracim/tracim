@@ -2,25 +2,37 @@ import json
 import typing
 
 from hapic import HapicData
+from hapic.data import HapicFile
 from pyramid.config import Configurator
 from pyramid.response import Response
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
+from tracim_backend.exceptions import MimetypeNotAllowed
+from tracim_backend.exceptions import NoFileValidationError
+from tracim_backend.exceptions import NotFound
+from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import TooShortAutocompleteString
+from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserFollowAlreadyDefined
+from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
@@ -29,17 +41,22 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.subscription import SubscriptionLib
+from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
+from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
+from tracim_backend.lib.utils.authorization import knows_candidate_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.context_models import WorkspaceInContext
@@ -47,22 +64,29 @@ from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import FileQuerySchema
+from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
+from tracim_backend.views.core_api.schemas import GetUserFollowQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetConfigSchema
+from tracim_backend.views.core_api.schemas import SetCustomPropertiesSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
 from tracim_backend.views.core_api.schemas import UserConfigSchema
@@ -70,8 +94,11 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserIdSchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
+from tracim_backend.views.core_api.schemas import UserPicturePathSchema
+from tracim_backend.views.core_api.schemas import UserPreviewPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
@@ -122,6 +149,15 @@ SWAGGER_TAG__USER_CONFIG_ENDPOINTS = generate_documentation_swagger_tag(
 SWAGGER_TAG__USER_SUBSCRIPTIONS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 )
+
+ALLOWED__AVATAR_MIMETYPES = [
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "image/bmp",
+    "image/x-ms-bmp",
+    "image/gif",
+]
 
 
 class UserController(Controller):
@@ -832,6 +868,46 @@ class UserController(Controller):
         config_api.set_params(params=hapic_data.body["parameters"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(UserConfigSchema())
+    def get_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> typing.Dict:
+        """
+        get the custom properties parameters for the given user
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
+        )
+        return {"parameters": custom_properties_api.get_all_params()}
+
+    # TODO - G.M - 2021-01-13 - Permission should be adapted to be usable to all know_user
+    # as complex right rules will be delegated to properties, see #4004
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(SetCustomPropertiesSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_custom_properties(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Set or update the given custom_properties parameters for the given user
+        The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
+        whole configuration, so it's not possible to remove keys through this endpoint.
+        """
+        custom_properties_api = UserCustomPropertiesApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            app_config=request.app_config,
+        )
+        custom_properties_api.set_params(params=hapic_data.body["parameters"])
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceSchema(many=True))
@@ -846,7 +922,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.candidate_user, session=request.dbsession, config=app_config,
+            current_user=request.candidate_user, session=request.dbsession, config=app_config
         )
 
         workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
@@ -860,7 +936,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.get_user_subscription(request.candidate_user.user_id)
 
@@ -877,9 +953,313 @@ class UserController(Controller):
             current_user=None, session=request.dbsession, config=request.app_config
         ).get_one(hapic_data.body["workspace_id"])
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.submit_subscription(workspace=workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetUserFollowQuerySchema())
+    @hapic.output_body(FollowedUsersSchemaPage())
+    def following(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
+        """
+        For given user, get list of following user ids.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return PaginatedObject(
+            user_api.get_paginated_leaders_for_user(
+                user_id=request.candidate_user.user_id,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                filter_leader_id=hapic_data.query.user_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_body(UserIdSchema())
+    @hapic.handle_exception(UserFollowAlreadyDefined, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.CREATED)
+    def create_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Declare given user follow an other user.
+        If following already exist, return a 400 error with {error_code} error code.
+        """.format(
+            error_code=ErrorCode.USER_FOLLOW_ALREADY_DEFINED
+        )
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user_api.create_follower(
+            follower_id=hapic_data.path["user_id"], leader_id=hapic_data.body["user_id"]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(DeleteFollowedUserPathSchema())
+    @hapic.handle_exception(NotFound, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def delete_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        """
+        Delete given user following.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user_api.delete_follower(
+            follower_id=hapic_data.path["user_id"], leader_id=hapic_data.path["leader_id"]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(GetUserFollowQuerySchema())
+    @hapic.output_body(FollowedUsersSchemaPage())
+    def followers(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
+        """
+        For given user, get list of following user ids.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return PaginatedObject(
+            user_api.get_paginated_followers_for_leader(
+                user_id=request.candidate_user.user_id,
+                page_token=hapic_data.query.page_token,
+                count=hapic_data.query.count,
+                filter_user_id=hapic_data.query.user_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(AboutUserSchema())
+    def about_user(self, context, request: TracimRequest, hapic_data: HapicData) -> AboutUser:
+        """
+        Return public user profile.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        return user_api.get_about_user(hapic_data.path["user_id"])
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPreviewPicturePathSchema())
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def sized_preview_avatar(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> HapicFile:
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "avatar_{width}x{height}.jpg".format(
+            width=hapic_data.path.width, height=hapic_data.path.height,
+        )
+        return user_api.get_avatar_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+            force_download=hapic_data.query.force_download,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def get_preview_avatar(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> HapicFile:
+        width = DEFAULT_AVATAR_SIZE.width
+        height = DEFAULT_AVATAR_SIZE.height
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "avatar.jpg".format(width=width, height=height)
+        return user_api.get_avatar_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            force_download=hapic_data.query.force_download,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def get_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
+        try:
+            user_api = UserApi(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=request.app_config,
+            )
+            default_filename = "avatar.jpg"
+            return user_api.get_avatar(
+                request.candidate_user.user_id,
+                filename=hapic_data.path.filename,
+                default_filename=default_filename,
+                force_download=hapic_data.query.force_download,
+            )
+        except CannotGetDepotFileDepotCorrupted as exc:
+            raise TracimFileNotFound(
+                "avatar for user {} not found in depot.".format(request.candidate_user.user_id)
+            ) from exc
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(MimetypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_files(SimpleFileSchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
+        if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
+            raise MimetypeNotAllowed(
+                "File mimetype {} is not allowed for avatar".format(hapic_data.files.files.type)
+            )
+
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        user_api.set_avatar(
+            user_id=request.candidate_user.user_id,
+            new_filename=hapic_data.files.files.filename,
+            new_mimetype=hapic_data.files.files.type,
+            new_content=hapic_data.files.files.file,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPreviewPicturePathSchema())
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def sized_preview_cover(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> HapicFile:
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "cover_{width}x{height}.jpg".format(
+            width=hapic_data.path.width, height=hapic_data.path.height,
+        )
+        return user_api.get_cover_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+            force_download=hapic_data.query.force_download,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def get_preview_cover(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> HapicFile:
+        width = DEFAULT_COVER_SIZE.width
+        height = DEFAULT_COVER_SIZE.height
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        default_filename = "cover.jpg".format(width=width, height=height)
+        return user_api.get_cover_preview(
+            request.candidate_user.user_id,
+            filename=hapic_data.path.filename,
+            default_filename=default_filename,
+            width=width,
+            height=height,
+            force_download=hapic_data.query.force_download,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(knows_candidate_user)
+    @hapic.input_query(FileQuerySchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.output_file([])
+    def get_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
+        try:
+            user_api = UserApi(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=request.app_config,
+            )
+            default_filename = "cover.jpg"
+            return user_api.get_cover(
+                request.candidate_user.user_id,
+                filename=hapic_data.path.filename,
+                default_filename=default_filename,
+                force_download=hapic_data.query.force_download,
+            )
+        except CannotGetDepotFileDepotCorrupted as exc:
+            raise TracimFileNotFound(
+                "cover for user {} not found in depot.".format(request.candidate_user.user_id)
+            ) from exc
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(MimetypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_files(SimpleFileSchema())
+    @hapic.input_path(UserPicturePathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def put_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
+        if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
+            raise MimetypeNotAllowed(
+                "File mimetype {} is not allowed for cover".format(hapic_data.files.files.type)
+            )
+
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        user_api.set_cover(
+            user_id=request.candidate_user.user_id,
+            new_filename=hapic_data.files.files.filename,
+            new_mimetype=hapic_data.files.files.type,
+            new_content=hapic_data.files.files.file,
+        )
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -1057,7 +1437,7 @@ class UserController(Controller):
 
         # Tracim user messages
         configurator.add_route(
-            "messages", "/users/{user_id:\d+}/messages", request_method="GET",  # noqa: W605
+            "messages", "/users/{user_id:\d+}/messages", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
 
@@ -1094,14 +1474,29 @@ class UserController(Controller):
 
         # User configuration
         configurator.add_route(
-            "config_get", "/users/{user_id:\d+}/config", request_method="GET",  # noqa: W605
+            "config_get", "/users/{user_id:\d+}/config", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_config, route_name="config_get")
 
         configurator.add_route(
-            "config_post", "/users/{user_id:\d+}/config", request_method="PUT",  # noqa: W605
+            "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
+
+        # User custom properties
+        configurator.add_route(
+            "custom_properties_get",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
+
+        configurator.add_route(
+            "custom_properties_post",
+            "/users/{user_id:\d+}/custom-properties",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
 
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(
@@ -1127,3 +1522,89 @@ class UserController(Controller):
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.submit_subscription, route_name="subscriptions_put")
+
+        # User following/followers
+        configurator.add_route(
+            "following", "/users/{user_id:\d+}/following", request_method="GET"  # noqa: W605
+        )
+        configurator.add_view(self.following, route_name="following")
+
+        configurator.add_route(
+            "create_following",
+            "/users/{user_id:\d+}/following",
+            request_method="POST",  # noqa: W605
+        )
+        configurator.add_view(self.create_following, route_name="create_following")
+
+        configurator.add_route(
+            "delete_following",
+            "/users/{user_id:\d+}/following/{leader_id:\d+}",
+            request_method="DELETE",  # noqa: W605
+        )
+        configurator.add_view(self.delete_following, route_name="delete_following")
+
+        configurator.add_route(
+            "followers", "/users/{user_id:\d+}/followers", request_method="GET"  # noqa: W605
+        )
+        configurator.add_view(self.followers, route_name="followers")
+
+        configurator.add_route(
+            "about_user", "/users/{user_id:\d+}/about", request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.about_user, route_name="about_user")
+
+        configurator.add_route(
+            "sized_preview_avatar",
+            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")
+
+        configurator.add_route(
+            "get_preview_avatar",
+            "/users/{user_id:\d+}/avatar/preview/jpg/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_preview_avatar, route_name="get_preview_avatar")
+
+        configurator.add_route(
+            "get_raw_avatar",
+            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_raw_avatar, route_name="get_raw_avatar")
+
+        configurator.add_route(
+            "put_raw_avatar",
+            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.put_raw_avatar, route_name="put_raw_avatar")
+
+        configurator.add_route(
+            "sized_preview_cover",
+            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
+
+        configurator.add_route(
+            "get_preview_cover",
+            "/users/{user_id:\d+}/cover/preview/jpg/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_preview_cover, route_name="get_preview_cover")
+
+        configurator.add_route(
+            "get_raw_cover",
+            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.get_raw_cover, route_name="get_raw_cover")
+
+        configurator.add_route(
+            "put_raw_cover",
+            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.put_raw_cover, route_name="put_raw_cover")

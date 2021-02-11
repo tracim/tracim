@@ -3,4 +3,5 @@
 .git/
 node_modules/
 dist/file.app.js
+dist/file.app.standalone.js
 src/debug.js

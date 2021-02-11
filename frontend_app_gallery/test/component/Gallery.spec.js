@@ -116,12 +116,13 @@ describe('<Gallery />', () => {
     describe('play button', () => {
       it('should start the slideshow when the button play is clicked', () => {
         wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-pause')).to.be.lengthOf(1)
+        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-pause')
         expect(wrapper.state().autoPlay).to.be.a('object')
       })
+
       it('should stop the slideshow when the button pause is clicked', () => {
         wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-play')).to.be.lengthOf(1)
+        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-play')
         expect(wrapper.state().autoPlay).to.be.a('null')
       })
     })
@@ -275,7 +276,7 @@ describe('<Gallery />', () => {
         wrapper.setState({ imagePreviewList: [], folderId: null })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(2)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
+        expect(wrapper.state().breadcrumbsList[0].link).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
         expect(wrapper.state().breadcrumbsList[1].label).to.equal('Gallery')
       })
 
@@ -283,9 +284,9 @@ describe('<Gallery />', () => {
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList, folderId: null })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
         expect(wrapper.state().breadcrumbsList.length).to.equal(3)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
+        expect(wrapper.state().breadcrumbsList[0].link).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
         expect(wrapper.state().breadcrumbsList[1].label).to.equal('Gallery')
-        expect(wrapper.state().breadcrumbsList[2].link.props.to)
+        expect(wrapper.state().breadcrumbsList[2].link)
           .to.equal(PAGE.WORKSPACE.CONTENT(props.data.config.appConfig.workspaceId, 'file', stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId))
       })
 
@@ -296,10 +297,10 @@ describe('<Gallery />', () => {
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, folderDetail, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(4)
-        expect(wrapper.state().breadcrumbsList[0].link.props.to).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
-        expect(wrapper.state().breadcrumbsList[1].link.props.to).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},${folderDetail.folderParentIdList.join(',')}`)
+        expect(wrapper.state().breadcrumbsList[0].link).to.equal(PAGE.WORKSPACE.DASHBOARD(props.data.config.appConfig.workspaceId))
+        expect(wrapper.state().breadcrumbsList[1].link).to.equal(`/ui/workspaces/${props.data.config.appConfig.workspaceId}/contents?folder_open=${folderId},${folderDetail.folderParentIdList.join(',')}`)
         expect(wrapper.state().breadcrumbsList[2].label).to.equal('Gallery')
-        expect(wrapper.state().breadcrumbsList[3].link.props.to)
+        expect(wrapper.state().breadcrumbsList[3].link)
           .to.equal(PAGE.WORKSPACE.CONTENT(props.data.config.appConfig.workspaceId, 'file', stateMock.imagePreviewList[wrapper.state().displayedPictureIndex].contentId))
       })
     })

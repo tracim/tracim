@@ -68,14 +68,14 @@ class ContentItem extends React.Component {
                 ? (
                   <ComposedIcon
                     mainIcon={props.faIcon}
-                    smallIcon='share-alt'
-                    // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                    smallIcon='fas fa-share-alt'
+                    // FIXME - GB - 2019-07-26 - Replace these hardcoded values by webpack variables
                     // https://github.com/tracim/tracim/issues/2098
                     smallIconStyle={{ color: '#252525' }}
                   />
                 )
                 : (
-                  <i className={`fa fa-fw fa-${props.faIcon}`} />
+                  <i className={`fa-fw ${props.faIcon}`} />
                 )
               )}
             </div>
@@ -127,7 +127,7 @@ class ContentItem extends React.Component {
               {props.t(status.label)}
             </div>
             <div className='content__status__icon'>
-              <i className={`fa fa-fw fa-${status.faIcon}`} />
+              <i className={`fa-fw ${status.faIcon}`} />
             </div>
           </div>
         </Link>

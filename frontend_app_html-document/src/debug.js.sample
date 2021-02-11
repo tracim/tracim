@@ -5,10 +5,15 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'html-document',
-    faIcon: 'file-text-o',
+    faIcon: 'far fa-file-alt',
     hexcolor: '#00CC00',
     creationLabel: 'Write a note',
-    label: 'Note'
+    label: 'Note',
+    workspace: {
+      downloadEnabled: false,
+      label: 'test space',
+      memberList: []
+    }
   },
   content: {
     ...defaultDebug.content,

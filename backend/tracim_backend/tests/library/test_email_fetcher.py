@@ -256,7 +256,7 @@ class TestMailFetcher(object):
     @responses.activate
     def test_unit___get_content_info__ok__nominal_test(self):
         content_json = {
-            "author": {"avatar_url": None, "public_name": "Global manager", "user_id": 1},
+            "author": {"has_avatar": False, "public_name": "Global manager", "user_id": 1},
             "content_id": 1,
             "content_type": "thread",
             "created": "2018-08-24T15:00:08Z",
@@ -264,7 +264,7 @@ class TestMailFetcher(object):
             "is_archived": False,
             "is_deleted": False,
             "label": "coucou",
-            "last_modifier": {"avatar_url": None, "public_name": "Global manager", "user_id": 1},
+            "last_modifier": {"has_avatar": False, "public_name": "Global manager", "user_id": 1},
             "modified": "2018-08-24T15:00:08Z",
             "parent_id": None,
             "raw_content": "",
@@ -311,7 +311,7 @@ class TestMailFetcher(object):
         mail.get_from_address.return_value = "useremailaddress@mydomain.com"
 
         content_info = {
-            "author": {"avatar_url": None, "public_name": "Global manager", "user_id": 1},
+            "author": {"has_avatar": False, "public_name": "Global manager", "user_id": 1},
             "content_id": 1,
             "content_type": "thread",
             "created": "2018-08-24T15:00:08Z",
@@ -319,7 +319,7 @@ class TestMailFetcher(object):
             "is_archived": False,
             "is_deleted": False,
             "label": "coucou",
-            "last_modifier": {"avatar_url": None, "public_name": "Global manager", "user_id": 1},
+            "last_modifier": {"has_avatar": False, "public_name": "Global manager", "user_id": 1},
             "modified": "2018-08-24T15:00:08Z",
             "parent_id": None,
             "raw_content": "",
@@ -359,7 +359,7 @@ class TestMailFetcher(object):
     @responses.activate
     def test_unit__send_request__ok__nominal_case(self):
         content_json = {
-            "author": {"avatar_url": None, "public_name": "John Doe", "user_id": 3},
+            "author": {"has_avatar": False, "public_name": "John Doe", "user_id": 3},
             "content_id": 2,
             "created": "2018-08-27T12:12:23.807Z",
             "parent_id": 1,

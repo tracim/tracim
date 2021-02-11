@@ -4,7 +4,7 @@ import 'regenerator-runtime/runtime'
 import ReactDOM from 'react-dom'
 import Gallery from './container/Gallery.jsx'
 import { debug } from './debug.js'
-import { Router } from 'react-router'
+import { Router } from 'react-router-dom'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 
 export const history = require('history').createBrowserHistory()
@@ -16,7 +16,7 @@ manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
   <Router history={history}>
-    <Gallery data={debug} />
+    <Gallery data={undefined} />
   </Router>
   , document.getElementById('content')
 )

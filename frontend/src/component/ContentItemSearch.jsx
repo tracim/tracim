@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { AVATAR_SIZE, Badge, Avatar } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../util/helper.js'
 
 require('./ContentItemSearch.styl')
 
@@ -20,7 +21,7 @@ export const ContentItemSearch = props => {
         title={props.t(props.contentType.label)}
         style={{ color: props.contentType.hexcolor }}
       >
-        <i className={`fa fa-fw fa-${props.faIcon}`} />
+        <i className={`fa-fw ${props.faIcon}`} />
       </div>
 
       <div
@@ -41,11 +42,12 @@ export const ContentItemSearch = props => {
       <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
           size={AVATAR_SIZE.SMALL}
+          user={props.lastModificationAuthor}
+          apiUrl={FETCH_CONFIG.apiUrl}
           style={{
             display: 'inline-block',
             marginRight: '10px'
           }}
-          publicName={props.lastModificationAuthor}
         />
         {props.lastModificationTime}
       </div>
@@ -59,7 +61,7 @@ export const ContentItemSearch = props => {
           {props.t(status.label)}
         </div>
         <div className='content__status__icon'>
-          <i className={`fa fa-fw fa-${status.faIcon}`} />
+          <i className={`fa-fw ${status.faIcon}`} />
         </div>
       </div>
     </Link>

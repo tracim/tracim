@@ -20,6 +20,7 @@ const mockGetWorkspaceMember200 = (apiUrl, workspaceId, showDisabledUser, worksp
 
 const mockGetSubscriptionRequestList200 = (apiUrl, spaceId, subscriptions) => {
   return nock(apiUrl)
+    .persist()
     .get(`/workspaces/${spaceId}/subscriptions`)
     .reply(200, subscriptions)
 }

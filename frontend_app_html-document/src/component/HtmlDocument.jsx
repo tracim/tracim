@@ -26,8 +26,8 @@ export const HtmlDocument = props => {
             </span>
           }
           btnType='link'
-          icon='hand-o-right'
-          btnLabel={<i className='fa fa-times' />}
+          icon='far fa-hand-point-right'
+          btnLabel={<i className='fas fa-times' />}
           onClickBtn={props.onClickCloseNotifyAllMessage}
         />
       )}
@@ -36,7 +36,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is archived')}
           btnType='button'
-          icon='archive'
+          icon='fas fa-archive'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreArchived}
         />
@@ -46,7 +46,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is deleted')}
           btnType='button'
-          icon='trash'
+          icon='far fa-trash-alt'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreDeleted}
         />
@@ -64,7 +64,7 @@ export const HtmlDocument = props => {
           <PromptMessage
             msg={props.t('You have a pending draft')}
             btnType='link'
-            icon='hand-o-right'
+            icon='far fa-hand-point-right'
             btnLabel={props.t('Resume writing')}
             onClickBtn={props.onClickShowDraft}
           />
@@ -115,6 +115,7 @@ export const HtmlDocument = props => {
           <div className='html-document__editionmode__container'>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
               <MentionAutoComplete
+                apiUrl={props.apiUrl}
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
@@ -149,11 +150,12 @@ export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   mode: PropTypes.string,
+  apiUrl: PropTypes.string.isRequired,
   customColor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
   version: PropTypes.string,
-  lastVersion: PropTypes.string,
+  lastVersion: PropTypes.number,
   text: PropTypes.string,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
