@@ -7,9 +7,9 @@
   align-items center
   &__avatar
     &__content
-      margin 0px 25px
+      margin 0px 30px
     &__header
-      margin 15px
+      margin 15px 20px
   &__name
     padding 0px 5px
     white-space nowrap
@@ -27,6 +27,14 @@
     margin-inline-end 25px
     & > *
       font-size fontSizeSmall
+
+@media (max-width: max-sm)
+  .advancedSearchUser
+    &__avatar
+      &__header
+        margin 15px 10px
+      &__content
+        margin 0px 10px
 
 @media (max-width: max-xs)
   .advancedSearchUser

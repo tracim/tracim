@@ -18,8 +18,7 @@
       & > span
         font-size fontSizeSmall
     &__header
-      margin 15px 20px
-      width 50px
+      margin 15px 25px
       text-align center
       align-self center
   &__title
@@ -30,6 +29,7 @@
     color fontColor
     align-self center
     flex 1
+    width 0
   &__modification
     align-self center
     margin-inline-end 90px
@@ -46,6 +46,10 @@
 .advancedSearch__openMenu
   & .timedEvent.advancedSearchContent__modification .timedEvent__operation
     display none
+  & .advancedSearch__content .content .breadcrumbs
+    display none
+  & .advancedSearchContent .advancedSearchContent__title
+    padding-bottom 0
 
 // INFO - G.B. - 20210210 - The rules below (and its media queries) are in absolute position because they come from code that would have nested links.
 // To avoid this, the components have been placed outside the top link and displayed in the right place using absolute.
@@ -61,21 +65,14 @@
   left 95px
 .advancedSearchContent .advancedSearchContent__title
   padding-bottom 15px
+  padding-inline-end 210px
 
 
 @media (max-width: max-lg)
-  .content__header
-    & .advancedSearchContent
-      &__title
-        display none
   .advancedSearchContent
-    &__typeAndTitle
-      display unset
-      padding 15px 50px
-      flex 1
     &__type
       &__header
-        display none
+        margin 15px 10px
       &__content
         width 50px
         & > span
@@ -112,10 +109,16 @@
       &__type__content
         width 50px
       &__title
-        padding 0
+        padding 0px 5px
     &__modification
       display none
     &__typeAndTitle
-      padding 15px 25px
+      display unset
+      padding 15px 5px
+      flex 1
+  .content__header
+    & .advancedSearchContent
+      &__title
+        display none
   .advancedSearch__content .content .breadcrumbs
       display none

@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 // import PropTypes from 'prop-types'
 
 require('./AdvancedSearchUserList.styl')
-/*TODO - Change after backend*/
+/* TODO - Change after backend */
 export const AdvancedSearchUserList = props => {
   return (
     <>

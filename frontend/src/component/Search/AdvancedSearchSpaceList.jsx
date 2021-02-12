@@ -68,9 +68,9 @@ export const AdvancedSearchSpaceList = props => {
             </div>
 
             <div className='advancedSearchSpace__information'>
-              <span>3333</span> {/*TODO - Change after backend with title*/}
+              <span>3333</span> {/* TODO - Change after backend with title */}
               <i className='fa-fw fas fa-th' />
-              <span>3333</span> {/*TODO - Change after backend with title*/}
+              <span>3333</span> {/* TODO - Change after backend with title */}
               <i className='fa-fw far fa-user' />
             </div>
           </Link>

@@ -36,7 +36,7 @@ export const AdvancedSearchContentList = props => {
           {props.t('Title and path')}
         </div>
         <div className='advancedSearchContent__typeAndTitle'>
-          {props.t('Type and title')}
+          {props.t('Title')}
         </div>
         <div className='advancedSearchContent__modification'>
           {props.t('Last modification')}
@@ -90,36 +90,38 @@ export const AdvancedSearchContentList = props => {
                   style={{ color: searchItem.contentType.status.hexcolor }}
                   title={props.t(searchItem.contentType.status.label)}
                 />
-                <span>3333</span> {/*TODO - Change after backend with title*/}
+                <span>3333</span> {/* TODO - Change after backend with title */}
                 <i
                   className='fa-fw far fa-comment'
-                  /*title="N comments"*/
+                /* title="N comments" */
                 />
               </div>
             )}
           </Link>
 
-          <Breadcrumbs breadcrumbsList={[{
-            link: PAGE.HOME,
-            type: BREADCRUMBS_TYPE.CORE,
-            label: props.t('Home'),
-            isALink: true
-          },{
-            link: PAGE.HOME,
-            type: BREADCRUMBS_TYPE.CORE,
-            label: props.t('Home'),
-            isALink: true
-          },{
-            link: PAGE.HOME,
-            type: BREADCRUMBS_TYPE.CORE,
-            label: props.t('Home'),
-            isALink: true
-          },{
-            link: PAGE.HOME,
-            type: BREADCRUMBS_TYPE.CORE,
-            label: props.t('Home'),
-            isALink: true
-          }]} keepLastBreadcrumbAsLink /> {/*TODO - Change after backend*/}
+          <Breadcrumbs
+            breadcrumbsList={[{
+              link: PAGE.HOME,
+              type: BREADCRUMBS_TYPE.CORE,
+              label: props.t('Home'),
+              isALink: true
+            }, {
+              link: PAGE.HOME,
+              type: BREADCRUMBS_TYPE.CORE,
+              label: props.t('Home'),
+              isALink: true
+            }, {
+              link: PAGE.HOME,
+              type: BREADCRUMBS_TYPE.CORE,
+              label: props.t('Home'),
+              isALink: true
+            }, {
+              link: PAGE.HOME,
+              type: BREADCRUMBS_TYPE.CORE,
+              label: props.t('Home'),
+              isALink: true
+            }]} keepLastBreadcrumbAsLink
+          /> {/* TODO - Change after backend */}
 
           <TimedEvent
             customClass='advancedSearchContent__modification'
