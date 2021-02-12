@@ -74,7 +74,7 @@ class IndexedContent(Document):
     ElasticSearch Content Models.
     Used for index creation.
 
-    Should stay a enhanced version of ContentDigestSchema.
+    Should stay an enhanced version of ContentDigestSchema.
     """
 
     content_namespace = Keyword()
