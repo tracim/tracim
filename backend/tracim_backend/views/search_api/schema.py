@@ -9,12 +9,8 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import string_to_list
-<<<<<<< HEAD
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
-=======
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
-from tracim_backend.views.core_api.schemas import ContentSchema
->>>>>>> c678206bb... refactor(backend): modify ES indexed model for content
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
@@ -92,7 +88,7 @@ class WorkspaceSearchSchema(marshmallow.Schema):
     label = StrippedString(example="Intranet")
 
 
-class ContentSearchSchema(ContentSchema):
+class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     score = marshmallow.fields.Float()
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
