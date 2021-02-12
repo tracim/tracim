@@ -10,7 +10,6 @@ from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
-from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
@@ -22,7 +21,7 @@ class SearchFilterQuery(object):
         size: int = 10,
         page_nb: int = 1,
         search_string: str = "",
-        content_types: typing.Optional[str] = None,
+        content_types: typing.Optional[typing.List[str]] = None,
         show_deleted: int = 0,
         show_archived: int = 0,
         show_active: int = 1,
@@ -30,10 +29,10 @@ class SearchFilterQuery(object):
         self.search_string = search_string
         self.size = size
         self.page_nb = page_nb
+
         if not content_types:
             self.content_types = content_type_list.restricted_allowed_types_slug()
-        else:
-            self.content_types = string_to_list(content_types, ",", str)
+
         self.show_deleted = bool(show_deleted)
         self.show_archived = bool(show_archived)
         self.show_active = bool(show_active)
@@ -84,6 +83,12 @@ class SearchFilterQuerySchema(marshmallow.Schema):
 
 
 class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
+    search_fields = StrippedString(
+        required=False,
+        validate=regex_string_as_list_of_string,
+        description="search within these fields"
+        # FIXME restrict to "label", "raw_content", "comments", "description",
+    )
     workspace_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
@@ -103,12 +108,6 @@ class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
         required=False,
         validate=regex_string_as_list_of_string,
         description="select contents with these file extensions",
-    )
-    search_fields = StrippedString(
-        required=False,
-        validate=regex_string_as_list_of_string,
-        description="search within these fields"
-        # FIXME restrict to "label", "raw_content", "comments", "description",
     )
     statuses = StrippedString(
         required=False,
@@ -150,3 +149,39 @@ class ContentSearchResultSchema(marshmallow.Schema):
     contents = marshmallow.fields.Nested(ContentSearchSchema, many=True)
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
+
+
+class FacetsSchema(marshmallow.Schema):
+    search_fields = marshmallow.fields.List(
+        marshmallow.fields.String(description="search was performed in these fields")
+    )
+    workspace_names = marshmallow.fields.List(
+        marshmallow.fields.String(description="search was restricted to these workspaces")
+    )
+    author_public_names = marshmallow.fields.List(
+        marshmallow.fields.String(description="search was restricted to contents by these authors")
+    )
+    last_modifier_public_names = marshmallow.fields.List(
+        marshmallow.fields.String(
+            description="search was restricted to contents whose last modifier are these authors"
+        )
+    )
+    file_extensions = marshmallow.fields.List(
+        marshmallow.fields.String(
+            description="search was restricted to contents with these file extensions"
+        )
+    )
+    statuses = marshmallow.fields.List(
+        marshmallow.fields.String(
+            description="search was restricted to contents with these statuses"
+        )
+    )
+    created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    updated_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    updated_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+
+
+class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
+    search_fields = marshmallow.fields.List(marshmallow.fields.String())
+    simple_facets = marshmallow.fields.Nested(FacetsSchema)

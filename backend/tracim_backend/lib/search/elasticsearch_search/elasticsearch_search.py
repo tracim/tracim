@@ -458,7 +458,7 @@ class ESSearchApi(SearchApi):
                 from_=self.offset_from_pagination(simple_parameters.size, simple_parameters.page_nb)
             )
 
-        if simple_parameters.filtered_workspace_ids is not None:
+        if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
         # Simple Facets:
