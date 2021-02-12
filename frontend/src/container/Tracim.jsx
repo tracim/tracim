@@ -35,7 +35,8 @@ import {
   unLoggedAllowedPageList,
   getUserProfile,
   toggleFavicon,
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  SEARCH_TYPE
 } from '../util/helper.js'
 import {
   getAppList,
@@ -526,7 +527,7 @@ export class Tracim extends React.Component {
 
           <Route
             path={PAGE.SEARCH_RESULT}
-            component={props.system.config.search_engine === 'elasticsearch'
+            component={props.system.config.search_engine === SEARCH_TYPE.ADVANCED
               ? AdvancedSearch
               : SearchResult}
           />
