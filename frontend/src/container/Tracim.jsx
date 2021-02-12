@@ -526,7 +526,7 @@ export class Tracim extends React.Component {
 
           <Route
             path={PAGE.SEARCH_RESULT}
-            component={true // TODO - props.system.config.search_engine === 'elasticsearch'
+            component={props.system.config.search_engine === 'elasticsearch'
               ? AdvancedSearch
               : SearchResult}
           />
