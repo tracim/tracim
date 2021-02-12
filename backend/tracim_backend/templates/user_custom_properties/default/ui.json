@@ -1,38 +1,39 @@
 {
-  "first_name": {
-    "ui:autofocus": true,
-    "ui:emptyValue": "",
-    "ui:autocomplete": "family-name",
+  "ui:order": ["tagline", "location", "hobbies", "website", "birth_date", "phone", "languages", "personal_page"],
+
+  "tagline": {
     "tracim:display_group": "public_profile_first"
   },
-  "last_name": {
-    "ui:emptyValue": "",
-    "ui:autocomplete": "given-name",
+
+  "location": {
     "tracim:display_group": "public_profile_first"
   },
-  "bio": {
-    "ui:widget": "textarea",
-    "ui:help": "Write something about you.",
+
+  "hobbies": {
     "tracim:display_group": "public_profile_first"
   },
-  "birthday_date": {
-    "ui:widget": "alt-date",
+
+  "website": {
     "tracim:display_group": "public_profile_first"
   },
-  "phone_number": {
+
+  "birth_date": {
+    "tracim:display_group": "public_profile_first"
+  },
+
+  "phone": {
     "ui:options": {
       "inputType": "tel"
     },
     "tracim:display_group": "public_profile_first"
   },
-  "organization": {
+
+  "languages": {
     "tracim:display_group": "public_profile_first"
   },
+
   "personal_page": {
     "ui:widget": "textarea",
     "tracim:display_group": "public_profile_second"
-  },
-  "tasks": {
-    "tracim:display_group": "public_profile_first"
   }
 }

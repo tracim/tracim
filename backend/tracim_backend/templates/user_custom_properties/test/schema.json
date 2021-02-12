@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Test",
-  "description": "just test data",
+  "description": "just some test data",
   "type": "object",
   "definitions": {
     "subfield": {

@@ -100,10 +100,10 @@ export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
 export const getFileRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
 
-export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent) =>
+export const putFileDescription = (apiUrl, workspaceId, contentId, label, newDescription) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     label: label,
-    raw_content: newContent
+    description: newDescription
   })
 
 export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>

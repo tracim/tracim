@@ -120,3 +120,15 @@ class IndexedContent(Document):
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
     b64_file = Text()
+
+
+class IndexedUser(Document):
+    # TODO - S.G. - 2021-02-05 - placeholder to test multi-index creation,
+    # will be completed during https://github.com/tracim/tracim/issues/4095
+    pass
+
+
+class IndexedWorkspace(Document):
+    # TODO - S.G. - 2021-02-05 - placeholder to test multi-index creation,
+    # will be completed during https://github.com/tracim/tracim/issues/4134
+    pass

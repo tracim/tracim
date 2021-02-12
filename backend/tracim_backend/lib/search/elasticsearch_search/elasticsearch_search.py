@@ -2,27 +2,36 @@ from datetime import datetime
 import typing
 
 from elasticsearch import Elasticsearch
+from elasticsearch import RequestError
 from elasticsearch.client import IngestClient
-from elasticsearch_dsl import Index
+from elasticsearch_dsl import Document
 from elasticsearch_dsl import Search
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
+from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedUser
+from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
-from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
-
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
+
 
 class AdvancedSearchParameters:
     def __init__(
+        self,
         workspace_names: typing.Optional[typing.List[str]] = None,
         author_public_names: typing.Optional[typing.List[str]] = None,
         last_modifier_public_names: typing.Optional[typing.List[str]] = None,
@@ -37,11 +46,11 @@ class AdvancedSearchParameters:
         created_from: typing.Optional[datetime] = None,
         created_to: typing.Optional[datetime] = None,
         updated_from: typing.Optional[datetime] = None,
-        updated_to: typing.Optional[datetime] = None
+        updated_to: typing.Optional[datetime] = None,
     ):
         self.workspace_names = workspace_names
         self.author_public_names = author_public_names
-        self.last_modified_public_names = last_modified_public_names
+        self.last_modifier_public_names = last_modifier_public_names
         self.file_extensions = file_extensions
         self.search_fields = search_fields
         self.statuses = statuses
@@ -49,6 +58,16 @@ class AdvancedSearchParameters:
         self.created_to = created_to
         self.updated_from = updated_from
         self.updated_to = updated_to
+
+
+class IndexParameters:
+    def __init__(
+        self, alias: str, document_class: typing.Type[Document], index_name_template: str
+    ) -> None:
+        self.alias = alias
+        self.document_class = document_class
+        self.index_name_template = index_name_template
+
 
 class ESSearchApi(SearchApi):
     """
@@ -75,65 +94,78 @@ class ESSearchApi(SearchApi):
                 )
             ]
         )
-        self.index_document_pattern = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE.format(
-            date="*", index_alias=config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
-        )
-        self.index_document_pattern_template = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE
-        self.index_document_alias = config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
 
-    def create_index(self) -> None:
-        """
-        Create the index template in elasticsearch specifying the mappings and any
-        settings to be used. This can be run at any time, ideally at every new code
-        deploy
-        """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-
-        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
+    def create_indices(self) -> None:
+        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
-        logger.info(self, "Creating index settings ...")
+        logger.info(self, "Creating ES indices...")
         if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             self._create_ingest_pipeline()
-        # create an index template
-        index_template = IndexedContent._index.as_template(
-            self.index_document_alias, self.index_document_pattern
+
+        indices_parameters = self._get_indices_parameters()
+        for parameters in indices_parameters:
+            self.create_template(parameters)
+            index_name = self._get_index_name(parameters)
+            try:
+                self.es.indices.create(index=index_name)
+            except RequestError:
+                # Ignoring error if the index already exists
+                pass
+            else:
+                self.set_alias(parameters, index_name)
+
+        logger.info(self, "ES indices are ready")
+
+    def create_template(self, parameters: IndexParameters) -> None:
+        """Create an index template based on the given model."""
+        index_template = parameters.document_class._index.as_template(
+            parameters.alias, self._get_index_pattern(parameters)
         )
         # upload the template into elasticsearch
         # potentially overriding the one already there
         index_template.save(using=self.es)
 
-        # create the first index if it doesn't exist
-        current_index = Index(self.index_document_alias)
-        if not current_index.exists(using=self.es):
-            self.migrate_index(move_data=False)
+    def set_alias(self, parameters: IndexParameters, index_name: str) -> None:
+        """Ensure that the alias of the given parameters does point to the given index."""
+        self.es.indices.update_aliases(
+            body={
+                "actions": [
+                    {
+                        "remove": {
+                            "alias": parameters.alias,
+                            "index": self._get_index_pattern(parameters),
+                        }
+                    },
+                    {"add": {"alias": parameters.alias, "index": index_name}},
+                ]
+            }
+        )
 
-        logger.info(self, "ES index is ready")
-
-    def refresh_index(self) -> None:
+    def refresh_indices(self) -> None:
         """
-        refresh index to obtain up to odate information instead of relying on
-        periodically refresh, usefull for automated tests
+        refresh index to obtain up to date information instead of relying on
+        periodical refresh, useful for automated tests.
         see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
         """
+        for parameters in self._get_indices_parameters():
+            self.es.indices.refresh(parameters.alias)
 
-        self.es.indices.refresh(self.index_document_alias)
-
-    def delete_index(self) -> None:
+    def delete_indices(self) -> None:
 
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
-        logger.info(self, "delete index with pattern {}".format(self.index_document_pattern))
-        self.es.indices.delete(self.index_document_pattern, allow_no_indices=True)
-        self.es.indices.delete_template(self.index_document_alias)
+        for parameters in self._get_indices_parameters():
+            index_pattern = self._get_index_pattern(parameters)
+            logger.info(self, "deleting indices whose name matches {}".format(index_pattern))
+            self.es.indices.delete(index_pattern, allow_no_indices=True)
+            self.es.indices.delete_template(parameters.alias)
 
-    def migrate_index(self, move_data=True, update_alias=True) -> None:
+    def migrate_indices(self) -> None:
         """
-        Upgrade function that creates a new index for the data. Optionally it also can
-        (and by default will) reindex previous copy of the data into the new index
-        (specify ``move_data=False`` to skip this step) and update the alias to
-        point to the latest index (set ``update_alias=False`` to skip).
+        Upgrade function that creates a new index for the data and re-index
+        the previous copy of the data into the new index.
+
         Note that while this function is running the application can still perform
         any and all searches without any loss of functionality. It should, however,
         not perform any writes at this time as those might be lost.
@@ -141,62 +173,37 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
-        next_index = self.index_document_pattern_template.replace(
-            "{index_alias}", self.index_document_alias
-        ).replace("{date}", datetime.now().strftime("%Y%m%d%H%M%S%f"))
+        for parameters in self._get_indices_parameters():
+            new_index_name = self._get_index_name(parameters)
 
-        logger.info(self, 'create new index "{}"'.format(next_index))
-        # create new index, it will use the settings from the template
-        self.es.indices.create(index=next_index)
+            logger.info(self, 'Creating new index "{}"'.format(new_index_name))
+            # create new index, it will use the settings from the template
+            self.es.indices.create(index=new_index_name)
 
-        if move_data:
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(self.index_document_alias, next_index)
+                self, 'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name)
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={
-                    "source": {"index": self.index_document_alias},
-                    "dest": {"index": next_index},
-                },
+                body={"source": {"index": parameters.alias}, "dest": {"index": new_index_name}},
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
-            self.es.indices.refresh(index=next_index)
+            self.es.indices.refresh(index=new_index_name)
 
-        if update_alias:
             logger.info(
                 self,
-                'set alias "{}" to point on index "{}"'.format(
-                    self.index_document_alias, next_index
+                'Setting alias "{}" to point on index "{}"'.format(
+                    parameters.alias, new_index_name
                 ),
             )
-            # repoint the alias to point to the newly created index
-            self.es.indices.update_aliases(
-                body={
-                    "actions": [
-                        {
-                            "remove": {
-                                "alias": self.index_document_alias,
-                                "index": self.index_document_pattern,
-                            }
-                        },
-                        {"add": {"alias": self.index_document_alias, "index": next_index}},
-                    ]
-                }
-            )
+            # move the alias to point to the newly created index
+            self.set_alias(parameters, new_index_name)
 
     def index_content(self, content: ContentInContext) -> None:
         """
         Index/update a content into elastic_search engine
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-
         if content.content_type == content_type_list.Comment.slug:
             content = content.parent
             # INFO - G.M - 2019-05-20 - we currently do not support comment without parent
@@ -267,6 +274,7 @@ class ESSearchApi(SearchApi):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
+        content_index_alias = self._get_index_parameters(IndexedContent).alias
         if self._can_index_content(content):
             file_ = content.get_b64_file()
             if file_:
@@ -274,7 +282,7 @@ class ESSearchApi(SearchApi):
                 indexed_content.save(
                     using=self.es,
                     pipeline="attachment",
-                    index=self.index_document_alias,
+                    index=content_index_alias,
                     request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
                 )
                 return
@@ -286,7 +294,7 @@ class ESSearchApi(SearchApi):
             )
         indexed_content.save(
             using=self.es,
-            index=self.index_document_alias,
+            index=content_index_alias,
             request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
         )
 
@@ -364,7 +372,7 @@ class ESSearchApi(SearchApi):
             return {"gte": range_from, "lte": range_to}
 
         if range_from:
-           return {"gte", range_from}
+            return {"gte", range_from}
 
         if range_to:
             return {"lte", range_to}
@@ -374,21 +382,17 @@ class ESSearchApi(SearchApi):
     def search_content(
         self,
         simple_parameters: SearchFilterQuerySchema,
-        advanced_parameters: typing.Optional[AdvancedSearchParameters] = None
+        advanced_parameters: typing.Optional[AdvancedSearchParameters] = None,
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-
-        if not search_string:
+        if not simple_parameters.search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
-
-        # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
+        # INFO - G.M - 2019-05-31 - search using simple_query_string, which means user-friendly
         # syntax to match complex case,
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
         es_search_fields = []
@@ -414,7 +418,9 @@ class ESSearchApi(SearchApi):
                 es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
 
         search = Search(
-            using=self.es, doc_type=IndexedContent, index=self.index_document_alias
+            using=self.es,
+            doc_type=IndexedContent,
+            index=self._get_index_parameters(IndexedContent).alias,
         ).query(
             "simple_query_string",
             query=simple_parameters.search_string,
@@ -445,10 +451,12 @@ class ESSearchApi(SearchApi):
         # return all workspaces content, empty list mean return nothing.
 
         if simple_parameters.size:
-            search = search.extra(size=size)
+            search = search.extra(size=simple_parameters.size)
 
         if simple_parameters.page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+            search = search.extra(
+                from_=self.offset_from_pagination(simple_parameters.size, simple_parameters.page_nb)
+            )
 
         if simple_parameters.filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
@@ -461,16 +469,21 @@ class ESSearchApi(SearchApi):
 
         if advanced_parameters:
             if advanced_parameters.workspace_names:
-                search = search.filter("terms", workspace__label__exact=advanced_parameters.workspace_names)
+                search = search.filter(
+                    "terms", workspace__label__exact=advanced_parameters.workspace_names
+                )
             search.aggs.bucket("workspace_names", "terms", field="workspace.label.exact")
 
             if advanced_parameters.author_public_names:
-                search = search.filter("terms", author__public_name__exact=advanced_parameters.author_public_names)
+                search = search.filter(
+                    "terms", author__public_name__exact=advanced_parameters.author_public_names
+                )
 
             search.aggs.bucket("author__public_names", "terms", field="author.public_name.exact")
-            if advanced_parameters.last_modified_public_names:
+            if advanced_parameters.last_modifier_public_names:
                 search = search.filter(
-                    "terms", last_modified__public_name__exact=advanced_parameters.last_modified_public_names
+                    "terms",
+                    last_modifier_public_names__exact=advanced_parameters.last_modifier_public_names,
                 )
             search.aggs.bucket(
                 "last_modifier__public_names", "terms", field="last_modifier.public_name.exact"
@@ -485,16 +498,14 @@ class ESSearchApi(SearchApi):
             search.aggs.bucket("statuses", "terms", field="status")
 
             created_range = self.create_es_range(
-                advanced_parameters.created_from,
-                advanced_parameters.created_to
+                advanced_parameters.created_from, advanced_parameters.created_to
             )
 
             if created_range:
                 search = search.filter("range", created=created_range)
 
             modified_range = self.create_es_range(
-                advanced_parameters.modified_from,
-                advanced_parameters.modified_to
+                advanced_parameters.modified_from, advanced_parameters.modified_to
             )
 
             if modified_range:
@@ -508,6 +519,47 @@ class ESSearchApi(SearchApi):
 
         res = search.execute()
         return res
+
+    @staticmethod
+    def _get_index_name(parameters: IndexParameters) -> str:
+        return parameters.index_name_template.format(
+            date=datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+        )
+
+    @staticmethod
+    def _get_index_pattern(parameters: IndexParameters) -> str:
+        return parameters.index_name_template.format(date="*")
+
+    def _get_indices_parameters(self) -> typing.List[IndexParameters]:
+        prefix = self._config.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX
+        template = self._config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE
+
+        return [
+            IndexParameters(
+                alias=prefix + "-content",
+                index_name_template=template.format(index_alias=prefix + "-content", date="{date}"),
+                document_class=IndexedContent,
+            ),
+            IndexParameters(
+                alias=prefix + "-user",
+                index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
+                document_class=IndexedUser,
+            ),
+            IndexParameters(
+                alias=prefix + "-workspace",
+                index_name_template=template.format(
+                    index_alias=prefix + "-workspace", date="{date}"
+                ),
+                document_class=IndexedWorkspace,
+            ),
+        ]
+
+    def _get_index_parameters(self, document_class: typing.Type[Document]) -> IndexParameters:
+        return next(
+            parameters
+            for parameters in self._get_indices_parameters()
+            if parameters.document_class == document_class
+        )
 
     def _create_ingest_pipeline(self) -> None:
         """

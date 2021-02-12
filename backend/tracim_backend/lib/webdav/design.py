@@ -162,7 +162,7 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
 
 def design_page(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
 
-    return content_revision.description
+    return content_revision.raw_content
 
 
 def design_thread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
@@ -174,7 +174,7 @@ def design_thread(content: data.Content, content_revision: data.ContentRevisionR
     thread = THREAD_MESSAGE.format(
         posting_time=format_datetime(first_comment.created, locale=get_locale()),
         comment_owner=first_comment.owner.display_name,
-        comment_content=first_comment.description_as_raw_text(),
+        comment_content=first_comment.raw_content_as_raw_text(),
     )
     if len(comments) == 1:
         return thread
@@ -187,7 +187,7 @@ def design_thread(content: data.Content, content_revision: data.ContentRevisionR
         thread += THREAD_MESSAGE.format(
             posting_time=format_datetime(comment.created, locale=get_locale()),
             comment_owner=comment.owner.display_name,
-            comment_content=comment.description_as_raw_text(),
+            comment_content=comment.raw_content_as_raw_text(),
         )
         thread_closing_tags += "</blockquote>"
     thread += thread_closing_tags

@@ -307,7 +307,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         headers = {"X-Tracim-ClientToken": "justaclienttoken"}
@@ -342,7 +342,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         modified_event = event_helper.last_event
@@ -375,7 +375,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -408,7 +408,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         res = web_testapp.put_json(
@@ -443,7 +443,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -476,7 +476,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -515,7 +515,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set(
             [content_type_list.Folder.slug, content_type_list.Thread.slug]
         )
@@ -541,7 +541,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -574,7 +574,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -613,7 +613,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])
 
     def test_api__update_folder__err_400__label_already_used(
@@ -644,7 +644,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "already_used",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -677,7 +677,7 @@ class TestFolder(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.update_content(
-                folder, new_label="test-folder-updated", new_content="Just a test"
+                folder, new_label="test-folder-updated", new_raw_content="Just a test"
             )
         content_api.save(folder)
         with new_revision(session=session, tm=transaction.manager, content=folder):
@@ -1058,7 +1058,7 @@ class TestHtmlDocuments(object):
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
     @pytest.mark.parametrize("content_raw_data", ["<b>a first html comment</b>"])
-    def test_api__get_thread_html_preview__ok__200__nominal_case(
+    def test_api__get_html_document_html_preview__ok__200__nominal_case(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -1081,7 +1081,9 @@ class TestHtmlDocuments(object):
             do_notify=False,
         )
         with new_revision(session=session, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(test_html_document, "test_page", content_raw_data)
+            content_api.update_content(
+                test_html_document, "test_page", new_raw_content=content_raw_data
+            )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
@@ -1090,7 +1092,7 @@ class TestHtmlDocuments(object):
             ),
             status=200,
         )
-        binary_content_raw_data = test_html_document.description.encode("utf-8")
+        binary_content_raw_data = test_html_document.raw_content.encode("utf-8")
         assert res.body == binary_content_raw_data
         assert res.content_length == len(binary_content_raw_data)
         assert res.charset == "UTF-8"
@@ -4358,7 +4360,7 @@ class TestThreads(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         content_api.save(test_thread)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):

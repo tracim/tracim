@@ -23,10 +23,8 @@ function logerror {
 
 
 dev=""
-devext=""
 if [ "$1" = "-d" ]; then
     dev="-dev"
-    devext=".dev"
 fi
 
 log "creating debug file"
@@ -34,7 +32,7 @@ cp src/debug.js.sample src/debug.js
 log "building frontend_app_thread"
 yarn run buildoptimized$dev  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/thread.app$devext.js ../frontend/dist/app/thread.app.js && loggood "success" || logerror "some error"
+cp dist/thread.app.js ../frontend/dist/app/thread.app.js && loggood "success" || logerror "some error"
 log "copying en translation.json"
 cp i18next.scanner/en/translation.json ../frontend/dist/app/thread_en_translation.json && loggood "success" || logerror "some error"
 log "copying fr translation.json"

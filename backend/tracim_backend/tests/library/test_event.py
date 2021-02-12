@@ -156,7 +156,7 @@ class FakeLiveMessageBuilder(BaseLiveMessageBuilder):
 @pytest.mark.usefixtures("base_fixture")
 class TestEventReceiver:
     def test_unit__get_receiver_ids_user_event__nominal_case(
-        self, session, workspace_and_users, admin_user, user_api_factory
+        self, session, workspace_and_users, admin_user, user_api_factory, app_config
     ):
         (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
         user_api = user_api_factory.get()
@@ -171,14 +171,20 @@ class TestEventReceiver:
         }
         event = Event(entity_type=EntityType.USER, operation=OperationType.MODIFIED, fields=fields)
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
         assert admin_user.user_id in receivers_ids
 
     def test_unit__get_receiver_ids_workspace_event__nominal_case(
-        self, session, workspace_and_users, admin_user, user_api_factory, workspace_api_factory
+        self,
+        session,
+        workspace_and_users,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
     ):
         (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
         workspace_api = workspace_api_factory.get()
@@ -195,7 +201,7 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -208,6 +214,7 @@ class TestEventReceiver:
         admin_user,
         user_api_factory,
         workspace_api_factory,
+        app_config,
     ):
         (
             my_workspace,
@@ -230,10 +237,47 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id in receivers_ids
+        assert admin_user.user_id in receivers_ids
+
+    def test_unit__get_receiver_ids_workspace_event__workspace_without_access_type(
+        self,
+        session,
+        accessible_workspace_and_users,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
+    ):
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = accessible_workspace_and_users
+        workspace_api = workspace_api_factory.get()
+        workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
+        user_api = user_api_factory.get()
+        workspace_dict = WorkspaceSchema(exclude=("access_type",)).dump(workspace_in_context).data
+        fields = {
+            Event.AUTHOR_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+            Event.CLIENT_TOKEN_FIELD: "test",
+            Event.WORKSPACE_FIELD: workspace_dict,
+        }
+        event = Event(
+            entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
+        )
+
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
+        assert event_initiator.user_id in receivers_ids
+        assert same_workspace_user.user_id in receivers_ids
+        assert other_user.user_id not in receivers_ids
         assert admin_user.user_id in receivers_ids
 
     def test_unit__get_receiver_ids_workspace_members_event__nominal_case(
@@ -244,6 +288,7 @@ class TestEventReceiver:
         user_api_factory,
         workspace_api_factory,
         role_api_factory,
+        app_config,
     ):
         (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
         workspace_api = workspace_api_factory.get()
@@ -266,7 +311,7 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -280,6 +325,7 @@ class TestEventReceiver:
         user_api_factory,
         workspace_api_factory,
         role_api_factory,
+        app_config,
     ):
         (
             my_workspace,
@@ -308,7 +354,7 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -324,6 +370,7 @@ class TestEventReceiver:
         workspace_api_factory,
         role_api_factory,
         workspace_and_users,
+        app_config,
     ):
         (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
         workspace_api = workspace_api_factory.get()
@@ -351,7 +398,7 @@ class TestEventReceiver:
             entity_type=EntityType.CONTENT, operation=OperationType.MODIFIED, fields=fields
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -365,6 +412,7 @@ class TestEventReceiver:
         admin_user: User,
         workspace_api_factory: WorkspaceApiFactory,
         role_api_factory: RoleApiFactory,
+        app_config,
     ):
         user_api = user_api_factory.get()
         profile = Profile.USER
@@ -422,7 +470,7 @@ class TestEventReceiver:
             fields=fields,
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert subscriber.user_id in receivers_ids
         assert workspace_manager.user_id in receivers_ids
         assert admin_user.user_id in receivers_ids
@@ -437,6 +485,7 @@ class TestEventReceiver:
         admin_user: User,
         workspace_api_factory: WorkspaceApiFactory,
         role_api_factory: RoleApiFactory,
+        app_config,
     ):
         user_api = user_api_factory.get()
         profile = Profile.USER
@@ -495,7 +544,7 @@ class TestEventReceiver:
             fields=fields,
         )
 
-        receivers_ids = FakeLiveMessageBuilder()._get_receiver_ids(event, session)
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert subscriber.user_id in receivers_ids
         assert workspace_manager.user_id in receivers_ids
         assert admin_user.user_id in receivers_ids
