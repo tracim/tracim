@@ -69,7 +69,7 @@ class ContentItem extends React.Component {
                   <ComposedIcon
                     mainIcon={props.faIcon}
                     smallIcon='fas fa-share-alt'
-                    // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                    // FIXME - GB - 2019-07-26 - Replace these hardcoded values by webpack variables
                     // https://github.com/tracim/tracim/issues/2098
                     smallIconStyle={{ color: '#252525' }}
                   />

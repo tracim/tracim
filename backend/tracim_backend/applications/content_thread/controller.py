@@ -26,13 +26,13 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ContentModifySchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import RevisionSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentModifySchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -55,7 +55,7 @@ class ThreadController(Controller):
     @check_right(is_reader)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.output_body(ContentSchema())
     def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get thread content
@@ -98,9 +98,8 @@ class ThreadController(Controller):
             raise UnavailablePreview(
                 'No preview available for thread of content id "{}"'.format(content.content_id)
             )
-        file = BytesIO()
-        byte_size = file.write(first_comment.description.encode("utf-8"))
-        file.seek(0)
+        file = BytesIO(first_comment.raw_content.encode("utf-8"))
+        byte_size = len(file.getvalue())
         filename = hapic_data.path.filename
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
         # "raw", where filename returned will be original file one.
@@ -122,8 +121,8 @@ class ThreadController(Controller):
     @check_right(is_contributor)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(TextBasedContentModifySchema())
-    @hapic.output_body(TextBasedContentSchema())
+    @hapic.input_body(ContentModifySchema())
+    @hapic.output_body(ContentSchema())
     def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         update thread
@@ -141,7 +140,8 @@ class ThreadController(Controller):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
-                new_content=hapic_data.body.raw_content,
+                new_raw_content=hapic_data.body.raw_content,
+                new_description=hapic_data.body.description,
             )
             api.save(content)
             api.execute_update_content_actions(content)
@@ -151,7 +151,7 @@ class ThreadController(Controller):
     @check_right(is_reader)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TextBasedRevisionSchema(many=True))
+    @hapic.output_body(RevisionSchema(many=True))
     def get_thread_revisions(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[RevisionInContext]:

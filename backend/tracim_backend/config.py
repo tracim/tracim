@@ -344,6 +344,9 @@ class CFG(object):
         """
         "replace "%(here)s" by localisation of the config file.
         """
+        if "TRACIM_HERE_PATH" in os.environ:
+            return value.replace("%(here)s", os.environ["TRACIM_HERE_PATH"])
+
         return value.replace("%(here)s", self.settings["here"])
 
     def _load_global_config(self) -> None:
@@ -422,14 +425,22 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
+
+        default_user_custom_properties_path = self.here_macro_replace(
+            "%(here)s/tracim_backend/templates/user_custom_properties/default/"
+        )
+
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.json_schema_file_path"
+            "user.custom_properties.json_schema_file_path",
+            default_user_custom_properties_path + "schema.json",
         )
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.ui_schema_file_path"
+            "user.custom_properties.ui_schema_file_path",
+            default_user_custom_properties_path + "ui.json",
         )
         self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH = self.get_raw_config(
-            "user.custom_properties.translations_dir_path"
+            "user.custom_properties.translations_dir_path",
+            default_user_custom_properties_path + "locale",
         )
 
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
@@ -747,22 +758,21 @@ class CFG(object):
 
     def _load_search_config(self):
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
-
-        DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
-        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS = self.get_raw_config(
-            "search.elasticsearch.index_alias"
+        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX = self.get_raw_config(
+            "search.elasticsearch.index_alias_prefix"
         )
+        default_index_documents_pattern_template = "{index_alias}-{date}"
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE,
+            "search.elasticsearch.index_pattern_template", default_index_documents_pattern_template,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
         )
         # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
-        ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
+        allowed_ingest_default_mimetype = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE,
+                "search.elasticsearch.ingest.mimetype_whitelist", allowed_ingest_default_mimetype,
             ),
             separator=",",
             cast_func=str,
@@ -1180,8 +1190,8 @@ class CFG(object):
         # see https://github.com/tracim/tracim/issues/1835
         if self.SEARCH__ENGINE == "elasticsearch":
             self.check_mandatory_param(
-                "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
-                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
+                "SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX",
+                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX,
                 when_str="if elasticsearch search feature is enabled",
             )
 

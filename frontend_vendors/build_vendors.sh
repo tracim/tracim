@@ -23,13 +23,11 @@ function logerror {
 
 
 dev=""
-devext=""
 if [ "$1" = "-d" ]; then
     dev="-dev"
-    devext=".dev"
 fi
 
 log "building frontend_vendors"
 yarn run build$dev  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/tracim_frontend_vendors$devext.js ../frontend/dist/app/tracim_frontend_vendors.js && loggood "success" || logerror "some error"
+cp dist/tracim_frontend_vendors.js ../frontend/dist/app/tracim_frontend_vendors.js && loggood "success" || logerror "some error"

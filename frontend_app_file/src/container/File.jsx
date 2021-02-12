@@ -47,7 +47,7 @@ import {
   getFileContent,
   getFileRevision,
   PAGE,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual
@@ -402,7 +402,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const fetchResultSaveFile = await handleFetchResult(
-      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
+      await putFileDescription(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: {
@@ -418,10 +418,10 @@ export class File extends React.Component {
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+          default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
     }
   }
 
@@ -814,7 +814,7 @@ export class File extends React.Component {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
-      children: (
+      children: state.config.apiUrl ? (
         <Timeline
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
@@ -839,7 +839,7 @@ export class File extends React.Component {
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
         />
-      )
+      ) : null
     }
     const propertiesObject = {
       id: 'properties',
@@ -856,7 +856,7 @@ export class File extends React.Component {
           creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-          description={state.content.raw_content}
+          description={state.content.description}
           displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}

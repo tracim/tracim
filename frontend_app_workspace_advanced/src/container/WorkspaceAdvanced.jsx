@@ -318,7 +318,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description', 'warning'))
     }
   }
 

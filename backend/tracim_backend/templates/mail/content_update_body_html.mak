@@ -42,7 +42,7 @@
         </p>
         <%
             title_diff = htmldiff(html_escape(previous_revision.label), html_escape(content_in_context.label))
-            content_diff = htmldiff(previous_revision.description, content_in_context.raw_content)
+            content_diff = htmldiff(previous_revision.raw_content, content_in_context.raw_content)
         %>
         %if title_diff or content_diff:
             <p>${_("Here is an overview of the changes:")}</p>

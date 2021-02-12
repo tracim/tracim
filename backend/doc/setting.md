@@ -411,7 +411,7 @@ You then need to setup the configuration file:
     search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
-    search.elasticsearch.index_alias = tracim_contents
+    search.elasticsearch.index_alias_prefix = tracim
 
 Your Elasticsearch server needs to be running. You can then set up the index with:
 

@@ -1,3 +1,41 @@
+# 3.5.0 / 2021-02-11
+
+### New Features
+
+- All users have a parameterizable public profile
+- The user interface now uses icons from Font Awesome 5
+
+### Fixed Issues
+
+- Frontend: [#3578](https://github.com/tracim/tracim/issues/3578),
+[#3785](https://github.com/tracim/tracim/issues/3785),
+[#3790](https://github.com/tracim/tracim/issues/3790),
+[#3989](https://github.com/tracim/tracim/issues/3989),
+[#3999](https://github.com/tracim/tracim/issues/3999),
+[#4109](https://github.com/tracim/tracim/issues/4109)
+- Backend: [#4130](https://github.com/tracim/tracim/issues/4130),
+[#4137](https://github.com/tracim/tracim/issues/4137),
+[#4142](https://github.com/tracim/tracim/issues/4142)
+- Other: [#4062](https://github.com/tracim/tracim/issues/4062)
+
+### Known Issues
+
+- SQLite: After deleting a content/user/space directly in the database its id can be re-used (see details [here](https://sqlite.org/autoinc.html)). This can lead Tracim to display information referring to the wrong content/user/space in the notification wall and activity feed. (issue [#4016](https://github.com/tracim/tracim/issues/4016))
+
+### Breaking Changes
+
+- Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
+- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](.backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
+  - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
+  - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
+  - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`
+
+### Others
+
+- Implemented an API to allow users to follow each other (issue [#3916](https://github.com/tracim/tracim/issues/3916))
+- Simplified way to run tests (backend/frontend) in development environments (issue [#4020](https://github.com/tracim/tracim/issues/4020))
+
+
 ## 3.4.3 / 2021-01-11
 
 ### Fixed Issues

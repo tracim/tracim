@@ -27,13 +27,13 @@ class SimpleSearchApi(SearchApi):
     - limited feature (no ranking, no search into content, etc...)
     """
 
-    def create_index(self):
+    def create_indices(self):
         pass
 
-    def migrate_index(self, move_data=True, update_alias=True):
+    def migrate_indices(self):
         pass
 
-    def delete_index(self):
+    def delete_indices(self):
         pass
 
     def index_content(self, content: ContentInContext):
@@ -122,9 +122,21 @@ class SimpleSearchApi(SearchApi):
         filter_group_description = list(
             Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
         )
+        filter_group_raw_content = list(
+            Content.raw_content.ilike("%{}%".format(keyword)) for keyword in keywords
+        )
         title_keyworded_items = (
             content_api.get_base_query(None)
-            .filter(or_(*(filter_group_label + filter_group_filename + filter_group_description)))
+            .filter(
+                or_(
+                    *(
+                        filter_group_label
+                        + filter_group_filename
+                        + filter_group_description
+                        + filter_group_raw_content
+                    )
+                )
+            )
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
             .order_by(

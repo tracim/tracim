@@ -50,6 +50,9 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; jobs.async.redis.port = .*|jobs.async.redis.port = 6379|g" /etc/tracim/development.ini
     sed -i "s|^; jobs.async.redis.db = .*|jobs.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.json_schema_file_path = .*|user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.ui_schema_file_path = .*|user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.translations_dir_path = .*|user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path =.*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
     sed -i "s|^; collaborative_document_edition.file_template_dir = .*|collaborative_document_edition.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in

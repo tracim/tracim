@@ -111,7 +111,7 @@ class Content(Fixture):
         with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             content_api.update_content(
                 item=tiramisu_page,
-                new_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",
+                new_raw_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",
                 new_label="Tiramisu Recipes!!!",
             )
             content_api.save(tiramisu_page, do_notify=False)
@@ -250,14 +250,16 @@ class Content(Fixture):
         )
         with new_revision(session=self._session, tm=transaction.manager, content=best_cake_thread):
             bob_content_api.update_content(
-                item=best_cake_thread, new_content="What is the best cake?", new_label="Best Cakes?"
+                item=best_cake_thread,
+                new_raw_content="What is the best cake?",
+                new_label="Best Cakes?",
             )
             bob_content_api.save(best_cake_thread, do_notify=False)
 
         with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             bob_content_api.update_content(
                 item=tiramisu_page,
-                new_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",
+                new_raw_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",
                 new_label="Tiramisu Recipe",
             )
             bob_content_api.save(tiramisu_page, do_notify=False)

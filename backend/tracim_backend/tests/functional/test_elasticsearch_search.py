@@ -84,7 +84,7 @@ class TestElasticSearchSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content", status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -153,7 +153,7 @@ class TestElasticSearchSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content", status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -221,7 +221,7 @@ class TestElasticSearchSearch(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
-                content, new_label=created_content_name, new_content=created_content_body
+                content, new_label=created_content_name, new_raw_content=created_content_body
             )
             api.save(content)
         api.execute_created_content_actions(content)

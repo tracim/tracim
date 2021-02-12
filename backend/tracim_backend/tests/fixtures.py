@@ -452,7 +452,7 @@ def mailhog() -> MailHogHelper:
 def elasticsearch(app_config, session) -> ElasticSearchHelper:
     elasticsearch_helper = ElasticSearchHelper(app_config, session)
     yield elasticsearch_helper
-    elasticsearch_helper.delete_index()
+    elasticsearch_helper.delete_indices()
 
 
 @pytest.fixture

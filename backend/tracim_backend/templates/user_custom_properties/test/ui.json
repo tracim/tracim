@@ -1,4 +1,5 @@
 {
+  "ui:order": ["date", "property1"],
   "date": {
       "ui:description": "just a date",
       "ui:title": "Date",
@@ -13,6 +14,6 @@
   "property1": {
     "ui:widget": "textarea",
     "ui:help": "just some help",
-    "ui:placeholder": "write here !"
+    "ui:placeholder": "write here!"
   }
 }

@@ -874,7 +874,7 @@ export class HtmlDocument extends React.Component {
               id: 'timeline',
               label: props.t('Timeline'),
               icon: 'fas fa-history',
-              children: (
+              children: state.config.apiUrl ? (
                 <Timeline
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
@@ -898,7 +898,7 @@ export class HtmlDocument extends React.Component {
                   showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                   invalidMentionList={state.invalidMentionList}
                 />
-              )
+              ) : null
             }]}
           />
         </PopinFixedContent>

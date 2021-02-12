@@ -9,7 +9,7 @@
   "Add a member": "Add a member",
   "Error while loading members list": "Error while loading members list",
   "Save successful": "Save successful",
-  "Error while saving new description": "Error while saving new description",
+  "Error while saving the new description": "Error while saving the new description",
   "Error while saving new role for member": "Error while saving new role for member",
   "Error while fetching known members list": "Error while fetching known members list",
   "Please set a name, an email or a username": "Please set a name, an email or a username",
