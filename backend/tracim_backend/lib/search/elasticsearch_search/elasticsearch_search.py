@@ -429,6 +429,7 @@ class ESSearchApi(SearchApi):
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=es_search_fields,
+            quote_field_suffix=".keyword",
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -576,6 +577,26 @@ class ESSearchApi(SearchApi):
                 "processors": [
                     {"attachment": {"field": "b64_file", "target_field": "file_data"}},
                     {"remove": {"field": "b64_file"}},
+                    {
+                        "set": {
+                            "if": "ctx.file_data.language == 'fr'",
+                            "field": "file_data.content_fr",
+                            "value": "{{file_data.content}}",
+                        }
+                    },
+                    {
+                        "set": {
+                            "if": "ctx.file_data.language == 'en'",
+                            "field": "file_data.content_en",
+                            "value": "{{file_data.content}}",
+                        }
+                    },
+                    {
+                        "remove": {
+                            "if": "ctx.file_data.language == 'en' || ctx.file_data.language == 'fr'",
+                            "field": "file_data.content",
+                        }
+                    },
                 ],
             },
         )

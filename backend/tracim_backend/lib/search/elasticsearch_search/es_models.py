@@ -53,7 +53,9 @@ class DigestWorkspace(InnerDoc):
 class DigestContent(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     slug = Keyword()
     content_type = Keyword()
 
@@ -68,6 +70,20 @@ class DigestComments(InnerDoc):
     )
 
 
+class FileData(InnerDoc):
+    content = Text(analyzer=folding)
+    content_fr = Text(analyzer="french")
+    content_en = Text(analyzer="english")
+    title = Text()
+    name = Text()
+    author = Text()
+    keywords = Keyword(multi=True)
+    date = Date()
+    content_type = Keyword()
+    content_length = Integer()
+    language = Keyword()
+
+
 class IndexedContent(Document):
     """
     ElasticSearch Content Models.
@@ -75,10 +91,12 @@ class IndexedContent(Document):
     """
 
     content_id = Integer()
-    # INFO - G.M - 2019-07-17 - as label store ngram of limited size, we do need
-    # to store both label and label.exact to handle autocomplete up to max_gram of label analyzer
+    # INFO - G.M - 2019-07-17 - as label.acp store ngram of limited size, we do need
+    # to store both label.acp and label.keyword to handle autocomplete up to max_gram of label.acp analyzer
     # but also support for exact naming for any size of label.
-    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     slug = Keyword()
     content_type = Keyword()
 
@@ -103,10 +121,10 @@ class IndexedContent(Document):
     is_active = Boolean()
     show_in_ui = Boolean()
     file_extension = Text(
-        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
     )
     filename = Text(
-        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+        fields={"keyword": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
     )
     modified = Date()
     created = Date()
@@ -120,6 +138,7 @@ class IndexedContent(Document):
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
     b64_file = Text()
+    file_data = Object(FileData)
 
 
 class IndexedUser(Document):
