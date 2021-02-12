@@ -43,6 +43,7 @@ from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
@@ -66,7 +67,6 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
-from tracim_backend.models.context_models import TextBasedContentUpdate
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -1427,14 +1427,15 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-
-
-class ContentSchema(ContentDigestSchema):
+class UserInfoContentAbstractSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class TextBasedDataAbstractSchema(marshmallow.Schema):
+class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
+    description = StrippedString(
+        required=True, description="raw text or html description of the content"
+    )
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
@@ -1442,7 +1443,6 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
-    raw_content = StrippedString(description="raw text or html description of the file")
     page_nb = marshmallow.fields.Int(
         description="number of pages, return null value if unaivalable", example=1, allow_none=True
     )
@@ -1460,10 +1460,6 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     has_jpeg_preview = marshmallow.fields.Bool(
         description="true if a jpeg preview is available or false", example=True
     )
-
-
-class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
-    pass
 
 
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
@@ -1487,10 +1483,13 @@ class RevisionSchema(ContentDigestSchema):
         format=DATETIME_FORMAT, description="Content creation date"
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
-
-
-class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
-    pass
+    description = StrippedString(
+        required=True, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
 
 
 class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
@@ -1511,6 +1510,7 @@ class CommentSchema(marshmallow.Schema):
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    description = StrippedString(example="This is a description")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
@@ -1531,35 +1531,38 @@ class SetCommentSchema(marshmallow.Schema):
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True,
+        required=False,
         example="contract for client XXX",
         description="New title of the content",
         validate=not_empty_string_validator,
     )
+    description = StrippedString(
+        required=False, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=False,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
 
 
-class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
-        return TextBasedContentUpdate(**data)
+        return ContentUpdate(**data)
 
 
-class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
         description="list of content types allowed as sub contents. "
         "This field is required for folder contents, "
         "set it to empty list in other cases",
-        required=True,
+        required=False,
     )
 
     @post_load
     def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return FolderContentUpdate(**data)
-
-
-class FileContentModifySchema(TextBasedContentModifySchema):
-    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):
@@ -1589,6 +1592,7 @@ class ConfigSchema(marshmallow.Schema):
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
+    search_engine = marshmallow.fields.String()
 
 
 class EventSchema(marshmallow.Schema):

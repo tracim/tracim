@@ -28,10 +28,10 @@ class IndexingCommand(AppContextCommand):
         nb_index_errors = index_contents_result.get_nb_index_errors()
         nb_contents_to_index = index_contents_result.get_nb_contents_to_index()
         if nb_index_errors == 0:
-            print("All {} content where indexed".format(nb_contents_to_index))
+            print("{} content(s) were indexed".format(nb_contents_to_index))
         else:
             print(
-                "Warning ! {}/{} contents cannot be indexed properly.".format(
+                "Warning! Failed to index {}/{} content(s)".format(
                     nb_index_errors, nb_contents_to_index
                 )
             )
@@ -61,8 +61,8 @@ class SearchIndexInitCommand(IndexingCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.create_index()
-        print("Index template was created")
+        self.search_api.create_indices()
+        print("Index templates were created")
         if parsed_args.index_all:
             self._index_all_contents()
 
@@ -79,7 +79,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.migrate_index()
+        self.search_api.migrate_indices()
 
 
 class SearchIndexIndexCommand(IndexingCommand):
@@ -133,5 +133,5 @@ class SearchIndexDeleteCommand(AppContextCommand):
             current_user=None, session=self._session, config=self._app_config
         )
         print("delete index")
-        self.search_api.delete_index()
-        print("Index where deleted")
+        self.search_api.delete_indices()
+        print("Indices were deleted")

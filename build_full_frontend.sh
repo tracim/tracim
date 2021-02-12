@@ -38,10 +38,7 @@ mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $D
 
 # Tracim vendors
 cd "$DEFAULTDIR/frontend_vendors"
-./build_vendors.sh && loggood "success" || logerror "Could not build tracim_frontend_vendors"
-# RJ - 2020-06-11 - we do not build the vendors in development mode by default
-# even if -d was passed to this script, since it produce a huge file that is slow to load in the browser.
-# If you ever need to debug something in the vendors, go to the frontend_vendors directory and run ./build_vendors.sh -d
+./build_vendors.sh $appdev && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
 # Tracim Lib for unit tests
 # NOTE - RJ - 2020-08-20 - the absence of $dev is intentional

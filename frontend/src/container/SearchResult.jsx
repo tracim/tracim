@@ -89,12 +89,18 @@ export class SearchResult extends React.Component {
     const { props } = this
     const searchObject = parseSearchUrl(qs.parse(props.location.search))
     const FIRST_PAGE = 1
+    // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
+    const hasFirstPage = !(props.searchResult.resultsList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
       searchObject.contentTypes,
       searchObject.searchedKeywords,
-      searchObject.currentPage,
-      searchObject.numberResultsByPage,
+      hasFirstPage
+        ? searchObject.currentPage
+        : FIRST_PAGE,
+      hasFirstPage
+        ? searchObject.numberResultsByPage
+        : searchObject.numberResultsByPage * searchObject.currentPage,
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive
@@ -105,15 +111,10 @@ export class SearchResult extends React.Component {
         props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
-        if (searchObject.currentPage === FIRST_PAGE) {
+        if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
           props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
         } else {
-          // INFO - G.B. - 20210209 - if the user comes to the page through an url, he is placed on the first page
-          if (props.searchResult.resultsList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1)) {
-            props.history.push(
-              `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: FIRST_PAGE }, { encode: true })}`
-            )
-          } else props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
+          props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
         }
         this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
         break

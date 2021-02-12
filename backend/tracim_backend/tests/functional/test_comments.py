@@ -94,7 +94,7 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -148,7 +148,7 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         content_api.set_status(test_thread, "closed-deprecated")
         transaction.commit()

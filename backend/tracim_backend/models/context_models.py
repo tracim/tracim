@@ -69,6 +69,7 @@ class ConfigModel(object):
         workspaces_number_per_user_limit: int,
         instance_name: str,
         email_required: bool,
+        search_engine: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -80,6 +81,7 @@ class ConfigModel(object):
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
         self.instance_name = instance_name
         self.email_required = email_required
+        self.search_engine = search_engine
 
 
 class ErrorCodeModel(object):
@@ -616,14 +618,20 @@ class SetContentStatus(object):
         self.status = status
 
 
-class TextBasedContentUpdate(object):
+class ContentUpdate(object):
     """
-    TextBasedContent update model
+    Content update model
     """
 
-    def __init__(self, label: str, raw_content: str) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
+        self.description = description
 
 
 class BasePaginatedQuery(object):
@@ -690,10 +698,17 @@ class FolderContentUpdate(object):
     Folder Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, sub_content_types: List[str]) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        sub_content_types: Optional[List[str]] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
+        self.description = description
 
 
 class Agenda(object):
@@ -1185,6 +1200,10 @@ class ContentInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.content.raw_content
+
+    @property
+    def description(self) -> str:
         return self.content.description
 
     @property
@@ -1460,6 +1479,10 @@ class RevisionInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @property
+    def description(self) -> str:
         return self.revision.description
 
     @property

@@ -25,6 +25,11 @@ export const FETCH_CONFIG = {
   apiUrl: configEnv.apiUrl
 }
 
+export const SEARCH_TYPE = {
+  SIMPLE: 'simple',
+  ADVANCED: 'elasticsearch'
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }

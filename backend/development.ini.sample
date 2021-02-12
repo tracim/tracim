@@ -708,13 +708,13 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # global elasticsearch timeout in seconds
 ; search.elasticsearch.request_timeout = 60
 
-# main index alias use to search/index content in elasticsearch
-; search.elasticsearch.index_alias =
+# prefix of the index aliases that will be used to store Tracim users, contents and workspaces for searching
+; search.elasticsearch.index_alias_prefix =
 # example:
-# search.elasticsearch.index_alias = tracim_contents
+# search.elasticsearch.index_alias_prefix = my-tracim
 
-# template_name for all index created currently only {index_alias} and {date} variable are usable.
-# be carefull this template is use to find all index to delete with tracimcli search delete command
+# template_name for all created indices. Currently only {index_alias} and {date} variable are usable.
+# be careful this template is used to find all indices to delete with tracimcli search delete command
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
 # if you use ingest mode in elasticsearch, you can enable file content ingest
