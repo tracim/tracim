@@ -452,7 +452,6 @@ class ESSearchApi(SearchApi):
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=es_search_fields,
-            quote_field_suffix=".keyword",
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
