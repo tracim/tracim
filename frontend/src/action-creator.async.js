@@ -1100,3 +1100,18 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
     dispatch
   })
 }
+
+export const getAdvancedSearchResult = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: SEARCHED_KEYWORDS,
+    dispatch
+  })
+}

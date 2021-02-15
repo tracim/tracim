@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom'
 require('./AdvancedSearchSpaceList.styl')
 
 export const AdvancedSearchSpaceList = props => {
-  const resultList = props.searchResult.resultsList.map((searchItem) => {
+  const resultList = props.spaceSearch.resultList.map((searchItem) => {
     return {
       ...searchItem,
       contentType: {

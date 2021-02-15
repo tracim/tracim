@@ -16,7 +16,7 @@ import TimedEvent from '../TimedEvent.jsx'
 require('./AdvancedSearchContentList.styl')
 
 export const AdvancedSearchContentList = props => {
-  const resultList = props.searchResult.resultsList.map((searchItem) => {
+  const resultList = props.contentSearch.resultList.map((searchItem) => {
     return {
       ...searchItem,
       contentType: {

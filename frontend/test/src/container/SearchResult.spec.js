@@ -24,7 +24,7 @@ describe('In <SearchResult />', () => {
 
   const props = {
     breadcrumbs: [],
-    searchResult: searchResult,
+    simpleSearch: searchResult,
     contentType: contentType,
     user: user,
     system: {
@@ -90,9 +90,9 @@ describe('In <SearchResult />', () => {
     })
 
     describe('getSubtitle', () => {
-      it('should return the subtitle according to resultsList size', () => {
+      it('should return the subtitle according to resultList size', () => {
         expect(searchResultInstance.getSubtitle()).to.equal(
-          `${props.searchResult.resultsList.length} best results for "${props.searchResult.searchedKeywords}"`
+          `${props.simpleSearch.resultList.length} best results for "${props.simpleSearch.searchedKeywords}"`
         )
       })
     })

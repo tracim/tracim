@@ -23,15 +23,18 @@ import {
   putUserLang
 } from '../action-creator.async.js'
 import {
+  ADVANCED_SEARCH_TYPE,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
-  ALL_CONTENT_TYPES
+  ALL_CONTENT_TYPES,
+  SEARCH_TYPE
 } from '../util/helper.js'
 import SearchInput from '../component/Search/SearchInput.jsx'
 import {
   PROFILE,
   ComposedIcon,
   CUSTOM_EVENT,
+  NUMBER_RESULTS_BY_PAGE,
   PAGE
 } from 'tracim_frontend_lib'
 
@@ -94,10 +97,11 @@ export class Header extends React.Component {
       t: ALL_CONTENT_TYPES,
       q: searchedKeywords,
       p: FIRST_PAGE,
-      nr: props.searchResult.numberResultsByPage,
+      nr: NUMBER_RESULTS_BY_PAGE,
       arc: 0,
       del: 0,
-      act: 1
+      act: 1,
+      s: props.system.config.search_engine === SEARCH_TYPE.ADVANCED ? ADVANCED_SEARCH_TYPE.CONTENT : SEARCH_TYPE.SIMPLE
     }
 
     props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
@@ -138,7 +142,7 @@ export class Header extends React.Component {
                   <SearchInput
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
-                    searchedKeywords={props.searchResult.searchedKeywords}
+                    searchedKeywords={props.simpleSearch.searchedKeywords}
                   />
                 </li>
               )}
@@ -192,5 +196,5 @@ export class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ searchResult, lang, user, system, appList, tlm }) => ({ searchResult, lang, user, system, appList, tlm })
+const mapStateToProps = ({ simpleSearch, lang, user, system, appList, tlm }) => ({ simpleSearch, lang, user, system, appList, tlm })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

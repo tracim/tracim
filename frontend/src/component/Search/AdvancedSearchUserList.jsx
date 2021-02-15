@@ -26,12 +26,12 @@ export const AdvancedSearchUserList = props => {
         </div>
       </div>
 
-      {props.searchResult.resultsList.map((searchItem, index) => (
+      {props.userSearch.resultList.map((searchItem, index) => (
         <ListItemWrapper
           label={searchItem.label}
           read
           contentType={props.user}
-          isLast={index === props.searchResult.resultsList.length - 1}
+          isLast={index === props.userSearch.resultList.length - 1}
           key={searchItem.contentId}
         >
           <Link
