@@ -8,6 +8,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.user_custom_properties import UserCustomProperties
 
 
 class DatabaseCrudHookCaller:
@@ -48,7 +49,7 @@ class DatabaseCrudHookCaller:
             # see https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.dirty
             if not session.is_modified(obj):
                 continue
-            if isinstance(obj, User):
+            if isinstance(obj, User) or isinstance(obj, UserCustomProperties):
                 self._plugin_manager.hook.on_user_modified(user=obj, context=session.context)
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_modified(

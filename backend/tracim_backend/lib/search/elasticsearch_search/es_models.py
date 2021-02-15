@@ -168,16 +168,22 @@ JSON_SCHEMA_TYPE_MAPPINGS = {
 JsonSchemaDict = typing.Dict[str, typing.Any]
 
 
-def _get_es_field_from_json_schema(schema: JsonSchemaDict) -> Field:
+def get_es_field_from_json_schema(schema: JsonSchemaDict) -> Field:
     """Return the right elastic-search field for a given JSON schema."""
     type_ = schema.get("type")
     if type_ == "array":
         items_schema = schema.get("items")
         if isinstance(items_schema, dict):
-            field = _get_es_field_from_json_schema(items_schema)
+            field = get_es_field_from_json_schema(items_schema)
             field._multi = True
         else:
             field = Field(multi=True)
+    elif type_ == "object":
+        properties = {
+            key: get_es_field_from_json_schema(value)
+            for key, value in schema.get("properties", []).items()
+        }
+        field = Object(properties=properties)
     else:
         format_ = schema.get("format")
         try:
@@ -186,16 +192,6 @@ def _get_es_field_from_json_schema(schema: JsonSchemaDict) -> Field:
             # Fallback for unmanaged formats
             field = JSON_SCHEMA_TYPE_MAPPINGS[(type_, None)]
     return field
-
-
-def get_es_properties_from_custom_properties_schema(
-    user__custom_properties__json_schema: JsonSchemaDict,
-) -> Object:
-    assert user__custom_properties__json_schema.get("type") == "object"
-    return {
-        key: _get_es_field_from_json_schema(value)
-        for key, value in user__custom_properties__json_schema.get("properties", []).items()
-    }
 
 
 def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
@@ -213,10 +209,10 @@ def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
         is_active = Boolean()
         workspace_ids = Integer(multi=True)
         last_authored_content_revision_date = Date()
-        custom_properties = Object(
-            properties=get_es_properties_from_custom_properties_schema(
-                config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA
-            )
+        has_avatar = Boolean()
+        has_cover = Boolean()
+        custom_properties = get_es_field_from_json_schema(
+            config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA
         )
 
     return IndexedUser

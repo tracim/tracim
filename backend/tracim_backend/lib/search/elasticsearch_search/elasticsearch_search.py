@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 import typing
 
 from elasticsearch import Elasticsearch
@@ -10,11 +11,14 @@ import pluggy
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
+# from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
@@ -459,8 +463,69 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         if content_types:
             search = search.filter("terms", content_type=content_types)
-        res = search.execute()
-        return res
+        return search.execute()
+
+    def search_user(
+        self,
+        search_string: str,
+        search_fields: typing.List[str],
+        workspace_ids: typing.List[int],
+        show_deleted: bool = False,
+        show_active: bool = True,
+        page_nb: int = 0,
+        size: int = 10,
+    ):
+        search = Search(
+            using=self.es,
+            doc_type=self.IndexedUser,
+            index=self._get_index_parameters(self.IndexedUser).alias,
+        )
+
+        fields = [
+            "public_name.exact^5",
+            "username.exact^5",
+            "public_name^3",
+            "username^3",
+            "custom_properties",
+        ]
+        if search_fields:
+            fields = [field for field in fields if re.split(r"\^\.", field) in search_fields]
+
+        query = search.query("simple_query_string", query=search_string, fields=fields)
+        known_user_ids = UserApi(
+            current_user=None, session=self._session, config=self._config
+        ).get_known_user_ids(self._user.user_id)
+        query = search.filter("terms", user_id=known_user_ids)
+        if not show_active:
+            search = query.exclude("term", is_active=True)
+        if not show_deleted:
+            search = query.exclude("term", is_deleted=True)
+        if workspace_ids:
+            query = query.filter("terms", workspace_ids=workspace_ids)
+        if size:
+            search = query.extra(size=size)
+        if page_nb:
+            search = query.extra(from_=self.offset_from_pagination(size, page_nb))
+
+        query.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
+
+        response = query.execute()
+        accessible_workspaces = WorkspaceApi(
+            current_user=None, session=self._session, config=self._config
+        ).get_all_accessible_by_user(self._user)
+        workspace_facets = []
+        for bucket in response.aggregations.workspace_ids.buckets:
+            try:
+                workspace = next(
+                    ws for ws in accessible_workspaces if ws.workspace_id == bucket.key
+                )
+                # FIXME #4095: should be a SimpleFacet instance
+                workspace_facets.append({"value": workspace, "count": bucket.doc_count})
+            except StopIteration:
+                pass
+
+        # FIXME #4095: should be transformed to something like a UserSearchResponse.
+        return response
 
     @staticmethod
     def _get_index_name(parameters: IndexParameters) -> str:

@@ -306,6 +306,12 @@ class UserApi(object):
         query = query.limit(nb_elems)
         return query.all()
 
+    def get_known_user_ids(self, user_id: int) -> typing.List[int]:
+        if self._config.KNOWN_MEMBERS__FILTER:
+            return self.get_users_ids_in_same_workpaces()
+        else:
+            return self._session.query(User.user_id).all()
+
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         return ALL__GROUP_MENTIONS
 

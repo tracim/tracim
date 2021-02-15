@@ -11,9 +11,7 @@ from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import 
 from tracim_backend.lib.search.elasticsearch_search.es_models import HtmlText
 from tracim_backend.lib.search.elasticsearch_search.es_models import JsonSchemaDict
 from tracim_backend.lib.search.elasticsearch_search.es_models import SimpleText
-from tracim_backend.lib.search.elasticsearch_search.es_models import (
-    get_es_properties_from_custom_properties_schema,
-)
+from tracim_backend.lib.search.elasticsearch_search.es_models import get_es_field_from_json_schema
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -200,30 +198,33 @@ class TestElasticSearchUserIndexer:
         assert index_user_mock.call_args[0][0].user_id == a_user().user_id
 
 
-class TestIndexedUserCreation:
+class TestUtils:
     @pytest.mark.parametrize(
-        "schema,es_fields",
+        "schema,expected_field",
         [
-            ({"type": "object", "properties": {"foo": {"type": "string"}}}, {"foo": SimpleText()},),
+            (
+                {"type": "object", "properties": {"foo": {"type": "string"}}},
+                es_dsl.Object(properties={"foo": SimpleText()}),
+            ),
             (
                 {"type": "object", "properties": {"foo": {"type": "number"}}},
-                {"foo": es_dsl.field.Float()},
+                es_dsl.Object(properties={"foo": es_dsl.field.Float()}),
             ),
             (
                 {"type": "object", "properties": {"foo": {"type": "string", "format": "html"}}},
-                {"foo": HtmlText()},
+                es_dsl.Object(properties={"foo": HtmlText()}),
             ),
             (
                 {
                     "type": "object",
                     "properties": {"foo": {"type": "array", "items": {"type": "string"}}},
                 },
-                {"foo": SimpleText(multi=True)},
+                es_dsl.Object(properties={"foo": SimpleText(multi=True)}),
             ),
         ],
     )
-    def test_unit__get_es_properties_from_custom_properties_schema__ok__nominal_cases(
-        self, schema: JsonSchemaDict, es_fields: dict
+    def test_unit__get_es_field_from_json_schema__ok__nominal_cases(
+        self, schema: JsonSchemaDict, expected_field: es_dsl.Field
     ) -> None:
-        custom_properties = get_es_properties_from_custom_properties_schema(schema)
-        assert custom_properties == es_fields
+        field = get_es_field_from_json_schema(schema)
+        assert expected_field == field

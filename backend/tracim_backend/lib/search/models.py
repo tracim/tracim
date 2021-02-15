@@ -1,23 +1,5 @@
-from abc import ABC
 from datetime import datetime
 import typing
-
-
-class ContentSearchResponse(ABC):
-    def __init__(
-        self,
-        contents: typing.List["SearchedContent"],
-        total_hits: int = 0,
-        is_total_hits_accurate=True,
-    ):
-        self.contents = contents
-        self.total_hits = total_hits
-        self.is_total_hits_accurate = is_total_hits_accurate
-
-
-class EmptyContentSearchResponse(ContentSearchResponse):
-    def __init__(self):
-        super().__init__(contents=[], total_hits=0)
 
 
 class SearchedDigestUser(object):
@@ -114,3 +96,38 @@ class SearchedContent(object):
         self.score = score
         self.active_shares = active_shares
         self.content_size = content_size
+
+
+class ContentSearchResponse:
+    def __init__(
+        self,
+        contents: typing.Optional[typing.List[SearchedContent]] = None,
+        total_hits: int = 0,
+        is_total_hits_accurate=True,
+    ):
+        self.contents = contents or []
+        self.total_hits = total_hits
+        self.is_total_hits_accurate = is_total_hits_accurate
+
+
+class EmptyContentSearchResponse(ContentSearchResponse):
+    def __init__(self):
+        super().__init__(contents=[], total_hits=0)
+
+
+class SearchedUser:
+    def __init__(
+        self,
+        user_id: int,
+        public_name: str,
+        is_deleted: bool,
+        is_archived: bool,
+        has_avatar: bool,
+        has_cover: bool,
+    ) -> None:
+        self.user_id = user_id
+        self.public_name = public_name
+        self.is_deleted = is_deleted
+        self.is_archived = is_archived
+        self.has_avatar = has_avatar
+        self.has_cover = has_cover
