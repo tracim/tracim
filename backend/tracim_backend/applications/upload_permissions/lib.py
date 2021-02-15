@@ -304,7 +304,6 @@ class UploadPermissionLib(object):
                 parent=content, content=comment_message, do_save=True, do_notify=False
             )
             created_contents.append(content_api.get_content_in_context(content))
-            content_api.execute_created_content_actions(content)
 
         if do_notify:
             workspace_lib = WorkspaceApi(

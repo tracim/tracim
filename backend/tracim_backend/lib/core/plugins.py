@@ -113,11 +113,14 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     # Static plugins, imported here to avoid circular reference with hookimpl
     from tracim_backend.lib.core.event import EventBuilder
     from tracim_backend.lib.core.event import EventPublisher
+    from tracim_backend.lib.search.search_factory import SearchFactory
     import tracim_backend.lib.core.mention as mention
 
     plugin_manager.register(EventBuilder(app_config))
     plugin_manager.register(EventPublisher(app_config))
     mention.register_tracim_plugin(plugin_manager)
+    search_api = SearchFactory.get_search_lib(session=None, config=app_config, current_user=None)
+    search_api.register_plugins(plugin_manager)
 
     # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
     plugin_path = app_config.PLUGIN__FOLDER_PATH

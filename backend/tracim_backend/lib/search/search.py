@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 import typing
 
+import pluggy
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
@@ -58,6 +59,9 @@ class SearchApi(ABC):
 
     @abstractmethod
     def index_content(self, content: ContentInContext):
+        pass
+
+    def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
         pass
 
     def index_all_content(self) -> IndexedContentsResults:

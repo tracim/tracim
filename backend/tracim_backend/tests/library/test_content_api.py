@@ -3173,6 +3173,30 @@ class TestContentApi(object):
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
 
+    def test_unit__get_all_query__with_user(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="foo",
+            do_save=True,
+        )
+        assert len(list(api.get_all_query(user=user))) == 1
+        assert len(list(api.get_all_query(user=admin_user))) == 0
+
 
 @pytest.mark.usefixtures("test_fixture")
 class TestContentApiSecurity(object):
