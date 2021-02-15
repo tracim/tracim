@@ -14,7 +14,7 @@ from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Content
-from tracim_backend.views.search_api.schemas import SearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import ContentSearchFilterQuerySchema
 
 SEARCH_SEPARATORS = ",| "
 SEARCH_DEFAULT_RESULT_NB = 10
@@ -154,7 +154,9 @@ class SimpleSearchApi(SearchApi):
 
         return title_keyworded_items
 
-    def search_content(self, search_parameters: SearchFilterQuerySchema) -> ContentSearchResponse:
+    def search_content(
+        self, search_parameters: ContentSearchFilterQuerySchema
+    ) -> ContentSearchResponse:
         """
         Search content with sql
         - do no show archived/deleted content by default

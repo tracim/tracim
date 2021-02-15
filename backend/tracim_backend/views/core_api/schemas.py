@@ -3,6 +3,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.fields import Field
 from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
@@ -99,9 +100,19 @@ FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 class StrippedString(String):
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
-        if value:
-            value = value.strip()
         return value.strip()
+
+
+class StringList(marshmallow.fields.List):
+    def __init__(self, cls: typing.Type[Field], separator: str = ",", **kwargs: dict) -> None:
+        super().__init__(cls, **kwargs)
+        self._separator = separator
+
+    def _deserialize(self, value: typing.Optional[str], *args: typing.Any, **kwargs: typing.Any):
+        return super()._deserialize(value.split(self._separator), *args, **kwargs)
+
+    def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
+        return self._separator.join(super().serialize(*args, **kwargs))
 
 
 class EventTypeListField(StrippedString):

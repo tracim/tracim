@@ -1,7 +1,7 @@
+from enum import Enum
 import typing
 
 import marshmallow
-from marshmallow import post_load
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -11,11 +11,21 @@ from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
+from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
+# from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import AdvancedContentSearchParameters
 
-class SearchFilterQuery(object):
+
+class SearchContentField(Enum):
+    LABEL = "label"
+    RAW_CONTENT = "raw_content"
+    COMMENT = "comment"
+    DESCRIPTION = "description"
+
+
+class ContentSearchFilterQuery(object):
     def __init__(
         self,
         size: int = 10,
@@ -38,7 +48,7 @@ class SearchFilterQuery(object):
         self.show_active = bool(show_active)
 
 
-class SearchFilterQuerySchema(marshmallow.Schema):
+class ContentSearchFilterQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
         example="test", description="just a search string", required=False
     )
@@ -77,17 +87,43 @@ class SearchFilterQuerySchema(marshmallow.Schema):
         validate=bool_as_int_validator,
     )
 
-    @post_load
-    def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-        return SearchFilterQuery(**data)
+    # @post_load
+    # def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
+    # return ContentSearchFilterQuery(
+    # search_string=data["search_string"],
+    # size=data["size"],
+    # page_nb=data["page_nb"],
+    # content_types=data["content_types"],
+    # show_archived=data["show_archived"],
+    # show_deleted=data["show_deleted"],
+    # show_active=data["show_active"],
+    # )
 
 
-class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
-    search_fields = StrippedString(
-        required=False,
-        validate=regex_string_as_list_of_string,
-        description="search within these fields"
-        # FIXME restrict to "label", "raw_content", "comments", "description",
+class EnumField(marshmallow.fields.Field):
+    def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
+        super().__init__(**kwargs)
+        self._enum = enum_cls
+
+    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any):
+        for val in self._enum.__members__.values():
+            if value == val.value:
+                return val
+
+        raise marshmallow.ValidationError("{} is not a valid value for this field".format(value))
+
+    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value not in self._enum:
+            raise marshmallow.ValidationError(
+                "{} is not a valid value for this field".format(value)
+            )
+
+        return value.value
+
+
+class AdvancedContentSearchFilterQuerySchema(ContentSearchFilterQuerySchema):
+    search_fields = StringList(
+        EnumField(SearchContentField), required=False, description="search within these fields"
     )
     workspace_names = StrippedString(
         required=False,
@@ -118,6 +154,21 @@ class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
     created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
     updated_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
     updated_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+
+    # @post_load
+    # def make_advanced_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
+    # return AdvancedContentSearchParameters(
+    # workspace_names=data["workspace_names"],
+    # author__public_names=data["author__public_names"],
+    # last_modifier__public_names=data["last_modifier__public_names"],
+    # file_extensions=data["file_extensions"],
+    # search_fields=data["search_fields"],
+    # statuses=data["statuses"],
+    # created_from=data["created_from"],
+    # created_to=data["created_to"],
+    # updated_from=data["updated_from"],
+    # updated_to=data["updated_to"],
+    # )
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):

@@ -34,11 +34,12 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.views.search_api.schemas import SearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import ContentSearchFilterQuerySchema
 
 FILE_PIPELINE_ID = "attachment"
 FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
+FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 
 
 class AdvancedContentSearchParameters:
@@ -48,12 +49,7 @@ class AdvancedContentSearchParameters:
         author__public_names: typing.Optional[typing.List[str]] = None,
         last_modifier__public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
-        search_fields: typing.Optional[typing.List[str]] = (
-            "label",
-            "raw_content",
-            "comments",
-            "description",
-        ),
+        search_fields: typing.Optional[typing.List[str]] = None,
         statuses: typing.Optional[typing.List[str]] = None,
         created_from: typing.Optional[datetime] = None,
         created_to: typing.Optional[datetime] = None,
@@ -396,7 +392,7 @@ class ESSearchApi(SearchApi):
 
     def search_content(
         self,
-        simple_parameters: SearchFilterQuerySchema,
+        simple_parameters: ContentSearchFilterQuerySchema,
         advanced_parameters: typing.Optional[AdvancedContentSearchParameters] = None,
     ) -> ContentSearchResponse:
         """
@@ -593,6 +589,12 @@ class ESSearchApi(SearchApi):
             if parameters.document_class == document_class
         )
 
+    @classmethod
+    def test_lang(cls, lang):
+        return "ctx.{source}.language == '{lang}'".format(
+            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+        )
+
     def _create_ingest_pipeline(self) -> None:
         """
         Create ingest pipeline to allow extract file content and use them for search.
@@ -601,40 +603,42 @@ class ESSearchApi(SearchApi):
         # TODO - G.M - 2019-05-31 - check if possible to set specific analyzer for
         # attachment content parameters. Goal :
         # allow ngram or lang specific indexing for "in file search"
+
+        processors = [
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
+            {
+                "attachment": {
+                    "field": FILE_PIPELINE_SOURCE_FIELD,
+                    "target_field": FILE_PIPELINE_DESTINATION_FIELD,
+                }
+            },
+        ]
+
+        for lang in FILE_PIPELINE_LANGS:
+            processors.append(
+                {
+                    "set": {
+                        "if": self.test_lang(lang),
+                        "field": "{source}.content_{lang}".format(
+                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+                        ),
+                        "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
+                    }
+                }
+            )
+
+        processors.append(
+            {
+                "remove": {
+                    "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
+                    "field": "{}.content".format(FILE_PIPELINE_SOURCE_FIELD),
+                }
+            }
+        )
+
         p.put_pipeline(
             id=FILE_PIPELINE_ID,
-            body={
-                "description": "Extract attachment information",
-                "processors": [
-                    {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
-                    {
-                        "attachment": {
-                            "field": FILE_PIPELINE_SOURCE_FIELD,
-                            "target_field": FILE_PIPELINE_DESTINATION_FIELD,
-                        }
-                    },
-                    {
-                        "set": {
-                            "if": "ctx.file_data.language == 'fr'",
-                            "field": "file_data.content_fr",
-                            "value": "{{file_data.content}}",
-                        }
-                    },
-                    {
-                        "set": {
-                            "if": "ctx.file_data.language == 'en'",
-                            "field": "file_data.content_en",
-                            "value": "{{file_data.content}}",
-                        }
-                    },
-                    {
-                        "remove": {
-                            "if": "ctx.file_data.language == 'en' || ctx.file_data.language == 'fr'",
-                            "field": "file_data.content",
-                        }
-                    },
-                ],
-            },
+            body={"description": "Extract attachment information", "processors": processors},
         )
 
 

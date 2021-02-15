@@ -72,8 +72,10 @@ class DigestComments(InnerDoc):
 
 class FileData(InnerDoc):
     content = Text(analyzer=folding)
-    content_fr = Text(analyzer="french")
+    content_de = Text(analyzer="german")
     content_en = Text(analyzer="english")
+    content_fr = Text(analyzer="french")
+    content_pt = Text(analyzer="portuguese")
     title = Text()
     name = Text()
     author = Text()
