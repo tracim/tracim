@@ -94,12 +94,12 @@ class AdvancedSearchFilterQuerySchema(SearchFilterQuerySchema):
         validate=regex_string_as_list_of_string,
         description="select contents in these workspaces",
     )
-    author_public_names = StrippedString(
+    author__public_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
         description="select contents by these authors",
     )
-    last_modifier_public_names = StrippedString(
+    last_modifier__public_names = StrippedString(
         required=False,
         validate=regex_string_as_list_of_string,
         description="select contents by these authors",
@@ -151,37 +151,52 @@ class ContentSearchResultSchema(marshmallow.Schema):
     is_total_hits_accurate = marshmallow.fields.Boolean()
 
 
-class FacetsSchema(marshmallow.Schema):
+class FacetCountSchema(marshmallow.Schema):
+    key = marshmallow.fields.String("The value of this field")
+    count = marshmallow.fields.Int("The number of results matching this value")
+
+
+class ContentSimpleFacetsSchema(marshmallow.Schema):
     search_fields = marshmallow.fields.List(
         marshmallow.fields.String(description="search was performed in these fields")
     )
     workspace_names = marshmallow.fields.List(
-        marshmallow.fields.String(description="search was restricted to these workspaces")
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents in these workspaces",
+        )
     )
-    author_public_names = marshmallow.fields.List(
-        marshmallow.fields.String(description="search was restricted to contents by these authors")
+    author__public_names = marshmallow.fields.List(
+        marshmallow.fields.Nested(
+            FacetCountSchema(),
+            description="search matches contents which have authors with these public names",
+        )
     )
-    last_modifier_public_names = marshmallow.fields.List(
-        marshmallow.fields.String(
-            description="search was restricted to contents whose last modifier are these authors"
+    last_modifier__public_names = marshmallow.fields.List(
+        marshmallow.fields.Nested(
+            FacetCountSchema(),
+            description="search matches contents last modified by authors with these public names",
         )
     )
     file_extensions = marshmallow.fields.List(
-        marshmallow.fields.String(
-            description="search was restricted to contents with these file extensions"
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents with these file extensions",
         )
     )
     statuses = marshmallow.fields.List(
-        marshmallow.fields.String(
-            description="search was restricted to contents with these statuses"
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents with these statuses",
         )
     )
     created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    updated_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    updated_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    modified_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    modified_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
 
 
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
-    search_fields = marshmallow.fields.List(marshmallow.fields.String())
-    simple_facets = marshmallow.fields.Nested(FacetsSchema)
+    search_fields = marshmallow.fields.List(
+        marshmallow.fields.String(), description="search was performed in these fields"
+    )
+    simple_facets = marshmallow.fields.Nested(
+        ContentSimpleFacetsSchema(), description="search matched content with these characteristics"
+    )

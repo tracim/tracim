@@ -1,13 +1,28 @@
+import typing
+
 from dateutil.parser import parse
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response import Response
 
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import FacetCount
 from tracim_backend.lib.search.models import SearchedContent
 from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedWorkspace
+from tracim_backend.lib.search.models import SimpleFacets
+
+
+def facet_count(aggregations: dict, field: str) -> typing.List[FacetCount]:
+    """
+    Builds a FacetCount object from an elasticsearch bucket aggregation result
+    """
+
+    facet: typing.List[FacetCount] = []
+    for bucket in aggregations[field]["buckets"]:
+        facet.append(FacetCount(key=bucket["key"], count=bucket["doc_count"]))
+    return facet
 
 
 class ESContentSearchResponse(ContentSearchResponse):
@@ -96,6 +111,25 @@ class ESContentSearchResponse(ContentSearchResponse):
                 current_revision_id=source["current_revision_id"],
             )
             contents.append(content)
+
+        aggregations = response["aggregations"]
+
+        simple_facets = SimpleFacets(
+            workspace_names=facet_count(aggregations, "workspace_names"),
+            author__public_names=facet_count(aggregations, "author__public_names"),
+            last_modifier__public_names=facet_count(aggregations, "last_modifier__public_names"),
+            file_extensions=facet_count(aggregations, "file_extensions"),
+            statuses=facet_count(aggregations, "statuses"),
+            content_types=facet_count(aggregations, "content_types"),
+            created_from=parse(aggregations["created_from"]["value_as_string"]),
+            created_to=parse(aggregations["created_to"]["value_as_string"]),
+            modified_from=parse(aggregations["modified_from"]["value_as_string"]),
+            modified_to=parse(aggregations["modified_to"]["value_as_string"]),
+        )
+
         super().__init__(
-            contents=contents, total_hits=total_hits, is_total_hits_accurate=is_total_hit_accurate
+            contents=contents,
+            total_hits=total_hits,
+            is_total_hits_accurate=is_total_hit_accurate,
+            simple_facets=simple_facets,
         )

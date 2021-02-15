@@ -13,11 +13,11 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.search_api.schema import AdvancedContentSearchResultSchema
-from tracim_backend.views.search_api.schema import AdvancedSearchFilterQuerySchema
-from tracim_backend.views.search_api.schema import ContentSearchResultSchema
-from tracim_backend.views.search_api.schema import SearchFilterQuery
-from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import AdvancedContentSearchResultSchema
+from tracim_backend.views.search_api.schemas import AdvancedSearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import ContentSearchResultSchema
+from tracim_backend.views.search_api.schemas import SearchFilterQuery
+from tracim_backend.views.search_api.schemas import SearchFilterQuerySchema
 
 SWAGGER_TAG__SEARCH_SECTION = "Search"
 

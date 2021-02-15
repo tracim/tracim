@@ -26,15 +26,15 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import SearchFilterQuerySchema
 
 
 class AdvancedSearchParameters:
     def __init__(
         self,
         workspace_names: typing.Optional[typing.List[str]] = None,
-        author_public_names: typing.Optional[typing.List[str]] = None,
-        last_modifier_public_names: typing.Optional[typing.List[str]] = None,
+        author__public_names: typing.Optional[typing.List[str]] = None,
+        last_modifier__public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
         search_fields: typing.Optional[typing.List[str]] = (
             "label",
@@ -49,8 +49,8 @@ class AdvancedSearchParameters:
         updated_to: typing.Optional[datetime] = None,
     ):
         self.workspace_names = workspace_names
-        self.author_public_names = author_public_names
-        self.last_modifier_public_names = last_modifier_public_names
+        self.author__public_names = author__public_names
+        self.last_modifier__public_names = last_modifier__public_names
         self.file_extensions = file_extensions
         self.search_fields = search_fields
         self.statuses = statuses
@@ -397,25 +397,33 @@ class ESSearchApi(SearchApi):
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
         es_search_fields = []
 
-        if advanced_parameters:
-            if "label" in advanced_parameters.search_fields:
-                # TODO : we may want to split exact and not exact search to allow doing exact search efficiently.
-                es_search_fields.extend(
-                    ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
-                )
-            if "raw_content" in advanced_parameters.search_fields:
-                es_search_fields.extend(
-                    [
-                        "raw_content.exact^3",
-                        "raw_content^3",
-                        "file_data.content^3",
-                        "file_data.title^4",
-                        "file_data.author",
-                        "file_data.keywords",
-                    ]
-                )
-            if "comments" in advanced_parameters.search_fields:
-                es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
+        search_fields = (
+            advanced_parameters.search_fields
+            if advanced_parameters and advanced_parameters.search_fields
+            else ["label", "raw_content", "comments"]
+        )
+
+        if "label" in search_fields:
+            # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
+            # doing exact search efficiently.
+            es_search_fields.extend(
+                ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
+            )
+
+        if "raw_content" in search_fields:
+            es_search_fields.extend(
+                [
+                    "raw_content.exact^3",
+                    "raw_content^3",
+                    "file_data.content^3",
+                    "file_data.title^4",
+                    "file_data.author",
+                    "file_data.keywords",
+                ]
+            )
+
+        if "comments" in search_fields:
+            es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
 
         search = Search(
             using=self.es,
@@ -462,41 +470,31 @@ class ESSearchApi(SearchApi):
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
-        # Simple Facets:
-        # TODO: do refactor to simplify the code
         if simple_parameters.content_types:
             search = search.filter("terms", content_type=simple_parameters.content_types)
-        search.aggs.bucket("content_types", "terms", field="content_type")
 
         if advanced_parameters:
             if advanced_parameters.workspace_names:
                 search = search.filter(
                     "terms", workspace__label__exact=advanced_parameters.workspace_names
                 )
-            search.aggs.bucket("workspace_names", "terms", field="workspace.label.exact")
 
-            if advanced_parameters.author_public_names:
+            if advanced_parameters.author__public_names:
                 search = search.filter(
-                    "terms", author__public_name__exact=advanced_parameters.author_public_names
+                    "terms", author__public_names__exact=advanced_parameters.author__public_names
                 )
 
-            search.aggs.bucket("author__public_names", "terms", field="author.public_name.exact")
-            if advanced_parameters.last_modifier_public_names:
+            if advanced_parameters.last_modifier__public_names:
                 search = search.filter(
                     "terms",
-                    last_modifier_public_names__exact=advanced_parameters.last_modifier_public_names,
+                    last_modifier__public_names__exact=advanced_parameters.last_modifier__public_names,
                 )
-            search.aggs.bucket(
-                "last_modifier__public_names", "terms", field="last_modifier.public_name.exact"
-            )
 
             if advanced_parameters.file_extensions:
                 search = search.filter("terms", file_extension=advanced_parameters.file_extensions)
-            search.aggs.bucket("file_extensions", "terms", field="file_extension.exact")
 
             if advanced_parameters.statuses:
                 search = search.filter("terms", status=advanced_parameters.statuses)
-            search.aggs.bucket("statuses", "terms", field="status")
 
             created_range = self.create_es_range(
                 advanced_parameters.created_from, advanced_parameters.created_to
@@ -512,13 +510,21 @@ class ESSearchApi(SearchApi):
             if modified_range:
                 search = search.filter("range", modified=modified_range)
 
-        # possible to use aggregate histogram with just one bucket here?
+        search.aggs.bucket("content_types", "terms", field="content_type.keyword")
+        search.aggs.bucket("workspace_names", "terms", field="workspace.label.keyword")
+        search.aggs.bucket("author__public_names", "terms", field="author.public_name.keyword")
+        search.aggs.bucket(
+            "last_modifier__public_names", "terms", field="last_modifier.public_name.keyword"
+        )
+        search.aggs.bucket("file_extensions", "terms", field="file_extension.keyword")
+        search.aggs.bucket("statuses", "terms", field="status.keyword")
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
         search.aggs.metric("modified_to", "max", field="modified")
 
         res = search.execute()
+        res.set_search_fields(search_fields)
         return res
 
     @staticmethod

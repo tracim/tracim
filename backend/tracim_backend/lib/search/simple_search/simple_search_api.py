@@ -14,7 +14,7 @@ from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Content
-from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import SearchFilterQuerySchema
 
 SEARCH_SEPARATORS = ",| "
 SEARCH_DEFAULT_RESULT_NB = 10

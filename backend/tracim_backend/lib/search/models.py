@@ -3,16 +3,55 @@ from datetime import datetime
 import typing
 
 
+class FacetCount:
+    def __init__(self, key: str, count: int) -> None:
+        self.key = key
+        self.count = count
+
+
+class SimpleFacets:
+    def __init__(
+        self,
+        workspace_names: typing.List[str],
+        author__public_names: typing.List[str],
+        last_modifier__public_names: typing.List[str],
+        file_extensions: typing.List[str],
+        statuses: typing.List[str],
+        content_types: typing.List[FacetCount],
+        created_from: datetime,
+        created_to: datetime,
+        modified_from: datetime,
+        modified_to: datetime,
+    ) -> None:
+        self.workspace_names = workspace_names
+        self.author__public_names = author__public_names
+        self.last_modifier__public_names = last_modifier__public_names
+        self.file_extensions = file_extensions
+        self.statuses = statuses
+        self.content_types = content_types
+        self.created_from = created_from
+        self.created_to = created_to
+        self.modified_from = modified_from
+        self.modified_to = modified_to
+
+
 class ContentSearchResponse(ABC):
     def __init__(
         self,
         contents: typing.List["SearchedContent"],
         total_hits: int = 0,
-        is_total_hits_accurate=True,
+        is_total_hits_accurate: bool = True,
+        simple_facets: typing.Optional[typing.List[str]] = None,
+        search_fields: typing.Optional[typing.List[str]] = None,
     ):
         self.contents = contents
         self.total_hits = total_hits
         self.is_total_hits_accurate = is_total_hits_accurate
+        self.simple_facets = simple_facets
+        self.set_search_fields(search_fields)
+
+    def set_search_fields(self, search_fields: typing.Optional[typing.List[str]]) -> None:
+        self.search_fields = search_fields
 
 
 class EmptyContentSearchResponse(ContentSearchResponse):
