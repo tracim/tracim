@@ -1,6 +1,10 @@
+import typing
+
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Document
+from elasticsearch_dsl import Field
+from elasticsearch_dsl import Float
 from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Integer
 from elasticsearch_dsl import Keyword
@@ -9,6 +13,8 @@ from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 from elasticsearch_dsl import analysis
 from elasticsearch_dsl import analyzer
+
+from tracim_backend.config import CFG
 
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
 # Instead of relying of wildcard for autocompletion which is costly and make some feature doesn't
@@ -40,6 +46,26 @@ html_folding = analyzer(
 html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip",)
 
 
+class SimpleText(Text):
+    def __init__(self, **kwargs: dict) -> None:
+        super().__init__(
+            fields={"exact": Keyword()},
+            analyzer=edge_ngram_folding,
+            search_analyzer=folding,
+            **kwargs
+        )
+
+
+class HtmlText(Text):
+    def __init__(self, **kwargs: dict) -> None:
+        super().__init__(
+            fields={"exact": Text(analyzer=html_exact_folding)},
+            analyzer=html_folding,
+            search_analyzer=folding,
+            **kwargs
+        )
+
+
 class DigestUser(InnerDoc):
     user_id = Integer()
     public_name = Text()
@@ -54,7 +80,7 @@ class DigestWorkspace(InnerDoc):
 
 class DigestContent(InnerDoc):
     content_id = Integer()
-    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = SimpleText()
     slug = Keyword()
     content_type = Keyword()
 
@@ -62,11 +88,7 @@ class DigestContent(InnerDoc):
 class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    raw_content = Text(
-        fields={"exact": Text(analyzer=html_exact_folding)},
-        analyzer=html_folding,
-        search_analyzer=folding,
-    )
+    raw_content = HtmlText()
 
 
 class IndexedContent(Document):
@@ -88,7 +110,7 @@ class IndexedContent(Document):
     # INFO - G.M - 2019-07-17 - as label store ngram of limited size, we do need
     # to store both label and label.exact to handle autocomplete up to max_gram of label analyzer
     # but also support for exact naming for any size of label.
-    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = SimpleText()
     content_type = Keyword()
     sub_content_types = Keyword(multi=True)
     status = Keyword()
@@ -119,22 +141,85 @@ class IndexedContent(Document):
 
     archived_through_parent_id = Integer()
     deleted_through_parent_id = Integer()
-    raw_content = Text(
-        fields={"exact": Text(analyzer=html_exact_folding)},
-        analyzer=html_folding,
-        search_analyzer=folding,
-    )
+    raw_content = HtmlText()
     content_size = Integer()
+
     # INFO - G.M - 2019-05-31 - file is needed to store file content b64 value,
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
     b64_file = Text()
 
 
-class IndexedUser(Document):
-    # TODO - S.G. - 2021-02-05 - placeholder to test multi-index creation,
-    # will be completed during https://github.com/tracim/tracim/issues/4095
-    pass
+# Mappings from (type, format) -> ES field type.
+# format is currently only used for "string".
+JSON_SCHEMA_TYPE_MAPPINGS = {
+    ("boolean", None): Boolean(),
+    ("object", None): Object(),
+    ("number", None): Float(),
+    ("string", "date"): Date(),
+    ("string", "date-time"): Date(),
+    ("string", "html"): HtmlText(),
+    # default string field type
+    ("string", None): SimpleText(),
+    # default field type
+    (None, None): Field(),
+}
+
+JsonSchemaDict = typing.Dict[str, typing.Any]
+
+
+def _get_es_field_from_json_schema(schema: JsonSchemaDict) -> Field:
+    """Return the right elastic-search field for a given JSON schema."""
+    type_ = schema.get("type")
+    if type_ == "array":
+        items_schema = schema.get("items")
+        if isinstance(items_schema, dict):
+            field = _get_es_field_from_json_schema(items_schema)
+            field._multi = True
+        else:
+            field = Field(multi=True)
+    else:
+        format_ = schema.get("format")
+        try:
+            field = JSON_SCHEMA_TYPE_MAPPINGS[(type_, format_)]
+        except KeyError:
+            # Fallback for unmanaged formats
+            field = JSON_SCHEMA_TYPE_MAPPINGS[(type_, None)]
+    return field
+
+
+def get_es_properties_from_custom_properties_schema(
+    user__custom_properties__json_schema: JsonSchemaDict,
+) -> Object:
+    assert user__custom_properties__json_schema.get("type") == "object"
+    return {
+        key: _get_es_field_from_json_schema(value)
+        for key, value in user__custom_properties__json_schema.get("properties", []).items()
+    }
+
+
+def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
+    """Create the indexed user class appropriate for the given configuration.
+
+    The returned document class has a custom_properties field created
+    using the USER__CUSTOM_PROPERTIES__JSON_SCHEMA.
+    """
+
+    class IndexedUser(Document):
+        user_id = Integer()
+        public_name = SimpleText()
+        username = SimpleText()
+        is_deleted = Boolean()
+        is_active = Boolean()
+        workspace_ids = Integer(multi=True)
+        last_authored_content_revision_date = Date()
+        custom_properties = Object(
+            properties=get_es_properties_from_custom_properties_schema(
+                config.USER__CUSTOM_PROPERTIES__JSON_SCHEMA
+            )
+        )
+
+    return IndexedUser
 
 
 class IndexedWorkspace(Document):

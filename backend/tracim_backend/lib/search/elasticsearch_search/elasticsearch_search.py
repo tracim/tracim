@@ -14,13 +14,14 @@ from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
@@ -30,6 +31,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -79,6 +81,7 @@ class ESSearchApi(SearchApi):
                 )
             ]
         )
+        self.IndexedUser = create_indexed_user_class(config)
 
     def create_indices(self) -> None:
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
@@ -277,6 +280,35 @@ class ESSearchApi(SearchApi):
         for content in contents:
             self.index_content(content)
 
+    def index_user(self, user: User) -> None:
+        """Index the given user in the appropriate index."""
+        user_in_context = UserInContext(user, dbsession=self._session, config=self._config)
+
+        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
+        workspace_ids = rapi.get_user_workspaces_ids(user.user_id)
+
+        indexed_user = self.IndexedUser(
+            user_id=user_in_context.user_id,
+            public_name=user_in_context.public_name,
+            username=user_in_context.username,
+            is_deleted=user_in_context.is_deleted,
+            is_active=user_in_context.is_active,
+            workspace_ids=workspace_ids,
+            custom_properties=user.custom_properties,
+        )
+        indexed_user.meta.id = user.user_id
+        user_index_alias = self._get_index_parameters(self.IndexedUser).alias
+        indexed_user.save(
+            using=self.es,
+            index=user_index_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
+
+    def delete_user(self, user: User) -> None:
+        """Delete the given user from the corresponding ES index."""
+        user_index_alias = self._get_index_parameters(self.IndexedUser).alias
+        self.es.delete(user_index_alias, user.user_id)
+
     def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
         for parameters in self._get_indices_parameters():
             plugin_manager.register(parameters.indexer)
@@ -454,7 +486,7 @@ class ESSearchApi(SearchApi):
             IndexParameters(
                 alias=prefix + "-user",
                 index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
-                document_class=IndexedUser,
+                document_class=create_indexed_user_class(self._config),
                 indexer=object(),
             ),
             IndexParameters(
@@ -628,3 +660,58 @@ class ESContentIndexer:
         for content in contents:
             if content.type not in cls.EXCLUDED_CONTENT_TYPES:
                 yield content
+
+
+class ESUserIndexer:
+    @hookimpl
+    def on_user_created(self, user: User, context: TracimContext) -> None:
+        self._index_user(user, context)
+
+    @hookimpl
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
+        self._index_user(user, context)
+
+    @hookimpl
+    def on_user_deleted(self, user: User, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.delete_user(user)
+        except Exception:
+            logger.exception(self, "Exception while deleting indexed user {}".format(user.user_id))
+
+    @hookimpl
+    def on_content_created(self, content: Content, context: TracimContext) -> None:
+        self._index_user(content.current_revision.owner, context)
+
+    @hookimpl
+    def on_content_modified(self, content: Content, context: TracimContext) -> None:
+        self._index_user(content.current_revision.owner, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self._index_user(role.user, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_modified(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self._index_user(role.user, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self._index_user(role.user, context)
+
+    def _index_user(self, user: User, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.index_user(user)
+        except Exception:
+            logger.exception(self, "Exception while indexing user {}".format(user.user_id))
