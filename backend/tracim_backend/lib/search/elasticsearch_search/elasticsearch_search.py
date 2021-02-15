@@ -41,7 +41,7 @@ FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 
 
-class AdvancedSearchParameters:
+class AdvancedContentSearchParameters:
     def __init__(
         self,
         workspace_names: typing.Optional[typing.List[str]] = None,
@@ -397,7 +397,7 @@ class ESSearchApi(SearchApi):
     def search_content(
         self,
         simple_parameters: SearchFilterQuerySchema,
-        advanced_parameters: typing.Optional[AdvancedSearchParameters] = None,
+        advanced_parameters: typing.Optional[AdvancedContentSearchParameters] = None,
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
