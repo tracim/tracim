@@ -1551,7 +1551,7 @@ class TestFiles(object):
         assert content["mimetype"] == ""
         assert content["file_extension"] == ""
         assert content["filename"] == "Test file"
-        assert content["size"] is None
+        assert content["size"] == 0
         assert content["page_nb"] is None
         assert content["has_pdf_preview"] is False
         assert content["has_jpeg_preview"] is False

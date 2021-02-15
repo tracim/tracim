@@ -8,9 +8,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_elasticsearch_search"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
@@ -60,25 +58,22 @@ class TestElasticSearchSearch(object):
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
-        content1 = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label=created_content_name,
             do_save=True,
         )
-        api.execute_created_content_actions(content1)
-        content2 = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="another content",
             do_save=True,
         )
-        api.execute_created_content_actions(content2)
 
-        content3 = api.create(
+        api.create(
             content_type_slug="html-document", workspace=workspace, label="test", do_save=True
         )
-        api.execute_created_content_actions(content3)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
 
@@ -133,21 +128,18 @@ class TestElasticSearchSearch(object):
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
-        content1 = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label=created_content_name,
             do_save=True,
         )
-        api.execute_created_content_actions(content1)
-        content2 = api.create(
+        api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
         )
-        api.execute_created_content_actions(content2)
-        content3 = api.create(
+        api.create(
             content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
         )
-        api.execute_created_content_actions(content3)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
 
@@ -224,15 +216,12 @@ class TestElasticSearchSearch(object):
                 content, new_label=created_content_name, new_raw_content=created_content_body
             )
             api.save(content)
-        api.execute_created_content_actions(content)
-        report = api.create(
+        api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
         )
-        api.execute_created_content_actions(report)
-        thread = api.create(
+        api.create(
             content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
         )
-        api.execute_created_content_actions(thread)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
 
@@ -306,26 +295,21 @@ class TestElasticSearchSearch(object):
             label=created_content_name,
             do_save=True,
         )
-        api.execute_created_content_actions(content)
-        comment = api.create_comment(
+        api.create_comment(
             workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
         )
-        api.execute_created_content_actions(comment)
-        comment2 = api.create_comment(
+        api.create_comment(
             workspace=workspace,
             parent=content,
             content=second_created_comment_content,
             do_save=True,
         )
-        api.execute_created_content_actions(comment2)
-        report = api.create(
+        api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
         )
-        api.execute_created_content_actions(report)
-        thread = api.create(
+        api.create(
             content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
         )
-        api.execute_created_content_actions(thread)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
 
@@ -402,34 +386,30 @@ class TestElasticSearchSearch(object):
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
-        doc = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch doc",
             do_save=True,
         )
-        api.execute_created_content_actions(doc)
-        doc2 = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch doc 2",
             do_save=True,
         )
-        api.execute_created_content_actions(doc2)
-        thread = api.create(
+        api.create(
             content_type_slug="thread",
             workspace=workspace,
             label="stringtosearch thread",
             do_save=True,
         )
-        api.execute_created_content_actions(thread)
-        folder = api.create(
+        api.create(
             content_type_slug="folder",
             workspace=workspace,
             label="stringtosearch folder",
             do_save=True,
         )
-        api.execute_created_content_actions(folder)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
         # get all
@@ -504,42 +484,36 @@ class TestElasticSearchSearch(object):
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
-        active_content = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch active",
             do_save=True,
         )
-        api.execute_created_content_actions(active_content)
-        active_content2 = api.create(
+        api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch active 2",
             do_save=True,
         )
-        api.execute_created_content_actions(active_content2)
         deleted_content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch deleted",
             do_save=True,
         )
-        api.execute_created_content_actions(deleted_content)
         with new_revision(session=session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
-        api.execute_update_content_actions(deleted_content)
         archived_content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label="stringtosearch archived",
             do_save=True,
         )
-        api.execute_created_content_actions(archived_content)
         with new_revision(session=session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
-        api.execute_update_content_actions(archived_content)
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
         # get all
@@ -605,7 +579,7 @@ class TestElasticSearchSearch(object):
             "show_archived": 1,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/search/content", status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -658,7 +632,6 @@ class TestElasticSearchSearchWithIngest(object):
                 text_file, "test_file", "text/plain", b"we need to find stringtosearch here !"
             )
             api.save(text_file)
-            api.execute_created_content_actions(text_file)
         content_id = text_file.content_id
         transaction.commit()
         elasticsearch.refresh_elasticsearch()

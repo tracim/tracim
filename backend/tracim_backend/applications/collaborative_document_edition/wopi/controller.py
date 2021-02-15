@@ -155,7 +155,6 @@ class WOPIController(Controller):
                 new_content=request.body,
             )
             api.save(request.current_content)
-            api.execute_update_content_actions(request.current_content)
 
         return WopiLib(
             current_user=request.current_user, session=request.dbsession, config=app_config

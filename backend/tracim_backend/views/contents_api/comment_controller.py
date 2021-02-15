@@ -84,7 +84,6 @@ class CommentController(Controller):
         comment = api.create_comment(
             content.workspace, content, hapic_data.body.raw_content, do_save=True
         )
-        api.execute_created_content_actions(comment)
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])

@@ -41,75 +41,38 @@ class ESContentSearchResponse(ContentSearchResponse):
         contents = []
         for hit in response["hits"]["hits"]:
             source = hit["_source"]
-            parent = None
-            if source.get("parent"):
-                dict_content = source["parent"]
-                parent = SearchedDigestContent(
-                    content_id=dict_content["content_id"],
-                    parent_id=dict_content.get("parent_id"),
-                    label=dict_content["label"],
-                    slug=dict_content["slug"],
-                    content_type=dict_content["content_type"],
-                )
-            parents = []
-            if source.get("parents"):
-                for parent in source["parents"]:
-                    dict_content = parent
-                    parent = SearchedDigestContent(
-                        content_id=dict_content["content_id"],
-                        parent_id=dict_content.get("parent_id"),
-                        label=dict_content["label"],
-                        slug=dict_content["slug"],
-                        content_type=dict_content["content_type"],
-                    )
-                    parents.append(parent)
-            comments = []
-            if source.get("comments"):
-                for comment in source["comments"]:
-                    comment = SearchedDigestComment(
+            try:
+                comments = [
+                    SearchedDigestComment(
                         content_id=comment["content_id"], parent_id=comment.get("parent_id")
                     )
-                    comments.append(comment)
+                    for comment in source["comments"]
+                ]
+            except KeyError:
+                comments = []
+            path = [SearchedDigestContent(**component) for component in source["path"]]
 
             dict_workspace = source["workspace"]
             workspace = SearchedWorkspace(
                 workspace_id=dict_workspace["workspace_id"], label=dict_workspace["label"]
             )
             dict_last_modifier = source["last_modifier"]
-            last_modifier = SearchedDigestUser(
-                user_id=dict_last_modifier["user_id"], public_name=dict_last_modifier["public_name"]
-            )
+            last_modifier = SearchedDigestUser(**dict_last_modifier)
             dict_author = source["author"]
-            author = SearchedDigestUser(
-                user_id=dict_author["user_id"], public_name=dict_author["public_name"]
+            author = SearchedDigestUser(**dict_author)
+            source.update(
+                dict(
+                    workspace=workspace,
+                    author=author,
+                    last_modifier=last_modifier,
+                    comments=comments,
+                    modified=parse(source["modified"]),
+                    created=parse(source["created"]),
+                    score=hit["_score"],
+                    path=path,
+                )
             )
-            content = SearchedContent(
-                content_id=source["content_id"],
-                label=source["label"],
-                slug=source["slug"],
-                status=source["status"],
-                content_type=source["content_type"],
-                workspace=workspace,
-                workspace_id=source["workspace_id"],
-                parent=parent,
-                parent_id=source.get("parent_id"),
-                parents=parents,
-                comments=comments,
-                author=author,
-                last_modifier=last_modifier,
-                sub_content_types=source["sub_content_types"],
-                is_archived=source["is_archived"],
-                is_deleted=source["is_deleted"],
-                is_editable=source["is_editable"],
-                is_active=source["is_active"],
-                show_in_ui=source["show_in_ui"],
-                file_extension=source["file_extension"],
-                filename=source["filename"],
-                modified=parse(source["modified"]),
-                created=parse(source["created"]),
-                score=hit["_score"],
-                current_revision_id=source["current_revision_id"],
-            )
+            content = SearchedContent(**source)
             contents.append(content)
 
         aggregations = response["aggregations"]
