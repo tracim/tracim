@@ -19,7 +19,7 @@ def facet_count(aggregations: dict, field: str) -> typing.List[FacetCount]:
     Builds a FacetCount object from an elasticsearch bucket aggregation result
     """
 
-    facet: typing.List[FacetCount] = []
+    facet = []
     for bucket in aggregations[field]["buckets"]:
         facet.append(FacetCount(key=bucket["key"], count=bucket["doc_count"]))
     return facet
