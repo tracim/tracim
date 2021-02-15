@@ -121,7 +121,7 @@ export class SearchResult extends React.Component {
     }
   }
 
-  getPath = (path) => path.map(c => c.label).join('/')
+  getPath = (path) => path.map(c => c.label).join(' / ')
 
   getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
