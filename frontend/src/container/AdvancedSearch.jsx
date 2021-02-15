@@ -196,9 +196,8 @@ export class AdvancedSearch extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper customClass='advancedSearch'>
+          <PageWrapper>
             <PageTitle
-              parentClass='advancedSearch'
               title={(currentNumberSearchResults === 1
                 ? props.t('Result for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
                 : props.t('Results for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
