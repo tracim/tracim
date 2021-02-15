@@ -33,7 +33,6 @@ class ESContentSearchResponse(ContentSearchResponse):
     """
 
     def __init__(self, search: Search, response: Response) -> None:
-        # debug result here is the good idea
         self._response = response
         self._search = search
         total_hits = self._response["hits"]["total"]["value"]
