@@ -1,6 +1,7 @@
 from abc import ABC
 from datetime import datetime
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 
 class FacetCount:
@@ -48,9 +49,6 @@ class ContentSearchResponse(ABC):
         self.total_hits = total_hits
         self.is_total_hits_accurate = is_total_hits_accurate
         self.simple_facets = simple_facets
-        self.set_search_fields(search_fields)
-
-    def set_search_fields(self, search_fields: Optional[List[str]]) -> None:
         self.search_fields = search_fields
 
 
@@ -138,7 +136,7 @@ class SearchedContent(object):
         self.workspace_id = workspace_id
         self.path = path
         self.comments = comments
-        self.comments_count = comments_count
+        self.comment_count = comment_count
         self.author = author
         self.last_modifier = last_modifier
         self.sub_content_types = sub_content_types

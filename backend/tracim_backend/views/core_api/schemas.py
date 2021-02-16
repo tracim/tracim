@@ -105,32 +105,43 @@ class StrippedString(String):
 
 
 class StringList(marshmallow.fields.List):
+    """
+    This Field validates a list of elements the given field validates.
+    The Field is deserialized into a Python list.
+    The Field is serialized into a string with the Field's separated with the given separator.
+    """
+
     def __init__(self, cls: typing.Type[Field], separator: str = ",", **kwargs: dict) -> None:
         super().__init__(cls, **kwargs)
         self._separator = separator
 
-    def _deserialize(self, value: typing.Optional[str], *args: typing.Any, **kwargs: typing.Any):
-        return super()._deserialize(value.split(self._separator), *args, **kwargs)
+    def _deserialize(self, value: str, *args: typing.Any, **kwargs: typing.Any):
+        return super()._deserialize(value.strip().split(self._separator), *args, **kwargs)
 
     def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
         return self._separator.join(super()._serialize(*args, **kwargs))
 
 
 class EnumField(marshmallow.fields.Field):
+    """
+    This Field validates elements found in an Enum.
+    The serialized value of this Field is the value of an enum field of the given Enum.
+    The deserialized value of this Field an enum field.
+    """
+
     def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
         super().__init__(**kwargs)
         self._enum = enum_cls
 
     def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
-        for val in self._enum.__members__.values():
-            if value == val.value:
-                return val
-
-        raise marshmallow.ValidationError(
-            "'{}' is not a valid value for this field. Allowed values:".format(
-                value, (val.value for val in self._enum.__members__.values())
+        try:
+            return self._enum(value)
+        except ValueError:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field. Allowed values: {}".format(
+                    value, [val.value for val in self._enum.__members__.values()]
+                )
             )
-        )
 
     def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> str:
         if value not in self._enum:
@@ -142,6 +153,12 @@ class EnumField(marshmallow.fields.Field):
 
 
 class RestrictedStringField(marshmallow.fields.String):
+    """
+    This Field validates elements found in a Python list.
+    The serialized value and the deserialized value are elements of this list.
+    Serialization and deserialization fail for values that do not belong to this list.
+    """
+
     def __init__(self, allowed_strings: typing.Container[str], **kwargs):
         super().__init__(**kwargs)
         self._allowed_strings = allowed_strings

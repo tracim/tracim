@@ -181,7 +181,7 @@ class ContentSearchResultSchema(marshmallow.Schema):
 
 
 class FacetCountSchema(marshmallow.Schema):
-    key = marshmallow.fields.String("The value of this field")
+    value = marshmallow.fields.String("The value of this field")
     count = marshmallow.fields.Int("The number of results matching this value")
 
 

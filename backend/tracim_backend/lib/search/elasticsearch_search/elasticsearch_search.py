@@ -513,7 +513,7 @@ class ESSearchApi(SearchApi):
         search.aggs.metric("modified_to", "max", field="modified")
 
         res = search.execute()
-        res.set_search_fields(search_fields)
+        res.search_fields = search_fields
         return res
 
     @staticmethod
