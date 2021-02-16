@@ -25,6 +25,13 @@ def facet_count(aggregations: dict, field: str) -> typing.List[FacetCount]:
     return facet
 
 
+def date_from_aggregation(aggregations: dict, field: str):
+    try:
+        return parse(aggregations[field]["value_as_string"])
+    except KeyError:
+        return None
+
+
 class ESContentSearchResponse(ContentSearchResponse):
     """
     Response of search using LibSearch
@@ -83,10 +90,10 @@ class ESContentSearchResponse(ContentSearchResponse):
             file_extensions=facet_count(aggregations, "file_extensions"),
             statuses=facet_count(aggregations, "statuses"),
             content_types=facet_count(aggregations, "content_types"),
-            created_from=parse(aggregations["created_from"]["value_as_string"]),
-            created_to=parse(aggregations["created_to"]["value_as_string"]),
-            modified_from=parse(aggregations["modified_from"]["value_as_string"]),
-            modified_to=parse(aggregations["modified_to"]["value_as_string"]),
+            created_from=date_from_aggregation(aggregations, "created_from"),
+            created_to=date_from_aggregation(aggregations, "created_to"),
+            modified_from=date_from_aggregation(aggregations, "modified_from"),
+            modified_to=date_from_aggregation(aggregations, "modified_to"),
         )
 
         super().__init__(

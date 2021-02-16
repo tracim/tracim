@@ -131,6 +131,7 @@ class IndexedContent(Document):
     # INFO - G.M - 2019-05-31 - we need to include in parent here, because we need
     # to search into comments content.
     comments = Nested(DigestComments, include_in_parent=True)
+    comment_count = Integer()
     author = Object(DigestUser)
     last_modifier = Object(DigestUser)
 

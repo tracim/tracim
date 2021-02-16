@@ -1,4 +1,5 @@
 # coding=utf-8
+from enum import Enum
 import typing
 
 import marshmallow
@@ -112,7 +113,57 @@ class StringList(marshmallow.fields.List):
         return super()._deserialize(value.split(self._separator), *args, **kwargs)
 
     def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
-        return self._separator.join(super().serialize(*args, **kwargs))
+        return self._separator.join(super()._serialize(*args, **kwargs))
+
+
+class EnumField(marshmallow.fields.Field):
+    def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
+        super().__init__(**kwargs)
+        self._enum = enum_cls
+
+    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
+        for val in self._enum.__members__.values():
+            if value == val.value:
+                return val
+
+        raise marshmallow.ValidationError(
+            "'{}' is not a valid value for this field. Allowed values:".format(
+                value, (val.value for val in self._enum.__members__.values())
+            )
+        )
+
+    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value not in self._enum:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field".format(value)
+            )
+
+        return value.value
+
+
+class RestrictedStringField(marshmallow.fields.String):
+    def __init__(self, allowed_strings: typing.Container[str], **kwargs):
+        super().__init__(**kwargs)
+        self._allowed_strings = allowed_strings
+
+    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value in self._allowed_strings:
+            return value
+
+        self.error(value)
+
+    def _serialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value not in self._allowed_strings:
+            self.error(value)
+
+        return value
+
+    def error(self, value: str) -> typing.NoReturn:
+        raise marshmallow.ValidationError(
+            "'{}' is not a valid value for this field. Allowed values: {}".format(
+                value, self._allowed_strings
+            )
+        )
 
 
 class EventTypeListField(StrippedString):
@@ -315,7 +366,9 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True, example={"param1": "value1"}, description="custom_properties schema",
+        required=True,
+        example={"param1": "value1"},
+        description="custom_properties schema",
     )
 
 
@@ -1186,7 +1239,9 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties", required=True, allow_none=False,
+        description="ui schema used for user custom properties",
+        required=True,
+        allow_none=False,
     )
 
 

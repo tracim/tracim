@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 import typing
 
@@ -11,11 +12,11 @@ from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
+from tracim_backend.views.core_api.schemas import EnumField
+from tracim_backend.views.core_api.schemas import RestrictedStringField
 from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
-
-# from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import AdvancedContentSearchParameters
 
 
 class SearchContentField(Enum):
@@ -25,7 +26,10 @@ class SearchContentField(Enum):
     DESCRIPTION = "description"
 
 
-class ContentSearchFilterQuery(object):
+filterable_content_types = content_type_list.restricted_allowed_types_slug()
+
+
+class ContentSearchQuery(object):
     def __init__(
         self,
         size: int = 10,
@@ -40,15 +44,43 @@ class ContentSearchFilterQuery(object):
         self.size = size
         self.page_nb = page_nb
 
-        if not content_types:
-            self.content_types = content_type_list.restricted_allowed_types_slug()
+        self.content_types = content_types or filterable_content_types
 
         self.show_deleted = bool(show_deleted)
         self.show_archived = bool(show_archived)
         self.show_active = bool(show_active)
 
 
-class ContentSearchFilterQuerySchema(marshmallow.Schema):
+class AdvancedContentSearchQuery(ContentSearchQuery):
+    def __init__(
+        self,
+        workspace_names: typing.Optional[typing.List[str]] = None,
+        author__public_names: typing.Optional[typing.List[str]] = None,
+        last_modifier__public_names: typing.Optional[typing.List[str]] = None,
+        file_extensions: typing.Optional[typing.List[str]] = None,
+        search_fields: typing.Optional[typing.List[str]] = None,
+        statuses: typing.Optional[typing.List[str]] = None,
+        created_from: typing.Optional[datetime] = None,
+        created_to: typing.Optional[datetime] = None,
+        modified_from: typing.Optional[datetime] = None,
+        modified_to: typing.Optional[datetime] = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+
+        self.workspace_names = workspace_names
+        self.author__public_names = author__public_names
+        self.last_modifier__public_names = last_modifier__public_names
+        self.file_extensions = file_extensions
+        self.search_fields = search_fields
+        self.statuses = statuses
+        self.created_from = created_from
+        self.created_to = created_to
+        self.modified_from = modified_from
+        self.modified_to = modified_to
+
+
+class ContentSearchQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
         example="test", description="just a search string", required=False
     )
@@ -58,8 +90,10 @@ class ContentSearchFilterQuerySchema(marshmallow.Schema):
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
-    content_types = StrippedString(
-        required=False, validate=regex_string_as_list_of_string, description="content_types to show"
+    content_types = StringList(
+        RestrictedStringField(filterable_content_types),
+        required=False,
+        description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -87,41 +121,8 @@ class ContentSearchFilterQuerySchema(marshmallow.Schema):
         validate=bool_as_int_validator,
     )
 
-    # @post_load
-    # def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-    # return ContentSearchFilterQuery(
-    # search_string=data["search_string"],
-    # size=data["size"],
-    # page_nb=data["page_nb"],
-    # content_types=data["content_types"],
-    # show_archived=data["show_archived"],
-    # show_deleted=data["show_deleted"],
-    # show_active=data["show_active"],
-    # )
 
-
-class EnumField(marshmallow.fields.Field):
-    def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
-        super().__init__(**kwargs)
-        self._enum = enum_cls
-
-    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any):
-        for val in self._enum.__members__.values():
-            if value == val.value:
-                return val
-
-        raise marshmallow.ValidationError("{} is not a valid value for this field".format(value))
-
-    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> str:
-        if value not in self._enum:
-            raise marshmallow.ValidationError(
-                "{} is not a valid value for this field".format(value)
-            )
-
-        return value.value
-
-
-class AdvancedContentSearchFilterQuerySchema(ContentSearchFilterQuerySchema):
+class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     search_fields = StringList(
         EnumField(SearchContentField), required=False, description="search within these fields"
     )
@@ -152,23 +153,8 @@ class AdvancedContentSearchFilterQuerySchema(ContentSearchFilterQuerySchema):
     )
     created_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
     created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    updated_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    updated_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-
-    # @post_load
-    # def make_advanced_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-    # return AdvancedContentSearchParameters(
-    # workspace_names=data["workspace_names"],
-    # author__public_names=data["author__public_names"],
-    # last_modifier__public_names=data["last_modifier__public_names"],
-    # file_extensions=data["file_extensions"],
-    # search_fields=data["search_fields"],
-    # statuses=data["statuses"],
-    # created_from=data["created_from"],
-    # created_to=data["created_to"],
-    # updated_from=data["updated_from"],
-    # updated_to=data["updated_to"],
-    # )
+    modified_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    modified_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):
@@ -182,7 +168,7 @@ class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
-    comments_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
+    comment_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
     content_size = marshmallow.fields.Integer(
         example=1200, description="Content size in bytes", validate=positive_int_validator
     )
@@ -205,7 +191,8 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
     )
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents in these workspaces",
+            FacetCountSchema(),
+            description="search matches contents in these workspaces",
         )
     )
     author__public_names = marshmallow.fields.List(
@@ -222,24 +209,25 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
     )
     file_extensions = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these file extensions",
+            FacetCountSchema(),
+            description="search matches contents with these file extensions",
         )
     )
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these statuses",
+            FacetCountSchema(),
+            description="search matches contents with these statuses",
         )
     )
-    created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    modified_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    modified_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
+    created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
+    modified_from = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, required=False, missing=None
+    )
+    modified_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
 
 
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
-    search_fields = marshmallow.fields.List(
-        marshmallow.fields.String(), description="search was performed in these fields"
-    )
     simple_facets = marshmallow.fields.Nested(
         ContentSimpleFacetsSchema(), description="search matched content with these characteristics"
     )

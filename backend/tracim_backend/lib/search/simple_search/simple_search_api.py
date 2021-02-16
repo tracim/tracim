@@ -14,7 +14,7 @@ from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Content
-from tracim_backend.views.search_api.schemas import ContentSearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import ContentSearchQuery
 
 SEARCH_SEPARATORS = ",| "
 SEARCH_DEFAULT_RESULT_NB = 10
@@ -25,7 +25,7 @@ class SimpleSearchApi(SearchApi):
     Simple search using sql:
     - Do not index anything.
     - allow pagination and filtering by content_type, deleted, archived
-    - limited feature (no ranking, no search into content, etc...)
+    - limited feature (no ranking, no search into content,
     """
 
     def create_indices(self):
@@ -154,9 +154,7 @@ class SimpleSearchApi(SearchApi):
 
         return title_keyworded_items
 
-    def search_content(
-        self, search_parameters: ContentSearchFilterQuerySchema
-    ) -> ContentSearchResponse:
+    def search_content(self, search_parameters: ContentSearchQuery) -> ContentSearchResponse:
         """
         Search content with sql
         - do no show archived/deleted content by default

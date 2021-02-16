@@ -34,38 +34,12 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.views.search_api.schemas import ContentSearchFilterQuerySchema
+from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
 
 FILE_PIPELINE_ID = "attachment"
 FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
-
-
-class AdvancedContentSearchParameters:
-    def __init__(
-        self,
-        workspace_names: typing.Optional[typing.List[str]] = None,
-        author__public_names: typing.Optional[typing.List[str]] = None,
-        last_modifier__public_names: typing.Optional[typing.List[str]] = None,
-        file_extensions: typing.Optional[typing.List[str]] = None,
-        search_fields: typing.Optional[typing.List[str]] = None,
-        statuses: typing.Optional[typing.List[str]] = None,
-        created_from: typing.Optional[datetime] = None,
-        created_to: typing.Optional[datetime] = None,
-        updated_from: typing.Optional[datetime] = None,
-        updated_to: typing.Optional[datetime] = None,
-    ):
-        self.workspace_names = workspace_names
-        self.author__public_names = author__public_names
-        self.last_modifier__public_names = last_modifier__public_names
-        self.file_extensions = file_extensions
-        self.search_fields = search_fields
-        self.statuses = statuses
-        self.created_from = created_from
-        self.created_to = created_to
-        self.updated_from = updated_from
-        self.updated_to = updated_to
 
 
 class IndexParameters:
@@ -279,7 +253,7 @@ class ESSearchApi(SearchApi):
             active_shares=content_in_context.actives_shares,
             path=path,
             comments=comments,
-            comments_count=len(comments),
+            comment_count=len(comments),
             author=author,
             last_modifier=last_modifier,
             archived_through_parent_id=content_in_context.archived_through_parent_id,
@@ -391,16 +365,14 @@ class ESSearchApi(SearchApi):
         return None
 
     def search_content(
-        self,
-        simple_parameters: ContentSearchFilterQuerySchema,
-        advanced_parameters: typing.Optional[AdvancedContentSearchParameters] = None,
+        self, search_parameters: AdvancedContentSearchQuery
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
-        if not simple_parameters.search_string:
+        if not search_parameters.search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
         # INFO - G.M - 2019-05-31 - search using simple_query_string, which means user-friendly
@@ -409,8 +381,8 @@ class ESSearchApi(SearchApi):
         es_search_fields = []
 
         search_fields = (
-            advanced_parameters.search_fields
-            if advanced_parameters and advanced_parameters.search_fields
+            search_parameters.search_fields
+            if search_parameters and search_parameters.search_fields
             else ["label", "raw_content", "comments"]
         )
 
@@ -442,7 +414,7 @@ class ESSearchApi(SearchApi):
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
             "simple_query_string",
-            query=simple_parameters.search_string,
+            query=search_parameters.search_string,
             # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
             # change score according to this boost. label is the most important, content is
             # important too, content of comment is less important. filename and file_extension is
@@ -451,14 +423,14 @@ class ESSearchApi(SearchApi):
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
-        if not simple_parameters.show_active:
+        if not search_parameters.show_active:
             search = search.exclude("term", is_active=True)
 
-        if not simple_parameters.show_deleted:
+        if not search_parameters.show_deleted:
             search = search.exclude("term", is_deleted=True)
             search = search.filter("term", deleted_through_parent_id=0)
 
-        if not simple_parameters.show_archived:
+        if not search_parameters.show_archived:
             search = search.exclude("term", is_archived=True)
             search = search.filter("term", archived_through_parent_id=0)
 
@@ -477,56 +449,55 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
 
-        if simple_parameters.size:
-            search = search.extra(size=simple_parameters.size)
+        if search_parameters.size:
+            search = search.extra(size=search_parameters.size)
 
-        if simple_parameters.page_nb:
+        if search_parameters.page_nb:
             search = search.extra(
-                from_=self.offset_from_pagination(simple_parameters.size, simple_parameters.page_nb)
+                from_=self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
             )
 
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
-        if simple_parameters.content_types:
-            search = search.filter("terms", content_type=simple_parameters.content_types)
+        if search_parameters.content_types:
+            search = search.filter("terms", content_type=search_parameters.content_types)
 
-        if advanced_parameters:
-            if advanced_parameters.workspace_names:
-                search = search.filter(
-                    "terms", workspace__label__exact=advanced_parameters.workspace_names
-                )
-
-            if advanced_parameters.author__public_names:
-                search = search.filter(
-                    "terms", author__public_names__exact=advanced_parameters.author__public_names
-                )
-
-            if advanced_parameters.last_modifier__public_names:
-                search = search.filter(
-                    "terms",
-                    last_modifier__public_names__exact=advanced_parameters.last_modifier__public_names,
-                )
-
-            if advanced_parameters.file_extensions:
-                search = search.filter("terms", file_extension=advanced_parameters.file_extensions)
-
-            if advanced_parameters.statuses:
-                search = search.filter("terms", status=advanced_parameters.statuses)
-
-            created_range = self.create_es_range(
-                advanced_parameters.created_from, advanced_parameters.created_to
+        if search_parameters.workspace_names:
+            search = search.filter(
+                "terms", workspace__label__exact=search_parameters.workspace_names
             )
 
-            if created_range:
-                search = search.filter("range", created=created_range)
-
-            modified_range = self.create_es_range(
-                advanced_parameters.modified_from, advanced_parameters.modified_to
+        if search_parameters.author__public_names:
+            search = search.filter(
+                "terms", author__public_names__exact=search_parameters.author__public_names
             )
 
-            if modified_range:
-                search = search.filter("range", modified=modified_range)
+        if search_parameters.last_modifier__public_names:
+            search = search.filter(
+                "terms",
+                last_modifier__public_names__exact=search_parameters.last_modifier__public_names,
+            )
+
+        if search_parameters.file_extensions:
+            search = search.filter("terms", file_extension=search_parameters.file_extensions)
+
+        if search_parameters.statuses:
+            search = search.filter("terms", status=search_parameters.statuses)
+
+        created_range = self.create_es_range(
+            search_parameters.created_from, search_parameters.created_to
+        )
+
+        if created_range:
+            search = search.filter("range", created=created_range)
+
+        modified_range = self.create_es_range(
+            search_parameters.modified_from, search_parameters.modified_to
+        )
+
+        if modified_range:
+            search = search.filter("range", modified=modified_range)
 
         search.aggs.bucket("content_types", "terms", field="content_type.keyword")
         search.aggs.bucket("workspace_names", "terms", field="workspace.label.keyword")
@@ -592,7 +563,8 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+            source=FILE_PIPELINE_SOURCE_FIELD,
+            lang=lang,
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -620,7 +592,8 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+                            source=FILE_PIPELINE_SOURCE_FIELD,
+                            lang=lang,
                         ),
                         "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
                     }
@@ -752,9 +725,9 @@ class ESContentIndexer:
     @classmethod
     def _should_reindex_children(cls, obj: typing.Union[ContentRevisionRO, Workspace]) -> bool:
         """Changes on a content/workspace only have effect on their children if:
-          - their 'label' has changed
-          - their 'is_deleted' state has changed
-          - (for contents) their 'is_archived' state has changed
+        - their 'label' has changed
+        - their 'is_deleted' state has changed
+        - (for contents) their 'is_archived' state has changed
         """
         attribute_state = inspect(obj).attrs
         return (

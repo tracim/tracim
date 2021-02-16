@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import datetime
-import typing
+from typing import List, Optional
 
 
 class FacetCount:
@@ -12,16 +12,16 @@ class FacetCount:
 class SimpleFacets:
     def __init__(
         self,
-        workspace_names: typing.List[str],
-        author__public_names: typing.List[str],
-        last_modifier__public_names: typing.List[str],
-        file_extensions: typing.List[str],
-        statuses: typing.List[str],
-        content_types: typing.List[FacetCount],
-        created_from: datetime,
-        created_to: datetime,
-        modified_from: datetime,
-        modified_to: datetime,
+        workspace_names: Optional[List[str]],
+        author__public_names: Optional[List[str]],
+        last_modifier__public_names: Optional[List[str]],
+        file_extensions: Optional[List[str]],
+        statuses: Optional[List[str]],
+        content_types: Optional[List[FacetCount]],
+        created_from: Optional[datetime],
+        created_to: Optional[datetime],
+        modified_from: Optional[datetime],
+        modified_to: Optional[datetime],
     ) -> None:
         self.workspace_names = workspace_names
         self.author__public_names = author__public_names
@@ -38,11 +38,11 @@ class SimpleFacets:
 class ContentSearchResponse(ABC):
     def __init__(
         self,
-        contents: typing.List["SearchedContent"],
+        contents: List["SearchedContent"],
         total_hits: int = 0,
         is_total_hits_accurate: bool = True,
-        simple_facets: typing.Optional[typing.List[str]] = None,
-        search_fields: typing.Optional[typing.List[str]] = None,
+        simple_facets: Optional[List[str]] = None,
+        search_fields: Optional[List[str]] = None,
     ):
         self.contents = contents
         self.total_hits = total_hits
@@ -50,7 +50,7 @@ class ContentSearchResponse(ABC):
         self.simple_facets = simple_facets
         self.set_search_fields(search_fields)
 
-    def set_search_fields(self, search_fields: typing.Optional[typing.List[str]]) -> None:
+    def set_search_fields(self, search_fields: Optional[List[str]]) -> None:
         self.search_fields = search_fields
 
 
@@ -103,12 +103,12 @@ class SearchedContent(object):
         status: str,
         content_type: str,
         workspace: SearchedWorkspace,
-        path: typing.List[SearchedDigestContent],
-        comments: typing.List[SearchedDigestComment],
-        comments_count: int,
+        path: List[SearchedDigestContent],
+        comments: List[SearchedDigestComment],
+        comment_count: int,
         author: SearchedDigestUser,
         last_modifier: SearchedDigestUser,
-        sub_content_types: typing.List[str],
+        sub_content_types: List[str],
         is_archived: bool,
         is_deleted: bool,
         is_editable: bool,
@@ -123,7 +123,7 @@ class SearchedContent(object):
         workspace_id: int,
         active_shares: int,
         content_size: int,
-        parent_id: typing.Optional[int] = None,
+        parent_id: Optional[int] = None,
     ) -> None:
         self.current_revision_id = current_revision_id
         self.current_revision_type = current_revision_type
