@@ -84,28 +84,28 @@ export class AdvancedSearch extends React.Component {
 
   componentDidMount () {
     const { props } = this
-    const searchObject = parseSearchUrl(qs.parse(props.location.search))
+    const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
 
-    if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
+    if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
       this.getSearchResult({
-        ...searchObject,
+        ...urlSearchObject,
         currentPage: FIRST_PAGE,
         searchType: ADVANCED_SEARCH_TYPE.CONTENT
       }, props.contentSearch)
     } else this.setState({ currentSearch: props.contentSearch })
 
     /*
-      if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
+      if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
         this.getSearchResult({
-          ...searchObject,
+          ...urlSearchObject,
           currentPage: FIRST_PAGE,
           searchType: ADVANCED_SEARCH_TYPE.USER
         }, props.userSearch)
       } else this.setState({ currentSearch: props.userSearch })
 
-      if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
+      if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
         this.getSearchResult({
-          ...searchObject,
+          ...urlSearchObject,
           currentPage: FIRST_PAGE,
           searchType: ADVANCED_SEARCH_TYPE.SPACE
         }, props.spaceSearch)
