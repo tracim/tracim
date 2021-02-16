@@ -3,7 +3,6 @@ import { translate } from 'react-i18next'
 import {
   Badge,
   Breadcrumbs,
-  BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
@@ -11,7 +10,7 @@ import {
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
 import TimedEvent from '../TimedEvent.jsx'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 
 require('./AdvancedSearchContentList.styl')
 
@@ -100,34 +99,15 @@ export const AdvancedSearchContentList = props => {
           </Link>
 
           <Breadcrumbs
-            breadcrumbsList={[{
-              link: PAGE.HOME,
-              type: BREADCRUMBS_TYPE.CORE,
-              label: props.t('Home'),
-              isALink: true
-            }, {
-              link: PAGE.HOME,
-              type: BREADCRUMBS_TYPE.CORE,
-              label: props.t('Home'),
-              isALink: true
-            }, {
-              link: PAGE.HOME,
-              type: BREADCRUMBS_TYPE.CORE,
-              label: props.t('Home'),
-              isALink: true
-            }, {
-              link: PAGE.HOME,
-              type: BREADCRUMBS_TYPE.CORE,
-              label: props.t('Home'),
-              isALink: true
-            }]} keepLastBreadcrumbAsLink
-          /> {/* TODO - Change after backend */}
+            breadcrumbsList={props.breadcrumbsList(searchItem)}
+            keepLastBreadcrumbAsLink
+          />
 
           <TimedEvent
             customClass='advancedSearchContent__modification'
-            operation='status modified' // TODO - update after backend
+            operation={searchItem.current_revision_type}
             date={searchItem.modified}
-            lang={props.user.lang}
+            lang={props.userLang}
             author={{
               publicName: searchItem.lastModifier.public_name,
               userId: searchItem.lastModifier.user_id
@@ -140,3 +120,15 @@ export const AdvancedSearchContentList = props => {
 }
 
 export default translate()(AdvancedSearchContentList)
+
+AdvancedSearchContentList.propTypes = {
+  contentSearch: PropTypes.array.isRequired,
+  contentType: PropTypes.array.isRequired,
+  breadcrumbsList: PropTypes.func,
+  userLang: PropTypes.string
+}
+
+AdvancedSearchContentList.defaultProps = {
+  breadcrumbsList: () => {},
+  userLang: 'en'
+}

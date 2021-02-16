@@ -10,7 +10,9 @@ import { Link } from 'react-router-dom'
 // import PropTypes from 'prop-types'
 
 require('./AdvancedSearchUserList.styl')
-/* TODO - Change after backend */
+
+// TODO - G.B. - 2021-02-16 - This component should be updated at https://github.com/tracim/tracim/issues/4097
+
 export const AdvancedSearchUserList = props => {
   return (
     <>
@@ -56,7 +58,7 @@ export const AdvancedSearchUserList = props => {
             </div>
 
             <div className='advancedSearchUser__information'>
-              <span>giuliabonaspetti</span>
+              <span>username</span>
               <i className='fa-fw fas fa-at' title={props.t('Username')} />
             </div>
           </Link>

@@ -11,6 +11,8 @@ import { Link } from 'react-router-dom'
 
 require('./AdvancedSearchSpaceList.styl')
 
+// TODO - G.B. - 2021-02-16 - This component should be updated at https://github.com/tracim/tracim/issues/4097
+
 export const AdvancedSearchSpaceList = props => {
   const resultList = props.spaceSearch.resultList.map((searchItem) => {
     return {
@@ -68,9 +70,9 @@ export const AdvancedSearchSpaceList = props => {
             </div>
 
             <div className='advancedSearchSpace__information'>
-              <span>3333</span> {/* TODO - Change after backend with title */}
+              <span>3333</span>
               <i className='fa-fw fas fa-th' />
-              <span>3333</span> {/* TODO - Change after backend with title */}
+              <span>3333</span>
               <i className='fa-fw far fa-user' />
             </div>
           </Link>

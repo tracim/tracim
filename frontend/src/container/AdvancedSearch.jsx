@@ -2,29 +2,34 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
-  PageWrapper,
-  PageTitle,
-  PageContent,
-  IconButton,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT,
+  buildContentPathBreadcrumbs,
   buildHeadTitle,
+  CUSTOM_EVENT,
+  IconButton,
   PAGE,
+  PageContent,
+  PageTitle,
+  PageWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
-  newFlashMessage,
-  setCurrentNumberPage,
   appendSearchResultList,
-  setSearchResultList,
+  newFlashMessage,
+  setBreadcrumbs,
+  setCurrentNumberPage,
+  setHeadTitle,
   setNumberResultsByPage,
   setSearchedKeywords,
-  setBreadcrumbs,
-  setHeadTitle
+  setSearchResultList
 } from '../action-creator.sync.js'
 import { getAdvancedSearchResult } from '../action-creator.async.js'
 import SearchInput from '../component/Search/SearchInput.jsx'
-import { ADVANCED_SEARCH_TYPE, parseSearchUrl } from '../util/helper.js'
+import {
+  ADVANCED_SEARCH_TYPE,
+  FETCH_CONFIG,
+  parseSearchUrl
+} from '../util/helper.js'
 import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
 import AdvancedSearchContentList from '../component/Search/AdvancedSearchContentList.jsx'
 import AdvancedSearchUserList from '../component/Search/AdvancedSearchUserList.jsx'
@@ -33,6 +38,9 @@ import classnames from 'classnames'
 
 const qs = require('query-string')
 const FIRST_PAGE = 1
+
+// TODO - G.B. - 2021-02-16 - All commented code at this component should be evaluated
+// and possibly uncommented or explained at https://github.com/tracim/tracim/issues/4097
 
 export class AdvancedSearch extends React.Component {
   constructor (props) {
@@ -75,6 +83,7 @@ export class AdvancedSearch extends React.Component {
   }
 
   componentDidMount () {
+    const { props } = this
     const searchObject = parseSearchUrl(qs.parse(props.location.search))
 
     if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
@@ -85,22 +94,23 @@ export class AdvancedSearch extends React.Component {
       }, props.contentSearch)
     } else this.setState({ currentSearch: props.contentSearch })
 
-    if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
-      this.getSearchResult({
-        ...searchObject,
-        currentPage: FIRST_PAGE,
-        searchType: ADVANCED_SEARCH_TYPE.USER
-      }, props.userSearch)
-    } else this.setState({ currentSearch: props.userSearch })
+    /*
+      if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
+        this.getSearchResult({
+          ...searchObject,
+          currentPage: FIRST_PAGE,
+          searchType: ADVANCED_SEARCH_TYPE.USER
+        }, props.userSearch)
+      } else this.setState({ currentSearch: props.userSearch })
 
-    if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
-      this.getSearchResult({
-        ...searchObject,
-        currentPage: FIRST_PAGE,
-        searchType: ADVANCED_SEARCH_TYPE.SPACE
-      }, props.spaceSearch)
-    } else this.setState({ currentSearch: props.spaceSearch })
-
+      if (searchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
+        this.getSearchResult({
+          ...searchObject,
+          currentPage: FIRST_PAGE,
+          searchType: ADVANCED_SEARCH_TYPE.SPACE
+        }, props.spaceSearch)
+      } else this.setState({ currentSearch: props.spaceSearch })
+    */
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
@@ -169,6 +179,15 @@ export class AdvancedSearch extends React.Component {
     this.getSearchResult(searchObject, this.state.currentSearch)
   }
 
+  buildBreadcrumbs = async (content) => {
+    try {
+      const contentBreadcrumbsList = await buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, content)
+      return contentBreadcrumbsList
+    } catch (e) {
+      console.error('Error at advanced search, count not build breadcrumbs', e)
+    }
+  }
+
   getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
     // https://github.com/tracim/tracim/issues/1840
@@ -223,6 +242,7 @@ export class AdvancedSearch extends React.Component {
   }
 
   handleChangeSearchType = (e) => {
+    const { props } = this
     props.history.push(
       `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), s: e.currentTarget.value }, { encode: true })}`
     )
@@ -302,24 +322,24 @@ export class AdvancedSearch extends React.Component {
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
                     <AdvancedSearchContentList
+                      breadcrumbsList={this.buildBreadcrumbs}
                       contentSearch={props.contentSearch}
                       contentType={props.contentType}
-                      user={props.user}
+                      userLang={props.user.lang}
                     />
                   )}
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.USER && (
                     <AdvancedSearchUserList
-                      userSearch={props.userSearch}
-                      contentType={props.contentType}
                       user={props.user}
+                      userSearch={props.contentSearch} // {props.userSearch}
                     />
                   )}
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.SPACE && (
                     <AdvancedSearchSpaceList
-                      spaceSearch={props.spaceSearch}
                       contentType={props.contentType}
+                      spaceSearch={props.contentSearch} // {props.spaceSearch}
                       user={props.user}
                     />
                   )}
