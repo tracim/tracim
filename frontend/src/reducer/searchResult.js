@@ -105,6 +105,6 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
   }
 }
 
-export default function searchResultWrapper (searchType) {
-  return (state, action) => searchResult(searchType, state, action)
+export default function searchResultWrapper (searchType = SEARCH_TYPE.SIMPLE) {
+  return (state = defaultResult, action) => searchResult(searchType, state, action)
 }

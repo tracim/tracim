@@ -35,7 +35,7 @@ describe('In <Header />', () => {
   const props = {
     user: user,
     appList: appList,
-    searchResult: {},
+    simpleSearch: {},
     tlm: {
       manager: {
         closeLiveMessageConnection: () => {}
