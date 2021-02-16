@@ -1,11 +1,14 @@
 import {
   APPEND,
+  DATE_RANGE_FACETS,
   REMOVE,
+  SEARCH_FIELD_LIST,
   SEARCH_RESULTS_LIST,
   SEARCHED_KEYWORDS,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_CURRENT_PAGE,
   SET,
+  SIMPLE_FACETS,
   UPDATE,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL
@@ -44,8 +47,11 @@ export const serializeSearchItemProps = {
 
 const defaultResult = {
   currentNumberPage: 1,
+  dateRangeFacets: {},
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
   searchedKeywords: '',
+  searchFieldList: [],
+  simpleFacets: {},
   resultsList: []
 }
 
@@ -84,6 +90,15 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${SET}/${SEARCHED_KEYWORDS}`:
       return { ...state, searchedKeywords: action.searchedKeywords }
+
+    case `${SET}/${SIMPLE_FACETS(searchType)}`:
+      return { ...state, simpleFacets: action.simpleFacets }
+
+    case `${SET}/${DATE_RANGE_FACETS(searchType)}`:
+      return { ...state, dateRangeFacets: action.dateRangeFacets }
+
+    case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
+      return { ...state, searchFieldList: action.searchFieldList }
 
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }

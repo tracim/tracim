@@ -280,6 +280,8 @@ export class AdvancedSearch extends React.Component {
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
                     onClickSearchFilterMenu={this.handleClickFilterMenu}
+                    simpleFacets={state.currentSearch.simpleFacets}
+                    dateRangeFacets={state.currentSearch.dateRangeFacets}
                   />
                 )}
               </div>
