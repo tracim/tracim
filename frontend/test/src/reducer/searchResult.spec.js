@@ -8,11 +8,11 @@ import {
   SEARCH_CURRENT_PAGE,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_RESULTS_LIST,
-  SEARCHED_KEYWORDS,
+  SEARCHED_STRING,
   SET,
   setCurrentNumberPage,
   setNumberResultsByPage,
-  setSearchedKeywords,
+  setSearchedString,
   setSearchResultList,
   UPDATE,
   updateWorkspaceContentList,
@@ -22,13 +22,14 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
+import { SEARCH_TYPE } from '../../../src/util/helper.js'
 
 describe('reducer searchResult.js', () => {
   describe('actions', () => {
     const initialState = {
       currentNumberPage: 1,
       numberResultsByPage: 10,
-      searchedKeywords: '',
+      searchedString: '',
       resultList: []
     }
     const content = {
@@ -45,12 +46,12 @@ describe('reducer searchResult.js', () => {
     }
 
     it('should return the initial state when no action given', () => {
-      const rez = searchResult('simple', initialState, { type: 'nothing that will match', action: {} })
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, initialState, { type: 'nothing that will match', action: {} })
       expect(rez).to.deep.equal({ ...initialState })
     })
 
     describe(`${SET}/${SEARCH_RESULTS_LIST}`, () => {
-      const rez = searchResult('simple', initialState, setSearchResultList([contentFromApi], 'simple'))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, initialState, setSearchResultList([contentFromApi], SEARCH_TYPE.SIMPLE))
 
       it('should return a contents object', () => {
         expect(rez).to.deep.equal({
@@ -62,7 +63,7 @@ describe('reducer searchResult.js', () => {
 
     describe(`${UPDATE}/${WORKSPACE_CONTENT}`, () => {
       const oldState = { ...initialState, resultList: [content] }
-      const rez = searchResult('simple', oldState, updateWorkspaceContentList([{ ...contentFromApi, label: 'newName' }], 9))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, oldState, updateWorkspaceContentList([{ ...contentFromApi, label: 'newName' }], 9))
 
       it('should return a content list with the element changed', () => {
         expect(rez).to.deep.equal({
@@ -74,7 +75,7 @@ describe('reducer searchResult.js', () => {
 
     describe(`${REMOVE}/${WORKSPACE_CONTENT}`, () => {
       const oldState = { ...initialState, resultList: [content] }
-      const rez = searchResult('simple', oldState, deleteWorkspaceContentList([{ ...contentFromApi, label: 'name_deleted' }], 9))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, oldState, deleteWorkspaceContentList([{ ...contentFromApi, label: 'name_deleted' }], 9))
 
       it('should return a content list with the deleted element changed', () => {
         expect(rez).to.deep.equal({
@@ -84,11 +85,11 @@ describe('reducer searchResult.js', () => {
       })
     })
 
-    describe(`${APPEND}/${SEARCH_RESULTS_LIST('simple')}`, () => {
+    describe(`${APPEND}/${SEARCH_RESULTS_LIST(SEARCH_TYPE.SIMPLE)}`, () => {
       const oldState = { ...initialState, resultList: [content] }
-      const rez = searchResult('simple', oldState, appendSearchResultList([
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, oldState, appendSearchResultList([
         { content_id: 999, label: 'another content' }
-      ], 'simple'))
+      ], SEARCH_TYPE.SIMPLE))
 
       it('should return a content list with the list appended in the old one', () => {
         expect(rez).to.deep.equal({
@@ -101,22 +102,22 @@ describe('reducer searchResult.js', () => {
       })
     })
 
-    describe(`${SET}/${SEARCHED_KEYWORDS}`, () => {
-      const rez = searchResult('simple', initialState, setSearchedKeywords('keyword'))
+    describe(`${SET}/${SEARCHED_STRING}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, initialState, setSearchedString('keyword'))
       it('should return a content object with the keywords', () => {
-        expect(rez).to.deep.equal({ ...initialState, searchedKeywords: 'keyword' })
+        expect(rez).to.deep.equal({ ...initialState, searchedString: 'keyword' })
       })
     })
 
     describe(`${SET}/${SEARCH_RESULTS_BY_PAGE}`, () => {
-      const rez = searchResult('simple', initialState, setNumberResultsByPage(5))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, initialState, setNumberResultsByPage(5))
       it('should return a content object with the number the results by page', () => {
         expect(rez).to.deep.equal({ ...initialState, numberResultsByPage: 5 })
       })
     })
 
-    describe(`${SET}/${SEARCH_CURRENT_PAGE('simple')}`, () => {
-      const rez = searchResult('simple', initialState, setCurrentNumberPage(5, 'simple'))
+    describe(`${SET}/${SEARCH_CURRENT_PAGE(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, initialState, setCurrentNumberPage(5, SEARCH_TYPE.SIMPLE))
       it('should return a content object with the current number of pages', () => {
         expect(rez).to.deep.equal({ ...initialState, currentNumberPage: 5 })
       })
@@ -124,7 +125,7 @@ describe('reducer searchResult.js', () => {
 
     describe(`${UPDATE}/${WORKSPACE_DETAIL}`, () => {
       const oldState = { ...initialState, resultList: [content] }
-      const rez = searchResult('simple', oldState, updateWorkspaceDetail({ ...contentFromApi.workspace, label: 'newName' }))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE, oldState, updateWorkspaceDetail({ ...contentFromApi.workspace, label: 'newName' }))
 
       it('should return a content list with the list appended in the old one', () => {
         expect(rez).to.deep.equal({

@@ -71,9 +71,15 @@ export const AdvancedSearchSpaceList = props => {
 
             <div className='advancedSearchSpace__information'>
               <span>3333</span>
-              <i className='fa-fw fas fa-th' />
+              <Icon
+                icon='fa-fw fas fa-th'
+                title=''
+              />
               <span>3333</span>
-              <i className='fa-fw far fa-user' />
+              <Icon
+                icon='fa-fw far fa-user'
+                title=''
+              />
             </div>
           </Link>
         </ListItemWrapper>

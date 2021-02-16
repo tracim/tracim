@@ -84,15 +84,15 @@ export const AdvancedSearchContentList = props => {
                 <span title={props.t(searchItem.contentType.status.label)}>
                   {props.t(searchItem.contentType.status.label)}
                 </span>
-                <i
-                  className={`fa-fw ${searchItem.contentType.status.faIcon}`}
-                  style={{ color: searchItem.contentType.status.hexcolor }}
+                <Icon
+                  icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
                   title={props.t(searchItem.contentType.status.label)}
+                  color={searchItem.contentType.status.hexcolor}
                 />
                 <span>3333</span> {/* TODO - Change after backend with title */}
-                <i
-                  className='fa-fw far fa-comment'
-                /* title="N comments" */
+                <Icon
+                  icon='fa-fw far fa-comment'
+                  title='N comments'
                 />
               </div>
             )}

@@ -2,7 +2,7 @@ import {
   APPEND,
   REMOVE,
   SEARCH_RESULTS_LIST,
-  SEARCHED_KEYWORDS,
+  SEARCHED_STRING,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_CURRENT_PAGE,
   SET,
@@ -15,6 +15,7 @@ import {
   serialize,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
+import { SEARCH_TYPE } from '../util/helper.js'
 
 export const serializeSearchItemProps = {
   author: 'author',
@@ -45,11 +46,11 @@ export const serializeSearchItemProps = {
 const defaultResult = {
   currentNumberPage: 1,
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
-  searchedKeywords: '',
+  searchedString: '',
   resultList: []
 }
 
-function searchResult (searchType = 'simple', state = defaultResult, action) {
+function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
   let newResultList, uniqueResultList
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST(searchType)}`:
@@ -82,8 +83,8 @@ function searchResult (searchType = 'simple', state = defaultResult, action) {
       uniqueResultList = uniqBy([...state.resultList, ...newResultList], 'contentId')
       return { ...state, resultList: uniqueResultList }
 
-    case `${SET}/${SEARCHED_KEYWORDS}`:
-      return { ...state, searchedKeywords: action.searchedKeywords }
+    case `${SET}/${SEARCHED_STRING}`:
+      return { ...state, searchedString: action.searchedString }
 
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }

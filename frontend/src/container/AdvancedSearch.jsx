@@ -20,7 +20,7 @@ import {
   setCurrentNumberPage,
   setHeadTitle,
   setNumberResultsByPage,
-  setSearchedKeywords,
+  setSearchedString,
   setSearchResultList
 } from '../action-creator.sync.js'
 import { getAdvancedSearchResult } from '../action-creator.async.js'
@@ -65,7 +65,7 @@ export class AdvancedSearch extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedKeywords}`]
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedString}`]
     )
 
     props.dispatch(setHeadTitle(headTitle))
@@ -122,14 +122,14 @@ export class AdvancedSearch extends React.Component {
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
     if (
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords ||
+      prevSearch.searchedString !== currentSearch.searchedString ||
       prevSearch.currentPage !== currentSearch.currentPage
     ) {
       this.loadSearchUrl()
     }
     if (
       prevProps.system.config.instance_name !== props.system.config.instance_name ||
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords
+      prevSearch.searchedString !== currentSearch.searchedString
     ) {
       this.setHeadTitle()
     }
@@ -143,7 +143,7 @@ export class AdvancedSearch extends React.Component {
 
     const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
       searchObject.contentTypes,
-      searchObject.searchedKeywords,
+      searchObject.searchedString,
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
@@ -158,7 +158,7 @@ export class AdvancedSearch extends React.Component {
 
     switch (fetchGetAdvancedSearchResult.status) {
       case 200:
-        props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
+        props.dispatch(setSearchedString(searchObject.searchedString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
@@ -204,20 +204,20 @@ export class AdvancedSearch extends React.Component {
 
   handleClickSeeMore = async () => {
     const { props, state } = this
-    const NEXT_PAGE = state.currentSearch.currentNumberPage + 1
+    const nextPage = state.currentSearch.currentNumberPage + 1
     props.history.push(
-      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true })}`
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
     )
   }
 
   handleClickFilterMenu = () => this.setState(prev => ({ isFilterMenuOpen: !prev.isFilterMenuOpen }))
 
-  handleClickSearch = searchedKeywords => {
+  handleClickSearch = searchedString => {
     const { props } = this
     const FIRST_PAGE = 1
     props.history.push(`${PAGE.SEARCH_RESULT}?${qs.stringify({
       ...qs.parse(props.location.search),
-      q: searchedKeywords,
+      q: searchedString,
       p: FIRST_PAGE
     }, { encode: true })}`)
   }
@@ -258,8 +258,8 @@ export class AdvancedSearch extends React.Component {
           <PageWrapper>
             <PageTitle
               title={(currentNumberSearchResults === 1
-                ? props.t('Result for "{{keywords}}"', { keywords: state.currentSearch.searchedKeywords })
-                : props.t('Results for "{{keywords}}"', { keywords: state.currentSearch.searchedKeywords })
+                ? props.t('Result for "{{keywords}}"', { keywords: state.currentSearch.searchedString })
+                : props.t('Results for "{{keywords}}"', { keywords: state.currentSearch.searchedString })
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
@@ -292,7 +292,7 @@ export class AdvancedSearch extends React.Component {
                 </div>
                 <SearchInput
                   onClickSearch={this.handleClickSearch}
-                  searchedKeywords={state.currentSearch.searchedKeywords}
+                  searchedString={state.currentSearch.searchedString}
                 />
               </div>
 
@@ -316,7 +316,7 @@ export class AdvancedSearch extends React.Component {
 
                   {currentNumberSearchResults === 0 && (
                     <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms')}: "${state.currentSearch.searchedKeywords}"`}
+                      {`${props.t('No results for the search terms')}: "${state.currentSearch.searchedString}"`}
                     </div>
                   )}
 

@@ -22,16 +22,16 @@ import {
   appendSearchResultList,
   setSearchResultList,
   setNumberResultsByPage,
-  setSearchedKeywords,
+  setSearchedString,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
-import { getSearchedKeywords } from '../action-creator.async.js'
+import { getSimpleSearchResult } from '../action-creator.async.js'
 import { parseSearchUrl, SEARCH_TYPE } from '../util/helper.js'
 
 const qs = require('query-string')
 
-export class SearchResult extends React.Component {
+export class SimpleSearch extends React.Component {
   constructor (props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
@@ -63,14 +63,14 @@ export class SearchResult extends React.Component {
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
     if (
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords ||
+      prevSearch.searchedString !== currentSearch.searchedString ||
       prevSearch.currentPage !== currentSearch.currentPage
     ) {
       this.loadSearchUrl()
     }
     if (
       prevProps.system.config.instance_name !== props.system.config.instance_name ||
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords
+      prevSearch.searchedString !== currentSearch.searchedString
     ) {
       this.setHeadTitle()
     }
@@ -79,7 +79,7 @@ export class SearchResult extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedKeywords}`]
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedString}`]
     )
 
     props.dispatch(setHeadTitle(headTitle))
@@ -92,9 +92,9 @@ export class SearchResult extends React.Component {
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(props.simpleSearch.resultList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
+    const fetchGetSimpleSearchResult = await props.dispatch(getSimpleSearchResult(
       searchObject.contentTypes,
-      searchObject.searchedKeywords,
+      searchObject.searchedString,
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
@@ -106,17 +106,17 @@ export class SearchResult extends React.Component {
       searchObject.showActive
     ))
 
-    switch (fetchGetSearchedKeywords.status) {
+    switch (fetchGetSimpleSearchResult.status) {
       case 200:
-        props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
+        props.dispatch(setSearchedString(searchObject.searchedString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, SEARCH_TYPE.SIMPLE))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
-          props.dispatch(setSearchResultList(fetchGetSearchedKeywords.json.contents, SEARCH_TYPE.SIMPLE))
+          props.dispatch(setSearchResultList(fetchGetSimpleSearchResult.json.contents, SEARCH_TYPE.SIMPLE))
         } else {
-          props.dispatch(appendSearchResultList(fetchGetSearchedKeywords.json.contents, SEARCH_TYPE.SIMPLE))
+          props.dispatch(appendSearchResultList(fetchGetSimpleSearchResult.json.contents, SEARCH_TYPE.SIMPLE))
         }
-        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
+        this.setState({ totalHits: fetchGetSimpleSearchResult.json.total_hits })
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -142,9 +142,9 @@ export class SearchResult extends React.Component {
 
   handleClickSeeMore = async () => {
     const { props } = this
-    const NEXT_PAGE = props.simpleSearch.currentNumberPage + 1
+    const nextPage = props.simpleSearch.currentNumberPage + 1
     props.history.push(
-      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true })}`
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
     )
   }
 
@@ -155,7 +155,7 @@ export class SearchResult extends React.Component {
     const numberResults = simpleSearch.resultList.length
     const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
-    const subtitle = `${numberResults} ${text} "${simpleSearch.searchedKeywords}"`
+    const subtitle = `${numberResults} ${text} "${simpleSearch.searchedString}"`
 
     return subtitle
   }
@@ -215,7 +215,7 @@ export class SearchResult extends React.Component {
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchedKeywords}"`}
+                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchedString}"`}
                   </div>
                 )}
 
@@ -265,4 +265,4 @@ export class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, simpleSearch, contentType, system, user }) => ({ breadcrumbs, simpleSearch, contentType, system, user })
-export default connect(mapStateToProps)(translate()(TracimComponent(SearchResult)))
+export default connect(mapStateToProps)(translate()(TracimComponent(SimpleSearch)))

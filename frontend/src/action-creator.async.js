@@ -19,7 +19,7 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   NOTIFICATION_NOT_READ_COUNT,
-  SEARCHED_KEYWORDS,
+  SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
   USER,
@@ -805,9 +805,9 @@ export const getUserCalendar = userId => dispatch => {
   })
 }
 
-export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
+export const getSimpleSearchResult = (contentTypes, searchedString, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -815,7 +815,7 @@ export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, 
       },
       method: 'GET'
     },
-    actionName: SEARCHED_KEYWORDS,
+    actionName: SEARCHED_STRING,
     dispatch
   })
 }
@@ -1101,9 +1101,9 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
   })
 }
 
-export const getAdvancedSearchResult = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
+export const getAdvancedSearchResult = (searchedString, contentTypes, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -1111,7 +1111,7 @@ export const getAdvancedSearchResult = (contentTypes, searchedKeywords, pageNumb
       },
       method: 'GET'
     },
-    actionName: SEARCHED_KEYWORDS,
+    actionName: SEARCHED_STRING,
     dispatch
   })
 }

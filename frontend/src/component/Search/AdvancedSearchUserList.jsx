@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import {
   Avatar,
   AVATAR_SIZE,
+  Icon,
   ListItemWrapper,
   PAGE
 } from 'tracim_frontend_lib'
@@ -59,7 +60,10 @@ export const AdvancedSearchUserList = props => {
 
             <div className='advancedSearchUser__information'>
               <span>username</span>
-              <i className='fa-fw fas fa-at' title={props.t('Username')} />
+              <Icon
+                icon='fa-fw fas fa-at'
+                title={props.t('Username')}
+              />
             </div>
           </Link>
         </ListItemWrapper>

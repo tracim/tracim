@@ -87,7 +87,7 @@ export class Header extends React.Component {
     }
   }
 
-  handleClickSearch = async (searchedKeywords) => {
+  handleClickSearch = async (searchedString) => {
     const { props } = this
     const FIRST_PAGE = 1
 
@@ -95,7 +95,7 @@ export class Header extends React.Component {
     // Respectively, we have arc for show_archived=0 (false), del for show_deleted=0 (false) and act for show_active=1 (true)
     const newUrlSearchObject = {
       t: ALL_CONTENT_TYPES,
-      q: searchedKeywords,
+      q: searchedString,
       p: FIRST_PAGE,
       nr: NUMBER_RESULTS_BY_PAGE,
       arc: 0,
@@ -142,7 +142,7 @@ export class Header extends React.Component {
                   <SearchInput
                     className='header__menu__rightside__search'
                     onClickSearch={this.handleClickSearch}
-                    searchedKeywords={props.simpleSearch.searchedKeywords}
+                    searchedString={props.simpleSearch.searchedString}
                   />
                 </li>
               )}

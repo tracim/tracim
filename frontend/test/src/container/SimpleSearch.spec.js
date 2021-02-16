@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { expect } from 'chai'
-import { SearchResult as SearchResultWithoutHOC } from '../../../src/container/SearchResult.jsx'
+import { SimpleSearch as SimpleSearchWithoutHOC } from '../../../src/container/SimpleSearch.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
@@ -10,7 +10,7 @@ import { BREADCRUMBS, SET } from '../../../src/action-creator.sync.js'
 import { isFunction } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
 
-describe('In <SearchResult />', () => {
+describe('In <SimpleSearch />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
 
   const dispatchMock = (params) => {
@@ -37,8 +37,8 @@ describe('In <SearchResult />', () => {
     registerCustomEventHandlerList: () => { }
   }
 
-  const SearchResultWithHOC = withRouterMock(SearchResultWithoutHOC)
-  const wrapper = shallow(<SearchResultWithHOC {...props} />).dive()
+  const SimpleSearchWithHOC = withRouterMock(SimpleSearchWithoutHOC)
+  const wrapper = shallow(<SimpleSearchWithHOC {...props} />).dive()
   const searchResultInstance = wrapper.instance()
 
   describe('its internal function', () => {
@@ -92,7 +92,7 @@ describe('In <SearchResult />', () => {
     describe('getSubtitle', () => {
       it('should return the subtitle according to resultList size', () => {
         expect(searchResultInstance.getSubtitle()).to.equal(
-          `${props.simpleSearch.resultList.length} best results for "${props.simpleSearch.searchedKeywords}"`
+          `${props.simpleSearch.resultList.length} best results for "${props.simpleSearch.searchedString}"`
         )
       })
     })

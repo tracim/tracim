@@ -17,6 +17,7 @@ import accessibleWorkspaceList from './accessibleWorkspaceList.js'
 import workspaceSubscriptionList from './workspaceSubscriptionList.js'
 import workspaceActivity from './workspaceActivity.js'
 import userActivity from './userActivity.js'
+import { ADVANCED_SEARCH_TYPE, SEARCH_TYPE } from '../util/helper.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -31,10 +32,10 @@ const rootReducer = combineReducers({
   contentType,
   timezone,
   system,
-  simpleSearch: searchResult('simple'),
-  contentSearch: searchResult('content'),
-  userSearch: searchResult('user'),
-  spaceSearch: searchResult('space'),
+  simpleSearch: searchResult(SEARCH_TYPE.SIMPLE),
+  contentSearch: searchResult(ADVANCED_SEARCH_TYPE.CONTENT),
+  userSearch: searchResult(ADVANCED_SEARCH_TYPE.USER),
+  spaceSearch: searchResult(ADVANCED_SEARCH_TYPE.SPACE),
   notificationPage,
   accessibleWorkspaceList,
   workspaceSubscriptionList,

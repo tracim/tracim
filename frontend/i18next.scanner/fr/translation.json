@@ -331,7 +331,7 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
-  "Showing {{displayedResults}} of {{totalResults}} results": "{{displayedResults}} résultats affichées sur {{totalResults}}",
+  "Showing {{displayedResults}} of {{totalResults}} results": "{{displayedResults}} résultats affichés sur {{totalResults}}",
   "Result for \"{{keywords}}\"": "Résultat pour \"{{keywords}}\"",
   "Results for \"{{keywords}}\"": "Résultats pour \"{{keywords}}\"",
   "Filter": "Filtrer",
