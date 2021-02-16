@@ -1,15 +1,21 @@
+import typing
+
 import pytest
 import transaction
 
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import WorkspaceApiFactory
 
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
-class TestElasticSearchSearch(object):
+class TestElasticSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
         [
@@ -645,3 +651,135 @@ class TestElasticSearchSearchWithIngest(object):
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["content_id"] == content_id
+
+
+@pytest.fixture
+def user_search_fixture(
+    elasticsearch,
+    base_fixture,
+    bob_user: User,
+    riyad_user: User,
+    workspace_api_factory: WorkspaceApiFactory,
+    role_api_factory: RoleApiFactory,
+) -> typing.Tuple[User, User]:
+    wapi = workspace_api_factory.get(bob_user)
+    wapi.create_workspace("Bob only")
+    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
+    rapi = role_api_factory.get(bob_user)
+    rapi.create_one(
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
+    )
+    elasticsearch.refresh_elasticsearch()
+    return (bob_user, riyad_user)
+
+
+@pytest.mark.usefixtures("user_search_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
+class TestElasticSearchUserSearch:
+    def test_api__elasticsearch_user_search__ok__check_result(
+        self, web_testapp, user_search_fixture: typing.Tuple[User, User],
+    ) -> None:
+        (bob_user, _) = user_search_fixture
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        parameters = {"search_string": bob_user.display_name}
+        search_result = web_testapp.get(
+            "/api/advanced_search/users".format(), params=parameters, status=200
+        ).json_body
+        user = search_result["users"][0]
+        assert user == {
+            "user_id": bob_user.user_id,
+            "username": bob_user.username,
+            "public_name": bob_user.display_name,
+            "is_deleted": bob_user.is_deleted,
+            "is_active": bob_user.is_active,
+            "has_avatar": bob_user.has_avatar,
+            "has_cover": bob_user.has_cover,
+        }
+        facets = search_result["simple_facets"]
+        assert facets == {}
+
+    @pytest.mark.parametrize(
+        "query_parameters,expected_user_ids", [({"search_string": "test"}, [1])]
+    )
+    def test_api__elasticsearch_user_search__ok__nominal_cases(
+        self,
+        web_testapp,
+        elasticsearch,
+        query_parameters: dict,
+        expected_user_ids: typing.List[int],
+    ) -> None:
+        """Test different search parameters.
+        The fixtures do create 4 users: TheAdmin, test, riyad and bob.
+        """
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        search_result = web_testapp.get(
+            "/api/advanced_search/users".format(), status=200, params=query_parameters
+        ).json_body
+        assert search_result["total_hits"] == len(expected_user_ids)
+        assert search_result["is_total_hits_accurate"] is True
+        user_ids = [user["user_id"] for user in search_result["users"]]
+        assert user_ids == expected_user_ids
+
+
+@pytest.fixture
+def workspace_search_fixture(
+    elasticsearch,
+    base_fixture,
+    bob_user: User,
+    riyad_user: User,
+    workspace_api_factory: WorkspaceApiFactory,
+    role_api_factory: RoleApiFactory,
+) -> typing.Tuple[Workspace, Workspace]:
+    wapi = workspace_api_factory.get(bob_user)
+    bob_only = wapi.create_workspace("Bob only")
+    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
+    rapi = role_api_factory.get(bob_user)
+    rapi.create_one(
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
+    )
+    elasticsearch.refresh_elasticsearch()
+    return (bob_only, bob_and_riyad)
+
+
+@pytest.mark.usefixtures("workspace_search_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
+class TestElasticSearchWorkspaceSearch:
+    def test_api__elasticsearch_workspace_search__ok__check_result(
+        self, web_testapp, workspace_search_fixture: typing.Tuple[User, User],
+    ) -> None:
+        (bob_only_workspace, _) = workspace_search_fixture
+        bob = bob_only_workspace.owner
+        web_testapp.authorization = ("Basic", (bob.username, bob.password))
+        parameters = {"search_string": bob_only_workspace.label}
+        search_result = web_testapp.get(
+            "/api/advanced_search/workspaces".format(), params=parameters, status=200
+        ).json_body
+        workspace = search_result["workspaces"][0]
+        assert workspace == {
+            "workspace_id": bob_only_workspace.workspace_id,
+            "access_type": bob_only_workspace.access_type.value,
+            "label": bob_only_workspace.label,
+            "is_deleted": bob_only_workspace.is_deleted,
+            "content_count": 0,
+            "member_count": 1,
+        }
+        facets = search_result["simple_facets"]
+        assert facets == {}
+
+    @pytest.mark.parametrize(
+        "query_parameters,expected_workspace_ids", [({"search_string": "test"}, [1])]
+    )
+    def test_api__elasticsearch_workspace_search__ok__nominal_cases(
+        self, web_testapp, query_parameters: dict, expected_workspace_ids: typing.List[int],
+    ) -> None:
+        """Test different search parameters.
+        The fixture do create .....
+        """
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        search_result = web_testapp.get(
+            "/api/advanced_search/workspaces".format(), status=200, params=query_parameters
+        ).json_body
+        assert search_result["total_hits"] == len(expected_workspace_ids)
+        assert search_result["is_total_hits_accurate"] is True
+        workspace_ids = [w["workspace_id"] for w in search_result["workspaces"]]
+        assert workspace_ids == expected_workspace_ids

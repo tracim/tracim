@@ -308,9 +308,18 @@ class UserApi(object):
 
     def get_known_user_ids(self, user_id: int) -> typing.List[int]:
         if self._config.KNOWN_MEMBERS__FILTER:
-            return self.get_users_ids_in_same_workpaces()
+            return self.get_users_ids_in_same_workpaces(user_id)
         else:
             return self._session.query(User.user_id).all()
+
+    def get_all_known_users(self, user_id: int) -> typing.List[User]:
+        if self._config.KNOWN_MEMBERS__FILTER:
+            query = self._apply_base_filters(self._session.query(User))
+            users_in_workspaces = self._get_user_ids_in_same_workspace(user_id=user_id)
+            query = query.filter(User.user_id.in_(users_in_workspaces))
+            return query.all()
+        else:
+            return self.get_all()
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         return ALL__GROUP_MENTIONS

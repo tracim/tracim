@@ -219,6 +219,14 @@ def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
 
 
 class IndexedWorkspace(Document):
-    # TODO - S.G. - 2021-02-05 - placeholder to test multi-index creation,
-    # will be completed during https://github.com/tracim/tracim/issues/4134
-    pass
+    """Model used for indexing workspaces in elasticsearch."""
+
+    access_type = Keyword()
+    label = SimpleText()
+    description = HtmlText()
+    workspace_id = Integer()
+    is_deleted = Boolean()
+    owner_id = Integer()
+    member_ids = Integer(multi=True)
+    member_count = Integer()
+    content_count = Integer()

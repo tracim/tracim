@@ -8,6 +8,7 @@ import pytest
 
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESContentIndexer
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESUserIndexer
+from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESWorkspaceIndexer
 from tracim_backend.lib.search.elasticsearch_search.es_models import HtmlText
 from tracim_backend.lib.search.elasticsearch_search.es_models import JsonSchemaDict
 from tracim_backend.lib.search.elasticsearch_search.es_models import SimpleText
@@ -35,6 +36,10 @@ def a_user() -> User:
     return User(user_id=42, display_name="Bob the sponge")
 
 
+def a_workspace() -> Workspace:
+    return Workspace(workspace_id=42, label="Friends of Bob")
+
+
 ContentIndexerWithApiMock = typing.Tuple[ESContentIndexer, MagicMock, MagicMock]
 
 
@@ -56,7 +61,7 @@ def content_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock
 
 @pytest.fixture
 def user_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
-    """Create an ESUserIndexer instance with mocked ESSearchApi and ContentApi.
+    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
 
     Return a (ESUserIndexer, ESSearchApi.index_user_mock, RoleApi_mock) tuple.
     """
@@ -68,6 +73,22 @@ def user_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
         role_api_mock = MagicMock()
         role_api_class_mock.return_value = role_api_mock
         yield (ESUserIndexer(), index_user_mock, role_api_mock)
+
+
+@pytest.fixture
+def workspace_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
+    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
+
+    Return a (ESWorkspaceIndexer, ESSearchApi.index_workspace_mock, RoleApi_mock) tuple.
+    """
+    with patch(
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.index_workspace"
+    ) as index_workspace_mock, patch(
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.RoleApi"
+    ) as role_api_class_mock:
+        role_api_mock = MagicMock()
+        role_api_class_mock.return_value = role_api_mock
+        yield (ESWorkspaceIndexer(), index_workspace_mock, role_api_mock)
 
 
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
@@ -196,6 +217,40 @@ class TestElasticSearchUserIndexer:
         event_hook(indexer, event_parameter, test_context)
         index_user_mock.assert_called_once()
         assert index_user_mock.call_args[0][0].user_id == a_user().user_id
+
+
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
+class TestElasticSearchWorkspaceIndexer:
+    @pytest.mark.parametrize(
+        "event_hook, event_parameter",
+        [
+            (ESWorkspaceIndexer.on_workspace_created, a_workspace()),
+            (ESWorkspaceIndexer.on_workspace_modified, a_workspace()),
+            (
+                ESWorkspaceIndexer.on_user_role_in_workspace_created,
+                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+            ),
+            (
+                ESWorkspaceIndexer.on_user_role_in_workspace_modified,
+                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+            ),
+            (
+                ESWorkspaceIndexer.on_user_role_in_workspace_deleted,
+                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+            ),
+        ],
+    )
+    def test_unit__hook_impls__ok__nominal_case(
+        self,
+        test_context: TracimContext,
+        workspace_indexer_with_api_mock: ContentIndexerWithApiMock,
+        event_hook: typing.Callable,
+        event_parameter: typing.Any,
+    ) -> None:
+        (indexer, index_workspace_mock, _) = workspace_indexer_with_api_mock
+        event_hook(indexer, event_parameter, test_context)
+        index_workspace_mock.assert_called_once()
+        assert index_workspace_mock.call_args[0][0].workspace_id == a_workspace().workspace_id
 
 
 class TestUtils:

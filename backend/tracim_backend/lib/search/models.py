@@ -10,7 +10,7 @@ class SearchedDigestUser(object):
         self.has_cover = has_cover
 
 
-class SearchedWorkspace(object):
+class SearchedDigestWorkspace(object):
     def __init__(self, workspace_id: int, label: str) -> None:
         self.workspace_id = workspace_id
         self.label = label
@@ -45,7 +45,7 @@ class SearchedContent(object):
         slug: str,
         status: str,
         content_type: str,
-        workspace: SearchedWorkspace,
+        workspace: SearchedDigestWorkspace,
         path: typing.List[SearchedDigestContent],
         comments: typing.List[SearchedDigestComment],
         comments_count: int,

@@ -7,6 +7,7 @@ from elasticsearch import RequestError
 from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Document
 from elasticsearch_dsl import Search
+from elasticsearch_dsl.response.aggs import Bucket
 import pluggy
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
@@ -27,6 +28,8 @@ from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedCont
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
@@ -44,6 +47,8 @@ from tracim_backend.models.data import Workspace
 FILE_PIPELINE_ID = "attachment"
 FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
+
+T = typing.TypeVar("T")
 
 
 class IndexParameters:
@@ -298,7 +303,7 @@ class ESSearchApi(SearchApi):
             is_deleted=user_in_context.is_deleted,
             is_active=user_in_context.is_active,
             workspace_ids=workspace_ids,
-            custom_properties=user.custom_properties,
+            custom_properties=user.custom_properties.fields,
         )
         indexed_user.meta.id = user.user_id
         user_index_alias = self._get_index_parameters(self.IndexedUser).alias
@@ -312,6 +317,34 @@ class ESSearchApi(SearchApi):
         """Delete the given user from the corresponding ES index."""
         user_index_alias = self._get_index_parameters(self.IndexedUser).alias
         self.es.delete(user_index_alias, user.user_id)
+
+    def index_workspace(self, workspace: Workspace) -> None:
+        """Index the given worspace in the appropriate ES index."""
+        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
+        capi = ContentApi(config=self._config, session=self._session, current_user=None)
+        member_ids = rapi.get_workspace_member_ids(workspace.workspace_id)
+        indexed_workspace = IndexedWorkspace(
+            access_type=workspace.access_type.value,
+            workspace_id=workspace.workspace_id,
+            label=workspace.label,
+            description=workspace.description,
+            owner_id=workspace.owner_id,
+            member_ids=member_ids,
+            member_count=len(member_ids),
+            content_count=capi.get_all_query(workspace=workspace).count(),
+        )
+        indexed_workspace.meta.id = workspace.workspace_id
+        workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
+        indexed_workspace.save(
+            using=self.es,
+            index=workspace_index_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
+
+    def delete_workspace(self, workspace: Workspace) -> None:
+        """Delete the given workspace from the corresponding ES index."""
+        workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
+        self.es.delete(workspace_index_alias, workspace.workspace_id)
 
     def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
         for parameters in self._get_indices_parameters():
@@ -474,7 +507,7 @@ class ESSearchApi(SearchApi):
         show_active: bool = True,
         page_nb: int = 0,
         size: int = 10,
-    ):
+    ) -> UserSearchResponse:
         search = Search(
             using=self.es,
             doc_type=self.IndexedUser,
@@ -508,24 +541,91 @@ class ESSearchApi(SearchApi):
             search = query.extra(from_=self.offset_from_pagination(size, page_nb))
 
         query.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
+        query.aggs.metric(
+            "last_authored_content_revision_dates",
+            "boxplot",
+            field="last_authored_content_revision_date",
+        )
 
         response = query.execute()
         accessible_workspaces = WorkspaceApi(
             current_user=None, session=self._session, config=self._config
         ).get_all_accessible_by_user(self._user)
-        workspace_facets = []
-        for bucket in response.aggregations.workspace_ids.buckets:
+        workspace_facets = self._create_filtered_facets(
+            "workspace_id", response.aggregations.workspace_ids.buckets, accessible_workspaces
+        )
+
+        return UserSearchResponse(response["hits"], workspace_facets, search_fields=fields)
+
+    def search_workspace(
+        self,
+        search_string: str,
+        search_fields: typing.List[str],
+        user_ids: typing.List[int],
+        show_deleted: bool = False,
+        page_nb: int = 0,
+        size: int = 10,
+    ) -> WorkspaceSearchResponse:
+        search = Search(
+            using=self.es,
+            doc_type=IndexedWorkspace,
+            index=self._get_index_parameters(IndexedWorkspace).alias,
+        )
+
+        fields = [
+            "label.exact^5",
+            "label^3",
+            "description^3",
+        ]
+        if search_fields:
+            fields = [field for field in fields if re.split(r"\^\.", field) in search_fields]
+
+        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        known_workspace_ids = [
+            ws.workspace_id
+            for ws in wapi.get_all_accessible_by_user(self._user)
+            + wapi.get_all_for_user(self._user)
+        ]
+        query = search.query("simple_query_string", search_string)
+        query = query.filter("terms", workspace_id=known_workspace_ids)
+        if user_ids:
+            query = query.filter("terms", members_ids=user_ids)
+        if not show_deleted:
+            search = query.exclude("term", is_deleted=True)
+        if size:
+            search = query.extra(size=size)
+        if page_nb:
+            search = query.extra(from_=self.offset_from_pagination(size, page_nb))
+
+        query.aggs.bucket("member_ids", "terms", field="member_ids")
+
+        response = query.execute()
+        known_users = UserApi(
+            current_user=None, session=self._session, config=self._config
+        ).get_all_known_users(self._user.user_id)
+        member_facets = self._create_filtered_facets(
+            "user_id", response.aggregations.member_ids.buckets, known_users
+        )
+
+        return WorkspaceSearchResponse(response["hits"], member_facets)
+
+    @staticmethod
+    def _create_filtered_facets(
+        attr_name: str, buckets: typing.List[Bucket], items: typing.List["SimpleFacet"]
+    ) -> typing.List["SimpleFacet"]:
+        """Filter the given ES aggregation buckets and create simple facets from the result.
+
+        Only keep buckets whose key equals an item's attr_name.
+        """
+        facets = []
+        for bucket in buckets:
             try:
-                workspace = next(
-                    ws for ws in accessible_workspaces if ws.workspace_id == bucket.key
-                )
+                item = next(i for i in items if getattr(i, attr_name) == bucket.key)
                 # FIXME #4095: should be a SimpleFacet instance
-                workspace_facets.append({"value": workspace, "count": bucket.doc_count})
+                facets.append({"value": item, "count": bucket.doc_count})
             except StopIteration:
                 pass
-
-        # FIXME #4095: should be transformed to something like a UserSearchResponse.
-        return response
+        return facets
 
     @staticmethod
     def _get_index_name(parameters: IndexParameters) -> str:
@@ -551,8 +651,8 @@ class ESSearchApi(SearchApi):
             IndexParameters(
                 alias=prefix + "-user",
                 index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
-                document_class=create_indexed_user_class(self._config),
-                indexer=object(),
+                document_class=self.IndexedUser,
+                indexer=ESUserIndexer(),
             ),
             IndexParameters(
                 alias=prefix + "-workspace",
@@ -560,7 +660,7 @@ class ESSearchApi(SearchApi):
                     index_alias=prefix + "-workspace", date="{date}"
                 ),
                 document_class=IndexedWorkspace,
-                indexer=object(),
+                indexer=ESWorkspaceIndexer(),
             ),
         ]
 
@@ -597,7 +697,7 @@ class ESSearchApi(SearchApi):
 
 
 class ESContentIndexer:
-    """Listen for events and trigger re-indexing of contents when needed."""
+    """Listen for events from database and trigger re-indexing of contents when needed."""
 
     # content types which won't be indexed directly. Instead their main content will be indexed
     # when they are created/modified.
@@ -728,6 +828,8 @@ class ESContentIndexer:
 
 
 class ESUserIndexer:
+    """Listen for events from database and trigger re-indexing of users when needed."""
+
     @hookimpl
     def on_user_created(self, user: User, context: TracimContext) -> None:
         self._index_user(user, context)
@@ -780,3 +882,54 @@ class ESUserIndexer:
             search_api.index_user(user)
         except Exception:
             logger.exception(self, "Exception while indexing user {}".format(user.user_id))
+
+
+class ESWorkspaceIndexer:
+    """Listen for events from database and trigger re-indexing of workspaces when needed."""
+
+    @hookimpl
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+        self._index_workspace(workspace, context)
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        self._index_workspace(workspace, context)
+
+    @hookimpl
+    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.delete_workspace(workspace)
+        except Exception:
+            msg = "Exception while deleting indexed workspace {}".format(workspace.workspace_id)
+            logger.exception(self, msg)
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self._index_workspace(role.workspace, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_modified(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self._index_workspace(role.workspace, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self._index_workspace(role.workspace, context)
+
+    def _index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.index_workspace(workspace)
+        except Exception:
+            msg = "Exception while indexing workspace {}".format(workspace.workspace_id)
+            logger.exception(self, msg)
