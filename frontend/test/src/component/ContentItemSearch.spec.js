@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../../src/component/ContentItemSearch.jsx'
+import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../../src/component/Search/ContentItemSearch.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 
 describe('<ContentItemSearch />', () => {
