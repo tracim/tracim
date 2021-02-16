@@ -76,15 +76,15 @@ describe('In <SearchResult />', () => {
 
     describe('getPath', () => {
       it('should return the content path', () => {
-        const parentList = [
+        const path = [
           {
             label: 'first'
           }, {
             label: 'second'
           }
         ]
-        expect(searchResultInstance.getPath(parentList)).to.equal(
-          `${parentList[1].label} / ${parentList[0].label} / `
+        expect(searchResultInstance.getPath(path)).to.equal(
+          `${path[0].label} / ${path[1].label}`
         )
       })
     })

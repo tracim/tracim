@@ -26,9 +26,9 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -304,15 +304,10 @@ class TracimTestContext(TracimContext):
     ) -> None:
         super().__init__()
         self._app_config = app_config
-        self._plugin_manager = create_plugin_manager()
-        event_builder = EventBuilder(app_config)
-        event_publisher = EventPublisher(app_config)
+        self._plugin_manager = init_plugin_manager(app_config)
         # mock event publishing to avoid requiring a working
         # pushpin instance for every test
         EventPublisher._publish_pending_events_of_context = mock.Mock()
-
-        self._plugin_manager.register(event_builder)
-        self._plugin_manager.register(event_publisher)
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
         self._dbsession.set_context(self)
         self._current_user = user

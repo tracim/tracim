@@ -92,7 +92,6 @@ class FolderController(Controller):
                 allowed_content_type_slug_list=hapic_data.body.sub_content_types,
             )
             api.save(content)
-            api.execute_update_content_actions(content)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
@@ -140,7 +139,6 @@ class FolderController(Controller):
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
-            api.execute_update_content_actions(content)
         return
 
     def bind(self, configurator: Configurator) -> None:

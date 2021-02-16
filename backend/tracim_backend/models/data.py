@@ -1396,8 +1396,7 @@ class Content(DeclarativeBase):
             """
         )
         children_ids = [
-            elem[0]
-            for elem in object_session(self).execute(statement, {"content_id": self.id}).fetchall()
+            elem[0] for elem in object_session(self).execute(statement, {"content_id": self.id})
         ]
         if children_ids:
             return (
