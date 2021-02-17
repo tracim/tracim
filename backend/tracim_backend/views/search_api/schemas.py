@@ -13,7 +13,6 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
 from tracim_backend.views.core_api.schemas import EnumField
-from tracim_backend.views.core_api.schemas import RestrictedStringField
 from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
@@ -90,10 +89,16 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
+
+    # RJ - 2020-02-17 - TODO
+    # Ideally we would restrict strings allowed in content_types to known content types this way:
+    #
+    #   content_types = StringList(RestrictedStringField(filterable_content_types))
+    #
+    # However, in functional tests, since apps are not enabled, filterable_content_types is empty
+    # and tests break.
     content_types = StringList(
-        RestrictedStringField(filterable_content_types),
-        required=False,
-        description="content_types to show",
+        marshmallow.fields.String(), required=False, description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -226,5 +231,8 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
 
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
     simple_facets = marshmallow.fields.Nested(
-        ContentSimpleFacetsSchema(), description="search matched content with these characteristics"
+        ContentSimpleFacetsSchema(),
+        description="search matched content with these characteristics",
+        required=False,
+        missing=None,
     )

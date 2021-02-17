@@ -374,6 +374,7 @@ class ESSearchApi(SearchApi):
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
+
         if not search_parameters.search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
@@ -384,10 +385,11 @@ class ESSearchApi(SearchApi):
 
         search_fields = (
             search_parameters.search_fields
-            if search_parameters and search_parameters.search_fields
+            if search_parameters.search_fields
             else ["label", "raw_content", "comments"]
         )
 
+        search_fields = ["label", "raw_content", "comments"]
         if "label" in search_fields:
             # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
             # doing exact search efficiently.

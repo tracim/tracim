@@ -82,7 +82,7 @@ class SimpleSearchApi(SearchApi):
             if content.type == content_type_list.Comment.slug:
                 # INFO - G.M - 2019-06-13 -  filter by content_types of parent for comment
                 # if correct content_type, content is parent.
-                if content.parent.type in content_types:
+                if not content_types or content.parent.type in content_types:
                     content = content.parent
                 else:
                     continue

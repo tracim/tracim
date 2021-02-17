@@ -10,6 +10,9 @@ from elasticsearch_dsl import Text
 from elasticsearch_dsl import analysis
 from elasticsearch_dsl import analyzer
 
+KEYWORD_FIELD = "keyword"
+EXACT_FIELD = "exact"
+
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
 # Instead of relying of wildcard for autocompletion which is costly and make some feature doesn't
 # work correctly, for example ranking, We use ngram mechanism.
@@ -42,20 +45,22 @@ html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_f
 
 class DigestUser(InnerDoc):
     user_id = Integer()
-    public_name = Text(fields={"exact": Keyword()})
+    public_name = Text(fields={EXACT_FIELD: Keyword()})
     has_avatar = Boolean()
     has_cover = Boolean()
 
 
 class DigestWorkspace(InnerDoc):
     workspace_id = Integer()
-    label = Text(fields={"exact": Keyword()})
+    label = Text(fields={EXACT_FIELD: Keyword()})
 
 
 class DigestContent(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    label = Text(fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Text(
+        fields={EXACT_FIELD: Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+    )
     slug = Keyword()
     content_type = Keyword()
 
@@ -64,7 +69,7 @@ class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
     raw_content = Text(
-        fields={"exact": Text(analyzer=html_exact_folding)},
+        fields={EXACT_FIELD: Text(analyzer=html_exact_folding)},
         analyzer=html_folding,
         search_analyzer=folding,
     )
@@ -84,10 +89,6 @@ class FileData(InnerDoc):
     content_type = Keyword()
     content_length = Integer()
     language = Keyword()
-
-
-KEYWORD_FIELD = "keyword"
-EXACT_FIELD = "exact"
 
 
 class IndexedContent(Document):
@@ -144,7 +145,7 @@ class IndexedContent(Document):
     archived_through_parent_id = Integer()
     deleted_through_parent_id = Integer()
     raw_content = Text(
-        fields={"exact": Text(analyzer=html_exact_folding)},
+        fields={EXACT_FIELD: Text(analyzer=html_exact_folding)},
         analyzer=html_folding,
         search_analyzer=folding,
     )
