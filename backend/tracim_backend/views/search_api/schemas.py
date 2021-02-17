@@ -63,7 +63,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         created_to: typing.Optional[datetime] = None,
         modified_from: typing.Optional[datetime] = None,
         modified_to: typing.Optional[datetime] = None,
-        **kwargs,
+        **kwargs
     ):
         super().__init__(**kwargs)
 
