@@ -179,11 +179,11 @@ export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${
 export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
 export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
 export const DATE_RANGE_FACETS = (searchType) => `DateRangeFacets_${searchType}`
-export const setDateRangeFacets = (dateRangeFacets, searchType) =>  ({ type: `${SET}/${DATE_RANGE_FACETS(searchType)}`, dateRangeFacets })
+export const setDateRangeFacets = (dateRangeFacets, searchType) => ({ type: `${SET}/${DATE_RANGE_FACETS(searchType)}`, dateRangeFacets })
 export const SEARCH_FIELD_LIST = (searchType) => `SearchFieldList_${searchType}`
-export const setSearchFieldList = (searchFieldList, searchType) =>  ({ type: `${SET}/${SEARCH_FIELD_LIST(searchType)}`, searchFieldList })
+export const setSearchFieldList = (searchFieldList, searchType) => ({ type: `${SET}/${SEARCH_FIELD_LIST(searchType)}`, searchFieldList })
 export const SIMPLE_FACETS = (searchType) => `SimpleFacets_${searchType}`
-export const setSimpleFacets = (simpleFacets, searchType) =>  ({ type: `${SET}/${SIMPLE_FACETS(searchType)}`, simpleFacets })
+export const setSimpleFacets = (simpleFacets, searchType) => ({ type: `${SET}/${SIMPLE_FACETS(searchType)}`, simpleFacets })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

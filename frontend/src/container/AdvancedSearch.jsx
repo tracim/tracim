@@ -29,7 +29,7 @@ import {
 import { getSearchedKeywords } from '../action-creator.async.js'
 import Search from '../component/Search/Search.jsx'
 import { parseSearchUrl } from '../util/helper.js'
-import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
+import SearchFilterMenu from './SearchFilterMenu.jsx'
 import classnames from 'classnames'
 
 const qs = require('query-string')
@@ -39,7 +39,7 @@ export class AdvancedSearch extends React.Component {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: false
+      isFilterMenuOpen: true
     }
 
     props.registerCustomEventHandlerList([
@@ -279,9 +279,10 @@ export class AdvancedSearch extends React.Component {
                 </div>
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
-                    onClickSearchFilterMenu={this.handleClickFilterMenu}
-                    simpleFacets={state.currentSearch.simpleFacets}
-                    dateRangeFacets={state.currentSearch.dateRangeFacets}
+                    onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
+                    userLang={props.user.lang}
+                    // simpleFacets={state.currentSearch.simpleFacets}
+                    // dateRangeFacets={state.currentSearch.dateRangeFacets}
                   />
                 )}
               </div>

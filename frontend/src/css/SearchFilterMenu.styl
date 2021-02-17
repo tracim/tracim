@@ -17,6 +17,22 @@
       margin-inline-end 10px
     & > button
       margin-inline-start auto
+  &__item
+    &__title
+      background-color veryLightGrey
+      height 40px
+      align-items center
+      display flex
+      padding 10px
+      & > button
+        padding 0
+        padding-inline-end 10px
+    &__checkbox
+      padding 5px
+      & > *
+        cursor pointer
+      & > input[type='checkbox']
+        margin 0px 10px
 
 @media (max-width: max-md)
   .searchFilterMenu

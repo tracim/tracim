@@ -10770,6 +10770,17 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"react-day-picker@npm:^7.4.8":
+  version: 7.4.8
+  resolution: "react-day-picker@npm:7.4.8"
+  dependencies:
+    prop-types: ^15.6.2
+  peerDependencies:
+    react: ~0.13.x || ~0.14.x || ^15.0.0 || ^16.0.0
+  checksum: 579a607cb67f380466bdaacbf6c5126d1a0db183bb675e5bb8af3b07bf60dd5553d0c84ae43d14c743a05c895cf8143dea47c36f9bbc303cc97ca0ab8617848b
+  languageName: node
+  linkType: hard
+
 "react-device-detect@npm:^1.7.5":
   version: 1.13.1
   resolution: "react-device-detect@npm:1.13.1"
@@ -13223,6 +13234,7 @@ fsevents@^1.2.7:
     radium: ^0.25.2
     react: ^16.13.1
     react-animate-height: ^2.0.15
+    react-day-picker: ^7.4.8
     react-device-detect: ^1.7.5
     react-dnd: 7.4.5
     react-dnd-html5-backend: 7.4.4

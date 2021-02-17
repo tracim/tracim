@@ -90,16 +90,16 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${SET}/${SEARCHED_KEYWORDS}`:
       return { ...state, searchedKeywords: action.searchedKeywords }
+    /*
+      case `${SET}/${SIMPLE_FACETS(searchType)}`:
+        return { ...state, simpleFacets: action.simpleFacets }
 
-    case `${SET}/${SIMPLE_FACETS(searchType)}`:
-      return { ...state, simpleFacets: action.simpleFacets }
+      case `${SET}/${DATE_RANGE_FACETS(searchType)}`:
+        return { ...state, dateRangeFacets: action.dateRangeFacets }
 
-    case `${SET}/${DATE_RANGE_FACETS(searchType)}`:
-      return { ...state, dateRangeFacets: action.dateRangeFacets }
-
-    case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
-      return { ...state, searchFieldList: action.searchFieldList }
-
+      case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
+        return { ...state, searchFieldList: action.searchFieldList }
+    */
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
