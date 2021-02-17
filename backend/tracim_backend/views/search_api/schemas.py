@@ -90,7 +90,7 @@ class ContentSearchQuerySchema(marshmallow.Schema):
         required=False, default=1, validate=strictly_positive_int_validator
     )
 
-    # RJ - 2020-02-17 - TODO
+    # RJ - 2020-02-17 - TODO (#4186)
     # Ideally we would restrict strings allowed in content_types to known content types this way:
     #
     #   content_types = StringList(RestrictedStringField(filterable_content_types))

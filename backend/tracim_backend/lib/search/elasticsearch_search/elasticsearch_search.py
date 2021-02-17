@@ -378,9 +378,6 @@ class ESSearchApi(SearchApi):
         if not search_parameters.search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
-        # INFO - G.M - 2019-05-31 - search using simple_query_string, which means user-friendly
-        # syntax to match complex case,
-        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
         es_search_fields = []
 
         search_fields = (
@@ -388,6 +385,11 @@ class ESSearchApi(SearchApi):
             if search_parameters.search_fields
             else ["label", "raw_content", "comments"]
         )
+
+        # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
+        # change score according to this boost. label is the most important, content is
+        # important too, content of comment is less important. filename and file_extension is
+        # only useful to allow matching "png" or "nameofmycontent.png".
 
         if "label" in search_fields:
             # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
@@ -429,13 +431,7 @@ class ESSearchApi(SearchApi):
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string",
-            query=search_parameters.search_string,
-            # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
-            # change score according to this boost. label is the most important, content is
-            # important too, content of comment is less important. filename and file_extension is
-            # only useful to allow matching "png" or "nameofmycontent.png".
-            fields=es_search_fields,
+            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default

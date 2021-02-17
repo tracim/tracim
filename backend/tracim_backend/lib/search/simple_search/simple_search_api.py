@@ -25,7 +25,7 @@ class SimpleSearchApi(SearchApi):
     Simple search using sql:
     - Do not index anything.
     - allow pagination and filtering by content_type, deleted, archived
-    - limited feature (no ranking, no search into content,
+    - limited feature (no ranking, no search into content, etc)
     """
 
     def create_indices(self):
