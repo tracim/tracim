@@ -1,6 +1,7 @@
 import {
   APPEND,
   REMOVE,
+  SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
   SEARCHED_STRING,
   SEARCH_RESULTS_BY_PAGE,
@@ -19,10 +20,12 @@ import { SEARCH_TYPE } from '../util/helper.js'
 
 export const serializeSearchItemProps = {
   author: 'author',
+  comment_count: 'commentCount',
   content_id: 'contentId',
   content_type: 'contentType',
   created: 'created',
   current_revision_id: 'currentRevisionId',
+  current_revision_type: 'currentRevisionType',
   file_extension: 'fileExtension',
   filename: 'filename',
   is_active: 'isActive',
@@ -83,6 +86,17 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
       newResultList = action.appendSearchResultList.map(item => serialize(item, serializeSearchItemProps))
       uniqueResultList = uniqBy([...state.resultList, ...newResultList], 'contentId')
       return { ...state, resultList: uniqueResultList }
+
+    case `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`:
+      newResultList = state.resultList.map(result =>
+        result.contentId === action.contentId
+          ? {
+            ...result,
+            breadcrumbsList: action.contentBreadcrumbsList
+          }
+          : result
+      )
+      return { ...state, resultList: newResultList }
 
     case `${SET}/${SEARCHED_STRING}`:
       return { ...state, searchedString: action.searchedString }

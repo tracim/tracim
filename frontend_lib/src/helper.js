@@ -680,14 +680,16 @@ export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
+  const workspaceId = content.workspace_id || content.workspaceId
+  const contentId = content.content_id || content.contentId
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+    await getContentPath(apiUrl, workspaceId, contentId)
   )
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
       return fetchGetContentPath.body.items.map(crumb => ({
-        link: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+        link: PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true

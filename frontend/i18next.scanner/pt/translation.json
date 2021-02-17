@@ -359,5 +359,6 @@
   "Maximum size: {{size}} MB": "Tamanho máximo: {{size}} MB",
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{pubblicName}}",
-  "Change cover": "Mudar a capa"
+  "Change cover": "Mudar a capa",
+  "{{numberComments}} comments": "{{numberComments}} comentários"
 }

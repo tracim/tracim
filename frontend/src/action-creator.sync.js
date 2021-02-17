@@ -178,6 +178,12 @@ export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = searchType => `SearchCurrentPage_${searchType}`
 export const setCurrentNumberPage = (currentNumberPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentNumberPage })
+export const SEARCH_CONTENT_BREADCRUMBS = searchType => `SearchContentBreadcrumbs_${searchType}`
+export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, searchType) => ({
+  type: `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`,
+  contentBreadcrumbsList,
+  contentId
+})
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

@@ -359,5 +359,6 @@
   "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
   "Registration date:": "Registration date:",
   "Cover image of {{publicName}}": "Cover image of {{publicName}}",
-  "Change cover": "Change cover"
+  "Change cover": "Change cover",
+  "{{numberComments}} comments": "{{numberComments}} comments"
 }

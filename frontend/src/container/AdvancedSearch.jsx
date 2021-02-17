@@ -17,6 +17,7 @@ import {
   appendSearchResultList,
   newFlashMessage,
   setBreadcrumbs,
+  setSearchContentBreadcrumbs,
   setCurrentNumberPage,
   setHeadTitle,
   setNumberResultsByPage,
@@ -49,7 +50,9 @@ export class AdvancedSearch extends React.Component {
       totalHits: 0,
       isFilterMenuOpen: false,
       searchType: ADVANCED_SEARCH_TYPE.CONTENT,
-      currentSearch: {}
+      currentSearch: {
+        resultList: []
+      }
     }
 
     props.registerCustomEventHandlerList([
@@ -142,8 +145,8 @@ export class AdvancedSearch extends React.Component {
     const hasFirstPage = !(currentSearch.resultList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
     const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
-      searchObject.contentTypes,
       searchObject.searchedString,
+      searchObject.contentTypes,
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
@@ -166,7 +169,16 @@ export class AdvancedSearch extends React.Component {
         } else {
           props.dispatch(appendSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         }
-        if (searchObject.searchType === this.state.searchType) this.setState({ totalHits: fetchGetAdvancedSearchResult.json.total_hits })
+        if (searchObject.searchType === this.state.searchType) {
+          this.setState({
+            currentSearch: {
+              ...searchObject,
+              resultList: fetchGetAdvancedSearchResult.json.contents
+            },
+            totalHits: fetchGetAdvancedSearchResult.json.total_hits
+          })
+        }
+        if (searchObject.searchType === ADVANCED_SEARCH_TYPE.CONTENT) this.buildContentBreadcrumbs()
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -174,18 +186,24 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  loadSearchUrl = async () => {
+  loadSearchUrl = () => {
     const searchObject = parseSearchUrl(qs.parse(this.props.location.search))
     this.getSearchResult(searchObject, this.state.currentSearch)
   }
 
-  buildBreadcrumbs = async (content) => {
-    try {
-      const contentBreadcrumbsList = await buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, content)
-      return contentBreadcrumbsList
-    } catch (e) {
-      console.error('Error at advanced search, count not build breadcrumbs', e)
-    }
+  buildContentBreadcrumbs = () => {
+    const { state, props } = this
+    if (state.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) return
+
+    props.contentSearch.resultList.map(async (content) => {
+      let contentBreadcrumbsList = []
+      try {
+        contentBreadcrumbsList = await buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, content)
+      } catch (e) {
+        console.error('Error at advanced search, count not build breadcrumbs', e)
+      }
+      props.dispatch(setSearchContentBreadcrumbs(contentBreadcrumbsList, content.contentId, state.searchType))
+    })
   }
 
   getContentName = (content) => {
@@ -204,7 +222,7 @@ export class AdvancedSearch extends React.Component {
 
   handleClickSeeMore = async () => {
     const { props, state } = this
-    const nextPage = state.currentSearch.currentNumberPage + 1
+    const nextPage = state.currentSearch.currentPage + 1
     props.history.push(
       `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
     )
@@ -237,8 +255,8 @@ export class AdvancedSearch extends React.Component {
 
   hasMoreResults () {
     const { state } = this
-    const currentNumberSearchResults = this.state.totalHits
-    return currentNumberSearchResults >= (state.currentSearch.numberResultsByPage * state.currentSearch.currentNumberPage)
+    const currentNumberSearchResults = state.totalHits
+    return currentNumberSearchResults >= (state.currentSearch.numberResultsByPage * state.currentSearch.currentPage)
   }
 
   handleChangeSearchType = (e) => {
@@ -251,7 +269,6 @@ export class AdvancedSearch extends React.Component {
   render () {
     const { props, state } = this
     const currentNumberSearchResults = state.currentSearch.resultList.length
-
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -322,7 +339,6 @@ export class AdvancedSearch extends React.Component {
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
                     <AdvancedSearchContentList
-                      breadcrumbsList={this.buildBreadcrumbs}
                       contentSearch={props.contentSearch}
                       contentType={props.contentType}
                       userLang={props.user.lang}
