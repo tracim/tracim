@@ -152,10 +152,18 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         validate=regex_string_as_list_of_string,
         description="select contents with these statuses",
     )
-    created_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    modified_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    modified_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    created_from = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    created_to = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    modified_from = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    modified_to = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):

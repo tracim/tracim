@@ -154,11 +154,15 @@ class TestElasticSearchSearch(object):
             assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
-        "created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name",
+        "created_from, created_to, modified_from, modified_to, created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, created_content_body,  search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             (
+                "",
+                "",
+                "",
+                "",
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
                 "subpart",
@@ -166,6 +170,10 @@ class TestElasticSearchSearch(object):
                 "good practices",
             ),
             (
+                "",
+                "",
+                "",
+                "",
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
                 "sub",
@@ -176,6 +184,10 @@ class TestElasticSearchSearch(object):
     )
     def test_api___elasticsearch_search_ok__by_description(
         self,
+        created_from,
+        created_to,
+        modified_from,
+        modified_to,
         user_api_factory,
         role_api_factory,
         workspace_api_factory,
@@ -226,7 +238,13 @@ class TestElasticSearchSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": search_string}
+        params = {
+            "search_string": search_string,
+            "created_from": created_from,
+            "created_to": created_to,
+            "modified_from": modified_from,
+            "modified_to": modified_to,
+        }
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
