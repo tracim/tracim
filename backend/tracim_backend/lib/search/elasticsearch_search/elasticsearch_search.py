@@ -14,6 +14,8 @@ from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
+from tracim_backend.lib.search.elasticsearch_search.es_models import KEYWORD_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
@@ -390,13 +392,19 @@ class ESSearchApi(SearchApi):
             # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
             # doing exact search efficiently.
             es_search_fields.extend(
-                ["label.exact^8", "label^5", "filename.exact", "filename", "file_extension"]
+                [
+                    "label.{}^8".format(KEYWORD_FIELD),
+                    "label^5",
+                    "filename.{}".format(KEYWORD_FIELD),
+                    "filename",
+                    "file_extension",
+                ]
             )
 
         if "raw_content" in search_fields:
             es_search_fields.extend(
                 [
-                    "raw_content.exact^3",
+                    "raw_content.{}^3".format(EXACT_FIELD),
                     "raw_content^3",
                     "{}.content^3".format(FILE_PIPELINE_DESTINATION_FIELD),
                     "{}.title^4".format(FILE_PIPELINE_DESTINATION_FIELD),
@@ -406,7 +414,9 @@ class ESSearchApi(SearchApi):
             )
 
         if "comments" in search_fields:
-            es_search_fields.extend(["comments.raw_content.exact", "comments.raw_content"])
+            es_search_fields.extend(
+                ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
+            )
 
         search = Search(
             using=self.es,
@@ -499,14 +509,22 @@ class ESSearchApi(SearchApi):
         if modified_range:
             search = search.filter("range", modified=modified_range)
 
-        search.aggs.bucket("content_types", "terms", field="content_type.keyword")
-        search.aggs.bucket("workspace_names", "terms", field="workspace.label.keyword")
-        search.aggs.bucket("author__public_names", "terms", field="author.public_name.keyword")
+        search.aggs.bucket("content_types", "terms", field="content_type.{}".format(KEYWORD_FIELD))
         search.aggs.bucket(
-            "last_modifier__public_names", "terms", field="last_modifier.public_name.keyword"
+            "workspace_names", "terms", field="workspace.label.{}".format(KEYWORD_FIELD)
         )
-        search.aggs.bucket("file_extensions", "terms", field="file_extension.keyword")
-        search.aggs.bucket("statuses", "terms", field="status.keyword")
+        search.aggs.bucket(
+            "author__public_names", "terms", field="author.public_name.{}".format(KEYWORD_FIELD)
+        )
+        search.aggs.bucket(
+            "last_modifier__public_names",
+            "terms",
+            field="last_modifier.public_name.{}".format(KEYWORD_FIELD),
+        )
+        search.aggs.bucket(
+            "file_extensions", "terms", field="file_extension.{}".format(KEYWORD_FIELD)
+        )
+        search.aggs.bucket("statuses", "terms", field="status.{}".format(KEYWORD_FIELD))
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
@@ -563,8 +581,7 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD,
-            lang=lang,
+            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -592,8 +609,7 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD,
-                            lang=lang,
+                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
                         ),
                         "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
                     }
