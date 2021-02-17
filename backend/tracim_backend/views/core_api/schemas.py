@@ -133,7 +133,7 @@ class EnumField(marshmallow.fields.Field):
         super().__init__(**kwargs)
         self._enum = enum_cls
 
-    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
+    def _deserialize(self, value: typing.Any, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
         try:
             return self._enum(value)
         except ValueError:
@@ -143,7 +143,7 @@ class EnumField(marshmallow.fields.Field):
                 )
             )
 
-    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> str:
+    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> typing.Any:
         if value not in self._enum:
             raise marshmallow.ValidationError(
                 "'{}' is not a valid value for this field".format(value)
@@ -383,9 +383,7 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True,
-        example={"param1": "value1"},
-        description="custom_properties schema",
+        required=True, example={"param1": "value1"}, description="custom_properties schema",
     )
 
 
@@ -1256,9 +1254,7 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties",
-        required=True,
-        allow_none=False,
+        description="ui schema used for user custom properties", required=True, allow_none=False,
     )
 
 
