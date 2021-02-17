@@ -389,7 +389,6 @@ class ESSearchApi(SearchApi):
             else ["label", "raw_content", "comments"]
         )
 
-        search_fields = ["label", "raw_content", "comments"]
         if "label" in search_fields:
             # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
             # doing exact search efficiently.
@@ -414,6 +413,11 @@ class ESSearchApi(SearchApi):
                     "{}.keywords".format(FILE_PIPELINE_DESTINATION_FIELD),
                 ]
             )
+
+            for lang in FILE_PIPELINE_LANGS:
+                es_search_fields.append(
+                    "{}.content_{lang}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
+                )
 
         if "comments" in search_fields:
             es_search_fields.extend(
