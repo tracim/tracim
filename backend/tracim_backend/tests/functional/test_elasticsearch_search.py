@@ -235,11 +235,12 @@ class TestElasticSearchSearch(object):
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
-        "created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
+        "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
             (
+                "",
                 "good practices",
                 "eureka",
                 1,
@@ -247,8 +248,18 @@ class TestElasticSearchSearch(object):
                 "this is a comment content containing the string: eureka.",
                 "this is another comment content",
             ),
+            (
+                "raw_content,description",
+                "good practices",
+                "eureka",
+                0,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content",
+            ),
             # autocompletion
             (
+                "",
                 "good practices",
                 "eur",
                 1,
@@ -260,6 +271,7 @@ class TestElasticSearchSearch(object):
     )
     def test_api___elasticsearch_search_ok__by_comment_content(
         self,
+        search_fields,
         user_api_factory,
         role_api_factory,
         workspace_api_factory,
@@ -314,14 +326,15 @@ class TestElasticSearchSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": search_string}
+        params = {"search_string": search_string, "search_fields": search_fields}
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
 
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
-        assert search_result["contents"][0]["label"] == first_search_result_content_name
+        if nb_content_result:
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___elasticsearch_search_ok__no_search_string(
         self,
