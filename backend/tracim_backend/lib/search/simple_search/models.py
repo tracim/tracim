@@ -56,7 +56,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 workspace=workspace,
                 path=path,
                 comments=comments,
-                comments_count=len(comments),
+                comment_count=len(comments),
                 author=author,
                 last_modifier=last_modifier,
                 sub_content_types=content.sub_content_types,
