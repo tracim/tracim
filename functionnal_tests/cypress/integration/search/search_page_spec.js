@@ -44,11 +44,6 @@ describe('Searching keywords', () => {
       cy.get('.searchResult__title').should('be.visible')
     })
 
-    it('Should be disabled if the input is empty', () => {
-      cy.get(searchInput).clear()
-      cy.get(searchButton).should('be.disabled')
-    })
-
     it('Should display the same word in the search input', () => {
       cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 

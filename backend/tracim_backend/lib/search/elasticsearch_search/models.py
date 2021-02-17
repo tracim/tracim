@@ -6,16 +6,31 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.response import Response
 
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import FacetCount
 from tracim_backend.lib.search.models import SearchedContent
 from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedDigestWorkspace
+from tracim_backend.lib.search.models import SimpleFacets
 
 
-# FIXME #4095: remove this and import the real SimpleFacet class
-class SimpleFacet:
-    pass
+def facet_count(aggregations: dict, field: str) -> typing.List[FacetCount]:
+    """
+    Builds a FacetCount object from an elasticsearch bucket aggregation result
+    """
+
+    facet = []
+    for bucket in aggregations[field]["buckets"]:
+        facet.append(FacetCount(value=bucket["key"], count=bucket["doc_count"]))
+    return facet
+
+
+def date_from_aggregation(aggregations: typing.Dict[str, typing.Any], field: str) -> datetime:
+    try:
+        return parse(aggregations[field]["value_as_string"])
+    except KeyError:
+        return None
 
 
 class ESContentSearchResponse(ContentSearchResponse):
@@ -66,8 +81,27 @@ class ESContentSearchResponse(ContentSearchResponse):
             )
             content = SearchedContent(**source)
             contents.append(content)
+
+        aggregations = response["aggregations"]
+
+        simple_facets = SimpleFacets(
+            workspace_names=facet_count(aggregations, "workspace_names"),
+            author__public_names=facet_count(aggregations, "author__public_names"),
+            last_modifier__public_names=facet_count(aggregations, "last_modifier__public_names"),
+            file_extensions=facet_count(aggregations, "file_extensions"),
+            statuses=facet_count(aggregations, "statuses"),
+            content_types=facet_count(aggregations, "content_types"),
+            created_from=date_from_aggregation(aggregations, "created_from"),
+            created_to=date_from_aggregation(aggregations, "created_to"),
+            modified_from=date_from_aggregation(aggregations, "modified_from"),
+            modified_to=date_from_aggregation(aggregations, "modified_to"),
+        )
+
         super().__init__(
-            contents=contents, total_hits=total_hits, is_total_hits_accurate=is_total_hit_accurate
+            contents=contents,
+            total_hits=total_hits,
+            is_total_hits_accurate=is_total_hit_accurate,
+            simple_facets=simple_facets,
         )
 
 
@@ -93,7 +127,7 @@ class UserSearchResponse:
     def __init__(
         self,
         hits: typing.Dict[str, typing.Any],
-        workspace_facets: typing.List[SimpleFacet],
+        workspace_facets: typing.List[FacetCount],
         search_fields: typing.List[str],
         last_authored_content_revision_dates,
     ) -> None:
@@ -132,7 +166,7 @@ class SearchedWorkspace:
 
 class WorkspaceSearchResponse:
     def __init__(
-        self, hits: typing.Dict[str, typing.Any], member_facets: typing.List[SimpleFacet]
+        self, hits: typing.Dict[str, typing.Any], member_facets: typing.List[FacetCount]
     ) -> None:
         self.users = [
             SearchedWorkspace(

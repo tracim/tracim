@@ -16,6 +16,9 @@ from elasticsearch_dsl import analyzer
 
 from tracim_backend.config import CFG
 
+KEYWORD_FIELD = "keyword"
+EXACT_FIELD = "exact"
+
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
 # Instead of relying of wildcard for autocompletion which is costly and make some feature doesn't
 # work correctly, for example ranking, We use ngram mechanism.
@@ -43,13 +46,13 @@ html_folding = analyzer(
     filter=["lowercase", "asciifolding", edge_ngram_token_filter],
     char_filter="html_strip",
 )
-html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip",)
+html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip")
 
 
 class SimpleText(Text):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
-            fields={"exact": Keyword()},
+            fields={EXACT_FIELD: Keyword()},
             analyzer=edge_ngram_folding,
             search_analyzer=folding,
             **kwargs
@@ -59,7 +62,7 @@ class SimpleText(Text):
 class HtmlText(Text):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
-            fields={"exact": Text(analyzer=html_exact_folding)},
+            fields={EXACT_FIELD: Text(analyzer=html_exact_folding)},
             analyzer=html_folding,
             search_analyzer=folding,
             **kwargs
@@ -68,14 +71,14 @@ class HtmlText(Text):
 
 class DigestUser(InnerDoc):
     user_id = Integer()
-    public_name = Text()
+    public_name = Text(fields={EXACT_FIELD: Keyword()})
     has_avatar = Boolean()
     has_cover = Boolean()
 
 
 class DigestWorkspace(InnerDoc):
     workspace_id = Integer()
-    label = Text()
+    label = Text(fields={EXACT_FIELD: Keyword()})
 
 
 class DigestContent(InnerDoc):
@@ -89,6 +92,22 @@ class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
     raw_content = HtmlText()
+
+
+class FileData(InnerDoc):
+    content = Text(analyzer=folding)
+    content_de = Text(analyzer="german")
+    content_en = Text(analyzer="english")
+    content_fr = Text(analyzer="french")
+    content_pt = Text(analyzer="portuguese")
+    title = Text()
+    name = Text()
+    author = Text()
+    keywords = Keyword(multi=True)
+    date = Date()
+    content_type = Keyword()
+    content_length = Integer()
+    language = Keyword()
 
 
 class IndexedContent(Document):
@@ -107,9 +126,6 @@ class IndexedContent(Document):
     parent_id = Integer()
     workspace_id = Integer()
     workspace = Object(DigestWorkspace)
-    # INFO - G.M - 2019-07-17 - as label store ngram of limited size, we do need
-    # to store both label and label.exact to handle autocomplete up to max_gram of label analyzer
-    # but also support for exact naming for any size of label.
     label = SimpleText()
     content_type = Keyword()
     sub_content_types = Keyword(multi=True)
@@ -119,10 +135,10 @@ class IndexedContent(Document):
     is_editable = Boolean()
     show_in_ui = Boolean()
     file_extension = Text(
-        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+        fields={KEYWORD_FIELD: Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
     )
     filename = Text(
-        fields={"exact": Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
+        fields={KEYWORD_FIELD: Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
     )
     modified = Date()
     created = Date()
@@ -136,6 +152,7 @@ class IndexedContent(Document):
     # INFO - G.M - 2019-05-31 - we need to include in parent here, because we need
     # to search into comments content.
     comments = Nested(DigestComments, include_in_parent=True)
+    comment_count = Integer()
     author = Object(DigestUser)
     last_modifier = Object(DigestUser)
 
@@ -148,6 +165,7 @@ class IndexedContent(Document):
     # information about content are stored in the "file_data" fields not defined
     # in this mapping
     b64_file = Text()
+    file_data = Object(FileData)
 
 
 # Mappings from (type, format) -> ES field type.

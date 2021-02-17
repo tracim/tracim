@@ -5,7 +5,7 @@ from tracim_backend.lib.search.models import SearchedContent
 from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
 from tracim_backend.lib.search.models import SearchedDigestUser
-from tracim_backend.lib.search.models import SearchedWorkspace
+from tracim_backend.lib.search.models import SearchedDigestWorkspace
 from tracim_backend.models.context_models import ContentInContext
 
 
@@ -31,7 +31,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 for comment in content.comments
             ]
 
-            workspace = SearchedWorkspace(
+            workspace = SearchedDigestWorkspace(
                 workspace_id=content.workspace.workspace_id, label=content.workspace.label
             )
             last_modifier = SearchedDigestUser(
@@ -56,7 +56,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 workspace=workspace,
                 path=path,
                 comments=comments,
-                comments_count=len(comments),
+                comment_count=len(comments),
                 author=author,
                 last_modifier=last_modifier,
                 sub_content_types=content.sub_content_types,

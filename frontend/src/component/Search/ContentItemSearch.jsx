@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { AVATAR_SIZE, Badge, Avatar } from 'tracim_frontend_lib'
-import { FETCH_CONFIG } from '../util/helper.js'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 require('./ContentItemSearch.styl')
 

@@ -25,6 +25,11 @@ export const FETCH_CONFIG = {
   apiUrl: configEnv.apiUrl
 }
 
+export const SEARCH_TYPE = {
+  SIMPLE: 'simple',
+  ADVANCED: 'elasticsearch'
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }
@@ -142,4 +147,18 @@ export const toggleFavicon = (hasNewNotification) => {
       favicon.href = canvas.toDataURL('image/png')
     }
   })
+}
+
+export const parseSearchUrl = (parsedQuery) => {
+  const searchObject = {}
+
+  searchObject.contentTypes = parsedQuery.t
+  searchObject.searchedKeywords = parsedQuery.q
+  searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
+  searchObject.currentPage = parseInt(parsedQuery.p)
+  searchObject.showArchived = !!(parseInt(parsedQuery.arc))
+  searchObject.showDeleted = !!(parseInt(parsedQuery.del))
+  searchObject.showActive = !!(parseInt(parsedQuery.act))
+
+  return searchObject
 }

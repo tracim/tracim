@@ -1,0 +1,25 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.searchFilterMenu
+  margin-top 15px
+  width 300px
+  background-color offWhite
+  border 1px solid grey
+  &__title
+    background-color veryLightGrey
+    height 40px
+    align-items center
+    display flex
+    padding 10px
+    font-weight bold
+    border-bottom 1px solid grey
+    & > i
+      margin-inline-end 10px
+    & > button
+      margin-inline-start auto
+
+@media (max-width: max-md)
+  .searchFilterMenu
+    width 100%
+    height calc(100vh - 130px)
+    margin 0px
