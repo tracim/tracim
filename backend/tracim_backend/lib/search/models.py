@@ -4,36 +4,10 @@ from typing import List
 from typing import Optional
 
 
-class FacetCount:
-    def __init__(self, key: str, count: int) -> None:
-        self.key = key
-        self.count = count
-
-
-class SimpleFacets:
-    def __init__(
-        self,
-        workspace_names: Optional[List[str]],
-        author__public_names: Optional[List[str]],
-        last_modifier__public_names: Optional[List[str]],
-        file_extensions: Optional[List[str]],
-        statuses: Optional[List[str]],
-        content_types: Optional[List[FacetCount]],
-        created_from: Optional[datetime],
-        created_to: Optional[datetime],
-        modified_from: Optional[datetime],
-        modified_to: Optional[datetime],
-    ) -> None:
-        self.workspace_names = workspace_names
-        self.author__public_names = author__public_names
-        self.last_modifier__public_names = last_modifier__public_names
-        self.file_extensions = file_extensions
-        self.statuses = statuses
-        self.content_types = content_types
-        self.created_from = created_from
-        self.created_to = created_to
-        self.modified_from = modified_from
-        self.modified_to = modified_to
+class DateRange:
+    def __init__(self, date_from: str, date_to: str):
+        self.date_from = date_from
+        self.date_to = date_to
 
 
 class ContentSearchResponse(ABC):
@@ -42,14 +16,18 @@ class ContentSearchResponse(ABC):
         contents: List["SearchedContent"],
         total_hits: int = 0,
         is_total_hits_accurate: bool = True,
-        simple_facets: Optional[List[str]] = None,
+        facets: Optional[List[str]] = None,
         search_fields: Optional[List[str]] = None,
+        created_range: Optional[DateRange] = None,
+        modified_range: Optional[DateRange] = None,
     ):
         self.contents = contents
         self.total_hits = total_hits
         self.is_total_hits_accurate = is_total_hits_accurate
-        self.simple_facets = simple_facets
+        self.facets = facets
         self.search_fields = search_fields
+        self.created_range = created_range
+        self.modified_range = modified_range
 
 
 class EmptyContentSearchResponse(ContentSearchResponse):

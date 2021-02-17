@@ -190,7 +190,16 @@ class FacetCountSchema(marshmallow.Schema):
     count = marshmallow.fields.Int("The number of results matching this value")
 
 
-class ContentSimpleFacetsSchema(marshmallow.Schema):
+class DateRangeSchema(marshmallow.Schema):
+    date_from = marshmallow.fields.DateTime(
+        data_key="from", format=DATETIME_FORMAT, required=False, missing=None
+    )
+    date_to = marshmallow.fields.DateTime(
+        data_key="to", format=DATETIME_FORMAT, required=False, missing=None
+    )
+
+
+class ContentFacetsSchema(marshmallow.Schema):
     search_fields = marshmallow.fields.List(
         marshmallow.fields.String(description="search was performed in these fields")
     )
@@ -221,18 +230,14 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
             FacetCountSchema(), description="search matches contents with these statuses"
         )
     )
-    created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
-    created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
-    modified_from = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, required=False, missing=None
-    )
-    modified_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
 
 
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
-    simple_facets = marshmallow.fields.Nested(
-        ContentSimpleFacetsSchema(),
+    facets = marshmallow.fields.Nested(
+        ContentFacetsSchema(),
         description="search matched content with these characteristics",
         required=False,
         missing=None,
     )
+    created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
