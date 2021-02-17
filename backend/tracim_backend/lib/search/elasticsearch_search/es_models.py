@@ -37,7 +37,7 @@ html_folding = analyzer(
     filter=["lowercase", "asciifolding", edge_ngram_token_filter],
     char_filter="html_strip",
 )
-html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip",)
+html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip")
 
 
 class DigestUser(InnerDoc):

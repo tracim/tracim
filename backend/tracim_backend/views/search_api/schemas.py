@@ -191,8 +191,7 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
     )
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(),
-            description="search matches contents in these workspaces",
+            FacetCountSchema(), description="search matches contents in these workspaces"
         )
     )
     author__public_names = marshmallow.fields.List(
@@ -209,14 +208,12 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
     )
     file_extensions = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(),
-            description="search matches contents with these file extensions",
+            FacetCountSchema(), description="search matches contents with these file extensions"
         )
     )
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(),
-            description="search matches contents with these statuses",
+            FacetCountSchema(), description="search matches contents with these statuses"
         )
     )
     created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)

@@ -581,7 +581,7 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -589,9 +589,6 @@ class ESSearchApi(SearchApi):
         Create ingest pipeline to allow extract file content and use them for search.
         """
         p = IngestClient(self.es)
-        # TODO - G.M - 2019-05-31 - check if possible to set specific analyzer for
-        # attachment content parameters. Goal :
-        # allow ngram or lang specific indexing for "in file search"
 
         processors = [
             {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
@@ -609,7 +606,7 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang,
+                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
                         ),
                         "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
                     }

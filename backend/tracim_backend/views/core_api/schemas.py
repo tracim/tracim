@@ -279,10 +279,10 @@ class UserDigestSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     has_avatar = marshmallow.fields.Bool(
-        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint",
+        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint"
     )
     has_cover = marshmallow.fields.Bool(
-        description="Does the user have a cover? cover need to be obtain with /cover endpoint",
+        description="Does the user have a cover? cover need to be obtain with /cover endpoint"
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
@@ -383,7 +383,7 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True, example={"param1": "value1"}, description="custom_properties schema",
+        required=True, example={"param1": "value1"}, description="custom_properties schema"
     )
 
 
@@ -1254,7 +1254,7 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties", required=True, allow_none=False,
+        description="ui schema used for user custom properties", required=True, allow_none=False
     )
 
 
