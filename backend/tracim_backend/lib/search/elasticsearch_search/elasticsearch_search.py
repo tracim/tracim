@@ -418,7 +418,7 @@ class ESSearchApi(SearchApi):
 
             for lang in FILE_PIPELINE_LANGS:
                 es_search_fields.append(
-                    "{}.content_{lang}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
+                    "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
                 )
 
         if "comments" in search_fields:
