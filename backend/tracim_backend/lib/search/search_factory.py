@@ -37,22 +37,35 @@ class SearchFactory(object):
             )
 
     @classmethod
-    def get_search_lib(cls, session: Session, current_user: typing.Optional[User], config: CFG):
+    def get_elastic_search_api(
+        cls, session: Session, current_user: typing.Optional[User], config: CFG
+    ) -> "ESSearchApi":  # noqa: F821
+        # TODO - G.M - 2019-05-22 - fix circular import
+        from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
+
+        return ESSearchApi(session=session, current_user=current_user, config=config)
+
+    @classmethod
+    def get_simple_search_api(
+        cls, session: Session, current_user: typing.Optional[User], config: CFG
+    ) -> "SimpleSearchApi":  # noqa: F821
+        # TODO - G.M - 2019-05-22 - fix circular import
+        from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
+
+        return SimpleSearchApi(session=session, current_user=current_user, config=config)
+
+    @classmethod
+    def get_search_lib(
+        cls, session: Session, current_user: typing.Optional[User], config: CFG
+    ) -> typing.Union["ESSearchApi", "SimpleSearchApi"]:
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
-            # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import (
-                ESSearchApi,
-            )
+            return cls.get_elastic_search_api(session, current_user, config)
 
-            return ESSearchApi(session=session, current_user=current_user, config=config)
-        elif config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
-            # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
+        if config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
+            return cls.get_simple_search_api(session, current_user, config)
 
-            return SimpleSearchApi(session=session, current_user=current_user, config=config)
-        else:
-            raise NoValidSearchEngine(
-                "Can't provide search lib"
-                ' because search engine provided "{}"'
-                " is not valid".format(config.SEARCH__ENGINE)
-            )
+        raise NoValidSearchEngine(
+            "Can't provide search lib"
+            ' because the provided search engine "{}"'
+            " is not valid".format(config.SEARCH__ENGINE)
+        )
