@@ -452,6 +452,7 @@ class ESSearchApi(SearchApi):
         search = search.source(
             exclude=[
                 "raw_content",
+                FILE_PIPELINE_DESTINATION_FIELD,
                 "{}.*".format(FILE_PIPELINE_DESTINATION_FIELD),
                 "deleted_through_parent_id",
                 "archived_through_parent_id",
@@ -610,7 +611,7 @@ class ESSearchApi(SearchApi):
                         "field": "{source}.content_{lang}".format(
                             source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
                         ),
-                        "value": "{{{}.content}}".format(FILE_PIPELINE_DESTINATION_FIELD),
+                        "value": "{{" + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD) + "}}",
                     }
                 }
             )
