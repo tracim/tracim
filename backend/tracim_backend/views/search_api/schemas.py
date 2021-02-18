@@ -97,7 +97,9 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     # However, in functional tests, since apps are not enabled, filterable_content_types is empty
     # and tests break.
     content_types = StringList(
-        marshmallow.fields.String(), required=False, description="content_types to show",
+        marshmallow.fields.String(),
+        required=False,
+        description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -198,8 +200,8 @@ class ContentSearchResultSchema(marshmallow.Schema):
 
 
 class FacetCountSchema(marshmallow.Schema):
-    value = marshmallow.fields.String("The value of this field")
-    count = marshmallow.fields.Int("The number of results matching this value")
+    value = marshmallow.fields.String(description="The value of this field")
+    count = marshmallow.fields.Int(description="The number of results matching this value")
 
 
 class DateRangeSchema(marshmallow.Schema):
@@ -224,6 +226,11 @@ class ContentFacetsSchema(marshmallow.Schema):
         marshmallow.fields.Nested(
             FacetCountSchema(),
             description="search matches contents which have authors with these public names",
+        )
+    )
+    content_types = marshmallow.fields.List(
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents with these content types"
         )
     )
     last_modifier__public_names = marshmallow.fields.List(
