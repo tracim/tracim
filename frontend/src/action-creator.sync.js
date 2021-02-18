@@ -169,15 +169,21 @@ export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${B
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
 export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })
 
-export const SEARCH_RESULTS_LIST = 'SearchResultsList'
-export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
-export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })
-export const SEARCHED_KEYWORDS = 'SearchedKeywords'
-export const setSearchedKeywords = searchedKeywords => ({ type: `${SET}/${SEARCHED_KEYWORDS}`, searchedKeywords })
+export const SEARCH_RESULTS_LIST = searchType => `SearchResultList_${searchType}`
+export const setSearchResultList = (newSearchResultList, searchType) => ({ type: `${SET}/${SEARCH_RESULTS_LIST(searchType)}`, newSearchResultList })
+export const appendSearchResultList = (appendSearchResultList, searchType) => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST(searchType)}`, appendSearchResultList })
+export const SEARCHED_STRING = 'SearchString'
+export const setSearchString = searchString => ({ type: `${SET}/${SEARCHED_STRING}`, searchString })
 export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
-export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
-export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })
+export const SEARCH_CURRENT_PAGE = searchType => `SearchCurrentPage_${searchType}`
+export const setCurrentNumberPage = (currentNumberPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentNumberPage })
+export const SEARCH_CONTENT_BREADCRUMBS = searchType => `SearchContentBreadcrumbs_${searchType}`
+export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, searchType) => ({
+  type: `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`,
+  contentBreadcrumbsList,
+  contentId
+})
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

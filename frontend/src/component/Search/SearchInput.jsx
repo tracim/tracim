@@ -2,30 +2,30 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-require('./Search.styl')
+require('./SearchInput.styl')
 
-export class Search extends React.Component {
+export class SearchInput extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      searchedKeywords: ''
+      searchString: ''
     }
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.searchedKeywords !== this.props.searchedKeywords) {
-      this.setState({ searchedKeywords: this.props.searchedKeywords })
+    if (prevProps.searchString !== this.props.searchString) {
+      this.setState({ searchString: this.props.searchString })
     }
   }
 
-  handleNewSearch = e => this.setState({ searchedKeywords: e.target.value })
+  handleNewSearch = e => this.setState({ searchString: e.target.value })
 
   handleClickSearch = () => {
-    this.props.onClickSearch(this.state.searchedKeywords)
+    this.props.onClickSearch(this.state.searchString)
   }
 
-  handleKeyDown = e => e.key === 'Enter' && this.state.searchedKeywords !== '' && this.handleClickSearch()
+  handleKeyDown = e => e.key === 'Enter' && this.state.searchString !== '' && this.handleClickSearch()
 
   render () {
     const { props } = this
@@ -39,7 +39,7 @@ export class Search extends React.Component {
           placeholder={props.t('Search')}
           onChange={this.handleNewSearch}
           onKeyDown={this.handleKeyDown}
-          value={this.state.searchedKeywords}
+          value={this.state.searchString}
         />
         <button
           className='search__btn'
@@ -53,12 +53,12 @@ export class Search extends React.Component {
     )
   }
 }
-export default translate()(Search)
+export default translate()(SearchInput)
 
-Search.propTypes = {
-  searchedKeywords: PropTypes.string
+SearchInput.propTypes = {
+  searchString: PropTypes.string
 }
 
-Search.defaultProps = {
-  searchedKeywords: ''
+SearchInput.defaultProps = {
+  searchString: ''
 }

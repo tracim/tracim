@@ -27,7 +27,7 @@ const URLS = {
   [PAGES.WORKSPACE_ACTIVITY_FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/activity-feed/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
-  [PAGES.SEARCH]: ({ searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes }) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
+  [PAGES.SEARCH]: ({ searchString, pageNumber, numberByPage, actived, deleted, archived, contentTypes }) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchString}&t=${contentTypes}`,
   [PAGES.SHARE_FOLDER]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/share_folder`,
   [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace',
   [PAGES.ADMIN_USER]: ({ userId }) => `/ui/admin/user/${userId || ''}`,
