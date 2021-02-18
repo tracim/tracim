@@ -725,6 +725,7 @@ class TestElasticSearchUserSearch:
             ),
             (("bob", "password"), {"search_string": "riyad"}, [3]),
             (("bob", "password"), {"search_string": "*"}, [2, 3]),
+            (("bob", "password"), {"search_string": "*", "workspace_ids": [1]}, [2]),
             (("bob", "password"), {"search_string": "riy"}, [3]),
             (
                 ("bob", "password"),
@@ -742,7 +743,6 @@ class TestElasticSearchUserSearch:
     def test_api__elasticsearch_user_search__ok__nominal_cases(
         self,
         web_testapp,
-        elasticsearch,
         authorization: typing.Tuple[str, str],
         query_parameters: dict,
         expected_user_ids: typing.List[int],
@@ -761,9 +761,9 @@ class TestElasticSearchUserSearch:
         assert user_ids == expected_user_ids
 
 
-@pytest.mark.usefixtures("base_fixture")
 @pytest.fixture
 def workspace_search_fixture(
+    base_fixture,
     elasticsearch,
     bob_user: User,
     riyad_user: User,
@@ -771,12 +771,15 @@ def workspace_search_fixture(
     role_api_factory: RoleApiFactory,
 ) -> typing.Tuple[Workspace, Workspace]:
     wapi = workspace_api_factory.get(bob_user)
-    bob_only = wapi.create_workspace("Bob only")
+    bob_only = wapi.create_workspace(
+        label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
+    )
     bob_and_riyad = wapi.create_workspace("Bob & Riyad")
     rapi = role_api_factory.get(bob_user)
     rapi.create_one(
         riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
+    transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return (bob_only, bob_and_riyad)
 
@@ -789,35 +792,66 @@ class TestElasticSearchWorkspaceSearch:
     ) -> None:
         (bob_only_workspace, _) = workspace_search_fixture
         bob = bob_only_workspace.owner
-        web_testapp.authorization = ("Basic", (bob.username, bob.password))
+        web_testapp.authorization = ("Basic", (bob.username, "password"))
         parameters = {"search_string": bob_only_workspace.label}
         search_result = web_testapp.get(
-            "/api/advanced_search/workspaces".format(), params=parameters, status=200
+            "/api/advanced_search/workspace", params=parameters, status=200
         ).json_body
-        workspace = search_result["workspaces"][0]
-        assert workspace == {
+        workspaces = search_result["workspaces"]
+        assert len(workspaces) == 1
+        assert workspaces[0] == {
             "workspace_id": bob_only_workspace.workspace_id,
             "access_type": bob_only_workspace.access_type.value,
             "label": bob_only_workspace.label,
-            "is_deleted": bob_only_workspace.is_deleted,
             "content_count": 0,
             "member_count": 1,
         }
-        facets = search_result["simple_facets"]
-        assert facets == {}
+        facets = search_result["facets"]
+        assert facets == {
+            "members": [
+                {
+                    "count": 1,
+                    "value": {
+                        "has_avatar": bob.has_avatar,
+                        "has_cover": bob.has_cover,
+                        "user_id": bob.user_id,
+                        "username": bob.username,
+                        "public_name": bob.display_name,
+                    },
+                }
+            ]
+        }
+        search_fields = search_result["search_fields"]
+        assert search_fields == ["label", "description"]
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is True
 
     @pytest.mark.parametrize(
-        "query_parameters,expected_workspace_ids", [({"search_string": "test"}, [1])]
+        "authorization, query_parameters, expected_workspace_ids",
+        [
+            (("bob", "password"), {"search_string": "bob_only"}, [1]),
+            (("bob", "password"), {"search_string": "bob"}, [1, 2]),
+            (("bob", "password"), {"search_string": "bob", "member_ids": [3]}, [2]),
+            (("bob", "password"), {"search_string": "bloody"}, [1]),
+            (("bob", "password"), {"search_string": "img"}, []),
+            (("bob", "password"), {"search_string": "bloody", "search_fields": ["label"]}, []),
+            (("riyad", "password"), {"search_string": "bob"}, [2]),
+        ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(
-        self, web_testapp, query_parameters: dict, expected_workspace_ids: typing.List[int],
+        self,
+        web_testapp,
+        authorization: typing.Tuple[str, str],
+        query_parameters: dict,
+        expected_workspace_ids: typing.List[int],
     ) -> None:
         """Test different search parameters.
-        The fixture do create .....
+        The fixture do create 2 workspaces, the first has only bob as member, the second has
+        bob and riyad.
         """
-        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", authorization)
         search_result = web_testapp.get(
-            "/api/advanced_search/workspaces".format(), status=200, params=query_parameters
+            "/api/advanced_search/workspace".format(), status=200, params=query_parameters
         ).json_body
         assert search_result["total_hits"] == len(expected_workspace_ids)
         assert search_result["is_total_hits_accurate"] is True

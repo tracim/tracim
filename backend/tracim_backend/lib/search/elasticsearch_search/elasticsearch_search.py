@@ -654,38 +654,38 @@ class ESSearchApi(SearchApi):
 
         search_fields = search_fields or DEFAULT_USER_SEARCH_FIELDS
         fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
-        query = search.query("simple_query_string", query=search_string, fields=fields)
+        search = search.query("simple_query_string", query=search_string, fields=fields)
         known_user_ids = UserApi(
             current_user=None, session=self._session, config=self._config
         ).get_known_user_ids(self._user.user_id)
-        query = query.filter("terms", user_id=known_user_ids)
+        search = search.filter("terms", user_id=known_user_ids)
         if not show_active:
-            query = query.exclude("term", is_active=True)
+            search = search.exclude("term", is_active=True)
         if not show_deleted:
-            query = query.exclude("term", is_deleted=True)
+            search = search.exclude("term", is_deleted=True)
         if workspace_ids:
-            query = query.filter("terms", workspace_ids=workspace_ids)
+            search = search.filter("terms", workspace_ids=workspace_ids)
         newest_authored_content_date_range = self.create_es_datetime_range(
             newest_authored_content_date_from, newest_authored_content_date_to
         )
         if newest_authored_content_date_range:
-            query = query.filter(
+            search = search.filter(
                 "range", newest_authored_content_date=newest_authored_content_date_range
             )
 
         if size:
-            query = query.extra(size=size)
+            search = search.extra(size=size)
         if page_nb:
-            query = query.extra(from_=self.offset_from_pagination(size, page_nb))
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
 
-        query.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
-        query.aggs.metric(
+        search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
+        search.aggs.metric(
             "newest_authored_content_date_from", "min", field="newest_authored_content_date",
         )
-        query.aggs.metric(
+        search.aggs.metric(
             "newest_authored_content_date_to", "max", field="newest_authored_content_date",
         )
-        response = query.execute()
+        response = search.execute()
         known_workspaces = self._get_workspaces_known_to_user()
         facets = {
             "workspaces": self._create_filtered_facets(
@@ -704,7 +704,7 @@ class ESSearchApi(SearchApi):
         self,
         search_string: str,
         search_fields: typing.Optional[typing.List[str]] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
-        user_ids: typing.Optional[typing.List[int]] = None,
+        member_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
         page_nb: int = 0,
         size: int = 10,
@@ -724,28 +724,28 @@ class ESSearchApi(SearchApi):
         fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
 
         known_workspace_ids = [ws.workspace_id for ws in self._get_workspaces_known_to_user()]
-        query = search.query("simple_query_string", search_string)
-        query = query.filter("terms", workspace_id=known_workspace_ids)
-        if user_ids:
-            query = query.filter("terms", members_ids=user_ids)
+        search = search.query("simple_query_string", query=search_string, fields=fields)
+        search = search.filter("terms", workspace_id=known_workspace_ids)
+        if member_ids:
+            search = search.filter("terms", member_ids=member_ids)
         if not show_deleted:
-            query = query.exclude("term", is_deleted=True)
+            search = search.exclude("term", is_deleted=True)
         if size:
-            query = query.extra(size=size)
+            search = search.extra(size=size)
         if page_nb:
-            query = query.extra(from_=self.offset_from_pagination(size, page_nb))
-
-        query.aggs.bucket("member_ids", "terms", field="member_ids")
-
-        response = query.execute()
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+        search.aggs.bucket("member_ids", "terms", field="member_ids")
+        response = search.execute()
         known_users = UserApi(
             current_user=None, session=self._session, config=self._config
         ).get_all_known_users(self._user.user_id)
-        member_facets = self._create_filtered_facets(
-            "user_id", response.aggregations.member_ids.buckets, known_users
-        )
+        facets = {
+            "members": self._create_filtered_facets(
+                "user_id", response.aggregations.member_ids.buckets, known_users
+            )
+        }
 
-        return WorkspaceSearchResponse(response["hits"], member_facets)
+        return WorkspaceSearchResponse(response["hits"], facets, search_fields)
 
     @staticmethod
     def _create_filtered_facets(

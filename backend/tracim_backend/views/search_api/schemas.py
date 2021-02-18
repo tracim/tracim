@@ -33,6 +33,11 @@ class UserSearchField(str, Enum):
     CUSTOM_PROPERTIES = "custom_properties"
 
 
+class WorkspaceSearchField(str, Enum):
+    LABEL = "label"
+    DESCRIPTION = "description"
+
+
 filterable_content_types = content_type_list.restricted_allowed_types_slug()
 
 
@@ -298,4 +303,47 @@ class UserSearchResultSchema(marshmallow.Schema):
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(UserSearchFacets())
     last_authored_content_revision_date_range = DateRangeSchema()
+    search_fields = marshmallow.fields.List(marshmallow.fields.String())
+
+
+class WorkspaceSearchQuerySchema(marshmallow.Schema):
+    """Query filters for searching workspaces."""
+
+    search_string = marshmallow.fields.String(required=True)
+    member_ids = StringList(
+        marshmallow.fields.Int(),
+        required=False,
+        missing=None,
+        description="if given only workspace having members in the list will be searched",
+    )
+    search_fields = StringList(
+        EnumField(WorkspaceSearchField),
+        required=False,
+        missing=None,
+        description="if given only search in the given workspace fields",
+    )
+
+
+class SearchedWorkspaceSchema(WorkspaceDigestSchema):
+    """Workspace object returned by a search."""
+
+    access_type = marshmallow.fields.String()
+    member_count = marshmallow.fields.Integer()
+    content_count = marshmallow.fields.Integer()
+
+
+class UserFacetSchema(marshmallow.Schema):
+    count = marshmallow.fields.Integer()
+    value = marshmallow.fields.Nested(UserDigestSchema())
+
+
+class WorkspaceSearchFacets(marshmallow.Schema):
+    members = marshmallow.fields.List(marshmallow.fields.Nested(UserFacetSchema()))
+
+
+class WorkspaceSearchResultSchema(marshmallow.Schema):
+    workspaces = marshmallow.fields.List(marshmallow.fields.Nested(SearchedWorkspaceSchema()))
+    total_hits = marshmallow.fields.Integer()
+    is_total_hits_accurate = marshmallow.fields.Boolean()
+    facets = marshmallow.fields.Nested(WorkspaceSearchFacets())
     search_fields = marshmallow.fields.List(marshmallow.fields.String())

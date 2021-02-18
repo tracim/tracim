@@ -181,9 +181,12 @@ class SearchedWorkspace:
 
 class WorkspaceSearchResponse:
     def __init__(
-        self, hits: typing.Dict[str, typing.Any], member_facets: typing.List[FacetCount]
+        self,
+        hits: typing.Dict[str, typing.Any],
+        facets: typing.Dict[str, typing.List[FacetCount]],
+        search_fields: typing.List[str],
     ) -> None:
-        self.users = [
+        self.workspaces = [
             SearchedWorkspace(
                 workspace_id=hit["_source"]["workspace_id"],
                 label=hit["_source"]["label"],
@@ -195,4 +198,5 @@ class WorkspaceSearchResponse:
         ]
         self.total_hits = hits["total"]["value"]
         self.is_total_hits_accurate = hits["total"]["relation"] == "eq"
-        self.simple_facets = {"members": member_facets}
+        self.facets = facets
+        self.search_fields = search_fields

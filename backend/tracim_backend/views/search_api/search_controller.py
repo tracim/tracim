@@ -3,12 +3,12 @@ from http import HTTPStatus
 from hapic import HapicData
 from pyramid.config import Configurator
 
-# from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AdvancedSearchNotEnabled
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
 from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
@@ -24,6 +24,8 @@ from tracim_backend.views.search_api.schemas import ContentSearchQuerySchema
 from tracim_backend.views.search_api.schemas import ContentSearchResultSchema
 from tracim_backend.views.search_api.schemas import UserSearchQuerySchema
 from tracim_backend.views.search_api.schemas import UserSearchResultSchema
+from tracim_backend.views.search_api.schemas import WorkspaceSearchQuerySchema
+from tracim_backend.views.search_api.schemas import WorkspaceSearchResultSchema
 
 SWAGGER_TAG__SEARCH_SECTION = "Search"
 
@@ -66,6 +68,18 @@ class SearchController(Controller):
         response = search_api.search_user(**hapic_data.query)
         return response
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
+    @check_right(is_user)
+    @hapic.input_query(WorkspaceSearchQuerySchema())
+    @hapic.output_body(WorkspaceSearchResultSchema())
+    @hapic.handle_exception(AdvancedSearchNotEnabled, HTTPStatus.BAD_REQUEST)
+    def advanced_search_workspace(
+        self, context, request: TracimRequest, hapic_data: HapicData = None
+    ) -> WorkspaceSearchResponse:
+        search_api = self._get_es_search_api(request)
+        response = search_api.search_workspace(**hapic_data.query)
+        return response
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -87,6 +101,13 @@ class SearchController(Controller):
             "advanced_search_user", "/advanced_search/user", request_method="GET"
         )  # noqa: W605
         configurator.add_view(self.advanced_search_user, route_name="advanced_search_user")
+
+        configurator.add_route(
+            "advanced_search_workspace", "/advanced_search/workspace", request_method="GET"
+        )  # noqa: W605
+        configurator.add_view(
+            self.advanced_search_workspace, route_name="advanced_search_workspace"
+        )
 
     def _get_es_search_api(self, request: TracimRequest) -> ESSearchApi:
         app_config = request.registry.settings["CFG"]  # type: CFG
