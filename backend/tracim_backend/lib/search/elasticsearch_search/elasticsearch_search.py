@@ -583,7 +583,7 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -593,13 +593,13 @@ class ESSearchApi(SearchApi):
         p = IngestClient(self.es)
 
         processors = [
-            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
             {
                 "attachment": {
                     "field": FILE_PIPELINE_SOURCE_FIELD,
                     "target_field": FILE_PIPELINE_DESTINATION_FIELD,
                 }
             },
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
         ]
 
         for lang in FILE_PIPELINE_LANGS:
@@ -608,9 +608,9 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+                            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
                         ),
-                        "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
+                        "value": "{{{}.content}}".format(FILE_PIPELINE_DESTINATION_FIELD),
                     }
                 }
             )
@@ -619,7 +619,7 @@ class ESSearchApi(SearchApi):
             {
                 "remove": {
                     "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
-                    "field": "{}.content".format(FILE_PIPELINE_SOURCE_FIELD),
+                    "field": "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD),
                 }
             }
         )
