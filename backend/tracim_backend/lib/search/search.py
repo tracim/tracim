@@ -10,7 +10,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.data import Content
 
 
 class IndexedContentsResults(object):
@@ -58,7 +58,7 @@ class SearchApi(ABC):
         pass
 
     @abstractmethod
-    def index_content(self, content: ContentInContext):
+    def index_content(self, content: Content) -> None:
         pass
 
     def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
@@ -80,30 +80,25 @@ class SearchApi(ABC):
         content_ids_to_index = []  # type: typing.List[int]
         errored_indexed_contents_ids = []  # type: typing.List[int]
         for content in contents:
-            content_in_context = ContentInContext(
-                content, config=self._config, dbsession=self._session
-            )
-            content_ids_to_index.append(content_in_context.content_id)
+            content_ids_to_index.append(content.content_id)
             try:
-                self.index_content(content_in_context)
+                self.index_content(content)
             except ConnectionError as exc:
                 logger.error(
                     self,
-                    "connexion error issue with elasticsearch during indexing of content {}".format(
-                        content_in_context.content_id
+                    "connection error issue with elasticsearch during indexing of content {}".format(
+                        content.content_id
                     ),
                 )
                 logger.exception(self, exc)
-                errored_indexed_contents_ids.append(content_in_context.content_id)
+                errored_indexed_contents_ids.append(content.content_id)
             except Exception as exc:
                 logger.error(
                     self,
-                    "something goes wrong during indexing of content {}".format(
-                        content_in_context.content_id
-                    ),
+                    "something goes wrong during indexing of content {}".format(content.content_id),
                 )
                 logger.exception(self, exc)
-                errored_indexed_contents_ids.append(content_in_context.content_id)
+                errored_indexed_contents_ids.append(content.content_id)
         return IndexedContentsResults(content_ids_to_index, errored_indexed_contents_ids)
 
     def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:

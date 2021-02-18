@@ -266,7 +266,7 @@ class ESSearchApi(SearchApi):
         indexed_content.meta.id = content_in_context.content_id
         content_index_alias = self._get_index_parameters(IndexedContent).alias
         pipeline_id = None  # type: typing.Optional[str]
-        if self._should_index_depot_file(content):
+        if self._should_index_depot_file(content_in_context):
             indexed_content.b64_file = content_in_context.get_b64_file()
             pipeline_id = FILE_PIPELINE_ID
         indexed_content.save(
