@@ -331,12 +331,17 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
-  "Showing {{displayedResults}} of {{totalResults}} results": "{{displayedResults}} résultats affichées sur {{totalResults}}",
+  "Showing {{displayedResults}} of {{totalResults}} results": "{{displayedResults}} résultats affichés sur {{totalResults}}",
   "Result for \"{{keywords}}\"": "Résultat pour \"{{keywords}}\"",
   "Results for \"{{keywords}}\"": "Résultats pour \"{{keywords}}\"",
   "Filter": "Filtrer",
   "Search filters": "Filtres de recherche",
   "Filters": "Filtres",
+  "Title and path": "Titre et chemin",
+  "Name": "Nom",
+  "Avatar": "Avatar",
+  "Full name": "Nom complet",
+  "Username": "Identifiant",
   "User account management": "Gestion des comptes utilisateurs",
   "{{user}}'s profile": "Profil de {{user}}",
   "Loading": "Chargement",
@@ -354,5 +359,6 @@
   "Change avatar": "Changer l'avatar",
   "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
-  "Change cover": "Changer la couverture"
+  "Change cover": "Changer la couverture",
+  "{{numberComments}} comments": "{{numberComments}} commentaires"
 }

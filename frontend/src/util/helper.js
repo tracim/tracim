@@ -30,6 +30,12 @@ export const SEARCH_TYPE = {
   ADVANCED: 'elasticsearch'
 }
 
+export const ADVANCED_SEARCH_TYPE = {
+  CONTENT: 'content',
+  USER: 'users',
+  SPACE: 'workspaces'
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }
@@ -153,12 +159,13 @@ export const parseSearchUrl = (parsedQuery) => {
   const searchObject = {}
 
   searchObject.contentTypes = parsedQuery.t
-  searchObject.searchedKeywords = parsedQuery.q
+  searchObject.searchString = parsedQuery.q
   searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
   searchObject.currentPage = parseInt(parsedQuery.p)
   searchObject.showArchived = !!(parseInt(parsedQuery.arc))
   searchObject.showDeleted = !!(parseInt(parsedQuery.del))
   searchObject.showActive = !!(parseInt(parsedQuery.act))
+  searchObject.searchType = parsedQuery.s
 
   return searchObject
 }

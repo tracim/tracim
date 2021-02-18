@@ -71,7 +71,7 @@ import {
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
-import SearchResult from './SearchResult.jsx'
+import SimpleSearch from './SimpleSearch.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
@@ -529,7 +529,7 @@ export class Tracim extends React.Component {
             path={PAGE.SEARCH_RESULT}
             component={props.system.config.search_engine === SEARCH_TYPE.ADVANCED
               ? AdvancedSearch
-              : SearchResult}
+              : SimpleSearch}
           />
 
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />

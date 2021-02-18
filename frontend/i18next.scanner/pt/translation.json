@@ -338,6 +338,11 @@
   "Search filters": "Filtros de pesquisa",
   "Recommended dimensions:": "Dimensões recomendadas",
   "Filters": "Filtros",
+  "Title and path": "Título e caminho",
+  "Name": "Nome",
+  "Avatar": "Avatar",
+  "Full name": "Nome completo",
+  "Username": "Identificador",
   "User account management": "Gestão da conta de utilizador",
   "{{user}}'s profile": "Perfil de {{user}}",
   "Loading": "Carregando",
@@ -354,5 +359,6 @@
   "Maximum size: {{size}} MB": "Tamanho máximo: {{size}} MB",
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{pubblicName}}",
-  "Change cover": "Mudar a capa"
+  "Change cover": "Mudar a capa",
+  "{{numberComments}} comments": "{{numberComments}} comentários"
 }

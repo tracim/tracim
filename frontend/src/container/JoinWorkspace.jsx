@@ -177,7 +177,7 @@ export class JoinWorkspace extends React.Component {
             <PageTitle
               parentClass={className}
               title={props.t('Join a space')}
-              icon='users'
+              icon='fas fa-users'
               breadcrumbsList={props.breadcrumbs}
             />
 
