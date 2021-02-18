@@ -17,7 +17,7 @@ describe('<SearchInput />', () => {
     it('handleNewSearch should change his state', () => {
       const randomValue = 'randomValue'
       wrapper.instance().handleNewSearch({ target: { value: randomValue } })
-      expect(wrapper.state('searchedString')).to.equal(randomValue)
+      expect(wrapper.state('searchString')).to.equal(randomValue)
     })
 
     it('handleKeyDown should call handleClickSearch which call onClickSearchCallBack when the key is "Enter"', () => {

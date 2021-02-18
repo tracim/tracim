@@ -172,8 +172,8 @@ export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS
 export const SEARCH_RESULTS_LIST = searchType => `SearchResultList_${searchType}`
 export const setSearchResultList = (newSearchResultList, searchType) => ({ type: `${SET}/${SEARCH_RESULTS_LIST(searchType)}`, newSearchResultList })
 export const appendSearchResultList = (appendSearchResultList, searchType) => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST(searchType)}`, appendSearchResultList })
-export const SEARCHED_STRING = 'SearchedString'
-export const setSearchedString = searchedString => ({ type: `${SET}/${SEARCHED_STRING}`, searchedString })
+export const SEARCHED_STRING = 'SearchString'
+export const setSearchString = searchString => ({ type: `${SET}/${SEARCHED_STRING}`, searchString })
 export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = searchType => `SearchCurrentPage_${searchType}`

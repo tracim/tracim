@@ -22,7 +22,7 @@ import {
   appendSearchResultList,
   setSearchResultList,
   setNumberResultsByPage,
-  setSearchedString,
+  setSearchString,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
@@ -63,14 +63,14 @@ export class SimpleSearch extends React.Component {
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
     if (
-      prevSearch.searchedString !== currentSearch.searchedString ||
+      prevSearch.searchString !== currentSearch.searchString ||
       prevSearch.currentPage !== currentSearch.currentPage
     ) {
       this.loadSearchUrl()
     }
     if (
       prevProps.system.config.instance_name !== props.system.config.instance_name ||
-      prevSearch.searchedString !== currentSearch.searchedString
+      prevSearch.searchString !== currentSearch.searchString
     ) {
       this.setHeadTitle()
     }
@@ -79,7 +79,7 @@ export class SimpleSearch extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedString}`]
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchString}`]
     )
 
     props.dispatch(setHeadTitle(headTitle))
@@ -94,7 +94,7 @@ export class SimpleSearch extends React.Component {
 
     const fetchGetSimpleSearchResult = await props.dispatch(getSimpleSearchResult(
       searchObject.contentTypes,
-      searchObject.searchedString,
+      searchObject.searchString,
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
@@ -108,7 +108,7 @@ export class SimpleSearch extends React.Component {
 
     switch (fetchGetSimpleSearchResult.status) {
       case 200:
-        props.dispatch(setSearchedString(searchObject.searchedString))
+        props.dispatch(setSearchString(searchObject.searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, SEARCH_TYPE.SIMPLE))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
@@ -155,7 +155,7 @@ export class SimpleSearch extends React.Component {
     const numberResults = simpleSearch.resultList.length
     const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
-    const subtitle = `${numberResults} ${text} "${simpleSearch.searchedString}"`
+    const subtitle = `${numberResults} ${text} "${simpleSearch.searchString}"`
 
     return subtitle
   }
@@ -215,7 +215,7 @@ export class SimpleSearch extends React.Component {
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchedString}"`}
+                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchString}"`}
                   </div>
                 )}
 
@@ -223,7 +223,7 @@ export class SimpleSearch extends React.Component {
                   <ListItemWrapper
                     label={searchItem.label}
                     read
-                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                    contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
                     isLast={index === props.simpleSearch.resultList.length - 1}
                     key={searchItem.contentId}
                   >

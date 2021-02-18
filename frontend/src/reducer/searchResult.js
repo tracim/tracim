@@ -50,7 +50,7 @@ export const serializeSearchItemProps = {
 const defaultResult = {
   currentNumberPage: 1,
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
-  searchedString: '',
+  searchString: '',
   resultList: []
 }
 
@@ -99,7 +99,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
       return { ...state, resultList: newResultList }
 
     case `${SET}/${SEARCHED_STRING}`:
-      return { ...state, searchedString: action.searchedString }
+      return { ...state, searchString: action.searchString }
 
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }

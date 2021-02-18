@@ -78,7 +78,7 @@ describe('Searching keywords', () => {
 
     before(function () {
       cy.loginAs('users')
-      cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedString: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
+      cy.visitPage({ pageName: PAGES.SEARCH, params: { searchString: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
     })
 
     describe('the subtitle', () => {

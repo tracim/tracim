@@ -805,9 +805,9 @@ export const getUserCalendar = userId => dispatch => {
   })
 }
 
-export const getSimpleSearchResult = (contentTypes, searchedString, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
+export const getSimpleSearchResult = (contentTypes, searchString, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedString)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -1101,9 +1101,9 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
   })
 }
 
-export const getAdvancedSearchResult = (searchedString, contentTypes, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
+export const getAdvancedSearchResult = (searchString, contentTypes, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedString)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {

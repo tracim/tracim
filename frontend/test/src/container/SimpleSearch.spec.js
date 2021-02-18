@@ -92,7 +92,7 @@ describe('In <SimpleSearch />', () => {
     describe('getSubtitle', () => {
       it('should return the subtitle according to resultList size', () => {
         expect(searchResultInstance.getSubtitle()).to.equal(
-          `${props.simpleSearch.resultList.length} best results for "${props.simpleSearch.searchedString}"`
+          `${props.simpleSearch.resultList.length} best results for "${props.simpleSearch.searchString}"`
         )
       })
     })

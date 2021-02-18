@@ -159,7 +159,7 @@ export const parseSearchUrl = (parsedQuery) => {
   const searchObject = {}
 
   searchObject.contentTypes = parsedQuery.t
-  searchObject.searchedString = parsedQuery.q
+  searchObject.searchString = parsedQuery.q
   searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
   searchObject.currentPage = parseInt(parsedQuery.p)
   searchObject.showArchived = !!(parseInt(parsedQuery.arc))

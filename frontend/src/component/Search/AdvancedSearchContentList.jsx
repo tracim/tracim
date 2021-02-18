@@ -16,11 +16,12 @@ require('./AdvancedSearchContentList.styl')
 
 export const AdvancedSearchContentList = props => {
   const resultList = props.contentSearch.resultList.map((searchItem) => {
+    const searchContentType = props.contentType.find(ct => ct.slug === searchItem.contentType)
     return {
       ...searchItem,
       contentType: {
-        ...props.contentType.find(ct => ct.slug === searchItem.contentType) || { hexcolor: '', label: '', faIcon: '' },
-        status: props.contentType.find(ct => ct.slug === searchItem.contentType).availableStatuses.find(s => s.slug === searchItem.status) || { hexcolor: '', label: '', faIcon: '' }
+        ...searchContentType || { hexcolor: '', label: '', faIcon: '' },
+        status: searchContentType.availableStatuses.find(s => s.slug === searchItem.status) || { hexcolor: '', label: '', faIcon: '' }
       }
     }
   })

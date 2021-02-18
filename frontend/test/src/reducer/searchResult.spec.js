@@ -12,7 +12,7 @@ import {
   SET,
   setCurrentNumberPage,
   setNumberResultsByPage,
-  setSearchedString,
+  setSearchString,
   setSearchResultList,
   UPDATE,
   updateWorkspaceContentList,
@@ -29,7 +29,7 @@ describe('reducer searchResult.js', () => {
     const initialState = {
       currentNumberPage: 1,
       numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
-      searchedString: '',
+      searchString: '',
       resultList: []
     }
     const content = {
@@ -103,9 +103,9 @@ describe('reducer searchResult.js', () => {
     })
 
     describe(`${SET}/${SEARCHED_STRING}`, () => {
-      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setSearchedString('keyword'))
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setSearchString('keyword'))
       it('should return a content object with the keywords', () => {
-        expect(rez).to.deep.equal({ ...initialState, searchedString: 'keyword' })
+        expect(rez).to.deep.equal({ ...initialState, searchString: 'keyword' })
       })
     })
 
