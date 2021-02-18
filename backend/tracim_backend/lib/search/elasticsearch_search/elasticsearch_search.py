@@ -353,16 +353,18 @@ class ESSearchApi(SearchApi):
         return True
 
     @classmethod
-    def create_es_range(cls, range_from, range_to):
+    def create_es_range(
+        cls, range_from: typing.Optional[datetime], range_to: typing.Optional[datetime]
+    ) -> dict:
         # simple date/number facet (no histogram)
         if range_from and range_to:
             return {"gte": range_from, "lte": range_to}
 
         if range_from:
-            return {"gte", range_from}
+            return {"gte": range_from}
 
         if range_to:
-            return {"lte", range_to}
+            return {"lte": range_to}
 
         return None
 

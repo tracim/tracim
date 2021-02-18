@@ -75,7 +75,12 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
 
 class ContentSearchQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
-        example="test", description="just a search string", required=False
+        example="test",
+        description="just a search string",
+        required=False,
+        allow_none=True,
+        missing="",
+        default_value="",
     )
     size = marshmallow.fields.Int(
         required=False, default=10, validate=strictly_positive_int_validator
@@ -125,6 +130,9 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     search_fields = StringList(
         RestrictedStringField(search_content_field_values),
         required=False,
+        allow_none=True,
+        missing="",
+        default_value="",
         description="search within these fields",
     )
     workspace_names = StrippedString(
@@ -196,10 +204,10 @@ class FacetCountSchema(marshmallow.Schema):
 
 class DateRangeSchema(marshmallow.Schema):
     date_from = marshmallow.fields.DateTime(
-        data_key="from", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="from", dump_to="from", format=DATETIME_FORMAT, required=False, missing=None
     )
     date_to = marshmallow.fields.DateTime(
-        data_key="to", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="to", dump_to="to", format=DATETIME_FORMAT, required=False, missing=None
     )
 
 
@@ -245,3 +253,6 @@ class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
     )
     created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
     modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    search_fields = marshmallow.fields.List(
+        marshmallow.fields.String(), required=False, missing=None
+    )
