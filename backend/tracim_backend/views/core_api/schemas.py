@@ -1,8 +1,10 @@
 # coding=utf-8
+from enum import Enum
 import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.fields import Field
 from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
@@ -99,9 +101,86 @@ FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 class StrippedString(String):
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
-        if value:
-            value = value.strip()
         return value.strip()
+
+
+class StringList(marshmallow.fields.List):
+    """
+    This Field validates a list of elements the given field validates.
+    The Field is deserialized into a Python list.
+    The Field is serialized into a string with the Field's separated with the given separator.
+    """
+
+    def __init__(self, cls: typing.Type[Field], separator: str = ",", **kwargs: dict) -> None:
+        super().__init__(cls, **kwargs)
+        self._separator = separator
+
+    def _deserialize(self, value: str, *args: typing.Any, **kwargs: typing.Any):
+        return super()._deserialize(value.strip().split(self._separator), *args, **kwargs)
+
+    def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
+        return self._separator.join(super()._serialize(*args, **kwargs))
+
+
+class EnumField(marshmallow.fields.Field):
+    """
+    This Field validates elements found in an Enum.
+    The serialized value of this Field is the value of an enum field of the given Enum.
+    The deserialized value of this Field an enum field.
+    """
+
+    def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
+        super().__init__(**kwargs)
+        self._enum = enum_cls
+
+    def _deserialize(self, value: typing.Any, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
+        try:
+            return self._enum(value)
+        except ValueError:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field. Allowed values: {}".format(
+                    value, [val.value for val in self._enum.__members__.values()]
+                )
+            )
+
+    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        if value not in self._enum:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field".format(value)
+            )
+
+        return value.value
+
+
+class RestrictedStringField(marshmallow.fields.String):
+    """
+    This Field validates elements found in a Python list.
+    The serialized value and the deserialized value are elements of this list.
+    Serialization and deserialization fail for values that do not belong to this list.
+    """
+
+    def __init__(self, allowed_strings: typing.Container[str], **kwargs):
+        super().__init__(**kwargs)
+        self._allowed_strings = allowed_strings
+
+    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value in self._allowed_strings:
+            return value
+
+        self.error(value)
+
+    def _serialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value not in self._allowed_strings:
+            self.error(value)
+
+        return value
+
+    def error(self, value: str) -> "typing.NoReturn":
+        raise marshmallow.ValidationError(
+            "'{}' is not a valid value for this field. Allowed values: {}".format(
+                value, self._allowed_strings
+            )
+        )
 
 
 class EventTypeListField(StrippedString):
@@ -200,10 +279,10 @@ class UserDigestSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     has_avatar = marshmallow.fields.Bool(
-        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint",
+        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint"
     )
     has_cover = marshmallow.fields.Bool(
-        description="Does the user have a cover? cover need to be obtain with /cover endpoint",
+        description="Does the user have a cover? cover need to be obtain with /cover endpoint"
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
@@ -304,7 +383,7 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True, example={"param1": "value1"}, description="custom_properties schema",
+        required=True, example={"param1": "value1"}, description="custom_properties schema"
     )
 
 
@@ -1175,7 +1254,7 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties", required=True, allow_none=False,
+        description="ui schema used for user custom properties", required=True, allow_none=False
     )
 
 

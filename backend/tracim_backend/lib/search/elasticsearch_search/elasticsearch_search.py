@@ -14,6 +14,8 @@ from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
+from tracim_backend.lib.search.elasticsearch_search.es_models import KEYWORD_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
@@ -34,10 +36,12 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
 
 FILE_PIPELINE_ID = "attachment"
 FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
+FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 
 
 class IndexParameters:
@@ -251,7 +255,7 @@ class ESSearchApi(SearchApi):
             active_shares=content_in_context.actives_shares,
             path=path,
             comments=comments,
-            comments_count=len(comments),
+            comment_count=len(comments),
             author=author,
             last_modifier=last_modifier,
             archived_through_parent_id=content_in_context.archived_through_parent_id,
@@ -348,63 +352,100 @@ class ESSearchApi(SearchApi):
 
         return True
 
+    @classmethod
+    def create_es_range(cls, range_from, range_to):
+        # simple date/number facet (no histogram)
+        if range_from and range_to:
+            return {"gte": range_from, "lte": range_to}
+
+        if range_from:
+            return {"gte", range_from}
+
+        if range_to:
+            return {"lte", range_to}
+
+        return None
+
     def search_content(
-        self,
-        search_string: str,
-        size: typing.Optional[int],
-        page_nb: typing.Optional[int],
-        content_types: typing.Optional[typing.List[str]] = None,
-        show_deleted: bool = False,
-        show_archived: bool = False,
-        show_active: bool = True,
+        self, search_parameters: AdvancedContentSearchQuery
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
-        if not search_string:
+
+        if not search_parameters.search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
-        # INFO - G.M - 2019-05-31 - search using simple_query_string, which means user-friendly
-        # syntax to match complex case,
-        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+        es_search_fields = []
+
+        search_fields = (
+            search_parameters.search_fields
+            if search_parameters.search_fields
+            else ["label", "raw_content", "comments"]
+        )
+
+        # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
+        # change score according to this boost. label is the most important, content is
+        # important too, content of comment is less important. filename and file_extension is
+        # only useful to allow matching "png" or "nameofmycontent.png".
+
+        if "label" in search_fields:
+            # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
+            # doing exact search efficiently.
+            es_search_fields.extend(
+                [
+                    "label.{}^8".format(KEYWORD_FIELD),
+                    "label^5",
+                    "filename.{}".format(KEYWORD_FIELD),
+                    "filename",
+                    "file_extension",
+                ]
+            )
+
+        if "raw_content" in search_fields:
+            es_search_fields.extend(
+                [
+                    "raw_content.{}^3".format(EXACT_FIELD),
+                    "raw_content^3",
+                    "{}.content^3".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.title^4".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.author".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.keywords".format(FILE_PIPELINE_DESTINATION_FIELD),
+                ]
+            )
+
+            for lang in FILE_PIPELINE_LANGS:
+                es_search_fields.append(
+                    "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
+                )
+
+        if "comments" in search_fields:
+            es_search_fields.extend(
+                ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
+            )
+
         search = Search(
             using=self.es,
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string",
-            query=search_string,
-            # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
-            # change score according to this boost. label is the most important, content is
-            # important too, content of comment is less important. filename and file_extension is
-            # only useful to allow matching "png" or "nameofmycontent.png".
-            fields=[
-                "label.exact^8",
-                "label^5",
-                "{}.title^4".format(FILE_PIPELINE_DESTINATION_FIELD),
-                "{}.content^3".format(FILE_PIPELINE_DESTINATION_FIELD),
-                "raw_content.exact^3",
-                "raw_content^3",
-                "filename.exact",
-                "filename",
-                "file_extension",
-                "comments.raw_content.exact",
-                "comments.raw_content",
-                "{}.author".format(FILE_PIPELINE_DESTINATION_FIELD),
-                "{}.keywords".format(FILE_PIPELINE_DESTINATION_FIELD),
-            ],
+            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
         )
+
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
-        if not show_active:
+        if not search_parameters.show_active:
             search = search.exclude("term", is_active=True)
-        if not show_deleted:
+
+        if not search_parameters.show_deleted:
             search = search.exclude("term", is_deleted=True)
             search = search.filter("term", deleted_through_parent_id=0)
-        if not show_archived:
+
+        if not search_parameters.show_archived:
             search = search.exclude("term", is_archived=True)
             search = search.filter("term", archived_through_parent_id=0)
+
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove some unneeded fields from results.
         # As they are useful only for searching.
@@ -419,15 +460,80 @@ class ESSearchApi(SearchApi):
         )
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
-        if size:
-            search = search.extra(size=size)
-        if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+
+        if search_parameters.size:
+            search = search.extra(size=search_parameters.size)
+
+        if search_parameters.page_nb:
+            search = search.extra(
+                from_=self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
+            )
+
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
-        if content_types:
-            search = search.filter("terms", content_type=content_types)
+
+        if search_parameters.content_types:
+            search = search.filter("terms", content_type=search_parameters.content_types)
+
+        if search_parameters.workspace_names:
+            search = search.filter(
+                "terms", workspace__label__exact=search_parameters.workspace_names
+            )
+
+        if search_parameters.author__public_names:
+            search = search.filter(
+                "terms", author__public_names__exact=search_parameters.author__public_names
+            )
+
+        if search_parameters.last_modifier__public_names:
+            search = search.filter(
+                "terms",
+                last_modifier__public_names__exact=search_parameters.last_modifier__public_names,
+            )
+
+        if search_parameters.file_extensions:
+            search = search.filter("terms", file_extension=search_parameters.file_extensions)
+
+        if search_parameters.statuses:
+            search = search.filter("terms", status=search_parameters.statuses)
+
+        created_range = self.create_es_range(
+            search_parameters.created_from, search_parameters.created_to
+        )
+
+        if created_range:
+            search = search.filter("range", created=created_range)
+
+        modified_range = self.create_es_range(
+            search_parameters.modified_from, search_parameters.modified_to
+        )
+
+        if modified_range:
+            search = search.filter("range", modified=modified_range)
+
+        search.aggs.bucket("content_types", "terms", field="content_type.{}".format(KEYWORD_FIELD))
+        search.aggs.bucket(
+            "workspace_names", "terms", field="workspace.label.{}".format(KEYWORD_FIELD)
+        )
+        search.aggs.bucket(
+            "author__public_names", "terms", field="author.public_name.{}".format(KEYWORD_FIELD)
+        )
+        search.aggs.bucket(
+            "last_modifier__public_names",
+            "terms",
+            field="last_modifier.public_name.{}".format(KEYWORD_FIELD),
+        )
+        search.aggs.bucket(
+            "file_extensions", "terms", field="file_extension.{}".format(KEYWORD_FIELD)
+        )
+        search.aggs.bucket("statuses", "terms", field="status.{}".format(KEYWORD_FIELD))
+        search.aggs.metric("created_from", "min", field="created")
+        search.aggs.metric("created_to", "max", field="created")
+        search.aggs.metric("modified_from", "min", field="modified")
+        search.aggs.metric("modified_to", "max", field="modified")
+
         res = search.execute()
+        res.search_fields = search_fields
         return res
 
     @staticmethod
@@ -474,28 +580,53 @@ class ESSearchApi(SearchApi):
             if parameters.document_class == document_class
         )
 
+    @classmethod
+    def test_lang(cls, lang):
+        return "ctx.{source}.language == '{lang}'".format(
+            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+        )
+
     def _create_ingest_pipeline(self) -> None:
         """
         Create ingest pipeline to allow extract file content and use them for search.
         """
         p = IngestClient(self.es)
-        # TODO - G.M - 2019-05-31 - check if possible to set specific analyzer for
-        # attachment content parameters. Goal :
-        # allow ngram or lang specific indexing for "in file search"
+
+        processors = [
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
+            {
+                "attachment": {
+                    "field": FILE_PIPELINE_SOURCE_FIELD,
+                    "target_field": FILE_PIPELINE_DESTINATION_FIELD,
+                }
+            },
+        ]
+
+        for lang in FILE_PIPELINE_LANGS:
+            processors.append(
+                {
+                    "set": {
+                        "if": self.test_lang(lang),
+                        "field": "{source}.content_{lang}".format(
+                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+                        ),
+                        "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
+                    }
+                }
+            )
+
+        processors.append(
+            {
+                "remove": {
+                    "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
+                    "field": "{}.content".format(FILE_PIPELINE_SOURCE_FIELD),
+                }
+            }
+        )
+
         p.put_pipeline(
             id=FILE_PIPELINE_ID,
-            body={
-                "description": "Extract attachment information",
-                "processors": [
-                    {
-                        "attachment": {
-                            "field": FILE_PIPELINE_SOURCE_FIELD,
-                            "target_field": FILE_PIPELINE_DESTINATION_FIELD,
-                        }
-                    },
-                    {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
-                ],
-            },
+            body={"description": "Extract attachment information", "processors": processors},
         )
 
 
@@ -609,9 +740,9 @@ class ESContentIndexer:
     @classmethod
     def _should_reindex_children(cls, obj: typing.Union[ContentRevisionRO, Workspace]) -> bool:
         """Changes on a content/workspace only have effect on their children if:
-          - their 'label' has changed
-          - their 'is_deleted' state has changed
-          - (for contents) their 'is_archived' state has changed
+        - their 'label' has changed
+        - their 'is_deleted' state has changed
+        - (for contents) their 'is_archived' state has changed
         """
         attribute_state = inspect(obj).attrs
         return (
