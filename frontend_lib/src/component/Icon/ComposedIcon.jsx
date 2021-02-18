@@ -19,7 +19,7 @@ ComposedIcon.propTypes = {
   mainIconCustomClass: PropTypes.string,
   smallIconCustomClass: PropTypes.string,
   mainIconStyle: PropTypes.object,
-  smallIconStyle: PropTypes.object, 
+  smallIconStyle: PropTypes.object,
   titleIcon: PropTypes.string
 }
 
@@ -27,7 +27,7 @@ ComposedIcon.defaultProps = {
   mainIconCustomClass: '',
   smallIconCustomClass: '',
   mainIconStyle: {},
-  smallIconStyle: {}, 
+  smallIconStyle: {},
   titleIcon: ''
 }
 
