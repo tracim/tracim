@@ -655,8 +655,8 @@ class TestElasticSearchSearchWithIngest(object):
 
 @pytest.fixture
 def user_search_fixture(
-    elasticsearch,
     base_fixture,
+    elasticsearch,
     bob_user: User,
     riyad_user: User,
     workspace_api_factory: WorkspaceApiFactory,
@@ -669,6 +669,7 @@ def user_search_fixture(
     rapi.create_one(
         riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
+    transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return (bob_user, riyad_user)
 
@@ -679,41 +680,80 @@ class TestElasticSearchUserSearch:
     def test_api__elasticsearch_user_search__ok__check_result(
         self, web_testapp, user_search_fixture: typing.Tuple[User, User],
     ) -> None:
-        (bob_user, _) = user_search_fixture
-        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        (bob_user, riyad_user) = user_search_fixture
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         parameters = {"search_string": bob_user.display_name}
         search_result = web_testapp.get(
-            "/api/advanced_search/users".format(), params=parameters, status=200
+            "/api/advanced_search/user", params=parameters, status=200
         ).json_body
-        user = search_result["users"][0]
-        assert user == {
+        users = search_result["users"]
+        assert len(users) == 1
+        bob = users[0]
+        assert bob == {
             "user_id": bob_user.user_id,
             "username": bob_user.username,
             "public_name": bob_user.display_name,
-            "is_deleted": bob_user.is_deleted,
-            "is_active": bob_user.is_active,
+            "newest_authored_content_date": None,
             "has_avatar": bob_user.has_avatar,
             "has_cover": bob_user.has_cover,
         }
-        facets = search_result["simple_facets"]
-        assert facets == {}
+        facets = search_result["facets"]
+        assert facets == {
+            "workspaces": [{"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}]
+        }
+        search_fields = search_result["search_fields"]
+        assert search_fields == ["public_name", "username", "custom_properties"]
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is True
 
     @pytest.mark.parametrize(
-        "query_parameters,expected_user_ids", [({"search_string": "test"}, [1])]
+        "authorization, query_parameters, expected_user_ids",
+        [
+            (("bob", "password"), {"search_string": "bob"}, [2]),
+            (
+                ("bob", "password"),
+                {
+                    "search_string": "bob",
+                    "newest_authored_content_date_from": "2020-12-13T00:00:00Z",
+                },
+                [],
+            ),
+            (
+                ("bob", "password"),
+                {"search_string": "bob", "newest_authored_content_date_to": "2020-12-13T00:00:00Z"},
+                [],
+            ),
+            (("bob", "password"), {"search_string": "riyad"}, [3]),
+            (("bob", "password"), {"search_string": "*"}, [2, 3]),
+            (("bob", "password"), {"search_string": "riy"}, [3]),
+            (
+                ("bob", "password"),
+                {"search_string": "riy", "search_fields": ["custom_properties"]},
+                [],
+            ),
+            (("bob", "password"), {"search_string": "faisal"}, [3]),
+            (("bob", "password"), {"search_string": "Faisal"}, [3]),
+            (("bob", "password"), {"search_string": "faisal", "search_fields": ["username"]}, []),
+            (("riyad", "password"), {"search_string": "bob"}, [2]),
+            (("riyad", "password"), {"search_string": "TheAdmin"}, []),
+            (("TheAdmin", "admin@admin.admin"), {"search_string": "bob"}, []),
+        ],
     )
     def test_api__elasticsearch_user_search__ok__nominal_cases(
         self,
         web_testapp,
         elasticsearch,
+        authorization: typing.Tuple[str, str],
         query_parameters: dict,
         expected_user_ids: typing.List[int],
     ) -> None:
         """Test different search parameters.
-        The fixtures do create 4 users: TheAdmin, test, riyad and bob.
+        The fixtures do create 3 users: TheAdmin, riyad and bob.
+        Riyad and Bob share a workspace, TheAdmin is member of none.
         """
-        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", authorization)
         search_result = web_testapp.get(
-            "/api/advanced_search/users".format(), status=200, params=query_parameters
+            "/api/advanced_search/user".format(), status=200, params=query_parameters
         ).json_body
         assert search_result["total_hits"] == len(expected_user_ids)
         assert search_result["is_total_hits_accurate"] is True
@@ -721,10 +761,10 @@ class TestElasticSearchUserSearch:
         assert user_ids == expected_user_ids
 
 
+@pytest.mark.usefixtures("base_fixture")
 @pytest.fixture
 def workspace_search_fixture(
     elasticsearch,
-    base_fixture,
     bob_user: User,
     riyad_user: User,
     workspace_api_factory: WorkspaceApiFactory,

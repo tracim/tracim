@@ -113,44 +113,59 @@ class SearchedUser:
         username: str,
         has_avatar: bool,
         has_cover: bool,
-        last_authored_content_revision_date: datetime,
+        newest_authored_content_date: datetime,
     ) -> None:
         self.user_id = user_id
         self.public_name = public_name
         self.username = username
         self.has_avatar = has_avatar
         self.has_cover = has_cover
-        self.last_authored_content_revision_date = last_authored_content_revision_date
+        self.newest_authored_content_date = newest_authored_content_date
+
+
+class DateRange:
+    def __init__(self, from_: datetime, to: datetime) -> None:
+        self.from_ = from_
+        self.to = to
 
 
 class UserSearchResponse:
     def __init__(
         self,
         hits: typing.Dict[str, typing.Any],
-        workspace_facets: typing.List[FacetCount],
+        facets: typing.Dict[str, typing.List[FacetCount]],
         search_fields: typing.List[str],
-        last_authored_content_revision_dates,
+        newest_authored_content_date_from: datetime,
+        newest_authored_content_date_to: datetime,
     ) -> None:
-        self.users = [
-            SearchedUser(
-                user_id=user_dict["user_id"],
-                public_name=user_dict["public_name"],
-                username=user_dict["username"],
-                has_avatar=user_dict["has_avatar"],
-                has_cover=user_dict["has_cover"],
-                last_authored_content_revision_date=user_dict[
-                    "last_authored_content_revision_date"
-                ],
-            )
-            for user_dict in hits["hits"]
-        ]
+        self.users = [self._create_searched_user(hit) for hit in hits["hits"]]
         self.total_hits = hits["total"]["value"]
-        self.is_total_hit_accurate = hits["total"]["relation"] == "eq"
-        self.simple_facets = {"workspaces": workspace_facets}
-        self.range_facets = {
-            "last_authored_content_revision_dates": last_authored_content_revision_dates
-        }
+        self.is_total_hits_accurate = hits["total"]["relation"] == "eq"
+        self.facets = facets
+        self.newest_authored_content_range = DateRange(
+            newest_authored_content_date_from, newest_authored_content_date_to
+        )
         self.search_fields = search_fields
+
+    @staticmethod
+    def _create_searched_user(hit) -> SearchedUser:
+        source = hit["_source"]
+        try:
+            username = source["username"]
+        except KeyError:
+            username = None
+        try:
+            newest_authored_content_date = source["newest_authored_content_date"]
+        except KeyError:
+            newest_authored_content_date = None
+        return SearchedUser(
+            user_id=source["user_id"],
+            public_name=source["public_name"],
+            username=username,
+            has_avatar=source["has_avatar"],
+            has_cover=source["has_cover"],
+            newest_authored_content_date=newest_authored_content_date,
+        )
 
 
 class SearchedWorkspace:
@@ -170,14 +185,14 @@ class WorkspaceSearchResponse:
     ) -> None:
         self.users = [
             SearchedWorkspace(
-                workspace_id=workspace_dict["workspace_id"],
-                label=workspace_dict["label"],
-                access_type=workspace_dict["access_type"],
-                member_count=workspace_dict["member_count"],
-                content_count=workspace_dict["content_count"],
+                workspace_id=hit["_source"]["workspace_id"],
+                label=hit["_source"]["label"],
+                access_type=hit["_source"]["access_type"],
+                member_count=hit["_source"]["member_count"],
+                content_count=hit["_source"]["content_count"],
             )
-            for workspace_dict in hits["hits"]
+            for hit in hits["hits"]
         ]
         self.total_hits = hits["total"]["value"]
-        self.is_total_hit_accurate = hits["total"]["relation"] == "eq"
+        self.is_total_hits_accurate = hits["total"]["relation"] == "eq"
         self.simple_facets = {"members": member_facets}

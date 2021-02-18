@@ -16,7 +16,6 @@ from elasticsearch_dsl import analyzer
 
 from tracim_backend.config import CFG
 
-KEYWORD_FIELD = "keyword"
 EXACT_FIELD = "exact"
 
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
@@ -134,12 +133,8 @@ class IndexedContent(Document):
     is_deleted = Boolean()
     is_editable = Boolean()
     show_in_ui = Boolean()
-    file_extension = Text(
-        fields={KEYWORD_FIELD: Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
-    )
-    filename = Text(
-        fields={KEYWORD_FIELD: Keyword()}, analyzer=edge_ngram_folding, search_analyzer=folding
-    )
+    file_extension = SimpleText()
+    filename = SimpleText()
     modified = Date()
     created = Date()
     active_shares = Integer()
@@ -161,9 +156,8 @@ class IndexedContent(Document):
     raw_content = HtmlText()
     content_size = Integer()
 
-    # INFO - G.M - 2019-05-31 - file is needed to store file content b64 value,
-    # information about content are stored in the "file_data" fields not defined
-    # in this mapping
+    # INFO - G.M - 2019-05-31 - b64_file is needed for storing the raw file contents
+    # it is analysed then removed by the ingest pipeline.
     b64_file = Text()
     file_data = Object(FileData)
 
@@ -187,7 +181,7 @@ JsonSchemaDict = typing.Dict[str, typing.Any]
 
 
 def get_es_field_from_json_schema(schema: JsonSchemaDict) -> Field:
-    """Return the right elastic-search field for a given JSON schema."""
+    """Return the right elasticsearch field for a given JSON schema."""
     type_ = schema.get("type")
     if type_ == "array":
         items_schema = schema.get("items")
@@ -220,13 +214,15 @@ def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
     """
 
     class IndexedUser(Document):
+        """Model used for indexing users in elasticsearch."""
+
         user_id = Integer()
         public_name = SimpleText()
         username = SimpleText()
         is_deleted = Boolean()
         is_active = Boolean()
         workspace_ids = Integer(multi=True)
-        last_authored_content_revision_date = Date()
+        newest_authored_content_date = Date()
         has_avatar = Boolean()
         has_cover = Boolean()
         custom_properties = get_es_field_from_json_schema(

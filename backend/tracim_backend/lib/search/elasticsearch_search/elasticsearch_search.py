@@ -1,5 +1,4 @@
 from datetime import datetime
-import re
 import typing
 
 from elasticsearch import Elasticsearch
@@ -16,6 +15,7 @@ from sqlalchemy.orm import Session
 # from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
@@ -33,6 +33,7 @@ from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearc
 from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
 from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import FacetCount
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
@@ -51,7 +52,14 @@ FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 
+DEFAULT_USER_SEARCH_FIELDS = ["public_name", "username", "custom_properties"]
+DEFAULT_WORKSPACE_SEARCH_FIELDS = ["label", "description"]
+
 T = typing.TypeVar("T")
+
+
+def name_starts_with_any_prefix(name: str, name_prefixes: typing.Iterable[str]) -> bool:
+    return any(name.startswith(n) for n in name_prefixes)
 
 
 class IndexParameters:
@@ -303,6 +311,13 @@ class ESSearchApi(SearchApi):
 
         rapi = RoleApi(config=self._config, session=self._session, current_user=None)
         workspace_ids = rapi.get_user_workspaces_ids(user.user_id)
+        capi = ContentApi(config=self._config, session=self._session, current_user=None)
+        try:
+            newest_authored_content_date = capi.get_newest_authored_content(
+                user_in_context.user_id
+            ).created
+        except ContentNotFound:
+            newest_authored_content_date = None
 
         indexed_user = self.IndexedUser(
             user_id=user_in_context.user_id,
@@ -310,8 +325,11 @@ class ESSearchApi(SearchApi):
             username=user_in_context.username,
             is_deleted=user_in_context.is_deleted,
             is_active=user_in_context.is_active,
+            has_avatar=user_in_context.has_avatar,
+            has_cover=user_in_context.has_cover,
             workspace_ids=workspace_ids,
             custom_properties=user.custom_properties.fields,
+            newest_authored_content_date=newest_authored_content_date,
         )
         indexed_user.meta.id = user.user_id
         user_index_alias = self._get_index_parameters(self.IndexedUser).alias
@@ -426,18 +444,18 @@ class ESSearchApi(SearchApi):
         return True
 
     @classmethod
-    def create_es_range(cls, range_from, range_to):
-        # simple date/number facet (no histogram)
-        if range_from and range_to:
-            return {"gte": range_from, "lte": range_to}
+    def create_es_datetime_range(
+        cls, range_from: typing.Optional[datetime], range_to: typing.Optional[datetime]
+    ) -> typing.Dict[str, str]:
+        range_ = {}
 
         if range_from:
-            return {"gte", range_from}
+            range_.update({"gte": range_from.isoformat()})
 
         if range_to:
-            return {"lte", range_to}
+            range_.update({"lte": range_to.isoformat()})
 
-        return None
+        return range_
 
     def search_content(
         self, search_parameters: AdvancedContentSearchQuery
@@ -570,14 +588,14 @@ class ESSearchApi(SearchApi):
         if search_parameters.statuses:
             search = search.filter("terms", status=search_parameters.statuses)
 
-        created_range = self.create_es_range(
+        created_range = self.create_es_datetime_range(
             search_parameters.created_from, search_parameters.created_to
         )
 
         if created_range:
             search = search.filter("range", created=created_range)
 
-        modified_range = self.create_es_range(
+        modified_range = self.create_es_datetime_range(
             search_parameters.modified_from, search_parameters.modified_to
         )
 
@@ -612,8 +630,10 @@ class ESSearchApi(SearchApi):
     def search_user(
         self,
         search_string: str,
-        search_fields: typing.List[str],
-        workspace_ids: typing.List[int],
+        search_fields: typing.List[str] = DEFAULT_USER_SEARCH_FIELDS,
+        workspace_ids: typing.Optional[typing.List[int]] = None,
+        newest_authored_content_date_from: typing.Optional[datetime] = None,
+        newest_authored_content_date_to: typing.Optional[datetime] = None,
         show_deleted: bool = False,
         show_active: bool = True,
         page_nb: int = 0,
@@ -624,7 +644,6 @@ class ESSearchApi(SearchApi):
             doc_type=self.IndexedUser,
             index=self._get_index_parameters(self.IndexedUser).alias,
         )
-
         fields = [
             "public_name.exact^5",
             "username.exact^5",
@@ -632,47 +651,60 @@ class ESSearchApi(SearchApi):
             "username^3",
             "custom_properties",
         ]
-        if search_fields:
-            fields = [field for field in fields if re.split(r"\^\.", field) in search_fields]
 
+        search_fields = search_fields or DEFAULT_USER_SEARCH_FIELDS
+        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
         query = search.query("simple_query_string", query=search_string, fields=fields)
         known_user_ids = UserApi(
             current_user=None, session=self._session, config=self._config
         ).get_known_user_ids(self._user.user_id)
-        query = search.filter("terms", user_id=known_user_ids)
+        query = query.filter("terms", user_id=known_user_ids)
         if not show_active:
-            search = query.exclude("term", is_active=True)
+            query = query.exclude("term", is_active=True)
         if not show_deleted:
-            search = query.exclude("term", is_deleted=True)
+            query = query.exclude("term", is_deleted=True)
         if workspace_ids:
             query = query.filter("terms", workspace_ids=workspace_ids)
+        newest_authored_content_date_range = self.create_es_datetime_range(
+            newest_authored_content_date_from, newest_authored_content_date_to
+        )
+        if newest_authored_content_date_range:
+            query = query.filter(
+                "range", newest_authored_content_date=newest_authored_content_date_range
+            )
+
         if size:
-            search = query.extra(size=size)
+            query = query.extra(size=size)
         if page_nb:
-            search = query.extra(from_=self.offset_from_pagination(size, page_nb))
+            query = query.extra(from_=self.offset_from_pagination(size, page_nb))
 
         query.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
         query.aggs.metric(
-            "last_authored_content_revision_dates",
-            "boxplot",
-            field="last_authored_content_revision_date",
+            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
         )
-
+        query.aggs.metric(
+            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
+        )
         response = query.execute()
-        accessible_workspaces = WorkspaceApi(
-            current_user=None, session=self._session, config=self._config
-        ).get_all_accessible_by_user(self._user)
-        workspace_facets = self._create_filtered_facets(
-            "workspace_id", response.aggregations.workspace_ids.buckets, accessible_workspaces
+        known_workspaces = self._get_workspaces_known_to_user()
+        facets = {
+            "workspaces": self._create_filtered_facets(
+                "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
+            )
+        }
+        return UserSearchResponse(
+            hits=response["hits"],
+            facets=facets,
+            search_fields=search_fields,
+            newest_authored_content_date_from=response.aggregations.newest_authored_content_date_from,
+            newest_authored_content_date_to=response.aggregations.newest_authored_content_date_to,
         )
-
-        return UserSearchResponse(response["hits"], workspace_facets, search_fields=fields)
 
     def search_workspace(
         self,
         search_string: str,
-        search_fields: typing.List[str],
-        user_ids: typing.List[int],
+        search_fields: typing.Optional[typing.List[str]] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
+        user_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
         page_nb: int = 0,
         size: int = 10,
@@ -688,25 +720,20 @@ class ESSearchApi(SearchApi):
             "label^3",
             "description^3",
         ]
-        if search_fields:
-            fields = [field for field in fields if re.split(r"\^\.", field) in search_fields]
+        search_fields = search_fields or DEFAULT_WORKSPACE_SEARCH_FIELDS
+        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
 
-        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        known_workspace_ids = [
-            ws.workspace_id
-            for ws in wapi.get_all_accessible_by_user(self._user)
-            + wapi.get_all_for_user(self._user)
-        ]
+        known_workspace_ids = [ws.workspace_id for ws in self._get_workspaces_known_to_user()]
         query = search.query("simple_query_string", search_string)
         query = query.filter("terms", workspace_id=known_workspace_ids)
         if user_ids:
             query = query.filter("terms", members_ids=user_ids)
         if not show_deleted:
-            search = query.exclude("term", is_deleted=True)
+            query = query.exclude("term", is_deleted=True)
         if size:
-            search = query.extra(size=size)
+            query = query.extra(size=size)
         if page_nb:
-            search = query.extra(from_=self.offset_from_pagination(size, page_nb))
+            query = query.extra(from_=self.offset_from_pagination(size, page_nb))
 
         query.aggs.bucket("member_ids", "terms", field="member_ids")
 
@@ -722,9 +749,9 @@ class ESSearchApi(SearchApi):
 
     @staticmethod
     def _create_filtered_facets(
-        attr_name: str, buckets: typing.List[Bucket], items: typing.List["SimpleFacet"]
-    ) -> typing.List["SimpleFacet"]:
-        """Filter the given ES aggregation buckets and create simple facets from the result.
+        attr_name: str, buckets: typing.List[Bucket], items: typing.List[T]
+    ) -> typing.List[FacetCount]:
+        """Filter the given ES aggregation buckets and create facets from the result.
 
         Only keep buckets whose key equals an item's attr_name.
         """
@@ -732,8 +759,7 @@ class ESSearchApi(SearchApi):
         for bucket in buckets:
             try:
                 item = next(i for i in items if getattr(i, attr_name) == bucket.key)
-                # FIXME #4095: should be a SimpleFacet instance
-                facets.append({"value": item, "count": bucket.doc_count})
+                facets.append(FacetCount(value=item, count=bucket.doc_count))
             except StopIteration:
                 pass
         return facets
@@ -830,6 +856,10 @@ class ESSearchApi(SearchApi):
             id=FILE_PIPELINE_ID,
             body={"description": "Extract attachment information", "processors": processors},
         )
+
+    def _get_workspaces_known_to_user(self) -> typing.List[Workspace]:
+        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        return wapi.get_all_accessible_by_user(self._user) + wapi.get_all_for_user(self._user)
 
 
 class ESContentIndexer:

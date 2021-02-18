@@ -15,7 +15,9 @@ from tracim_backend.views.core_api.schemas import ContentMinimalSchema
 from tracim_backend.views.core_api.schemas import EnumField
 from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
+from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 
 
 class SearchContentField(Enum):
@@ -23,6 +25,12 @@ class SearchContentField(Enum):
     RAW_CONTENT = "raw_content"
     COMMENT = "comment"
     DESCRIPTION = "description"
+
+
+class UserSearchField(str, Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    CUSTOM_PROPERTIES = "custom_properties"
 
 
 filterable_content_types = content_type_list.restricted_allowed_types_slug()
@@ -236,3 +244,58 @@ class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
         required=False,
         missing=None,
     )
+
+
+class UserSearchQuerySchema(marshmallow.Schema):
+    """Query filters for searching users."""
+
+    search_string = marshmallow.fields.String(required=True)
+    workspace_ids = StringList(
+        marshmallow.fields.Int(),
+        required=False,
+        missing=None,
+        description="if given only users members of the given workspace ids will be searched",
+    )
+    search_fields = StringList(
+        EnumField(UserSearchField),
+        required=False,
+        missing=None,
+        description="if given only search in the given user fields",
+    )
+    newest_authored_content_date_from = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, required=False, missing=None
+    )
+    newest_authored_content_date_to = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, required=False, missing=None
+    )
+
+
+class SearchedUserSchema(UserDigestSchema):
+    """User object returned by a search."""
+
+    newest_authored_content_date = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, allow_none=True
+    )
+
+
+class WorkspaceFacetSchema(marshmallow.Schema):
+    count = marshmallow.fields.Integer()
+    value = marshmallow.fields.Nested(WorkspaceDigestSchema())
+
+
+class UserSearchFacets(marshmallow.Schema):
+    workspaces = marshmallow.fields.List(marshmallow.fields.Nested(WorkspaceFacetSchema()))
+
+
+class DateRangeSchema(marshmallow.Schema):
+    from_ = marshmallow.fields.DateTime(format=DATETIME_FORMAT, dict_key="from")
+    to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+
+
+class UserSearchResultSchema(marshmallow.Schema):
+    users = marshmallow.fields.List(marshmallow.fields.Nested(SearchedUserSchema()))
+    total_hits = marshmallow.fields.Integer()
+    is_total_hits_accurate = marshmallow.fields.Boolean()
+    facets = marshmallow.fields.Nested(UserSearchFacets())
+    last_authored_content_revision_date_range = DateRangeSchema()
+    search_fields = marshmallow.fields.List(marshmallow.fields.String())
