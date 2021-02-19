@@ -49,8 +49,10 @@ class DatabaseCrudHookCaller:
             # see https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.dirty
             if not session.is_modified(obj):
                 continue
-            if isinstance(obj, User) or isinstance(obj, UserCustomProperties):
+            if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_modified(user=obj, context=session.context)
+            elif isinstance(obj, UserCustomProperties):
+                self._plugin_manager.hook.on_user_modified(user=obj.user, context=session.context)
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_modified(
                     workspace=obj, context=session.context
