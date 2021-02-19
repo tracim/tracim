@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 import typing
 
 import marshmallow
@@ -11,12 +12,17 @@ from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
-from tracim_backend.views.core_api.schemas import RestrictedStringField
+from tracim_backend.views.core_api.schemas import EnumField
 from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
-search_content_field_values = ["label", "raw_content", "comment", "description"]
+
+class SearchContentField(str, Enum):
+    LABEL = "label"
+    RAW_CONTENT = "raw_content"
+    COMMENT = "comment"
+    DESCRIPTION = "description"
 
 
 filterable_content_types = content_type_list.restricted_allowed_types_slug()
@@ -128,7 +134,7 @@ class ContentSearchQuerySchema(marshmallow.Schema):
 
 class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     search_fields = StringList(
-        RestrictedStringField(search_content_field_values),
+        EnumField(SearchContentField),
         required=False,
         allow_none=True,
         missing="",
