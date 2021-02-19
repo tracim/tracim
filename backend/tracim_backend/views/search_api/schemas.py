@@ -18,7 +18,7 @@ from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 
 
-class SearchContentField(Enum):
+class SearchContentField(str, Enum):
     LABEL = "label"
     RAW_CONTENT = "raw_content"
     COMMENT = "comment"
@@ -81,7 +81,12 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
 
 class ContentSearchQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
-        example="test", description="just a search string", required=False
+        example="test",
+        description="just a search string",
+        required=False,
+        allow_none=True,
+        missing="",
+        default_value="",
     )
     size = marshmallow.fields.Int(
         required=False, default=10, validate=strictly_positive_int_validator
@@ -129,7 +134,12 @@ class ContentSearchQuerySchema(marshmallow.Schema):
 
 class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     search_fields = StringList(
-        EnumField(SearchContentField), required=False, description="search within these fields"
+        EnumField(SearchContentField),
+        required=False,
+        allow_none=True,
+        missing="",
+        default_value="",
+        description="search within these fields",
     )
     workspace_names = StrippedString(
         required=False,
@@ -156,10 +166,18 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         validate=regex_string_as_list_of_string,
         description="select contents with these statuses",
     )
-    created_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    created_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    modified_from = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
-    modified_to = marshmallow.fields.DateTime(required=False, format=DATETIME_FORMAT)
+    created_from = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    created_to = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    modified_from = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
+    modified_to = marshmallow.fields.DateTime(
+        required=False, format=DATETIME_FORMAT, allow_none=True
+    )
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):
@@ -186,11 +204,20 @@ class ContentSearchResultSchema(marshmallow.Schema):
 
 
 class FacetCountSchema(marshmallow.Schema):
-    value = marshmallow.fields.String("The value of this field")
-    count = marshmallow.fields.Int("The number of results matching this value")
+    value = marshmallow.fields.String(description="The value of this field")
+    count = marshmallow.fields.Int(description="The number of results matching this value")
 
 
-class ContentSimpleFacetsSchema(marshmallow.Schema):
+class DateRangeSchema(marshmallow.Schema):
+    date_from = marshmallow.fields.DateTime(
+        load_from="from", dump_to="from", format=DATETIME_FORMAT, required=False, missing=None
+    )
+    date_to = marshmallow.fields.DateTime(
+        load_from="to", dump_to="to", format=DATETIME_FORMAT, required=False, missing=None
+    )
+
+
+class ContentFacetsSchema(marshmallow.Schema):
     search_fields = marshmallow.fields.List(
         marshmallow.fields.String(description="search was performed in these fields")
     )
@@ -203,6 +230,11 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
         marshmallow.fields.Nested(
             FacetCountSchema(),
             description="search matches contents which have authors with these public names",
+        )
+    )
+    content_types = marshmallow.fields.List(
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents with these content types"
         )
     )
     last_modifier__public_names = marshmallow.fields.List(
@@ -221,18 +253,17 @@ class ContentSimpleFacetsSchema(marshmallow.Schema):
             FacetCountSchema(), description="search matches contents with these statuses"
         )
     )
-    created_from = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
-    created_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
-    modified_from = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, required=False, missing=None
-    )
-    modified_to = marshmallow.fields.DateTime(format=DATETIME_FORMAT, required=False, missing=None)
 
 
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
-    simple_facets = marshmallow.fields.Nested(
-        ContentSimpleFacetsSchema(),
+    facets = marshmallow.fields.Nested(
+        ContentFacetsSchema(),
         description="search matched content with these characteristics",
         required=False,
         missing=None,
+    )
+    created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    search_fields = marshmallow.fields.List(
+        marshmallow.fields.String(), required=False, missing=None
     )

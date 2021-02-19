@@ -116,7 +116,11 @@ class StringList(marshmallow.fields.List):
         self._separator = separator
 
     def _deserialize(self, value: str, *args: typing.Any, **kwargs: typing.Any):
-        return super()._deserialize(value.strip().split(self._separator), *args, **kwargs)
+        value = value.strip()
+        if value:
+            return super()._deserialize(value.split(self._separator), *args, **kwargs)
+
+        return super()._deserialize([], *args, **kwargs)
 
     def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
         return self._separator.join(super()._serialize(*args, **kwargs))
