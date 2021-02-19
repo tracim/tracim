@@ -19,7 +19,7 @@ services:
       MINIO_SECRET_KEY: minioadmin
     command: server /data
   elasticsearch:
-    image: elasticsearch:7.0.0
+    build: ../tools_docker/elasticsearch_ingest
     ports:
       - "9200:9200"
       - "9300:9300"
