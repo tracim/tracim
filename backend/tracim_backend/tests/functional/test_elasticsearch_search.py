@@ -264,7 +264,9 @@ class TestElasticSearchSearch(object):
             assert search_result["facets"]["file_extensions"] == [
                 {"value": ".document.html", "count": 1}
             ]
-            assert search_result["facets"]["content_types"] == [{"value": "file", "count": 1}]
+            assert search_result["facets"]["content_types"] == [
+                {"value": "html-document", "count": 1}
+            ]
             assert is_now(search_result["created_range"]["from"])
 
     @pytest.mark.parametrize(
