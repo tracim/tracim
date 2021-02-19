@@ -215,7 +215,7 @@ class TestElasticSearchUserIndexer:
     ) -> None:
         (indexer, index_user_mock, _) = user_indexer_with_api_mock
         event_hook(indexer, event_parameter, test_context)
-        index_user_mock.assert_called_once()
+        assert index_user_mock.call_count == 1
         assert index_user_mock.call_args[0][0].user_id == a_user().user_id
 
 
@@ -249,7 +249,7 @@ class TestElasticSearchWorkspaceIndexer:
     ) -> None:
         (indexer, index_workspace_mock, _) = workspace_indexer_with_api_mock
         event_hook(indexer, event_parameter, test_context)
-        index_workspace_mock.assert_called_once()
+        assert index_workspace_mock.called_once == 1
         assert index_workspace_mock.call_args[0][0].workspace_id == a_workspace().workspace_id
 
 
