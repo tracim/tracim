@@ -30,10 +30,10 @@ from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedCont
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import FacetCount
 from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
 from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
 from tracim_backend.lib.search.models import ContentSearchResponse
-from tracim_backend.lib.search.models import FacetCount
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
@@ -603,7 +603,7 @@ class ESSearchApi(SearchApi):
         if modified_range:
             search = search.filter("range", modified=modified_range)
 
-        search.aggs.bucket("content_types", "terms", field="content_type.{}".format(EXACT_FIELD))
+        search.aggs.bucket("content_types", "terms", field="content_type")
         search.aggs.bucket(
             "workspace_names", "terms", field="workspace.label.{}".format(EXACT_FIELD)
         )
@@ -618,7 +618,7 @@ class ESSearchApi(SearchApi):
         search.aggs.bucket(
             "file_extensions", "terms", field="file_extension.{}".format(EXACT_FIELD)
         )
-        search.aggs.bucket("statuses", "terms", field="status.{}".format(EXACT_FIELD))
+        search.aggs.bucket("statuses", "terms", field="status")
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")

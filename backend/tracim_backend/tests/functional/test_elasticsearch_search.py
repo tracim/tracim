@@ -1,8 +1,12 @@
+from datetime import datetime
+from datetime import timedelta
 import typing
 
+from dateutil.parser import parse
 import pytest
 import transaction
 
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -11,6 +15,13 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+
+in_a_year = (datetime.now() + timedelta(days=365)).strftime(DATETIME_FORMAT)
+a_year_ago = (datetime.now() - timedelta(days=365)).strftime(DATETIME_FORMAT)
+
+
+def is_now(d: str) -> bool:
+    return (parse(d).replace(tzinfo=None) - datetime.now()) < timedelta(minutes=1)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -159,28 +170,41 @@ class TestElasticSearch(object):
             assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
-        "created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name",
+        "search_params, created_content_name, created_content_body, nb_content_result, first_search_result_content_name",
         [
-            # created_content_name, created_content_body,  search_string, nb_content_result, first_search_result_content_name
-            # exact syntax
             (
+                {"search_string": "subpart"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
-                "subpart",
                 1,
                 "good practices",
             ),
             (
+                {"search_string": "sub"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
-                "sub",
                 1,
+                "good practices",
+            ),
+            (
+                {"created_from": in_a_year, "search_string": "sub"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                0,
+                "good practices",
+            ),
+            (
+                {"modified_to": a_year_ago, "search_string": "sub"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                0,
                 "good practices",
             ),
         ],
     )
     def test_api___elasticsearch_search_ok__by_description(
         self,
+        search_params,
         user_api_factory,
         role_api_factory,
         workspace_api_factory,
@@ -190,10 +214,12 @@ class TestElasticSearch(object):
         session,
         created_content_name,
         created_content_body,
-        search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
+
+        user_public_name = "Claude"
+        user2_public_name = "Leslie"
 
         uapi = user_api_factory.get()
 
@@ -203,10 +229,20 @@ class TestElasticSearch(object):
             password="test@test.test",
             do_save=True,
             do_notify=False,
+            name=user_public_name,
             profile=profile,
         )
+        user2 = uapi.create_user(
+            "test2@test.test",
+            password="test2@test.test",
+            do_save=True,
+            do_notify=False,
+            name=user2_public_name,
+            profile=profile,
+        )
+        workspace_name = "test"
         workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
+        workspace = workspace_api.create_workspace(workspace_name, save_now=True)
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
@@ -217,6 +253,7 @@ class TestElasticSearch(object):
             do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
+            api = content_api_factory.get(current_user=user2)
             api.update_content(
                 content, new_label=created_content_name, new_raw_content=created_content_body
             )
@@ -231,20 +268,40 @@ class TestElasticSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": search_string}
-        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/advanced_search/content", status=200, params=search_params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
-        assert search_result["contents"][0]["label"] == first_search_result_content_name
+        assert set(search_result["search_fields"]) == set(["label", "raw_content", "comments"])
+
+        if nb_content_result:
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
+            assert search_result["created_range"]["from"] == search_result["created_range"]["to"]
+            assert search_result["facets"]["file_extensions"] == [
+                {"value": ".document.html", "count": 1}
+            ]
+            assert search_result["facets"]["content_types"] == [
+                {"value": "html-document", "count": 1}
+            ]
+            assert search_result["facets"]["workspace_names"] == [
+                {"value": workspace_name, "count": 1}
+            ]
+            assert search_result["facets"]["author__public_names"] == [
+                {"value": user_public_name, "count": 1}
+            ]
+            assert search_result["facets"]["last_modifier__public_names"] == [
+                {"value": user2_public_name, "count": 1}
+            ]
+            assert is_now(search_result["created_range"]["from"])
 
     @pytest.mark.parametrize(
-        "created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
+        "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
             (
+                "",
                 "good practices",
                 "eureka",
                 1,
@@ -252,8 +309,18 @@ class TestElasticSearch(object):
                 "this is a comment content containing the string: eureka.",
                 "this is another comment content",
             ),
+            (
+                "raw_content,description",
+                "good practices",
+                "eureka",
+                0,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content",
+            ),
             # autocompletion
             (
+                "",
                 "good practices",
                 "eur",
                 1,
@@ -265,6 +332,7 @@ class TestElasticSearch(object):
     )
     def test_api___elasticsearch_search_ok__by_comment_content(
         self,
+        search_fields,
         user_api_factory,
         role_api_factory,
         workspace_api_factory,
@@ -319,14 +387,15 @@ class TestElasticSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": search_string}
+        params = {"search_string": search_string, "search_fields": search_fields}
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
 
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
-        assert search_result["contents"][0]["label"] == first_search_result_content_name
+        if nb_content_result:
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___elasticsearch_search_ok__no_search_string(
         self,
@@ -365,6 +434,7 @@ class TestElasticSearch(object):
         assert search_result
         assert search_result["total_hits"] == 0
         assert search_result["is_total_hits_accurate"] is True
+        assert search_result["modified_range"] == search_result["created_range"]
         assert len(search_result["contents"]) == 0
 
     def test_api___elasticsearch_search_ok__filter_by_content_type(
