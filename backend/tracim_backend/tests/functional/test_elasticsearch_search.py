@@ -274,7 +274,6 @@ class TestElasticSearchSearch(object):
         if nb_content_result:
             assert search_result["contents"][0]["label"] == first_search_result_content_name
             assert search_result["created_range"]["from"] == search_result["created_range"]["to"]
-            assert search_result["modified_range"] == search_result["created_range"]
             assert search_result["facets"]["file_extensions"] == [
                 {"value": ".document.html", "count": 1}
             ]
@@ -431,6 +430,7 @@ class TestElasticSearchSearch(object):
         assert search_result
         assert search_result["total_hits"] == 0
         assert search_result["is_total_hits_accurate"] is True
+        assert search_result["modified_range"] == search_result["created_range"]
         assert len(search_result["contents"]) == 0
 
     def test_api___elasticsearch_search_ok__filter_by_content_type(
