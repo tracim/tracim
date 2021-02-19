@@ -184,12 +184,14 @@ export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, s
   contentBreadcrumbsList,
   contentId
 })
-export const DATE_RANGE_FACETS = (searchType) => `DateRangeFacets_${searchType}`
-export const setDateRangeFacets = (dateRangeFacets, searchType) => ({ type: `${SET}/${DATE_RANGE_FACETS(searchType)}`, dateRangeFacets })
+export const CREATED_RANGE = (searchType) => `CreatedRange_${searchType}`
+export const setCreatedRange = (createdRange, searchType) => ({ type: `${SET}/${CREATED_RANGE(searchType)}`, createdRange })
+export const MODIFIED_RANGE = (searchType) => `ModifiedRange_${searchType}`
+export const setModifiedRange = (modifiedRange, searchType) => ({ type: `${SET}/${MODIFIED_RANGE(searchType)}`, modifiedRange })
 export const SEARCH_FIELD_LIST = (searchType) => `SearchFieldList_${searchType}`
 export const setSearchFieldList = (searchFieldList, searchType) => ({ type: `${SET}/${SEARCH_FIELD_LIST(searchType)}`, searchFieldList })
-export const SIMPLE_FACETS = (searchType) => `SimpleFacets_${searchType}`
-export const setSimpleFacets = (simpleFacets, searchType) => ({ type: `${SET}/${SIMPLE_FACETS(searchType)}`, simpleFacets })
+export const SEARCH_FACETS = (searchType) => `SearchFacets_${searchType}`
+export const setsearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

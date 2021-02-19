@@ -21,10 +21,10 @@ import {
   setCurrentNumberPage,
   setHeadTitle,
   setNumberResultsByPage,
+  setSearchFieldList,
   setSearchString,
   setSearchResultList
 } from '../action-creator.sync.js'
-import { parseSearchUrl } from '../util/helper.js'
 import SearchFilterMenu from './SearchFilterMenu.jsx'
 import { getAdvancedSearchResult } from '../action-creator.async.js'
 import SearchInput from '../component/Search/SearchInput.jsx'
@@ -33,7 +33,6 @@ import {
   FETCH_CONFIG,
   parseSearchUrl
 } from '../util/helper.js'
-import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
 import AdvancedSearchContentList from '../component/Search/AdvancedSearchContentList.jsx'
 import AdvancedSearchUserList from '../component/Search/AdvancedSearchUserList.jsx'
 import AdvancedSearchSpaceList from '../component/Search/AdvancedSearchSpaceList.jsx'
@@ -155,7 +154,8 @@ export class AdvancedSearch extends React.Component {
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive,
-      searchObject.searchType
+      searchObject.searchType,
+      ['label']
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -163,6 +163,7 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(setSearchString(searchObject.searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
+        props.dispatch(setSearchFieldList(fetchGetAdvancedSearchResult.json.search_fields, searchObject.searchType))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
           props.dispatch(setSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         } else {
@@ -298,6 +299,7 @@ export class AdvancedSearch extends React.Component {
         maxNumberSearchResults = (props.spaceSearch.numberResultsByPage * props.spaceSearch.currentPage)
       }
     */
+    console.log(currentNumberSearchResults, maxNumberSearchResults, currentNumberSearchResults >= maxNumberSearchResults)
     return currentNumberSearchResults >= maxNumberSearchResults
   }
 
@@ -327,7 +329,7 @@ export class AdvancedSearch extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper>
+          <PageWrapper customClass='advancedSearch__wrapper'>
             <PageTitle
               title={(currentNumberSearchResults === 1
                 ? props.t('Result for "{{keywords}}"', { keywords: props.contentSearch.searchString })

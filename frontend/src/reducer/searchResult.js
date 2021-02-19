@@ -1,7 +1,9 @@
 import {
   APPEND,
-  DATE_RANGE_FACETS,
+  CREATED_RANGE,
+  MODIFIED_RANGE,
   REMOVE,
+  SEARCH_FACETS,
   SEARCH_FIELD_LIST,
   SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
@@ -9,7 +11,6 @@ import {
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_CURRENT_PAGE,
   SET,
-  SIMPLE_FACETS,
   UPDATE,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL
@@ -51,16 +52,18 @@ export const serializeSearchItemProps = {
 }
 
 const defaultResult = {
+  createdRange: {},
   currentNumberPage: 1,
   dateRangeFacets: {},
+  modifiedRange: {},
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
-  searchFieldList: [],
   searchFacets: {},
+  searchFieldList: [],
   searchString: '',
   resultList: []
 }
 
-function searchResult(searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
+function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
   let newResultList, uniqueResultList
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST(searchType)}`:
@@ -107,14 +110,19 @@ function searchResult(searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, ac
     case `${SET}/${SEARCHED_STRING}`:
       return { ...state, searchString: action.searchString }
     /*
-      case `${SET}/${SIMPLE_FACETS(searchType)}`:
-        return { ...state, simpleFacets: action.simpleFacets }
-      case `${SET}/${DATE_RANGE_FACETS(searchType)}`:
-        return { ...state, dateRangeFacets: action.dateRangeFacets }
+      case `${SET}/${SEARCH_FACETS(searchType)}`:
+        return { ...state, searchFacets: action.searchFacets }
 
-      case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
-        return { ...state, searchFieldList: action.searchFieldList }
+      case `${SET}/${CREATED_RANGE(searchType)}`:
+        return { ...state, createdRange: action.createdRange }
+
+      case `${SET}/${MODIFIED_RANGE(searchType)}`:
+        return { ...state, modifiedRange: action.modifiedRange }
+
     */
+    case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
+      return { ...state, searchFieldList: action.searchFieldList }
+
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
@@ -134,6 +142,6 @@ function searchResult(searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, ac
   }
 }
 
-export default function searchResultWrapper(searchType = SEARCH_TYPE.SIMPLE) {
+export default function searchResultWrapper (searchType = SEARCH_TYPE.SIMPLE) {
   return (state = defaultResult, action) => searchResult(searchType, state, action)
 }

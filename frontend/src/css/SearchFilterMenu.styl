@@ -2,9 +2,10 @@
 
 .searchFilterMenu
   margin-top 15px
-  width 300px
+  width 325px
   background-color offWhite
   border 1px solid grey
+  min-height calc(100% - 15px)
   &__title
     background-color veryLightGrey
     height 40px
@@ -17,22 +18,37 @@
       margin-inline-end 10px
     & > button
       margin-inline-start auto
-  &__item
-    &__title
-      background-color veryLightGrey
-      height 40px
-      align-items center
-      display flex
-      padding 10px
-      & > button
-        padding 0
-        padding-inline-end 10px
-    &__checkbox
-      padding 5px
-      & > *
-        cursor pointer
-      & > input[type='checkbox']
-        margin 0px 10px
+  &__content
+    overflow-y auto
+    overflow-x hidden
+    height calc(100% - 40px)
+    &__item
+      &__title
+        background-color veryLightGrey
+        height 40px
+        align-items center
+        display flex
+        padding 10px
+        & > button
+          padding 0
+          padding-inline-end 10px
+      &__checkbox
+        padding 5px
+        & > *
+          cursor pointer
+        & > input[type='checkbox']
+          margin 0px 10px
+
+.DayPicker
+  border 1px solid grey
+  &-Day--today
+    color fontColor
+.DayPickerInput
+  margin-inline-start 10px
+  & input
+    width 180px
+  &-OverlayWrapper
+    margin-inline-start -95px
 
 @media (max-width: max-md)
   .searchFilterMenu

@@ -1101,9 +1101,28 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
   })
 }
 
-export const getAdvancedSearchResult = (searchString, contentTypes, pageNumber, pageSize, showArchived, showDeleted, showActive, searchType) => dispatch => {
+export const getAdvancedSearchResult = (
+  searchString,
+  contentTypes,
+  pageNumber,
+  pageSize,
+  showArchived,
+  showDeleted,
+  showActive,
+  searchType,
+  searchFieldList
+) => dispatch => {
+  const queryParameterList = []
+  if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
+  if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
+  if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
+  if (pageSize) queryParameterList.push(`size=${pageSize}`)
+  if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
+  if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
+  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+  if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchString)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?${queryParameterList.join('&')}`,
     param: {
       credentials: 'include',
       headers: {
