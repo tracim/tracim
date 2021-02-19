@@ -214,6 +214,9 @@ class TestElasticSearchSearch(object):
         first_search_result_content_name,
     ) -> None:
 
+        user_public_name = "Claude"
+        user2_public_name = "Leslie"
+
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -222,10 +225,20 @@ class TestElasticSearchSearch(object):
             password="test@test.test",
             do_save=True,
             do_notify=False,
+            name=user_public_name,
             profile=profile,
         )
+        user2 = uapi.create_user(
+            "test2@test.test",
+            password="test2@test.test",
+            do_save=True,
+            do_notify=False,
+            name=user2_public_name,
+            profile=profile,
+        )
+        workspace_name = "test"
         workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
+        workspace = workspace_api.create_workspace(workspace_name, save_now=True)
         rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
@@ -236,6 +249,7 @@ class TestElasticSearchSearch(object):
             do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
+            api = content_api_factory.get(current_user=user2)
             api.update_content(
                 content, new_label=created_content_name, new_raw_content=created_content_body
             )
@@ -266,6 +280,15 @@ class TestElasticSearchSearch(object):
             ]
             assert search_result["facets"]["content_types"] == [
                 {"value": "html-document", "count": 1}
+            ]
+            assert search_result["facets"]["workspace_names"] == [
+                {"value": workspace_name, "count": 1}
+            ]
+            assert search_result["facets"]["author__public_names"] == [
+                {"value": user_public_name, "count": 1}
+            ]
+            assert search_result["facets"]["last_modifier__public_names"] == [
+                {"value": user2_public_name, "count": 1}
             ]
             assert is_now(search_result["created_range"]["from"])
 
