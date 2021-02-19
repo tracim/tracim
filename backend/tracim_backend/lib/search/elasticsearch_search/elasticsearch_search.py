@@ -55,9 +55,9 @@ FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 
-DEFAULT_CONTENT_SEARCH_FIELDS = [field for field in ContentSearchField]
-DEFAULT_USER_SEARCH_FIELDS = [field for field in UserSearchField]
-DEFAULT_WORKSPACE_SEARCH_FIELDS = [field for field in WorkspaceSearchField]
+DEFAULT_CONTENT_SEARCH_FIELDS = list(ContentSearchField)
+DEFAULT_USER_SEARCH_FIELDS = list(UserSearchField)
+DEFAULT_WORKSPACE_SEARCH_FIELDS = list(WorkspaceSearchField)
 
 T = typing.TypeVar("T")
 
