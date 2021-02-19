@@ -97,9 +97,7 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     # However, in functional tests, since apps are not enabled, filterable_content_types is empty
     # and tests break.
     content_types = StringList(
-        marshmallow.fields.String(),
-        required=False,
-        description="content_types to show",
+        marshmallow.fields.String(), required=False, description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
