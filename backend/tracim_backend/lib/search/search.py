@@ -95,7 +95,7 @@ class SearchApi(ABC):
             except Exception as exc:
                 logger.error(
                     self,
-                    "something goes wrong during indexing of content {}".format(content.content_id),
+                    "something went wrong while indexing content {}".format(content.content_id),
                 )
                 logger.exception(self, exc)
                 errored_indexed_contents_ids.append(content.content_id)
