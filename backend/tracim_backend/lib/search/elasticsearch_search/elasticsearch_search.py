@@ -33,7 +33,10 @@ from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearc
 from tracim_backend.lib.search.elasticsearch_search.models import FacetCount
 from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
 from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
+from tracim_backend.lib.search.models import ContentSearchField
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import UserSearchField
+from tracim_backend.lib.search.models import WorkspaceSearchField
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
@@ -52,8 +55,9 @@ FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
 FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 
-DEFAULT_USER_SEARCH_FIELDS = ["public_name", "username", "custom_properties"]
-DEFAULT_WORKSPACE_SEARCH_FIELDS = ["label", "description"]
+DEFAULT_CONTENT_SEARCH_FIELDS = [field for field in ContentSearchField]
+DEFAULT_USER_SEARCH_FIELDS = [field for field in UserSearchField]
+DEFAULT_WORKSPACE_SEARCH_FIELDS = [field for field in WorkspaceSearchField]
 
 T = typing.TypeVar("T")
 
@@ -470,19 +474,14 @@ class ESSearchApi(SearchApi):
             return ContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
         es_search_fields = []
-
-        search_fields = (
-            search_parameters.search_fields
-            if search_parameters.search_fields
-            else ["label", "raw_content", "comments"]
-        )
+        search_fields = search_parameters.search_fields or DEFAULT_CONTENT_SEARCH_FIELDS
 
         # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
         # change score according to this boost. label is the most important, content is
         # important too, content of comment is less important. filename and file_extension is
         # only useful to allow matching "png" or "nameofmycontent.png".
 
-        if "label" in search_fields:
+        if ContentSearchField.LABEL in search_fields:
             # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
             # doing exact search efficiently.
             es_search_fields.extend(
@@ -495,7 +494,7 @@ class ESSearchApi(SearchApi):
                 ]
             )
 
-        if "raw_content" in search_fields:
+        if ContentSearchField.RAW_CONTENT in search_fields:
             es_search_fields.extend(
                 [
                     "raw_content.{}^3".format(EXACT_FIELD),
@@ -512,10 +511,13 @@ class ESSearchApi(SearchApi):
                     "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
                 )
 
-        if "comments" in search_fields:
+        if ContentSearchField.COMMENT in search_fields:
             es_search_fields.extend(
                 ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
             )
+
+        if ContentSearchField.DESCRIPTION in search_fields:
+            es_search_fields.append("description^3")
 
         search = Search(
             using=self.es,
@@ -631,7 +633,7 @@ class ESSearchApi(SearchApi):
     def search_user(
         self,
         search_string: str,
-        search_fields: typing.List[str] = DEFAULT_USER_SEARCH_FIELDS,
+        search_fields: typing.List[UserSearchField] = DEFAULT_USER_SEARCH_FIELDS,
         workspace_ids: typing.Optional[typing.List[int]] = None,
         newest_authored_content_date_from: typing.Optional[datetime] = None,
         newest_authored_content_date_to: typing.Optional[datetime] = None,
@@ -704,7 +706,9 @@ class ESSearchApi(SearchApi):
     def search_workspace(
         self,
         search_string: str,
-        search_fields: typing.Optional[typing.List[str]] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
+        search_fields: typing.Optional[
+            typing.List[WorkspaceSearchField]
+        ] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
         member_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
         page_nb: int = 0,

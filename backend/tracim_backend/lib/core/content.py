@@ -2080,6 +2080,6 @@ class ContentApi(object):
             .limit(1)
         )
         try:
-            return query.one()[0]
+            return query.one()
         except NoResultFound as exc:
             raise ContentNotFound("User {} did not author any content".format(user_id)) from exc

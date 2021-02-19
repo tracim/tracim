@@ -1,6 +1,25 @@
 from datetime import datetime
+from enum import Enum
 from typing import List
 from typing import Optional
+
+
+class ContentSearchField(str, Enum):
+    LABEL = "label"
+    RAW_CONTENT = "raw_content"
+    COMMENT = "comment"
+    DESCRIPTION = "description"
+
+
+class UserSearchField(str, Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    CUSTOM_PROPERTIES = "custom_properties"
+
+
+class WorkspaceSearchField(str, Enum):
+    LABEL = "label"
+    DESCRIPTION = "description"
 
 
 class DateRange:
@@ -112,7 +131,7 @@ class ContentSearchResponse:
         total_hits: int = 0,
         is_total_hits_accurate: bool = True,
         facets: Optional[List[str]] = None,
-        search_fields: Optional[List[str]] = None,
+        search_fields: Optional[List[ContentSearchField]] = None,
         created_range: Optional[DateRange] = None,
         modified_range: Optional[DateRange] = None,
     ):

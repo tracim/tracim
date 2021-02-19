@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import Enum
 import typing
 
 import marshmallow
@@ -9,6 +8,9 @@ from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.lib.search.models import ContentSearchField
+from tracim_backend.lib.search.models import UserSearchField
+from tracim_backend.lib.search.models import WorkspaceSearchField
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
@@ -18,25 +20,6 @@ from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserInfoContentAbstractSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-
-
-class SearchContentField(str, Enum):
-    LABEL = "label"
-    RAW_CONTENT = "raw_content"
-    COMMENT = "comment"
-    DESCRIPTION = "description"
-
-
-class UserSearchField(str, Enum):
-    PUBLIC_NAME = "public_name"
-    USERNAME = "username"
-    CUSTOM_PROPERTIES = "custom_properties"
-
-
-class WorkspaceSearchField(str, Enum):
-    LABEL = "label"
-    DESCRIPTION = "description"
-
 
 filterable_content_types = content_type_list.restricted_allowed_types_slug()
 
@@ -70,7 +53,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         author__public_names: typing.Optional[typing.List[str]] = None,
         last_modifier__public_names: typing.Optional[typing.List[str]] = None,
         file_extensions: typing.Optional[typing.List[str]] = None,
-        search_fields: typing.Optional[typing.List[str]] = None,
+        search_fields: typing.Optional[typing.List[ContentSearchField]] = None,
         statuses: typing.Optional[typing.List[str]] = None,
         created_from: typing.Optional[datetime] = None,
         created_to: typing.Optional[datetime] = None,
@@ -147,7 +130,7 @@ class ContentSearchQuerySchema(marshmallow.Schema):
 
 class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     search_fields = StringList(
-        EnumField(SearchContentField),
+        EnumField(ContentSearchField),
         required=False,
         allow_none=True,
         missing="",
@@ -278,7 +261,7 @@ class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
     created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
     modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
     search_fields = marshmallow.fields.List(
-        marshmallow.fields.String(), required=False, missing=None
+        EnumField(ContentSearchField), required=False, missing=None
     )
 
 
@@ -334,7 +317,7 @@ class UserSearchResultSchema(marshmallow.Schema):
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(UserSearchFacets())
     last_authored_content_revision_date_range = DateRangeSchema()
-    search_fields = marshmallow.fields.List(marshmallow.fields.String())
+    search_fields = marshmallow.fields.List(EnumField(UserSearchField))
 
 
 class WorkspaceSearchQuerySchema(marshmallow.Schema):
@@ -377,4 +360,4 @@ class WorkspaceSearchResultSchema(marshmallow.Schema):
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(WorkspaceSearchFacets())
-    search_fields = marshmallow.fields.List(marshmallow.fields.String())
+    search_fields = marshmallow.fields.List(EnumField(WorkspaceSearchField))

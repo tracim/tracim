@@ -273,7 +273,9 @@ class TestElasticSearch(object):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
-        assert set(search_result["search_fields"]) == set(["label", "raw_content", "comments"])
+        assert set(search_result["search_fields"]) == set(
+            ["label", "raw_content", "comment", "description"]
+        )
 
         if nb_content_result:
             assert search_result["contents"][0]["label"] == first_search_result_content_name

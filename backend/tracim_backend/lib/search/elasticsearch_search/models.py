@@ -12,6 +12,8 @@ from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedDigestWorkspace
+from tracim_backend.lib.search.models import UserSearchField
+from tracim_backend.lib.search.models import WorkspaceSearchField
 
 
 class FacetCount:
@@ -154,7 +156,7 @@ class UserSearchResponse:
         self,
         hits: typing.Dict[str, typing.Any],
         facets: typing.Dict[str, typing.List[FacetCount]],
-        search_fields: typing.List[str],
+        search_fields: typing.List[UserSearchField],
         newest_authored_content_date_from: datetime,
         newest_authored_content_date_to: datetime,
     ) -> None:
@@ -204,7 +206,7 @@ class WorkspaceSearchResponse:
         self,
         hits: typing.Dict[str, typing.Any],
         facets: typing.Dict[str, typing.List[FacetCount]],
-        search_fields: typing.List[str],
+        search_fields: typing.List[WorkspaceSearchField],
     ) -> None:
         self.workspaces = [
             SearchedWorkspace(
