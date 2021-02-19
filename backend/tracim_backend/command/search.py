@@ -16,10 +16,7 @@ class IndexingCommand(AppContextCommand):
         content = content_api.get_one(
             content_id=content_id, content_type=content_type_list.Any_SLUG
         )
-        content_in_context = ContentInContext(
-            content, dbsession=self._session, config=self._app_config
-        )
-        self.search_api.index_content(content_in_context)
+        self.search_api.index_content(content)
         print('content "{}" correctly indexed.'.format(content_id))
 
     def _index_all_contents(self) -> None:

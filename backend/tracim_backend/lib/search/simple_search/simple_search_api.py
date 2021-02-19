@@ -12,7 +12,6 @@ from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
-from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import Content
 from tracim_backend.views.search_api.schemas import ContentSearchQuery
 
@@ -37,7 +36,7 @@ class SimpleSearchApi(SearchApi):
     def delete_indices(self):
         pass
 
-    def index_content(self, content: ContentInContext):
+    def index_content(self, content: Content) -> None:
         pass
 
     def get_keywords(self, search_string, search_string_separators=None) -> typing.List[str]:

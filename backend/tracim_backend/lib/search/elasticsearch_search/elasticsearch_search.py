@@ -266,7 +266,7 @@ class ESSearchApi(SearchApi):
         indexed_content.meta.id = content_in_context.content_id
         content_index_alias = self._get_index_parameters(IndexedContent).alias
         pipeline_id = None  # type: typing.Optional[str]
-        if self._should_index_depot_file(content):
+        if self._should_index_depot_file(content_in_context):
             indexed_content.b64_file = content_in_context.get_b64_file()
             pipeline_id = FILE_PIPELINE_ID
         indexed_content.save(
@@ -353,16 +353,18 @@ class ESSearchApi(SearchApi):
         return True
 
     @classmethod
-    def create_es_range(cls, range_from, range_to):
+    def create_es_range(
+        cls, range_from: typing.Optional[datetime], range_to: typing.Optional[datetime]
+    ) -> dict:
         # simple date/number facet (no histogram)
         if range_from and range_to:
             return {"gte": range_from, "lte": range_to}
 
         if range_from:
-            return {"gte", range_from}
+            return {"gte": range_from}
 
         if range_to:
-            return {"lte", range_to}
+            return {"lte": range_to}
 
         return None
 
@@ -452,6 +454,7 @@ class ESSearchApi(SearchApi):
         search = search.source(
             exclude=[
                 "raw_content",
+                FILE_PIPELINE_DESTINATION_FIELD,
                 "{}.*".format(FILE_PIPELINE_DESTINATION_FIELD),
                 "deleted_through_parent_id",
                 "archived_through_parent_id",
@@ -511,22 +514,22 @@ class ESSearchApi(SearchApi):
         if modified_range:
             search = search.filter("range", modified=modified_range)
 
-        search.aggs.bucket("content_types", "terms", field="content_type.{}".format(KEYWORD_FIELD))
+        search.aggs.bucket("content_types", "terms", field="content_type")
         search.aggs.bucket(
-            "workspace_names", "terms", field="workspace.label.{}".format(KEYWORD_FIELD)
+            "workspace_names", "terms", field="workspace.label.{}".format(EXACT_FIELD)
         )
         search.aggs.bucket(
-            "author__public_names", "terms", field="author.public_name.{}".format(KEYWORD_FIELD)
+            "author__public_names", "terms", field="author.public_name.{}".format(EXACT_FIELD)
         )
         search.aggs.bucket(
             "last_modifier__public_names",
             "terms",
-            field="last_modifier.public_name.{}".format(KEYWORD_FIELD),
+            field="last_modifier.public_name.{}".format(EXACT_FIELD),
         )
         search.aggs.bucket(
             "file_extensions", "terms", field="file_extension.{}".format(KEYWORD_FIELD)
         )
-        search.aggs.bucket("statuses", "terms", field="status.{}".format(KEYWORD_FIELD))
+        search.aggs.bucket("statuses", "terms", field="status")
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
@@ -583,7 +586,7 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -593,13 +596,13 @@ class ESSearchApi(SearchApi):
         p = IngestClient(self.es)
 
         processors = [
-            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
             {
                 "attachment": {
                     "field": FILE_PIPELINE_SOURCE_FIELD,
                     "target_field": FILE_PIPELINE_DESTINATION_FIELD,
                 }
             },
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
         ]
 
         for lang in FILE_PIPELINE_LANGS:
@@ -608,9 +611,9 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+                            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
                         ),
-                        "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
+                        "value": "{{" + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD) + "}}",
                     }
                 }
             )
@@ -619,7 +622,7 @@ class ESSearchApi(SearchApi):
             {
                 "remove": {
                     "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
-                    "field": "{}.content".format(FILE_PIPELINE_SOURCE_FIELD),
+                    "field": "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD),
                 }
             }
         )
