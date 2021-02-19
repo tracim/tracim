@@ -2071,3 +2071,15 @@ class ContentApi(object):
         query = self._session.query(revision_count, workspace_count)
         infos = query.filter(ContentRevisionRO.owner_id == user_id).one()
         return AuthoredContentRevisionsInfos(infos[0], infos[1])
+
+    def get_newest_authored_content(self, user_id: int) -> Content:
+        query = (
+            self._base_query()
+            .filter(ContentRevisionRO.owner_id == user_id)
+            .order_by(ContentRevisionRO.created.desc())
+            .limit(1)
+        )
+        try:
+            return query.one()
+        except NoResultFound as exc:
+            raise ContentNotFound("User {} did not author any content".format(user_id)) from exc
