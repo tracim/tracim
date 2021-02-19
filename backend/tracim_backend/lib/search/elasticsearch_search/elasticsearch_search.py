@@ -290,7 +290,7 @@ class ESSearchApi(SearchApi):
         indexed_content.meta.id = content_in_context.content_id
         content_index_alias = self._get_index_parameters(IndexedContent).alias
         pipeline_id = None  # type: typing.Optional[str]
-        if self._should_index_depot_file(content):
+        if self._should_index_depot_file(content_in_context):
             indexed_content.b64_file = content_in_context.get_b64_file()
             pipeline_id = FILE_PIPELINE_ID
         indexed_content.save(
@@ -543,6 +543,7 @@ class ESSearchApi(SearchApi):
         search = search.source(
             exclude=[
                 "raw_content",
+                FILE_PIPELINE_DESTINATION_FIELD,
                 "{}.*".format(FILE_PIPELINE_DESTINATION_FIELD),
                 "deleted_through_parent_id",
                 "archived_through_parent_id",
@@ -811,7 +812,7 @@ class ESSearchApi(SearchApi):
     @classmethod
     def test_lang(cls, lang):
         return "ctx.{source}.language == '{lang}'".format(
-            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
         )
 
     def _create_ingest_pipeline(self) -> None:
@@ -821,13 +822,13 @@ class ESSearchApi(SearchApi):
         p = IngestClient(self.es)
 
         processors = [
-            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
             {
                 "attachment": {
                     "field": FILE_PIPELINE_SOURCE_FIELD,
                     "target_field": FILE_PIPELINE_DESTINATION_FIELD,
                 }
             },
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
         ]
 
         for lang in FILE_PIPELINE_LANGS:
@@ -836,9 +837,9 @@ class ESSearchApi(SearchApi):
                     "set": {
                         "if": self.test_lang(lang),
                         "field": "{source}.content_{lang}".format(
-                            source=FILE_PIPELINE_SOURCE_FIELD, lang=lang
+                            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
                         ),
-                        "value": "{{{}.content}}".format(FILE_PIPELINE_SOURCE_FIELD),
+                        "value": "{{" + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD) + "}}",
                     }
                 }
             )
@@ -847,7 +848,7 @@ class ESSearchApi(SearchApi):
             {
                 "remove": {
                     "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
-                    "field": "{}.content".format(FILE_PIPELINE_SOURCE_FIELD),
+                    "field": "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD),
                 }
             }
         )

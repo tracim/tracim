@@ -1,8 +1,9 @@
 import {
   APPEND,
   REMOVE,
+  SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
-  SEARCHED_KEYWORDS,
+  SEARCHED_STRING,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_CURRENT_PAGE,
   SET,
@@ -15,13 +16,16 @@ import {
   serialize,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
+import { SEARCH_TYPE } from '../util/helper.js'
 
 export const serializeSearchItemProps = {
   author: 'author',
+  comment_count: 'commentCount',
   content_id: 'contentId',
   content_type: 'contentType',
   created: 'created',
   current_revision_id: 'currentRevisionId',
+  current_revision_type: 'currentRevisionType',
   file_extension: 'fileExtension',
   filename: 'filename',
   is_active: 'isActive',
@@ -31,7 +35,8 @@ export const serializeSearchItemProps = {
   label: 'label',
   last_modifier: 'lastModifier',
   modified: 'modified',
-  parent_id: 'parentId',
+  parent: 'parent',
+  parents: 'parents',
   path: 'path',
   score: 'score',
   show_in_ui: 'showInUi',
@@ -45,22 +50,22 @@ export const serializeSearchItemProps = {
 const defaultResult = {
   currentNumberPage: 1,
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
-  searchedKeywords: '',
-  resultsList: []
+  searchString: '',
+  resultList: []
 }
 
-export default function searchResult (state = defaultResult, action) {
+function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
   let newResultList, uniqueResultList
   switch (action.type) {
-    case `${SET}/${SEARCH_RESULTS_LIST}`:
-      newResultList = action.newSearchResultsList.map(item => serialize(item, serializeSearchItemProps))
+    case `${SET}/${SEARCH_RESULTS_LIST(searchType)}`:
+      newResultList = action.newSearchResultList.map(item => serialize(item, serializeSearchItemProps))
       uniqueResultList = uniqBy(newResultList, 'contentId')
-      return { ...state, resultsList: uniqueResultList }
+      return { ...state, resultList: uniqueResultList }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
     case `${UPDATE}/${WORKSPACE_CONTENT}`:
       newResultList = []
-      state.resultsList.forEach(searchResultItem => action.workspaceContentList.forEach(content => {
+      state.resultList.forEach(searchResultItem => action.workspaceContentList.forEach(content => {
         // INFO - GB - 2020-06-23 - Update if one of the content received in the action is the content at the resultList
         if (searchResultItem.contentId === content.content_id) {
           newResultList = [...newResultList, { ...searchResultItem, ...serialize(content, serializeSearchItemProps) }]
@@ -75,31 +80,46 @@ export default function searchResult (state = defaultResult, action) {
         }
       }))
       uniqueResultList = uniqBy(newResultList, 'contentId')
-      return { ...state, resultsList: uniqueResultList }
+      return { ...state, resultList: uniqueResultList }
 
-    case `${APPEND}/${SEARCH_RESULTS_LIST}`:
-      newResultList = action.appendSearchResultsList.map(item => serialize(item, serializeSearchItemProps))
-      uniqueResultList = uniqBy([...state.resultsList, ...newResultList], 'contentId')
-      return { ...state, resultsList: uniqueResultList }
+    case `${APPEND}/${SEARCH_RESULTS_LIST(searchType)}`:
+      newResultList = action.appendSearchResultList.map(item => serialize(item, serializeSearchItemProps))
+      uniqueResultList = uniqBy([...state.resultList, ...newResultList], 'contentId')
+      return { ...state, resultList: uniqueResultList }
 
-    case `${SET}/${SEARCHED_KEYWORDS}`:
-      return { ...state, searchedKeywords: action.searchedKeywords }
+    case `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`:
+      newResultList = state.resultList.map(result =>
+        result.contentId === action.contentId
+          ? {
+            ...result,
+            breadcrumbsList: action.contentBreadcrumbsList
+          }
+          : result
+      )
+      return { ...state, resultList: newResultList }
+
+    case `${SET}/${SEARCHED_STRING}`:
+      return { ...state, searchString: action.searchString }
 
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
-    case `${SET}/${SEARCH_CURRENT_PAGE}`:
+    case `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`:
       return { ...state, currentNumberPage: action.currentNumberPage }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
-      newResultList = state.resultsList.map(item =>
+      newResultList = state.resultList.map(item =>
         action.workspaceDetail.workspace_id === item.workspaceId
           ? { ...item, workspace: { ...item.workspace, label: action.workspaceDetail.label } }
           : item
       )
-      return { ...state, resultsList: newResultList }
+      return { ...state, resultList: newResultList }
 
     default:
       return state
   }
+}
+
+export default function searchResultWrapper (searchType = SEARCH_TYPE.SIMPLE) {
+  return (state = defaultResult, action) => searchResult(searchType, state, action)
 }

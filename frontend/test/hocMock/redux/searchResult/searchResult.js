@@ -4,8 +4,8 @@ import { userFromApi } from '../user/user.js'
 export const searchResult = {
   currentNumberPage: 1,
   numberResultsByPage: 10,
-  searchedKeywords: 'word',
-  resultsList: [
+  searchString: 'word',
+  resultList: [
     {
       modified: '2020-06-12T16:05:08Z',
       created: '2020-06-12T13:17:56Z',

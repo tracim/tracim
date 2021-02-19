@@ -2,44 +2,54 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
-  PageWrapper,
-  PageTitle,
-  PageContent,
-  ListItemWrapper,
-  displayDistanceDate,
-  IconButton,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT,
+  buildContentPathBreadcrumbs,
   buildHeadTitle,
+  CUSTOM_EVENT,
+  IconButton,
   PAGE,
+  PageContent,
+  PageTitle,
+  PageWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
-import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
-import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
+  appendSearchResultList,
   newFlashMessage,
-  setCurrentNumberPage,
-  appendSearchResultsList,
-  setSearchResultsList,
-  setNumberResultsByPage,
-  setSearchedKeywords,
   setBreadcrumbs,
-  setHeadTitle
+  setSearchContentBreadcrumbs,
+  setCurrentNumberPage,
+  setHeadTitle,
+  setNumberResultsByPage,
+  setSearchString,
+  setSearchResultList
 } from '../action-creator.sync.js'
-import { getSearchedKeywords } from '../action-creator.async.js'
-import Search from '../component/Search/Search.jsx'
-import { parseSearchUrl } from '../util/helper.js'
+import { getAdvancedSearchResult } from '../action-creator.async.js'
+import SearchInput from '../component/Search/SearchInput.jsx'
+import {
+  ADVANCED_SEARCH_TYPE,
+  FETCH_CONFIG,
+  parseSearchUrl
+} from '../util/helper.js'
 import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
+import AdvancedSearchContentList from '../component/Search/AdvancedSearchContentList.jsx'
+import AdvancedSearchUserList from '../component/Search/AdvancedSearchUserList.jsx'
+import AdvancedSearchSpaceList from '../component/Search/AdvancedSearchSpaceList.jsx'
 import classnames from 'classnames'
 
 const qs = require('query-string')
+const FIRST_PAGE = 1
+
+// TODO - G.B. - 2021-02-16 - All commented code at this component should be evaluated
+// and possibly uncommented or explained at https://github.com/tracim/tracim/issues/4097
 
 export class AdvancedSearch extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: false
+      isFilterMenuOpen: false,
+      searchType: ADVANCED_SEARCH_TYPE.CONTENT
     }
 
     props.registerCustomEventHandlerList([
@@ -52,7 +62,55 @@ export class AdvancedSearch extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  setHeadTitle = () => {
+    const { props } = this
+    const headTitle = buildHeadTitle(
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchString}`]
+    )
+
+    props.dispatch(setHeadTitle(headTitle))
+  }
+
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: PAGE.SEARCH_RESULT,
+      type: BREADCRUMBS_TYPE.CORE,
+      label: props.t('Search results'),
+      isALink: true
+    }]))
+  }
+
   componentDidMount () {
+    const { props } = this
+    const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
+
+    if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
+      this.getSearchResult({
+        ...urlSearchObject,
+        currentPage: FIRST_PAGE,
+        searchType: ADVANCED_SEARCH_TYPE.CONTENT
+      }, props.contentSearch.resultList.length)
+    }
+
+    /*
+      if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
+        this.getSearchResult({
+          ...urlSearchObject,
+          currentPage: FIRST_PAGE,
+          searchType: ADVANCED_SEARCH_TYPE.USER
+        }, props.userSearch.resultList.length)
+      }
+
+      if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
+        this.getSearchResult({
+          ...urlSearchObject,
+          currentPage: FIRST_PAGE,
+          searchType: ADVANCED_SEARCH_TYPE.SPACE
+        }, props.spaceSearch.resultList.length)
+      }
+    */
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
@@ -64,38 +122,28 @@ export class AdvancedSearch extends React.Component {
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
     if (
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords ||
+      prevSearch.searchString !== currentSearch.searchString ||
       prevSearch.currentPage !== currentSearch.currentPage
     ) {
       this.loadSearchUrl()
     }
     if (
       prevProps.system.config.instance_name !== props.system.config.instance_name ||
-      prevSearch.searchedKeywords !== currentSearch.searchedKeywords
+      prevSearch.searchString !== currentSearch.searchString
     ) {
       this.setHeadTitle()
     }
   }
 
-  setHeadTitle = () => {
+  getSearchResult = async (searchObject, currentSearchLength) => {
     const { props } = this
-    const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchedKeywords}`]
-    )
 
-    props.dispatch(setHeadTitle(headTitle))
-  }
-
-  loadSearchUrl = async () => {
-    const { props } = this
-    const searchObject = parseSearchUrl(qs.parse(props.location.search))
-    const FIRST_PAGE = 1
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
-    const hasFirstPage = !(props.searchResult.resultsList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
+    const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
+    const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
+      searchObject.searchString,
       searchObject.contentTypes,
-      searchObject.searchedKeywords,
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
@@ -104,25 +152,61 @@ export class AdvancedSearch extends React.Component {
         : searchObject.numberResultsByPage * searchObject.currentPage,
       searchObject.showArchived,
       searchObject.showDeleted,
-      searchObject.showActive
+      searchObject.showActive,
+      searchObject.searchType
     ))
 
-    switch (fetchGetSearchedKeywords.status) {
+    switch (fetchGetAdvancedSearchResult.status) {
       case 200:
-        props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
-        props.dispatch(setCurrentNumberPage(searchObject.currentPage))
+        props.dispatch(setSearchString(searchObject.searchString))
+        props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
-          props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
+          props.dispatch(setSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         } else {
-          props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
+          props.dispatch(appendSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         }
-        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
+        if (searchObject.searchType === this.state.searchType) this.setState({ totalHits: fetchGetAdvancedSearchResult.json.total_hits })
+        if (searchObject.searchType === ADVANCED_SEARCH_TYPE.CONTENT) this.buildContentBreadcrumbs()
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
+  }
+
+  loadSearchUrl = () => {
+    const searchObject = parseSearchUrl(qs.parse(this.props.location.search))
+    let currentSearchLength = 0
+
+    if (searchObject.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearchLength = this.props.contentSearch.resultList.length
+    }
+    /*
+      if (searchObject.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearchLength = props.userSearch.resultList.length
+      }
+
+      if (searchObject.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearchLength = props.spaceSearch.resultList.length
+      }
+    */
+    this.getSearchResult(searchObject, currentSearchLength)
+  }
+
+  buildContentBreadcrumbs = () => {
+    const { state, props } = this
+    if (state.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) return
+
+    props.contentSearch.resultList.map(async (content) => {
+      let contentBreadcrumbsList = []
+      try {
+        contentBreadcrumbsList = await buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, content)
+      } catch (e) {
+        console.error('Error at advanced search, count not build breadcrumbs', e)
+      }
+      props.dispatch(setSearchContentBreadcrumbs(contentBreadcrumbsList, content.contentId, state.searchType))
+    })
   }
 
   getContentName = (content) => {
@@ -140,32 +224,56 @@ export class AdvancedSearch extends React.Component {
   }
 
   handleClickSeeMore = async () => {
-    const { props } = this
-    const NEXT_PAGE = props.searchResult.currentNumberPage + 1
+    const { props, state } = this
+    let nextPage
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      nextPage = props.contentSearch.currentPage + 1
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        nextPage = props.userSearch.currentPage + 1
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        nextPage = props.spaceSearch.currentPage + 1
+      }
+    */
     props.history.push(
-      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true })}`
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
     )
   }
 
   handleClickFilterMenu = () => this.setState(prev => ({ isFilterMenuOpen: !prev.isFilterMenuOpen }))
 
-  handleClickSearch = searchedKeywords => {
+  handleClickSearch = searchString => {
     const { props } = this
     const FIRST_PAGE = 1
     props.history.push(`${PAGE.SEARCH_RESULT}?${qs.stringify({
       ...qs.parse(props.location.search),
-      q: searchedKeywords,
+      q: searchString,
       p: FIRST_PAGE
     }, { encode: true })}`)
   }
 
   getDisplayDetail () {
-    const { props } = this
+    const { props, state } = this
     const totalResultsNumber = this.state.totalHits
+    let displayedResultsNumber
 
     if (totalResultsNumber <= 0) return ''
 
-    const displayedResultsNumber = props.searchResult.resultsList.length
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      displayedResultsNumber = props.contentSearch.resultList.length
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        displayedResultsNumber = props.userSearch.resultList.length
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        displayedResultsNumber = props.spaceSearch.resultList.length
+      }
+    */
     return props.t('Showing {{displayedResults}} of {{totalResults}} results', {
       displayedResults: displayedResultsNumber,
       totalResults: totalResultsNumber
@@ -173,96 +281,138 @@ export class AdvancedSearch extends React.Component {
   }
 
   hasMoreResults () {
-    const { props } = this
-    const currentNumberSearchResults = this.state.totalHits
-    return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
+    const { props, state } = this
+    const currentNumberSearchResults = state.totalHits
+    let maxNumberSearchResults = 0
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      maxNumberSearchResults = (props.contentSearch.numberResultsByPage * props.contentSearch.currentPage)
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        maxNumberSearchResults = (props.userSearch.numberResultsByPage * props.userSearch.currentPage)
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        maxNumberSearchResults = (props.spaceSearch.numberResultsByPage * props.spaceSearch.currentPage)
+      }
+    */
+    return currentNumberSearchResults >= maxNumberSearchResults
   }
 
-  buildBreadcrumbs = () => {
+  handleChangeSearchType = (e) => {
     const { props } = this
-
-    props.dispatch(setBreadcrumbs([{
-      link: PAGE.SEARCH_RESULT,
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Search results'),
-      isALink: true
-    }]))
+    props.history.push(
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), s: e.currentTarget.value }, { encode: true })}`
+    )
   }
 
   render () {
     const { props, state } = this
-    const currentNumberSearchResults = props.searchResult.resultsList.length
+    let currentNumberSearchResults = 0
 
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentNumberSearchResults = props.contentSearch.resultList.length
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentNumberSearchResults = props.userSearch.resultList.length
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentNumberSearchResults = props.spaceSearch.resultList.length
+      }
+    */
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper>
             <PageTitle
               title={(currentNumberSearchResults === 1
-                ? props.t('Result for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
-                : props.t('Results for "{{keywords}}"', { keywords: props.searchResult.searchedKeywords })
+                ? props.t('Result for "{{keywords}}"', { keywords: props.contentSearch.searchString })
+                : props.t('Results for "{{keywords}}"', { keywords: props.contentSearch.searchString })
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
-              <Search
-                onClickSearch={this.handleClickSearch}
-                searchedKeywords={props.searchResult.searchedKeywords}
-              />
+              <div className='advancedSearch__input'>
+                <div className='advancedSearch__input__type'>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.CONTENT}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.CONTENT}
+                    type='radio'
+                  />
+                  <span>{props.t('Contents')}</span>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.SPACE}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.SPACE}
+                    type='radio'
+                  />
+                  <span>{props.t('Spaces')}</span>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.USER}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.USER}
+                    type='radio'
+                  />
+                  <span>{props.t('Users')}</span>
+                </div>
+                <SearchInput
+                  onClickSearch={this.handleClickSearch}
+                  searchString={props.contentSearch.searchString}
+                />
+              </div>
 
               <div className='advancedSearch__page'>
                 <div className='advancedSearch__content'>
                   {currentNumberSearchResults > 0 && (
-                    <>
-                      <div className='advancedSearch__content__detail'>
-                        {this.getDisplayDetail()}
+                    <div className='advancedSearch__content__detail'>
+                      {this.getDisplayDetail()}
 
-                        {!state.isFilterMenuOpen && (
-                          <IconButton
-                            customClass='advancedSearch__content__detail__filter'
-                            icon='fas fa-sliders-h'
-                            onClick={this.handleClickFilterMenu}
-                            text={props.t('Filter')}
-                            title={props.t('Search filters')}
-                          />
-                        )}
-                      </div>
-
-                      <ContentItemHeader showSearchDetails />
-                    </>
+                      {!state.isFilterMenuOpen && (
+                        <IconButton
+                          customClass='advancedSearch__content__detail__filter'
+                          icon='fas fa-sliders-h'
+                          onClick={this.handleClickFilterMenu}
+                          text={props.t('Filter')}
+                          title={props.t('Search filters')}
+                        />
+                      )}
+                    </div>
                   )}
 
                   {currentNumberSearchResults === 0 && (
                     <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
+                      {`${props.t('No results for the search terms')}: "${props.contentSearch.searchString}"`}
                     </div>
                   )}
 
-                  {props.searchResult.resultsList.map((searchItem, index) => (
-                    <ListItemWrapper
-                      label={searchItem.label}
-                      read
-                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                      isLast={index === props.searchResult.resultsList.length - 1}
-                      key={searchItem.contentId}
-                    >
-                      <ContentItemSearch
-                        label={searchItem.label}
-                        path={searchItem.workspace.label}
-                        lastModificationAuthor={searchItem.lastModifier}
-                        lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                        lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                        fileExtension={searchItem.fileExtension}
-                        faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-                        statusSlug={searchItem.status}
-                        contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                        urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
-                        key={searchItem.contentId}
-                      />
-                    </ListItemWrapper>
-                  ))}
+                  {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
+                    <AdvancedSearchContentList
+                      contentSearch={props.contentSearch}
+                      contentType={props.contentType}
+                      userLang={props.user.lang}
+                    />
+                  )}
+
+                  {state.searchType === ADVANCED_SEARCH_TYPE.USER && (
+                    <AdvancedSearchUserList
+                      user={props.user}
+                      userSearch={props.contentSearch} // {props.userSearch}
+                    />
+                  )}
+
+                  {state.searchType === ADVANCED_SEARCH_TYPE.SPACE && (
+                    <AdvancedSearchSpaceList
+                      contentType={props.contentType}
+                      spaceSearch={props.contentSearch} // {props.spaceSearch}
+                      user={props.user}
+                    />
+                  )}
+
                   <div className='advancedSearch__content__btnSeeMore'>
                     {(this.hasMoreResults()
                       ? (
@@ -272,7 +422,7 @@ export class AdvancedSearch extends React.Component {
                           text={props.t('See more')}
                         />
                       )
-                      : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
+                      : currentNumberSearchResults > props.contentSearch.numberResultsByPage &&
                       props.t('No more results')
                     )}
                   </div>
@@ -291,5 +441,13 @@ export class AdvancedSearch extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
+const mapStateToProps = ({ breadcrumbs, contentSearch, spaceSearch, contentType, userSearch, system, user }) => ({
+  breadcrumbs,
+  contentSearch,
+  spaceSearch,
+  userSearch,
+  contentType,
+  system,
+  user
+})
 export default connect(mapStateToProps)(translate()(TracimComponent(AdvancedSearch)))

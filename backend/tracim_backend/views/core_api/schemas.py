@@ -175,7 +175,7 @@ class RestrictedStringField(marshmallow.fields.String):
 
         return value
 
-    def error(self, value: str) -> typing.NoReturn:
+    def error(self, value: str) -> "typing.NoReturn":
         raise marshmallow.ValidationError(
             "'{}' is not a valid value for this field. Allowed values: {}".format(
                 value, self._allowed_strings
