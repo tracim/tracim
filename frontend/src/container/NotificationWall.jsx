@@ -126,7 +126,7 @@ export class NotificationWall extends React.Component {
 
           return {
             icon: 'fas fa-magic',
-            title: props.t('New space'),
+            title: props.t('New content'),
             text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
