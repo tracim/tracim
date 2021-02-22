@@ -139,7 +139,7 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, createdRange) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, createdRange, modifiedRange, searchFacets) => {
     const { props } = this
 
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
@@ -159,7 +159,8 @@ export class AdvancedSearch extends React.Component {
       searchObject.showActive,
       searchObject.searchType,
       searchFieldList,
-      createdRange
+      createdRange,
+      modifiedRange
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -212,7 +213,7 @@ export class AdvancedSearch extends React.Component {
   handleChangeCreatedRange = (dateObject) => {
     const { props, state } = this
     let currentSearch
-    console.log('AdvancedSearch - handleChangeCreatedRange', dateObject)
+
     if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
       currentSearch = props.contentSearch
     }
@@ -229,8 +230,37 @@ export class AdvancedSearch extends React.Component {
     this.getSearchResult(
       { ...currentSearch, searchType: state.searchType },
       currentSearch.resultList.length,
-      undefined,
-      { ...currentSearch.created_range, ...dateObject }
+      currentSearch.searchFieldList,
+      { ...currentSearch.createdRange, ...dateObject },
+      currentSearch.modifiedRange,
+      currentSearch.searchFacets
+    )
+  }
+
+  handleChangeModifiedRange = (dateObject) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+
+    this.getSearchResult(
+      { ...currentSearch, searchType: state.searchType },
+      currentSearch.resultList.length,
+      currentSearch.searchFieldList,
+      currentSearch.createdRange,
+      { ...currentSearch.modifiedRange, ...dateObject },
+      currentSearch.searchFacets
     )
   }
 
@@ -492,6 +522,7 @@ export class AdvancedSearch extends React.Component {
                     searchType={state.searchType}
                     onClickSearchField={this.handleChangeSearchFieldList}
                     onChangeCreatedDate={this.handleChangeCreatedRange}
+                    onChangeModifiedDate={this.handleChangeModifiedRange}
                   />
                 )}
               </div>

@@ -21,7 +21,13 @@ export class SearchFilterMenu extends React.Component {
         beforeDateActive: false,
         beforeDate: ''
       },
-      showModifiedRange: true
+      modifiedRange: {
+        showFilter: true,
+        afterDateActive: false,
+        afterDate: '',
+        beforeDateActive: false,
+        beforeDate: ''
+      }
     }
   }
 
@@ -65,7 +71,6 @@ export class SearchFilterMenu extends React.Component {
 
   handleChangeCreatedDate = (date, type) => {
     const { props } = this
-    console.log('SearchFilterMenu - handleChangeCreatedDate', date)
     if (type === 'after') {
       this.setState(prev => ({
         createdRange: {
@@ -88,7 +93,56 @@ export class SearchFilterMenu extends React.Component {
   }
 
   handleOpenOrCloseModifiedRange = () => {
-    this.setState(prev => ({ showModifiedRange: !prev.showModifiedRange }))
+    this.setState(prev => ({
+      modifiedRange: {
+        ...prev.modifiedRange,
+        showFilter: !prev.modifiedRange.showFilter
+      }
+    }))
+  }
+
+  handleCheckboxModifiedRange = (type) => {
+    const {  state } = this
+    if (type === 'after') {
+      state.modifiedRange.afterDateActive ? this.handleChangeModifiedDate('', 'after') : this.handleChangeModifiedDate(state.modifiedRange.afterDate, 'after')
+      this.setState(prev => ({
+        modifiedRange: {
+          ...prev.modifiedRange,
+          afterDateActive: !prev.modifiedRange.afterDateActive
+        }
+      }))
+    } else {
+      state.modifiedRange.beforeDateActive ? this.handleChangeModifiedDate('', 'before') : this.handleChangeModifiedDate(state.modifiedRange.beforeDate, 'before')
+      this.setState(prev => ({
+        modifiedRange: {
+          ...prev.modifiedRange,
+          beforeDateActive: !prev.modifiedRange.beforeDateActive
+        }
+      }))
+    }
+  }
+
+  handleChangeModifiedDate = (date, type) => {
+    const { props } = this
+    if (type === 'after') {
+      this.setState(prev => ({
+        modifiedRange: {
+          ...prev.modifiedRange,
+          afterDateActive: true,
+          afterDate: date
+        }
+      }))
+      props.onChangeModifiedDate({ from: date })
+    } else {
+      this.setState(prev => ({
+        modifiedRange: {
+          ...prev.modifiedRange,
+          beforeDateActive: true,
+          beforeDate: date
+        }
+      }))
+      props.onChangeModifiedDate({ to: date })
+    }
   }
 
   render() {
@@ -178,12 +232,46 @@ export class SearchFilterMenu extends React.Component {
                   id='creation'
                   from={currentSearch.createdRange.from}
                   to={currentSearch.createdRange.to}
-                  onChangeCreatedDate={this.handleChangeCreatedDate}
+                  onChangeDate={this.handleChangeCreatedDate}
                   onClickDateCheckbox={this.handleCheckboxCreatedRange}
                   isAfterCheckboxChecked={state.createdRange.afterDateActive}
                   isBeforeCheckboxChecked={state.createdRange.beforeDateActive}
-                  afterDate={state.afterDate || ''}
-                  beforeDate={state.beforeDate || ''}
+                  afterDate={state.createdRange.afterDate}
+                  beforeDate={state.createdRange.beforeDate}
+                />
+              )}
+            </>
+          )}
+
+          {Object.keys(currentSearch.modifiedRange).length > 0 && (
+            <>
+              <div className='searchFilterMenu__content__item__title'>
+                <button
+                  className='transparentButton'
+                  onClick={this.handleOpenOrCloseModifiedRange}
+                >
+                  <Icon
+                    icon={state.modifiedRange.showFilter
+                      ? 'fa-fw fas fa-caret-down'
+                      : 'fa-fw fas fa-caret-right'}
+                    title={state.modifiedRange.showFilter
+                      ? props.t('Hide {{filter}}', { filter: props.t('Last Intervention') })
+                      : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}
+                  />
+                </button>
+                {props.t('Last Intervention')}
+              </div>
+              {state.modifiedRange.showFilter && (
+                <DateFilter
+                  id='modification'
+                  from={currentSearch.modifiedRange.from}
+                  to={currentSearch.modifiedRange.to}
+                  onChangeDate={this.handleChangeModifiedDate}
+                  onClickDateCheckbox={this.handleCheckboxModifiedRange}
+                  isAfterCheckboxChecked={state.modifiedRange.afterDateActive}
+                  isBeforeCheckboxChecked={state.modifiedRange.beforeDateActive}
+                  afterDate={state.modifiedRange.afterDate}
+                  beforeDate={state.modifiedRange.beforeDate}
                 />
               )}
             </>

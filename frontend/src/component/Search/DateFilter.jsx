@@ -107,7 +107,7 @@ export class DateFilter extends React.Component {
       fr: 'DD/MM/YYYY',
       pt: 'DD/MM/YYYY'
     }
-    console.log('aaa', props.afterDate)
+    console.log('aaa', props.isAfterCheckboxChecked, props.id)
     return (
       <>
         <div className='searchFilterMenu__content__item__checkbox'>
@@ -133,9 +133,9 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeCreatedDate(`${day.toISOString().split('T')[0]}T00:00:01Z`, 'after')}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T00:00:01Z`, 'after')}
             placeholder={props.t('mm/dd/yyyy')}
-            value={props.afterDate}
+            value={props.afterDate ? this.formatDate(props.afterDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
         </div>
 
@@ -162,9 +162,9 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeCreatedDate(`${day.toISOString().split('T')[0]}T23:59:59Z`, 'before')}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T23:59:59Z`, 'before')}
             placeholder={props.t('mm/dd/yyyy')}
-            value={props.beforeDate}
+            value={props.beforeDate ? this.formatDate(props.beforeDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
         </div>
       </>

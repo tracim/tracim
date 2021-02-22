@@ -1111,7 +1111,8 @@ export const getAdvancedSearchResult = (
   showActive,
   searchType,
   searchFieldList,
-  createdRange
+  createdRange,
+  modifiedRange
 ) => dispatch => {
   const queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
@@ -1126,6 +1127,11 @@ export const getAdvancedSearchResult = (
     if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
     if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
   }
+  if (modifiedRange) {
+    if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
+    if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
+  }
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?${queryParameterList.join('&')}`,
     param: {
