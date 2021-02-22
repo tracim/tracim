@@ -94,7 +94,7 @@ describe('<NotificationWall />', () => {
           .to.deep.equal({
             icon: 'fas fa-magic',
             text: '{{author}} created {{content}} in {{space}}',
-            title: 'New space',
+            title: 'New content',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
