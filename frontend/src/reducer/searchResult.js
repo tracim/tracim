@@ -53,7 +53,7 @@ export const serializeSearchItemProps = {
 
 const defaultResult = {
   createdRange: {},
-  currentNumberPage: 1,
+  currentPage: 1,
   dateRangeFacets: {},
   modifiedRange: {},
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
@@ -109,17 +109,16 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
 
     case `${SET}/${SEARCHED_STRING}`:
       return { ...state, searchString: action.searchString }
-    /*
-      case `${SET}/${SEARCH_FACETS(searchType)}`:
-        return { ...state, searchFacets: action.searchFacets }
 
-      case `${SET}/${CREATED_RANGE(searchType)}`:
-        return { ...state, createdRange: action.createdRange }
+    case `${SET}/${SEARCH_FACETS(searchType)}`:
+      return { ...state, searchFacets: action.searchFacets }
 
-      case `${SET}/${MODIFIED_RANGE(searchType)}`:
-        return { ...state, modifiedRange: action.modifiedRange }
+    case `${SET}/${CREATED_RANGE(searchType)}`:
+      return { ...state, createdRange: action.createdRange }
 
-    */
+    case `${SET}/${MODIFIED_RANGE(searchType)}`:
+      return { ...state, modifiedRange: action.modifiedRange }
+
     case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
       return { ...state, searchFieldList: action.searchFieldList }
 
@@ -127,7 +126,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
     case `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`:
-      return { ...state, currentNumberPage: action.currentNumberPage }
+      return { ...state, currentPage: action.currentPage }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       newResultList = state.resultList.map(item =>

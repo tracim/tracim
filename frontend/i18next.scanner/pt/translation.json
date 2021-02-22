@@ -360,5 +360,7 @@
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{pubblicName}}",
   "Change cover": "Mudar a capa",
-  "{{numberComments}} comments": "{{numberComments}} comentários"
+  "{{numberComments}} comments": "{{numberComments}} comentários",
+  "Close": "Fechar",
+  "mm/dd/yyyy": "dd/mm/aaaa"
 }

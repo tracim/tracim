@@ -17,10 +17,13 @@ import {
   appendSearchResultList,
   newFlashMessage,
   setBreadcrumbs,
+  setCreatedRange,
   setSearchContentBreadcrumbs,
   setCurrentNumberPage,
   setHeadTitle,
+  setModifiedRange,
   setNumberResultsByPage,
+  setSearchFacets,
   setSearchFieldList,
   setSearchString,
   setSearchResultList
@@ -45,7 +48,7 @@ const FIRST_PAGE = 1
 // and possibly uncommented or explained at https://github.com/tracim/tracim/issues/4097
 
 export class AdvancedSearch extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       totalHits: 0,
@@ -83,7 +86,7 @@ export class AdvancedSearch extends React.Component {
     }]))
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { props } = this
     const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
 
@@ -117,7 +120,7 @@ export class AdvancedSearch extends React.Component {
     this.loadSearchUrl()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { props } = this
     const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
@@ -136,7 +139,7 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, createdRange) => {
     const { props } = this
 
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
@@ -155,7 +158,8 @@ export class AdvancedSearch extends React.Component {
       searchObject.showDeleted,
       searchObject.showActive,
       searchObject.searchType,
-      ['label']
+      searchFieldList,
+      createdRange
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -164,6 +168,9 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         props.dispatch(setSearchFieldList(fetchGetAdvancedSearchResult.json.search_fields, searchObject.searchType))
+        props.dispatch(setCreatedRange(fetchGetAdvancedSearchResult.json.created_range, searchObject.searchType))
+        props.dispatch(setModifiedRange(fetchGetAdvancedSearchResult.json.modified_range, searchObject.searchType))
+        props.dispatch(setSearchFacets(fetchGetAdvancedSearchResult.json.facets, searchObject.searchType))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
           props.dispatch(setSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         } else {
@@ -176,6 +183,55 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
+  }
+
+  handleChangeSearchFieldList = (field) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    if (currentSearch.searchFieldList.find(searchField => searchField === field)) {
+      this.getSearchResult(
+        { ...currentSearch, searchType: state.searchType },
+        currentSearch.resultList.length,
+        currentSearch.searchFieldList.filter(searchField => searchField !== field))
+    }
+  }
+
+  handleChangeCreatedRange = (dateObject) => {
+    const { props, state } = this
+    let currentSearch
+    console.log('AdvancedSearch - handleChangeCreatedRange', dateObject)
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+
+    this.getSearchResult(
+      { ...currentSearch, searchType: state.searchType },
+      currentSearch.resultList.length,
+      undefined,
+      { ...currentSearch.created_range, ...dateObject }
+    )
   }
 
   loadSearchUrl = () => {
@@ -258,7 +314,7 @@ export class AdvancedSearch extends React.Component {
     }, { encode: true })}`)
   }
 
-  getDisplayDetail () {
+  getDisplayDetail() {
     const { props, state } = this
     const totalResultsNumber = this.state.totalHits
     let displayedResultsNumber
@@ -283,7 +339,7 @@ export class AdvancedSearch extends React.Component {
     })
   }
 
-  hasMoreResults () {
+  hasMoreResults() {
     const { props, state } = this
     const currentNumberSearchResults = state.totalHits
     let maxNumberSearchResults = 0
@@ -299,7 +355,6 @@ export class AdvancedSearch extends React.Component {
         maxNumberSearchResults = (props.spaceSearch.numberResultsByPage * props.spaceSearch.currentPage)
       }
     */
-    console.log(currentNumberSearchResults, maxNumberSearchResults, currentNumberSearchResults >= maxNumberSearchResults)
     return currentNumberSearchResults >= maxNumberSearchResults
   }
 
@@ -310,7 +365,7 @@ export class AdvancedSearch extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { props, state } = this
     let currentNumberSearchResults = 0
 
@@ -434,9 +489,9 @@ export class AdvancedSearch extends React.Component {
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
                     onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
-                    userLang={props.user.lang}
-                    // simpleFacets={state.currentSearch.simpleFacets}
-                    // dateRangeFacets={state.currentSearch.dateRangeFacets}
+                    searchType={state.searchType}
+                    onClickSearchField={this.handleChangeSearchFieldList}
+                    onChangeCreatedDate={this.handleChangeCreatedRange}
                   />
                 )}
               </div>

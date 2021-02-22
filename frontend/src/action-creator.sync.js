@@ -177,7 +177,7 @@ export const setSearchString = searchString => ({ type: `${SET}/${SEARCHED_STRIN
 export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = searchType => `SearchCurrentPage_${searchType}`
-export const setCurrentNumberPage = (currentNumberPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentNumberPage })
+export const setCurrentNumberPage = (currentPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentPage })
 export const SEARCH_CONTENT_BREADCRUMBS = searchType => `SearchContentBreadcrumbs_${searchType}`
 export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, searchType) => ({
   type: `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`,
@@ -191,7 +191,7 @@ export const setModifiedRange = (modifiedRange, searchType) => ({ type: `${SET}/
 export const SEARCH_FIELD_LIST = (searchType) => `SearchFieldList_${searchType}`
 export const setSearchFieldList = (searchFieldList, searchType) => ({ type: `${SET}/${SEARCH_FIELD_LIST(searchType)}`, searchFieldList })
 export const SEARCH_FACETS = (searchType) => `SearchFacets_${searchType}`
-export const setsearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
+export const setSearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

@@ -36,6 +36,13 @@ export const ADVANCED_SEARCH_TYPE = {
   SPACE: 'workspaces'
 }
 
+export const SEARCH_FIELD_LIST = [
+  { slug: 'label', label: i18n.t('Label') },
+  { slug: 'raw_content', label: i18n.t('Content') },
+  { slug: 'comments', label: i18n.t('Comments') },
+  { slug: 'description', label: i18n.t('Description') }
+]
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }

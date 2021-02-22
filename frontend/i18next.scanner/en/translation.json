@@ -360,5 +360,7 @@
   "Registration date:": "Registration date:",
   "Cover image of {{publicName}}": "Cover image of {{publicName}}",
   "Change cover": "Change cover",
-  "{{numberComments}} comments": "{{numberComments}} comments"
+  "{{numberComments}} comments": "{{numberComments}} comments",
+  "Close": "Close",
+  "mm/dd/yyyy": "mm/dd/yyyy"
 }

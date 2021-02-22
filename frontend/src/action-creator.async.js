@@ -1110,7 +1110,8 @@ export const getAdvancedSearchResult = (
   showDeleted,
   showActive,
   searchType,
-  searchFieldList
+  searchFieldList,
+  createdRange
 ) => dispatch => {
   const queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
@@ -1121,6 +1122,10 @@ export const getAdvancedSearchResult = (
   if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
+  if (createdRange) {
+    if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
+    if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
+  }
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?${queryParameterList.join('&')}`,
     param: {

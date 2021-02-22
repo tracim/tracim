@@ -360,5 +360,7 @@
   "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
   "Change cover": "Changer la couverture",
-  "{{numberComments}} comments": "{{numberComments}} commentaires"
+  "{{numberComments}} comments": "{{numberComments}} commentaires",
+  "Close": "Fermer",
+  "mm/dd/yyyy": "jj/mm/aaaa"
 }

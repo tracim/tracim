@@ -27,7 +27,7 @@ import { SEARCH_TYPE } from '../../../src/util/helper.js'
 describe('reducer searchResult.js', () => {
   describe('actions', () => {
     const initialState = {
-      currentNumberPage: 1,
+      currentPage: 1,
       numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
       searchString: '',
       resultList: []
@@ -119,7 +119,7 @@ describe('reducer searchResult.js', () => {
     describe(`${SET}/${SEARCH_CURRENT_PAGE(SEARCH_TYPE.SIMPLE)}`, () => {
       const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setCurrentNumberPage(5, SEARCH_TYPE.SIMPLE))
       it('should return a content object with the current number of pages', () => {
-        expect(rez).to.deep.equal({ ...initialState, currentNumberPage: 5 })
+        expect(rez).to.deep.equal({ ...initialState, currentPage: 5 })
       })
     })
 
