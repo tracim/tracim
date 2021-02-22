@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 import DateFilter from '../component/Search/DateFilter.jsx'
+import ContentFacets from '../component/Search/ContentFacets.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
   DATE_FILTER_ELEMENT,
@@ -289,7 +290,12 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
-
+          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
+            <ContentFacets
+              searchFacets={currentSearch.searchFacets}
+              onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
+            />
+          )}
         </div>
       </div>
     )

@@ -1112,7 +1112,8 @@ export const getAdvancedSearchResult = (
   searchType,
   searchFieldList,
   createdRange,
-  modifiedRange
+  modifiedRange,
+  searchFacets
 ) => dispatch => {
   const queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
@@ -1130,6 +1131,13 @@ export const getAdvancedSearchResult = (
   if (modifiedRange) {
     if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
     if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
+  }
+  if (searchFacets) {
+    if(searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
+    if(searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
+    if(searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
+    if(searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
+    if(searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
   }
 
   return fetchWrapper({

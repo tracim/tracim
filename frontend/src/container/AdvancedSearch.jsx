@@ -160,7 +160,8 @@ export class AdvancedSearch extends React.Component {
       searchObject.searchType,
       searchFieldList,
       createdRange,
-      modifiedRange
+      modifiedRange,
+      searchFacets
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -210,7 +211,7 @@ export class AdvancedSearch extends React.Component {
           : [],
         currentSearch.createdRange,
         currentSearch.modifiedRange,
-        currentSearch.searchFacets
+        undefined // currentSearch.searchFacets
       )}
   }
 
@@ -237,7 +238,7 @@ export class AdvancedSearch extends React.Component {
       currentSearch.searchFieldList,
       { ...currentSearch.createdRange, ...dateObject },
       currentSearch.modifiedRange,
-      currentSearch.searchFacets
+      undefined // currentSearch.searchFacets
     )
   }
 
@@ -264,7 +265,34 @@ export class AdvancedSearch extends React.Component {
       currentSearch.searchFieldList,
       currentSearch.createdRange,
       { ...currentSearch.modifiedRange, ...dateObject },
-      currentSearch.searchFacets
+      undefined // currentSearch.searchFacets
+    )
+  }
+
+  handleChangeSearchFacets = (facetsObject) => {
+    const { props, state } = this
+    let currentSearch
+    console.log('handleChangeSearchFacets', facetsObject)
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+
+    this.getSearchResult(
+      { ...currentSearch, searchType: state.searchType },
+      currentSearch.resultList.length,
+      currentSearch.searchFieldList,
+      currentSearch.createdRange,
+      currentSearch.modifiedRange,
+      facetsObject
     )
   }
 
@@ -527,6 +555,7 @@ export class AdvancedSearch extends React.Component {
                     onClickSearchField={this.handleChangeSearchFieldList}
                     onChangeCreatedDate={this.handleChangeCreatedRange}
                     onChangeModifiedDate={this.handleChangeModifiedRange}
+                    onChangeSearchFacets={this.handleChangeSearchFacets}
                   />
                 )}
               </div>
