@@ -38,12 +38,12 @@ describe('<RecentActivity />', () => {
 
   describe('static design', () => {
     it(`should display ${props.recentActivityList.length} activity items`, () =>
-      expect(wrapper.find('div.recentactivity__list__item__name').length).to.equal(props.recentActivityList.length)
+      expect(wrapper.find('div.FilenameWithExtension').length).to.equal(props.recentActivityList.length)
     )
 
     it('should display the label of each recent activity', () => {
       for (let i = 0; i < props.recentActivityList.length; i++) {
-        expect(wrapper.find('div.recentactivity__list__item__name').at(i)).to.text().contains(props.recentActivityList[i].label)
+        expect(wrapper.find('div.FilenameWithExtension').at(i)).to.text().contains(props.recentActivityList[i].label)
       }
     })
 

@@ -221,6 +221,8 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+
 export {
   appContentFactory,
   addRevisionFromTLM,

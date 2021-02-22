@@ -1,11 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  Badge,
   Breadcrumbs,
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
+  FilenameWithExtension,
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -27,7 +27,7 @@ export const AdvancedSearchContentList = props => {
   })
 
   return (
-    <>
+    <div className='advancedSearchContent'>
       <div className='content__header'>
         <div className='advancedSearchContent__type__header'>
           {props.t('Type')}
@@ -46,81 +46,85 @@ export const AdvancedSearchContentList = props => {
         </div>
       </div>
 
-      {resultList.map((searchItem, index) => (
-        <ListItemWrapper
-          label={searchItem.label}
-          read
-          contentType={searchItem.contentType}
-          isLast={index === resultList.length - 1}
-          key={searchItem.contentId}
-        >
-          <Link
-            to={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType.slug, searchItem.contentId)}`}
-            className='advancedSearchContent'
+      {resultList.map((searchItem, index) => {
+        const searchItemUrl = PAGE.WORKSPACE.CONTENT(
+          searchItem.workspaceId,
+          searchItem.contentType.slug,
+          searchItem.contentId
+        )
+
+        return (
+          <ListItemWrapper
+            label={searchItem.label}
+            read
+            contentType={searchItem.contentType}
+            isLast={index === resultList.length - 1}
+            key={searchItem.contentId}
           >
-            <div
-              className='advancedSearchContent__type__content'
-              style={{ color: searchItem.contentType.hexcolor }}
-              title={props.t(searchItem.contentType.label)}
-            >
-              <Icon
-                icon={`fa-fw ${searchItem.contentType.faIcon}`}
-                color={searchItem.contentType.hexcolor}
-              />
-              <span>{props.t(searchItem.contentType.label)}</span>
-            </div>
-
-            <div
-              className='advancedSearchContent__title'
-              title={searchItem.label}
-            >
-              {searchItem.label}
-              {searchItem.contentType.slug === CONTENT_TYPE.FILE && (
-                <Badge text={searchItem.fileExtension} customClass='badgeBackgroundColor' />
-              )}
-            </div>
-
-            {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
-              <div className='advancedSearchContent__information'>
-                <span title={props.t(searchItem.contentType.status.label)}>
-                  {props.t(searchItem.contentType.status.label)}
-                </span>
+            <Link
+              to={searchItemUrl}
+              className='advancedSearchContent__link'
+            />
+            <div class='advancedSearchContent__wrapper'>
+              <div
+                className='advancedSearchContent__type__content'
+                style={{ color: searchItem.contentType.hexcolor }}
+                title={props.t(searchItem.contentType.label)}
+              >
                 <Icon
-                  icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
-                  title={props.t(searchItem.contentType.status.label)}
-                  color={searchItem.contentType.status.hexcolor}
+                  icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                  color={searchItem.contentType.hexcolor}
                 />
-                <span
-                  title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                >
-                  {searchItem.commentCount}
-                </span>
-                <Icon
-                  icon='fa-fw far fa-comment'
-                  title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                <span>{props.t(searchItem.contentType.label)}</span>
+              </div>
+
+              <div className='advancedSearchContent__name_path'>
+                <Link to={searchItemUrl}>
+                  <FilenameWithExtension file={searchItem} />
+                </Link>
+                <Breadcrumbs
+                  breadcrumbsList={searchItem.breadcrumbsList || []}
+                  keepLastBreadcrumbAsLink
                 />
               </div>
-            )}
-          </Link>
 
-          <Breadcrumbs
-            breadcrumbsList={searchItem.breadcrumbsList || []}
-            keepLastBreadcrumbAsLink
-          />
+              <TimedEvent
+                customClass='advancedSearchContent__modification'
+                operation={searchItem.currentRevisionType}
+                date={searchItem.modified}
+                lang={props.userLang}
+                author={{
+                  publicName: searchItem.lastModifier.public_name,
+                  userId: searchItem.lastModifier.user_id
+                }}
+              />
 
-          <TimedEvent
-            customClass='advancedSearchContent__modification'
-            operation={searchItem.currentRevisionType}
-            date={searchItem.modified}
-            lang={props.userLang}
-            author={{
-              publicName: searchItem.lastModifier.public_name,
-              userId: searchItem.lastModifier.user_id
-            }}
-          />
-        </ListItemWrapper>
-      ))}
-    </>
+              {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
+                <div className='advancedSearchContent__information'>
+                  <span title={props.t(searchItem.contentType.status.label)}>
+                    {props.t(searchItem.contentType.status.label)}
+                  </span>
+                  <Icon
+                    icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                    title={props.t(searchItem.contentType.status.label)}
+                    color={searchItem.contentType.status.hexcolor}
+                  />
+                  <span
+                    title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                  >
+                    {searchItem.commentCount}
+                  </span>
+                  <Icon
+                    icon='fa-fw far fa-comment'
+                    title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                  />
+                </div>
+              )}
+            </div>
+          </ListItemWrapper>
+        )
+      })}
+    </div>
   )
 }
 

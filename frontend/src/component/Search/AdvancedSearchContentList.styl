@@ -1,10 +1,18 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
+.advancedSearchContent__link
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+
 .advancedSearchContent
-  height 65px
-  width 100%
-  display flex
-  align-items center
+  &__wrapper
+    height 65px
+    width 100%
+    display flex
+    align-items center
   &__typeAndTitle
     display none
   &__type
@@ -21,6 +29,8 @@
       margin 15px 25px
       text-align center
       align-self center
+  &__name_path
+    flex 1
   &__title
     padding 0px 5px
     white-space nowrap
@@ -31,13 +41,20 @@
     flex 1
     width 0
   &__modification
-    align-self center
-    margin-inline-end 90px
+    align-content center
+    display flex
+    width 250px
+    margin-left 10px
+    margin-right 10px
+
+
   &__information
     color fontColor
     align-self center
     margin-inline-end 5px
     width 160px
+    display flex
+    align-items center
     & > *
       font-size fontSizeSmall
     & > i
@@ -52,21 +69,12 @@
   & .advancedSearchContent .advancedSearchContent__title
     padding-bottom 0
 
-// INFO - G.B. - 20210210 - The rules below (and its media queries) are in absolute position because they come from code that would have nested links.
-// To avoid this, the components have been placed outside the top link and displayed in the right place using absolute.
 .timedEvent.advancedSearchContent__modification
-  position absolute
-  top 15px
-  right 250px
-  align-items flex-end
+  width 250px
   margin 0
-.advancedSearch__content .content .breadcrumbs
-  position absolute
-  top 35px
-  left 95px
-.advancedSearchContent .advancedSearchContent__title
-  padding-bottom 15px
-  padding-inline-end 210px
+
+  .timedEvent__bottom
+    justify-content start
 
 
 @media (max-width: max-lg)
