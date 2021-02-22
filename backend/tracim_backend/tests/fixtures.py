@@ -387,7 +387,7 @@ def riyad_user(session: Session, user_api_factory: UserApiFactory) -> User:
         email="riyad@test.test",
         username="riyad",
         password="password",
-        name="riyad",
+        name="Riyad Faisal",
         profile=Profile.USER,
         timezone="Europe/Paris",
         lang="fr",

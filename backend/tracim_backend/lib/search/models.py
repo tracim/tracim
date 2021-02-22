@@ -1,38 +1,31 @@
-from abc import ABC
 from datetime import datetime
+from enum import Enum
 from typing import List
 from typing import Optional
+
+
+class ContentSearchField(str, Enum):
+    LABEL = "label"
+    RAW_CONTENT = "raw_content"
+    COMMENT = "comment"
+    DESCRIPTION = "description"
+
+
+class UserSearchField(str, Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    CUSTOM_PROPERTIES = "custom_properties"
+
+
+class WorkspaceSearchField(str, Enum):
+    LABEL = "label"
+    DESCRIPTION = "description"
 
 
 class DateRange:
     def __init__(self, date_from: str, date_to: str):
         self.date_from = date_from
         self.date_to = date_to
-
-
-class ContentSearchResponse(ABC):
-    def __init__(
-        self,
-        contents: List["SearchedContent"],
-        total_hits: int = 0,
-        is_total_hits_accurate: bool = True,
-        facets: Optional[List[str]] = None,
-        search_fields: Optional[List[str]] = None,
-        created_range: Optional[DateRange] = None,
-        modified_range: Optional[DateRange] = None,
-    ):
-        self.contents = contents
-        self.total_hits = total_hits
-        self.is_total_hits_accurate = is_total_hits_accurate
-        self.facets = facets
-        self.search_fields = search_fields
-        self.created_range = created_range
-        self.modified_range = modified_range
-
-
-class EmptyContentSearchResponse(ContentSearchResponse):
-    def __init__(self):
-        super().__init__(contents=[], total_hits=0)
 
 
 class SearchedDigestUser(object):
@@ -43,7 +36,7 @@ class SearchedDigestUser(object):
         self.has_cover = has_cover
 
 
-class SearchedWorkspace(object):
+class SearchedDigestWorkspace(object):
     def __init__(self, workspace_id: int, label: str) -> None:
         self.workspace_id = workspace_id
         self.label = label
@@ -78,7 +71,7 @@ class SearchedContent(object):
         slug: str,
         status: str,
         content_type: str,
-        workspace: SearchedWorkspace,
+        workspace: SearchedDigestWorkspace,
         path: List[SearchedDigestContent],
         comments: List[SearchedDigestComment],
         comment_count: int,
@@ -129,3 +122,41 @@ class SearchedContent(object):
         self.score = score
         self.active_shares = active_shares
         self.content_size = content_size
+
+
+class ContentSearchResponse:
+    def __init__(
+        self,
+        contents: Optional[List["SearchedContent"]] = None,
+        total_hits: int = 0,
+        is_total_hits_accurate: bool = True,
+        facets: Optional[List[str]] = None,
+        search_fields: Optional[List[ContentSearchField]] = None,
+        created_range: Optional[DateRange] = None,
+        modified_range: Optional[DateRange] = None,
+    ):
+        self.contents = contents or []
+        self.total_hits = total_hits
+        self.is_total_hits_accurate = is_total_hits_accurate
+        self.facets = facets
+        self.search_fields = search_fields
+        self.created_range = created_range
+        self.modified_range = modified_range
+
+
+class SearchedUser:
+    def __init__(
+        self,
+        user_id: int,
+        public_name: str,
+        is_deleted: bool,
+        is_archived: bool,
+        has_avatar: bool,
+        has_cover: bool,
+    ) -> None:
+        self.user_id = user_id
+        self.public_name = public_name
+        self.is_deleted = is_deleted
+        self.is_archived = is_archived
+        self.has_avatar = has_avatar
+        self.has_cover = has_cover
