@@ -186,10 +186,9 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  handleChangeSearchFieldList = (field) => {
+  handleChangeSearchFieldList = (isCheckboxChecked, field) => {
     const { props, state } = this
     let currentSearch
-
     if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
       currentSearch = props.contentSearch
     }
@@ -206,8 +205,13 @@ export class AdvancedSearch extends React.Component {
       this.getSearchResult(
         { ...currentSearch, searchType: state.searchType },
         currentSearch.resultList.length,
-        currentSearch.searchFieldList.filter(searchField => searchField !== field))
-    }
+        isCheckboxChecked
+          ? currentSearch.searchFieldList.filter(searchField => searchField === field)
+          : [],
+        currentSearch.createdRange,
+        currentSearch.modifiedRange,
+        currentSearch.searchFacets
+      )}
   }
 
   handleChangeCreatedRange = (dateObject) => {

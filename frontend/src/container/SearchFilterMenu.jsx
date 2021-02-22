@@ -6,6 +6,7 @@ import { Icon } from 'tracim_frontend_lib'
 import DateFilter from '../component/Search/DateFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
+  DATE_FILTER_ELEMENT,
   SEARCH_FIELD_LIST
 } from '../util/helper.js'
 
@@ -48,10 +49,12 @@ export class SearchFilterMenu extends React.Component {
   }
 
   handleCheckboxCreatedRange = (type) => {
-    const { props, state } = this
-    console.log('SearchFilterMenu - handleCheckboxCreatedRange', state, props)
-    if (type === 'after') {
-      state.createdRange.afterDateActive ? this.handleChangeCreatedDate('', 'after') : this.handleChangeCreatedDate(state.createdRange.afterDate, 'after')
+    const { state } = this
+
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
+      state.createdRange.afterDateActive
+        ? this.handleChangeCreatedDate('', DATE_FILTER_ELEMENT.AFTER)
+        : this.handleChangeCreatedDate(state.createdRange.afterDate, DATE_FILTER_ELEMENT.AFTER)
       this.setState(prev => ({
         createdRange: {
           ...prev.createdRange,
@@ -59,7 +62,9 @@ export class SearchFilterMenu extends React.Component {
         }
       }))
     } else {
-      state.createdRange.beforeDateActive ? this.handleChangeCreatedDate('', 'before') : this.handleChangeCreatedDate(state.createdRange.beforeDate, 'before')
+      state.createdRange.beforeDateActive
+        ? this.handleChangeCreatedDate('', DATE_FILTER_ELEMENT.BEFORE)
+        : this.handleChangeCreatedDate(state.createdRange.beforeDate, DATE_FILTER_ELEMENT.BEFORE)
       this.setState(prev => ({
         createdRange: {
           ...prev.createdRange,
@@ -71,7 +76,7 @@ export class SearchFilterMenu extends React.Component {
 
   handleChangeCreatedDate = (date, type) => {
     const { props } = this
-    if (type === 'after') {
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
       this.setState(prev => ({
         createdRange: {
           ...prev.createdRange,
@@ -102,9 +107,11 @@ export class SearchFilterMenu extends React.Component {
   }
 
   handleCheckboxModifiedRange = (type) => {
-    const {  state } = this
-    if (type === 'after') {
-      state.modifiedRange.afterDateActive ? this.handleChangeModifiedDate('', 'after') : this.handleChangeModifiedDate(state.modifiedRange.afterDate, 'after')
+    const { state } = this
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
+      state.modifiedRange.afterDateActive
+        ? this.handleChangeModifiedDate('', DATE_FILTER_ELEMENT.AFTER)
+        : this.handleChangeModifiedDate(state.modifiedRange.afterDate, DATE_FILTER_ELEMENT.AFTER)
       this.setState(prev => ({
         modifiedRange: {
           ...prev.modifiedRange,
@@ -112,7 +119,9 @@ export class SearchFilterMenu extends React.Component {
         }
       }))
     } else {
-      state.modifiedRange.beforeDateActive ? this.handleChangeModifiedDate('', 'before') : this.handleChangeModifiedDate(state.modifiedRange.beforeDate, 'before')
+      state.modifiedRange.beforeDateActive
+        ? this.handleChangeModifiedDate('', DATE_FILTER_ELEMENT.BEFORE)
+        : this.handleChangeModifiedDate(state.modifiedRange.beforeDate, DATE_FILTER_ELEMENT.BEFORE)
       this.setState(prev => ({
         modifiedRange: {
           ...prev.modifiedRange,
@@ -124,7 +133,7 @@ export class SearchFilterMenu extends React.Component {
 
   handleChangeModifiedDate = (date, type) => {
     const { props } = this
-    if (type === 'after') {
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
       this.setState(prev => ({
         modifiedRange: {
           ...prev.modifiedRange,
@@ -202,14 +211,18 @@ export class SearchFilterMenu extends React.Component {
 
           {state.showSearchFieldList && currentSearch.searchFieldList.map(field => (
             <div className='searchFilterMenu__content__item__checkbox' key={`item__${field}`}>
-              <input type='checkbox' id={`item__${field}`} onClick={() => props.onClickSearchField(field)} />
+              <input
+                type='checkbox'
+                id={`item__${field}`}
+                onChange={(e) => props.onClickSearchField(e.currentTarget.checked, field)}
+              />
               <label htmlFor={`item__${field}`}>
                 {(SEARCH_FIELD_LIST.find(searchField => searchField.slug === field) || { label: '' }).label}
               </label>
             </div>
           ))}
 
-          {Object.keys(currentSearch.createdRange).length > 0 && (
+          {currentSearch.createdRange && Object.keys(currentSearch.createdRange).length > 0 && (
             <>
               <div className='searchFilterMenu__content__item__title'>
                 <button
@@ -243,7 +256,7 @@ export class SearchFilterMenu extends React.Component {
             </>
           )}
 
-          {Object.keys(currentSearch.modifiedRange).length > 0 && (
+          {currentSearch.modifiedRange && Object.keys(currentSearch.modifiedRange).length > 0 && (
             <>
               <div className='searchFilterMenu__content__item__title'>
                 <button
@@ -276,6 +289,7 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
+
         </div>
       </div>
     )

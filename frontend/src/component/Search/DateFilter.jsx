@@ -1,9 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 import DayPickerInput from 'react-day-picker/DayPickerInput'
 import 'react-day-picker/lib/style.css'
 import dateFnsFormat from 'date-fns/format'
+import { DATE_FILTER_ELEMENT } from '../../util/helper.js'
 
 export class DateFilter extends React.Component {
 
@@ -107,17 +109,17 @@ export class DateFilter extends React.Component {
       fr: 'DD/MM/YYYY',
       pt: 'DD/MM/YYYY'
     }
-    console.log('aaa', props.isAfterCheckboxChecked, props.id)
+
     return (
       <>
         <div className='searchFilterMenu__content__item__checkbox'>
           <input
             type='checkbox'
-            id={`${props.id}_after`}
-            onChange={() => props.onClickDateCheckbox('after')}
+            id={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}
+            onChange={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.AFTER)}
             checked={props.isAfterCheckboxChecked}
           />
-          <label htmlFor={`${props.id}_after`}>{props.t('After')}</label>
+          <label htmlFor={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}>{props.t('After')}</label>
           <DayPickerInput
             dayPickerProps={{
               disabledDays: [{
@@ -133,7 +135,7 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T00:00:01Z`, 'after')}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T00:00:01Z`, DATE_FILTER_ELEMENT.AFTER)}
             placeholder={props.t('mm/dd/yyyy')}
             value={props.afterDate ? this.formatDate(props.afterDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
@@ -142,11 +144,11 @@ export class DateFilter extends React.Component {
         <div className='searchFilterMenu__content__item__checkbox'>
           <input
             type='checkbox'
-            id={`${props.id}_before`}
-            onChange={() => props.onClickDateCheckbox('before')}
+            id={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}
+            onChange={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.BEFORE)}
             checked={props.isBeforeCheckboxChecked}
           />
-          <label htmlFor={`${props.id}_before`}>{props.t('Before')}</label>
+          <label htmlFor={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}>{props.t('Before')}</label>
           <DayPickerInput
             dayPickerProps={{
               disabledDays: [{
@@ -162,7 +164,7 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T23:59:59Z`, 'before')}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T23:59:59Z`, DATE_FILTER_ELEMENT.BEFORE)}
             placeholder={props.t('mm/dd/yyyy')}
             value={props.beforeDate ? this.formatDate(props.beforeDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
@@ -176,7 +178,9 @@ const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(DateFilter))
 
 DateFilter.propTypes = {
+  onChangeDate: PropTypes.func
 }
 
 DateFilter.defaultProps = {
+  onChangeDate: () => {}
 }

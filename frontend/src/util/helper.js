@@ -39,9 +39,14 @@ export const ADVANCED_SEARCH_TYPE = {
 export const SEARCH_FIELD_LIST = [
   { slug: 'label', label: i18n.t('Label') },
   { slug: 'raw_content', label: i18n.t('Content') },
-  { slug: 'comments', label: i18n.t('Comments') },
+  { slug: 'comment', label: i18n.t('Comments') },
   { slug: 'description', label: i18n.t('Description') }
 ]
+
+export const DATE_FILTER_ELEMENT = {
+  AFTER: 'after',
+  BEFORE: 'before'
+}
 
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
