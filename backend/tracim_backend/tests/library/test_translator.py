@@ -59,7 +59,7 @@ class TestSystranTranslateService:
                 {
                     "source": "en",
                     "target": "fr",
-                    "profiles": [{"id": "6b80a3f5-aff2-41ba-a5ce-21603738432e", "private": False}],
+                    "profiles": [{"id": "XXXXXX-XXXX-XXXX-XXX-XXXX", "private": False}],
                 }
             ]
         }
