@@ -192,7 +192,7 @@ export class SearchFilterMenu extends React.Component {
           <CheckboxFilter
             filterList={SEARCH_FIELD_LIST.map(field => ({ value: field.label }))}
             label={props.t('Only search in')}
-            onChangeSearchFacets={(value) => props.onClickSearchField(value)}
+            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELD_LIST.find(field => field.label === value))}
             onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
             showFilter={state.showSearchFieldList}
           />

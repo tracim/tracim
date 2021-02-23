@@ -30,7 +30,7 @@ export const CheckboxFilter = props => {
           <input
             type='checkbox'
             id={`item__${item.value}`}
-            onChange={(e) => props.onChangeSearchFacets(e.currentTarget.checked ? item.value : '')}
+            onChange={() => props.onChangeSearchFacets(item.value)}
           />
           <label htmlFor={`item__${item.value}`}>
             {props.t(`${item.value}`)}{item.count && ` (${item.count})`}

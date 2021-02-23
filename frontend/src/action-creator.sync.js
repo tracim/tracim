@@ -188,10 +188,10 @@ export const CREATED_RANGE = (searchType) => `CreatedRange_${searchType}`
 export const setCreatedRange = (createdRange, searchType) => ({ type: `${SET}/${CREATED_RANGE(searchType)}`, createdRange })
 export const MODIFIED_RANGE = (searchType) => `ModifiedRange_${searchType}`
 export const setModifiedRange = (modifiedRange, searchType) => ({ type: `${SET}/${MODIFIED_RANGE(searchType)}`, modifiedRange })
-export const SEARCH_FIELD_LIST = (searchType) => `SearchFieldList_${searchType}`
-export const setSearchFieldList = (searchFieldList, searchType) => ({ type: `${SET}/${SEARCH_FIELD_LIST(searchType)}`, searchFieldList })
 export const SEARCH_FACETS = (searchType) => `SearchFacets_${searchType}`
 export const setSearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
+export const APPLIED_FILTER = (searchType) => `AppliedFilter_${searchType}`
+export const setAppliedFilter = (key, value, searchType) => ({ type: `${SET}/${APPLIED_FILTER(searchType)}`, key, value })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

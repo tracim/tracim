@@ -36,6 +36,13 @@ export const ADVANCED_SEARCH_TYPE = {
   SPACE: 'workspaces'
 }
 
+export const ADVANCED_SEARCH_FILTER = {
+  SEARCH_FIELD: 'searchField',
+  CREATED_RANGE: 'createdRange',
+  MODIFIED_RANGE: 'modifiedRange',
+  SEARCH_FACETS: 'searchFacets'
+}
+
 export const SEARCH_FIELD_LIST = [
   { slug: 'label', label: i18n.t('Label') },
   { slug: 'raw_content', label: i18n.t('Content') },

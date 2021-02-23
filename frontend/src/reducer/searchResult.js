@@ -1,10 +1,10 @@
 import {
   APPEND,
+  APPLIED_FILTER,
   CREATED_RANGE,
   MODIFIED_RANGE,
   REMOVE,
   SEARCH_FACETS,
-  SEARCH_FIELD_LIST,
   SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
   SEARCHED_STRING,
@@ -52,13 +52,13 @@ export const serializeSearchItemProps = {
 }
 
 const defaultResult = {
+  appliedFilterList: {},
   createdRange: {},
   currentPage: 1,
   dateRangeFacets: {},
   modifiedRange: {},
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
   searchFacets: {},
-  searchFieldList: [],
   searchString: '',
   resultList: []
 }
@@ -119,14 +119,14 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
     case `${SET}/${MODIFIED_RANGE(searchType)}`:
       return { ...state, modifiedRange: action.modifiedRange }
 
-    case `${SET}/${SEARCH_FIELD_LIST(searchType)}`:
-      return { ...state, searchFieldList: action.searchFieldList }
-
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
     case `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`:
       return { ...state, currentPage: action.currentPage }
+
+    case `${SET}/${APPLIED_FILTER(searchType)}`:
+      return { ...state, appliedFilterList: { ...state.appliedFilterList, [action.key]: action.value } }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       newResultList = state.resultList.map(item =>
