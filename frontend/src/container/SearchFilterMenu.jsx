@@ -206,7 +206,7 @@ export class SearchFilterMenu extends React.Component {
                     : props.t('Show {{filter}}', { filter: props.t('Search Fields') })}
                 />
               </button>
-              {props.t('Only search at')}
+              {props.t('Only search in')}
             </div>
           )}
 

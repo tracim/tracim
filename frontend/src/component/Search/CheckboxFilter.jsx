@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 
 export const CheckboxFilter = props => {
-  const { props, state } = this
   return (
     <>
       <div className='searchFilterMenu__content__item__title'>
@@ -30,11 +29,7 @@ export const CheckboxFilter = props => {
             <input
               type='checkbox'
               id={`item__${item.value}`}
-              onChange={(e) => {
-                e.currentTarget.checked
-                  ? props.onChangeSearchFacets(item.value)
-                  : props.onChangeSearchFacets({})
-              }}
+              onChange={(e) => props.onChangeSearchFacets(e.currentTarget.checked ? item.value : '')}
             />
             <label htmlFor={`item__${item.value}`}>
               {props.t(`${item.value}`)} ({item.count})
@@ -48,7 +43,16 @@ export const CheckboxFilter = props => {
 export default translate()(CheckboxFilter)
 
 CheckboxFilter.propTypes = {
+  filterList: PropTypes.array.isRequired,
+  label: PropTypes.string,
+  onChangeSearchFacets: PropTypes.func,
+  onClickOpenOrCloseFilter: PropTypes.func,
+  showFilter: PropTypes.bool
 }
 
 CheckboxFilter.defaultProps = {
+  label: '',
+  onChangeSearchFacets: () => {},
+  onClickOpenOrCloseFilter: () => {},
+  showFilter: true
 }

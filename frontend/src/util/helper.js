@@ -48,6 +48,41 @@ export const DATE_FILTER_ELEMENT = {
   BEFORE: 'before'
 }
 
+export const SEARCH_CONTENT_FACETS = {
+  SPACE: {
+    slug: 'workspace_names',
+    label: i18n.t('Space')
+  },
+  STATUS: {
+    slug: 'statuses',
+    label: i18n.t('Status'),
+    items: [
+      i18n.t('open'),
+      i18n.t('closed-deprecated'),
+      i18n.t('closed-unvalidated'),
+      i18n.t('closed-validated')
+    ]
+  },
+  TYPE: {
+    slug: 'content_types',
+    label: i18n.t('Type'),
+    items: [
+      i18n.t('folder'),
+      i18n.t('html-document'),
+      i18n.t('thread'),
+      i18n.t('file')
+    ]
+  },
+  EXTENSION: {
+    slug: 'file_extensions',
+    label: i18n.t('File extension')
+  },
+  AUTHOR: {
+    slug: 'author__public_names',
+    label: i18n.t('Author')
+  }
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }

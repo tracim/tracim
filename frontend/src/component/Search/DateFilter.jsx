@@ -178,9 +178,25 @@ const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(DateFilter))
 
 DateFilter.propTypes = {
-  onChangeDate: PropTypes.func
+  afterDate: PropTypes.string,
+  beforeDate: PropTypes.string,
+  from: PropTypes.string,
+  id: PropTypes.string,
+  isAfterCheckboxChecked: PropTypes.bool,
+  isBeforeCheckboxChecked: PropTypes.bool,
+  onChangeDate: PropTypes.func,
+  onClickDateCheckbox: PropTypes.func,
+  to: PropTypes.string
 }
 
 DateFilter.defaultProps = {
-  onChangeDate: () => {}
+  afterDate: '',
+  beforeDate: '',
+  from: '',
+  id: '',
+  isAfterCheckboxChecked: false,
+  isBeforeCheckboxChecked: false,
+  onChangeDate: () => {},
+  onClickDateCheckbox: () => {},
+  to: ''
 }
