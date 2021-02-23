@@ -57,7 +57,7 @@ class PopinFixedHeader extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`${faIcon}`} title={rawTitle}/>
+          <i className={`${faIcon}`} title={rawTitle} />
         </div>
 
         <div
