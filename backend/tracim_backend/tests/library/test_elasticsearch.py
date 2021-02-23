@@ -5,7 +5,11 @@ from unittest.mock import patch
 
 import elasticsearch_dsl as es_dsl
 import pytest
+import transaction
 
+from tracim_backend.lib.rq import RqQueueName
+from tracim_backend.lib.rq import get_rq_queue2
+from tracim_backend.lib.rq.worker import DatabaseWorker
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESContentIndexer
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESUserIndexer
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESWorkspaceIndexer
@@ -33,14 +37,16 @@ def content_with_parent(content_type: str, parent_type: str) -> Content:
 
 
 def a_user() -> User:
-    return User(user_id=42, display_name="Bob the sponge")
+    return User(user_id=42, display_name="Bob the sponge", email="bob@sponge.net")
 
 
 def a_workspace() -> Workspace:
-    return Workspace(workspace_id=42, label="Friends of Bob")
+    return Workspace(workspace_id=42, label="Friends of Bob", owner=a_user())
 
 
 ContentIndexerWithApiMock = typing.Tuple[ESContentIndexer, MagicMock, MagicMock]
+UserIndexerWithApiMock = typing.Tuple[ESUserIndexer, MagicMock, MagicMock]
+WorkspaceIndexerWithApiMock = typing.Tuple[ESWorkspaceIndexer, MagicMock, MagicMock]
 
 
 @pytest.fixture
@@ -60,7 +66,7 @@ def content_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock
 
 
 @pytest.fixture
-def user_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
+def user_indexer_with_api_mock() -> typing.Iterator[UserIndexerWithApiMock]:
     """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
 
     Return a (ESUserIndexer, ESSearchApi.index_user_mock, RoleApi_mock) tuple.
@@ -76,7 +82,7 @@ def user_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
 
 
 @pytest.fixture
-def workspace_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock]:
+def workspace_indexer_with_api_mock() -> typing.Iterator[WorkspaceIndexerWithApiMock]:
     """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
 
     Return a (ESWorkspaceIndexer, ESSearchApi.index_workspace_mock, RoleApi_mock) tuple.
@@ -91,8 +97,10 @@ def workspace_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMo
         yield (ESWorkspaceIndexer(), index_workspace_mock, role_api_mock)
 
 
-@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchContentIndexer:
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
     @pytest.mark.parametrize(
         "content,indexed_content_is_parent",
         [
@@ -103,17 +111,21 @@ class TestElasticSearchContentIndexer:
     )
     def test_unit__on_content_created__ok__nominal_cases(
         self,
-        test_context: TracimContext,
+        test_context_without_plugins: TracimContext,
+        session,
         content_indexer_with_api_mock: ContentIndexerWithApiMock,
         content: Content,
         indexed_content_is_parent: bool,
     ) -> None:
         (indexer, index_content_mock, _) = content_indexer_with_api_mock
-        indexer.on_content_created(content, test_context)
+        indexer.on_content_created(content, test_context_without_plugins)
         index_content_mock.assert_called_once_with(
             content if not indexed_content_is_parent else content.parent
         )
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
     @pytest.mark.parametrize(
         "content,indexed_content_is_parent",
         [
@@ -135,6 +147,9 @@ class TestElasticSearchContentIndexer:
             content if not indexed_content_is_parent else content.parent
         )
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
     @pytest.mark.parametrize("content_type, indexed_count", [("comment", 1), ("file", 2)])
     def test_unit__on_content_modified__ok__content_with_child(
         self,
@@ -153,6 +168,9 @@ class TestElasticSearchContentIndexer:
         assert index_content_mock.call_count == indexed_count
 
     @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
+    @pytest.mark.parametrize(
         "workspace, indexed_count", [(Workspace(label="A workspace"), 1), (Workspace(), 0)]
     )
     def test_unit__on_workspace_modified__ok__nominal_cases(
@@ -168,6 +186,9 @@ class TestElasticSearchContentIndexer:
         assert index_content_mock.call_count == indexed_count
 
     @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
+    @pytest.mark.parametrize(
         "user, indexed_count", [(User(display_name="An user"), 1), (User(), 0)]
     )
     def test_unit__on_user_modified__ok__nominal_cases(
@@ -182,9 +203,37 @@ class TestElasticSearchContentIndexer:
         indexer.on_user_modified(user, test_context)
         assert index_content_mock.call_count == indexed_count
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
+    )
+    def test_unit__index_contents__ok__async(
+        self,
+        test_context_without_plugins: TracimContext,
+        content_indexer_with_api_mock: ContentIndexerWithApiMock,
+        session,
+    ) -> None:
+        content = html_document()
+        (indexer, index_content_mock, _) = content_indexer_with_api_mock
+        test_context_without_plugins.dbsession.add(content)
+        test_context_without_plugins.dbsession.flush()
+        indexer.index_contents([content], test_context_without_plugins)
+        transaction.commit()
+        queue = get_rq_queue2(
+            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        )
+        assert not queue.is_empty()
+        job = queue.jobs[0]
+        worker = DatabaseWorker([queue], connection=queue.connection)
+        worker.work(burst=True, app_config=test_context_without_plugins.app_config)
+        assert queue.is_empty()
+        assert not job.is_failed
+        assert index_content_mock.call_count == 1
 
-@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
+
 class TestElasticSearchUserIndexer:
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
     @pytest.mark.parametrize(
         "event_hook, event_parameter",
         [
@@ -218,9 +267,37 @@ class TestElasticSearchUserIndexer:
         assert index_user_mock.call_count == 1
         assert index_user_mock.call_args[0][0].user_id == a_user().user_id
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
+    )
+    def test_unit__index_user__ok__async(
+        self,
+        test_context_without_plugins: TracimContext,
+        user_indexer_with_api_mock: UserIndexerWithApiMock,
+        session,
+    ) -> None:
+        user = a_user()
+        (indexer, index_user_mock, _) = user_indexer_with_api_mock
+        test_context_without_plugins.dbsession.add(user)
+        test_context_without_plugins.dbsession.flush()
+        indexer.index_user(user, test_context_without_plugins)
+        transaction.commit()
+        queue = get_rq_queue2(
+            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        )
+        assert not queue.is_empty()
+        job = queue.jobs[0]
+        worker = DatabaseWorker([queue], connection=queue.connection)
+        worker.work(burst=True, app_config=test_context_without_plugins.app_config)
+        assert queue.is_empty()
+        assert not job.is_failed
+        assert index_user_mock.call_count == 1
 
-@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
+
 class TestElasticSearchWorkspaceIndexer:
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
     @pytest.mark.parametrize(
         "event_hook, event_parameter",
         [
@@ -251,6 +328,32 @@ class TestElasticSearchWorkspaceIndexer:
         event_hook(indexer, event_parameter, test_context)
         assert index_workspace_mock.call_count == 1
         assert index_workspace_mock.call_args[0][0].workspace_id == a_workspace().workspace_id
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
+    )
+    def test_unit__index_user__ok__async(
+        self,
+        test_context_without_plugins: TracimContext,
+        workspace_indexer_with_api_mock: WorkspaceIndexerWithApiMock,
+        session,
+    ) -> None:
+        workspace = a_workspace()
+        (indexer, index_workspace_mock, _) = workspace_indexer_with_api_mock
+        test_context_without_plugins.dbsession.add(workspace)
+        test_context_without_plugins.dbsession.flush()
+        indexer.index_workspace(workspace, test_context_without_plugins)
+        transaction.commit()
+        queue = get_rq_queue2(
+            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        )
+        assert not queue.is_empty()
+        job = queue.jobs[0]
+        worker = DatabaseWorker([queue], connection=queue.connection)
+        worker.work(burst=True, app_config=test_context_without_plugins.app_config)
+        assert queue.is_empty()
+        assert not job.is_failed
+        assert index_workspace_mock.call_count == 1
 
 
 class TestUtils:

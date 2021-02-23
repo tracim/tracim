@@ -79,7 +79,10 @@ class DatabaseWorker(SimpleWorker):
     """
 
     def work(self, *args, **kwargs):
-        app_config = initialize_config_from_environment()
+        try:
+            app_config = kwargs.pop("app_config")
+        except KeyError:
+            app_config = initialize_config_from_environment()
         _engines.push(get_engine(app_config))
         _configs.push(app_config)
         try:
