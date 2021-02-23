@@ -3,6 +3,7 @@ import time
 import pytest
 
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import worker_context
@@ -24,7 +25,7 @@ class TestRQDatabaseWorker(object):
         self, app_config, session, rq_database_worker
     ) -> None:
         redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, queue_name="event")
+        queue = get_rq_queue(redis, queue_name=RqQueueName.EVENT)
         job = queue.enqueue(
             # need to enqueue by name as enqueuing with get_public_name fails in pytest
             "tracim_backend.tests.library.test_rq.get_public_name",
