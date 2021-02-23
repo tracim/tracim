@@ -27,7 +27,7 @@ class TranslateService(ABC):
         language_pair: TranslationLanguagePair,
         file_buffer: BinaryIO,
         mimetype: str,
-        **options,
+        **options
     ) -> BinaryIO:
         """ Translate a file"""
         pass
@@ -73,6 +73,6 @@ class ExternalTranslator:
         backend: TranslateService,
         file_buffer: BinaryIO,
         mimetype: str,
-        **options,
+        **options
     ):
         return backend.translate_file(translation_node, file_buffer, mimetype, **options)
