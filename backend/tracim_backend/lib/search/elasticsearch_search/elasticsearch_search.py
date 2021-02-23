@@ -511,7 +511,7 @@ class ESSearchApi(SearchApi):
                     "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
                 )
 
-        if ContentSearchField.COMMENT in search_fields:
+        if ContentSearchField.COMMENTS in search_fields:
             es_search_fields.extend(
                 ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
             )

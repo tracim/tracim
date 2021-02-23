@@ -7,7 +7,7 @@ from typing import Optional
 class ContentSearchField(str, Enum):
     LABEL = "label"
     RAW_CONTENT = "raw_content"
-    COMMENT = "comment"
+    COMMENTS = "comments"
     DESCRIPTION = "description"
 
 
