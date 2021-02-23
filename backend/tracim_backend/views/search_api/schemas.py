@@ -6,7 +6,6 @@ import marshmallow
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import positive_int_validator
-from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.lib.search.models import ContentSearchField
 from tracim_backend.lib.search.models import UserSearchField
@@ -99,7 +98,9 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     # However, in functional tests, since apps are not enabled, filterable_content_types is empty
     # and tests break.
     content_types = StringList(
-        marshmallow.fields.String(), required=False, description="content_types to show",
+        marshmallow.fields.String(),
+        required=False,
+        description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -137,29 +138,29 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         default_value="",
         description="search within these fields",
     )
-    workspace_names = StrippedString(
+    workspace_names = StringList(
+        marshmallow.fields.String(),
         required=False,
-        validate=regex_string_as_list_of_string,
         description="select contents in these workspaces",
     )
-    author__public_names = StrippedString(
+    author__public_names = StringList(
+        marshmallow.fields.String(),
         required=False,
-        validate=regex_string_as_list_of_string,
         description="select contents by these authors",
     )
-    last_modifier__public_names = StrippedString(
+    last_modifier__public_names = StringList(
+        marshmallow.fields.String(),
         required=False,
-        validate=regex_string_as_list_of_string,
         description="select contents by these authors",
     )
-    file_extensions = StrippedString(
+    file_extensions = StringList(
+        marshmallow.fields.String(),
         required=False,
-        validate=regex_string_as_list_of_string,
         description="select contents with these file extensions",
     )
-    statuses = StrippedString(
+    statuses = StringList(
+        marshmallow.fields.String(),
         required=False,
-        validate=regex_string_as_list_of_string,
         description="select contents with these statuses",
     )
     created_from = marshmallow.fields.DateTime(
@@ -214,9 +215,6 @@ class DateRangeSchema(marshmallow.Schema):
 
 
 class ContentFacetsSchema(marshmallow.Schema):
-    search_fields = marshmallow.fields.List(
-        marshmallow.fields.String(description="search was performed in these fields")
-    )
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(), description="search matches contents in these workspaces"
@@ -260,9 +258,6 @@ class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
     )
     created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
     modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
-    search_fields = marshmallow.fields.List(
-        EnumField(ContentSearchField), required=False, missing=None
-    )
 
 
 class UserSearchQuerySchema(marshmallow.Schema):
@@ -317,7 +312,6 @@ class UserSearchResultSchema(marshmallow.Schema):
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(UserSearchFacets())
     last_authored_content_revision_date_range = DateRangeSchema()
-    search_fields = marshmallow.fields.List(EnumField(UserSearchField))
 
 
 class WorkspaceSearchQuerySchema(marshmallow.Schema):
@@ -360,4 +354,3 @@ class WorkspaceSearchResultSchema(marshmallow.Schema):
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(WorkspaceSearchFacets())
-    search_fields = marshmallow.fields.List(EnumField(WorkspaceSearchField))

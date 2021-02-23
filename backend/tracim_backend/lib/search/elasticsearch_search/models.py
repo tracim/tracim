@@ -12,8 +12,6 @@ from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedDigestWorkspace
-from tracim_backend.lib.search.models import UserSearchField
-from tracim_backend.lib.search.models import WorkspaceSearchField
 
 
 class FacetCount:
@@ -40,14 +38,18 @@ class ContentFacets:
         self.content_types = content_types
 
 
-def facet_count(aggregations: dict, field: str) -> typing.List[FacetCount]:
+def facet_count(
+    aggregations: dict, field: str, exclude_empty_values=False
+) -> typing.List[FacetCount]:
     """
     Builds a FacetCount object from an elasticsearch bucket aggregation result
     """
 
     facet = []
     for bucket in aggregations[field]["buckets"]:
-        facet.append(FacetCount(value=bucket["key"], count=bucket["doc_count"]))
+        value = bucket["key"]
+        if (not exclude_empty_values) or value:
+            facet.append(FacetCount(value=value, count=bucket["doc_count"]))
     return facet
 
 
@@ -118,7 +120,7 @@ class ESContentSearchResponse(ContentSearchResponse):
             workspace_names=facet_count(aggregations, "workspace_names"),
             author__public_names=facet_count(aggregations, "author__public_names"),
             last_modifier__public_names=facet_count(aggregations, "last_modifier__public_names"),
-            file_extensions=facet_count(aggregations, "file_extensions"),
+            file_extensions=facet_count(aggregations, "file_extensions", exclude_empty_values=True),
             statuses=facet_count(aggregations, "statuses"),
             content_types=facet_count(aggregations, "content_types"),
         )
@@ -156,7 +158,6 @@ class UserSearchResponse:
         self,
         hits: typing.Dict[str, typing.Any],
         facets: typing.Dict[str, typing.List[FacetCount]],
-        search_fields: typing.List[UserSearchField],
         newest_authored_content_date_from: datetime,
         newest_authored_content_date_to: datetime,
     ) -> None:
@@ -167,7 +168,6 @@ class UserSearchResponse:
         self.newest_authored_content_range = DateRange(
             newest_authored_content_date_from, newest_authored_content_date_to
         )
-        self.search_fields = search_fields
 
     @staticmethod
     def _create_searched_user(hit) -> SearchedUser:
@@ -206,7 +206,6 @@ class WorkspaceSearchResponse:
         self,
         hits: typing.Dict[str, typing.Any],
         facets: typing.Dict[str, typing.List[FacetCount]],
-        search_fields: typing.List[WorkspaceSearchField],
     ) -> None:
         self.workspaces = [
             SearchedWorkspace(
@@ -221,4 +220,3 @@ class WorkspaceSearchResponse:
         self.total_hits = hits["total"]["value"]
         self.is_total_hits_accurate = hits["total"]["relation"] == "eq"
         self.facets = facets
-        self.search_fields = search_fields
