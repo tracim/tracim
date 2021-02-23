@@ -588,7 +588,7 @@ class ESSearchApi(SearchApi):
             )
 
         if search_parameters.file_extensions:
-            search = search.filter("terms", file_extension=search_parameters.file_extensions)
+            search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
 
         if search_parameters.statuses:
             search = search.filter("terms", status=search_parameters.statuses)
