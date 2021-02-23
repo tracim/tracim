@@ -5,7 +5,7 @@ import CheckboxFilter from './CheckboxFilter.jsx'
 import { SEARCH_CONTENT_FACETS } from '../../util/helper.js'
 
 export class ContentFacets extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       showWorkspaceList: true,
@@ -36,7 +36,7 @@ export class ContentFacets extends React.Component {
     }
   }
 
-  render() {
+  render () {
     const { props, state } = this
 
     const showFileExtentionList = props.searchFacets.file_extensions
@@ -46,7 +46,7 @@ export class ContentFacets extends React.Component {
       : []
 
     return (
-      <>
+      <div className='contentFacets'>
         {props.searchFacets.workspace_names && (
           <CheckboxFilter
             filterList={props.searchFacets.workspace_names}
@@ -78,14 +78,14 @@ export class ContentFacets extends React.Component {
         )}
 
         {props.searchFacets.file_extensions && showFileExtentionList.length > 0 && (
-            <CheckboxFilter
-              filterList={showFileExtentionList}
-              label={SEARCH_CONTENT_FACETS.EXTENSION.label}
-              onChangeSearchFacets={(value) => props.onChangeSearchFacets({ file_extensions: value })}
-              onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.EXTENSION.slug)}
-              showFilter={state.showFileExtentionList}
-            />
-          )}
+          <CheckboxFilter
+            filterList={showFileExtentionList}
+            label={SEARCH_CONTENT_FACETS.EXTENSION.label}
+            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ file_extensions: value })}
+            onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.EXTENSION.slug)}
+            showFilter={state.showFileExtentionList}
+          />
+        )}
 
         {props.searchFacets.author__public_names && (
           <CheckboxFilter
@@ -96,7 +96,7 @@ export class ContentFacets extends React.Component {
             showFilter={state.showAuthorList}
           />
         )}
-      </>
+      </div>
     )
   }
 }

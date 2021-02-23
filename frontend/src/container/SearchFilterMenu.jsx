@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 import DateFilter from '../component/Search/DateFilter.jsx'
 import ContentFacets from '../component/Search/ContentFacets.jsx'
+import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
   DATE_FILTER_ELEMENT,
@@ -12,7 +13,7 @@ import {
 } from '../util/helper.js'
 
 export class SearchFilterMenu extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       showSearchFieldList: true,
@@ -31,9 +32,6 @@ export class SearchFilterMenu extends React.Component {
         beforeDate: ''
       }
     }
-  }
-
-  componentDidMount() {
   }
 
   handleOpenOrCloseSearchFields = () => {
@@ -155,7 +153,7 @@ export class SearchFilterMenu extends React.Component {
     }
   }
 
-  render() {
+  render () {
     const { props, state } = this
     let currentSearch
     if (props.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
@@ -191,37 +189,13 @@ export class SearchFilterMenu extends React.Component {
         </div>
 
         <div className='searchFilterMenu__content'>
-          {currentSearch.searchFieldList.length > 0 && (
-            <div className='searchFilterMenu__content__item__title'>
-              <button
-                className='transparentButton'
-                onClick={this.handleOpenOrCloseSearchFields}
-              >
-                <Icon
-                  icon={state.showSearchFieldList
-                    ? 'fa-fw fas fa-caret-down'
-                    : 'fa-fw fas fa-caret-right'}
-                  title={state.showSearchFieldList
-                    ? props.t('Hide {{filter}}', { filter: props.t('Search Fields') })
-                    : props.t('Show {{filter}}', { filter: props.t('Search Fields') })}
-                />
-              </button>
-              {props.t('Only search in')}
-            </div>
-          )}
-
-          {state.showSearchFieldList && currentSearch.searchFieldList.map(field => (
-            <div className='searchFilterMenu__content__item__checkbox' key={`item__${field}`}>
-              <input
-                type='checkbox'
-                id={`item__${field}`}
-                onChange={(e) => props.onClickSearchField(e.currentTarget.checked, field)}
-              />
-              <label htmlFor={`item__${field}`}>
-                {(SEARCH_FIELD_LIST.find(searchField => searchField.slug === field) || { label: '' }).label}
-              </label>
-            </div>
-          ))}
+          <CheckboxFilter
+            filterList={SEARCH_FIELD_LIST.map(field => ({ value: field.label }))}
+            label={props.t('Only search in')}
+            onChangeSearchFacets={(value) => props.onClickSearchField(value)}
+            onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
+            showFilter={state.showSearchFieldList}
+          />
 
           {currentSearch.createdRange && Object.keys(currentSearch.createdRange).length > 0 && (
             <>
@@ -308,12 +282,13 @@ export default connect(mapStateToProps)(translate()(SearchFilterMenu))
 SearchFilterMenu.propTypes = {
   onClickCloseSearchFilterMenu: PropTypes.func.isRequired,
   searchType: PropTypes.string.isRequired,
+  onChangeCreatedDate: PropTypes.func,
+  onChangeModifiedDate: PropTypes.func,
   onClickSearchField: PropTypes.func
 }
 
 SearchFilterMenu.defaultProps = {
-  onClickSearchField: () => { }
+  onClickSearchField: () => { },
+  onChangeCreatedDate: () => { },
+  onChangeModifiedDate: () => { }
 }
-
-/* Add a "showFilter: true" em cada filtro quando didmount. no onclick envia a key e
-procura peo elemento que tem a key, faz o toggle, só mostra se showFilter is false */

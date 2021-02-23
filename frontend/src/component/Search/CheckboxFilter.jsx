@@ -3,10 +3,12 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 
+require('./CheckboxFilter.styl')
+
 export const CheckboxFilter = props => {
   return (
-    <>
-      <div className='searchFilterMenu__content__item__title'>
+    <div className='checkboxFilter'>
+      <div className='checkboxFilter__title'>
         <button
           className='transparentButton'
           onClick={props.onClickOpenOrCloseFilter}
@@ -23,20 +25,19 @@ export const CheckboxFilter = props => {
         {props.label}
       </div>
 
-      {props.showFilter &&
-        props.filterList.map(item =>
-          <div className='searchFilterMenu__content__item__checkbox' key={`item__${item.value}`}>
-            <input
-              type='checkbox'
-              id={`item__${item.value}`}
-              onChange={(e) => props.onChangeSearchFacets(e.currentTarget.checked ? item.value : '')}
-            />
-            <label htmlFor={`item__${item.value}`}>
-              {props.t(`${item.value}`)} ({item.count})
-            </label>
-          </div>
-        )}
-    </>
+      {props.showFilter && props.filterList.map(item =>
+        <div className='checkboxFilter__checkbox' key={`item__${item.value}`}>
+          <input
+            type='checkbox'
+            id={`item__${item.value}`}
+            onChange={(e) => props.onChangeSearchFacets(e.currentTarget.checked ? item.value : '')}
+          />
+          <label htmlFor={`item__${item.value}`}>
+            {props.t(`${item.value}`)}{item.count && ` (${item.count})`}
+          </label>
+        </div>
+      )}
+    </div>
   )
 }
 

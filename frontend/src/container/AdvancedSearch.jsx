@@ -48,7 +48,7 @@ const FIRST_PAGE = 1
 // and possibly uncommented or explained at https://github.com/tracim/tracim/issues/4097
 
 export class AdvancedSearch extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       totalHits: 0,
@@ -86,7 +86,7 @@ export class AdvancedSearch extends React.Component {
     }]))
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { props } = this
     const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
 
@@ -120,7 +120,7 @@ export class AdvancedSearch extends React.Component {
     this.loadSearchUrl()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     const { props } = this
     const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
@@ -187,7 +187,7 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  handleChangeSearchFieldList = (isCheckboxChecked, field) => {
+  handleChangeSearchFieldList = (field) => {
     const { props, state } = this
     let currentSearch
     if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
@@ -206,13 +206,12 @@ export class AdvancedSearch extends React.Component {
       this.getSearchResult(
         { ...currentSearch, searchType: state.searchType },
         currentSearch.resultList.length,
-        isCheckboxChecked
-          ? currentSearch.searchFieldList.filter(searchField => searchField === field)
-          : [],
-        currentSearch.createdRange,
-        currentSearch.modifiedRange,
+        currentSearch.searchFieldList,
+        undefined, // currentSearch.createdRange,
+        undefined, // currentSearch.modifiedRange,
         undefined // currentSearch.searchFacets
-      )}
+      )
+    }
   }
 
   handleChangeCreatedRange = (dateObject) => {
@@ -376,7 +375,7 @@ export class AdvancedSearch extends React.Component {
     }, { encode: true })}`)
   }
 
-  getDisplayDetail() {
+  getDisplayDetail () {
     const { props, state } = this
     const totalResultsNumber = this.state.totalHits
     let displayedResultsNumber
@@ -401,7 +400,7 @@ export class AdvancedSearch extends React.Component {
     })
   }
 
-  hasMoreResults() {
+  hasMoreResults () {
     const { props, state } = this
     const currentNumberSearchResults = state.totalHits
     let maxNumberSearchResults = 0
@@ -427,7 +426,7 @@ export class AdvancedSearch extends React.Component {
     )
   }
 
-  render() {
+  render () {
     const { props, state } = this
     let currentNumberSearchResults = 0
 

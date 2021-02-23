@@ -8,12 +8,11 @@ import dateFnsFormat from 'date-fns/format'
 import { DATE_FILTER_ELEMENT } from '../../util/helper.js'
 
 export class DateFilter extends React.Component {
-
   formatDate = (date, format, locale) => {
     return dateFnsFormat(date, format, { locale })
   }
 
-  render() {
+  render () {
     const { props } = this
 
     const WEEKDAYS_LONG = {
