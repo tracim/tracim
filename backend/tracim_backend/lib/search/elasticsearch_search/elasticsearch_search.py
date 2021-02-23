@@ -524,7 +524,9 @@ class ESSearchApi(SearchApi):
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
+            "simple_query_string",
+            query=search_parameters.search_string,
+            fields=es_search_fields,
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -576,13 +578,13 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.author__public_names:
             search = search.filter(
-                "terms", author__public_names__exact=search_parameters.author__public_names
+                "terms", author__public_name__exact=search_parameters.author__public_names
             )
 
         if search_parameters.last_modifier__public_names:
             search = search.filter(
                 "terms",
-                last_modifier__public_names__exact=search_parameters.last_modifier__public_names,
+                last_modifier__public_name__exact=search_parameters.last_modifier__public_names,
             )
 
         if search_parameters.file_extensions:
@@ -627,7 +629,6 @@ class ESSearchApi(SearchApi):
         search.aggs.metric("modified_to", "max", field="modified")
 
         res = search.execute()
-        res.search_fields = search_fields
         return res
 
     def search_user(
@@ -648,8 +649,8 @@ class ESSearchApi(SearchApi):
             index=self._get_index_parameters(self.IndexedUser).alias,
         )
         fields = [
-            "public_name.exact^5",
-            "username.exact^5",
+            "public_name.{}^5".format(EXACT_FIELD),
+            "username.{}^5".format(EXACT_FIELD),
             "public_name^3",
             "username^3",
             "custom_properties",
@@ -683,10 +684,14 @@ class ESSearchApi(SearchApi):
 
         search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
         search.aggs.metric(
-            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
+            "newest_authored_content_date_from",
+            "min",
+            field="newest_authored_content_date",
         )
         search.aggs.metric(
-            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
+            "newest_authored_content_date_to",
+            "max",
+            field="newest_authored_content_date",
         )
         response = search.execute()
         known_workspaces = self._get_workspaces_known_to_user()
@@ -698,7 +703,6 @@ class ESSearchApi(SearchApi):
         return UserSearchResponse(
             hits=response["hits"],
             facets=facets,
-            search_fields=search_fields,
             newest_authored_content_date_from=response.aggregations.newest_authored_content_date_from,
             newest_authored_content_date_to=response.aggregations.newest_authored_content_date_to,
         )
@@ -721,7 +725,7 @@ class ESSearchApi(SearchApi):
         )
 
         fields = [
-            "label.exact^5",
+            "label.{}^5".format(EXACT_FIELD),
             "label^3",
             "description^3",
         ]
@@ -750,7 +754,7 @@ class ESSearchApi(SearchApi):
             )
         }
 
-        return WorkspaceSearchResponse(response["hits"], facets, search_fields)
+        return WorkspaceSearchResponse(response["hits"], facets)
 
     @staticmethod
     def _create_filtered_facets(
@@ -1029,19 +1033,25 @@ class ESUserIndexer:
 
     @hookimpl
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 

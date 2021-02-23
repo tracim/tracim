@@ -131,7 +131,6 @@ class ContentSearchResponse:
         total_hits: int = 0,
         is_total_hits_accurate: bool = True,
         facets: Optional[List[str]] = None,
-        search_fields: Optional[List[ContentSearchField]] = None,
         created_range: Optional[DateRange] = None,
         modified_range: Optional[DateRange] = None,
     ):
@@ -139,7 +138,6 @@ class ContentSearchResponse:
         self.total_hits = total_hits
         self.is_total_hits_accurate = is_total_hits_accurate
         self.facets = facets
-        self.search_fields = search_fields
         self.created_range = created_range
         self.modified_range = modified_range
 
