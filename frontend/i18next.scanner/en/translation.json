@@ -360,5 +360,10 @@
   "Registration date:": "Registration date:",
   "Cover image of {{publicName}}": "Cover image of {{publicName}}",
   "Change cover": "Change cover",
+  "Undeletion": "Undeletion",
+  "Edition": "Edition",
+  "Creation": "Creation",
+  "Revision": "Revision",
+  "Status change": "Status change",
   "{{numberComments}} comments": "{{numberComments}} comments"
 }

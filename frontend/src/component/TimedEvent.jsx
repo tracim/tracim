@@ -10,14 +10,31 @@ import {
 
 require('./TimedEvent.styl')
 
+function operationText (operation, t) {
+  switch (operation) {
+    case 'revision':
+      return t('Revision')
+    case 'creation':
+      return t('Creation')
+    case 'edition':
+      return t('Edition')
+    case 'undeletion':
+      return t('Undeletion')
+    case 'status-update':
+      return t('Status change')
+  }
+
+  return operation
+}
+
 const TimedEvent = (props) => {
   const topContents = (
-    <div key={`timedEvent-${props.date}`}>
+    <div key={`timedEvent-${props.date}`} className='timedEvent__topContents'>
       {props.operation && (
         <span className={classnames('timedEvent__operation', { rootTimedEvent__operation: props.isRoot })}>
-          {props.operation}
+          {operationText(props.operation, props.t)}&nbsp;
         </span>
-      )}&nbsp;
+      )}
       <DistanceDate absoluteDate={props.date} lang={props.lang} />
     </div>
   )

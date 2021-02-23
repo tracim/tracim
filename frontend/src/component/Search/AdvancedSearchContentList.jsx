@@ -101,23 +101,28 @@ export const AdvancedSearchContentList = props => {
 
               {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
                 <div className='advancedSearchContent__information'>
-                  <span title={props.t(searchItem.contentType.status.label)}>
-                    {props.t(searchItem.contentType.status.label)}
+                  <span className='advancedSearchContent__information__comments'>
+                    <span
+                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                    >
+                      {searchItem.commentCount}
+                    </span>
+                    <Icon
+                      icon='fa-fw far fa-comment'
+                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                    />
                   </span>
-                  <Icon
-                    icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
-                    title={props.t(searchItem.contentType.status.label)}
-                    color={searchItem.contentType.status.hexcolor}
-                  />
-                  <span
-                    title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                  >
-                    {searchItem.commentCount}
+                  <span className='advancedSearchContent__information__status'>
+                    <Icon
+                      icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                      title={props.t(searchItem.contentType.status.label)}
+                      color={searchItem.contentType.status.hexcolor}
+                    />
+                    <span
+                      title={props.t(searchItem.contentType.status.label)}>
+                      {props.t(searchItem.contentType.status.label)}
+                    </span>
                   </span>
-                  <Icon
-                    icon='fa-fw far fa-comment'
-                    title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                  />
                 </div>
               )}
             </div>

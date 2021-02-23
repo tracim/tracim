@@ -6,7 +6,7 @@ import classnames from 'classnames'
 export default function FilenameWithExtension (props) {
   const file = props.file
   const contentType = file.type || file.content_type || file.contentType
-  const isFile =  contentType && ((contentType.slug || contentType) === CONTENT_TYPE.FILE)
+  const isFile = contentType && ((contentType.slug || contentType) === CONTENT_TYPE.FILE)
 
   return (
     <div

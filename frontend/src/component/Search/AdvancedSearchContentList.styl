@@ -1,18 +1,18 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-.advancedSearchContent__link
-  position absolute
-  top 0
-  left 0
-  right 0
-  bottom 0
-
 .advancedSearchContent
+  &__link
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
   &__wrapper
     height 65px
     width 100%
     display flex
     align-items center
+    position relative // RJ - 2020-02-23 - NOTE: required to be above the link
   &__typeAndTitle
     display none
   &__type
@@ -41,11 +41,13 @@
     flex 1
     width 0
   &__modification
-    align-content center
-    display flex
+    align-self center
     width 250px
-    margin-left 10px
-    margin-right 10px
+    &.timedEvent
+      align-content center
+      display flex
+      margin-left 10px
+      margin-right 10px
 
 
   &__information
@@ -55,6 +57,11 @@
     width 160px
     display flex
     align-items center
+    &__comments
+      display inline-block
+      min-width: 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
+      padding-right 10px
+      text-align center
     & > *
       font-size fontSizeSmall
     & > i
@@ -88,6 +95,8 @@
           display none
     &__modification
       margin-inline-end 30px
+      overflow hidden
+      text-overflow ellipsis
   .advancedSearch__content .content .breadcrumbs
     left 55px
   .timedEvent.advancedSearchContent__modification

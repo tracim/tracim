@@ -360,5 +360,10 @@
   "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
   "Change cover": "Changer la couverture",
+  "Undeletion": "Restauration",
+  "Edition": "Modification",
+  "Creation": "Création",
+  "Revision": "Révision",
+  "Status change": "Changement de statut",
   "{{numberComments}} comments": "{{numberComments}} commentaires"
 }
