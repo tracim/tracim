@@ -555,7 +555,7 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
 
-        if search_parameters.size:
+        if search_parameters.size is not None:
             search = search.extra(size=search_parameters.size)
 
         if search_parameters.page_nb:
