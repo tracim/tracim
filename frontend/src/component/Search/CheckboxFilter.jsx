@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { Icon } from 'tracim_frontend_lib'
+import { Checkbox, Icon } from 'tracim_frontend_lib'
 
 require('./CheckboxFilter.styl')
 
@@ -27,12 +27,14 @@ export const CheckboxFilter = props => {
 
       {props.showFilter && props.filterList.map(item =>
         <div className='checkboxFilter__checkbox' key={`item__${item.value}`}>
-          <input
-            type='checkbox'
-            id={`item__${item.value}`}
-            onChange={() => props.onChangeSearchFacets(item.value)}
+          <Checkbox
+            name={item.value}
+            onClickCheckbox={() => props.onChangeSearchFacets(item.value)}
+            checked={props.appliedFilterList.find(filter => filter.value === item.value)}
+            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleCheck={{ top: '-5px' }}
           />
-          <label htmlFor={`item__${item.value}`}>
+          <label htmlFor={`checkbox-${item.value}`}>
             {props.t(`${item.value}`)}{item.count && ` (${item.count})`}
           </label>
         </div>
@@ -45,6 +47,7 @@ export default translate()(CheckboxFilter)
 
 CheckboxFilter.propTypes = {
   filterList: PropTypes.array.isRequired,
+  appliedFilterList: PropTypes.array,
   label: PropTypes.string,
   onChangeSearchFacets: PropTypes.func,
   onClickOpenOrCloseFilter: PropTypes.func,
@@ -52,6 +55,7 @@ CheckboxFilter.propTypes = {
 }
 
 CheckboxFilter.defaultProps = {
+  appliedFilterList: [],
   label: '',
   onChangeSearchFacets: () => {},
   onClickOpenOrCloseFilter: () => {},

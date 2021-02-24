@@ -49,28 +49,18 @@ export class SearchFilterMenu extends React.Component {
 
   handleCheckboxCreatedRange = (type) => {
     const { state } = this
-
-    if (type === DATE_FILTER_ELEMENT.AFTER) {
-      state.createdRange.afterDateActive
-        ? this.handleChangeCreatedDate('', DATE_FILTER_ELEMENT.AFTER)
-        : this.handleChangeCreatedDate(state.createdRange.afterDate, DATE_FILTER_ELEMENT.AFTER)
-      this.setState(prev => ({
-        createdRange: {
-          ...prev.createdRange,
-          afterDateActive: !prev.createdRange.afterDateActive
-        }
-      }))
-    } else {
-      state.createdRange.beforeDateActive
-        ? this.handleChangeCreatedDate('', DATE_FILTER_ELEMENT.BEFORE)
-        : this.handleChangeCreatedDate(state.createdRange.beforeDate, DATE_FILTER_ELEMENT.BEFORE)
-      this.setState(prev => ({
-        createdRange: {
-          ...prev.createdRange,
-          beforeDateActive: !prev.createdRange.beforeDateActive
-        }
-      }))
-    }
+    this.handleChangeCreatedDate(
+      state.createdRange[`${type}DateActive`]
+        ? ''
+        : state.createdRange[`${type}Date`],
+      type
+    )
+    this.setState(prev => ({
+      createdRange: {
+        ...prev.createdRange,
+        [`${type}DateActive`]: !prev.createdRange[`${type}DateActive`]
+      }
+    }))
   }
 
   handleChangeCreatedDate = (date, type) => {
@@ -107,27 +97,18 @@ export class SearchFilterMenu extends React.Component {
 
   handleCheckboxModifiedRange = (type) => {
     const { state } = this
-    if (type === DATE_FILTER_ELEMENT.AFTER) {
-      state.modifiedRange.afterDateActive
-        ? this.handleChangeModifiedDate('', DATE_FILTER_ELEMENT.AFTER)
-        : this.handleChangeModifiedDate(state.modifiedRange.afterDate, DATE_FILTER_ELEMENT.AFTER)
-      this.setState(prev => ({
-        modifiedRange: {
-          ...prev.modifiedRange,
-          afterDateActive: !prev.modifiedRange.afterDateActive
-        }
-      }))
-    } else {
-      state.modifiedRange.beforeDateActive
-        ? this.handleChangeModifiedDate('', DATE_FILTER_ELEMENT.BEFORE)
-        : this.handleChangeModifiedDate(state.modifiedRange.beforeDate, DATE_FILTER_ELEMENT.BEFORE)
-      this.setState(prev => ({
-        modifiedRange: {
-          ...prev.modifiedRange,
-          beforeDateActive: !prev.modifiedRange.beforeDateActive
-        }
-      }))
-    }
+    this.handleChangeModifiedDate(
+      state.modifiedRange[`${type}DateActive`]
+        ? ''
+        : state.modifiedRange[`${type}Date`],
+      type
+    )
+    this.setState(prev => ({
+      modifiedRange: {
+        ...prev.modifiedRange,
+        [`${type}DateActive`]: !prev.modifiedRange[`${type}DateActive`]
+      }
+    }))
   }
 
   handleChangeModifiedDate = (date, type) => {
@@ -190,9 +171,12 @@ export class SearchFilterMenu extends React.Component {
 
         <div className='searchFilterMenu__content'>
           <CheckboxFilter
-            filterList={SEARCH_FIELD_LIST.map(field => ({ value: field.label }))}
+            appliedFilterList={SEARCH_FIELD_LIST.filter(field => (
+              currentSearch.appliedFilters.searchField && currentSearch.appliedFilters.searchField.includes(field.slug)
+            ))}
+            filterList={SEARCH_FIELD_LIST}
             label={props.t('Only search in')}
-            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELD_LIST.find(field => field.label === value))}
+            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELD_LIST.find(field => field.value === value))}
             onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
             showFilter={state.showSearchFieldList}
           />
@@ -268,6 +252,7 @@ export class SearchFilterMenu extends React.Component {
             <ContentFacets
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
+              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
             />
           )}
         </div>

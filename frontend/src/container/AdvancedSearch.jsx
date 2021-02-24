@@ -140,9 +140,8 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, createdRange, modifiedRange, searchFacets) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters) => {
     const { props } = this
-
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
@@ -160,9 +159,9 @@ export class AdvancedSearch extends React.Component {
       searchObject.showActive,
       searchObject.searchType,
       searchFieldList,
-      createdRange,
-      modifiedRange,
-      searchFacets
+      appliedFilters ? appliedFilters.createdRange : {},
+      appliedFilters ? appliedFilters.modifiedRange : {},
+      appliedFilters ? appliedFilters.searchFacets : {}
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -202,14 +201,11 @@ export class AdvancedSearch extends React.Component {
         currentSearch = props.spaceSearch
       }
     */
-    let newAppliedSearchFieldList = []
-    const oldAppliedSearchFieldList = currentSearch.appliedFilterList.searchFieldList
+    const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
 
-    if (oldAppliedSearchFieldList) {
-      if (oldAppliedSearchFieldList.find(searchField => searchField === field.slug)) {
-        newAppliedSearchFieldList = oldAppliedSearchFieldList.filter(searchField => searchField !== field.slug)
-      } else newAppliedSearchFieldList = [...oldAppliedSearchFieldList, field.slug]
-    } else newAppliedSearchFieldList = [field.slug]
+    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.slug)
+      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.slug)
+      : [...oldAppliedSearchFieldList, field.slug]
 
     props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FIELD, newAppliedSearchFieldList, state.searchType))
 
@@ -217,9 +213,9 @@ export class AdvancedSearch extends React.Component {
       { ...currentSearch, searchType: state.searchType },
       currentSearch.resultList.length,
       newAppliedSearchFieldList,
-      currentSearch.appliedFilterList.createdRange,
-      currentSearch.appliedFilterList.modifiedRange,
-      currentSearch.appliedFilterList.searchFacets
+      currentSearch.appliedFilters.createdRange,
+      currentSearch.appliedFilters.modifiedRange,
+      currentSearch.appliedFilters.searchFacets
     )
   }
 
@@ -239,29 +235,10 @@ export class AdvancedSearch extends React.Component {
         currentSearch = props.spaceSearch
       }
     */
-
-    let newAppliedCreatedRange = {}
-    const oldAppliedCreatedRange = currentSearch.appliedFilterList.createdRange
-
-    if (oldAppliedCreatedRange) {
-      if (Object.keys(dateObject)[0] in oldAppliedCreatedRange) {
-        Object.keys(oldAppliedCreatedRange).forEach(key => {
-          if (key !== Object.keys(dateObject)[0]) {
-            newAppliedCreatedRange[key] = oldAppliedCreatedRange[key]
-          }
-        })
-      } else newAppliedCreatedRange = { ...oldAppliedCreatedRange, ...dateObject }
-    } else newAppliedCreatedRange = dateObject
-
-    props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.CREATED_RANGE, newAppliedCreatedRange, state.searchType))
-
-    this.getSearchResult(
-      { ...currentSearch, searchType: state.searchType },
-      currentSearch.resultList.length,
-      currentSearch.appliedFilterList.searchFieldList,
-      newAppliedCreatedRange,
-      currentSearch.appliedFilterList.modifiedRange,
-      currentSearch.appliedFilterList.searchFacets
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.CREATED_RANGE,
+      currentSearch.appliedFilters.createdRange,
+      dateObject
     )
   }
 
@@ -281,33 +258,37 @@ export class AdvancedSearch extends React.Component {
         currentSearch = props.spaceSearch
       }
     */
-
-    let newAppliedModifieddRange = {}
-    const oldAppliedModifieddRange = currentSearch.appliedFilterList.modifiedRange
-
-    if (oldAppliedModifieddRange) {
-      if (Object.keys(dateObject)[0] in oldAppliedModifieddRange) {
-        Object.keys(oldAppliedModifieddRange).forEach(key => {
-          if (key !== Object.keys(dateObject)[0]) {
-            newAppliedModifieddRange[key] = oldAppliedModifieddRange[key]
-          }
-        })
-      } else newAppliedModifieddRange = { ...oldAppliedModifieddRange, ...dateObject }
-    } else newAppliedModifieddRange = dateObject
-
-    props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.MODIFIED_RANGE, newAppliedModifieddRange, state.searchType))
-
-    this.getSearchResult(
-      { ...currentSearch, searchType: state.searchType },
-      currentSearch.resultList.length,
-      currentSearch.appliedFilterList.searchFieldList,
-      currentSearch.appliedFilterList.createdRange,
-      newAppliedModifieddRange,
-      currentSearch.appliedFilterList.searchFacets
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.MODIFIED_RANGE,
+      currentSearch.appliedFilters.modifiedRange,
+      dateObject
     )
   }
 
   handleChangeSearchFacets = (facetObject) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
+      currentSearch.appliedFilters.searchFacets,
+      facetObject
+    )
+  }
+
+  updateAppliedFilter = (type, oldAppliedFilter, filterObject) => {
     const { props, state } = this
     let currentSearch
     if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
@@ -323,28 +304,26 @@ export class AdvancedSearch extends React.Component {
       }
     */
 
-    let newAppliedSearchFacets = {}
-    const oldAppliedSearchFacets = currentSearch.appliedFilterList.searchFacets
+    let newAppliedFilter = {}
+    const filterKey = Object.keys(filterObject)[0]
 
-    if (oldAppliedSearchFacets) {
-      if (Object.keys(facetObject)[0] in oldAppliedSearchFacets) {
-        Object.keys(oldAppliedSearchFacets).forEach(key => {
-          if (key !== Object.keys(facetObject)[0]) {
-            newAppliedSearchFacets[key] = oldAppliedSearchFacets[key]
-          }
-        })
-      } else newAppliedSearchFacets = { ...oldAppliedSearchFacets, ...facetObject }
-    } else newAppliedSearchFacets = facetObject
+    if (oldAppliedFilter) {
+      if (Object.keys(oldAppliedFilter).includes(filterKey)) {
+        newAppliedFilter = { ...oldAppliedFilter }
+        delete newAppliedFilter[filterKey]
+      } else newAppliedFilter = { ...oldAppliedFilter, ...filterObject }
+    } else newAppliedFilter = filterObject
 
-    props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FACETS, newAppliedSearchFacets, state.searchType))
+    props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
 
     this.getSearchResult(
       { ...currentSearch, searchType: state.searchType },
       currentSearch.resultList.length,
-      currentSearch.appliedFilterList.searchFieldList,
-      currentSearch.appliedFilterList.createdRange,
-      currentSearch.appliedFilterList.modifiedRange,
-      newAppliedSearchFacets
+      currentSearch.appliedFilters.searchFieldList,
+      {
+        ...currentSearch.appliedFilters,
+        [type]: newAppliedFilter
+      }
     )
   }
 

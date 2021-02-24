@@ -6,6 +6,9 @@ import DayPickerInput from 'react-day-picker/DayPickerInput'
 import 'react-day-picker/lib/style.css'
 import dateFnsFormat from 'date-fns/format'
 import { DATE_FILTER_ELEMENT } from '../../util/helper.js'
+import { Checkbox } from 'tracim_frontend_lib'
+
+require('./DateFilter.styl')
 
 export class DateFilter extends React.Component {
   formatDate = (date, format, locale) => {
@@ -110,15 +113,16 @@ export class DateFilter extends React.Component {
     }
 
     return (
-      <>
-        <div className='searchFilterMenu__content__item__checkbox'>
-          <input
-            type='checkbox'
-            id={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}
-            onChange={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.AFTER)}
+      <div className='dateFilter'>
+        <div className='dateFilter__checkbox'>
+          <Checkbox
+            name={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}
+            onClickCheckbox={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.AFTER)}
             checked={props.isAfterCheckboxChecked}
+            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleCheck={{ top: '-5px' }}
           />
-          <label htmlFor={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}>{props.t('After')}</label>
+          <label htmlFor={`checkbox-${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}>{props.t('After')}</label>
           <DayPickerInput
             dayPickerProps={{
               disabledDays: [{
@@ -140,14 +144,15 @@ export class DateFilter extends React.Component {
           />
         </div>
 
-        <div className='searchFilterMenu__content__item__checkbox'>
-          <input
-            type='checkbox'
-            id={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}
-            onChange={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.BEFORE)}
+        <div className='dateFilter__checkbox'>
+          <Checkbox
+            name={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}
+            onClickCheckbox={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.BEFORE)}
             checked={props.isBeforeCheckboxChecked}
+            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleCheck={{ top: '-5px' }}
           />
-          <label htmlFor={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}>{props.t('Before')}</label>
+          <label htmlFor={`checkbox-${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}>{props.t('Before')}</label>
           <DayPickerInput
             dayPickerProps={{
               disabledDays: [{
@@ -168,7 +173,7 @@ export class DateFilter extends React.Component {
             value={props.beforeDate ? this.formatDate(props.beforeDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
         </div>
-      </>
+      </div>
     )
   }
 }

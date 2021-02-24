@@ -1,15 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-.checkboxFilter
-  &__title
-    background-color veryLightGrey
-    height 40px
-    align-items center
-    display flex
-    padding 10px
-    & > button
-      padding 0
-      margin-inline-end 10px
+.dateFilter
   &__checkbox
     padding 0px 5px
     display flex
@@ -18,3 +9,14 @@
       cursor pointer
     & > input[type='checkbox']
           margin 0px 10px
+
+.DayPicker
+  border 1px solid grey
+  &-Day--today
+    color fontColor
+.DayPickerInput
+  margin-inline-start 10px
+  & input
+    width 180px
+  &-OverlayWrapper
+    margin-inline-start -80px

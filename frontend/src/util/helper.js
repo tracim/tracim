@@ -44,10 +44,10 @@ export const ADVANCED_SEARCH_FILTER = {
 }
 
 export const SEARCH_FIELD_LIST = [
-  { slug: 'label', label: i18n.t('Title') },
-  { slug: 'raw_content', label: i18n.t('Content') },
-  { slug: 'comments', label: i18n.t('Comments') },
-  { slug: 'description', label: i18n.t('Description') }
+  { slug: 'label', value: i18n.t('Title') },
+  { slug: 'raw_content', value: i18n.t('Content') },
+  { slug: 'comments', value: i18n.t('Comments') },
+  { slug: 'description', value: i18n.t('Description') }
 ]
 
 export const DATE_FILTER_ELEMENT = {
