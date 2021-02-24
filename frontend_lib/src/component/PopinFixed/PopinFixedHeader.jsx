@@ -57,7 +57,7 @@ class PopinFixedHeader extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`${faIcon}`} />
+          <i className={`${faIcon}`} title={rawTitle} />
         </div>
 
         <div
@@ -103,6 +103,7 @@ class PopinFixedHeader extends React.Component {
           className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
           onClick={onClickCloseBtn}
           data-cy='popinFixed__header__button__close'
+          title={t('Close')}
         >
           <i className='fas fa-times' />
         </div>
