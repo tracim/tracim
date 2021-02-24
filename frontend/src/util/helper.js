@@ -74,10 +74,10 @@ export const SEARCH_CONTENT_FACETS = {
     slug: 'content_types',
     label: i18n.t('Type'),
     items: [
-      i18n.t('folder'),
-      i18n.t('html-document'),
-      i18n.t('thread'),
-      i18n.t('file')
+      i18n.t('folder_search'),
+      i18n.t('html-document_search'),
+      i18n.t('thread_search'),
+      i18n.t('file_search')
     ]
   },
   EXTENSION: {

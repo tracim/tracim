@@ -69,9 +69,9 @@ export class ContentFacets extends React.Component {
 
         {props.searchFacets.content_types && (
           <CheckboxFilter
-            filterList={props.searchFacets.content_types}
+            filterList={props.searchFacets.content_types.map(type => ({ ...type, value: `${type.value}_search`}))}
             label={SEARCH_CONTENT_FACETS.TYPE.label}
-            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ content_types: value })}
+            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ content_types: value.replace('_search', '') })}
             onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.TYPE.slug)}
             showFilter={state.showContentTypeList}
           />

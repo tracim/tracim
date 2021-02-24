@@ -377,10 +377,10 @@
   "closed-deprecated": "Deprecated",
   "closed-unvalidated": "Cancalled",
   "closed-validated": "Validated",
-  "folder": "Folder",
-  "html-document": "Note",
-  "thread": "Thread",
-  "file": "File",
+  "folder_search": "Folder",
+  "html-document_search": "Note",
+  "thread_search": "Thread",
+  "file_search": "File",
   "File extension": "File extension",
   "Author": "Author"
 }

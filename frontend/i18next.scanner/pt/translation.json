@@ -377,10 +377,10 @@
   "closed-deprecated": "Obsoleto",
   "closed-unvalidated": "Cancelado",
   "closed-validated": "Validado",
-  "folder": "Pasta",
-  "html-document": "Nota",
-  "thread": "Discussão",
-  "file": "Ficheiro",
+  "folder_search": "Pasta",
+  "html-document_search": "Nota",
+  "thread_search": "Discussão",
+  "file_search": "Ficheiro",
   "File extension": "Extenção de ficheiro",
   "Author": "Autor"
 }

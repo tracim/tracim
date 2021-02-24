@@ -1117,9 +1117,10 @@ export const getAdvancedSearchResult = (
 ) => dispatch => {
   const queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
+  else queryParameterList.push('search_string=*')
   if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
-  if (pageSize) queryParameterList.push(`size=${pageSize}`)
+  if (pageSize) queryParameterList.push(`size=${searchString ? pageSize : 0}`)
   if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
   if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)

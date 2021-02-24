@@ -377,10 +377,10 @@
   "closed-deprecated": "Obsolète",
   "closed-unvalidated": "Annulé",
   "closed-validated": "Validé",
-  "folder": "Dossier",
-  "html-document": "Note",
-  "thread": "Discussion",
-  "file": "Fichier",
+  "folder_search": "Dossier",
+  "html-document_search": "Note",
+  "thread_search": "Discussion",
+  "file_search": "Fichier",
   "File extension": "Extension de fichier",
   "Author": "Auteur"
 }

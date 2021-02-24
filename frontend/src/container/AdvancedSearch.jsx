@@ -469,7 +469,7 @@ export class AdvancedSearch extends React.Component {
         maxNumberSearchResults = (props.spaceSearch.numberResultsByPage * props.spaceSearch.currentPage)
       }
     */
-    return currentNumberSearchResults >= maxNumberSearchResults
+    return props.contentSearch.resultList.length !== 0 && currentNumberSearchResults >= maxNumberSearchResults
   }
 
   handleChangeSearchType = (e) => {
