@@ -65,14 +65,14 @@ export const AdvancedSearchContentList = props => {
               to={searchItemUrl}
               className='advancedSearchContent__link'
             />
-            <div class='advancedSearchContent__wrapper'>
+            <div className='advancedSearchContent__wrapper'>
               <div
                 className='advancedSearchContent__type__content'
                 style={{ color: searchItem.contentType.hexcolor }}
-                title={props.t(searchItem.contentType.label)}
               >
                 <Icon
                   icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                  title={props.t(searchItem.contentType.label)}
                   color={searchItem.contentType.hexcolor}
                 />
                 <span>{props.t(searchItem.contentType.label)}</span>
@@ -102,15 +102,15 @@ export const AdvancedSearchContentList = props => {
               {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
                 <div className='advancedSearchContent__information'>
                   <span className='advancedSearchContent__information__comments'>
+                    <Icon
+                      icon='fa-fw far fa-comment'
+                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                    />
                     <span
                       title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
                     >
                       {searchItem.commentCount}
                     </span>
-                    <Icon
-                      icon='fa-fw far fa-comment'
-                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                    />
                   </span>
                   <span className='advancedSearchContent__information__status'>
                     <Icon

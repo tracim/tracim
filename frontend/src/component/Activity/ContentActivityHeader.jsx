@@ -20,22 +20,22 @@ require('./ContentActivityHeader.styl')
 export class ContentActivityHeader extends React.Component {
   getDisplayOperation (message) {
     const { props } = this
-    if (message.fields.content.current_revision_type === 'status-update') return props.t('status modified')
+    if (message.fields.content.current_revision_type === 'status-update') return 'status-update'
     const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
-    if (TLM_ET.MENTION === entityType) return props.t('mention made')
-    if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
+    if (TLM_ET.MENTION === entityType) return 'mention'
+    if (CONTENT_TYPE.COMMENT === subEntityType) return 'comment'
 
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return props.t('created')
+        return 'created'
       case TLM_CET.MODIFIED:
-        return props.t('modified')
+        return 'modified'
       case TLM_CET.DELETED:
-        return props.t('deleted')
+        return 'deleted'
       case TLM_CET.UNDELETED:
-        return props.t('restored')
+        return 'restored'
     }
-    return props.t('unknown')
+    return 'unknown'
   }
 
   render () {

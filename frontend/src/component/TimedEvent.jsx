@@ -10,18 +10,24 @@ import {
 
 require('./TimedEvent.styl')
 
-function operationText (operation, t) {
+function getDisplayOperation (operation, t) {
   switch (operation) {
     case 'revision':
-      return t('Revision')
+      return t('modified')
     case 'creation':
-      return t('Creation')
+      return t('created')
     case 'edition':
-      return t('Edition')
+      return t('edited')
     case 'undeletion':
-      return t('Undeletion')
+      return t('undeleted')
+    case 'mention':
+      return props.t('mention made')
+    case 'comment':
+      return props.t('commented')
     case 'status-update':
-      return t('Status change')
+      return t('status modified')
+    case 'unkown':
+      return t('unknown')
   }
 
   return operation
