@@ -541,7 +541,7 @@ You can find an example docker compose file for storing files in minio [here](..
 
 ## Translation Feature
 
-Tracim has a feature allowing translation of Note and Comments through external translation service (only systran supported now)
+Tracim has a feature allowing translation of notes and comments through external translation service (only systran supported now)
 To enable it in config file:
 
 ```
