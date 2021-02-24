@@ -385,6 +385,94 @@ class TestElasticSearch(object):
             ]
             assert is_now(search_result["created_range"]["from"])
 
+    def test_api___elasticsearch_search_ok__wildcard__facet_only(
+        self,
+        user_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        session,
+    ) -> None:
+
+        user_public_name = "Claude"
+        user2_public_name = "Leslie"
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.TRUSTED_USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            name=user_public_name,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test.test",
+            password="test2@test.test",
+            do_save=True,
+            do_notify=False,
+            name=user2_public_name,
+            profile=profile,
+        )
+        workspace_name = "test"
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace(workspace_name, save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = content_api_factory.get(current_user=user)
+        content = api.create(
+            content_type_slug="html-document", workspace=workspace, label="document", do_save=True,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            api = content_api_factory.get(current_user=user2)
+            api.update_content(content, new_label="document", new_raw_content="just some content")
+            api.save(content)
+        api = content_api_factory.get(current_user=user)
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+        elasticsearch.refresh_elasticsearch()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get(
+            "/api/advanced_search/content", status=200, params={"search_string": "*", "size": 0}
+        )
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 3
+        assert search_result["is_total_hits_accurate"] is True
+        assert set(search_result["search_fields"]) == set(
+            ["label", "raw_content", "comment", "description"]
+        )
+        assert search_result["contents"] == []
+        assert search_result["facets"]["file_extensions"] == [
+            {"value": ".document.html", "count": 2},
+            {"value": ".thread.html", "count": 1},
+        ]
+        assert search_result["facets"]["content_types"] == [
+            {"value": "html-document", "count": 2},
+            {"value": "thread", "count": 1},
+        ]
+        assert search_result["facets"]["workspace_names"] == [
+            {"value": workspace_name, "count": 3},
+        ]
+        assert search_result["facets"]["author__public_names"] == [
+            {"value": user_public_name, "count": 3}
+        ]
+        assert search_result["facets"]["last_modifier__public_names"] == [
+            {"value": user_public_name, "count": 2},
+            {"value": user2_public_name, "count": 1},
+        ]
+        assert search_result["created_range"]
+
     @pytest.mark.parametrize(
         "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [

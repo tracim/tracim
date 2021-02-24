@@ -83,9 +83,7 @@ class ContentSearchQuerySchema(marshmallow.Schema):
         missing="",
         default_value="",
     )
-    size = marshmallow.fields.Int(
-        required=False, default=10, validate=strictly_positive_int_validator
-    )
+    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
