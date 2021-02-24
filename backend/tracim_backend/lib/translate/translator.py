@@ -40,13 +40,13 @@ class TranslateService(ABC):
 
     @property
     @abstractmethod
-    def supported_languages_pair(self) -> List[TranslationLanguagePair]:
+    def supported_language_pairs(self) -> List[TranslationLanguagePair]:
         """How to obtain the list of translation pair supported"""
         pass
 
     @property
     @abstractmethod
-    def supported_mimetypes_pair(self) -> List[TranslationMimetypePair]:
+    def supported_mimetype_pairs(self) -> List[TranslationMimetypePair]:
         """ List of supported mimetypes for the service"""
         pass
 

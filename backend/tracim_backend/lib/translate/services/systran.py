@@ -94,15 +94,15 @@ class SystranTranslateService(TranslateService):
         return formats
 
     @property
-    def supported_mimetypes_pair(self) -> List[TranslationMimetypePair]:
-        mimetypes_pairs = []
+    def supported_mimetype_pairs(self) -> List[TranslationMimetypePair]:
+        mimetype_pairs = []
         for format in self.supported_format:
-            mimetypes_pairs.append(format.mimetype_pair)
-        return mimetypes_pairs
+            mimetype_pairs.append(format.mimetype_pair)
+        return mimetype_pairs
 
     @property
-    def supported_languages_pair(self) -> List[TranslationLanguagePair]:
-        languages_pairs = []
+    def supported_language_pairs(self) -> List[TranslationLanguagePair]:
+        language_pairs = []
         params = self._add_auth_to_params({})
         response = requests.get(
             "{}{}".format(self.api_url, SUPPORTED_LANGUAGES_ENDPOINT),
@@ -114,8 +114,8 @@ class SystranTranslateService(TranslateService):
         for pair in pairs:
             source = pair["source"]
             target = pair["target"]
-            languages_pairs.append(TranslationLanguagePair(source, target))
-        return languages_pairs
+            language_pairs.append(TranslationLanguagePair(source, target))
+        return language_pairs
 
 
 # TODO: remove this code as soon as tracim implement the api.

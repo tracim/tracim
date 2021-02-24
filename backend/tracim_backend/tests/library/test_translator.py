@@ -30,14 +30,14 @@ class FakeTranslateService(TranslateService):
         return io.BytesIO("Translated".encode("utf-8"))
 
     @property
-    def supported_languages_pair(self):
+    def supported_language_pairs(self):
         return [
             TranslationLanguagePair("fr", "en"),
             TranslationLanguagePair("en", "fr"),
         ]
 
     @property
-    def supported_mimetypes_pair(self) -> List[str]:
+    def supported_mimetype_pairs(self) -> List[str]:
         return ["text/plain"]
 
 
@@ -71,8 +71,8 @@ class TestSystranTranslateService:
         )
         translate_service = SystranTranslateService(api_url=BASE_API_URL, api_key=API_KEY)
 
-        assert len(translate_service.supported_languages_pair) == 1
-        assert translate_service.supported_languages_pair[0] == TranslationLanguagePair("en", "fr")
+        assert len(translate_service.supported_language_pairs) == 1
+        assert translate_service.supported_language_pairs[0] == TranslationLanguagePair("en", "fr")
 
     @responses.activate
     def test_unit___systran_service__supported_mimetype_pairs__ok__nominal_case(self):
@@ -96,8 +96,8 @@ class TestSystranTranslateService:
         assert format.name == "sample"
         assert format.mimetype_pair == mimetype_pair
 
-        assert len(translate_service.supported_mimetypes_pair) == 1
-        assert translate_service.supported_mimetypes_pair[0] == mimetype_pair
+        assert len(translate_service.supported_mimetype_pairs) == 1
+        assert translate_service.supported_mimetype_pairs[0] == mimetype_pair
 
     @responses.activate
     def test_unit___systran_service__translate_file__ok__nominal_case(self):
