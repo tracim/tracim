@@ -17,22 +17,18 @@ SUPPORTED_LANGUAGES_ENDPOINT = "/translation/supportedLanguages"
 
 
 class SystranFormat:
-    def __init__(self, name: str, mimetype_pair: TranslationLanguagePair):
+    def __init__(self, name: str, mimetype_pair: TranslationMimetypePair):
         self.name = name
         self.mimetype_pair = mimetype_pair
 
     def __repr__(self):
-        return "<Systranformat(name=%s, translation_pair=%s)>" % (
+        return "<SystranFormat(name={}, translation_pair={})>".format(
             repr(self.name),
             repr(self.mimetype_pair),
         )
 
 
-class SystranTranslateService(TranslateService):
-    """
-    Sample example of translation service:
-    Do uppercase the text/plain file given.
-    """
+class SystranTranslationService(TranslationService):
 
     def __init__(self, api_url: str, api_key: str):
         self.api_url = api_url
@@ -47,9 +43,9 @@ class SystranTranslateService(TranslateService):
         return params
 
     def translate_file(
-        self, language_pair, file_buffer: BinaryIO, mimetype: str, **options
+        self, language_pair: TranslationLanguagePair, binary_io: BinaryIO, mimetype: str, **kwargs: typing.Any
     ) -> BinaryIO:
-        format = options.get("format")
+        format = kwargs.get("format")
         extension = mimetypes.guess_extension(mimetype)
         file_name = "file{}".format(extension)
         params = {
@@ -62,7 +58,7 @@ class SystranTranslateService(TranslateService):
             params["format"] = format
         response = requests.post(
             "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
-            files={"input": (file_name, file_buffer, mimetype)},
+            files={"input": (file_name, binary_io, mimetype)},
             params=params,
             # TODO: RECHECK how to use header instead of query parameter
             # headers={
@@ -76,7 +72,7 @@ class SystranTranslateService(TranslateService):
             raise TranslationFailed(str(response.json()))
 
     @property
-    def supported_format(self) -> List[SystranFormat]:
+    def supported_formats(self) -> List[SystranFormat]:
         formats = []
         params = self._add_auth_to_params({})
         response = requests.get(

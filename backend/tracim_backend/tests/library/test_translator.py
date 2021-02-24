@@ -14,7 +14,7 @@ from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 
 
-class FakeTranslateService(TranslateService):
+class FakeTranslationService(TranslationService):
     """
     Sample example of translation service:
     Do uppercase the text/plain file given.
@@ -42,16 +42,16 @@ class FakeTranslateService(TranslateService):
 
 
 class TestExternalTranslator:
-    def test__fake_translate_service_translate__nominal_case(self):
-        translator = ExternalTranslator(FakeTranslateService())
+    def test__fake_translate_service_translate__nominal_case(self) -> None:
+        translator = ExternalTranslator(FakeTranslationService())
         base_content = io.BytesIO("Source content".encode("utf-8"))
         result = translator.translate("fr", "en", base_content, "text/plain",)
         assert result.read().decode("utf-8") == "Translated"
 
 
-class TestSystranTranslateService:
+class TestSystranTranslationService:
     @responses.activate
-    def test_unit___systran_service__supported_languages_pair__ok__nominal_case(self):
+    def test_unit___systran_service__supported_languages_pair__ok__nominal_case(self) -> None:
         BASE_API_URL = "https://systran_fake_server:5050"
         API_KEY = "a super key"
         content_response_json = {
@@ -113,8 +113,8 @@ class TestSystranTranslateService:
             content_type="text/plain",
             stream=True,
         )
-        translate_service = SystranTranslateService(api_url=BASE_API_URL, api_key=API_KEY)
-        result = translate_service.translate_file(
+        translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
+        result = translation_service.translate_file(
             file_buffer=base_content,
             language_pair=TranslationLanguagePair("fr", "en"),
             mimetype="text/plain",
