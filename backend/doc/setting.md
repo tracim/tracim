@@ -538,3 +538,15 @@ Tracim can also be configured to use a Amazon S3 compatible storage back-end by 
 If you want to use your own S3 compatible back-end we recommend [minio](https://min.io) as we have tested its usage with Tracim.
 
 You can find an example docker compose file for storing files in minio [here](../../tools_docker/docker-compose-minio.yml)
+
+## Translation Feature
+
+Tracim has a feature allowing translation of Note and Comments through external translation service (only systran supported now)
+To enable it in config file:
+
+```
+translation_service.enabled = True
+translation_service.provider = systran
+translation_service.systran.api_url = https://translate.systran.net/
+translation_service.systran.api_key = your-systran-api-key
+```

@@ -779,7 +779,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; translation_service.systran.api_key =
 # example:
 # translation_service.systran.api_url = https://translate.systran.net/
-# translation_service.systran.api_key = xxxx-xxxx-xxxx.xxxx
+# translation_service.systran.api_key = your-systran-api-key
 
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
 
