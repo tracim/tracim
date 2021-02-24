@@ -524,9 +524,7 @@ class ESSearchApi(SearchApi):
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string",
-            query=search_parameters.search_string,
-            fields=es_search_fields,
+            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -684,14 +682,10 @@ class ESSearchApi(SearchApi):
 
         search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
         search.aggs.metric(
-            "newest_authored_content_date_from",
-            "min",
-            field="newest_authored_content_date",
+            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
         )
         search.aggs.metric(
-            "newest_authored_content_date_to",
-            "max",
-            field="newest_authored_content_date",
+            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
         )
         response = search.execute()
         known_workspaces = self._get_workspaces_known_to_user()
@@ -1033,25 +1027,19 @@ class ESUserIndexer:
 
     @hookimpl
     def on_user_role_in_workspace_created(
-        self,
-        role: UserRoleInWorkspace,
-        context: TracimContext,
+        self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self,
-        role: UserRoleInWorkspace,
-        context: TracimContext,
+        self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self,
-        role: UserRoleInWorkspace,
-        context: TracimContext,
+        self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
         self._index_user(role.user, context)
 
