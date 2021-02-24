@@ -827,10 +827,7 @@ def user_search_fixture(
     bob_and_riyad = wapi.create_workspace("Bob & Riyad")
     rapi = role_api_factory.get(bob_user)
     rapi.create_one(
-        riyad_user,
-        bob_and_riyad,
-        role_level=UserRoleInWorkspace.CONTRIBUTOR,
-        with_notif=False,
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
@@ -841,9 +838,7 @@ def user_search_fixture(
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchUserSearch:
     def test_api__elasticsearch_user_search__ok__check_result(
-        self,
-        web_testapp,
-        user_search_fixture: typing.Tuple[User, User],
+        self, web_testapp, user_search_fixture: typing.Tuple[User, User],
     ) -> None:
         (bob_user, riyad_user) = user_search_fixture
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
@@ -940,10 +935,7 @@ def workspace_search_fixture(
     bob_and_riyad = wapi.create_workspace("Bob & Riyad")
     rapi = role_api_factory.get(bob_user)
     rapi.create_one(
-        riyad_user,
-        bob_and_riyad,
-        role_level=UserRoleInWorkspace.CONTRIBUTOR,
-        with_notif=False,
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
@@ -954,9 +946,7 @@ def workspace_search_fixture(
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchWorkspaceSearch:
     def test_api__elasticsearch_workspace_search__ok__check_result(
-        self,
-        web_testapp,
-        workspace_search_fixture: typing.Tuple[User, User],
+        self, web_testapp, workspace_search_fixture: typing.Tuple[User, User],
     ) -> None:
         (bob_only_workspace, _) = workspace_search_fixture
         bob = bob_only_workspace.owner
