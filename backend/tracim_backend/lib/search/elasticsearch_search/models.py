@@ -203,9 +203,7 @@ class SearchedWorkspace:
 
 class WorkspaceSearchResponse:
     def __init__(
-        self,
-        hits: typing.Dict[str, typing.Any],
-        facets: typing.Dict[str, typing.List[FacetCount]],
+        self, hits: typing.Dict[str, typing.Any], facets: typing.Dict[str, typing.List[FacetCount]],
     ) -> None:
         self.workspaces = [
             SearchedWorkspace(
