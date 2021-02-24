@@ -6,7 +6,6 @@ from typing import List
 
 import requests
 
-from tracim_backend.lib.translate.translator import ExternalTranslator
 from tracim_backend.lib.translate.translator import TranslationFailed
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
@@ -18,30 +17,30 @@ SUPPORTED_LANGUAGES_ENDPOINT = "/translation/supportedLanguages"
 
 
 class SystranFormat:
-    def __init__(self, name: str, mimetype_pair: TranslationMimetypePair):
+    def __init__(self, name: str, mimetype_pair: TranslationMimetypePair) -> None:
         self.name = name
         self.mimetype_pair = mimetype_pair
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<SystranFormat(name={}, translation_pair={})>".format(
             repr(self.name), repr(self.mimetype_pair),
         )
 
 
 class SystranTranslationService(TranslationService):
-    def __init__(self, api_url: str, api_key: str):
+    def __init__(self, api_url: str, api_key: str) -> None:
         self.api_url = api_url
         self.api_key = api_key
 
     @property
-    def name(self):
+    def name(self) -> str:
         return "Systran"
 
     def _add_auth_to_headers(self, headers: dict) -> dict:
         headers["Authorization"] = "{} {}".format("Key", self.api_key)
         return headers
 
-    def translate_file(
+    def _translate_file(
         self,
         language_pair: TranslationLanguagePair,
         binary_io: BinaryIO,
@@ -114,14 +113,12 @@ class SystranTranslationService(TranslationService):
 if __name__ == "__main__":
     import os
 
-    simple_html_file = "a valid_path"
-    translator = ExternalTranslator(
-        SystranTranslationService(
-            api_url=os.environ["SYSTRAN_API_URL"], api_key=os.environ["SYSTRAN_API_KEY"]
-        )
+    simple_html_file = "valid path"
+    translation_service = SystranTranslationService(
+        api_url=os.environ["SYSTRAN_API_URL"], api_key=os.environ["SYSTRAN_API_KEY"]
     )
     with open(simple_html_file, "rb") as my_file:
-        result = translator.translate(
+        result = translation_service.translate_file(
             "fr",
             "ko",
             my_file,

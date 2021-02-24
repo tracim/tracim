@@ -22,8 +22,14 @@ class TranslationService(ABC):
     connect to a service, and permit to obtain translations
     """
 
-    @abstractmethod
     def translate_file(
+        self, input_lang: str, output_lang: str, binary_io: BinaryIO, mimetype: str, **options: Any
+    ) -> BinaryIO:
+        current_node = TranslationLanguagePair(input_lang, output_lang)
+        return self._translate_file(current_node, binary_io, mimetype, **options)
+
+    @abstractmethod
+    def _translate_file(
         self,
         language_pair: TranslationLanguagePair,
         binary_io: BinaryIO,
@@ -50,28 +56,3 @@ class TranslationService(ABC):
     def supported_mimetype_pairs(self) -> List[TranslationMimetypePair]:
         """ List of supported mimetypes for the service"""
         pass
-
-
-class ExternalTranslator:
-    """
-    Main class for translation, same api for different translation service.
-    """
-
-    def __init__(self, translate_service: TranslationService):
-        self.translate_service = translate_service
-
-    def translate(
-        self, input_lang: str, output_lang: str, binary_io: BinaryIO, mimetype: str, **options: Any
-    ) -> BinaryIO:
-        current_node = TranslationLanguagePair(input_lang, output_lang)
-        return self._translate(current_node, self.translate_service, binary_io, mimetype, **options)
-
-    def _translate(
-        self,
-        translation_node: TranslationLanguagePair,
-        backend: TranslationService,
-        file_buffer: BinaryIO,
-        mimetype: str,
-        **kwargs: Any
-    ) -> BinaryIO:
-        return backend.translate_file(translation_node, file_buffer, mimetype, **kwargs)

@@ -8,7 +8,6 @@ from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPO
 from tracim_backend.lib.translate.services.systran import SUPPORTED_FORMAT_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_LANGUAGES_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SystranTranslationService
-from tracim_backend.lib.translate.translator import ExternalTranslator
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 from tracim_backend.lib.translate.translator import TranslationService
@@ -24,7 +23,7 @@ class FakeTranslationService(TranslationService):
     def name(self):
         return "uppercase"
 
-    def translate_file(
+    def _translate_file(
         self, language_pair, binary_io: BinaryIO, mimetype: str, **options
     ) -> BinaryIO:
         return io.BytesIO("Translated".encode("utf-8"))
@@ -42,10 +41,10 @@ class FakeTranslationService(TranslationService):
 
 
 class TestExternalTranslator:
-    def test__fake_translate_service_translate__nominal_case(self) -> None:
-        translator = ExternalTranslator(FakeTranslationService())
+    def test__fake_translate_service_translate_file__nominal_case(self) -> None:
+        translator = FakeTranslationService()
         base_content = io.BytesIO("Source content".encode("utf-8"))
-        result = translator.translate("fr", "en", base_content, "text/plain",)
+        result = translator.translate_file("fr", "en", base_content, "text/plain",)
         assert result.read().decode("utf-8") == "Translated"
 
 
@@ -117,8 +116,6 @@ class TestSystranTranslationService:
         )
         translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
         result = translation_service.translate_file(
-            binary_io=base_content,
-            language_pair=TranslationLanguagePair("fr", "en"),
-            mimetype="text/plain",
+            input_lang="fr", output_lang="en", binary_io=base_content, mimetype="text/plain",
         )
         assert result.read().decode("utf-8") == "Translated"
