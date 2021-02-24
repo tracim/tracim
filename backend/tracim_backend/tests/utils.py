@@ -301,14 +301,21 @@ class MessageHelper(object):
 
 class TracimTestContext(TracimContext):
     def __init__(
-        self, app_config: CFG, session_factory, user: typing.Optional[User] = None,
+        self,
+        app_config: CFG,
+        session_factory,
+        user: typing.Optional[User] = None,
+        init_plugins: bool = True,
     ) -> None:
         super().__init__()
         self._app_config = app_config
-        self._plugin_manager = init_plugin_manager(app_config)
-        # mock event publishing to avoid requiring a working
-        # pushpin instance for every test
-        EventPublisher._publish_pending_events_of_context = mock.Mock()
+        if init_plugins:
+            self._plugin_manager = init_plugin_manager(app_config)
+            # mock event publishing to avoid requiring a working
+            # pushpin instance for every test
+            EventPublisher._publish_pending_events_of_context = mock.Mock()
+        else:
+            self._plugin_manager = create_plugin_manager()
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
         self._dbsession.set_context(self)
         self._current_user = user

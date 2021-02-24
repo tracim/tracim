@@ -10,6 +10,7 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.response.aggs import Bucket
 import pluggy
 from sqlalchemy import inspect
+from sqlalchemy.event import listen
 from sqlalchemy.orm import Session
 
 # from tracim_backend.lib.search.models import UserSearchResponse
@@ -21,6 +22,9 @@ from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rq import RqQueueName
+from tracim_backend.lib.rq import get_rq_queue2
+from tracim_backend.lib.rq.worker import worker_context
 from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
@@ -877,10 +881,7 @@ class ESContentIndexer:
         """Index the given content"""
         content = self._get_main_content(content)
         try:
-            search_api = ESSearchApi(
-                session=context.dbsession, config=context.app_config, current_user=None
-            )
-            search_api.index_content(content)
+            self.index_contents([content], context)
         except Exception:
             logger.exception(
                 self, "Exception while indexing created content {}".format(content.content_id)
@@ -892,16 +893,12 @@ class ESContentIndexer:
 
         Children are indexed only if the content has changes influencing their index."""
         content = self._get_main_content(content)
-        search_api = ESSearchApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
         try:
-            search_api.index_content(content)
+            self.index_contents([content], context)
             if self._should_reindex_children(content.current_revision):
-                search_api.index_contents(
-                    self._filter_excluded_content_types(content.recursive_children)
+                self.index_contents(
+                    self._filter_excluded_content_types(content.recursive_children), context
                 )
-
         except Exception:
             logger.exception(
                 self, "Exception while indexing modified content {}".format(content.content_id)
@@ -914,9 +911,6 @@ class ESContentIndexer:
         Contents are indexed only if the workspace has changes influencing their index."""
         if not self._should_reindex_children(workspace):
             return
-        search_api = ESSearchApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
         content_api = ContentApi(
             session=context.dbsession,
             current_user=None,
@@ -925,8 +919,9 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            search_api.index_contents(
-                self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace))
+            self.index_contents(
+                self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace)),
+                context,
             )
         except Exception:
             logger.exception(
@@ -944,9 +939,6 @@ class ESContentIndexer:
         """
         if not inspect(user).attrs.display_name.history.has_changes():
             return
-        search_api = ESSearchApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
         content_api = ContentApi(
             session=context.dbsession,
             current_user=None,
@@ -955,7 +947,7 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            search_api.index_contents(content_api.get_all_query(user=user))
+            self.index_contents(content_api.get_all_query(user=user), context)
         except Exception:
             logger.exception(
                 self,
@@ -963,6 +955,36 @@ class ESContentIndexer:
                     user.user_id
                 ),
             )
+
+    def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            content_ids = [content.content_id for content in contents]
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_contents_from_ids, content_ids)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            for content in contents:
+                search_api.index_content(content)
+
+    def _index_contents_from_ids(self, content_ids: typing.List[int]) -> None:
+        """Index contents whose ids are given.
+        Is exclusively made to be used inside a RQ DatabaseWorker()
+        """
+        with worker_context() as context:
+            capi = ContentApi(
+                session=context.dbsession, current_user=None, config=context.app_config
+            )
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            for content_id in content_ids:
+                search_api.index_content(capi.get_one(content_id))
 
     @classmethod
     def _get_main_content(cls, content: Content) -> Content:
@@ -1001,11 +1023,11 @@ class ESUserIndexer:
 
     @hookimpl
     def on_user_created(self, user: User, context: TracimContext) -> None:
-        self._index_user(user, context)
+        self.index_user(user, context)
 
     @hookimpl
     def on_user_modified(self, user: User, context: TracimContext) -> None:
-        self._index_user(user, context)
+        self.index_user(user, context)
 
     @hookimpl
     def on_user_deleted(self, user: User, context: TracimContext) -> None:
@@ -1019,38 +1041,63 @@ class ESUserIndexer:
 
     @hookimpl
     def on_content_created(self, content: Content, context: TracimContext) -> None:
-        self._index_user(content.current_revision.owner, context)
+        self.index_user(content.current_revision.owner, context)
 
     @hookimpl
     def on_content_modified(self, content: Content, context: TracimContext) -> None:
-        self._index_user(content.current_revision.owner, context)
+        self.index_user(content.current_revision.owner, context)
 
     @hookimpl
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
-        self._index_user(role.user, context)
+        self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
         self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
-        self._index_user(role.user, context)
+        self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
         self, role: UserRoleInWorkspace, context: TracimContext,
     ) -> None:
-        self._index_user(role.user, context)
+        self.index_user(role.user, context)
 
-    def _index_user(self, user: User, context: TracimContext) -> None:
-        search_api = ESSearchApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
-        try:
-            search_api.index_user(user)
-        except Exception:
-            logger.exception(self, "Exception while indexing user {}".format(user.user_id))
+    def index_user(self, user: User, context: TracimContext) -> None:
+        """Index the given user in the corresponding ES index.
+        Two execution modes: sync or async depending on jobs.processing_mode.
+        """
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            user_id = user.user_id
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_user_from_id, user_id)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            try:
+                search_api.index_user(user)
+            except Exception:
+                logger.exception(self, "Exception while indexing user {}".format(user.user_id))
+
+    def _index_user_from_id(self, user_id: int) -> None:
+        """Index user whose id is given.
+        Is exclusively made to be used inside a RQ DatabaseWorker().
+        """
+        with worker_context() as context:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            user_api = UserApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            search_api.index_user(user_api.get_one(user_id))
 
 
 class ESWorkspaceIndexer:
@@ -1058,11 +1105,11 @@ class ESWorkspaceIndexer:
 
     @hookimpl
     def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
-        self._index_workspace(workspace, context)
+        self.index_workspace(workspace, context)
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
-        self._index_workspace(workspace, context)
+        self.index_workspace(workspace, context)
 
     @hookimpl
     def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
@@ -1079,26 +1126,52 @@ class ESWorkspaceIndexer:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._index_workspace(role.workspace, context)
+        self.index_workspace(role.workspace, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._index_workspace(role.workspace, context)
+        self.index_workspace(role.workspace, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._index_workspace(role.workspace, context)
+        self.index_workspace(role.workspace, context)
 
-    def _index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
-        search_api = ESSearchApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
-        try:
-            search_api.index_workspace(workspace)
-        except Exception:
-            msg = "Exception while indexing workspace {}".format(workspace.workspace_id)
-            logger.exception(self, msg)
+    def index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
+        """Index the given workpace in the corresponding ES index.
+
+        Two execution modes: sync or async depending on jobs.processing_mode.
+        """
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            workspace_id = workspace.workspace_id
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_workspace_from_id, workspace_id)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            try:
+                search_api.index_workspace(workspace)
+            except Exception:
+                msg = "Exception while indexing workspace {}".format(workspace.workspace_id)
+                logger.exception(self, msg)
+
+    def _index_workspace_from_id(self, workspace_id: int) -> None:
+        """Index workspace whose id is given.
+        Is exclusively made to be used inside a RQ DatabaseWorker().
+        """
+        with worker_context() as context:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            workspace_api = WorkspaceApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            search_api.index_workspace(workspace_api.get_one(workspace_id))

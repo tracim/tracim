@@ -131,5 +131,6 @@
   "Error while uploading file": "Error while uploading file",
   "Error while uploading file(s)": "Error while uploading file(s)",
   "Please wait until the upload ends": "Please wait until the upload ends",
-  "Avatar of {{publicName}}": "Avatar of {{publicName}}"
+  "Avatar of {{publicName}}": "Avatar of {{publicName}}",
+  "Close": "Close"
 }

@@ -616,7 +616,7 @@ class ContentApi(object):
     def get_one(
         self,
         content_id: int,
-        content_type: str,
+        content_type: str = content_type_list.Any_SLUG,
         workspace: Workspace = None,
         parent: Content = None,
         ignore_content_state_filter: bool = False,
