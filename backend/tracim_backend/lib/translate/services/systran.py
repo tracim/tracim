@@ -1,15 +1,16 @@
 from http import HTTPStatus
 import mimetypes
+from typing import Any
 from typing import BinaryIO
 from typing import List
 
 import requests
 
 from tracim_backend.lib.translate.translator import ExternalTranslator
-from tracim_backend.lib.translate.translator import TranslateService
 from tracim_backend.lib.translate.translator import TranslationFailed
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
+from tracim_backend.lib.translate.translator import TranslationService
 
 FILE_TRANSLATION_ENDPOINT = "/translation/file/translate"
 SUPPORTED_FORMAT_ENDPOINT = "/translation/supportedFormats"
@@ -23,13 +24,11 @@ class SystranFormat:
 
     def __repr__(self):
         return "<SystranFormat(name={}, translation_pair={})>".format(
-            repr(self.name),
-            repr(self.mimetype_pair),
+            repr(self.name), repr(self.mimetype_pair),
         )
 
 
 class SystranTranslationService(TranslationService):
-
     def __init__(self, api_url: str, api_key: str):
         self.api_url = api_url
         self.api_key = api_key
@@ -43,7 +42,11 @@ class SystranTranslationService(TranslationService):
         return params
 
     def translate_file(
-        self, language_pair: TranslationLanguagePair, binary_io: BinaryIO, mimetype: str, **kwargs: typing.Any
+        self,
+        language_pair: TranslationLanguagePair,
+        binary_io: BinaryIO,
+        mimetype: str,
+        **kwargs: Any
     ) -> BinaryIO:
         format = kwargs.get("format")
         extension = mimetypes.guess_extension(mimetype)
@@ -92,7 +95,7 @@ class SystranTranslationService(TranslationService):
     @property
     def supported_mimetype_pairs(self) -> List[TranslationMimetypePair]:
         mimetype_pairs = []
-        for format in self.supported_format:
+        for format in self.supported_formats:
             mimetype_pairs.append(format.mimetype_pair)
         return mimetype_pairs
 
@@ -120,7 +123,7 @@ if __name__ == "__main__":
 
     simple_html_file = "a valid_path"
     translator = ExternalTranslator(
-        SystranTranslateService(
+        SystranTranslationService(
             api_url=os.environ["SYSTRAN_API_URL"], api_key=os.environ["SYSTRAN_API_KEY"]
         )
     )

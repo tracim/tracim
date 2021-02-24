@@ -7,11 +7,11 @@ import responses
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_FORMAT_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_LANGUAGES_ENDPOINT
-from tracim_backend.lib.translate.services.systran import SystranTranslateService
+from tracim_backend.lib.translate.services.systran import SystranTranslationService
 from tracim_backend.lib.translate.translator import ExternalTranslator
-from tracim_backend.lib.translate.translator import TranslateService
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
+from tracim_backend.lib.translate.translator import TranslationService
 
 
 class FakeTranslationService(TranslationService):
@@ -25,7 +25,7 @@ class FakeTranslationService(TranslationService):
         return "uppercase"
 
     def translate_file(
-        self, language_pair, file_buffer: BinaryIO, mimetype: str, **options
+        self, language_pair, binary_io: BinaryIO, mimetype: str, **options
     ) -> BinaryIO:
         return io.BytesIO("Translated".encode("utf-8"))
 
@@ -69,7 +69,7 @@ class TestSystranTranslationService:
             json=content_response_json,
             status=200,
         )
-        translate_service = SystranTranslateService(api_url=BASE_API_URL, api_key=API_KEY)
+        translate_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
 
         assert len(translate_service.supported_language_pairs) == 1
         assert translate_service.supported_language_pairs[0] == TranslationLanguagePair("en", "fr")
@@ -89,10 +89,10 @@ class TestSystranTranslationService:
             json=content_response_json,
             status=200,
         )
-        translate_service = SystranTranslateService(api_url=BASE_API_URL, api_key=API_KEY)
+        translate_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
         mimetype_pair = TranslationMimetypePair("text/input", "text/output")
-        assert len(translate_service.supported_format) == 1
-        format = translate_service.supported_format[0]
+        assert len(translate_service.supported_formats) == 1
+        format = translate_service.supported_formats[0]
         assert format.name == "sample"
         assert format.mimetype_pair == mimetype_pair
 
@@ -115,7 +115,7 @@ class TestSystranTranslationService:
         )
         translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
         result = translation_service.translate_file(
-            file_buffer=base_content,
+            binary_io=base_content,
             language_pair=TranslationLanguagePair("fr", "en"),
             mimetype="text/plain",
         )

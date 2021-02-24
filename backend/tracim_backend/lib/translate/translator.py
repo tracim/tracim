@@ -1,6 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 from collections import namedtuple
+from typing import Any
 from typing import BinaryIO
 from typing import List
 
@@ -15,7 +16,7 @@ class TranslationFailed(Exception):
     pass
 
 
-class TranslateService(ABC):
+class TranslationService(ABC):
     """
     Translation service: Class based on this should
     connect to a service, and permit to obtain translations
@@ -25,9 +26,9 @@ class TranslateService(ABC):
     def translate_file(
         self,
         language_pair: TranslationLanguagePair,
-        file_buffer: BinaryIO,
+        binary_io: BinaryIO,
         mimetype: str,
-        **options
+        **kwargs: Any
     ) -> BinaryIO:
         """ Translate a file"""
         pass
@@ -56,23 +57,21 @@ class ExternalTranslator:
     Main class for translation, same api for different translation service.
     """
 
-    def __init__(self, translate_service: TranslateService):
+    def __init__(self, translate_service: TranslationService):
         self.translate_service = translate_service
 
     def translate(
-        self, input_lang: str, output_lang: str, file_buffer: BinaryIO, mimetype: str, **options
-    ):
+        self, input_lang: str, output_lang: str, binary_io: BinaryIO, mimetype: str, **options: Any
+    ) -> BinaryIO:
         current_node = TranslationLanguagePair(input_lang, output_lang)
-        return self._translate(
-            current_node, self.translate_service, file_buffer, mimetype, **options
-        )
+        return self._translate(current_node, self.translate_service, binary_io, mimetype, **options)
 
     def _translate(
         self,
         translation_node: TranslationLanguagePair,
-        backend: TranslateService,
+        backend: TranslationService,
         file_buffer: BinaryIO,
         mimetype: str,
-        **options
-    ):
-        return backend.translate_file(translation_node, file_buffer, mimetype, **options)
+        **kwargs: Any
+    ) -> BinaryIO:
+        return backend.translate_file(translation_node, file_buffer, mimetype, **kwargs)
