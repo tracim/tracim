@@ -19,8 +19,8 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.translate.services.systran import SystranTranslationService
-from tracim_backend.lib.translate.translator import TranslationService
+from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
+from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
@@ -51,18 +51,6 @@ DEPOT_LOCAL_STORAGE_BACKEND = "depot.io.local.LocalFileStorage"
 DEPOT_S3_STORAGE_BACKEND = "depot.io.boto3.S3Storage"
 DEPOT_MEMORY_STORAGE_BACKEND = "depot.io.memory.MemoryFileStorage"
 DEPOT_CONTENT_CONF_PREFIX = "uploaded_files"
-
-
-class TranslationProvider(Enum):
-    SYSTRAN = ("systran", SystranTranslationService)
-
-    def __init__(self, slug: str, translation_service: TranslationService):
-        self.slug = slug
-        self.translation_service = translation_service
-
-    @classmethod
-    def get_valid_translation_service_slug(cls) -> typing.List[str]:
-        return [provider.slug for provider in TranslationProvider]
 
 
 class DepotFileStorageType(Enum):
@@ -1239,7 +1227,7 @@ class CFG(object):
 
     def _check_translation_service_validity(self) -> None:
         if self.TRANSLATION_SERVICE__ENABLED:
-            valid_translations_service = TranslationProvider.get_valid_translation_service_slug()
+            valid_translations_service = TRANSLATION_SERVICE_CLASSES.keys()
             if self.TRANSLATION_SERVICE__PROVIDER not in valid_translations_service:
                 translation_service_list = ", ".join(
                     ['"{}"'.format(slug) for slug in valid_translations_service]
@@ -1250,7 +1238,7 @@ class CFG(object):
                         self.TRANSLATION_SERVICE__PROVIDER, translation_service_list
                     )
                 )
-            if self.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.SYSTRAN.slug:
+            if self.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.SYSTRAN:
                 self.check_mandatory_param(
                     "TRANSLATION_SERVICE__SYSTRAN__API_URL",
                     self.TRANSLATION_SERVICE__SYSTRAN__API_URL,
