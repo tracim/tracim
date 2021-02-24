@@ -53,7 +53,7 @@ export class AdvancedSearch extends React.Component {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: true,
+      isFilterMenuOpen: false,
       searchType: ADVANCED_SEARCH_TYPE.CONTENT
     }
 

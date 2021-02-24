@@ -108,11 +108,13 @@ export class ContentFacets extends React.Component {
 export default translate()(ContentFacets)
 
 ContentFacets.propTypes = {
+  appliedFilters: PropTypes.object,
   onChangeSearchFacets: PropTypes.func,
   searchFacets: PropTypes.object
 }
 
 ContentFacets.defaultProps = {
+  appliedFilters: {},
   onChangeSearchFacets: () => { },
   searchFacets: {}
 }

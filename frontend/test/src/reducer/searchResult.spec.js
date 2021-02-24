@@ -3,15 +3,23 @@ import searchResult, { serializeSearchItemProps } from '../../../src/reducer/sea
 import {
   APPEND,
   appendSearchResultList,
+  APPLIED_FILTER,
+  CREATED_RANGE,
   deleteWorkspaceContentList,
+  MODIFIED_RANGE,
   REMOVE,
   SEARCH_CURRENT_PAGE,
+  SEARCH_FACETS,
   SEARCH_RESULTS_BY_PAGE,
   SEARCH_RESULTS_LIST,
   SEARCHED_STRING,
   SET,
+  setAppliedFilter,
+  setCreatedRange,
   setCurrentNumberPage,
+  setModifiedRange,
   setNumberResultsByPage,
+  setSearchFacets,
   setSearchString,
   setSearchResultList,
   UPDATE,
@@ -27,8 +35,13 @@ import { SEARCH_TYPE } from '../../../src/util/helper.js'
 describe('reducer searchResult.js', () => {
   describe('actions', () => {
     const initialState = {
+      appliedFilters: {},
+      createdRange: {},
       currentPage: 1,
+      dateRangeFacets: {},
+      modifiedRange: {},
       numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
+      searchFacets: {},
       searchString: '',
       resultList: []
     }
@@ -120,6 +133,34 @@ describe('reducer searchResult.js', () => {
       const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setCurrentNumberPage(5, SEARCH_TYPE.SIMPLE))
       it('should return a content object with the current number of pages', () => {
         expect(rez).to.deep.equal({ ...initialState, currentPage: 5 })
+      })
+    })
+
+    describe(`${SET}/${SEARCH_FACETS(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setSearchFacets({ facet: 'value' }, SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the searchFacets property set as given object', () => {
+        expect(rez).to.deep.equal({ ...initialState, searchFacets: { facet: 'value' } })
+      })
+    })
+
+    describe(`${SET}/${CREATED_RANGE(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setCreatedRange({ from: 'date' }, SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the createdRange property set as given object', () => {
+        expect(rez).to.deep.equal({ ...initialState, createdRange: { from: 'date' } })
+      })
+    })
+
+    describe(`${SET}/${MODIFIED_RANGE(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setModifiedRange({ to: 'date' }, SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the modifiedRange property set as given object', () => {
+        expect(rez).to.deep.equal({ ...initialState, modifiedRange: { to: 'date' } })
+      })
+    })
+
+    describe(`${SET}/${APPLIED_FILTER(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setAppliedFilter('key', 'value', SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the appliedFilters property set as an object with the given key and value', () => {
+        expect(rez).to.deep.equal({ ...initialState, appliedFilters: { key: 'value' } })
       })
     })
 
