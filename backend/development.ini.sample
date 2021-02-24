@@ -761,6 +761,26 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; collaborative_document_edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
 
 
+####
+# Translation service
+####
+
+# This feature permit to translate some content/comments by using external services
+
+; translation_service.enabled = False
+
+## Translation provider, currently only "systran" is supported
+; translation_service.provider =
+# example:
+# translation_service.provider = systran
+
+## Systran translation config parameters
+; translation_service.systran.api_url =
+; translation_service.systran.api_key =
+# example:
+# translation_service.systran.api_url = https://translate.systran.net/
+# translation_service.systran.api_key = xxxx-xxxx-xxxx.xxxx
+
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
 
 ##############################
