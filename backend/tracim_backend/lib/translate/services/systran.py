@@ -37,9 +37,9 @@ class SystranTranslationService(TranslationService):
     def name(self):
         return "Systran"
 
-    def _add_auth_to_params(self, params: dict) -> dict:
-        params["key"] = self.api_key
-        return params
+    def _add_auth_to_headers(self, headers: dict) -> dict:
+        headers["Authorization"] = "{} {}".format("Key", self.api_key)
+        return headers
 
     def translate_file(
         self,
@@ -56,17 +56,14 @@ class SystranTranslationService(TranslationService):
             "target": language_pair.output_lang,
             "async": False,
         }
-        params = self._add_auth_to_params(params)
+        headers = self._add_auth_to_headers({})
         if format:
             params["format"] = format
         response = requests.post(
             "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
             files={"input": (file_name, binary_io, mimetype)},
             params=params,
-            # TODO: RECHECK how to use header instead of query parameter
-            # headers={
-            #      'Authorization': 'api_key {}'.format(self.api_key)
-            # },
+            headers=headers,
             stream=True,
         )
         if response.status_code == HTTPStatus.OK:
@@ -77,11 +74,9 @@ class SystranTranslationService(TranslationService):
     @property
     def supported_formats(self) -> List[SystranFormat]:
         formats = []
-        params = self._add_auth_to_params({})
+        headers = self._add_auth_to_headers({})
         response = requests.get(
-            "{}{}".format(self.api_url, SUPPORTED_FORMAT_ENDPOINT),
-            # TODO: RECHECK how to use header instead of query parameter
-            params=params,
+            "{}{}".format(self.api_url, SUPPORTED_FORMAT_ENDPOINT), headers=headers,
         )
         json_response = response.json()
         for format in json_response["formats"]:
@@ -102,11 +97,9 @@ class SystranTranslationService(TranslationService):
     @property
     def supported_language_pairs(self) -> List[TranslationLanguagePair]:
         language_pairs = []
-        params = self._add_auth_to_params({})
+        headers = self._add_auth_to_headers({})
         response = requests.get(
-            "{}{}".format(self.api_url, SUPPORTED_LANGUAGES_ENDPOINT),
-            # TODO: RECHECK how to use header instead of query parameter
-            params=params,
+            "{}{}".format(self.api_url, SUPPORTED_LANGUAGES_ENDPOINT), headers=headers,
         )
         json_response = response.json()
         pairs = json_response["languagePairs"]
