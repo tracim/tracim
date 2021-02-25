@@ -32,8 +32,8 @@ export const SEARCH_TYPE = {
 
 export const ADVANCED_SEARCH_TYPE = {
   CONTENT: 'content',
-  USER: 'users',
-  SPACE: 'workspaces'
+  USER: 'user',
+  SPACE: 'workspace'
 }
 
 export const ANCHOR_NAMESPACE = {
