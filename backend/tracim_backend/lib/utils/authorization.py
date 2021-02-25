@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
+from tracim_backend import PageNotFound
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import AllUsersAreNotKnown
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
-from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
@@ -231,7 +231,7 @@ class CommentOwnerChecker(AuthorizationChecker):
 class TranslationEnabled(AuthorizationChecker):
     def check(self, tracim_context: TracimContext):
         if not tracim_context.app_config.TRANSLATION_SERVICE__ENABLED:
-            raise NotFound()
+            raise PageNotFound()
 
 
 class OrAuthorizationChecker(AuthorizationChecker):
