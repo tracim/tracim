@@ -56,17 +56,26 @@
             &:hover
               color #1a0dab
               text-decoration underline
-      &__version
+      &__top
+        width 100%
+        margin-bottom 10px
         display flex
-        justify-content flex-end
-        align-items center
-        text-align right
-        opacity 0.7
-      &__lastversion
-        margin-left 15px
-        font-weight bold
+        &__translation
+          font-size fontSizeSmall
+        &__version
+          margin-left auto
+          display flex
+          color mediumDarkGrey
+        &__lastversion
+          margin-left 15px
+          font-weight bold
       &__edition
         display none
+      &__text_translated
+        border-left-width 2px
+        border-left-style solid
+        padding-left 5px
+        color lightDarkGrey
     &__messagelist
       min-height 70px
       padding 0 20px 10px

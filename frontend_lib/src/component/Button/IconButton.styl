@@ -2,7 +2,6 @@
 
 .iconbutton
   padding 10px 15px
-  margin 0 auto
   cursor pointer
   border-radius 5px
   border-width 0px
@@ -18,7 +17,7 @@
   &__light
     color offWhite
 
-  &__text
+  &__text_with_icon
     padding-left 5px
     white-space pre
 
@@ -41,10 +40,17 @@
   &__link
     background-color transparent
     border none
-    text-decoration underline
-    padding 0 5px
+    padding 0
     &:hover
       text-decoration underline
+    &_light
+      color mediumDarkGrey
+      &:hover
+        color darkGrey
+    &_dark
+      color fontColor
+      &:hover
+        color black
 
   &__pins
     padding 0

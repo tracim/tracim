@@ -45,13 +45,14 @@ import {
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { initWysiwyg } from '../helper.js'
+import { initWysiwyg, TRANSLATION_STATE } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead
+  putHtmlDocRead,
+  getHtmlDocTranslated
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -90,7 +91,9 @@ export class HtmlDocument extends React.Component {
       invalidMentionList: [],
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      showInvalidMentionPopupInContent: false
+      showInvalidMentionPopupInContent: false,
+      translatedRawContent: null,
+      translationState: TRANSLATION_STATE.UNTRANSLATED
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -420,7 +423,9 @@ export class HtmlDocument extends React.Component {
       newComment: localStorageComment || '',
       rawContentBeforeEdit: rawContentBeforeEdit,
       timeline: revisionWithComment,
-      isLastTimelineItemCurrentToken: false
+      isLastTimelineItemCurrentToken: false,
+      translationState: TRANSLATION_STATE.UNTRANSLATED,
+      translatedRawContent: null
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -532,7 +537,9 @@ export class HtmlDocument extends React.Component {
             raw_content: newDocumentForApiWithMention
           },
           oldInvalidMentionList: allInvalidMentionList,
-          showInvalidMentionPopupInContent: false
+          showInvalidMentionPopupInContent: false,
+          translatedRawContent: null,
+          translationState: TRANSLATION_STATE.UNTRANSLATED
         }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
@@ -658,9 +665,12 @@ export class HtmlDocument extends React.Component {
         raw_content: revision.raw_content,
         number: revision.number,
         status: revision.status,
+        current_revision_id: revision.revision_id,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted
       },
+      translationState: TRANSLATION_STATE.UNTRANSLATED,
+      translatedRawContent: null,
       mode: APP_FEATURE_MODE.REVISION
     }))
   }
@@ -689,7 +699,9 @@ export class HtmlDocument extends React.Component {
       content: newObjectContent,
       timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
-      showRefreshWarning: false
+      showRefreshWarning: false,
+      translatedRawContent: null,
+      translationState: TRANSLATION_STATE.UNTRANSLATED
     }))
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
@@ -743,10 +755,54 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
+  handleTranslateDocument = async () => {
+    const { props, state } = this
+    this.setState({ translationState: TRANSLATION_STATE.PENDING })
+    await new Promise(resolve => {
+      setTimeout(() => resolve(), 500)
+    })
+    const response = await getHtmlDocTranslated(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      state.content.current_revision_id,
+      state.loggedUser.lang
+    )
+    if (!response.ok) {
+      const errors = [
+        { status: 502, message: props.t('Translation service is not available') },
+        { status: 504, message: props.t('Translation service is not available') }
+      ]
+      const error = errors.find(e => e.status === response.status) || { status: null, message: props.t('Unknown error') }
+      this.sendGlobalFlashMessage(
+        props.t(
+          'Error while translating the document: {{details}}',
+          { details: error.message }
+        )
+      )
+      this.setState({ translationState: TRANSLATION_STATE.UNTRANSLATED })
+      // return
+    }
+    const translatedRawContent = state.content.raw_content // await response.text()
+    this.setState({ translatedRawContent, translationState: TRANSLATION_STATE.TRANSLATED })
+  }
+
+  handleRestoreDocument = () => {
+    this.setState({ translationState: TRANSLATION_STATE.UNTRANSLATED })
+  }
+
   render () {
     const { props, state } = this
 
     if (!state.isVisible) return null
+
+    const displayTranslatedText = (
+      state.mode !== APP_FEATURE_MODE.EDIT &&
+        state.translationState === TRANSLATION_STATE.TRANSLATED
+    )
+    const handleToggleTranslation = state.translationState === TRANSLATION_STATE.UNTRANSLATED
+      ? this.handleTranslateDocument
+      : this.handleRestoreDocument
 
     return (
       <PopinFixed
@@ -842,15 +898,15 @@ export class HtmlDocument extends React.Component {
             onClickValidateBtn={this.handleClickSaveDocument}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            text={state.content.raw_content}
+            text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
-            onClickRestoreArchived={this.handleClickRestoreArchive}
-            onClickRestoreDeleted={this.handleClickRestoreDelete}
+            // onClickRestoreArchived={this.handleClickRestoreArchive}
+            // onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
@@ -865,6 +921,8 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
+            onClickToggleTranslation={handleToggleTranslation}
+            translationState={state.translationState}
           />
 
           <PopinFixedRightPart

@@ -9,6 +9,11 @@ export const getHtmlDocComment = (apiUrl, workspaceId, contentId) =>
 export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions`)
 
+export const getHtmlDocTranslated = (apiUrl, workspaceId, contentId, revisionId, targetLanguageCode) => {
+  const url = `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/revisions/${revisionId}/translated?target_language_code=${targetLanguageCode}`
+  return baseFetch('GET', url)
+}
+
 export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newContent) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {
     label: label,
