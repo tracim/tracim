@@ -785,9 +785,9 @@ export class HtmlDocument extends React.Component {
         )
       )
       this.setState({ translationState: state.defaultTranslationState })
-      // return
+      return
     }
-    const translatedRawContent = state.content.raw_content // await response.text()
+    const translatedRawContent = await response.text()
     this.setState({ translatedRawContent, translationState: TRANSLATION_STATE.TRANSLATED })
   }
 
