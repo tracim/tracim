@@ -63,6 +63,9 @@ export class HtmlDocument extends React.Component {
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
 
+    const defaultTranslationState = param.config.translation_service__enabled
+      ? TRANSLATION_STATE.UNTRANSLATED
+      : TRANSLATION_STATE.DISABLED
     this.state = {
       appName: 'html-document',
       isVisible: true,
@@ -93,7 +96,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInComment: false,
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
-      translationState: TRANSLATION_STATE.UNTRANSLATED
+      defaultTranslationState: defaultTranslationState,
+      translationState: defaultTranslationState
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -424,7 +428,7 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: rawContentBeforeEdit,
       timeline: revisionWithComment,
       isLastTimelineItemCurrentToken: false,
-      translationState: TRANSLATION_STATE.UNTRANSLATED,
+      translationState: state.defaultTranslationState,
       translatedRawContent: null
     })
 
@@ -539,7 +543,7 @@ export class HtmlDocument extends React.Component {
           oldInvalidMentionList: allInvalidMentionList,
           showInvalidMentionPopupInContent: false,
           translatedRawContent: null,
-          translationState: TRANSLATION_STATE.UNTRANSLATED
+          translationState: state.defaultTranslationState
         }))
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
@@ -669,7 +673,7 @@ export class HtmlDocument extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted
       },
-      translationState: TRANSLATION_STATE.UNTRANSLATED,
+      translationState: state.defaultTranslationState,
       translatedRawContent: null,
       mode: APP_FEATURE_MODE.REVISION
     }))
@@ -701,7 +705,7 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       translatedRawContent: null,
-      translationState: TRANSLATION_STATE.UNTRANSLATED
+      translationState: state.defaultTranslationState
     }))
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
@@ -780,7 +784,7 @@ export class HtmlDocument extends React.Component {
           { details: error.message }
         )
       )
-      this.setState({ translationState: TRANSLATION_STATE.UNTRANSLATED })
+      this.setState({ translationState: state.defaultTranslationState })
       // return
     }
     const translatedRawContent = state.content.raw_content // await response.text()
@@ -788,7 +792,9 @@ export class HtmlDocument extends React.Component {
   }
 
   handleRestoreDocument = () => {
-    this.setState({ translationState: TRANSLATION_STATE.UNTRANSLATED })
+    this.setState(previousState => {
+      return { translationState: previousState.defaultTranslationState }
+    })
   }
 
   render () {
@@ -800,9 +806,13 @@ export class HtmlDocument extends React.Component {
       state.mode !== APP_FEATURE_MODE.EDIT &&
         state.translationState === TRANSLATION_STATE.TRANSLATED
     )
-    const handleToggleTranslation = state.translationState === TRANSLATION_STATE.UNTRANSLATED
-      ? this.handleTranslateDocument
-      : this.handleRestoreDocument
+    const HANDLE_TOGGLE_TRANSLATION = {
+      [TRANSLATION_STATE.UNTRANSLATED]: this.handleTranslateDocument,
+      [TRANSLATION_STATE.TRANSLATED]: this.handleRestoreDocument,
+      [TRANSLATION_STATE.PENDING]: null,
+      [TRANSLATION_STATE.DISABLED]: null
+    }
+    const handleToggleTranslation = HANDLE_TOGGLE_TRANSLATION[state.translationState]
 
     return (
       <PopinFixed

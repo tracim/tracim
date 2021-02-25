@@ -16,6 +16,7 @@ export const initWysiwyg = (
 }
 
 export const TRANSLATION_STATE = {
+  DISABLED: 'disabled',
   UNTRANSLATED: 'untranslated',
   PENDING: 'pending',
   TRANSLATED: 'translated'

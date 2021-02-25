@@ -15,9 +15,13 @@ import {
 import { TRANSLATION_STATE } from '../helper.js'
 
 export const HtmlDocument = props => {
-  const toggleTranslationText = props.translationState === TRANSLATION_STATE.TRANSLATED
-    ? props.t('Restore the original language')
-    : props.t('Show translation')
+  const TOGGLE_TRANSLATION_TEXT = {
+    [TRANSLATION_STATE.TRANSLATED]: props.t('Restore the original language'),
+    [TRANSLATION_STATE.UNTRANSLATED]: props.t('Show translation'),
+    [TRANSLATION_STATE.DISABLED]: null,
+    [TRANSLATION_STATE.PENDING]: null
+  }
+  const toggleTranslationText = TOGGLE_TRANSLATION_TEXT[props.translationState]
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.displayNotifyAllMessage && (
@@ -79,17 +83,19 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__top'>
-              {props.translationState === TRANSLATION_STATE.PENDING ? (
+              {props.translationState === TRANSLATION_STATE.PENDING && (
                 <span className='html-document__contentpage__textnote__top__translation'>
                   <i className='fa fa-spinner fa-spin' /> {props.t('Translation pending…')}
                 </span>
-              ) : (
+              )}
+              {toggleTranslationText && (
                 <IconButton
                   text={toggleTranslationText}
                   onClick={props.onClickToggleTranslation}
                   intent='link'
                   mode='light'
                   customClass='html-document__contentpage__textnote__top__translation'
+                  dataCy='htmlDocumentTranslationButton'
                 />
               )}
               <div className='html-document__contentpage__textnote__top__version'>
