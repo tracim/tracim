@@ -1799,12 +1799,6 @@ class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
         return LiveMessageQuery(**data)
 
 
-class ContentLanguagesOutputHeaders(marshmallow.Schema):
-    accept = marshmallow.fields.String(
-        required=True, load_from="Content-Language", dump_to="Content-Language"
-    )
-
-
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
