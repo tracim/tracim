@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+
 import pytest
+import responses
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -66,6 +69,51 @@ class TestCommentsEndpoint(object):
         assert comment["author"]["username"] is None
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
+
+    def test_api__get_one_comment__ok_200__nominal_case(
+        self, web_testapp, session, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one specific comment of a content
+        """
+        raw_content = "<b>just a comment label</b>"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        comment_created = content_api.create_comment(
+            workspace=workspace,
+            parent=test_html_document,
+            content=raw_content,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment_created.content_id
+            ),
+            status=200,
+        )
+        comment = res.json_body
+        assert comment["content_id"] == comment_created.content_id
+        assert comment["parent_id"] == comment_created.parent_id
+        assert comment["parent_content_type"] == "html-document"
+        assert comment["parent_label"] == "test_page"
+        assert comment["raw_content"] == raw_content
+        assert comment["author"]
+        assert comment["author"]["user_id"] == 1
+        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["public_name"] == "Global manager"
+        assert comment["author"]["username"] == "TheAdmin"
 
     def test_api__post_content_comment__ok_200__nominal_case(
         self,
@@ -471,3 +519,78 @@ class TestCommentsEndpoint(object):
         assert response.json_body
         assert "code" in response.json_body
         assert response.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+)
+class TestCommentTranslation(object):
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_comment_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get content translation of a comment
+        """
+        BASE_API_URL = "https://systran_fake_server:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        comment = content_api.create_comment(
+            workspace=workspace,
+            parent=test_html_document,
+            content=raw_content,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}/translated/{}".format(
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
+                translation_filename,
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"

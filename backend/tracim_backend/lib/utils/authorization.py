@@ -14,6 +14,7 @@ from tracim_backend.exceptions import AllUsersAreNotKnown
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
@@ -227,6 +228,12 @@ class CommentOwnerChecker(AuthorizationChecker):
         )
 
 
+class TranslationEnabled(AuthorizationChecker):
+    def check(self, tracim_context: TracimContext):
+        if not tracim_context.app_config.TRANSLATION_SERVICE__ENABLED:
+            raise NotFound()
+
+
 class OrAuthorizationChecker(AuthorizationChecker):
     """
     Check multiple auth_checker with a logical operator "or"
@@ -340,6 +347,7 @@ is_comment_owner = CommentOwnerChecker()
 can_delete_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
+is_translation_service_enabled = TranslationEnabled()
 
 ###
 # Authorization decorators for views

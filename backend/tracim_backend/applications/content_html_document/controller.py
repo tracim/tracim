@@ -15,10 +15,14 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.translate.providers import TranslationLib
+from tracim_backend.lib.translate.translator import InvalidParametersForTranslationService
+from tracim_backend.lib.translate.translator import TranslationServiceException
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_translation_service_enabled
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
@@ -29,10 +33,13 @@ from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
+from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import RevisionSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import TranslationQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceAndContentRevisionIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
 try:  # Python 3.5+
@@ -112,6 +119,93 @@ class HTMLDocumentController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
+    @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
+    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
+    @check_right(is_reader)
+    @check_right(is_translation_service_enabled)
+    @hapic.input_path(FilePathSchema())
+    @hapic.input_query(TranslationQuerySchema())
+    @hapic.output_file([])
+    def get_html_document_translation(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Translate a html-document
+        """
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        file = BytesIO(content.raw_content.encode("utf-8"))
+        translation_service = TranslationLib(
+            config=request.app_config, current_user=request.current_user, session=request.dbsession
+        ).get_translation_service()
+        translated_file = translation_service.translate_file(
+            input_lang=hapic_data.query.source_language_code,
+            output_lang=hapic_data.query.target_language_code,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            binary_io=file,
+        )
+        filename = hapic_data.path.filename
+        if not filename or "raw":
+            filename = content.file_name
+
+        return HapicFile(
+            file_object=translated_file,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download,
+            last_modified=content.updated,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
+    @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
+    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
+    @check_right(is_reader)
+    @check_right(is_translation_service_enabled)
+    @hapic.input_path(FileRevisionPathSchema())
+    @hapic.input_query(TranslationQuerySchema())
+    @hapic.output_file([])
+    def get_html_document_revision_translation(
+        self, context, request: TracimRequest, hapic_data=None
+    ):
+        """
+        Translate a html-document
+        """
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        file = BytesIO(revision.raw_content.encode("utf-8"))
+        translation_service = TranslationLib(
+            config=request.app_config, current_user=request.current_user, session=request.dbsession
+        ).get_translation_service()
+        translated_file = translation_service.translate_file(
+            input_lang=hapic_data.query.source_language_code,
+            output_lang=hapic_data.query.target_language_code,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            binary_io=file,
+        )
+        filename = hapic_data.path.filename
+        if not filename or "raw":
+            filename = revision.file_name
+
+        return HapicFile(
+            file_object=translated_file,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download,
+            last_modified=revision.updated,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
@@ -144,6 +238,29 @@ class HTMLDocumentController(Controller):
             )
             api.save(content)
         return api.get_content_in_context(content)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_html_document_content)
+    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.output_body(RevisionSchema())
+    def get_html_document_revision(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> RevisionInContext:
+        """
+        get one html_document revision
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        return api.get_revision_in_context(revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @check_right(is_reader)
@@ -222,6 +339,14 @@ class HTMLDocumentController(Controller):
         )
         configurator.add_view(self.update_html_document, route_name="update_html_document")
 
+        # get one html document revision
+        configurator.add_route(
+            "html_document_revision",
+            "/workspaces/{workspace_id}/html-documents/{content_id}/revisions/{revision_id}",
+            request_method="GET",
+        )
+        configurator.add_view(self.get_html_document_revision, route_name="html_document_revision")
+
         # get html document revisions
         configurator.add_route(
             "html_document_revisions",
@@ -239,3 +364,23 @@ class HTMLDocumentController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.set_html_document_status, route_name="set_html_document_status")
+
+        # get content translation
+        configurator.add_route(
+            "html_document_translation",
+            "/workspaces/{workspace_id}/html-documents/{content_id}/translated/{filename:[^/]*}",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.get_html_document_translation, route_name="html_document_translation"
+        )
+        # get revision translation
+        configurator.add_route(
+            "html_document_revision_translation",
+            "/workspaces/{workspace_id}/html-documents/{content_id}/revisions/{revision_id}/translated/{filename:[^/]*}",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.get_html_document_revision_translation,
+            route_name="html_document_revision_translation",
+        )

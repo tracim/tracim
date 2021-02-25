@@ -264,6 +264,7 @@ class TestConfigEndpoint(object):
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
         assert res.json_body["webdav_enabled"] is False
+        assert res.json_body["translation_service__enabled"] is False
         assert res.json_body["webdav_url"] == "https://localhost:3030/webdav"
         assert res.json_body["collaborative_document_edition"] is None
         assert res.json_body["content_length_file_size_limit"] == 0

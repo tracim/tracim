@@ -12,7 +12,19 @@ TranslationMimetypePair = namedtuple(
 )
 
 
-class TranslationFailed(Exception):
+class TranslationServiceException(Exception):
+    pass
+
+
+class TranslationServiceAccessRefused(TranslationServiceException):
+    pass
+
+
+class InvalidParametersForTranslationService(TranslationServiceException):
+    pass
+
+
+class TranslationServiceServerError(TranslationServiceException):
     pass
 
 
