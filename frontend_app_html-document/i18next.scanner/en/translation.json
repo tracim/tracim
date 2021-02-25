@@ -29,5 +29,11 @@
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Error while saving the user configuration": "Error while saving the user configuration",
   "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
-  "Validate anyway": "Validate anyway"
+  "Validate anyway": "Validate anyway",
+  "Restore the original language": "Restore the original language",
+  "Show translation": "Show translation",
+  "Translation pending…": "Translation pending…",
+  "Translation service is not available": "Translation service is not available",
+  "Unknown error": "Unknown error",
+  "Error while translating the document: {{details}}": "Error while translating the document: {{details}}"
 }

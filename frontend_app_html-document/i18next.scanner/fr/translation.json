@@ -29,5 +29,11 @@
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
   "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
   "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
-  "Validate anyway": "Valider quand même"
+  "Validate anyway": "Valider quand même",
+  "Restore the original language": "__NOT_TRANSLATED__",
+  "Show translation": "__NOT_TRANSLATED__",
+  "Translation pending…": "__NOT_TRANSLATED__",
+  "Translation service is not available": "__NOT_TRANSLATED__",
+  "Unknown error": "__NOT_TRANSLATED__",
+  "Error while translating the document: {{details}}": "__NOT_TRANSLATED__"
 }
