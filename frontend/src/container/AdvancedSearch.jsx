@@ -91,6 +91,7 @@ export class AdvancedSearch extends React.Component {
   componentDidMount () {
     const { props } = this
     const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
+    props.dispatch(resetAppliedFilter(urlSearchObject.searchType))
 
     if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
       props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.CONTENT))
