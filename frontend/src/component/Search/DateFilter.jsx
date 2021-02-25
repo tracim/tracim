@@ -18,7 +18,7 @@ export class DateFilter extends React.Component {
   render () {
     const { props } = this
 
-    // FIXME - G.B. - 2021-02-24 - this translations shouldn't be hard-coded
+    // FIXME - G.B. - 2021-02-24 - these translations shouldn't be hard-coded
     // See https://github.com/tracim/tracim/issues/4212
     const WEEKDAYS_LONG = {
       en: [
