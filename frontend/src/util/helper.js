@@ -57,12 +57,10 @@ export const DATE_FILTER_ELEMENT = {
 
 export const SEARCH_CONTENT_FACETS = {
   SPACE: {
-    slug: 'workspace_names',
-    label: i18n.t('Space')
+    slug: 'workspace_names'
   },
   STATUS: {
     slug: 'statuses',
-    label: i18n.t('Status'),
     items: [
       i18n.t('open'),
       i18n.t('closed-deprecated'),
@@ -72,7 +70,6 @@ export const SEARCH_CONTENT_FACETS = {
   },
   TYPE: {
     slug: 'content_types',
-    label: i18n.t('Type'),
     items: [
       i18n.t('folder_search'),
       i18n.t('html-document_search'),
@@ -81,12 +78,10 @@ export const SEARCH_CONTENT_FACETS = {
     ]
   },
   EXTENSION: {
-    slug: 'file_extensions',
-    label: i18n.t('File extension')
+    slug: 'file_extensions'
   },
   AUTHOR: {
-    slug: 'author__public_names',
-    label: i18n.t('Author')
+    slug: 'author__public_names'
   }
 }
 
