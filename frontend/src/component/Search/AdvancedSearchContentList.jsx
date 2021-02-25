@@ -39,7 +39,7 @@ export const AdvancedSearchContentList = props => {
           {props.t('Title')}
         </div>
         <div className='advancedSearchContent__modification'>
-          {props.t('Last modification')}
+          {props.t('Last Modification')}
         </div>
         <div className='advancedSearchContent__information'>
           {props.t('Information_plural')}

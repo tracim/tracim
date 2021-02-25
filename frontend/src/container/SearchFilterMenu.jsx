@@ -199,7 +199,7 @@ export class SearchFilterMenu extends React.Component {
                 </button>
                 {props.t('Creation')}
               </div>
-              {state.createdRange.showFilter && (
+              {state.createdRange.showFilter && currentSearch.createdRange && (
                 <DateFilter
                   id='creation'
                   from={currentSearch.createdRange.from}
@@ -227,13 +227,13 @@ export class SearchFilterMenu extends React.Component {
                       ? 'fa-fw fas fa-caret-down'
                       : 'fa-fw fas fa-caret-right'}
                     title={state.modifiedRange.showFilter
-                      ? props.t('Hide {{filter}}', { filter: props.t('Last Intervention') })
-                      : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}
+                      ? props.t('Hide {{filter}}', { filter: props.t('Last Modification') })
+                      : props.t('Show {{filter}}', { filter: props.t('Last Modification') })}
                   />
                 </button>
-                {props.t('Last Intervention')}
+                {props.t('Last Modification')}
               </div>
-              {state.modifiedRange.showFilter && (
+              {state.modifiedRange.showFilter && currentSearch.modifiedRange && (
                 <DateFilter
                   id='modification'
                   from={currentSearch.modifiedRange.from}
@@ -248,7 +248,7 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
-          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
+          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && currentSearch.searchFacets && (
             <ContentFacets
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}

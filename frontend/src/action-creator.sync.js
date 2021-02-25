@@ -192,6 +192,7 @@ export const SEARCH_FACETS = (searchType) => `SearchFacets_${searchType}`
 export const setSearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
 export const APPLIED_FILTER = (searchType) => `AppliedFilter_${searchType}`
 export const setAppliedFilter = (key, value, searchType) => ({ type: `${SET}/${APPLIED_FILTER(searchType)}`, key, value })
+export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_FILTER(searchType)}` })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'

@@ -16,6 +16,7 @@ import {
 import {
   appendSearchResultList,
   newFlashMessage,
+  resetAppliedFilter,
   setAppliedFilter,
   setBreadcrumbs,
   setCreatedRange,
@@ -92,6 +93,7 @@ export class AdvancedSearch extends React.Component {
     const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
 
     if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
+      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.CONTENT))
       this.getSearchResult({
         ...urlSearchObject,
         currentPage: FIRST_PAGE,
@@ -137,6 +139,7 @@ export class AdvancedSearch extends React.Component {
       prevSearch.searchString !== currentSearch.searchString
     ) {
       this.setHeadTitle()
+      props.dispatch(resetAppliedFilter(this.state.searchType))
     }
   }
 

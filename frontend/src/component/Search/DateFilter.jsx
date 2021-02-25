@@ -123,6 +123,7 @@ export class DateFilter extends React.Component {
             checked={props.isAfterCheckboxChecked}
             styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
             styleCheck={{ top: '-5px' }}
+            disabled={props.afterDate === ''}
           />
           <label htmlFor={`checkbox-${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}>{props.t('After')}</label>
           <DayPickerInput
@@ -153,6 +154,7 @@ export class DateFilter extends React.Component {
             checked={props.isBeforeCheckboxChecked}
             styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
             styleCheck={{ top: '-5px' }}
+            disabled={props.beforeDate === ''}
           />
           <label htmlFor={`checkbox-${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}>{props.t('Before')}</label>
           <DayPickerInput

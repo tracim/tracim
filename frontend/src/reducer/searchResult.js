@@ -4,6 +4,7 @@ import {
   CREATED_RANGE,
   MODIFIED_RANGE,
   REMOVE,
+  RESET,
   SEARCH_FACETS,
   SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
@@ -127,6 +128,9 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
 
     case `${SET}/${APPLIED_FILTER(searchType)}`:
       return { ...state, appliedFilters: { ...state.appliedFilters, [action.key]: action.value } }
+
+    case `${RESET}/${APPLIED_FILTER(searchType)}`:
+      return { ...state, appliedFilters: { } }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       newResultList = state.resultList.map(item =>
