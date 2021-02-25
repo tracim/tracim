@@ -142,6 +142,7 @@ class IndexedContent(Document):
     # Fields below are specific to IndexedContent
 
     is_active = Boolean()
+    description = HtmlText()
     # path as returned by the /path HTTP API
     path = Nested(DigestContent)
     # INFO - G.M - 2019-05-31 - we need to include in parent here, because we need

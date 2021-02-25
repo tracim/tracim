@@ -285,6 +285,7 @@ class ESSearchApi(SearchApi):
             modified=content_in_context.modified,
             created=content_in_context.created,
             active_shares=content_in_context.actives_shares,
+            description=content_in_context.description,
             path=path,
             comments=comments,
             comment_count=len(comments),
@@ -554,6 +555,7 @@ class ESSearchApi(SearchApi):
                 "deleted_through_parent_id",
                 "archived_through_parent_id",
                 "is_active",
+                "description",
             ]
         )
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
