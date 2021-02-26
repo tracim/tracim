@@ -64,11 +64,35 @@ class TestTestTranslationService:
 
     def test_unit___test_service__translate_file__ok__nominal_case(self):
         translation_service = TestTranslationService()
-        assert translation_service.translate_file(
-            binary_io=io.BytesIO(b""),
-            input_lang="test_source",
-            output_lang="test_result",
-            mimetype="text/html",
+        assert (
+            translation_service.translate_file(
+                binary_io=io.BytesIO(b""),
+                input_lang="test_source",
+                output_lang="test_result",
+                mimetype="text/html",
+            )
+            .read()
+            .decode("utf-8")
+            == """
+        <table>
+        <thead>
+        <tr>
+        <th>source_lang_code</th>
+        <th>target_lang_code</th>
+        <th>mimetype</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>test_source</td>
+        <td>test_result</td>
+        <td>text/html</td>
+        </tr>
+        </tbody>
+        </table>
+        """.strip().replace(
+                " ", ""
+            )
         )
 
 

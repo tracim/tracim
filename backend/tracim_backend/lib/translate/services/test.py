@@ -27,7 +27,8 @@ class TestTranslationService(TranslationService):
         **kwargs: Any
     ) -> BinaryIO:
         try:
-            test_response = """
+            test_response = (
+                """
             <table>
                 <thead>
                     <tr>
@@ -45,7 +46,10 @@ class TestTranslationService(TranslationService):
                 </tbody>
             </table>
             """.format(
-                language_pair.input_lang, language_pair.output_lang, mimetype
+                    language_pair.input_lang, language_pair.output_lang, mimetype
+                )
+                .strip()
+                .replace(" ", "")
             )
             return io.BytesIO(test_response.encode("utf-8"))
         except Exception:
