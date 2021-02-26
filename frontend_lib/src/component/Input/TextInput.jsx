@@ -24,6 +24,7 @@ export class TextInput extends React.Component {
           disabled={props.disabled}
           placeholder={props.placeholder}
           onKeyPress={this.handleValidateIfEnterKey}
+          value={props.value}
         />
         {props.icon && <i className={`fas fa-fw fa-${props.icon} textinput__icon`} />}
       </div>

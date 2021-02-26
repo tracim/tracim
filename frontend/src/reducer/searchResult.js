@@ -35,6 +35,8 @@ export const serializeSearchItemProps = {
   current_revision_type: 'currentRevisionType',
   file_extension: 'fileExtension',
   filename: 'filename',
+  has_avatar: 'hasAvatar',
+  has_cover: 'hasCover',
   is_active: 'isActive',
   is_archived: 'isArchived',
   is_deleted: 'isDeleted',
@@ -46,11 +48,14 @@ export const serializeSearchItemProps = {
   parent: 'parent',
   parents: 'parents',
   path: 'path',
+  public_name: 'publicName',
   score: 'score',
   show_in_ui: 'showInUi',
   slug: 'slug',
   status: 'status',
   sub_content_types: 'subContentTypes',
+  user_id: 'userId',
+  username: 'username',
   workspace: 'workspace',
   workspace_id: 'workspaceId'
 }

@@ -203,19 +203,8 @@ export class AdvancedSearch extends React.Component {
 
   handleChangeSearchFieldList = (field) => {
     const { props, state } = this
-    let currentSearch
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch= props.userSearch
-      }
+    const currentSearch = this.getCurrentSearchObject()
 
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
     const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
 
     const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.slug)
@@ -235,21 +224,8 @@ export class AdvancedSearch extends React.Component {
   }
 
   handleChangeCreatedRange = (dateObject) => {
-    const { props, state } = this
-    let currentSearch
+    const currentSearch = this.getCurrentSearchObject()
 
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch= props.userSearch
-      }
-
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.CREATED_RANGE,
       currentSearch.appliedFilters.createdRange,
@@ -258,21 +234,8 @@ export class AdvancedSearch extends React.Component {
   }
 
   handleChangeModifiedRange = (dateObject) => {
-    const { props, state } = this
-    let currentSearch
+    const currentSearch = this.getCurrentSearchObject()
 
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch= props.userSearch
-      }
-
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.MODIFIED_RANGE,
       currentSearch.appliedFilters.modifiedRange,
@@ -281,21 +244,8 @@ export class AdvancedSearch extends React.Component {
   }
 
   handleChangeSearchFacets = (facetObject) => {
-    const { props, state } = this
-    let currentSearch
+    const currentSearch = this.getCurrentSearchObject()
 
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch= props.userSearch
-      }
-
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
       currentSearch.appliedFilters.searchFacets,
@@ -305,19 +255,7 @@ export class AdvancedSearch extends React.Component {
 
   updateAppliedFilter = (type, oldAppliedFilter, filterObject) => {
     const { props, state } = this
-    let currentSearch
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch= props.userSearch
-      }
-
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
+    const currentSearch = this.getCurrentSearchObject()
 
     let newAppliedFilter = {}
     const filterKey = Object.keys(filterObject)[0]
@@ -536,16 +474,15 @@ export class AdvancedSearch extends React.Component {
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.USER && (
                     <AdvancedSearchUserList
-                      user={props.user}
+                      apiUrl={FETCH_CONFIG.apiUrl}
                       userSearch={props.userSearch}
                     />
                   )}
 
                   {state.searchType === ADVANCED_SEARCH_TYPE.SPACE && (
                     <AdvancedSearchSpaceList
-                      contentType={props.contentType}
                       spaceSearch={props.spaceSearch}
-                      user={props.user}
+                      workspaceList={props.workspaceList}
                     />
                   )}
 
@@ -582,13 +519,14 @@ export class AdvancedSearch extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, contentSearch, spaceSearch, contentType, userSearch, system, user }) => ({
+const mapStateToProps = ({ breadcrumbs, contentSearch, spaceSearch, contentType, userSearch, system, user, workspaceList }) => ({
   breadcrumbs,
   contentSearch,
   spaceSearch,
   userSearch,
   contentType,
   system,
-  user
+  user,
+  workspaceList
 })
 export default connect(mapStateToProps)(translate()(TracimComponent(AdvancedSearch)))

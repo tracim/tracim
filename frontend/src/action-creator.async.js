@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  ADVANCED_SEARCH_TYPE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
@@ -1118,27 +1119,35 @@ export const getAdvancedSearchResult = (
   const queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
   else queryParameterList.push('search_string=*')
-  if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
   if (pageSize) queryParameterList.push(`size=${searchString ? pageSize : 0}`)
-  if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
-  if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
-  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
-  if (createdRange) {
-    if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
-    if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
+  if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+    if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
+    if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
+    if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
+    if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+    if (createdRange) {
+      if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
+      if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
+    }
+    if (modifiedRange) {
+      if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
+      if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
+    }
+    if (searchFacets) {
+      if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
+      if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
+      if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
+      if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
+      if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+    }
   }
-  if (modifiedRange) {
-    if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
-    if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
+  if (searchType === ADVANCED_SEARCH_TYPE.USER) {
+    // TODO - Add here the filters
   }
-  if (searchFacets) {
-    if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
-    if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
-    if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
-    if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
-    if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+  if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+    // TODO - Add here the filters
   }
 
   return fetchWrapper({

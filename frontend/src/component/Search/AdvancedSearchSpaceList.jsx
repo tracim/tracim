@@ -7,7 +7,7 @@ import {
   SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 
 require('./AdvancedSearchSpaceList.styl')
 
@@ -21,18 +21,20 @@ export const AdvancedSearchSpaceList = props => {
     }
   })
   return (
-    <>
-      <div className='content__header'>
-        <div className='advancedSearchSpace__type__header'>
-          {props.t('Type')}
+    <div>
+      {props.spaceSearch.resultList.length > 0 && (
+        <div className='content__header'>
+          <div className='advancedSearchSpace__type__header'>
+            {props.t('Type')}
+          </div>
+          <div className='advancedSearchSpace__name'>
+            {props.t('Name')}
+          </div>
+          <div className='advancedSearchSpace__information'>
+            {props.t('Information_plural')}
+          </div>
         </div>
-        <div className='advancedSearchSpace__name'>
-          {props.t('Name')}
-        </div>
-        <div className='advancedSearchSpace__information'>
-          {props.t('Information_plural')}
-        </div>
-      </div>
+      )}
 
       {resultList.map((searchItem, index) => (
         <ListItemWrapper
@@ -43,7 +45,12 @@ export const AdvancedSearchSpaceList = props => {
           key={searchItem.workspaceId}
         >
           <Link
-            to={`${PAGE.WORKSPACE.DASHBOARD(searchItem.workspaceId)}`}
+            to={{
+              pathname: props.workspaceList.find(workspace => workspace.id === searchItem.workspaceId)
+                ? `${PAGE.WORKSPACE.DASHBOARD(searchItem.workspaceId)}`
+                : `${PAGE.JOIN_WORKSPACE}`,
+              state: { fromSearch: true }
+            }}
             className='advancedSearchSpace'
           >
             <div
@@ -89,8 +96,17 @@ export const AdvancedSearchSpaceList = props => {
           </Link>
         </ListItemWrapper>
       ))}
-    </>
+    </div>
   )
 }
 
 export default translate()(AdvancedSearchSpaceList)
+
+AdvancedSearchSpaceList.propTypes = {
+  spaceSearch: PropTypes.object.isRequired,
+  workspaceList: PropTypes.array
+}
+
+AdvancedSearchSpaceList.defaultProps = {
+  workspaceList: []
+}
