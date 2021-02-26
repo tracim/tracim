@@ -643,7 +643,7 @@ class ESSearchApi(SearchApi):
         newest_authored_content_date_to: typing.Optional[datetime] = None,
         show_deleted: bool = False,
         show_active: bool = True,
-        page_nb: int = 0,
+        page_nb: int = 1,
         size: int = 10,
     ) -> UserSearchResponse:
         search = Search(
@@ -680,10 +680,8 @@ class ESSearchApi(SearchApi):
                 "range", newest_authored_content_date=newest_authored_content_date_range
             )
 
-        if size:
-            search = search.extra(size=size)
-        if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+        if size and page_nb:
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
 
         search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
         search.aggs.metric(
@@ -715,7 +713,7 @@ class ESSearchApi(SearchApi):
         ] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
         member_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
-        page_nb: int = 0,
+        page_nb: int = 1,
         size: int = 10,
     ) -> WorkspaceSearchResponse:
         search = Search(
@@ -739,10 +737,8 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", member_ids=member_ids)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-        if size:
-            search = search.extra(size=size)
-        if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+        if size and page_nb:
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
         search.aggs.bucket("member_ids", "terms", field="member_ids")
         response = search.execute()
         known_users = UserApi(
