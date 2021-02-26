@@ -9,10 +9,12 @@ import transaction
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
@@ -22,6 +24,51 @@ a_year_ago = (datetime.now() - timedelta(days=365)).strftime(DATETIME_FORMAT)
 
 def is_now(d: str) -> bool:
     return (parse(d).replace(tzinfo=None) - datetime.now()) < timedelta(minutes=1)
+
+
+@pytest.fixture
+def workspace_search_fixture(
+    base_fixture,
+    elasticsearch,
+    bob_user: User,
+    riyad_user: User,
+    workspace_api_factory: WorkspaceApiFactory,
+    role_api_factory: RoleApiFactory,
+) -> typing.Tuple[Workspace, Workspace]:
+    wapi = workspace_api_factory.get(bob_user)
+    bob_only = wapi.create_workspace(
+        label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
+    )
+    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
+    rapi = role_api_factory.get(bob_user)
+    rapi.create_one(
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
+    )
+    transaction.commit()
+    elasticsearch.refresh_elasticsearch()
+    return (bob_only, bob_and_riyad)
+
+
+@pytest.fixture
+def content_search_fixture(
+    session,
+    elasticsearch,
+    content_api_factory: ContentApiFactory,
+    workspace_search_fixture: typing.Tuple[Workspace, Workspace],
+) -> Content:
+    (bob_only, _) = workspace_search_fixture
+    capi = content_api_factory.get(bob_only.owner)
+    content = capi.create(
+        content_type_slug="html-document",
+        workspace=bob_only,
+        label="Content with description",
+        do_save=True,
+    )
+    with new_revision(session=session, tm=transaction.manager, content=content):
+        content = capi.update_content(content, new_description="A wonderful description")
+    transaction.commit()
+    elasticsearch.refresh_elasticsearch()
+    return content
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -202,7 +249,7 @@ class TestElasticSearch(object):
             ),
         ],
     )
-    def test_api___elasticsearch_search_ok__by_description(
+    def test_api___elasticsearch_search_ok__by_raw_content(
         self,
         search_params,
         user_api_factory,
@@ -665,6 +712,20 @@ class TestElasticSearch(object):
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
+    def test_api___elasticsearch_search_ok__by_description(
+        self, content_search_fixture: Content, web_testapp,
+    ) -> None:
+        web_testapp.authorization = ("Basic", (content_search_fixture.owner.username, "password"))
+        search_result = web_testapp.get(
+            "/api/advanced_search/content".format(),
+            status=200,
+            params={"search_string": "wonderful"},
+        ).json_body
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is True
+        content_ids = [c["content_id"] for c in search_result["contents"]]
+        assert content_ids == [content_search_fixture.content_id]
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
@@ -831,29 +892,6 @@ class TestElasticSearchUserSearch:
         assert search_result["is_total_hits_accurate"] is True
         user_ids = [user["user_id"] for user in search_result["users"]]
         assert user_ids == expected_user_ids
-
-
-@pytest.fixture
-def workspace_search_fixture(
-    base_fixture,
-    elasticsearch,
-    bob_user: User,
-    riyad_user: User,
-    workspace_api_factory: WorkspaceApiFactory,
-    role_api_factory: RoleApiFactory,
-) -> typing.Tuple[Workspace, Workspace]:
-    wapi = workspace_api_factory.get(bob_user)
-    bob_only = wapi.create_workspace(
-        label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
-    )
-    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
-    rapi = role_api_factory.get(bob_user)
-    rapi.create_one(
-        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
-    )
-    transaction.commit()
-    elasticsearch.refresh_elasticsearch()
-    return (bob_only, bob_and_riyad)
 
 
 @pytest.mark.usefixtures("workspace_search_fixture")
