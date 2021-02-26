@@ -52,8 +52,9 @@ class TestExternalTranslator:
 class TestTestTranslationService:
     def test_unit___test_service__supported_mimetypes_pair__ok__nominal_case(self) -> None:
         translation_service = TestTranslationService()
-        mimetype_pair = TranslationMimetypePair("text/html", "text/html")
-        assert translation_service.supported_mimetype_pairs == [mimetype_pair]
+        assert translation_service.supported_mimetype_pairs == [
+            TranslationMimetypePair("text/html", "text/html")
+        ]
 
     def test_unit___test_service__supported_languages_pair__ok__nominal_case(self) -> None:
         translation_service = TestTranslationService()
