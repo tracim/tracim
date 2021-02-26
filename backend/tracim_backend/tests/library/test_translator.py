@@ -99,7 +99,7 @@ class TestTestTranslationService:
 class TestSystranTranslationService:
     @responses.activate
     def test_unit___systran_service__supported_languages_pair__ok__nominal_case(self) -> None:
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         content_response_json = {
             "languagePairs": [
@@ -125,7 +125,7 @@ class TestSystranTranslationService:
 
     @responses.activate
     def test_unit___systran_service__supported_mimetype_pairs__ok__nominal_case(self):
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         content_response_json = {
             "formats": [
@@ -150,7 +150,7 @@ class TestSystranTranslationService:
 
     @responses.activate
     def test_unit___systran_service__translate_file__ok__nominal_case(self):
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         base_content = io.BytesIO("Source content".encode("utf-8"))
         result_content = io.BytesIO("Translated".encode("utf-8"))

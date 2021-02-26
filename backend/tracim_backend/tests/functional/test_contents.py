@@ -4804,7 +4804,7 @@ class TestContentTranslation(object):
         """
         Get revision translation of a html-content
         """
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         responses.add(
             responses.POST,
             "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
@@ -4870,7 +4870,7 @@ class TestContentTranslation(object):
         """
         Get content translation of a html-content
         """
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         responses.add(
             responses.POST,
             "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
