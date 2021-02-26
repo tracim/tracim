@@ -1,6 +1,5 @@
 # coding=utf-8
 from io import BytesIO
-import typing
 
 from hapic.data import HapicFile
 from pyramid.config import Configurator
@@ -20,6 +19,7 @@ from tracim_backend.lib.utils.authorization import can_delete_comment
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_translation_service_enabled
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.data import ContentRevisionRO
@@ -48,9 +48,6 @@ CONTENT_TYPE_TEXT_HTML = "text/html"
 
 
 class CommentController(Controller):
-    def __init__(self, app_config: CFG):
-        self.app_config = app_config
-
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @check_right(is_reader)
     @hapic.input_path(CommentsPathSchema())
@@ -74,6 +71,50 @@ class CommentController(Controller):
             hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
         )
         return api.get_content_in_context(comment)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
+    @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
+    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
+    @check_right(is_reader)
+    @check_right(is_translation_service_enabled)
+    @hapic.input_path(CommentsPathFilenameSchema())
+    @hapic.input_query(TranslationQuerySchema())
+    @hapic.output_file([])
+    def comment_translation(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Translate a comment
+        """
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        comment = api.get_one(
+            hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
+        )
+        file = BytesIO(comment.raw_content.encode("utf-8"))
+        translation_service = TranslationLib(
+            config=request.app_config, current_user=request.current_user, session=request.dbsession
+        ).get_translation_service()
+        translated_file = translation_service.translate_file(
+            input_lang=hapic_data.query.source_language_code,
+            output_lang=hapic_data.query.target_language_code,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            binary_io=file,
+        )
+        filename = hapic_data.path.filename
+        if not filename or "raw":
+            filename = "translated_comment_{}.html".format(comment.content_id)
+        return HapicFile(
+            file_object=translated_file,
+            mimetype=CONTENT_TYPE_TEXT_HTML,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download,
+            last_modified=comment.updated,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @check_right(is_reader)
@@ -156,63 +197,6 @@ class CommentController(Controller):
             api.delete(comment)
         return
 
-    # HACK - G.M - 2021-02-26 -
-    # Workaround to solve issue with hapic, hapic will fail if translation related endpoint are
-    # loaded but not used.
-    def load_translation_endpoints(self) -> typing.Dict[str, typing.Callable]:
-        @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
-        @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
-        @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
-        @check_right(is_reader)
-        @hapic.input_path(CommentsPathFilenameSchema())
-        @hapic.input_query(TranslationQuerySchema())
-        @hapic.output_file([])
-        def comment_translation(self, context, request: TracimRequest, hapic_data=None):
-            """
-            Translate a comment
-            """
-            api = ContentApi(
-                show_archived=True,
-                show_deleted=True,
-                current_user=request.current_user,
-                session=request.dbsession,
-                config=request.app_config,
-            )
-            content = api.get_one(
-                hapic_data.path.content_id, content_type=content_type_list.Any_SLUG
-            )
-            comment = api.get_one(
-                hapic_data.path.comment_id,
-                parent=content,
-                content_type=content_type_list.Comment.slug,
-            )
-            file = BytesIO(comment.raw_content.encode("utf-8"))
-            translation_service = TranslationLib(
-                config=request.app_config,
-                current_user=request.current_user,
-                session=request.dbsession,
-            ).get_translation_service()
-            translated_file = translation_service.translate_file(
-                input_lang=hapic_data.query.source_language_code,
-                output_lang=hapic_data.query.target_language_code,
-                mimetype=CONTENT_TYPE_TEXT_HTML,
-                binary_io=file,
-            )
-            filename = hapic_data.path.filename
-            if not filename or "raw":
-                filename = "translated_comment_{}.html".format(comment.content_id)
-            return HapicFile(
-                file_object=translated_file,
-                mimetype=CONTENT_TYPE_TEXT_HTML,
-                filename=filename,
-                as_attachment=hapic_data.query.force_download,
-                last_modified=comment.updated,
-            )
-
-        return {
-            "comment_translation": comment_translation,
-        }
-
     def bind(self, configurator: Configurator):
         # Get comments
         configurator.add_route(
@@ -229,16 +213,12 @@ class CommentController(Controller):
         )
         configurator.add_view(self.content_comment, route_name="content_comment")
 
-        if self.app_config.TRANSLATION_SERVICE__ENABLED:
-            translation_endpoints = self.load_translation_endpoints()
-            configurator.add_route(
-                "comment_translation",
-                "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}/translated/{filename:[^/]*}",
-                request_method="GET",
-            )
-            configurator.add_view(
-                translation_endpoints["comment_translation"], route_name="comment_translation"
-            )
+        configurator.add_route(
+            "comment_translation",
+            "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}/translated/{filename:[^/]*}",
+            request_method="GET",
+        )
+        configurator.add_view(self.comment_translation, route_name="comment_translation")
 
         # Add comments
         configurator.add_route(

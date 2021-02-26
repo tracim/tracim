@@ -235,7 +235,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     account_controller = AccountController()
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
-    comment_controller = CommentController(app_config)
+    comment_controller = CommentController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
