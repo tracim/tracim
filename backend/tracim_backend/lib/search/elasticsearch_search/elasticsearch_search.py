@@ -714,7 +714,6 @@ class ESSearchApi(SearchApi):
         return UserSearchResponse(
             hits=response["hits"],
             facets=facets,
-            search_fields=search_fields,
             newest_authored_content_date_from=newest_authored_content_date_from,
             newest_authored_content_date_to=newest_authored_content_date_to,
         )
