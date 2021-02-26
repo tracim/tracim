@@ -45,7 +45,7 @@ class ContentHTMLDocumentApp(TracimApplication):
             HTMLDocumentController,
         )
 
-        html_document_controller = HTMLDocumentController()
+        html_document_controller = HTMLDocumentController(app_config)
         configurator.include(html_document_controller.bind, route_prefix=route_prefix)
 
 
