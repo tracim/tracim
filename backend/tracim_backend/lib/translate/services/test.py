@@ -62,6 +62,6 @@ class TestTranslationService(TranslationService):
     @property
     def supported_language_pairs(self) -> List[TranslationLanguagePair]:
         """
-        This service don't support real language source and destination
+        This service doesn't support real language source and destination
         """
         return [TranslationLanguagePair("test_source", "test_result")]
