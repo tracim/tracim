@@ -16,22 +16,28 @@ import {
 import {
   appendSearchResultList,
   newFlashMessage,
+  resetAppliedFilter,
+  setAppliedFilter,
   setBreadcrumbs,
+  setCreatedRange,
   setSearchContentBreadcrumbs,
   setCurrentNumberPage,
   setHeadTitle,
+  setModifiedRange,
   setNumberResultsByPage,
+  setSearchFacets,
   setSearchString,
   setSearchResultList
 } from '../action-creator.sync.js'
+import SearchFilterMenu from './SearchFilterMenu.jsx'
 import { getAdvancedSearchResult } from '../action-creator.async.js'
 import SearchInput from '../component/Search/SearchInput.jsx'
 import {
+  ADVANCED_SEARCH_FILTER,
   ADVANCED_SEARCH_TYPE,
   FETCH_CONFIG,
   parseSearchUrl
 } from '../util/helper.js'
-import SearchFilterMenu from '../component/Search/SearchFilterMenu.jsx'
 import AdvancedSearchContentList from '../component/Search/AdvancedSearchContentList.jsx'
 import AdvancedSearchUserList from '../component/Search/AdvancedSearchUserList.jsx'
 import AdvancedSearchSpaceList from '../component/Search/AdvancedSearchSpaceList.jsx'
@@ -85,8 +91,10 @@ export class AdvancedSearch extends React.Component {
   componentDidMount () {
     const { props } = this
     const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
+    props.dispatch(resetAppliedFilter(urlSearchObject.searchType))
 
     if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
+      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.CONTENT))
       this.getSearchResult({
         ...urlSearchObject,
         currentPage: FIRST_PAGE,
@@ -132,12 +140,12 @@ export class AdvancedSearch extends React.Component {
       prevSearch.searchString !== currentSearch.searchString
     ) {
       this.setHeadTitle()
+      props.dispatch(resetAppliedFilter(this.state.searchType))
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters) => {
     const { props } = this
-
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
@@ -153,7 +161,11 @@ export class AdvancedSearch extends React.Component {
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive,
-      searchObject.searchType
+      searchObject.searchType,
+      searchFieldList,
+      appliedFilters ? appliedFilters.createdRange : {},
+      appliedFilters ? appliedFilters.modifiedRange : {},
+      appliedFilters ? appliedFilters.searchFacets : {}
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -161,6 +173,9 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(setSearchString(searchObject.searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
+        props.dispatch(setCreatedRange(fetchGetAdvancedSearchResult.json.created_range, searchObject.searchType))
+        props.dispatch(setModifiedRange(fetchGetAdvancedSearchResult.json.modified_range, searchObject.searchType))
+        props.dispatch(setSearchFacets(fetchGetAdvancedSearchResult.json.facets, searchObject.searchType))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
           props.dispatch(setSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
         } else {
@@ -173,6 +188,147 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
+  }
+
+  handleChangeSearchFieldList = (field) => {
+    const { props, state } = this
+    let currentSearch
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
+
+    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.slug)
+      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.slug)
+      : [...oldAppliedSearchFieldList, field.slug]
+
+    props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FIELD, newAppliedSearchFieldList, state.searchType))
+
+    this.getSearchResult(
+      { ...currentSearch, searchType: state.searchType },
+      currentSearch.resultList.length,
+      newAppliedSearchFieldList,
+      currentSearch.appliedFilters.createdRange,
+      currentSearch.appliedFilters.modifiedRange,
+      currentSearch.appliedFilters.searchFacets
+    )
+  }
+
+  handleChangeCreatedRange = (dateObject) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.CREATED_RANGE,
+      currentSearch.appliedFilters.createdRange,
+      dateObject
+    )
+  }
+
+  handleChangeModifiedRange = (dateObject) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.MODIFIED_RANGE,
+      currentSearch.appliedFilters.modifiedRange,
+      dateObject
+    )
+  }
+
+  handleChangeSearchFacets = (facetObject) => {
+    const { props, state } = this
+    let currentSearch
+
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
+      currentSearch.appliedFilters.searchFacets,
+      facetObject
+    )
+  }
+
+  updateAppliedFilter = (type, oldAppliedFilter, filterObject) => {
+    const { props, state } = this
+    let currentSearch
+    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+      currentSearch = props.contentSearch
+    }
+    /*
+      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
+        currentSearch= props.userSearch
+      }
+
+      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+        currentSearch = props.spaceSearch
+      }
+    */
+
+    let newAppliedFilter = {}
+    const filterKey = Object.keys(filterObject)[0]
+
+    if (oldAppliedFilter) {
+      if (Object.keys(oldAppliedFilter).includes(filterKey)) {
+        newAppliedFilter = { ...oldAppliedFilter }
+        delete newAppliedFilter[filterKey]
+      } else newAppliedFilter = { ...oldAppliedFilter, ...filterObject }
+    } else newAppliedFilter = filterObject
+
+    props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
+
+    this.getSearchResult(
+      { ...currentSearch, searchType: state.searchType },
+      currentSearch.resultList.length,
+      currentSearch.appliedFilters.searchFieldList,
+      {
+        ...currentSearch.appliedFilters,
+        [type]: newAppliedFilter
+      }
+    )
   }
 
   loadSearchUrl = () => {
@@ -296,7 +452,7 @@ export class AdvancedSearch extends React.Component {
         maxNumberSearchResults = (props.spaceSearch.numberResultsByPage * props.spaceSearch.currentPage)
       }
     */
-    return currentNumberSearchResults >= maxNumberSearchResults
+    return props.contentSearch.resultList.length !== 0 && currentNumberSearchResults >= maxNumberSearchResults
   }
 
   handleChangeSearchType = (e) => {
@@ -325,7 +481,7 @@ export class AdvancedSearch extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper>
+          <PageWrapper customClass='advancedSearch__wrapper'>
             <PageTitle
               title={(currentNumberSearchResults === 1
                 ? props.t('Result for "{{keywords}}"', { keywords: props.contentSearch.searchString })
@@ -429,7 +585,12 @@ export class AdvancedSearch extends React.Component {
                 </div>
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
-                    onClickSearchFilterMenu={this.handleClickFilterMenu}
+                    onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
+                    searchType={state.searchType}
+                    onClickSearchField={this.handleChangeSearchFieldList}
+                    onChangeCreatedDate={this.handleChangeCreatedRange}
+                    onChangeModifiedDate={this.handleChangeModifiedRange}
+                    onChangeSearchFacets={this.handleChangeSearchFacets}
                   />
                 )}
               </div>

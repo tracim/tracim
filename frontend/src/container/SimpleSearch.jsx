@@ -142,7 +142,7 @@ export class SimpleSearch extends React.Component {
 
   handleClickSeeMore = async () => {
     const { props } = this
-    const nextPage = props.simpleSearch.currentNumberPage + 1
+    const nextPage = props.simpleSearch.currentPage + 1
     props.history.push(
       `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
     )
@@ -173,7 +173,7 @@ export class SimpleSearch extends React.Component {
   hasMoreResults () {
     const { props } = this
     const currentNumberSearchResults = this.state.totalHits
-    return currentNumberSearchResults >= (props.simpleSearch.numberResultsByPage * props.simpleSearch.currentNumberPage)
+    return currentNumberSearchResults >= (props.simpleSearch.numberResultsByPage * props.simpleSearch.currentPage)
   }
 
   buildBreadcrumbs = () => {

@@ -1,0 +1,22 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.dateFilter
+  &__checkbox
+    padding 0px 5px
+    display flex
+    align-items center
+    & > *
+      cursor pointer
+    & > input[type='checkbox']
+          margin 0px 10px
+
+.DayPicker
+  border 1px solid grey
+  &-Day--today
+    color fontColor
+.DayPickerInput
+  margin-inline-start 10px
+  & input
+    width 180px
+  &-OverlayWrapper
+    margin-inline-start -80px

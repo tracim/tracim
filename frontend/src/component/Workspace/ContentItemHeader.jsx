@@ -16,7 +16,7 @@ export const FileItemHeader = props => {
             {props.t('Path')}
           </div>
           <div className='content__header__search__modif'>
-            {props.t('Last modification')}
+            {props.t('Last Modification')}
           </div>
         </div>
       )}
