@@ -19,6 +19,8 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
+from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
@@ -334,6 +336,8 @@ class CFG(object):
         self._load_search_config()
         self.log_config_header("Content Security Policy parameters:")
         self._load_content_security_policy_config()
+        self.log_config_header("Translation Service config parameters:")
+        self._load_translation_service_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -818,6 +822,19 @@ class CFG(object):
             "{}.additional_directives".format(prefix), ""
         )
 
+    def _load_translation_service_config(self) -> None:
+        prefix = "translation_service"
+        self.TRANSLATION_SERVICE__ENABLED = asbool(
+            self.get_raw_config("{}.enabled".format(prefix), "False")
+        )
+        self.TRANSLATION_SERVICE__PROVIDER = self.get_raw_config("{}.provider".format(prefix))
+        self.TRANSLATION_SERVICE__SYSTRAN__API_URL = self.get_raw_config(
+            "{}.systran.api_url".format(prefix)
+        )
+        self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
+            "{}.systran.api_key".format(prefix)
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -833,6 +850,7 @@ class CFG(object):
         self._check_search_config_validity()
         self._check_webdav_config_validity()
         self._check_content_security_policy_validity()
+        self._check_translation_service_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -1206,6 +1224,31 @@ class CFG(object):
                 self.CONTENT_SECURITY_POLICY__REPORT_URI,
                 when_str="if content_security_policy.report_only is enabled",
             )
+
+    def _check_translation_service_validity(self) -> None:
+        if self.TRANSLATION_SERVICE__ENABLED:
+            valid_translations_service = TRANSLATION_SERVICE_CLASSES.keys()
+            if self.TRANSLATION_SERVICE__PROVIDER not in valid_translations_service:
+                translation_service_list = ", ".join(
+                    ['"{}"'.format(slug) for slug in valid_translations_service]
+                )
+                raise ConfigurationError(
+                    'ERROR TRANSLATION_SERVICE__PROVIDER given "{}" is invalid,'
+                    "valids values are {}.".format(
+                        self.TRANSLATION_SERVICE__PROVIDER, translation_service_list
+                    )
+                )
+            if self.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.SYSTRAN:
+                self.check_mandatory_param(
+                    "TRANSLATION_SERVICE__SYSTRAN__API_URL",
+                    self.TRANSLATION_SERVICE__SYSTRAN__API_URL,
+                    when_str="if translation service with systran is activated",
+                )
+                self.check_mandatory_param(
+                    "TRANSLATION_SERVICE__SYSTRAN__API_KEY",
+                    self.TRANSLATION_SERVICE__SYSTRAN__API_KEY,
+                    when_str="if translation service with systran is activated",
+                )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):

@@ -2,9 +2,13 @@
 
 .advancedSearch
   padding-inline-end 0px
+  padding-bottom 0px
   overflow-x hidden
+  &__wrapper
+    height "calc(100vh - %s)" % (headerHeight + 69) // 69px is the PageTitle height
   &__page
     display flex
+    min-height calc(100% - 40px) // 40px is the search input height
   & .search
     margin-inline-end 30px
     width 100%
