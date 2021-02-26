@@ -16,11 +16,13 @@ import {
   serialize,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
-import { SEARCH_TYPE } from '../util/helper.js'
+import { ADVANCED_SEARCH_TYPE, SEARCH_TYPE } from '../util/helper.js'
 
 export const serializeSearchItemProps = {
+  access_type: 'accessType',
   author: 'author',
   comment_count: 'commentCount',
+  content_count: 'contentCount',
   content_id: 'contentId',
   content_type: 'contentType',
   created: 'created',
@@ -34,6 +36,7 @@ export const serializeSearchItemProps = {
   is_editable: 'isEditable',
   label: 'label',
   last_modifier: 'lastModifier',
+  member_count: 'memberCount',
   modified: 'modified',
   parent: 'parent',
   parents: 'parents',
@@ -54,12 +57,23 @@ const defaultResult = {
   resultList: []
 }
 
+function getUniqueResultList (searchType, resultList) {
+  switch (searchType) {
+    case ADVANCED_SEARCH_TYPE.SPACE:
+      return uniqBy(resultList, 'workspaceId')
+    case ADVANCED_SEARCH_TYPE.USER:
+      return uniqBy(resultList, 'userId')
+    default:
+      return uniqBy(resultList, 'contentId')
+  }
+}
+
 function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
   let newResultList, uniqueResultList
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST(searchType)}`:
       newResultList = action.newSearchResultList.map(item => serialize(item, serializeSearchItemProps))
-      uniqueResultList = uniqBy(newResultList, 'contentId')
+      uniqueResultList = getUniqueResultList(searchType, newResultList)
       return { ...state, resultList: uniqueResultList }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
@@ -84,7 +98,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
 
     case `${APPEND}/${SEARCH_RESULTS_LIST(searchType)}`:
       newResultList = action.appendSearchResultList.map(item => serialize(item, serializeSearchItemProps))
-      uniqueResultList = uniqBy([...state.resultList, ...newResultList], 'contentId')
+      uniqueResultList = getUniqueResultList(searchType, [...state.resultList, ...newResultList])
       return { ...state, resultList: uniqueResultList }
 
     case `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`:

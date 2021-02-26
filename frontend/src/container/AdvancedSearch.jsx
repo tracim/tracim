@@ -119,7 +119,8 @@ export class AdvancedSearch extends React.Component {
 
     if (
       prevSearch.searchString !== currentSearch.searchString ||
-      prevSearch.currentPage !== currentSearch.currentPage
+      prevSearch.currentPage !== currentSearch.currentPage ||
+      prevSearch.searchType !== currentSearch.searchType
     ) {
       this.loadSearchUrl()
     }
@@ -187,6 +188,7 @@ export class AdvancedSearch extends React.Component {
 
   loadSearchUrl = () => {
     const searchObject = parseSearchUrl(qs.parse(this.props.location.search))
+    this.setState({ searchType: searchObject.searchType })
     const currentSearch = this.getCurrentSearchObject()
     this.getSearchResult(searchObject, currentSearch.resultList.length)
   }
@@ -282,7 +284,6 @@ export class AdvancedSearch extends React.Component {
 
   handleChangeSearchType = (e) => {
     const { props } = this
-    console.log(e.currentTarget.value)
     props.history.push(
       `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), s: e.currentTarget.value }, { encode: true })}`
     )

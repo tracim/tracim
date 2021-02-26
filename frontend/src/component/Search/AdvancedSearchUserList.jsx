@@ -12,8 +12,6 @@ import { Link } from 'react-router-dom'
 
 require('./AdvancedSearchUserList.styl')
 
-// TODO - G.B. - 2021-02-16 - This component should be updated at https://github.com/tracim/tracim/issues/4097
-
 export const AdvancedSearchUserList = props => {
   return (
     <>
