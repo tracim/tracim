@@ -96,23 +96,25 @@ export class AdvancedSearch extends React.Component {
         ...urlSearchObject,
         currentPage: FIRST_PAGE,
         searchType: ADVANCED_SEARCH_TYPE.CONTENT
-      }, props.contentSearch.resultList.length)
+      }, props.contentSearch ? props.contentSearch.resultList.length : 0)
     }
 
     if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
+      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.USER))
       this.getSearchResult({
         ...urlSearchObject,
         currentPage: FIRST_PAGE,
         searchType: ADVANCED_SEARCH_TYPE.USER
-      }, props.userSearch.resultList.length)
+      }, props.userSearch ? props.userSearch.resultList.length : 0)
     }
 
     if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
+      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.USER))
       this.getSearchResult({
         ...urlSearchObject,
         currentPage: FIRST_PAGE,
         searchType: ADVANCED_SEARCH_TYPE.SPACE
-      }, props.spaceSearch.resultList.length)
+      }, props.spaceSearch ? props.spaceSearch.resultList.length : 0)
     }
 
     this.setHeadTitle()

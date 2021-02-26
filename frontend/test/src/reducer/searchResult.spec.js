@@ -8,6 +8,8 @@ import {
   deleteWorkspaceContentList,
   MODIFIED_RANGE,
   REMOVE,
+  RESET,
+  resetAppliedFilter,
   SEARCH_CURRENT_PAGE,
   SEARCH_FACETS,
   SEARCH_RESULTS_BY_PAGE,
@@ -161,6 +163,13 @@ describe('reducer searchResult.js', () => {
       const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setAppliedFilter('key', 'value', SEARCH_TYPE.SIMPLE))
       it('should return a content object with the appliedFilters property set as an object with the given key and value', () => {
         expect(rez).to.deep.equal({ ...initialState, appliedFilters: { key: 'value' } })
+      })
+    })
+
+    describe(`${RESET}/${APPLIED_FILTER(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)({ ...initialState, appliedFilters: { key: 'value' } }, resetAppliedFilter(SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the appliedFilters property set as an object with the given key and value', () => {
+        expect(rez).to.deep.equal(initialState)
       })
     })
 
