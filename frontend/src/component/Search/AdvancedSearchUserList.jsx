@@ -30,14 +30,14 @@ export const AdvancedSearchUserList = props => {
       )}
       {props.userSearch.resultList.map((searchItem, index) => (
         <ListItemWrapper
-          label={searchItem.label}
+          label={searchItem.publicName}
           read
           contentType={searchItem}
           isLast={index === props.userSearch.resultList.length - 1}
-          key={searchItem.contentId}
+          key={searchItem.userId}
         >
           <Link
-            to={`${PAGE.PUBLIC_PROFILE(searchItem.contentId)}`}
+            to={`${PAGE.PUBLIC_PROFILE(searchItem.userId)}`}
             className='advancedSearchUser'
           >
             <div
@@ -52,9 +52,9 @@ export const AdvancedSearchUserList = props => {
 
             <div
               className='advancedSearchUser__name'
-              title={searchItem.label}
+              title={searchItem.publicName}
             >
-              {searchItem.label}
+              {searchItem.publicName}
             </div>
 
             <div className='advancedSearchUser__information'>
