@@ -8,6 +8,7 @@ from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPO
 from tracim_backend.lib.translate.services.systran import SUPPORTED_FORMAT_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_LANGUAGES_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SystranTranslationService
+from tracim_backend.lib.translate.services.test import TestTranslationService
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 from tracim_backend.lib.translate.translator import TranslationService
@@ -46,6 +47,28 @@ class TestExternalTranslator:
         base_content = io.BytesIO("Source content".encode("utf-8"))
         result = translator.translate_file("fr", "en", base_content, "text/plain",)
         assert result.read().decode("utf-8") == "Translated"
+
+
+class TestTestTranslationService:
+    def test_unit___test_service__supported_mimetypes_pair__ok__nominal_case(self) -> None:
+        translation_service = TestTranslationService()
+        mimetype_pair = TranslationMimetypePair("text/html", "text/html")
+        assert translation_service.supported_mimetype_pairs == [mimetype_pair]
+
+    def test_unit___test_service__supported_languages_pair__ok__nominal_case(self) -> None:
+        translation_service = TestTranslationService()
+        assert translation_service.supported_language_pairs == [
+            TranslationLanguagePair("test_source", "test_result")
+        ]
+
+    def test_unit___test_service__translate_file__ok__nominal_case(self):
+        translation_service = TestTranslationService()
+        assert translation_service.translate_file(
+            binary_io=io.BytesIO(b""),
+            input_lang="test_source",
+            output_lang="test_result",
+            mimetype="text/html",
+        )
 
 
 class TestSystranTranslationService:
