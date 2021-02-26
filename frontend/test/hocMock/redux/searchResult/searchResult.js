@@ -2,7 +2,7 @@ import { firstWorkspaceFromApi } from '../../../fixture/workspace/firstWorkspace
 import { userFromApi } from '../user/user.js'
 
 export const searchResult = {
-  currentNumberPage: 1,
+  currentPage: 1,
   numberResultsByPage: 10,
   searchString: 'word',
   resultList: [
