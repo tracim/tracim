@@ -30,7 +30,7 @@ const IconButton = props => {
       data-cy={props.dataCy}
     >
       {props.icon && <i className={`fa-fw ${props.icon} iconbutton__icon`} />}
-      {props.text && <span className={props.icon ? 'iconbutton__text_with_icon' :'iconbutton__text'}>{props.text}</span>}
+      {props.text && <span className={props.icon ? 'iconbutton__text_with_icon' : 'iconbutton__text'}>{props.text}</span>}
     </button>
   )
 }
