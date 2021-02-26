@@ -898,9 +898,7 @@ class ESContentIndexer:
         try:
             self.index_contents([content], context)
             if self._should_reindex_children(content.current_revision):
-                self.index_contents(
-                    self._filter_excluded_content_types(content.recursive_children), context
-                )
+                self.index_contents(content.recursive_children, context)
         except Exception:
             logger.exception(
                 self, "Exception while indexing modified content {}".format(content.content_id)
@@ -921,10 +919,7 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            self.index_contents(
-                self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace)),
-                context,
-            )
+            self.index_contents(content_api.get_all_query(workspace=workspace), context)
         except Exception:
             logger.exception(
                 self,
@@ -961,7 +956,9 @@ class ESContentIndexer:
     def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
         if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
             queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
-            content_ids = [content.content_id for content in contents]
+            content_ids = [
+                content.content_id for content in self._filter_excluded_content_types(contents)
+            ]
 
             def index_via_rq_worker(session: Session, flush_context=None) -> None:
                 queue.enqueue(self._index_contents_from_ids, content_ids)
@@ -971,7 +968,7 @@ class ESContentIndexer:
             search_api = ESSearchApi(
                 session=context.dbsession, config=context.app_config, current_user=None
             )
-            for content in contents:
+            for content in self._filter_excluded_content_types(contents):
                 search_api.index_content(content)
 
     def _index_contents_from_ids(self, content_ids: typing.List[int]) -> None:
