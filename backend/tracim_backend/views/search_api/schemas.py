@@ -348,17 +348,12 @@ class UserSearchFacets(marshmallow.Schema):
     workspaces = marshmallow.fields.List(marshmallow.fields.Nested(WorkspaceFacetSchema()))
 
 
-class DateRangeSchema(marshmallow.Schema):
-    from_ = marshmallow.fields.DateTime(format=DATETIME_FORMAT, dict_key="from")
-    to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-
-
 class UserSearchResultSchema(marshmallow.Schema):
     users = marshmallow.fields.List(marshmallow.fields.Nested(SearchedUserSchema()))
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(UserSearchFacets())
-    last_authored_content_revision_date_range = DateRangeSchema()
+    newest_authored_content_date_range = marshmallow.fields.Nested(DateRangeSchema())
     search_fields = marshmallow.fields.List(EnumField(UserSearchField))
 
 

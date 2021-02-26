@@ -775,6 +775,7 @@ class TestElasticSearchUserSearch:
         }
         search_fields = search_result["search_fields"]
         assert search_fields == ["public_name", "username", "custom_properties"]
+        assert search_result["newest_authored_content_date_range"] == {"from": None, "to": None}
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
 
