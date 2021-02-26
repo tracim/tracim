@@ -1,6 +1,7 @@
 from datetime import datetime
 import typing
 
+from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import RequestError
@@ -698,11 +699,24 @@ class ESSearchApi(SearchApi):
                 "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
             )
         }
+        try:
+            newest_authored_content_date_from = parse(
+                response.aggregations.newest_authored_content_date_from["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_from = None
+        try:
+            newest_authored_content_date_to = parse(
+                response.aggregations.newest_authored_content_date_to["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_to = None
         return UserSearchResponse(
             hits=response["hits"],
             facets=facets,
-            newest_authored_content_date_from=response.aggregations.newest_authored_content_date_from,
-            newest_authored_content_date_to=response.aggregations.newest_authored_content_date_to,
+            search_fields=search_fields,
+            newest_authored_content_date_from=newest_authored_content_date_from,
+            newest_authored_content_date_to=newest_authored_content_date_to,
         )
 
     def search_workspace(
