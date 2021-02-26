@@ -153,18 +153,32 @@ export class AdvancedSearch extends React.Component {
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
-      case 200:
+      case 200: {
+        let resultList
+        if (searchObject.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+          resultList = fetchGetAdvancedSearchResult.json.contents
+        }
+
+        if (searchObject.searchType === ADVANCED_SEARCH_TYPE.USER) {
+          resultList = fetchGetAdvancedSearchResult.json.users
+        }
+
+        if (searchObject.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+          resultList = fetchGetAdvancedSearchResult.json.workspaces
+        }
+
         props.dispatch(setSearchString(searchObject.searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
-          props.dispatch(setSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
+          props.dispatch(setSearchResultList(resultList, searchObject.searchType))
         } else {
-          props.dispatch(appendSearchResultList(fetchGetAdvancedSearchResult.json.contents, searchObject.searchType))
+          props.dispatch(appendSearchResultList(resultList, searchObject.searchType))
         }
         if (searchObject.searchType === this.state.searchType) this.setState({ totalHits: fetchGetAdvancedSearchResult.json.total_hits })
         if (searchObject.searchType === ADVANCED_SEARCH_TYPE.CONTENT) this.buildContentBreadcrumbs()
         break
+      }
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
