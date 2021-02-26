@@ -3,6 +3,7 @@ import typing
 
 from sqlalchemy.orm import Session
 
+from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.translate.services.systran import SystranTranslationService
 from tracim_backend.lib.translate.translator import TranslationService
 from tracim_backend.models.auth import User
@@ -38,4 +39,4 @@ class TranslationLib:
                 api_key=self._config.TRANSLATION_SERVICE__SYSTRAN__API_KEY,
             )
         else:
-            return None
+            raise TracimException("Translation Service not available")
