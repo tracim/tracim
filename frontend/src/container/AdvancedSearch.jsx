@@ -281,10 +281,17 @@ export class AdvancedSearch extends React.Component {
   }
 
   loadSearchUrl = () => {
-    const searchObject = parseSearchUrl(qs.parse(this.props.location.search))
-    this.setState({ searchType: searchObject.searchType })
-    const currentSearch = this.getCurrentSearchObject()
-    this.getSearchResult(searchObject, currentSearch.resultList.length)
+    const { props } = this
+    const searchObject = parseSearchUrl(qs.parse(props.location.search))
+    if (Object.values(ADVANCED_SEARCH_TYPE).includes(searchObject.searchType)) {
+      this.setState({ searchType: searchObject.searchType })
+      const currentSearch = this.getCurrentSearchObject()
+      this.getSearchResult(searchObject, currentSearch.resultList.length)
+    } else {
+      props.history.push(
+        `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), s: ADVANCED_SEARCH_TYPE.CONTENT }, { encode: true })}`
+      )
+    }
   }
 
   buildContentBreadcrumbs = () => {
