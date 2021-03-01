@@ -50,6 +50,13 @@ export const DATE_FILTER_ELEMENT = {
 
 // INFO - G.B. - 2021-03-01 - All the translations in the object below has as their only purpose
 // to be able to generate translation keys through i18n.scanner
+
+export const SEARCH_USER_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  }
+}
+
 export const SEARCH_CONTENT_FACETS = {
   SPACE: {
     slug: 'workspace_names'
