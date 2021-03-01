@@ -9,7 +9,6 @@ from sqlalchemy.orm import joinedload
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.search.models import ContentSearchResponse
-from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.data import Content
@@ -160,7 +159,7 @@ class SimpleSearchApi(SearchApi):
         - filter content found according to workspace of current_user
         """
         if not search_parameters.search_string:
-            return EmptyContentSearchResponse()
+            return ContentSearchResponse()
 
         content_api = ContentApi(
             session=self._session,

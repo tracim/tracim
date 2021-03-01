@@ -278,6 +278,7 @@ const ON_REQUEST = {
 }
 const CONFIDENTIAL = {
   id: 4,
+  hexcolor: '#B61616',
   slug: 'confidential',
   faIcon: 'fas fa-user-secret',
   tradKey: [

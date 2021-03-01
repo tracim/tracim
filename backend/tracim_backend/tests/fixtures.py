@@ -26,7 +26,7 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
-from tracim_backend.lib.core.event import RQ_QUEUE_NAME
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
@@ -74,20 +74,20 @@ def pushpin(tracim_webserver, tmp_path_factory):
 
 @pytest.fixture
 def rq_database_worker(config_uri, app_config):
-    def empty_event_queue():
+    def empty_event_queues():
         redis_connection = get_redis_connection(app_config)
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-        queue.delete()
+        for queue_name in RqQueueName:
+            queue = get_rq_queue(redis_connection, queue_name)
+            queue.delete()
 
-    empty_event_queue()
+    empty_event_queues()
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
-    worker_process = subprocess.Popen(
-        "rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event".split(" "),
-        env=worker_env,
-    )
+    base_args = ["rq", "worker", "-q", "-w", "tracim_backend.lib.rq.worker.DatabaseWorker"]
+    queue_name_args = [queue_name.value for queue_name in RqQueueName]
+    worker_process = subprocess.Popen(base_args + queue_name_args, env=worker_env,)
     yield worker_process
-    empty_event_queue()
+    empty_event_queues()
     worker_process.terminate()
     try:
         worker_process.wait(5.0)
@@ -176,13 +176,6 @@ def web_testapp(settings, hapic, session):
 
 
 @pytest.fixture
-def empty_rq_event_queue(app_config):
-    redis_connection = get_redis_connection(app_config)
-    queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
-    queue.delete()
-
-
-@pytest.fixture
 def hapic():
     from tracim_backend.extensions import hapic as hapic_static
 
@@ -254,6 +247,11 @@ def load_child_removal_plugin(test_context, official_plugin_folder):
 @pytest.fixture
 def test_context(app_config, session_factory):
     yield TracimTestContext(app_config, session_factory=session_factory)
+
+
+@pytest.fixture
+def test_context_without_plugins(app_config, session_factory):
+    yield TracimTestContext(app_config, session_factory=session_factory, init_plugins=False)
 
 
 @pytest.fixture
@@ -387,7 +385,7 @@ def riyad_user(session: Session, user_api_factory: UserApiFactory) -> User:
         email="riyad@test.test",
         username="riyad",
         password="password",
-        name="riyad",
+        name="Riyad Faisal",
         profile=Profile.USER,
         timezone="Europe/Paris",
         lang="fr",

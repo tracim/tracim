@@ -12,6 +12,7 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -271,7 +272,7 @@ class TestNotificationsAsync(object):
 
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, "mail_sender")
+        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received
@@ -307,7 +308,7 @@ class TestNotificationsAsync(object):
         )
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, "mail_sender")
+        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received
@@ -329,7 +330,7 @@ class TestNotificationsAsync(object):
         transaction.commit()
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, "mail_sender")
+        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received

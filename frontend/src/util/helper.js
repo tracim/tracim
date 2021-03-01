@@ -32,8 +32,57 @@ export const SEARCH_TYPE = {
 
 export const ADVANCED_SEARCH_TYPE = {
   CONTENT: 'content',
-  USER: 'users',
-  SPACE: 'workspaces'
+  USER: 'user',
+  SPACE: 'workspace'
+}
+
+export const ADVANCED_SEARCH_FILTER = {
+  SEARCH_FIELD: 'searchField',
+  CREATED_RANGE: 'createdRange',
+  MODIFIED_RANGE: 'modifiedRange',
+  SEARCH_FACETS: 'searchFacets'
+}
+
+export const SEARCH_FIELD_LIST = [
+  { slug: 'label', value: i18n.t('Title') },
+  { slug: 'raw_content', value: i18n.t('Content') },
+  { slug: 'comments', value: i18n.t('Comments') },
+  { slug: 'description', value: i18n.t('Description') }
+]
+
+export const DATE_FILTER_ELEMENT = {
+  AFTER: 'after',
+  BEFORE: 'before'
+}
+
+export const SEARCH_CONTENT_FACETS = {
+  SPACE: {
+    slug: 'workspace_names'
+  },
+  STATUS: {
+    slug: 'statuses',
+    items: [
+      i18n.t('open'),
+      i18n.t('closed-deprecated'),
+      i18n.t('closed-unvalidated'),
+      i18n.t('closed-validated')
+    ]
+  },
+  TYPE: {
+    slug: 'content_types',
+    items: [
+      i18n.t('folder_search'),
+      i18n.t('html-document_search'),
+      i18n.t('thread_search'),
+      i18n.t('file_search')
+    ]
+  },
+  EXTENSION: {
+    slug: 'file_extensions'
+  },
+  AUTHOR: {
+    slug: 'author__public_names'
+  }
 }
 
 export const ANCHOR_NAMESPACE = {

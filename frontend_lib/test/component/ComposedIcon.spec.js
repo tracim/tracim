@@ -15,7 +15,8 @@ describe('<ComposedIcon />', () => {
     },
     smallIconStyle: {
       color: 'red'
-    }
+    },
+    titleIcon: 'randomTitle'
   }
 
   const wrapper = shallow(
@@ -36,5 +37,9 @@ describe('<ComposedIcon />', () => {
     it(`should display its text in color ${props.mainIconStyle.color}`, () =>
       expect(wrapper.find(`i.${props.mainIcon}`).prop('style')).to.deep.equal(props.mainIconStyle)
     )
+
+    it(`should display the title ${props.titleIcon}`, () => {
+      expect(wrapper.find('i.composedIcon').prop('title')).to.equal(props.titleIcon)
+    })
   })
 })

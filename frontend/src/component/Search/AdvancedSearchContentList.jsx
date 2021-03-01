@@ -51,23 +51,25 @@ export const AdvancedSearchContentList = props => {
 
   return (
     <div className='advancedSearchContent'>
-      <div className='content__header'>
-        <div className='advancedSearchContent__type__header'>
-          {props.t('Type')}
+      {resultList.length > 0 && (
+        <div className='content__header'>
+          <div className='advancedSearchContent__type__header'>
+            {props.t('Type')}
+          </div>
+          <div className='advancedSearchContent__title'>
+            {props.t('Title and path')}
+          </div>
+          <div className='advancedSearchContent__typeAndTitle'>
+            {props.t('Title')}
+          </div>
+          <div className='advancedSearchContent__modification'>
+            {props.t('Last Modification')}
+          </div>
+          <div className='advancedSearchContent__information'>
+            {props.t('Information_plural')}
+          </div>
         </div>
-        <div className='advancedSearchContent__title'>
-          {props.t('Title and path')}
-        </div>
-        <div className='advancedSearchContent__typeAndTitle'>
-          {props.t('Title')}
-        </div>
-        <div className='advancedSearchContent__modification'>
-          {props.t('Last modification')}
-        </div>
-        <div className='advancedSearchContent__information'>
-          {props.t('Information_plural')}
-        </div>
-      </div>
+      )}
 
       {resultList.map((searchItem, index) => {
         const searchItemUrl = PAGE.WORKSPACE.CONTENT(

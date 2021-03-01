@@ -62,6 +62,7 @@ class ConfigModel(object):
         email_notification_activated: bool,
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
+        translation_service__enabled: bool,
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
         content_length_file_size_limit: int,
@@ -82,6 +83,7 @@ class ConfigModel(object):
         self.instance_name = instance_name
         self.email_required = email_required
         self.search_engine = search_engine
+        self.translation_service__enabled = translation_service__enabled
 
 
 class ErrorCodeModel(object):
@@ -420,6 +422,19 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
+class CommentPathFilename(object):
+    """
+    Paths params with workspace id and content_id and comment_id model
+    and filename, useful to get preview/translation of a comment.
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, comment_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.comment_id = comment_id
+        self.filename = filename
+
+
 class KnownMembersQuery(object):
     """
     Autocomplete query model
@@ -642,6 +657,15 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
+
+
+class TranslationQuery:
+    def __init__(
+        self, source_language_code: str, target_language_code: str, force_download: int = 0,
+    ):
+        self.source_language_code = source_language_code
+        self.target_language_code = target_language_code
+        self.force_download = force_download
 
 
 class LiveMessageQuery(BasePaginatedQuery):

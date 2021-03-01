@@ -6,9 +6,11 @@ from PIL import Image
 import dateutil.parser
 from depot.io.utils import FileIntent
 import pytest
+import responses
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -1290,6 +1292,60 @@ class TestHtmlDocuments(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
+
+    def test_api__get_html_document_revision__ok_200__nominal_case(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ) -> None:
+        """
+        Get a specific revision of an html content
+        """
+        content_label = "test_page"
+        content_raw_content = "<b>html content</b>"
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=business_workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=content_raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/revisions/{}".format(
+                business_workspace.workspace_id,
+                test_html_document.content_id,
+                test_html_document.revision_id,
+            ),
+            status=200,
+        )
+        revision = res.json_body
+        assert revision["content_type"] == "html-document"
+        assert revision["content_id"] == test_html_document.content_id
+        assert revision["is_archived"] is False
+        assert revision["is_deleted"] is False
+        assert revision["is_editable"] is True
+        assert revision["label"] == content_label
+        assert revision["parent_id"] is None
+        assert revision["show_in_ui"] is True
+        assert revision["status"] == "open"
+        assert revision["workspace_id"] == business_workspace.workspace_id
+        assert revision["revision_id"] == test_html_document.revision_id
+        assert revision["revision_type"] == "edition"
+        assert revision["sub_content_types"]
+        assert revision["comment_ids"] == []
+        assert revision["created"]
+        assert revision["author"]
+        assert revision["author"]["user_id"] == 1
+        assert revision["author"]["has_avatar"] is False
+        assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
     def test_api__get_html_document_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """
@@ -4718,3 +4774,138 @@ class TestOwnerLimitedContentSize(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+)
+class TestContentTranslation(object):
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_html_document_revision_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get revision translation of a html-content
+        """
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/revisions/{}/translated/{}".format(
+                workspace.workspace_id,
+                test_html_document.content_id,
+                test_html_document.revision_id,
+                translation_filename,
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_html_document_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get content translation of a html-content
+        """
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/translated/{}".format(
+                workspace.workspace_id, test_html_document.content_id, translation_filename
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"

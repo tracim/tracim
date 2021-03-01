@@ -1,6 +1,11 @@
 import {
   APPEND,
+  APPLIED_FILTER,
+  CREATED_RANGE,
+  MODIFIED_RANGE,
   REMOVE,
+  RESET,
+  SEARCH_FACETS,
   SEARCH_CONTENT_BREADCRUMBS,
   SEARCH_RESULTS_LIST,
   SEARCHED_STRING,
@@ -16,11 +21,13 @@ import {
   serialize,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
-import { SEARCH_TYPE } from '../util/helper.js'
+import { ADVANCED_SEARCH_TYPE, SEARCH_TYPE } from '../util/helper.js'
 
 export const serializeSearchItemProps = {
+  access_type: 'accessType',
   author: 'author',
   comment_count: 'commentCount',
+  content_count: 'contentCount',
   content_id: 'contentId',
   content_type: 'contentType',
   created: 'created',
@@ -28,30 +35,52 @@ export const serializeSearchItemProps = {
   current_revision_type: 'currentRevisionType',
   file_extension: 'fileExtension',
   filename: 'filename',
+  has_avatar: 'hasAvatar',
+  has_cover: 'hasCover',
   is_active: 'isActive',
   is_archived: 'isArchived',
   is_deleted: 'isDeleted',
   is_editable: 'isEditable',
   label: 'label',
   last_modifier: 'lastModifier',
+  member_count: 'memberCount',
   modified: 'modified',
   parent: 'parent',
   parents: 'parents',
   path: 'path',
+  public_name: 'publicName',
   score: 'score',
   show_in_ui: 'showInUi',
   slug: 'slug',
   status: 'status',
   sub_content_types: 'subContentTypes',
+  user_id: 'userId',
+  username: 'username',
   workspace: 'workspace',
   workspace_id: 'workspaceId'
 }
 
 const defaultResult = {
-  currentNumberPage: 1,
+  appliedFilters: {},
+  createdRange: {},
+  currentPage: 1,
+  dateRangeFacets: {},
+  modifiedRange: {},
   numberResultsByPage: NUMBER_RESULTS_BY_PAGE,
+  searchFacets: {},
   searchString: '',
   resultList: []
+}
+
+function getUniqueResultList (searchType, resultList) {
+  switch (searchType) {
+    case ADVANCED_SEARCH_TYPE.SPACE:
+      return uniqBy(resultList, 'workspaceId')
+    case ADVANCED_SEARCH_TYPE.USER:
+      return uniqBy(resultList, 'userId')
+    default:
+      return uniqBy(resultList, 'contentId')
+  }
 }
 
 function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, action) {
@@ -59,7 +88,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST(searchType)}`:
       newResultList = action.newSearchResultList.map(item => serialize(item, serializeSearchItemProps))
-      uniqueResultList = uniqBy(newResultList, 'contentId')
+      uniqueResultList = getUniqueResultList(searchType, newResultList)
       return { ...state, resultList: uniqueResultList }
 
     case `${REMOVE}/${WORKSPACE_CONTENT}`:
@@ -84,7 +113,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
 
     case `${APPEND}/${SEARCH_RESULTS_LIST(searchType)}`:
       newResultList = action.appendSearchResultList.map(item => serialize(item, serializeSearchItemProps))
-      uniqueResultList = uniqBy([...state.resultList, ...newResultList], 'contentId')
+      uniqueResultList = getUniqueResultList(searchType, [...state.resultList, ...newResultList])
       return { ...state, resultList: uniqueResultList }
 
     case `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`:
@@ -101,11 +130,26 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
     case `${SET}/${SEARCHED_STRING}`:
       return { ...state, searchString: action.searchString }
 
+    case `${SET}/${SEARCH_FACETS(searchType)}`:
+      return { ...state, searchFacets: action.searchFacets }
+
+    case `${SET}/${CREATED_RANGE(searchType)}`:
+      return { ...state, createdRange: action.createdRange }
+
+    case `${SET}/${MODIFIED_RANGE(searchType)}`:
+      return { ...state, modifiedRange: action.modifiedRange }
+
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
       return { ...state, numberResultsByPage: action.numberResultsByPage }
 
     case `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`:
-      return { ...state, currentNumberPage: action.currentNumberPage }
+      return { ...state, currentPage: action.currentPage }
+
+    case `${SET}/${APPLIED_FILTER(searchType)}`:
+      return { ...state, appliedFilters: { ...state.appliedFilters, [action.key]: action.value } }
+
+    case `${RESET}/${APPLIED_FILTER(searchType)}`:
+      return { ...state, appliedFilters: { } }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       newResultList = state.resultList.map(item =>
