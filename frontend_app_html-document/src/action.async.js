@@ -10,7 +10,8 @@ export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions`)
 
 export const getHtmlDocTranslated = (apiUrl, workspaceId, contentId, revisionId, targetLanguageCode) => {
-  const url = `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/revisions/${revisionId}/translated?target_language_code=${targetLanguageCode}`
+  const name = `content-${contentId}-${targetLanguageCode}.html`
+  const url = `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions/${revisionId}/translated/${name}?target_language_code=${targetLanguageCode}`
   return baseFetch('GET', url)
 }
 

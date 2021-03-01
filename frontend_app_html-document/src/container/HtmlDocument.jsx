@@ -62,8 +62,8 @@ export class HtmlDocument extends React.Component {
 
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
-
-    const defaultTranslationState = param.config.translation_service__enabled
+    console.log(`translation config`, param.config.system.config.translation_service__enabled)
+    const defaultTranslationState = param.config.system.config.translation_service__enabled
       ? TRANSLATION_STATE.UNTRANSLATED
       : TRANSLATION_STATE.DISABLED
     this.state = {
@@ -97,7 +97,7 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       defaultTranslationState: defaultTranslationState,
-      translationState: defaultTranslationState
+      translationState: TRANSLATION_STATE.DISABLED
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
