@@ -365,8 +365,8 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
     show_deleted = marshmallow.fields.Int(
         example=0,
         default=0,
-        description="if set to 1, then show deleted contents."
-        " Default is 0 - hide deleted content",
+        description="if set to 1, then show deleted workpaces."
+        " Default is 0 - hide deleted workspaces",
         validate=bool_as_int_validator,
     )
 
