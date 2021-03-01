@@ -100,7 +100,7 @@ export const SEARCH_SPACE_FACETS = {
     slug: 'members'
   },
   AUTHOR: {
-    slug: 'author__public_names'
+    slug: 'owners'
   }
 }
 

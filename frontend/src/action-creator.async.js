@@ -1148,7 +1148,7 @@ export const getAdvancedSearchResult = (
   }
   if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
     if (searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
-    if (searchFacets.author) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+    if (searchFacets.owners) queryParameterList.push(`owner_ids=${searchFacets.owners}`)
   }
 
   return fetchWrapper({
