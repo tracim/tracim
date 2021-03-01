@@ -7,7 +7,7 @@ describe('Note/html document translation', function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.createHtmlDocument("A Note", workspaceId).then(doc => {
+    cy.createHtmlDocument('A Note', workspaceId).then(doc => {
       contentId = doc.content_id
     })
     cy.updateHtmlDocument(
