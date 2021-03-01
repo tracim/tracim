@@ -496,9 +496,6 @@ class TestElasticSearch(object):
         assert search_result
         assert search_result["total_hits"] == 3
         assert search_result["is_total_hits_accurate"] is True
-        assert set(search_result["search_fields"]) == set(
-            ["label", "raw_content", "comment", "description"]
-        )
         assert search_result["contents"] == []
         assert search_result["facets"]["file_extensions"] == [
             {"value": ".document.html", "count": 2},
@@ -1010,8 +1007,6 @@ class TestElasticSearchUserSearch:
         assert facets == {
             "workspaces": [{"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}]
         }
-        search_fields = search_result["search_fields"]
-        assert search_fields == ["public_name", "username", "custom_properties"]
         assert search_result["newest_authored_content_date_range"] == {"from": None, "to": None}
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
@@ -1055,9 +1050,10 @@ class TestElasticSearchUserSearch:
             ),
             (("riyad", "password"), {"search_string": "bob"}, [2], 1),
             (("riyad", "password"), {"search_string": "TheAdmin"}, [], 0),
-            (("TheAdmin", "admin@admin.admin"), {"search_string": "bob"}, [], 0),
+            (("TheAdmin", "admin@admin.admin"), {"search_string": "bob"}, [2], 1),
             (("bob", "password"), {"search_string": "*", "page_nb": 1, "size": 1}, [2], 2),
             (("bob", "password"), {"search_string": "*", "page_nb": 2, "size": 1}, [3], 2),
+            (("bob", "password"), {"search_string": "*", "size": 0}, [], 2),
         ],
     )
     def test_api__elasticsearch_user_search__ok__nominal_cases(
@@ -1134,6 +1130,7 @@ class TestElasticSearchWorkspaceSearch:
             (("riyad", "password"), {"search_string": "bob"}, [2], 1),
             (("bob", "password"), {"search_string": "bob", "page_nb": 1, "size": 1}, [1], 2),
             (("bob", "password"), {"search_string": "bob", "page_nb": 2, "size": 1}, [2], 2),
+            (("bob", "password"), {"search_string": "bob", "size": 0}, [], 2),
         ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(

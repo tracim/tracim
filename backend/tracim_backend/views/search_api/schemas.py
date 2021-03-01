@@ -292,9 +292,7 @@ class UserSearchQuerySchema(marshmallow.Schema):
     newest_authored_content_date_to = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, required=False, missing=None
     )
-    size = marshmallow.fields.Int(
-        required=False, default=10, validate=strictly_positive_int_validator
-    )
+    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
@@ -360,9 +358,7 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
         missing=None,
         description="if given only search in the given workspace fields",
     )
-    size = marshmallow.fields.Int(
-        required=False, default=10, validate=strictly_positive_int_validator
-    )
+    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )

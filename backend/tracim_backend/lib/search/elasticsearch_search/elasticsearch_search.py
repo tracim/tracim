@@ -559,17 +559,17 @@ class ESSearchApi(SearchApi):
                 "description",
             ]
         )
-        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
-        # return all workspaces content, empty list mean return nothing.
-
-        if search_parameters.size is not None:
-            search = search.extra(size=search_parameters.size)
 
         if search_parameters.page_nb:
             search = search.extra(
-                from_=self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
+                from_=self.offset_from_pagination(
+                    search_parameters.size, search_parameters.page_nb
+                ),
+                size=search_parameters.size,
             )
 
+        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
+        # return all workspaces content, empty list mean return nothing.
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
@@ -682,7 +682,7 @@ class ESSearchApi(SearchApi):
                 "range", newest_authored_content_date=newest_authored_content_date_range
             )
 
-        if size and page_nb:
+        if page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
 
         search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
@@ -750,7 +750,7 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", member_ids=member_ids)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-        if size and page_nb:
+        if page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
         search.aggs.bucket("member_ids", "terms", field="member_ids")
         response = search.execute()
