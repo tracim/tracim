@@ -285,6 +285,7 @@ class ESSearchApi(SearchApi):
             modified=content_in_context.modified,
             created=content_in_context.created,
             active_shares=content_in_context.actives_shares,
+            description=content_in_context.description,
             path=path,
             comments=comments,
             comment_count=len(comments),
@@ -515,7 +516,7 @@ class ESSearchApi(SearchApi):
                     "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
                 )
 
-        if ContentSearchField.COMMENT in search_fields:
+        if ContentSearchField.COMMENTS in search_fields:
             es_search_fields.extend(
                 ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
             )
@@ -554,12 +555,13 @@ class ESSearchApi(SearchApi):
                 "deleted_through_parent_id",
                 "archived_through_parent_id",
                 "is_active",
+                "description",
             ]
         )
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
 
-        if search_parameters.size:
+        if search_parameters.size is not None:
             search = search.extra(size=search_parameters.size)
 
         if search_parameters.page_nb:
@@ -580,17 +582,17 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.author__public_names:
             search = search.filter(
-                "terms", author__public_names__exact=search_parameters.author__public_names
+                "terms", author__public_name__exact=search_parameters.author__public_names
             )
 
         if search_parameters.last_modifier__public_names:
             search = search.filter(
                 "terms",
-                last_modifier__public_names__exact=search_parameters.last_modifier__public_names,
+                last_modifier__public_name__exact=search_parameters.last_modifier__public_names,
             )
 
         if search_parameters.file_extensions:
-            search = search.filter("terms", file_extension=search_parameters.file_extensions)
+            search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
 
         if search_parameters.statuses:
             search = search.filter("terms", status=search_parameters.statuses)
@@ -631,7 +633,6 @@ class ESSearchApi(SearchApi):
         search.aggs.metric("modified_to", "max", field="modified")
 
         res = search.execute()
-        res.search_fields = search_fields
         return res
 
     def search_user(
@@ -652,8 +653,8 @@ class ESSearchApi(SearchApi):
             index=self._get_index_parameters(self.IndexedUser).alias,
         )
         fields = [
-            "public_name.exact^5",
-            "username.exact^5",
+            "public_name.{}^5".format(EXACT_FIELD),
+            "username.{}^5".format(EXACT_FIELD),
             "public_name^3",
             "username^3",
             "custom_properties",
@@ -702,7 +703,6 @@ class ESSearchApi(SearchApi):
         return UserSearchResponse(
             hits=response["hits"],
             facets=facets,
-            search_fields=search_fields,
             newest_authored_content_date_from=response.aggregations.newest_authored_content_date_from,
             newest_authored_content_date_to=response.aggregations.newest_authored_content_date_to,
         )
@@ -725,7 +725,7 @@ class ESSearchApi(SearchApi):
         )
 
         fields = [
-            "label.exact^5",
+            "label.{}^5".format(EXACT_FIELD),
             "label^3",
             "description^3",
         ]
@@ -754,7 +754,7 @@ class ESSearchApi(SearchApi):
             )
         }
 
-        return WorkspaceSearchResponse(response["hits"], facets, search_fields)
+        return WorkspaceSearchResponse(response["hits"], facets)
 
     @staticmethod
     def _create_filtered_facets(

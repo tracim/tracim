@@ -35,6 +35,7 @@ from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.app_models.validator import workspace_access_type_validator
 from tracim_backend.app_models.validator import workspace_subscription_state_validator
+from tracim_backend.lib.translate.translator import AUTODETECT_LANG
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
@@ -42,6 +43,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
+from tracim_backend.models.context_models import CommentPathFilename
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -69,6 +71,7 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
+from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -799,6 +802,12 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentPath(**data)
+
+
+class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return CommentPathFilename(**data)
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
@@ -1666,6 +1675,7 @@ class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
     webdav_enabled = marshmallow.fields.Bool()
+    translation_service__enabled = marshmallow.fields.Bool()
     webdav_url = marshmallow.fields.String()
     collaborative_document_edition = marshmallow.fields.Nested(
         CollaborativeDocumentEditionConfigSchema(), allow_none=True
@@ -1720,6 +1730,26 @@ class LiveMessageSchemaPage(BasePaginatedSchemaPage):
 
 class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
+
+
+class TranslationQuerySchema(FileQuerySchema):
+    source_language_code = marshmallow.fields.String(
+        description="source language of translation, by default set to auto",
+        example="fr",
+        missing=AUTODETECT_LANG,
+        default=AUTODETECT_LANG,
+        allow_none=False,
+    )
+    target_language_code = marshmallow.fields.String(
+        description="destination language of translation",
+        example="en",
+        required=True,
+        allow_none=False,
+    )
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> TranslationQuery:
+        return TranslationQuery(**data)
 
 
 class BasePaginatedQuerySchema(marshmallow.Schema):

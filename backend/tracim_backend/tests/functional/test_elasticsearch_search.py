@@ -9,10 +9,12 @@ import transaction
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
@@ -22,6 +24,51 @@ a_year_ago = (datetime.now() - timedelta(days=365)).strftime(DATETIME_FORMAT)
 
 def is_now(d: str) -> bool:
     return (parse(d).replace(tzinfo=None) - datetime.now()) < timedelta(minutes=1)
+
+
+@pytest.fixture
+def workspace_search_fixture(
+    base_fixture,
+    elasticsearch,
+    bob_user: User,
+    riyad_user: User,
+    workspace_api_factory: WorkspaceApiFactory,
+    role_api_factory: RoleApiFactory,
+) -> typing.Tuple[Workspace, Workspace]:
+    wapi = workspace_api_factory.get(bob_user)
+    bob_only = wapi.create_workspace(
+        label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
+    )
+    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
+    rapi = role_api_factory.get(bob_user)
+    rapi.create_one(
+        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
+    )
+    transaction.commit()
+    elasticsearch.refresh_elasticsearch()
+    return (bob_only, bob_and_riyad)
+
+
+@pytest.fixture
+def content_search_fixture(
+    session,
+    elasticsearch,
+    content_api_factory: ContentApiFactory,
+    workspace_search_fixture: typing.Tuple[Workspace, Workspace],
+) -> Content:
+    (bob_only, _) = workspace_search_fixture
+    capi = content_api_factory.get(bob_only.owner)
+    content = capi.create(
+        content_type_slug="html-document",
+        workspace=bob_only,
+        label="Content with description",
+        do_save=True,
+    )
+    with new_revision(session=session, tm=transaction.manager, content=content):
+        content = capi.update_content(content, new_description="A wonderful description")
+    transaction.commit()
+    elasticsearch.refresh_elasticsearch()
+    return content
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -170,39 +217,131 @@ class TestElasticSearch(object):
             assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
-        "search_params, created_content_name, created_content_body, nb_content_result, first_search_result_content_name",
+        "search_params, created_content_name, created_content_body, created_workspace_name, nb_content_result, first_search_result_content_name, author_public_name, last_modifier_public_name",
         [
             (
                 {"search_string": "subpart"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
                 1,
                 "good practices",
+                "Claude",
+                "Leslie",
             ),
             (
                 {"search_string": "sub"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
                 1,
                 "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "subpart", "workspace_names": "Secret plans"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                1,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "subpart", "workspace_names": "Documentation"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                0,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "sub", "author__public_names": "Claude,Jean"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                1,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "subpart", "file_extensions": ".document.html,.dummy"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                1,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "sub", "file_extensions": ".dummy"},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                0,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "sub", "author__public_names": ["Patricia", "Jean"]},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                0,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "sub", "last_modifier__public_names": ["Leslie"]},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                1,
+                "good practices",
+                "Claude",
+                "Leslie",
+            ),
+            (
+                {"search_string": "sub", "last_modifier__public_names": ["Malory"]},
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
+                0,
+                "good practices",
+                "Claude",
+                "Leslie",
             ),
             (
                 {"created_from": in_a_year, "search_string": "sub"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
                 0,
                 "good practices",
+                "Claude",
+                "Leslie",
             ),
             (
                 {"modified_to": a_year_ago, "search_string": "sub"},
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
+                "Secret plans",
                 0,
                 "good practices",
+                "Claude",
+                "Leslie",
             ),
         ],
     )
-    def test_api___elasticsearch_search_ok__by_description(
+    def test_api___elasticsearch_search_ok__by_raw_content(
         self,
         search_params,
         user_api_factory,
@@ -214,8 +353,94 @@ class TestElasticSearch(object):
         session,
         created_content_name,
         created_content_body,
+        created_workspace_name,
         nb_content_result,
         first_search_result_content_name,
+        author_public_name,
+        last_modifier_public_name,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.TRUSTED_USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            name=author_public_name,
+            profile=profile,
+        )
+        last_modifier = uapi.create_user(
+            "test2@test.test",
+            password="test2@test.test",
+            do_save=True,
+            do_notify=False,
+            name=last_modifier_public_name,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace(created_workspace_name, save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = content_api_factory.get(current_user=user)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            api = content_api_factory.get(current_user=last_modifier)
+            api.update_content(
+                content, new_label=created_content_name, new_raw_content=created_content_body
+            )
+            api.save(content)
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+        elasticsearch.refresh_elasticsearch()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/advanced_search/content", status=200, params=search_params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is True
+
+        if nb_content_result:
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
+            assert search_result["created_range"]["from"] == search_result["created_range"]["to"]
+            assert search_result["facets"]["file_extensions"] == [
+                {"value": ".document.html", "count": 1}
+            ]
+            assert search_result["facets"]["content_types"] == [
+                {"value": "html-document", "count": 1}
+            ]
+            assert search_result["facets"]["workspace_names"] == [
+                {"value": created_workspace_name, "count": 1}
+            ]
+            assert search_result["facets"]["author__public_names"] == [
+                {"value": author_public_name, "count": 1}
+            ]
+            assert search_result["facets"]["last_modifier__public_names"] == [
+                {"value": last_modifier_public_name, "count": 1}
+            ]
+            assert is_now(search_result["created_range"]["from"])
+
+    def test_api___elasticsearch_search_ok__wildcard__facet_only(
+        self,
+        user_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        session,
     ) -> None:
 
         user_public_name = "Claude"
@@ -247,17 +472,13 @@ class TestElasticSearch(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = content_api_factory.get(current_user=user)
         content = api.create(
-            content_type_slug="html-document",
-            workspace=workspace,
-            label=created_content_name,
-            do_save=True,
+            content_type_slug="html-document", workspace=workspace, label="document", do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             api = content_api_factory.get(current_user=user2)
-            api.update_content(
-                content, new_label=created_content_name, new_raw_content=created_content_body
-            )
+            api.update_content(content, new_label="document", new_raw_content="just some content")
             api.save(content)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
         )
@@ -268,34 +489,33 @@ class TestElasticSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/advanced_search/content", status=200, params=search_params)
+        res = web_testapp.get(
+            "/api/advanced_search/content", status=200, params={"search_string": "*", "size": 0}
+        )
         search_result = res.json_body
         assert search_result
-        assert search_result["total_hits"] == nb_content_result
+        assert search_result["total_hits"] == 3
         assert search_result["is_total_hits_accurate"] is True
-        assert set(search_result["search_fields"]) == set(
-            ["label", "raw_content", "comment", "description"]
-        )
-
-        if nb_content_result:
-            assert search_result["contents"][0]["label"] == first_search_result_content_name
-            assert search_result["created_range"]["from"] == search_result["created_range"]["to"]
-            assert search_result["facets"]["file_extensions"] == [
-                {"value": ".document.html", "count": 1}
-            ]
-            assert search_result["facets"]["content_types"] == [
-                {"value": "html-document", "count": 1}
-            ]
-            assert search_result["facets"]["workspace_names"] == [
-                {"value": workspace_name, "count": 1}
-            ]
-            assert search_result["facets"]["author__public_names"] == [
-                {"value": user_public_name, "count": 1}
-            ]
-            assert search_result["facets"]["last_modifier__public_names"] == [
-                {"value": user2_public_name, "count": 1}
-            ]
-            assert is_now(search_result["created_range"]["from"])
+        assert search_result["contents"] == []
+        assert search_result["facets"]["file_extensions"] == [
+            {"value": ".document.html", "count": 2},
+            {"value": ".thread.html", "count": 1},
+        ]
+        assert search_result["facets"]["content_types"] == [
+            {"value": "html-document", "count": 2},
+            {"value": "thread", "count": 1},
+        ]
+        assert search_result["facets"]["workspace_names"] == [
+            {"value": workspace_name, "count": 3},
+        ]
+        assert search_result["facets"]["author__public_names"] == [
+            {"value": user_public_name, "count": 3}
+        ]
+        assert search_result["facets"]["last_modifier__public_names"] == [
+            {"value": user_public_name, "count": 2},
+            {"value": user2_public_name, "count": 1},
+        ]
+        assert search_result["created_range"]
 
     @pytest.mark.parametrize(
         "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
@@ -665,6 +885,20 @@ class TestElasticSearch(object):
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
+    def test_api___elasticsearch_search_ok__by_description(
+        self, content_search_fixture: Content, web_testapp,
+    ) -> None:
+        web_testapp.authorization = ("Basic", (content_search_fixture.owner.username, "password"))
+        search_result = web_testapp.get(
+            "/api/advanced_search/content".format(),
+            status=200,
+            params={"search_string": "wonderful"},
+        ).json_body
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is True
+        content_ids = [c["content_id"] for c in search_result["contents"]]
+        assert content_ids == [content_search_fixture.content_id]
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
@@ -773,8 +1007,6 @@ class TestElasticSearchUserSearch:
         assert facets == {
             "workspaces": [{"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}]
         }
-        search_fields = search_result["search_fields"]
-        assert search_fields == ["public_name", "username", "custom_properties"]
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
 
@@ -833,29 +1065,6 @@ class TestElasticSearchUserSearch:
         assert user_ids == expected_user_ids
 
 
-@pytest.fixture
-def workspace_search_fixture(
-    base_fixture,
-    elasticsearch,
-    bob_user: User,
-    riyad_user: User,
-    workspace_api_factory: WorkspaceApiFactory,
-    role_api_factory: RoleApiFactory,
-) -> typing.Tuple[Workspace, Workspace]:
-    wapi = workspace_api_factory.get(bob_user)
-    bob_only = wapi.create_workspace(
-        label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
-    )
-    bob_and_riyad = wapi.create_workspace("Bob & Riyad")
-    rapi = role_api_factory.get(bob_user)
-    rapi.create_one(
-        riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
-    )
-    transaction.commit()
-    elasticsearch.refresh_elasticsearch()
-    return (bob_only, bob_and_riyad)
-
-
 @pytest.mark.usefixtures("workspace_search_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchWorkspaceSearch:
@@ -893,8 +1102,6 @@ class TestElasticSearchWorkspaceSearch:
                 }
             ]
         }
-        search_fields = search_result["search_fields"]
-        assert search_fields == ["label", "description"]
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
 

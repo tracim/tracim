@@ -177,13 +177,22 @@ export const setSearchString = searchString => ({ type: `${SET}/${SEARCHED_STRIN
 export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
 export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
 export const SEARCH_CURRENT_PAGE = searchType => `SearchCurrentPage_${searchType}`
-export const setCurrentNumberPage = (currentNumberPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentNumberPage })
+export const setCurrentNumberPage = (currentPage, searchType) => ({ type: `${SET}/${SEARCH_CURRENT_PAGE(searchType)}`, currentPage })
 export const SEARCH_CONTENT_BREADCRUMBS = searchType => `SearchContentBreadcrumbs_${searchType}`
 export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, searchType) => ({
   type: `${SET}/${SEARCH_CONTENT_BREADCRUMBS(searchType)}`,
   contentBreadcrumbsList,
   contentId
 })
+export const CREATED_RANGE = (searchType) => `CreatedRange_${searchType}`
+export const setCreatedRange = (createdRange, searchType) => ({ type: `${SET}/${CREATED_RANGE(searchType)}`, createdRange })
+export const MODIFIED_RANGE = (searchType) => `ModifiedRange_${searchType}`
+export const setModifiedRange = (modifiedRange, searchType) => ({ type: `${SET}/${MODIFIED_RANGE(searchType)}`, modifiedRange })
+export const SEARCH_FACETS = (searchType) => `SearchFacets_${searchType}`
+export const setSearchFacets = (searchFacets, searchType) => ({ type: `${SET}/${SEARCH_FACETS(searchType)}`, searchFacets })
+export const APPLIED_FILTER = (searchType) => `AppliedFilter_${searchType}`
+export const setAppliedFilter = (key, value, searchType) => ({ type: `${SET}/${APPLIED_FILTER(searchType)}`, key, value })
+export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_FILTER(searchType)}` })
 
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'
