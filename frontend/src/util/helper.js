@@ -43,28 +43,13 @@ export const ADVANCED_SEARCH_FILTER = {
   SEARCH_FACETS: 'searchFacets'
 }
 
-export const CONTENT_FIELD_LIST = [
-  { slug: 'label', value: i18n.t('Title') },
-  { slug: 'raw_content', value: i18n.t('Content') },
-  { slug: 'comments', value: i18n.t('Comments') },
-  { slug: 'description', value: i18n.t('Description') }
-]
-
-export const SPACE_FIELD_LIST = [
-  { slug: 'label', value: i18n.t('Name') },
-  { slug: 'description', value: i18n.t('Description') }
-]
-
-export const SEARCH_FIELDS = {
-  content: CONTENT_FIELD_LIST,
-  workspace: SPACE_FIELD_LIST
-}
-
 export const DATE_FILTER_ELEMENT = {
   AFTER: 'after',
   BEFORE: 'before'
 }
 
+// INFO - G.B. - 2021-03-01 - All the translations in the object below has as their only purpose
+// to be able to generate translation keys through i18n.scanner
 export const SEARCH_CONTENT_FACETS = {
   SPACE: {
     slug: 'workspace_names'

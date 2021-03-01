@@ -35,7 +35,7 @@ export const CheckboxFilter = props => {
             styleCheck={{ top: '-5px' }}
           />
           <label htmlFor={`checkbox-${item.id || item.value}`}>
-            {props.t(`${item.value}`)}{item.count && ` (${item.count})`}
+            {props.t(item.value)}{item.count && ` (${item.count})`}
           </label>
         </div>
       )}

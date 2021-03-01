@@ -9,8 +9,7 @@ import SpaceFacets from '../component/Search/SpaceFacets.jsx'
 import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
-  DATE_FILTER_ELEMENT,
-  SEARCH_FIELDS
+  DATE_FILTER_ELEMENT
 } from '../util/helper.js'
 
 export class SearchFilterMenu extends React.Component {
@@ -137,18 +136,21 @@ export class SearchFilterMenu extends React.Component {
 
   render () {
     const { props, state } = this
-    let currentSearch = { appliedFilters: { } }
+    const CONTENT_FIELD_LIST = [
+      { slug: 'label', value: props.t('Title') },
+      { slug: 'raw_content', value: props.t('Content') },
+      { slug: 'comments', value: props.t('Comments') },
+      { slug: 'description', value: props.t('Description') }
+    ]
 
-    if (props.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
+    const SPACE_FIELD_LIST = [
+      { slug: 'label', value: props.t('Name') },
+      { slug: 'description', value: props.t('Description') }
+    ]
 
-    if (props.searchType === ADVANCED_SEARCH_TYPE.USER) {
-      currentSearch = props.userSearch
-    }
-
-    if (props.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-      currentSearch = props.spaceSearch
+    const SEARCH_FIELDS = {
+      content: CONTENT_FIELD_LIST,
+      workspace: SPACE_FIELD_LIST
     }
 
     return (
@@ -173,7 +175,7 @@ export class SearchFilterMenu extends React.Component {
         <div className='searchFilterMenu__content'>
           <CheckboxFilter
             appliedFilterList={SEARCH_FIELDS[props.searchType].filter(field => (
-              currentSearch.appliedFilters.searchField && currentSearch.appliedFilters.searchField.includes(field.slug)
+              props.currentSearch.appliedFilters.searchField && props.currentSearch.appliedFilters.searchField.includes(field.slug)
             ))}
             filterList={SEARCH_FIELDS[props.searchType]}
             label={props.t('Only search in')}
@@ -182,7 +184,7 @@ export class SearchFilterMenu extends React.Component {
             showFilter={state.showSearchFieldList}
           />
 
-          {currentSearch.createdRange && Object.keys(currentSearch.createdRange).length > 0 && (
+          {props.currentSearch.createdRange && Object.keys(props.currentSearch.createdRange).length > 0 && (
             <>
               <div className='searchFilterMenu__content__item__title'>
                 <button
@@ -200,11 +202,11 @@ export class SearchFilterMenu extends React.Component {
                 </button>
                 {props.t('Creation')}
               </div>
-              {state.createdRange.showFilter && currentSearch.createdRange && (
+              {state.createdRange.showFilter && props.currentSearch.createdRange && (
                 <DateFilter
                   id='creation'
-                  from={currentSearch.createdRange.from}
-                  to={currentSearch.createdRange.to}
+                  from={props.currentSearch.createdRange.from}
+                  to={props.currentSearch.createdRange.to}
                   onChangeDate={this.handleChangeCreatedDate}
                   onClickDateCheckbox={this.handleCheckboxCreatedRange}
                   isAfterCheckboxChecked={state.createdRange.afterDateActive}
@@ -216,7 +218,7 @@ export class SearchFilterMenu extends React.Component {
             </>
           )}
 
-          {currentSearch.modifiedRange && Object.keys(currentSearch.modifiedRange).length > 0 && (
+          {props.currentSearch.modifiedRange && Object.keys(props.currentSearch.modifiedRange).length > 0 && (
             <>
               <div className='searchFilterMenu__content__item__title'>
                 <button
@@ -234,11 +236,11 @@ export class SearchFilterMenu extends React.Component {
                 </button>
                 {props.t('Last Modification')}
               </div>
-              {state.modifiedRange.showFilter && currentSearch.modifiedRange && (
+              {state.modifiedRange.showFilter && props.currentSearch.modifiedRange && (
                 <DateFilter
                   id='modification'
-                  from={currentSearch.modifiedRange.from}
-                  to={currentSearch.modifiedRange.to}
+                  from={props.currentSearch.modifiedRange.from}
+                  to={props.currentSearch.modifiedRange.to}
                   onChangeDate={this.handleChangeModifiedDate}
                   onClickDateCheckbox={this.handleCheckboxModifiedRange}
                   isAfterCheckboxChecked={state.modifiedRange.afterDateActive}
@@ -249,19 +251,19 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
-          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && currentSearch.searchFacets && (
+          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && props.currentSearch.searchFacets && (
             <ContentFacets
-              searchFacets={currentSearch.searchFacets}
+              searchFacets={props.currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
-              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+              appliedFilters={props.currentSearch.appliedFilters.searchFacets || {}}
             />
           )}
 
-          {props.searchType === ADVANCED_SEARCH_TYPE.SPACE && currentSearch.searchFacets && (
+          {props.searchType === ADVANCED_SEARCH_TYPE.SPACE && props.currentSearch.searchFacets && (
             <SpaceFacets
-              searchFacets={currentSearch.searchFacets}
+              searchFacets={props.currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
-              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+              appliedFilters={props.currentSearch.appliedFilters.searchFacets || {}}
             />
           )}
         </div>
@@ -275,6 +277,7 @@ export default connect(mapStateToProps)(translate()(SearchFilterMenu))
 
 SearchFilterMenu.propTypes = {
   onClickCloseSearchFilterMenu: PropTypes.func.isRequired,
+  currentSearch: PropTypes.object.isRequired,
   searchType: PropTypes.string.isRequired,
   onChangeCreatedDate: PropTypes.func,
   onChangeModifiedDate: PropTypes.func,

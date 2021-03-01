@@ -404,8 +404,8 @@ export class AdvancedSearch extends React.Component {
           <PageWrapper customClass='advancedSearch__wrapper'>
             <PageTitle
               title={(currentNumberSearchResults === 1
-                ? props.t('Result for "{{keywords}}"', { keywords: props.contentSearch.searchString })
-                : props.t('Results for "{{keywords}}"', { keywords: props.contentSearch.searchString })
+                ? props.t('Result for "{{keywords}}"', { keywords: currentSearch.searchString })
+                : props.t('Results for "{{keywords}}"', { keywords: currentSearch.searchString })
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
@@ -447,7 +447,7 @@ export class AdvancedSearch extends React.Component {
                 </div>
                 <SearchInput
                   onClickSearch={this.handleClickSearch}
-                  searchString={props.contentSearch.searchString}
+                  searchString={currentSearch.searchString}
                 />
               </div>
 
@@ -471,7 +471,7 @@ export class AdvancedSearch extends React.Component {
 
                   {currentNumberSearchResults === 0 && (
                     <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms')}: "${props.contentSearch.searchString}"`}
+                      {`${props.t('No results for the search terms')}: "${currentSearch.searchString}"`}
                     </div>
                   )}
 
@@ -506,7 +506,7 @@ export class AdvancedSearch extends React.Component {
                           text={props.t('See more')}
                         />
                       )
-                      : currentNumberSearchResults > props.contentSearch.numberResultsByPage &&
+                      : currentNumberSearchResults > currentSearch.numberResultsByPage &&
                       props.t('No more results')
                     )}
                   </div>
@@ -514,6 +514,7 @@ export class AdvancedSearch extends React.Component {
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
                     onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
+                    currentSearch={currentSearch}
                     searchType={state.searchType}
                     onClickSearchField={this.handleChangeSearchFieldList}
                     onChangeCreatedDate={this.handleChangeCreatedRange}
