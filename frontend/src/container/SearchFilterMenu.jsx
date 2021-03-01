@@ -9,7 +9,7 @@ import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
   DATE_FILTER_ELEMENT,
-  SEARCH_FIELD_LIST
+  SEARCH_FIELDS
 } from '../util/helper.js'
 
 export class SearchFilterMenu extends React.Component {
@@ -136,19 +136,19 @@ export class SearchFilterMenu extends React.Component {
 
   render () {
     const { props, state } = this
-    let currentSearch
+    let currentSearch = { appliedFilters: { } }
+
     if (props.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
       currentSearch = props.contentSearch
     }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch = props.userSearch
-      }
 
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
+    if (props.searchType === ADVANCED_SEARCH_TYPE.USER) {
+      currentSearch = props.userSearch
+    }
+
+    if (props.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+      currentSearch = props.spaceSearch
+    }
 
     return (
       <div className='searchFilterMenu'>
@@ -171,12 +171,12 @@ export class SearchFilterMenu extends React.Component {
 
         <div className='searchFilterMenu__content'>
           <CheckboxFilter
-            appliedFilterList={SEARCH_FIELD_LIST.filter(field => (
+            appliedFilterList={SEARCH_FIELDS[props.searchType].filter(field => (
               currentSearch.appliedFilters.searchField && currentSearch.appliedFilters.searchField.includes(field.slug)
             ))}
-            filterList={SEARCH_FIELD_LIST}
+            filterList={SEARCH_FIELDS[props.searchType]}
             label={props.t('Only search in')}
-            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELD_LIST.find(field => field.value === value))}
+            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELDS[props.searchType].find(field => field.value === value))}
             onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
             showFilter={state.showSearchFieldList}
           />
@@ -253,6 +253,13 @@ export class SearchFilterMenu extends React.Component {
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
               appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+            />
+          )}
+
+          {props.searchType === ADVANCED_SEARCH_TYPE.SPACE && currentSearch.searchFacets && (
+            <ContentFacets
+              searchFacets={currentSearch.searchFacets}
+              onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
             />
           )}
         </div>
