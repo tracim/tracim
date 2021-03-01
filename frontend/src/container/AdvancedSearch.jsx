@@ -247,7 +247,6 @@ export class AdvancedSearch extends React.Component {
 
   handleChangeSearchFacets = (facetObject) => {
     const currentSearch = this.getCurrentSearchObject()
-
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
       currentSearch.appliedFilters.searchFacets,
@@ -259,15 +258,18 @@ export class AdvancedSearch extends React.Component {
     const { props, state } = this
     const currentSearch = this.getCurrentSearchObject()
 
-    let newAppliedFilter = {}
+    let newAppliedFilter = oldAppliedFilter ? { ...oldAppliedFilter } : filterObject
     const filterKey = Object.keys(filterObject)[0]
 
     if (oldAppliedFilter) {
       if (Object.keys(oldAppliedFilter).includes(filterKey)) {
-        newAppliedFilter = { ...oldAppliedFilter }
-        delete newAppliedFilter[filterKey]
-      } else newAppliedFilter = { ...oldAppliedFilter, ...filterObject }
-    } else newAppliedFilter = filterObject
+        if (Array.isArray(newAppliedFilter[filterKey])) {
+          if (newAppliedFilter[filterKey].find(filter => filter === filterObject[filterKey][0])) {
+            newAppliedFilter[filterKey] = newAppliedFilter[filterKey].filter(filter => filter !== filterObject[filterKey][0])
+          } else newAppliedFilter[filterKey] = newAppliedFilter[filterKey].concat(filterObject[filterKey])
+        } else delete newAppliedFilter[filterKey]
+      } else newAppliedFilter = { ...newAppliedFilter, ...filterObject }
+    }
 
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
 

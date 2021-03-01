@@ -31,12 +31,18 @@ export class SpaceFacets extends React.Component {
       <div className='SpaceFacets'>
         {props.searchFacets.members && props.searchFacets.members.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ value: props.appliedFilters.members }]}
-            filterList={props.searchFacets.members.map(filter => ({ value: filter.value.public_name, count: filter.count, id: filter.value.user_id }))}
+            appliedFilterList={[{ id: props.appliedFilters.members }]}
+            filterList={props.searchFacets.members.map(filter => ({
+              value: filter.value.public_name,
+              count: filter.count,
+              id: filter.value.user_id
+            }))}
             label={props.t('Member')}
-            onChangeSearchFacets={(value) => props.onChangeSearchFacets({
-              members: props.searchFacets.members.filter(member => value === member.value.public_name).user_id
-            })}
+            onChangeSearchFacets={(value) => {
+              props.onChangeSearchFacets({
+                members: [value]
+              })
+            }}
             onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_SPACE_FACETS.MEMBER.slug)}
             showFilter={state.showMemberList}
           />
