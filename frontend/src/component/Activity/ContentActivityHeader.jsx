@@ -20,22 +20,23 @@ require('./ContentActivityHeader.styl')
 export class ContentActivityHeader extends React.Component {
   getDisplayOperation (message) {
     const { props } = this
-    if (message.fields.content.current_revision_type === 'status-update') return 'status-update'
+
+    if (message.fields.content.current_revision_type === 'status-update') props.t('status modified')
     const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
-    if (TLM_ET.MENTION === entityType) return 'mention'
-    if (CONTENT_TYPE.COMMENT === subEntityType) return 'comment'
+    if (TLM_ET.MENTION === entityType) props.t('mention made')
+    if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
 
     switch (coreEventType) {
       case TLM_CET.CREATED:
-        return 'created'
+        return props.t('created')
       case TLM_CET.MODIFIED:
-        return 'modified'
+        return props.t('modified')
       case TLM_CET.DELETED:
-        return 'deleted'
+        return props.t('deleted')
       case TLM_CET.UNDELETED:
-        return 'restored'
+        return props.t('restored')
     }
-    return 'unknown'
+    return props.t('unknown')
   }
 
   render () {
@@ -65,6 +66,7 @@ export class ContentActivityHeader extends React.Component {
           </Link>
           <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
+
         <TimedEvent
           customClass='contentActivityHeader__right'
           operation={this.getDisplayOperation(newestMessage)}
@@ -78,6 +80,7 @@ export class ContentActivityHeader extends React.Component {
           onEventClicked={props.onEventClicked}
           dataCy='contentActivityTimedEvent'
         />
+
         <DropdownMenu
           buttonCustomClass='contentActivityHeader__actionMenu'
           buttonIcon='fas fa-ellipsis-v'

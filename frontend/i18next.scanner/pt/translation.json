@@ -360,10 +360,7 @@
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{pubblicName}}",
   "Change cover": "Mudar a capa",
-  "Undeletion": "Restauração",
-  "Edition": "Edição",
-  "Creation": "Criação",
-  "Revision": "Revisão",
-  "Status change": "Mudança de status",
-  "{{numberComments}} comments": "{{numberComments}} comentários"
+  "{{numberComments}} comments": "{{numberComments}} comentários",
+  "edited": "modificou",
+  "undeleted": "restaurou"
 }

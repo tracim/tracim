@@ -10,35 +10,12 @@ import {
 
 require('./TimedEvent.styl')
 
-function getDisplayOperation (operation, t) {
-  switch (operation) {
-    case 'revision':
-      return t('modified')
-    case 'creation':
-      return t('created')
-    case 'edition':
-      return t('edited')
-    case 'undeletion':
-      return t('undeleted')
-    case 'mention':
-      return props.t('mention made')
-    case 'comment':
-      return props.t('commented')
-    case 'status-update':
-      return t('status modified')
-    case 'unkown':
-      return t('unknown')
-  }
-
-  return operation
-}
-
 const TimedEvent = (props) => {
   const topContents = (
     <div key={`timedEvent-${props.date}`} className='timedEvent__topContents'>
       {props.operation && (
         <span className={classnames('timedEvent__operation', { rootTimedEvent__operation: props.isRoot })}>
-          {operationText(props.operation, props.t)}&nbsp;
+          {props.operation}&nbsp;
         </span>
       )}
       <DistanceDate absoluteDate={props.date} lang={props.lang} />

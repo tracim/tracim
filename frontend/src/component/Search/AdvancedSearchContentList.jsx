@@ -14,6 +14,29 @@ import PropTypes from 'prop-types'
 
 require('./AdvancedSearchContentList.styl')
 
+const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('edited')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
+}
+
 export const AdvancedSearchContentList = props => {
   const resultList = props.contentSearch.resultList.map((searchItem) => {
     const searchContentType = props.contentType.find(ct => ct.slug === searchItem.contentType)
@@ -90,7 +113,7 @@ export const AdvancedSearchContentList = props => {
 
               <TimedEvent
                 customClass='advancedSearchContent__modification'
-                operation={searchItem.currentRevisionType}
+                operation={getRevisionTypeLabel(searchItem.currentRevisionType, props.t)}
                 date={searchItem.modified}
                 lang={props.userLang}
                 author={{
