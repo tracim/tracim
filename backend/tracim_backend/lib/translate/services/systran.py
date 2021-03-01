@@ -6,10 +6,13 @@ from typing import List
 
 import requests
 
-from tracim_backend.lib.translate.translator import TranslationFailed
+from tracim_backend.lib.translate.translator import InvalidParametersForTranslationService
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 from tracim_backend.lib.translate.translator import TranslationService
+from tracim_backend.lib.translate.translator import TranslationServiceAccessRefused
+from tracim_backend.lib.translate.translator import TranslationServiceException
+from tracim_backend.lib.translate.translator import TranslationServiceServerError
 
 FILE_TRANSLATION_ENDPOINT = "/translation/file/translate"
 SUPPORTED_FORMAT_ENDPOINT = "/translation/supportedFormats"
@@ -67,8 +70,26 @@ class SystranTranslationService(TranslationService):
         )
         if response.status_code == HTTPStatus.OK:
             return response.raw
+        elif response.status_code == HTTPStatus.FORBIDDEN:
+            raise TranslationServiceAccessRefused("access refused to systran translation service")
         else:
-            raise TranslationFailed(str(response.json()))
+            try:
+                error = response.json()["error"]
+            except Exception as exc:
+                raise TranslationServiceException(
+                    "Unknown error when requesting translation server"
+                ) from exc
+
+            if error.get("statusCode") == HTTPStatus.BAD_REQUEST:
+                raise InvalidParametersForTranslationService(
+                    "Invalid parameters given for translation: {}".format(error["message"])
+                )
+            elif error.get("statusCode") == HTTPStatus.INTERNAL_SERVER_ERROR:
+                raise TranslationServiceServerError(
+                    "Translation service server error: {}".format(error["message"])
+                )
+            else:
+                raise TranslationServiceException(error["message"])
 
     @property
     def supported_formats(self) -> List[SystranFormat]:

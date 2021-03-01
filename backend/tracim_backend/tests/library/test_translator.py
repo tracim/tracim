@@ -8,6 +8,7 @@ from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPO
 from tracim_backend.lib.translate.services.systran import SUPPORTED_FORMAT_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_LANGUAGES_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SystranTranslationService
+from tracim_backend.lib.translate.services.test import TestTranslationService
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 from tracim_backend.lib.translate.translator import TranslationService
@@ -48,10 +49,57 @@ class TestExternalTranslator:
         assert result.read().decode("utf-8") == "Translated"
 
 
+class TestTestTranslationService:
+    def test_unit___test_service__supported_mimetypes_pair__ok__nominal_case(self) -> None:
+        translation_service = TestTranslationService()
+        assert translation_service.supported_mimetype_pairs == [
+            TranslationMimetypePair("text/html", "text/html")
+        ]
+
+    def test_unit___test_service__supported_languages_pair__ok__nominal_case(self) -> None:
+        translation_service = TestTranslationService()
+        assert translation_service.supported_language_pairs == [
+            TranslationLanguagePair("test_source", "test_result")
+        ]
+
+    def test_unit___test_service__translate_file__ok__nominal_case(self):
+        translation_service = TestTranslationService()
+        assert (
+            translation_service.translate_file(
+                binary_io=io.BytesIO(b""),
+                input_lang="test_source",
+                output_lang="test_result",
+                mimetype="text/html",
+            )
+            .read()
+            .decode("utf-8")
+            == """
+        <table>
+        <thead>
+        <tr>
+        <th>source_lang_code</th>
+        <th>target_lang_code</th>
+        <th>mimetype</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>test_source</td>
+        <td>test_result</td>
+        <td>text/html</td>
+        </tr>
+        </tbody>
+        </table>
+        """.strip().replace(
+                " ", ""
+            )
+        )
+
+
 class TestSystranTranslationService:
     @responses.activate
     def test_unit___systran_service__supported_languages_pair__ok__nominal_case(self) -> None:
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         content_response_json = {
             "languagePairs": [
@@ -77,7 +125,7 @@ class TestSystranTranslationService:
 
     @responses.activate
     def test_unit___systran_service__supported_mimetype_pairs__ok__nominal_case(self):
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         content_response_json = {
             "formats": [
@@ -102,7 +150,7 @@ class TestSystranTranslationService:
 
     @responses.activate
     def test_unit___systran_service__translate_file__ok__nominal_case(self):
-        BASE_API_URL = "https://systran_fake_server:5050"
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         base_content = io.BytesIO("Source content".encode("utf-8"))
         result_content = io.BytesIO("Translated".encode("utf-8"))

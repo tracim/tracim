@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
+from tracim_backend import PageNotFound
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import AllUsersAreNotKnown
@@ -227,6 +228,12 @@ class CommentOwnerChecker(AuthorizationChecker):
         )
 
 
+class TranslationEnabled(AuthorizationChecker):
+    def check(self, tracim_context: TracimContext):
+        if not tracim_context.app_config.TRANSLATION_SERVICE__ENABLED:
+            raise PageNotFound()
+
+
 class OrAuthorizationChecker(AuthorizationChecker):
     """
     Check multiple auth_checker with a logical operator "or"
@@ -340,6 +347,7 @@ is_comment_owner = CommentOwnerChecker()
 can_delete_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
+is_translation_service_enabled = TranslationEnabled()
 
 ###
 # Authorization decorators for views

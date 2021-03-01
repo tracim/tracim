@@ -1227,13 +1227,12 @@ class CFG(object):
 
     def _check_translation_service_validity(self) -> None:
         if self.TRANSLATION_SERVICE__ENABLED:
-            valid_translations_service = TRANSLATION_SERVICE_CLASSES.keys()
-            if self.TRANSLATION_SERVICE__PROVIDER not in valid_translations_service:
+            if self.TRANSLATION_SERVICE__PROVIDER not in TRANSLATION_SERVICE_CLASSES:
                 translation_service_list = ", ".join(
-                    ['"{}"'.format(slug) for slug in valid_translations_service]
+                    ['"{}"'.format(slug) for slug in TRANSLATION_SERVICE_CLASSES.keys()]
                 )
                 raise ConfigurationError(
-                    'ERROR TRANSLATION_SERVICE__PROVIDER given "{}" is invalid,'
+                    'ERROR "{}" is an invalid value for TRANSLATION_SERVICE__PROVIDER,'
                     "valids values are {}.".format(
                         self.TRANSLATION_SERVICE__PROVIDER, translation_service_list
                     )

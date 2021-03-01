@@ -496,9 +496,6 @@ class TestElasticSearch(object):
         assert search_result
         assert search_result["total_hits"] == 3
         assert search_result["is_total_hits_accurate"] is True
-        assert set(search_result["search_fields"]) == set(
-            ["label", "raw_content", "comment", "description"]
-        )
         assert search_result["contents"] == []
         assert search_result["facets"]["file_extensions"] == [
             {"value": ".document.html", "count": 2},
