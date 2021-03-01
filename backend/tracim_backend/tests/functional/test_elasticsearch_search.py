@@ -1113,7 +1113,19 @@ class TestElasticSearchWorkspaceSearch:
                         "public_name": bob.display_name,
                     },
                 }
-            ]
+            ],
+            "owners": [
+                {
+                    "count": 1,
+                    "value": {
+                        "has_avatar": bob.has_avatar,
+                        "has_cover": bob.has_cover,
+                        "user_id": bob.user_id,
+                        "username": bob.username,
+                        "public_name": bob.display_name,
+                    },
+                }
+            ],
         }
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
@@ -1131,6 +1143,8 @@ class TestElasticSearchWorkspaceSearch:
             (("bob", "password"), {"search_string": "bob", "page_nb": 1, "size": 1}, [1], 2),
             (("bob", "password"), {"search_string": "bob", "page_nb": 2, "size": 1}, [2], 2),
             (("bob", "password"), {"search_string": "bob", "size": 0}, [], 2),
+            (("bob", "password"), {"search_string": "*", "owner_ids": [3]}, [],  0),
+            (("bob", "password"), {"search_string": "*", "owner_ids": [2]}, [1, 2], 2),
         ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(
