@@ -62,7 +62,6 @@ export class HtmlDocument extends React.Component {
 
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
-    console.log(`translation config`, param.config.system.config.translation_service__enabled)
     const defaultTranslationState = param.config.system.config.translation_service__enabled
       ? TRANSLATION_STATE.UNTRANSLATED
       : TRANSLATION_STATE.DISABLED
