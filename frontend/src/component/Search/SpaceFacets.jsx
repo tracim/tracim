@@ -31,7 +31,7 @@ export class SpaceFacets extends React.Component {
       <div className='SpaceFacets'>
         {props.searchFacets.members && props.searchFacets.members.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.members }]}
+            appliedFilterList={props.appliedFilters.members && props.appliedFilters.members.map(filter => ({ id: filter }))}
             filterList={props.searchFacets.members.map(filter => ({
               value: filter.value.public_name,
               count: filter.count,

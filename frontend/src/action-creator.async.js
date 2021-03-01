@@ -1121,12 +1121,12 @@ export const getAdvancedSearchResult = (
   else queryParameterList.push('search_string=*')
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
   if (pageSize) queryParameterList.push(`size=${searchString ? pageSize : 0}`)
+  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+  if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
   if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
     if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
     if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
-    if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
-    if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
     if (createdRange) {
       if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
       if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)

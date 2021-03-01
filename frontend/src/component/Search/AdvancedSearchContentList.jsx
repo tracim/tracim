@@ -26,6 +26,12 @@ export const AdvancedSearchContentList = props => {
     }
   })
 
+  const numberCommentsTitle = (numberComments) => {
+    if (numberComments === 0) return props.t('0 comments')
+    if (numberComments === 1) return props.t('{{numberComments}} comment', { numberComments: numberComments })
+    else return props.t('{{numberComments}} comments', { numberComments: numberComments })
+  }
+
   return (
     <div>
       {resultList.length > 0 && (
@@ -92,14 +98,12 @@ export const AdvancedSearchContentList = props => {
                   title={props.t(searchItem.contentType.status.label)}
                   color={searchItem.contentType.status.hexcolor}
                 />
-                <span
-                  title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                >
+                <span title={numberCommentsTitle(searchItem.commentCount)}>
                   {searchItem.commentCount}
                 </span>
                 <Icon
                   icon='fa-fw far fa-comment'
-                  title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                  title={numberCommentsTitle(searchItem.commentCount)}
                 />
               </div>
             )}
