@@ -22,6 +22,15 @@ export const HtmlDocument = props => {
     [TRANSLATION_STATE.PENDING]: null
   }
   const toggleTranslationText = TOGGLE_TRANSLATION_TEXT[props.translationState]
+
+  const noteClass = 'html-document__contentpage__textnote__text'
+  const noteClassName = classnames(
+    noteClass,
+    {
+      [`${noteClass}-translated primaryColorBorder`]: props.translationState === TRANSLATION_STATE.TRANSLATED
+    }
+  )
+
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.displayNotifyAllMessage && (
@@ -114,7 +123,7 @@ export const HtmlDocument = props => {
               </div>
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className={classnames('html-document__contentpage__textnote__text', { 'html-document__contentpage__textnote__text_translated primaryColorBorder': props.translationState === TRANSLATION_STATE.TRANSLATED })}>
+            <div className={noteClassName}>
               <HTMLContent>{props.text}</HTMLContent>
             </div>
           </div>

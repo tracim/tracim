@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
+import { TRANSLATION_STATE } from '../../src/helper.js'
 import {
   TextAreaApp,
   PromptMessage,
@@ -9,12 +10,13 @@ import {
 } from 'tracim_frontend_lib'
 
 const props = {
+  apiUrl: 'http://localhost/api',
   mode: APP_FEATURE_MODE.VIEW,
   customColor: '#654321',
   wysiwygNewVersion: 'wysiwygNewVersionTest',
   disableValidateBtn: false,
   version: '42',
-  lastVersion: '1337',
+  lastVersion: 1337,
   text: "Hi, I'm a Html Document.",
   isArchived: false,
   isDeleted: false,
@@ -36,6 +38,8 @@ const props = {
   onClickShowDraft: () => {},
   onClickNotifyAll: () => {},
   onClickCloseNotifyAllMessage: () => {},
+  onClickToggleTranslation: () => {},
+  translationState: TRANSLATION_STATE.DISABLED,
   t: (s, opts) => {
     for (const p in opts) {
       s = s.replace('{{' + p + '}}', opts[p])
@@ -51,7 +55,7 @@ describe('<HtmlDocument />', () => {
     )
 
     it(`should display the last version number ${props.lastVersion}`, () =>
-      expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.lastVersion)
+      expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.lastVersion)
     )
 
     it('should display the content of the document', () =>
@@ -137,10 +141,55 @@ describe('<HtmlDocument />', () => {
           .have.html().to.contains('far fa-hand-point-right')
       )
     })
+
+    describe('with translation enabled', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          translationState={TRANSLATION_STATE.UNTRANSLATED}
+        />
+      )
+
+      it('should display the "show translation" button', () =>
+        expect(wrapper.find(
+          '.html-document__contentpage__textnote__top__translation'
+        ).render().text()).to.contains('Show translation')
+      )
+    })
+
+    describe('with translation pending', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          translationState={TRANSLATION_STATE.PENDING}
+        />
+      )
+
+      it('should display the "translation pending" text', () =>
+        expect(wrapper.find(
+          '.html-document__contentpage__textnote__top__translation'
+        ).render().text()).to.contains('Translation pending')
+      )
+    })
+
+    describe('with translation done', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          translationState={TRANSLATION_STATE.TRANSLATED}
+        />
+      )
+
+      it('should display the "restore translation" button', () =>
+        expect(wrapper.find(
+          '.html-document__contentpage__textnote__top__translation'
+        ).render().text()).to.contains('Restore the original language')
+      )
+    })
   })
 })
 
-describe('in REVISON mode', () => {
+describe('in REVISION mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
@@ -149,10 +198,10 @@ describe('in REVISON mode', () => {
   )
 
   it(`should display the version number ${props.version}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.version)
+    expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.version)
   )
   it(`should display the last version number ${props.lastVersion}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__lastversion').render().text()).to.contains(props.lastVersion)
+    expect(wrapper.find('.html-document__contentpage__textnote__top__lastversion').render().text()).to.contains(props.lastVersion)
   )
 })
 

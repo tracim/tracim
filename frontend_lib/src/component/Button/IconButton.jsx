@@ -8,9 +8,9 @@ require('./IconButton.styl')
 
 const IconButton = props => {
   const classes = [
-    `iconbutton__${props.intent}_${props.mode}`,
-    `iconbutton__${props.intent}`,
-    `iconbutton__${props.mode}`,
+    `iconbutton-${props.intent}-${props.mode}`,
+    `iconbutton-${props.intent}`,
+    `iconbutton-${props.mode}`,
     'iconbutton'
   ]
   const className = classnames(classes, { [props.customClass]: props.customClass })
