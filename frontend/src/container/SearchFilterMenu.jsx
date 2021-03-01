@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 import DateFilter from '../component/Search/DateFilter.jsx'
 import ContentFacets from '../component/Search/ContentFacets.jsx'
+import SpaceFacets from '../component/Search/SpaceFacets.jsx'
 import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
@@ -257,9 +258,10 @@ export class SearchFilterMenu extends React.Component {
           )}
 
           {props.searchType === ADVANCED_SEARCH_TYPE.SPACE && currentSearch.searchFacets && (
-            <ContentFacets
+            <SpaceFacets
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
+              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
             />
           )}
         </div>

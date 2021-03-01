@@ -51,6 +51,7 @@ export const CONTENT_FIELD_LIST = [
 ]
 
 export const SPACE_FIELD_LIST = [
+  { slug: 'label', value: i18n.t('Name') },
   { slug: 'description', value: i18n.t('Description') }
 ]
 
@@ -88,6 +89,15 @@ export const SEARCH_CONTENT_FACETS = {
   },
   EXTENSION: {
     slug: 'file_extensions'
+  },
+  AUTHOR: {
+    slug: 'author__public_names'
+  }
+}
+
+export const SEARCH_SPACE_FACETS = {
+  MEMBER: {
+    slug: 'members'
   },
   AUTHOR: {
     slug: 'author__public_names'

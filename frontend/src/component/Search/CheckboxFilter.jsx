@@ -26,11 +26,11 @@ export const CheckboxFilter = props => {
       </div>
 
       {props.showFilter && props.filterList.map(item =>
-        <div className='checkboxFilter__checkbox' key={`item__${item.value}`}>
+        <div className='checkboxFilter__checkbox' key={`item__${item.id || item.value}`}>
           <Checkbox
-            name={item.value}
-            onClickCheckbox={() => props.onChangeSearchFacets(item.value)}
-            checked={props.appliedFilterList.find(filter => filter.value === item.value)}
+            name={item.id || item.value}
+            onClickCheckbox={() => props.onChangeSearchFacets(item.id || item.value)}
+            checked={props.appliedFilterList.find(filter => filter.id ? filter.id === item.id : filter.value === item.value)}
             styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
             styleCheck={{ top: '-5px' }}
           />
