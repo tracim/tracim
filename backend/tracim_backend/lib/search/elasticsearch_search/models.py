@@ -165,7 +165,7 @@ class UserSearchResponse:
         self.total_hits = hits["total"]["value"]
         self.is_total_hits_accurate = hits["total"]["relation"] == "eq"
         self.facets = facets
-        self.newest_authored_content_range = DateRange(
+        self.newest_authored_content_date_range = DateRange(
             newest_authored_content_date_from, newest_authored_content_date_to
         )
 
@@ -177,7 +177,7 @@ class UserSearchResponse:
         except KeyError:
             username = None
         try:
-            newest_authored_content_date = source["newest_authored_content_date"]
+            newest_authored_content_date = parse(source["newest_authored_content_date"])
         except KeyError:
             newest_authored_content_date = None
         return SearchedUser(

@@ -8,37 +8,36 @@ import {
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 
 require('./AdvancedSearchUserList.styl')
 
-// TODO - G.B. - 2021-02-16 - This component should be updated at https://github.com/tracim/tracim/issues/4097
-
 export const AdvancedSearchUserList = props => {
   return (
-    <>
-      <div className='content__header'>
-        <div className='advancedSearchUser__avatar__header'>
-          {props.t('Avatar')}
+    <div>
+      {props.userSearch.resultList.length > 0 && (
+        <div className='content__header'>
+          <div className='advancedSearchUser__avatar__header'>
+            {props.t('Avatar')}
+          </div>
+          <div className='advancedSearchUser__name'>
+            {props.t('Full name')}
+          </div>
+          <div className='advancedSearchUser__information'>
+            {props.t('Information_plural')}
+          </div>
         </div>
-        <div className='advancedSearchUser__name'>
-          {props.t('Full name')}
-        </div>
-        <div className='advancedSearchUser__information'>
-          {props.t('Information_plural')}
-        </div>
-      </div>
-
+      )}
       {props.userSearch.resultList.map((searchItem, index) => (
         <ListItemWrapper
-          label={searchItem.label}
+          label={searchItem.publicName}
           read
-          contentType={props.user}
+          contentType={searchItem}
           isLast={index === props.userSearch.resultList.length - 1}
-          key={searchItem.contentId}
+          key={searchItem.userId}
         >
           <Link
-            to={`${PAGE.PUBLIC_PROFILE(searchItem.contentId)}`}
+            to={`${PAGE.PUBLIC_PROFILE(searchItem.userId)}`}
             className='advancedSearchUser'
           >
             <div
@@ -47,19 +46,19 @@ export const AdvancedSearchUserList = props => {
               <Avatar
                 size={AVATAR_SIZE.SMALL}
                 apiUrl={props.apiUrl}
-                user={props.user}
+                user={searchItem}
               />
             </div>
 
             <div
               className='advancedSearchUser__name'
-              title={searchItem.label}
+              title={searchItem.publicName}
             >
-              {searchItem.label}
+              {searchItem.publicName}
             </div>
 
             <div className='advancedSearchUser__information'>
-              <span>username</span>
+              <span title={searchItem.username}>{searchItem.username}</span>
               <Icon
                 icon='fa-fw fas fa-at'
                 title={props.t('Username')}
@@ -68,8 +67,13 @@ export const AdvancedSearchUserList = props => {
           </Link>
         </ListItemWrapper>
       ))}
-    </>
+    </div>
   )
 }
 
 export default translate()(AdvancedSearchUserList)
+
+AdvancedSearchUserList.propTypes = {
+  userSearch: PropTypes.object.isRequired,
+  apiUrl: PropTypes.string.isRequired
+}

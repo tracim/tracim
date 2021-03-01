@@ -1,65 +1,68 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  CONTENT_TYPE,
   Icon,
   ListItemWrapper,
-  PAGE
+  PAGE,
+  SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 
 require('./AdvancedSearchSpaceList.styl')
-
-// TODO - G.B. - 2021-02-16 - This component should be updated at https://github.com/tracim/tracim/issues/4097
 
 export const AdvancedSearchSpaceList = props => {
   const resultList = props.spaceSearch.resultList.map((searchItem) => {
     return {
       ...searchItem,
-      contentType: {
-        ...props.contentType.find(ct => ct.slug === searchItem.contentType) || { hexcolor: '', label: '', faIcon: '' },
-        status: props.contentType.find(ct => ct.slug === searchItem.contentType).availableStatuses.find(s => s.slug === searchItem.status) || { hexcolor: '', label: '', faIcon: '' }
+      accessType: {
+        ...SPACE_TYPE_LIST.find(type => type.slug === searchItem.accessType) || { hexcolor: '', label: '', faIcon: '' }
       }
     }
   })
-
   return (
-    <>
-      <div className='content__header'>
-        <div className='advancedSearchSpace__type__header'>
-          {props.t('Type')}
+    <div>
+      {props.spaceSearch.resultList.length > 0 && (
+        <div className='content__header'>
+          <div className='advancedSearchSpace__type__header'>
+            {props.t('Type')}
+          </div>
+          <div className='advancedSearchSpace__name'>
+            {props.t('Name')}
+          </div>
+          <div className='advancedSearchSpace__information'>
+            {props.t('Information_plural')}
+          </div>
         </div>
-        <div className='advancedSearchSpace__name'>
-          {props.t('Name')}
-        </div>
-        <div className='advancedSearchSpace__information'>
-          {props.t('Information_plural')}
-        </div>
-      </div>
+      )}
 
       {resultList.map((searchItem, index) => (
         <ListItemWrapper
           label={searchItem.label}
           read
-          contentType={searchItem.contentType}
+          contentType={searchItem.accessType}
           isLast={index === resultList.length - 1}
-          key={searchItem.contentId}
+          key={searchItem.workspaceId}
         >
           <Link
-            to={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType.slug, searchItem.contentId)}`}
+            to={{
+              pathname: props.workspaceList.find(workspace => workspace.id === searchItem.workspaceId)
+                ? `${PAGE.WORKSPACE.DASHBOARD(searchItem.workspaceId)}`
+                : `${PAGE.JOIN_WORKSPACE}`,
+              state: { fromSearch: true }
+            }}
             className='advancedSearchSpace'
           >
             <div
               className='advancedSearchSpace__type__content'
-              style={{ color: searchItem.contentType.slug !== CONTENT_TYPE.FILE ? searchItem.contentType.hexcolor : undefined }}
+              style={{ color: searchItem.accessType.slug !== SPACE_TYPE_LIST.CONFIDENTIAL ? searchItem.accessType.hexcolor : undefined }}
             >
               <Icon
-                icon={`fa-fw ${searchItem.contentType.faIcon}`}
-                title={props.t(searchItem.contentType.label)}
-                color={searchItem.contentType.slug !== CONTENT_TYPE.FILE ? searchItem.contentType.hexcolor : undefined}
+                icon={`fa-fw ${searchItem.accessType.faIcon}`}
+                title={props.t(searchItem.accessType.label)}
+                color={searchItem.accessType.slug !== SPACE_TYPE_LIST.CONFIDENTIAL ? searchItem.accessType.hexcolor : undefined}
               />
-              <span>{props.t(searchItem.contentType.label)}</span>
+              <span>{props.t(searchItem.accessType.label)}</span>
             </div>
 
             <div
@@ -70,22 +73,40 @@ export const AdvancedSearchSpaceList = props => {
             </div>
 
             <div className='advancedSearchSpace__information'>
-              <span>3333</span>
+              <span
+                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
+              >
+                {searchItem.contentCount}
+              </span>
               <Icon
                 icon='fa-fw fas fa-th'
-                title=''
+                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
               />
-              <span>3333</span>
+
+              <span
+                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
+              >
+                {searchItem.memberCount}
+              </span>
               <Icon
                 icon='fa-fw far fa-user'
-                title=''
+                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
               />
             </div>
           </Link>
         </ListItemWrapper>
       ))}
-    </>
+    </div>
   )
 }
 
 export default translate()(AdvancedSearchSpaceList)
+
+AdvancedSearchSpaceList.propTypes = {
+  spaceSearch: PropTypes.object.isRequired,
+  workspaceList: PropTypes.array
+}
+
+AdvancedSearchSpaceList.defaultProps = {
+  workspaceList: []
+}

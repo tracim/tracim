@@ -1,6 +1,7 @@
 from datetime import datetime
 import typing
 
+from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import RequestError
@@ -558,17 +559,17 @@ class ESSearchApi(SearchApi):
                 "description",
             ]
         )
-        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
-        # return all workspaces content, empty list mean return nothing.
-
-        if search_parameters.size is not None:
-            search = search.extra(size=search_parameters.size)
 
         if search_parameters.page_nb:
             search = search.extra(
-                from_=self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
+                from_=self.offset_from_pagination(
+                    search_parameters.size, search_parameters.page_nb
+                ),
+                size=search_parameters.size,
             )
 
+        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
+        # return all workspaces content, empty list mean return nothing.
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
@@ -644,7 +645,7 @@ class ESSearchApi(SearchApi):
         newest_authored_content_date_to: typing.Optional[datetime] = None,
         show_deleted: bool = False,
         show_active: bool = True,
-        page_nb: int = 0,
+        page_nb: int = 1,
         size: int = 10,
     ) -> UserSearchResponse:
         search = Search(
@@ -681,10 +682,8 @@ class ESSearchApi(SearchApi):
                 "range", newest_authored_content_date=newest_authored_content_date_range
             )
 
-        if size:
-            search = search.extra(size=size)
         if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
 
         search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
         search.aggs.metric(
@@ -700,11 +699,23 @@ class ESSearchApi(SearchApi):
                 "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
             )
         }
+        try:
+            newest_authored_content_date_from = parse(
+                response.aggregations.newest_authored_content_date_from["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_from = None
+        try:
+            newest_authored_content_date_to = parse(
+                response.aggregations.newest_authored_content_date_to["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_to = None
         return UserSearchResponse(
             hits=response["hits"],
             facets=facets,
-            newest_authored_content_date_from=response.aggregations.newest_authored_content_date_from,
-            newest_authored_content_date_to=response.aggregations.newest_authored_content_date_to,
+            newest_authored_content_date_from=newest_authored_content_date_from,
+            newest_authored_content_date_to=newest_authored_content_date_to,
         )
 
     def search_workspace(
@@ -715,7 +726,7 @@ class ESSearchApi(SearchApi):
         ] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
         member_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
-        page_nb: int = 0,
+        page_nb: int = 1,
         size: int = 10,
     ) -> WorkspaceSearchResponse:
         search = Search(
@@ -739,10 +750,8 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", member_ids=member_ids)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-        if size:
-            search = search.extra(size=size)
         if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
         search.aggs.bucket("member_ids", "terms", field="member_ids")
         response = search.execute()
         known_users = UserApi(
@@ -898,9 +907,7 @@ class ESContentIndexer:
         try:
             self.index_contents([content], context)
             if self._should_reindex_children(content.current_revision):
-                self.index_contents(
-                    self._filter_excluded_content_types(content.recursive_children), context
-                )
+                self.index_contents(content.recursive_children, context)
         except Exception:
             logger.exception(
                 self, "Exception while indexing modified content {}".format(content.content_id)
@@ -921,10 +928,7 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            self.index_contents(
-                self._filter_excluded_content_types(content_api.get_all_query(workspace=workspace)),
-                context,
-            )
+            self.index_contents(content_api.get_all_query(workspace=workspace), context)
         except Exception:
             logger.exception(
                 self,
@@ -961,7 +965,9 @@ class ESContentIndexer:
     def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
         if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
             queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
-            content_ids = [content.content_id for content in contents]
+            content_ids = [
+                content.content_id for content in self._filter_excluded_content_types(contents)
+            ]
 
             def index_via_rq_worker(session: Session, flush_context=None) -> None:
                 queue.enqueue(self._index_contents_from_ids, content_ids)
@@ -971,7 +977,7 @@ class ESContentIndexer:
             search_api = ESSearchApi(
                 session=context.dbsession, config=context.app_config, current_user=None
             )
-            for content in contents:
+            for content in self._filter_excluded_content_types(contents):
                 search_api.index_content(content)
 
     def _index_contents_from_ids(self, content_ids: typing.List[int]) -> None:

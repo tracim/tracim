@@ -23,7 +23,25 @@ from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 filterable_content_types = content_type_list.restricted_allowed_types_slug()
 
 
-class ContentSearchQuery(object):
+class SearchQuery:
+    def __init__(
+        self,
+        size: int = 10,
+        page_nb: int = 1,
+        search_string: str = "",
+        show_deleted: int = 0,
+        show_archived: int = 0,
+        show_active: int = 1,
+    ):
+        self.search_string = search_string
+        self.size = size
+        self.page_nb = page_nb
+        self.show_deleted = bool(show_deleted)
+        self.show_archived = bool(show_archived)
+        self.show_active = bool(show_active)
+
+
+class ContentSearchQuery(SearchQuery):
     def __init__(
         self,
         size: int = 10,
@@ -34,15 +52,15 @@ class ContentSearchQuery(object):
         show_archived: int = 0,
         show_active: int = 1,
     ):
-        self.search_string = search_string
-        self.size = size
-        self.page_nb = page_nb
-
+        super().__init__(
+            size=size,
+            page_nb=page_nb,
+            search_string=search_string,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+            show_active=show_active,
+        )
         self.content_types = content_types or filterable_content_types
-
-        self.show_deleted = bool(show_deleted)
-        self.show_archived = bool(show_archived)
-        self.show_active = bool(show_active)
 
 
 class AdvancedContentSearchQuery(ContentSearchQuery):
@@ -274,6 +292,28 @@ class UserSearchQuerySchema(marshmallow.Schema):
     newest_authored_content_date_to = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, required=False, missing=None
     )
+    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    page_nb = marshmallow.fields.Int(
+        required=False, default=1, validate=strictly_positive_int_validator
+    )
+    show_deleted = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description="if set to 1, then show deleted contents."
+        " Default is 0 - hide deleted content",
+        validate=bool_as_int_validator,
+    )
+    show_active = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description="if set to 1, then show active contents. "
+        "Default is 1 - show active content."
+        " Note: active content are content "
+        "that is neither archived nor deleted. "
+        "The reason for this parameter to exist is for example "
+        "to allow to show only archived documents",
+        validate=bool_as_int_validator,
+    )
 
 
 class SearchedUserSchema(UserDigestSchema):
@@ -293,17 +333,13 @@ class UserSearchFacets(marshmallow.Schema):
     workspaces = marshmallow.fields.List(marshmallow.fields.Nested(WorkspaceFacetSchema()))
 
 
-class DateRangeSchema(marshmallow.Schema):
-    from_ = marshmallow.fields.DateTime(format=DATETIME_FORMAT, dict_key="from")
-    to = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-
-
 class UserSearchResultSchema(marshmallow.Schema):
     users = marshmallow.fields.List(marshmallow.fields.Nested(SearchedUserSchema()))
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(UserSearchFacets())
-    last_authored_content_revision_date_range = DateRangeSchema()
+    newest_authored_content_date_range = marshmallow.fields.Nested(DateRangeSchema())
+    search_fields = marshmallow.fields.List(EnumField(UserSearchField))
 
 
 class WorkspaceSearchQuerySchema(marshmallow.Schema):
@@ -321,6 +357,17 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
         required=False,
         missing=None,
         description="if given only search in the given workspace fields",
+    )
+    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    page_nb = marshmallow.fields.Int(
+        required=False, default=1, validate=strictly_positive_int_validator
+    )
+    show_deleted = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description="if set to 1, then show deleted workpaces."
+        " Default is 0 - hide deleted workspaces",
+        validate=bool_as_int_validator,
     )
 
 
