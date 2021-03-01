@@ -1,18 +1,14 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .advancedSearchContent
-  &__link
-    position absolute
-    top 0
-    left 0
-    right 0
-    bottom 0
+  color fontColor
+  &:hover
+    color fontColor
   &__wrapper
     height 65px
     width 100%
     display flex
     align-items center
-    position relative // RJ - 2020-02-23 - NOTE: required to be above the link
   &__typeAndTitle
     display none
   &__type
@@ -32,7 +28,7 @@
   &__name_path
     flex 1
   &__title
-    padding 0px 5px
+    padding 0 5px
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
@@ -61,7 +57,6 @@
       display inline-block
       min-width: 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
       padding-right 10px
-      text-align center
     & > *
       font-size fontSizeSmall
     & > i
@@ -94,7 +89,6 @@
         & > span
           display none
     &__modification
-      margin-inline-end 30px
       overflow hidden
       text-overflow ellipsis
   .advancedSearch__content .content .breadcrumbs
@@ -107,17 +101,13 @@
     & .advancedSearchContent
       &__information
         display none
-      &__modification
-        margin-inline-end 15px
     & .timedEvent.advancedSearchContent__modification
-      right 0px
+      right 0
 
 @media (max-width: max-md)
   .advancedSearchContent
     &__information
       display none
-    &__modification
-      margin-inline-end 15px
   .timedEvent.advancedSearchContent__modification
     right 15px
 
@@ -127,7 +117,7 @@
       &__type__content
         width 50px
       &__title
-        padding 0px 5px
+        padding 0 5px
     &__modification
       display none
     &__typeAndTitle

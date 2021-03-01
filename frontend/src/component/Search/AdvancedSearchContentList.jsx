@@ -86,69 +86,68 @@ export const AdvancedSearchContentList = props => {
           >
             <Link
               to={searchItemUrl}
-              className='advancedSearchContent__link'
-            />
-            <div className='advancedSearchContent__wrapper'>
-              <div
-                className='advancedSearchContent__type__content'
-                style={{ color: searchItem.contentType.hexcolor }}
-              >
-                <Icon
-                  icon={`fa-fw ${searchItem.contentType.faIcon}`}
-                  title={props.t(searchItem.contentType.label)}
-                  color={searchItem.contentType.hexcolor}
-                />
-                <span>{props.t(searchItem.contentType.label)}</span>
-              </div>
-
-              <div className='advancedSearchContent__name_path'>
-                <Link to={searchItemUrl}>
-                  <FilenameWithExtension file={searchItem} />
-                </Link>
-                <Breadcrumbs
-                  breadcrumbsList={searchItem.breadcrumbsList || []}
-                  keepLastBreadcrumbAsLink
-                />
-              </div>
-
-              <TimedEvent
-                customClass='advancedSearchContent__modification'
-                operation={getRevisionTypeLabel(searchItem.currentRevisionType, props.t)}
-                date={searchItem.modified}
-                lang={props.userLang}
-                author={{
-                  publicName: searchItem.lastModifier.public_name,
-                  userId: searchItem.lastModifier.user_id
-                }}
-              />
-
-              {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
-                <div className='advancedSearchContent__information'>
-                  <span className='advancedSearchContent__information__comments'>
-                    <Icon
-                      icon='fa-fw far fa-comment'
-                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                    />
-                    <span
-                      title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                    >
-                      {searchItem.commentCount}
-                    </span>
-                  </span>
-                  <span className='advancedSearchContent__information__status'>
-                    <Icon
-                      icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
-                      title={props.t(searchItem.contentType.status.label)}
-                      color={searchItem.contentType.status.hexcolor}
-                    />
-                    <span
-                      title={props.t(searchItem.contentType.status.label)}>
-                      {props.t(searchItem.contentType.status.label)}
-                    </span>
-                  </span>
+              className='advancedSearchContent'
+            >
+              <div className='advancedSearchContent__wrapper'>
+                <div
+                  className='advancedSearchContent__type__content'
+                  style={{ color: searchItem.contentType.hexcolor }}
+                >
+                  <Icon
+                    icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                    title={props.t(searchItem.contentType.label)}
+                    color={searchItem.contentType.hexcolor}
+                  />
+                  <span>{props.t(searchItem.contentType.label)}</span>
                 </div>
-              )}
-            </div>
+
+                <div className='advancedSearchContent__name_path'>
+                  <FilenameWithExtension file={searchItem} />
+                  <Breadcrumbs
+                    breadcrumbsList={searchItem.breadcrumbsList || []}
+                    keepLastBreadcrumbAsLink
+                  />
+                </div>
+
+                <TimedEvent
+                  customClass='advancedSearchContent__modification'
+                  operation={getRevisionTypeLabel(searchItem.currentRevisionType, props.t)}
+                  date={searchItem.modified}
+                  lang={props.userLang}
+                  author={{
+                    publicName: searchItem.lastModifier.public_name,
+                    userId: searchItem.lastModifier.user_id
+                  }}
+                />
+
+                {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
+                  <div className='advancedSearchContent__information'>
+                    <span className='advancedSearchContent__information__comments'>
+                      <Icon
+                        icon='fa-fw far fa-comment'
+                        title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                      />
+                      <span
+                        title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                      >
+                        {searchItem.commentCount}
+                      </span>
+                    </span>
+                    <span className='advancedSearchContent__information__status'>
+                      <Icon
+                        icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                        title={props.t(searchItem.contentType.status.label)}
+                        color={searchItem.contentType.status.hexcolor}
+                      />
+                      <span
+                        title={props.t(searchItem.contentType.status.label)}>
+                        {props.t(searchItem.contentType.status.label)}
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </Link>
           </ListItemWrapper>
         )
       })}
