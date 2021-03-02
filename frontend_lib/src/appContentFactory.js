@@ -6,7 +6,8 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate
+  sortTimelineByDate,
+  TRANSLATION_STATE
 } from './helper.js'
 
 import {

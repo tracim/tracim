@@ -4,6 +4,9 @@ import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 
+import { TRANSLATION_STATE } from '../../helper.js'
+import TranslateButton from '../Button/TranslateButton.jsx'
+
 const Comment = props => {
   const styleSent = {
     borderColor: props.customColor
@@ -41,7 +44,7 @@ const Comment = props => {
             <div
               className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
             >
-              <HTMLContent>{props.text}</HTMLContent>
+              <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
             </div>
           </div>
         </div>
@@ -58,7 +61,8 @@ Comment.propTypes = {
   text: PropTypes.string,
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,
-  fromMe: PropTypes.bool
+  fromMe: PropTypes.bool,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
 
 Comment.defaultProps = {
@@ -67,5 +71,6 @@ Comment.defaultProps = {
   text: '',
   createdFormated: '',
   createdDistance: '',
-  fromMe: false
+  fromMe: false,
+  translationState: TRANSLATION_STATE.DISABLED
 }
