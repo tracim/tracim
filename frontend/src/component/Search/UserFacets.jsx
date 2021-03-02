@@ -25,6 +25,7 @@ export class UserFacets extends React.Component {
     const workspaceNames = (props.searchFacets.workspaces || []).map(
       workspace => ({
         value: workspace.value.label,
+        id: workspace.value.workspace_id,
         count: workspace.count
       })
     )
@@ -33,10 +34,12 @@ export class UserFacets extends React.Component {
       <div className='userFacets'>
         {props.searchFacets.workspaces && props.searchFacets.workspaces.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ value: props.appliedFilters.workspace_names }]}
+            appliedFilterList={props.appliedFilters.workspace_ids &&
+              props.appliedFilters.workspace_ids.map(workspaceId => ({ id: workspaceId }))
+            }
             filterList={workspaceNames}
-            label={props.t('Space')}
-            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ workspace_names: value })}
+            label={props.t('Member of')}
+            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ workspace_ids: [value] })}
             onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_USER_FACETS.SPACE.slug)}
             showFilter={state.showWorkspaceList}
           />

@@ -209,9 +209,9 @@ export class AdvancedSearch extends React.Component {
 
     const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
 
-    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.slug)
-      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.slug)
-      : [...oldAppliedSearchFieldList, field.slug]
+    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.id)
+      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.id)
+      : [...oldAppliedSearchFieldList, field.id]
 
     props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FIELD, newAppliedSearchFieldList, state.searchType))
 

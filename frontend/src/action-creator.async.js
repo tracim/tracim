@@ -1144,7 +1144,7 @@ export const getAdvancedSearchResult = (
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {
-    // TODO - Add here the filters
+    if (searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
   }
   if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
     if (searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
