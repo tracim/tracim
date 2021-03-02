@@ -334,7 +334,7 @@ export class SearchFilterMenu extends React.Component {
                       : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}
                   />
                 </button>
-                {props.t('Last intervention')}
+                {props.t('Last Intervention')}
               </div>
               {state.newestAuthoredContentRange.showFilter && currentSearch.newestAuthoredContentRange && (
                 <DateFilter
