@@ -1143,7 +1143,7 @@ class TestElasticSearchWorkspaceSearch:
             (("bob", "password"), {"search_string": "bob", "page_nb": 1, "size": 1}, [1], 2),
             (("bob", "password"), {"search_string": "bob", "page_nb": 2, "size": 1}, [2], 2),
             (("bob", "password"), {"search_string": "bob", "size": 0}, [], 2),
-            (("bob", "password"), {"search_string": "*", "owner_ids": [3]}, [],  0),
+            (("bob", "password"), {"search_string": "*", "owner_ids": [3]}, [], 0),
             (("bob", "password"), {"search_string": "*", "owner_ids": [2]}, [1, 2], 2),
         ],
     )
