@@ -33,7 +33,7 @@
   "Restore the original language": "Restore the original language",
   "Show translation": "Show translation",
   "Translation pending…": "Translation pending…",
-  "Translation service is not available": "Translation service is not available",
+  "Translation is not available": "Translation is not available",
   "Unknown error": "Unknown error",
   "Error while translating the document: {{details}}": "Error while translating the document: {{details}}"
 }

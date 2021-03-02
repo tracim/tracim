@@ -33,7 +33,7 @@
   "Restore the original language": "Rétablir la langue d'origine",
   "Show translation": "Voir la traduction",
   "Translation pending…": "Traduction en cours…",
-  "Translation service is not available": "Le service de traduction est indisponible",
+  "Translation is not available": "La traduction est indisponible",
   "Unknown error": "Erreur inconnue",
   "Error while translating the document: {{details}}": "Erreur pendant la traduction du document : {{details}}"
 }

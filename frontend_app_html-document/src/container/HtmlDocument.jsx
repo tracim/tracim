@@ -778,8 +778,8 @@ export class HtmlDocument extends React.Component {
     )
     if (!response.ok) {
       const errors = [
-        { status: 502, message: props.t('Translation service is not available') },
-        { status: 504, message: props.t('Translation service is not available') }
+        { status: 502, message: props.t('Translation is not available') },
+        { status: 504, message: props.t('Translation is not available') }
       ]
       const error = errors.find(e => e.status === response.status) || { status: null, message: props.t('Unknown error') }
       this.sendGlobalFlashMessage(
