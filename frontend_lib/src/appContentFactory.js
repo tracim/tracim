@@ -6,8 +6,7 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate,
-  TRANSLATION_STATE
+  sortTimelineByDate
 } from './helper.js'
 
 import {
@@ -23,6 +22,11 @@ import {
   getInvalidMentionList,
   getMatchingGroupMentionList
 } from './mention.js'
+
+import {
+  TRANSLATION_STATE
+} from './translation.js'
+
 import {
   putEditContent,
   postNewComment,
@@ -340,12 +344,15 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
-      const resCommentWithProperDate = commentList.map(c => ({
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED) => {
+      const timelineCommentList = commentList.map(c => ({
         ...c,
+        timelineType: 'comment',
         created_raw: c.created,
         created: displayDistanceDate(c.created, loggedUser.lang),
-        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
+        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username),
+        translatedRawContent: null,
+        translationState: initialCommentTranslationState
       }))
 
       return revisionList
@@ -354,14 +361,19 @@ export function appContentFactory (WrappedComponent) {
           created_raw: revision.created,
           created: displayDistanceDate(revision.created, loggedUser.lang),
           timelineType: 'revision',
-          commentList: revision.comment_ids.map(ci => ({
-            timelineType: 'comment',
-            ...resCommentWithProperDate.find(c => c.content_id === ci)
-          })),
+          commentList: revision.comment_ids.map(ci => (
+            timelineCommentList.find(c => c.content_id === ci)
+          )),
           number: i + 1,
           hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
+    }
+
+    replaceComment = (comment, timeline) => {
+      return timeline.map(
+        item => item.timelineType === 'comment' && item.content_id === comment.content_id ? comment : item
+      )
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
@@ -410,6 +422,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
+          replaceComment={this.replaceComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
         />

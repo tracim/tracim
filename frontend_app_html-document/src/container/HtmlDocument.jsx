@@ -43,9 +43,14 @@ import {
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getCommentTranslated,
+  getTranslationApiErrorMessage,
+  setTranslatedRawContent,
+  setTranslationState,
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
-import { initWysiwyg, TRANSLATION_STATE } from '../helper.js'
+import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
@@ -387,7 +392,12 @@ export class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      state.defaultTranslationState
+    )
 
     const localStorageComment = getLocalStorageItem(
       state.appName,
@@ -767,7 +777,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleTranslateDocument = async () => {
-    const { props, state } = this
+    const { state } = this
     this.setState({ translationState: TRANSLATION_STATE.PENDING })
     const response = await getHtmlDocTranslated(
       state.config.apiUrl,
@@ -776,18 +786,9 @@ export class HtmlDocument extends React.Component {
       state.content.current_revision_id,
       state.loggedUser.lang
     )
-    if (!response.ok) {
-      const errors = [
-        { status: 502, message: props.t('Translation is not available') },
-        { status: 504, message: props.t('Translation is not available') }
-      ]
-      const error = errors.find(e => e.status === response.status) || { status: null, message: props.t('Unknown error') }
-      this.sendGlobalFlashMessage(
-        props.t(
-          'Error while translating the document: {{details}}',
-          { details: error.message }
-        )
-      )
+    const errorMessage = getTranslationApiErrorMessage(response)
+    if (errorMessage) {
+      this.sendGlobalFlashMessage(errorMessage)
       this.setState(previousState => {
         return { translationState: previousState.defaultTranslationState }
       })
@@ -803,6 +804,59 @@ export class HtmlDocument extends React.Component {
     })
   }
 
+  handleTranslateComment = async (comment) => {
+    const { props, state } = this
+    this.setState(previousState => {
+      return {
+        timeline: props.replaceComment(
+          setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+          previousState.timeline
+        )
+      }
+    })
+    const response = await getCommentTranslated(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.lang
+    )
+    const errorMessage = getTranslationApiErrorMessage(response)
+    if (errorMessage) {
+      this.sendGlobalFlashMessage(errorMessage)
+      this.setState(previousState => {
+        return {
+          timeline: props.replaceComment(
+            setTranslationState(comment, TRANSLATION_STATE.PENDING),
+            previousState.timeline
+          )
+        }
+      })
+      return
+    }
+    const translatedRawContent = await response.text()
+    this.setState(previousState => {
+      return {
+        timeline: props.replaceComment(
+          setTranslatedRawContent(comment, translatedRawContent),
+          previousState.timeline
+        )
+      }
+    })
+  }
+
+  handleRestoreComment = (comment) => {
+    const { props } = this
+    this.setState(previousState => {
+      return {
+        timeline: props.replaceComment(
+          setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+          previousState.timeline
+        )
+      }
+    })
+  }
+
   render () {
     const { props, state } = this
 
@@ -812,14 +866,6 @@ export class HtmlDocument extends React.Component {
       state.mode !== APP_FEATURE_MODE.EDIT &&
         state.translationState === TRANSLATION_STATE.TRANSLATED
     )
-    const HANDLE_TOGGLE_TRANSLATION = {
-      [TRANSLATION_STATE.UNTRANSLATED]: this.handleTranslateDocument,
-      [TRANSLATION_STATE.TRANSLATED]: this.handleRestoreDocument,
-      [TRANSLATION_STATE.PENDING]: null,
-      [TRANSLATION_STATE.DISABLED]: null
-    }
-    const handleToggleTranslation = HANDLE_TOGGLE_TRANSLATION[state.translationState]
-
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -937,7 +983,8 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
-            onClickToggleTranslation={handleToggleTranslation}
+            onClickTranslateDocument={this.handleTranslateDocument}
+            onClickRestoreDocument={this.handleRestoreDocument}
             translationState={state.translationState}
           />
 
@@ -971,6 +1018,8 @@ export class HtmlDocument extends React.Component {
                   onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
                   showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                   invalidMentionList={state.invalidMentionList}
+                  onClickTranslateComment={this.handleTranslateComment}
+                  onClickRestoreComment={this.handleRestoreComment}
                 />
               ) : null
             }]}

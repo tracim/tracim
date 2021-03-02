@@ -10,24 +10,17 @@ import {
   PromptMessage,
   HTMLContent,
   TextAreaApp,
-  IconButton
+  TRANSLATION_STATE,
+  TranslateButton
 } from 'tracim_frontend_lib'
-import { TRANSLATION_STATE } from '../helper.js'
 
 export const HtmlDocument = props => {
-  const TOGGLE_TRANSLATION_TEXT = {
-    [TRANSLATION_STATE.TRANSLATED]: props.t('Restore the original language'),
-    [TRANSLATION_STATE.UNTRANSLATED]: props.t('Show translation'),
-    [TRANSLATION_STATE.DISABLED]: null,
-    [TRANSLATION_STATE.PENDING]: null
-  }
-  const toggleTranslationText = TOGGLE_TRANSLATION_TEXT[props.translationState]
-
+  const isTranslated = props.translationState === TRANSLATION_STATE.TRANSLATED
   const noteClass = 'html-document__contentpage__textnote__text'
   const noteClassName = classnames(
     noteClass,
     {
-      [`${noteClass}-translated primaryColorBorder`]: props.translationState === TRANSLATION_STATE.TRANSLATED
+      [`${noteClass}-translated primaryColorBorder`]: isTranslated
     }
   )
 
@@ -92,21 +85,11 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__top'>
-              {props.translationState === TRANSLATION_STATE.PENDING && (
-                <span className='html-document__contentpage__textnote__top__translation'>
-                  <i className='fa fa-spinner fa-spin' /> {props.t('Translation pending…')}
-                </span>
-              )}
-              {toggleTranslationText && (
-                <IconButton
-                  text={toggleTranslationText}
-                  onClick={props.onClickToggleTranslation}
-                  intent='link'
-                  mode='light'
-                  customClass='html-document__contentpage__textnote__top__translation'
-                  dataCy='htmlDocumentTranslationButton'
-                />
-              )}
+              <TranslateButton
+                translationState={props.translationState}
+                onClickTranslate={props.onClickTranslateDocument}
+                onClickRestore={props.onClickRestoreDocument}
+              />
               <div className='html-document__contentpage__textnote__top__version'>
                 {props.t(
                   'Version #{{versionNumber}}', {
@@ -124,7 +107,7 @@ export const HtmlDocument = props => {
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className={noteClassName}>
-              <HTMLContent>{props.text}</HTMLContent>
+              <HTMLContent isTranslated={isTranslated}>{props.text}</HTMLContent>
             </div>
           </div>
         )}
@@ -207,6 +190,7 @@ HtmlDocument.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
   isRefreshNeeded: PropTypes.bool,
-  onClickToggleTranslation: PropTypes.func,
+  onClickTranslateDocument: PropTypes.func,
+  onClickRestoreDocument: PropTypes.func,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }

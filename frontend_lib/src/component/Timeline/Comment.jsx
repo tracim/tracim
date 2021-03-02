@@ -4,7 +4,7 @@ import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 
-import { TRANSLATION_STATE } from '../../helper.js'
+import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 
 const Comment = props => {
@@ -14,14 +14,15 @@ const Comment = props => {
 
   return (
     <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
-      <div className={classnames(`${props.customClass}`, 'comment', {
-        sent: props.fromMe,
-        received: !props.fromMe
-      })}
+      <div
+        className={classnames(`${props.customClass}`, 'comment', {
+          sent: props.fromMe,
+          received: !props.fromMe
+        })}
+        style={props.fromMe ? styleSent : {}}
       >
         <div
           className={classnames(`${props.customClass}__body`, 'comment__body')}
-          style={props.fromMe ? styleSent : {}}
         >
           <Avatar
             size={AVATAR_SIZE.MEDIUM}
@@ -48,6 +49,15 @@ const Comment = props => {
             </div>
           </div>
         </div>
+        <div
+          className={classnames(`${props.customClass}__footer`, 'comment__footer')}
+        >
+          <TranslateButton
+            isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}
+            onClickTranslate={props.onClickTranslate}
+            onClickRestore={props.onClickRestore}
+          />
+        </div>
       </div>
     </li>
   )
@@ -62,7 +72,9 @@ Comment.propTypes = {
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,
   fromMe: PropTypes.bool,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  onClickTranslate: PropTypes.func,
+  onClickRestore: PropTypes.func
 }
 
 Comment.defaultProps = {

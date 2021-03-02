@@ -192,7 +192,8 @@ import {
   putMyselfFileRead,
   getContentComment,
   getContent,
-  getWorkspaceContent
+  getWorkspaceContent,
+  getCommentTranslated
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -221,6 +222,13 @@ export {
   setLocalStorageItem,
   removeLocalStorageItem
 } from './localStorage.js'
+
+export {
+  TRANSLATION_STATE,
+  getTranslationApiErrorMessage,
+  setTranslatedRawContent,
+  setTranslationState
+} from './translation.js'
 
 export {
   appContentFactory,
@@ -377,5 +385,6 @@ export {
   getAvatarBaseUrl,
   ProfileNavigation,
   getCoverBaseUrl,
-  TranslateButton
+  TranslateButton,
+  getCommentTranslated
 }
