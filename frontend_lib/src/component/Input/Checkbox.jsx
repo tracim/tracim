@@ -57,7 +57,7 @@ export const Checkbox = props =>
           ...(props.disabled ? style.disabled : {}),
           ...props.styleCheck
         }}
-      >✔
+      >✓
       </div>
     )}
     <input

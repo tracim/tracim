@@ -38,6 +38,7 @@ export const ADVANCED_SEARCH_TYPE = {
 
 export const ADVANCED_SEARCH_FILTER = {
   SEARCH_FIELD: 'searchField',
+  NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
   CREATED_RANGE: 'createdRange',
   MODIFIED_RANGE: 'modifiedRange',
   SEARCH_FACETS: 'searchFacets'

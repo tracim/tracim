@@ -8,16 +8,17 @@ export class UserFacets extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showWorkspaceList: true
+      hiddenFilters: {}
     }
   }
 
   handleOpenOrCloseFilter = (filter) => {
-    switch (filter) {
-      case SEARCH_USER_FACETS.SPACE.slug:
-        this.setState(prev => ({ showWorkspaceList: !prev.showWorkspaceList }))
-        break
-    }
+    this.setState(prev => ({
+      hiddenFilters: {
+        ...this.state.hiddenFilters,
+        [filter]: !prev.hiddenFilters[filter]
+      }
+    }))
   }
 
   render () {
@@ -34,14 +35,12 @@ export class UserFacets extends React.Component {
       <div className='userFacets'>
         {props.searchFacets.workspaces && props.searchFacets.workspaces.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={props.appliedFilters.workspace_ids &&
-              props.appliedFilters.workspace_ids.map(workspaceId => ({ id: workspaceId }))
-            }
+            appliedFilterList={(props.appliedFilters.workspace_ids || []).map(workspaceId => ({ id: workspaceId }))}
             filterList={workspaceNames}
             label={props.t('Member of')}
             onChangeSearchFacets={(value) => props.onChangeSearchFacets({ workspace_ids: [value] })}
-            onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_USER_FACETS.SPACE.slug)}
-            showFilter={state.showWorkspaceList}
+            onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_USER_FACETS.MEMBER.slug)}
+            showFilter={!state.hiddenFilters[SEARCH_USER_FACETS.MEMBER.slug]}
           />
         )}
       </div>

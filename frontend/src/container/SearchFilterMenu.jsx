@@ -18,6 +18,13 @@ export class SearchFilterMenu extends React.Component {
     super(props)
     this.state = {
       showSearchFieldList: true,
+      newestAuthoredContentRange: {
+        showFilter: true,
+        afterDateActive: false,
+        afterDate: '',
+        beforeDateActive: false,
+        beforeDate: ''
+      },
       createdRange: {
         showFilter: true,
         afterDateActive: false,
@@ -64,6 +71,45 @@ export class SearchFilterMenu extends React.Component {
     }))
   }
 
+  handleChangeNewestAuthoredContentDate = (date, type) => {
+    const { props } = this
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
+      this.setState(prev => ({
+        newestAuthoredContentRange: {
+          ...prev.newestAuthoredContentRange,
+          afterDateActive: true,
+          afterDate: date
+        }
+      }))
+      props.onChangeNewestAuthoredContentDate({ from: date })
+    } else {
+      this.setState(prev => ({
+        newestAuthoredContentRange: {
+          ...prev.newestAuthoredContentRange,
+          beforeDateActive: true,
+          beforeDate: date
+        }
+      }))
+      props.onChangeNewestAuthoredContentDate({ to: date })
+    }
+  }
+
+  handleCheckboxNewestAuthoredContentDate = (type) => {
+    const { state } = this
+    this.handleChangeNewestAuthoredContentDate(
+      state.newestAuthoredContentRange[`${type}DateActive`]
+        ? ''
+        : state.newestAuthoredContentRange[`${type}Date`],
+      type
+    )
+    this.setState(prev => ({
+      newestAuthoredContentRange: {
+        ...prev.newestAuthoredContentRange,
+        [`${type}DateActive`]: !prev.newestAuthoredContentRange[`${type}DateActive`]
+      }
+    }))
+  }
+
   handleChangeCreatedDate = (date, type) => {
     const { props } = this
     if (type === DATE_FILTER_ELEMENT.AFTER) {
@@ -92,6 +138,15 @@ export class SearchFilterMenu extends React.Component {
       modifiedRange: {
         ...prev.modifiedRange,
         showFilter: !prev.modifiedRange.showFilter
+      }
+    }))
+  }
+
+  handleOpenOrCloseNewestAuthoredContentRange = () => {
+    this.setState(prev => ({
+      newestAuthoredContentRange: {
+        ...prev.newestAuthoredContentRange,
+        showFilter: !prev.newestAuthoredContentRange.showFilter
       }
     }))
   }
@@ -190,9 +245,7 @@ export class SearchFilterMenu extends React.Component {
             ))}
             filterList={SEARCH_FIELDS[props.searchType]}
             label={props.t('Only search in')}
-            onChangeSearchFacets={(value) =>
-              props.onClickSearchField(SEARCH_FIELDS[props.searchType].find(field => field.id === value))
-            }
+            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELDS[props.searchType].find(field => field.id === value))}
             onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
             showFilter={state.showSearchFieldList}
           />
@@ -264,6 +317,41 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
+
+          {currentSearch.newestAuthoredContentRange && Object.keys(currentSearch.newestAuthoredContentRange).length > 0 && (
+            <>
+              <div className='searchFilterMenu__content__item__title'>
+                <button
+                  className='transparentButton'
+                  onClick={this.handleOpenOrCloseNewestAuthoredContentRange}
+                >
+                  <Icon
+                    icon={state.newestAuthoredContentRange.showFilter
+                      ? 'fa-fw fas fa-caret-down'
+                      : 'fa-fw fas fa-caret-right'}
+                    title={state.newestAuthoredContentRange.showFilter
+                      ? props.t('Hide {{filter}}', { filter: props.t('Last Intervention') })
+                      : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}
+                  />
+                </button>
+                {props.t('Last intervention')}
+              </div>
+              {state.newestAuthoredContentRange.showFilter && currentSearch.newestAuthoredContentRange && (
+                <DateFilter
+                  id='modification'
+                  from={currentSearch.newestAuthoredContentRange.from}
+                  to={currentSearch.newestAuthoredContentRange.to}
+                  onChangeDate={this.handleChangeModifiedDate}
+                  onClickDateCheckbox={this.handleCheckboxModifiedRange}
+                  isAfterCheckboxChecked={state.newestAuthoredContentRange.afterDateActive}
+                  isBeforeCheckboxChecked={state.newestAuthoredContentRange.beforeDateActive}
+                  afterDate={state.newestAuthoredContentRange.afterDate}
+                  beforeDate={state.newestAuthoredContentRange.beforeDate}
+                />
+              )}
+            </>
+          )}
+
           {props.searchType === ADVANCED_SEARCH_TYPE.USER && currentSearch.searchFacets && (
             <UserFacets
               searchFacets={currentSearch.searchFacets}
@@ -301,12 +389,14 @@ SearchFilterMenu.propTypes = {
   currentSearch: PropTypes.object.isRequired,
   searchType: PropTypes.string.isRequired,
   onChangeCreatedDate: PropTypes.func,
+  onChangeNewestAuthoredContentDate: PropTypes.func,
   onChangeModifiedDate: PropTypes.func,
   onClickSearchField: PropTypes.func
 }
 
 SearchFilterMenu.defaultProps = {
   onClickSearchField: () => { },
+  onChangeNewestAuthoredContentDate: () => { },
   onChangeCreatedDate: () => { },
   onChangeModifiedDate: () => { }
 }
