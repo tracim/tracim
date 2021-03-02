@@ -126,6 +126,8 @@ if [ "$mode" = "cypress" ]; then
     tracimcli db delete --force || true
     tracimcli db init || true
     cp /tmp/${DATABASE_NAME}.sqlite /tmp/${DATABASE_NAME}.sqlite.tmp
+    export TRACIM_TRANSLATION_SERVICE__ENABLED=True
+    export TRACIM_TRANSLATION_SERVICE__PROVIDER=test
     pserve development.ini > /tmp/${DATABASE_NAME}.log 2>&1 &
     backend_pid=$!
     popd

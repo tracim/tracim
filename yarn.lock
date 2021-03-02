@@ -11677,11 +11677,11 @@ fsevents@^1.2.7:
 
 "resolve@patch:resolve@^1.10.0#builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#builtin<compat/resolve>, resolve@patch:resolve@^1.11.0#builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#builtin<compat/resolve>, resolve@patch:resolve@^1.17.0#builtin<compat/resolve>":
   version: 1.19.0
-  resolution: "resolve@patch:resolve@npm%3A1.19.0#builtin<compat/resolve>::version=1.19.0&hash=e7677c"
+  resolution: "resolve@patch:resolve@npm%3A1.19.0#builtin<compat/resolve>::version=1.19.0&hash=3388aa"
   dependencies:
     is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 346993290e1579ba21ce88047ecfbdf72741233e53fe7934dad3225ece79bc09e2e0045178b92c47c821ad28a263a2e342874a895da33f01f6a1fa20dd0cf6e3
+  checksum: 983e1f00a147b20c9bd6c12216fad49d2d0b83a280a203a0261b68f48621d699c5131f9626044af91254da6d2e8309c7e5559c5886faeeae7c6c47507c855410
   languageName: node
   linkType: hard
 

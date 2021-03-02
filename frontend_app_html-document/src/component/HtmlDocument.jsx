@@ -1,16 +1,36 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
+import classnames from 'classnames'
+
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
   MentionAutoComplete,
   PromptMessage,
   HTMLContent,
-  TextAreaApp
+  TextAreaApp,
+  IconButton
 } from 'tracim_frontend_lib'
-import { translate } from 'react-i18next'
+import { TRANSLATION_STATE } from '../helper.js'
 
 export const HtmlDocument = props => {
+  const TOGGLE_TRANSLATION_TEXT = {
+    [TRANSLATION_STATE.TRANSLATED]: props.t('Restore the original language'),
+    [TRANSLATION_STATE.UNTRANSLATED]: props.t('Show translation'),
+    [TRANSLATION_STATE.DISABLED]: null,
+    [TRANSLATION_STATE.PENDING]: null
+  }
+  const toggleTranslationText = TOGGLE_TRANSLATION_TEXT[props.translationState]
+
+  const noteClass = 'html-document__contentpage__textnote__text'
+  const noteClassName = classnames(
+    noteClass,
+    {
+      [`${noteClass}-translated primaryColorBorder`]: props.translationState === TRANSLATION_STATE.TRANSLATED
+    }
+  )
+
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.displayNotifyAllMessage && (
@@ -69,25 +89,41 @@ export const HtmlDocument = props => {
             onClickBtn={props.onClickShowDraft}
           />
         )}
-
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
-            <div className='html-document__contentpage__textnote__version'>
-              {props.t(
-                'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                    ? props.lastVersion
-                    : props.version
-                }
+            <div className='html-document__contentpage__textnote__top'>
+              {props.translationState === TRANSLATION_STATE.PENDING && (
+                <span className='html-document__contentpage__textnote__top__translation'>
+                  <i className='fa fa-spinner fa-spin' /> {props.t('Translation pending…')}
+                </span>
               )}
-              {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                <div className='html-document__contentpage__textnote__lastversion'>
-                  ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                </div>
+              {toggleTranslationText && (
+                <IconButton
+                  text={toggleTranslationText}
+                  onClick={props.onClickToggleTranslation}
+                  intent='link'
+                  mode='light'
+                  customClass='html-document__contentpage__textnote__top__translation'
+                  dataCy='htmlDocumentTranslationButton'
+                />
               )}
+              <div className='html-document__contentpage__textnote__top__version'>
+                {props.t(
+                  'Version #{{versionNumber}}', {
+                    versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                      ? props.lastVersion
+                      : props.version
+                  }
+                )}
+                {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                  <div className='html-document__contentpage__textnote__top__lastversion'>
+                    ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                  </div>
+                )}
+              </div>
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className='html-document__contentpage__textnote__text'>
+            <div className={noteClassName}>
               <HTMLContent>{props.text}</HTMLContent>
             </div>
           </div>
@@ -170,5 +206,7 @@ HtmlDocument.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  isRefreshNeeded: PropTypes.bool
+  isRefreshNeeded: PropTypes.bool,
+  onClickToggleTranslation: PropTypes.func,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
