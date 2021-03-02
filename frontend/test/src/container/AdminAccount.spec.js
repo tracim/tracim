@@ -90,19 +90,35 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
   describe('TLM handlers', () => {
     describe('eventType user', () => {
-      describe('handleUserModified', () => {
-        it('should update the public name', () => {
+      describe('handleUserModifiedOrCreated', () => {
+        const newUserFromApi = {
+          ...userFromApi,
+          email: 'new_email',
+          public_name: 'new_public_name',
+          username: 'new_username'
+        }
+
+        mockGetUser200(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, newUserFromApi)
+
+        it('should update the public name, the username and the email', async () => {
           const tlmData = {
             fields: {
               author: userFromApi,
-              user: { ...userFromApi, public_name: 'new_public_name' }
+              user: {
+                username: newUserFromApi.username,
+                user_id: newUserFromApi.user_id,
+                public_name: newUserFromApi.public_name
+              }
             }
           }
-          adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountWrapper.state().userToEdit.publicName).to.equal(tlmData.fields.user.public_name)
+          await adminAccountInstance.handleUserModifiedOrCreated(tlmData)
+          const newUser = adminAccountWrapper.state().userToEdit
+          expect(newUser.publicName).to.equal(newUserFromApi.public_name)
+          expect(newUser.username).to.equal(newUserFromApi.username)
+          expect(newUser.email).to.equal(newUserFromApi.email)
         })
 
-        it('should update the username', () => {
+        it('should update the username', async () => {
           const tlmData = {
             fields: {
               author: userFromApi,
@@ -113,24 +129,21 @@ describe('In <Account /> at AdminAccount.jsx', () => {
               }
             }
           }
-          adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountWrapper.state().userToEdit.username).to.equal(tlmData.fields.user.username)
+          await adminAccountInstance.handleUserModifiedOrCreated(tlmData)
         })
 
-        it('should update the email', () => {
+        it('should update the email', async () => {
           const tlmData = {
             fields: {
               author: userFromApi,
               user: {
                 ...userFromApi,
                 public_name: adminAccountWrapper.state().userToEdit.publicName,
-                username: adminAccountWrapper.state().userToEdit.username,
-                email: 'new_email'
+                username: adminAccountWrapper.state().userToEdit.username
               }
             }
           }
-          adminAccountInstance.handleUserModified(tlmData)
-          expect(adminAccountWrapper.state().userToEdit.email).to.equal(tlmData.fields.user.email)
+          await adminAccountInstance.handleUserModifiedOrCreated(tlmData)
         })
       })
     })
@@ -207,7 +220,6 @@ describe('In <Account /> at AdminAccount.jsx', () => {
         mockGetUser200(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, userFromApi)
         adminAccountInstance.getUserDetail().then(() => {
           expect(adminAccountWrapper.state().userToEdit).to.deep.equal({
-            allowedSpace: undefined,
             isUsernameValid: true,
             usernameInvalidMsg: '',
             ...user

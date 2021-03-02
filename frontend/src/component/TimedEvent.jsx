@@ -41,18 +41,20 @@ const TimedEvent = (props) => {
       className={classnames('timedEvent', props.customClass, { rootTimedEvent: props.isRoot })}
       data-cy={props.dataCy}
     >
-      {props.onEventClicked
-        ? (
-          <DropdownMenu
-            buttonCustomClass='timedEvent__top'
-            buttonClick={props.onEventClicked} // eslint-disable-line
-            buttonOpts={topContents}
-            buttonTooltip=''
-          >
-            {props.eventList.map(createHistoryTimedEvent)}
-          </DropdownMenu>
-        )
-        : <div>{topContents}</div>}
+      {
+        props.onEventClicked
+          ? (
+            <DropdownMenu
+              buttonCustomClass='timedEvent__top'
+              buttonClick={props.onEventClicked} // eslint-disable-line
+              buttonOpts={topContents}
+              buttonTooltip=''
+            >
+              {props.eventList.map(createHistoryTimedEvent)}
+            </DropdownMenu>
+          )
+          : <div>{topContents}</div>
+      }
       <div className='timedEvent__bottom'>
         {props.t('by')}&nbsp;
         <ProfileNavigation user={props.author}>
