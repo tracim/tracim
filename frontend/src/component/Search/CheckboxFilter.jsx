@@ -30,7 +30,9 @@ export const CheckboxFilter = props => {
           <Checkbox
             name={item.id || item.value}
             onClickCheckbox={() => props.onChangeSearchFacets(item.id || item.value)}
-            checked={props.appliedFilterList.find(filter => filter.id ? filter.id === item.id : filter.value === item.value)}
+            checked={props.appliedFilterList.findIndex(
+              filter => filter.id ? filter.id === item.id : filter.value === item.value
+            ) !== -1}
             styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
             styleCheck={{ top: '-5px' }}
           />

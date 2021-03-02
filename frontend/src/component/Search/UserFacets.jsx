@@ -17,12 +17,6 @@ export class UserFacets extends React.Component {
       case SEARCH_USER_FACETS.SPACE.slug:
         this.setState(prev => ({ showWorkspaceList: !prev.showWorkspaceList }))
         break
-      case SEARCH_USER_FACETS.PUBLIC_NAME.slug:
-        this.setState(prev => ({ showPublicNameList: !prev.showPublicNameList }))
-        break
-      case SEARCH_USER_FACETS.PROFILE.slug:
-        this.setState(prev => ({ showPublicNameList: !prev.showProfileList }))
-        break
     }
   }
 
