@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
   buildHeadTitle,
   CUSTOM_EVENT,
   IconButton,
@@ -300,14 +299,24 @@ export class AdvancedSearch extends React.Component {
     const { state, props } = this
     if (state.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) return
 
-    props.contentSearch.resultList.map(async (content) => {
-      let contentBreadcrumbsList = []
-      try {
-        contentBreadcrumbsList = await buildContentPathBreadcrumbs(FETCH_CONFIG.apiUrl, content)
-      } catch (e) {
-        console.error('Error at advanced search, count not build breadcrumbs', e)
+    props.contentSearch.resultList.forEach((content) => {
+      const workspace = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspaceId),
+        label: content.workspace.label,
+        type: BREADCRUMBS_TYPE.APP_FEATURE,
+        isALink: true
       }
-      props.dispatch(setSearchContentBreadcrumbs(contentBreadcrumbsList, content.contentId, state.searchType))
+      const contentBreadcrumbsList = content.path.map(crumb => ({
+        link: PAGE.WORKSPACE.CONTENT(content.workspaceId, crumb.content_type, crumb.content_id),
+        label: crumb.label,
+        type: BREADCRUMBS_TYPE.APP_FEATURE,
+        isALink: true
+      }))
+      props.dispatch(setSearchContentBreadcrumbs(
+        [workspace, ...contentBreadcrumbsList],
+        content.contentId,
+        state.searchType
+      ))
     })
   }
 

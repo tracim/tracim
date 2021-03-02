@@ -73,25 +73,25 @@ export const AdvancedSearchSpaceList = props => {
             </div>
 
             <div className='advancedSearchSpace__information'>
+              <Icon
+                icon='fa-fw fas fa-th'
+                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
+              />
               <span
                 title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
               >
                 {searchItem.contentCount}
               </span>
-              <Icon
-                icon='fa-fw fas fa-th'
-                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
-              />
 
+              <Icon
+                icon='fa-fw far fa-user'
+                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
+              />
               <span
                 title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
               >
                 {searchItem.memberCount}
               </span>
-              <Icon
-                icon='fa-fw far fa-user'
-                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
-              />
             </div>
           </Link>
         </ListItemWrapper>

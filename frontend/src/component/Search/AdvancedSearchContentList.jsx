@@ -122,32 +122,35 @@ export const AdvancedSearchContentList = props => {
                   }}
                 />
 
-                {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
-                  <div className='advancedSearchContent__information'>
-                    <span className='advancedSearchContent__information__comments'>
-                      <Icon
-                        icon='fa-fw far fa-comment'
-                        title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                      />
-                      <span
-                        title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
-                      >
-                        {searchItem.commentCount}
+                <div className='advancedSearchContent__information'>
+                  {searchItem.contentType.slug !== CONTENT_TYPE.FOLDER && (
+                    <div>
+                      <span className='advancedSearchContent__information__comments'>
+                        <Icon
+                          icon='fa-fw far fa-comment'
+                          title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                        />
+                        <span
+                          title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                        >
+                          {searchItem.commentCount}
+                        </span>
                       </span>
-                    </span>
-                    <span className='advancedSearchContent__information__status'>
-                      <Icon
-                        icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
-                        title={props.t(searchItem.contentType.status.label)}
-                        color={searchItem.contentType.status.hexcolor}
-                      />
-                      <span
-                        title={props.t(searchItem.contentType.status.label)}>
-                        {props.t(searchItem.contentType.status.label)}
+                      <span className='advancedSearchContent__information__status'>
+                        <Icon
+                          icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                          title={props.t(searchItem.contentType.status.label)}
+                          color={searchItem.contentType.status.hexcolor}
+                        />
+                        <span
+                          title={props.t(searchItem.contentType.status.label)}
+                        >
+                          {props.t(searchItem.contentType.status.label)}
+                        </span>
                       </span>
-                    </span>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             </Link>
           </ListItemWrapper>

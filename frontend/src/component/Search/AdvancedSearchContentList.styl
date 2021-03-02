@@ -26,7 +26,10 @@
       text-align center
       align-self center
   &__name_path
-    flex 1
+    flex 2
+    text-overflow ellipsis
+    overflow hidden
+    width 0
   &__title
     padding 0 5px
     white-space nowrap
@@ -34,18 +37,15 @@
     text-overflow ellipsis
     color fontColor
     align-self center
-    flex 1
+    flex 2
     width 0
   &__modification
     align-self center
-    width 250px
+    flex 1
     &.timedEvent
-      align-content center
-      display flex
-      margin-left 10px
+      margin-left 15px
       margin-right 10px
-
-
+      overflow hidden
   &__information
     color fontColor
     align-self center
@@ -55,7 +55,7 @@
     align-items center
     &__comments
       display inline-block
-      min-width: 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
+      min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
       padding-right 10px
     & > *
       font-size fontSizeSmall
@@ -66,14 +66,6 @@
 .advancedSearch__openMenu
   & .advancedSearchContent .advancedSearchContent__title
     padding-bottom 0
-
-.timedEvent.advancedSearchContent__modification
-  width 250px
-  margin 0
-
-  .timedEvent__bottom
-    justify-content start
-
 
 @media (max-width: max-lg)
   .advancedSearchContent
@@ -87,25 +79,20 @@
     &__modification
       overflow hidden
       text-overflow ellipsis
-  .advancedSearch__content .content .breadcrumbs
-    left 55px
+    &__name_path
+      padding-inline-start 10px
   .timedEvent.advancedSearchContent__modification
-    right 195px
     & .timedEvent__operation
       display none
   .advancedSearch__openMenu
     & .advancedSearchContent
       &__information
         display none
-    & .timedEvent.advancedSearchContent__modification
-      right 0
 
 @media (max-width: max-md)
   .advancedSearchContent
     &__information
       display none
-  .timedEvent.advancedSearchContent__modification
-    right 15px
 
 @media (max-width: max-sm)
   .advancedSearchContent
@@ -119,7 +106,7 @@
     &__typeAndTitle
       display unset
       padding 15px 5px
-      flex 1
+      flex 2
   .content__header
     & .advancedSearchContent
       &__title
