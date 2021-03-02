@@ -54,7 +54,7 @@ module.exports = {
       loader: 'babel-loader',
       options: {
         presets: [
-          ['@babel/preset-env', { targets: { firefox: 83, chrome: 86 }  } ],
+          '@babel/preset-env',
           '@babel/preset-react'
         ],
         plugins: [
@@ -102,4 +102,3 @@ module.exports = {
     )
   ]
 }
-module.exports.module.rules[0] = {}
