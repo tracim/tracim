@@ -8,7 +8,7 @@ let threadId
 let fileId
 let workspaceId
 
-describe("An app's name", () => {
+describe("A content's name inside an app", () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -28,7 +28,7 @@ describe("An app's name", () => {
     cy.cancelXHR()
   })
 
-  it('should show the file extension with content type is a file', () => {
+  it('should show the extension if content type is a file', () => {
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
       params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
@@ -39,7 +39,7 @@ describe("An app's name", () => {
     cy.contains('.FilenameWithExtension .badge', '.png')
   })
 
-  it('should not show the file extension with content type is not a file', () => {
+  it('should not show the extension if content type is not a file', () => {
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
       params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
