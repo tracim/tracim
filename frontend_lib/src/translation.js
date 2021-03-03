@@ -22,21 +22,6 @@ export const getTranslationApiErrorMessage = (response) => {
   return null
 }
 
-export const setTranslatedRawContent = (object, translatedRawContent) => {
-  return {
-    ...object,
-    translatedRawContent,
-    translationState: TRANSLATION_STATE.TRANSLATED
-  }
-}
-
-export const setTranslationState = (object, translationState) => {
-  return {
-    ...object,
-    translationState
-  }
-}
-
 export const getDefaultTranslationState = (config) => {
   return config.translation_service__enabled
     ? TRANSLATION_STATE.UNTRANSLATED

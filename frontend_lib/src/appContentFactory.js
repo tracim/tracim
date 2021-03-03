@@ -26,8 +26,6 @@ import {
 
 import {
   getTranslationApiErrorMessage,
-  setTranslatedRawContent,
-  setTranslationState,
   TRANSLATION_STATE
 } from './translation.js'
 
@@ -413,7 +411,7 @@ export function appContentFactory (WrappedComponent) {
       setState(previousState => {
         return {
           timeline: this.replaceComment(
-            setTranslationState(comment, TRANSLATION_STATE.PENDING),
+            { ...comment, translationState: TRANSLATION_STATE.PENDING },
             previousState.timeline
           )
         }
@@ -431,7 +429,7 @@ export function appContentFactory (WrappedComponent) {
         setState(previousState => {
           return {
             timeline: this.replaceComment(
-              setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+              { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
               previousState.timeline
             )
           }
@@ -442,7 +440,11 @@ export function appContentFactory (WrappedComponent) {
       setState(previousState => {
         return {
           timeline: this.replaceComment(
-            setTranslatedRawContent(comment, translatedRawContent),
+            {
+              ...comment,
+              translatedRawContent,
+              translationState: TRANSLATION_STATE.TRANSLATED
+            },
             previousState.timeline
           )
         }
@@ -453,7 +455,7 @@ export function appContentFactory (WrappedComponent) {
       setState(previousState => {
         return {
           timeline: this.replaceComment(
-            setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
             previousState.timeline
           )
         }

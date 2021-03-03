@@ -226,8 +226,6 @@ export {
 export {
   TRANSLATION_STATE,
   getTranslationApiErrorMessage,
-  setTranslatedRawContent,
-  setTranslationState,
   getDefaultTranslationState
 } from './translation.js'
 

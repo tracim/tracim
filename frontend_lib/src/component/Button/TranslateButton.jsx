@@ -16,7 +16,7 @@ export const TranslateButton = props => {
   if (props.translationState === TRANSLATION_STATE.PENDING) {
     return (
       <span className={className}>
-        <i className='fa fa-spinner fa-spin' /> {props.t('Translation pending…')}
+        <i className='fas fa-spinner fa-spin' /> {props.t('Translation pending…')}
       </span>
     )
   }
