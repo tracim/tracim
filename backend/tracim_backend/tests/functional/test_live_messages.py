@@ -162,7 +162,6 @@ class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):
-
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
             "http://localhost:7999/api/users/1/live_messages",
@@ -194,6 +193,37 @@ class TestLiveMessages(object):
         assert result["fields"]["author"]
         assert result["fields"]["author"]["user_id"] == 1
         assert event1.event == "message"
+
+    @pytest.mark.pushpin
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__check_email_leaked(
+        self, pushpin, app_config
+    ):
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7999/api/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+        client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
+        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+        update_user_request = requests.put(
+            "http://localhost:7999/api/users/1",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            json=params,
+        )
+        assert update_user_request.status_code == 200
+        event1 = next(client_events)
+        response.close()
+        result = json.loads(event1.data)
+        # verify no email are leaked
+        assert not result["fields"]["user"].get("email")
+        assert not result["fields"]["author"].get("email")
+        assert str(result).find("@") == -1
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize(

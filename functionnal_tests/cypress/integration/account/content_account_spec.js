@@ -4,6 +4,7 @@ import baseUser from '../../fixtures/baseUser.json'
 
 describe('Account page', () => {
   beforeEach(() => {
+    cy.cancelXHR()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')

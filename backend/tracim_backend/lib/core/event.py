@@ -68,7 +68,7 @@ from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
@@ -79,7 +79,7 @@ JsonDict = Dict[str, Any]
 class EventApi:
     """Api to query event & messages"""
 
-    user_schema = UserSchema()
+    user_schema = UserDigestSchema()
     workspace_schema = WorkspaceSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),

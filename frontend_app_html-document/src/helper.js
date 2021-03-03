@@ -14,3 +14,10 @@ export const initWysiwyg = (
     globalThis.wysiwyg('#wysiwygNewVersion', lang, handlerNewVersion, handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange)
   }
 }
+
+export const TRANSLATION_STATE = {
+  DISABLED: 'disabled',
+  UNTRANSLATED: 'untranslated',
+  PENDING: 'pending',
+  TRANSLATED: 'translated'
+}
