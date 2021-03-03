@@ -7,7 +7,7 @@ const fileDescription = 'newDescription'
 
 let workspaceId, contentId
 
-describe('In Html Document', () => {
+describe('In File', () => {
   describe('when the user makes a change', () => {
     before(function () {
       cy.resetDB()

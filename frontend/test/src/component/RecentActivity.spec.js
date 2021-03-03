@@ -38,14 +38,8 @@ describe('<RecentActivity />', () => {
 
   describe('static design', () => {
     it(`should display ${props.recentActivityList.length} activity items`, () =>
-      expect(wrapper.find('div.FilenameWithExtension').length).to.equal(props.recentActivityList.length)
+      expect(wrapper.find('.recentactivity__list__item').length).to.equal(props.recentActivityList.length)
     )
-
-    it('should display the label of each recent activity', () => {
-      for (let i = 0; i < props.recentActivityList.length; i++) {
-        expect(wrapper.find('div.FilenameWithExtension').at(i)).to.text().contains(props.recentActivityList[i].label)
-      }
-    })
 
     it('should use a link if the logged User is a contentManager', () => {
       wrapper.setProps({ roleIdForLoggedUser: ROLE.contentManager.id })

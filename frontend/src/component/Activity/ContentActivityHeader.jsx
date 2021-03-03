@@ -21,9 +21,9 @@ export class ContentActivityHeader extends React.Component {
   getDisplayOperation (message) {
     const { props } = this
 
-    if (message.fields.content.current_revision_type === 'status-update') props.t('status modified')
+    if (message.fields.content.current_revision_type === 'status-update') return props.t('status modified')
     const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
-    if (TLM_ET.MENTION === entityType) props.t('mention made')
+    if (TLM_ET.MENTION === entityType) return props.t('mention made')
     if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
 
     switch (coreEventType) {
