@@ -4,12 +4,13 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Icon } from 'tracim_frontend_lib'
 import DateFilter from '../component/Search/DateFilter.jsx'
+import UserFacets from '../component/Search/UserFacets.jsx'
 import ContentFacets from '../component/Search/ContentFacets.jsx'
+import SpaceFacets from '../component/Search/SpaceFacets.jsx'
 import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
-  DATE_FILTER_ELEMENT,
-  SEARCH_FIELD_LIST
+  DATE_FILTER_ELEMENT
 } from '../util/helper.js'
 
 export class SearchFilterMenu extends React.Component {
@@ -17,6 +18,13 @@ export class SearchFilterMenu extends React.Component {
     super(props)
     this.state = {
       showSearchFieldList: true,
+      newestAuthoredContentRange: {
+        showFilter: true,
+        afterDateActive: false,
+        afterDate: '',
+        beforeDateActive: false,
+        beforeDate: ''
+      },
       createdRange: {
         showFilter: true,
         afterDateActive: false,
@@ -63,6 +71,45 @@ export class SearchFilterMenu extends React.Component {
     }))
   }
 
+  handleChangeNewestAuthoredContentDate = (date, type) => {
+    const { props } = this
+    if (type === DATE_FILTER_ELEMENT.AFTER) {
+      this.setState(prev => ({
+        newestAuthoredContentRange: {
+          ...prev.newestAuthoredContentRange,
+          afterDateActive: true,
+          afterDate: date
+        }
+      }))
+      props.onChangeNewestAuthoredContentDate({ from: date })
+    } else {
+      this.setState(prev => ({
+        newestAuthoredContentRange: {
+          ...prev.newestAuthoredContentRange,
+          beforeDateActive: true,
+          beforeDate: date
+        }
+      }))
+      props.onChangeNewestAuthoredContentDate({ to: date })
+    }
+  }
+
+  handleCheckboxNewestAuthoredContentDate = (type) => {
+    const { state } = this
+    this.handleChangeNewestAuthoredContentDate(
+      state.newestAuthoredContentRange[`${type}DateActive`]
+        ? ''
+        : state.newestAuthoredContentRange[`${type}Date`],
+      type
+    )
+    this.setState(prev => ({
+      newestAuthoredContentRange: {
+        ...prev.newestAuthoredContentRange,
+        [`${type}DateActive`]: !prev.newestAuthoredContentRange[`${type}DateActive`]
+      }
+    }))
+  }
+
   handleChangeCreatedDate = (date, type) => {
     const { props } = this
     if (type === DATE_FILTER_ELEMENT.AFTER) {
@@ -91,6 +138,15 @@ export class SearchFilterMenu extends React.Component {
       modifiedRange: {
         ...prev.modifiedRange,
         showFilter: !prev.modifiedRange.showFilter
+      }
+    }))
+  }
+
+  handleOpenOrCloseNewestAuthoredContentRange = () => {
+    this.setState(prev => ({
+      newestAuthoredContentRange: {
+        ...prev.newestAuthoredContentRange,
+        showFilter: !prev.newestAuthoredContentRange.showFilter
       }
     }))
   }
@@ -136,19 +192,32 @@ export class SearchFilterMenu extends React.Component {
 
   render () {
     const { props, state } = this
-    let currentSearch
-    if (props.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-    /*
-      if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-        currentSearch = props.userSearch
-      }
 
-      if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-        currentSearch = props.spaceSearch
-      }
-    */
+    const USER_FIELD_LIST = [
+      { id: 'public_name', value: props.t('Full name') },
+      { id: 'username', value: props.t('Username') },
+      { id: 'custom_properties', value: props.t('Profile') }
+    ]
+
+    const CONTENT_FIELD_LIST = [
+      { id: 'label', value: props.t('Title') },
+      { id: 'raw_content', value: props.t('Content') },
+      { id: 'comments', value: props.t('Comments') },
+      { id: 'description', value: props.t('Description') }
+    ]
+
+    const SPACE_FIELD_LIST = [
+      { id: 'label', value: props.t('Name') },
+      { id: 'description', value: props.t('Description') }
+    ]
+
+    const SEARCH_FIELDS = {
+      user: USER_FIELD_LIST,
+      content: CONTENT_FIELD_LIST,
+      workspace: SPACE_FIELD_LIST
+    }
+
+    const currentSearch = props.currentSearch
 
     return (
       <div className='searchFilterMenu'>
@@ -171,12 +240,12 @@ export class SearchFilterMenu extends React.Component {
 
         <div className='searchFilterMenu__content'>
           <CheckboxFilter
-            appliedFilterList={SEARCH_FIELD_LIST.filter(field => (
-              currentSearch.appliedFilters.searchField && currentSearch.appliedFilters.searchField.includes(field.slug)
+            appliedFilterList={SEARCH_FIELDS[props.searchType].filter(field => (
+              currentSearch.appliedFilters.searchField && currentSearch.appliedFilters.searchField.includes(field.id)
             ))}
-            filterList={SEARCH_FIELD_LIST}
+            filterList={SEARCH_FIELDS[props.searchType]}
             label={props.t('Only search in')}
-            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELD_LIST.find(field => field.value === value))}
+            onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELDS[props.searchType].find(field => field.id === value))}
             onClickOpenOrCloseFilter={this.handleOpenOrCloseSearchFields}
             showFilter={state.showSearchFieldList}
           />
@@ -248,8 +317,59 @@ export class SearchFilterMenu extends React.Component {
               )}
             </>
           )}
+
+          {currentSearch.newestAuthoredContentRange && Object.keys(currentSearch.newestAuthoredContentRange).length > 0 && (
+            <>
+              <div className='searchFilterMenu__content__item__title'>
+                <button
+                  className='transparentButton'
+                  onClick={this.handleOpenOrCloseNewestAuthoredContentRange}
+                >
+                  <Icon
+                    icon={state.newestAuthoredContentRange.showFilter
+                      ? 'fa-fw fas fa-caret-down'
+                      : 'fa-fw fas fa-caret-right'}
+                    title={state.newestAuthoredContentRange.showFilter
+                      ? props.t('Hide {{filter}}', { filter: props.t('Last Intervention') })
+                      : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}
+                  />
+                </button>
+                {props.t('Last Intervention')}
+              </div>
+              {state.newestAuthoredContentRange.showFilter && currentSearch.newestAuthoredContentRange && (
+                <DateFilter
+                  id='intervention'
+                  from={currentSearch.newestAuthoredContentRange.from}
+                  to={currentSearch.newestAuthoredContentRange.to}
+                  onChangeDate={this.handleChangeNewestAuthoredContentDate}
+                  onClickDateCheckbox={this.handleCheckboxNewestAuthoredContentDate}
+                  isAfterCheckboxChecked={state.newestAuthoredContentRange.afterDateActive}
+                  isBeforeCheckboxChecked={state.newestAuthoredContentRange.beforeDateActive}
+                  afterDate={state.newestAuthoredContentRange.afterDate}
+                  beforeDate={state.newestAuthoredContentRange.beforeDate}
+                />
+              )}
+            </>
+          )}
+
+          {props.searchType === ADVANCED_SEARCH_TYPE.USER && currentSearch.searchFacets && (
+            <UserFacets
+              searchFacets={currentSearch.searchFacets}
+              onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
+              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+            />
+          )}
+
           {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && currentSearch.searchFacets && (
             <ContentFacets
+              searchFacets={currentSearch.searchFacets}
+              onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
+              appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+            />
+          )}
+
+          {props.searchType === ADVANCED_SEARCH_TYPE.SPACE && currentSearch.searchFacets && (
+            <SpaceFacets
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
               appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
@@ -266,14 +386,17 @@ export default connect(mapStateToProps)(translate()(SearchFilterMenu))
 
 SearchFilterMenu.propTypes = {
   onClickCloseSearchFilterMenu: PropTypes.func.isRequired,
+  currentSearch: PropTypes.object.isRequired,
   searchType: PropTypes.string.isRequired,
   onChangeCreatedDate: PropTypes.func,
+  onChangeNewestAuthoredContentDate: PropTypes.func,
   onChangeModifiedDate: PropTypes.func,
   onClickSearchField: PropTypes.func
 }
 
 SearchFilterMenu.defaultProps = {
   onClickSearchField: () => { },
+  onChangeNewestAuthoredContentDate: () => { },
   onChangeCreatedDate: () => { },
   onChangeModifiedDate: () => { }
 }

@@ -1,6 +1,7 @@
 import {
   APPEND,
   APPLIED_FILTER,
+  NEWEST_AUTHORED_CONTENT_RANGE,
   CREATED_RANGE,
   MODIFIED_RANGE,
   REMOVE,
@@ -63,6 +64,7 @@ export const serializeSearchItemProps = {
 const defaultResult = {
   appliedFilters: {},
   createdRange: {},
+  newestAuthoredContentRange: {},
   currentPage: 1,
   dateRangeFacets: {},
   modifiedRange: {},
@@ -132,6 +134,9 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
 
     case `${SET}/${SEARCH_FACETS(searchType)}`:
       return { ...state, searchFacets: action.searchFacets }
+
+    case `${SET}/${NEWEST_AUTHORED_CONTENT_RANGE(searchType)}`:
+      return { ...state, newestAuthoredContentRange: action.newestAuthoredContentRange }
 
     case `${SET}/${CREATED_RANGE(searchType)}`:
       return { ...state, createdRange: action.createdRange }

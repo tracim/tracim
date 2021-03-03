@@ -352,6 +352,12 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
         missing=None,
         description="if given only workspace having members in the list will be searched",
     )
+    owner_ids = StringList(
+        marshmallow.fields.Int(),
+        required=False,
+        missing=None,
+        description="If the workspace has been owned by some users",
+    )
     search_fields = StringList(
         EnumField(WorkspaceSearchField),
         required=False,
@@ -386,6 +392,7 @@ class UserFacetSchema(marshmallow.Schema):
 
 class WorkspaceSearchFacets(marshmallow.Schema):
     members = marshmallow.fields.List(marshmallow.fields.Nested(UserFacetSchema()))
+    owners = marshmallow.fields.List(marshmallow.fields.Nested(UserFacetSchema()))
 
 
 class WorkspaceSearchResultSchema(marshmallow.Schema):

@@ -658,7 +658,7 @@ class ESSearchApi(SearchApi):
             "username.{}^5".format(EXACT_FIELD),
             "public_name^3",
             "username^3",
-            "custom_properties",
+            "custom_properties.*",
         ]
 
         search_fields = search_fields or DEFAULT_USER_SEARCH_FIELDS
@@ -725,6 +725,7 @@ class ESSearchApi(SearchApi):
             typing.List[WorkspaceSearchField]
         ] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
         member_ids: typing.Optional[typing.List[int]] = None,
+        owner_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
         page_nb: int = 1,
         size: int = 10,
@@ -748,11 +749,14 @@ class ESSearchApi(SearchApi):
         search = search.filter("terms", workspace_id=known_workspace_ids)
         if member_ids:
             search = search.filter("terms", member_ids=member_ids)
+        if owner_ids:
+            search = search.filter("terms", owner_id=owner_ids)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
         if page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
         search.aggs.bucket("member_ids", "terms", field="member_ids")
+        search.aggs.bucket("owner_ids", "terms", field="owner_id")
         response = search.execute()
         known_users = UserApi(
             current_user=None, session=self._session, config=self._config
@@ -760,7 +764,10 @@ class ESSearchApi(SearchApi):
         facets = {
             "members": self._create_filtered_facets(
                 "user_id", response.aggregations.member_ids.buckets, known_users
-            )
+            ),
+            "owners": self._create_filtered_facets(
+                "user_id", response.aggregations.owner_ids.buckets, known_users
+            ),
         }
 
         return WorkspaceSearchResponse(response["hits"], facets)

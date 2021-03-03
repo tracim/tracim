@@ -38,21 +38,24 @@ export const ADVANCED_SEARCH_TYPE = {
 
 export const ADVANCED_SEARCH_FILTER = {
   SEARCH_FIELD: 'searchField',
+  NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
   CREATED_RANGE: 'createdRange',
   MODIFIED_RANGE: 'modifiedRange',
   SEARCH_FACETS: 'searchFacets'
 }
 
-export const SEARCH_FIELD_LIST = [
-  { slug: 'label', value: i18n.t('Title') },
-  { slug: 'raw_content', value: i18n.t('Content') },
-  { slug: 'comments', value: i18n.t('Comments') },
-  { slug: 'description', value: i18n.t('Description') }
-]
-
 export const DATE_FILTER_ELEMENT = {
   AFTER: 'after',
   BEFORE: 'before'
+}
+
+// INFO - G.B. - 2021-03-01 - All the translations in the object below has as their only purpose
+// to be able to generate translation keys through i18n.scanner
+
+export const SEARCH_USER_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  }
 }
 
 export const SEARCH_CONTENT_FACETS = {
@@ -82,6 +85,15 @@ export const SEARCH_CONTENT_FACETS = {
   },
   AUTHOR: {
     slug: 'author__public_names'
+  }
+}
+
+export const SEARCH_SPACE_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  },
+  AUTHOR: {
+    slug: 'owners'
   }
 }
 

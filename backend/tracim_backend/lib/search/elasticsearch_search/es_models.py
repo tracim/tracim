@@ -1,10 +1,10 @@
 import typing
 
+# from elasticsearch_dsl import Float
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Document
 from elasticsearch_dsl import Field
-from elasticsearch_dsl import Float
 from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Integer
 from elasticsearch_dsl import Keyword
@@ -165,17 +165,28 @@ class IndexedContent(Document):
 
 # Mappings from (type, format) -> ES field type.
 # format is currently only used for "string".
+
+# NOTE - 2021-03-02 - RJ
+# Everything is handled as text instead of using Boolean(), Float() and Date() fields.
+# A string search in the user's custom properties otherwise fails
+# on a date field with the following error:
+# RequestError(400, 'search_phase_execution_exception', 'failed to parse date field [Hello] with format
+# [strict_date_optional_time||epoch_millis]: [failed to parse date field [Hello] with format
+# [strict_date_optional_time||epoch_millis]]')
+# (with Hello being the search string)
+
 JSON_SCHEMA_TYPE_MAPPINGS = {
-    ("boolean", None): Boolean(),
+    ("boolean", None): SimpleText(),
     ("object", None): Object(),
-    ("number", None): Float(),
-    ("string", "date"): Date(),
-    ("string", "date-time"): Date(),
+    ("number", None): SimpleText(),
+    ("string", "date"): SimpleText(),
+    ("string", "date-time"): SimpleText(),
     ("string", "html"): HtmlText(),
     # default string field type
     ("string", None): SimpleText(),
+    ("null", None): SimpleText(),
     # default field type
-    (None, None): Field(),
+    (None, None): SimpleText(),
 }
 
 JsonSchemaDict = typing.Dict[str, typing.Any]

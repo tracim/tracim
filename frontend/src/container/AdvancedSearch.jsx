@@ -20,6 +20,7 @@ import {
   setAppliedFilter,
   setBreadcrumbs,
   setCreatedRange,
+  setNewestAuthoredContentRange,
   setSearchContentBreadcrumbs,
   setCurrentNumberPage,
   setHeadTitle,
@@ -143,7 +144,7 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
     const { props } = this
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
@@ -162,9 +163,10 @@ export class AdvancedSearch extends React.Component {
       searchObject.showActive,
       searchObject.searchType,
       searchFieldList,
-      appliedFilters ? appliedFilters.createdRange : {},
-      appliedFilters ? appliedFilters.modifiedRange : {},
-      appliedFilters ? appliedFilters.searchFacets : {}
+      appliedFilters.createdRange || {},
+      appliedFilters.modifiedRange || {},
+      appliedFilters.newestAuthoredContentRange || {},
+      appliedFilters.searchFacets || {}
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -185,6 +187,7 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(setSearchString(searchObject.searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
+        props.dispatch(setNewestAuthoredContentRange(fetchGetAdvancedSearchResult.json.newest_authored_content_date_range, searchObject.searchType))
         props.dispatch(setCreatedRange(fetchGetAdvancedSearchResult.json.created_range, searchObject.searchType))
         props.dispatch(setModifiedRange(fetchGetAdvancedSearchResult.json.modified_range, searchObject.searchType))
         props.dispatch(setSearchFacets(fetchGetAdvancedSearchResult.json.facets, searchObject.searchType))
@@ -209,9 +212,9 @@ export class AdvancedSearch extends React.Component {
 
     const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
 
-    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.slug)
-      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.slug)
-      : [...oldAppliedSearchFieldList, field.slug]
+    const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.id)
+      ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.id)
+      : [...oldAppliedSearchFieldList, field.id]
 
     props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FIELD, newAppliedSearchFieldList, state.searchType))
 
@@ -219,9 +222,20 @@ export class AdvancedSearch extends React.Component {
       { ...currentSearch, searchType: state.searchType },
       currentSearch.resultList.length,
       newAppliedSearchFieldList,
+      currentSearch.appliedFilters.newestAuthoredContentRange,
       currentSearch.appliedFilters.createdRange,
       currentSearch.appliedFilters.modifiedRange,
       currentSearch.appliedFilters.searchFacets
+    )
+  }
+
+  handleChangeNewestAuthoredContentDate = (dateObject) => {
+    const currentSearch = this.getCurrentSearchObject()
+
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.NEWEST_AUTHORED_CONTENT_RANGE,
+      currentSearch.appliedFilters.newestAuthoredContentRange,
+      dateObject
     )
   }
 
@@ -247,7 +261,6 @@ export class AdvancedSearch extends React.Component {
 
   handleChangeSearchFacets = (facetObject) => {
     const currentSearch = this.getCurrentSearchObject()
-
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
       currentSearch.appliedFilters.searchFacets,
@@ -259,15 +272,18 @@ export class AdvancedSearch extends React.Component {
     const { props, state } = this
     const currentSearch = this.getCurrentSearchObject()
 
-    let newAppliedFilter = {}
+    let newAppliedFilter = oldAppliedFilter ? { ...oldAppliedFilter } : filterObject
     const filterKey = Object.keys(filterObject)[0]
 
     if (oldAppliedFilter) {
       if (Object.keys(oldAppliedFilter).includes(filterKey)) {
-        newAppliedFilter = { ...oldAppliedFilter }
-        delete newAppliedFilter[filterKey]
-      } else newAppliedFilter = { ...oldAppliedFilter, ...filterObject }
-    } else newAppliedFilter = filterObject
+        if (Array.isArray(newAppliedFilter[filterKey])) {
+          if (newAppliedFilter[filterKey].find(filter => filter === filterObject[filterKey][0])) {
+            newAppliedFilter[filterKey] = newAppliedFilter[filterKey].filter(filter => filter !== filterObject[filterKey][0])
+          } else newAppliedFilter[filterKey] = newAppliedFilter[filterKey].concat(filterObject[filterKey])
+        } else delete newAppliedFilter[filterKey]
+      } else newAppliedFilter = { ...newAppliedFilter, ...filterObject }
+    }
 
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
 
@@ -402,8 +418,8 @@ export class AdvancedSearch extends React.Component {
           <PageWrapper customClass='advancedSearch__wrapper'>
             <PageTitle
               title={(currentNumberSearchResults === 1
-                ? props.t('Result for "{{keywords}}"', { keywords: props.contentSearch.searchString })
-                : props.t('Results for "{{keywords}}"', { keywords: props.contentSearch.searchString })
+                ? props.t('Result for "{{keywords}}"', { keywords: currentSearch.searchString })
+                : props.t('Results for "{{keywords}}"', { keywords: currentSearch.searchString })
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
@@ -445,7 +461,7 @@ export class AdvancedSearch extends React.Component {
                 </div>
                 <SearchInput
                   onClickSearch={this.handleClickSearch}
-                  searchString={props.contentSearch.searchString}
+                  searchString={currentSearch.searchString}
                 />
               </div>
 
@@ -453,7 +469,9 @@ export class AdvancedSearch extends React.Component {
                 <div className='advancedSearch__content'>
                   {currentNumberSearchResults > 0 && (
                     <div className='advancedSearch__content__detail'>
-                      {this.getDisplayDetail()}
+                      <div className='advancedSearch__content__detail__count'>
+                        {this.getDisplayDetail()}
+                      </div>
 
                       {!state.isFilterMenuOpen && (
                         <IconButton
@@ -469,7 +487,7 @@ export class AdvancedSearch extends React.Component {
 
                   {currentNumberSearchResults === 0 && (
                     <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms')}: "${props.contentSearch.searchString}"`}
+                      {`${props.t('No results for the search terms')}: "${currentSearch.searchString}"`}
                     </div>
                   )}
 
@@ -504,7 +522,7 @@ export class AdvancedSearch extends React.Component {
                           text={props.t('See more')}
                         />
                       )
-                      : currentNumberSearchResults > props.contentSearch.numberResultsByPage &&
+                      : currentNumberSearchResults > currentSearch.numberResultsByPage &&
                       props.t('No more results')
                     )}
                   </div>
@@ -512,8 +530,10 @@ export class AdvancedSearch extends React.Component {
                 {state.isFilterMenuOpen && (
                   <SearchFilterMenu
                     onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
+                    currentSearch={currentSearch}
                     searchType={state.searchType}
                     onClickSearchField={this.handleChangeSearchFieldList}
+                    onChangeNewestAuthoredContentDate={this.handleChangeNewestAuthoredContentDate}
                     onChangeCreatedDate={this.handleChangeCreatedRange}
                     onChangeModifiedDate={this.handleChangeModifiedRange}
                     onChangeSearchFacets={this.handleChangeSearchFacets}

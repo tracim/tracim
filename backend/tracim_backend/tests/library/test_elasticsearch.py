@@ -366,7 +366,7 @@ class TestUtils:
             ),
             (
                 {"type": "object", "properties": {"foo": {"type": "number"}}},
-                es_dsl.Object(properties={"foo": es_dsl.field.Float()}),
+                es_dsl.Object(properties={"foo": SimpleText()}),
             ),
             (
                 {"type": "object", "properties": {"foo": {"type": "string", "format": "html"}}},
