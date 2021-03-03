@@ -520,7 +520,6 @@ class TestElasticSearch(object):
     @pytest.mark.parametrize(
         "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
-            # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
             (
                 "",

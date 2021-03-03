@@ -41,6 +41,6 @@
     "date": {
       "type": "string"
     },
-    "fields": { "$ref": "#/definitions/subfield"}
+    "fields": { "$ref": "#/definitions/subfield" }
   }
 }
