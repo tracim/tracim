@@ -502,7 +502,7 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision',
+      timelineType: TIMELINE_TYPE.REVISION,
       hasBeenRead: isTokenClient
     }
   ]

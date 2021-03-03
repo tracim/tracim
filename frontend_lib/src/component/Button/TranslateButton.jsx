@@ -47,14 +47,15 @@ export const TranslateButton = props => {
 }
 
 TranslateButton.propTypes = {
+  onClickTranslate: PropTypes.func.isRequired,
+  onClickRestore: PropTypes.func.isRequired,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  onClickTranslate: PropTypes.func,
-  onClickRestore: PropTypes.func,
   customClass: PropTypes.string,
   dataCy: PropTypes.string
 }
 
-TranslateButton.defaultPropTypes = {
+TranslateButton.defaultProps = {
+  translationState: TRANSLATION_STATE.DISABLED,
   customClass: '',
   dataCy: ''
 }

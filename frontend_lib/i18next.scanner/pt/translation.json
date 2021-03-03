@@ -132,5 +132,11 @@
   "Error while uploading file(s)": "Erro ao carregar o(s) ficheiro(s)",
   "Please wait until the upload ends": "Por favor aguarde até que o carregamento termine",
   "Avatar of {{publicName}}": "Avatar de {{publicName}}",
-  "Close": "Fechar"
+  "Close": "Fechar",
+  "Restore the original language": "Restaurar a língua original",
+  "Show translation": "Visualizar tradução",
+  "Translation pending…": "Tradução pendente...",
+  "Translation is not available": "A tradução não está disponível",
+  "Unknown error": "Erro desconhecido",
+  "Error while translating the document: {{details}}": "Erro ao traduzir o documento: {{details}}"
 }

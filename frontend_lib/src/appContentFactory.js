@@ -6,7 +6,8 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate
+  sortTimelineByDate,
+  TIMELINE_TYPE
 } from './helper.js'
 
 import {
@@ -351,7 +352,7 @@ export function appContentFactory (WrappedComponent) {
     buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED) => {
       const timelineCommentList = commentList.map(c => ({
         ...c,
-        timelineType: 'comment',
+        timelineType: TIMELINE_TYPE.COMMENT,
         created_raw: c.created,
         created: displayDistanceDate(c.created, loggedUser.lang),
         raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username),
@@ -364,9 +365,9 @@ export function appContentFactory (WrappedComponent) {
           ...revision,
           created_raw: revision.created,
           created: displayDistanceDate(revision.created, loggedUser.lang),
-          timelineType: 'revision',
-          commentList: revision.comment_ids.map(ci => (
-            timelineCommentList.find(c => c.content_id === ci)
+          timelineType: TIMELINE_TYPE.REVISION,
+          commentList: revision.comment_ids.map(commentId => (
+            timelineCommentList.find(comment => comment.content_id === commentId)
           )),
           number: i + 1,
           hasBeenRead: true
@@ -376,7 +377,7 @@ export function appContentFactory (WrappedComponent) {
 
     replaceComment = (comment, timeline) => {
       return timeline.map(
-        item => item.timelineType === 'comment' && item.content_id === comment.content_id ? comment : item
+        item => item.timelineType === TIMELINE_TYPE.COMMENT && item.content_id === comment.content_id ? comment : item
       )
     }
 
