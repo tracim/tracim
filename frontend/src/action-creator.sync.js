@@ -184,6 +184,8 @@ export const setSearchContentBreadcrumbs = (contentBreadcrumbsList, contentId, s
   contentBreadcrumbsList,
   contentId
 })
+export const NEWEST_AUTHORED_CONTENT_RANGE = (searchType) => `NewestAuthoredContentRange_${searchType}`
+export const setNewestAuthoredContentRange = (newestAuthoredContentRange, searchType) => ({ type: `${SET}/${NEWEST_AUTHORED_CONTENT_RANGE(searchType)}`, newestAuthoredContentRange })
 export const CREATED_RANGE = (searchType) => `CreatedRange_${searchType}`
 export const setCreatedRange = (createdRange, searchType) => ({ type: `${SET}/${CREATED_RANGE(searchType)}`, createdRange })
 export const MODIFIED_RANGE = (searchType) => `ModifiedRange_${searchType}`

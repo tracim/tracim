@@ -49,6 +49,12 @@ export const AdvancedSearchContentList = props => {
     }
   })
 
+  const numberCommentsTitle = (numberComments) => {
+    if (numberComments === 0) return props.t('0 comments')
+    if (numberComments === 1) return props.t('{{numberComments}} comment', { numberComments: numberComments })
+    else return props.t('{{numberComments}} comments', { numberComments: numberComments })
+  }
+
   return (
     <div className='advancedSearchContent'>
       {resultList.length > 0 && (
@@ -128,10 +134,10 @@ export const AdvancedSearchContentList = props => {
                       <span className='advancedSearchContent__information__comments'>
                         <Icon
                           icon='fa-fw far fa-comment'
-                          title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                          title={numberCommentsTitle(searchItem.commentCount)}
                         />
                         <span
-                          title={props.t('{{numberComments}} comments', { numberComments: searchItem.commentCount })}
+                          title={numberCommentsTitle(searchItem.commentCount)}
                         >
                           {searchItem.commentCount}
                         </span>

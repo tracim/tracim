@@ -3,36 +3,6 @@
   "title": "Test",
   "description": "just some test data",
   "type": "object",
-  "definitions": {
-    "subfield": {
-      "title": "sub fields",
-      "description": "some parameters",
-      "type": "object",
-      "properties": {
-        "subfield1": { "type": "string" },
-        "subfield2": { "type": "integer" },
-        "subfield3": { "type": "boolean" },
-        "subfield4": { "type": "null" },
-        "subfield5": {"type": "array",
-          "items": {
-            "type": "string",
-            "enumNames":
-              [
-                "First",
-                "Second",
-                "Third"
-              ],
-            "enum": [
-              "first",
-              "second",
-              "third"
-            ]
-          }
-        }
-
-      }
-    }
-  },
   "properties": {
     "property1": {
       "type": "string",
@@ -41,6 +11,31 @@
     "date": {
       "type": "string"
     },
-    "fields": { "$ref": "#/definitions/subfield"}
+    "fields": {
+      "type": "object",
+      "properties": {
+        "subfield1": { "type": "string" },
+        "subfield2": { "type": "number" },
+        "subfield3": { "type": "boolean" },
+        "subfield4": { "type": "null" },
+        "subfield5": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enumNames": [
+              "First",
+              "Second",
+              "Third"
+            ],
+            "enum": [
+                "first",
+                "second",
+                "third"
+            ]
+          }
+        },
+        "subfieldhtml": { "type": "string", "format": "html" }
+      }
+    }
   }
 }

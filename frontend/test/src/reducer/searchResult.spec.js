@@ -7,6 +7,7 @@ import {
   CREATED_RANGE,
   deleteWorkspaceContentList,
   MODIFIED_RANGE,
+  NEWEST_AUTHORED_CONTENT_RANGE,
   REMOVE,
   RESET,
   resetAppliedFilter,
@@ -20,6 +21,7 @@ import {
   setCreatedRange,
   setCurrentNumberPage,
   setModifiedRange,
+  setNewestAuthoredContentRange,
   setNumberResultsByPage,
   setSearchFacets,
   setSearchString,
@@ -38,6 +40,7 @@ describe('reducer searchResult.js', () => {
   describe('actions', () => {
     const initialState = {
       appliedFilters: {},
+      newestAuthoredContentRange: {},
       createdRange: {},
       currentPage: 1,
       dateRangeFacets: {},
@@ -142,6 +145,13 @@ describe('reducer searchResult.js', () => {
       const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setSearchFacets({ facet: 'value' }, SEARCH_TYPE.SIMPLE))
       it('should return a content object with the searchFacets property set as given object', () => {
         expect(rez).to.deep.equal({ ...initialState, searchFacets: { facet: 'value' } })
+      })
+    })
+
+    describe(`${SET}/${NEWEST_AUTHORED_CONTENT_RANGE(SEARCH_TYPE.SIMPLE)}`, () => {
+      const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setNewestAuthoredContentRange({ from: 'date' }, SEARCH_TYPE.SIMPLE))
+      it('should return a content object with the newestAuthoredContentRange property set as given object', () => {
+        expect(rez).to.deep.equal({ ...initialState, newestAuthoredContentRange: { from: 'date' } })
       })
     })
 

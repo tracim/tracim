@@ -24,10 +24,10 @@ describe('<ContentFacets />', () => {
         wrapper.instance().handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.TYPE.slug)
         expect(wrapper.state('showContentTypeList')).to.equal(true)
       })
-      it(`should update showFileExtentionList state if ${SEARCH_CONTENT_FACETS.EXTENSION.slug}`, () => {
-        wrapper.setState({ showFileExtentionList: false })
+      it(`should update showFileExtensionList state if ${SEARCH_CONTENT_FACETS.EXTENSION.slug}`, () => {
+        wrapper.setState({ showFileExtensionList: false })
         wrapper.instance().handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.EXTENSION.slug)
-        expect(wrapper.state('showFileExtentionList')).to.equal(true)
+        expect(wrapper.state('showFileExtensionList')).to.equal(true)
       })
       it(`should update showAuthorList state if ${SEARCH_CONTENT_FACETS.AUTHOR.slug}`, () => {
         wrapper.setState({ showAuthorList: false })

@@ -20,6 +20,19 @@ export const AdvancedSearchSpaceList = props => {
       }
     }
   })
+
+  const numberMembersTitle = (numberMembers) => {
+    if (numberMembers === 0) return props.t('0 members')
+    if (numberMembers === 1) return props.t('{{numberMembers}} member', { numberMembers: numberMembers })
+    else return props.t('{{numberMembers}} members', { numberMembers: numberMembers })
+  }
+
+  const numberContentsTitle = (numberContents) => {
+    if (numberContents === 0) return props.t('0 contents')
+    if (numberContents === 1) return props.t('{{numberContents}} content', { numberContents: numberContents })
+    else return props.t('{{numberContents}} contents', { numberContents: numberContents })
+  }
+
   return (
     <div>
       {props.spaceSearch.resultList.length > 0 && (
@@ -75,20 +88,20 @@ export const AdvancedSearchSpaceList = props => {
             <div className='advancedSearchSpace__information'>
               <Icon
                 icon='fa-fw fas fa-th'
-                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
+                title={numberContentsTitle(searchItem.contentCount)}
               />
               <span
-                title={props.t('{{numberContents}} contents', { numberContents: searchItem.contentCount })}
+                title={numberContentsTitle(searchItem.contentCount)}
               >
                 {searchItem.contentCount}
               </span>
 
               <Icon
                 icon='fa-fw far fa-user'
-                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
+                title={numberMembersTitle(searchItem.memberCount)}
               />
               <span
-                title={props.t('{{numberMembers}} members', { numberMembers: searchItem.memberCount })}
+                title={numberMembersTitle(searchItem.memberCount)}
               >
                 {searchItem.memberCount}
               </span>

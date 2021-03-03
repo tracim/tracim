@@ -50,6 +50,7 @@
 
     "personal_page": {
       "type": "string",
+      "format": "html",
       "title": " "
     }
   }

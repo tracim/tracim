@@ -347,7 +347,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
         assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["First", "Second", "Third"],
             "enum": ["first", "second", "third"],
@@ -373,8 +373,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema.get("properties")
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
-        assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["Premier", "Second", "Troisième"],
             "enum": ["first", "second", "third"],

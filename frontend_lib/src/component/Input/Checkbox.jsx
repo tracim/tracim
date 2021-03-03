@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+// INFO - GB - 2021-03-02 - this style is here to override the basic and passed styles for the component
 const style = {
   label: {
     position: 'relative',
@@ -56,7 +57,7 @@ export const Checkbox = props =>
           ...(props.disabled ? style.disabled : {}),
           ...props.styleCheck
         }}
-      >✔
+      >✓
       </div>
     )}
     <input
