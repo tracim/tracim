@@ -89,6 +89,7 @@ export const HtmlDocument = props => {
                 translationState={props.translationState}
                 onClickTranslate={props.onClickTranslateDocument}
                 onClickRestore={props.onClickRestoreDocument}
+                dataCy='htmlDocumentTranslateButton'
               />
               <div className='html-document__contentpage__textnote__top__version'>
                 {props.t(

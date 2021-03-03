@@ -56,6 +56,7 @@ const Comment = props => {
               translationState={props.translationState}
               onClickTranslate={props.onClickTranslate}
               onClickRestore={props.onClickRestore}
+              dataCy='commentTranslateButton'
             />
           </div>
         </div>
