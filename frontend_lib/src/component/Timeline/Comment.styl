@@ -1,12 +1,6 @@
 @import '../../css/Variable.styl'
 
 .comment
-  border-radius 5px
-  padding 15px 15px 15px 20px
-  border 1px solid darkGrey
-  background-color offWhite
-  display flex
-  flex-direction column
   &.sent
     padding-left 5%
     margin-left auto
@@ -14,9 +8,16 @@
     padding-right 5%
     margin-right auto
   &__body
+    border-radius 5px
+    padding 15px 15px 15px 20px
+    border 1px solid darkGrey
+    background-color offWhite
     display flex
+    flex-direction column
     &__content
-      width calc(100% - 44px) // 44px is the avatar size
+      display flex
+      &__text
+        width calc(100% - 44px) // 44px is the avatar size
     &__author
       margin-left 20px
     &__date

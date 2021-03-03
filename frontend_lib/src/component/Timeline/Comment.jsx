@@ -24,39 +24,40 @@ const Comment = props => {
         <div
           className={classnames(`${props.customClass}__body`, 'comment__body')}
         >
-          <Avatar
-            size={AVATAR_SIZE.MEDIUM}
-            user={props.author}
-            apiUrl={props.apiUrl}
-          />
-
           <div className='comment__body__content'>
-            <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-              {props.author.public_name}
-            </div>
+            <Avatar
+              size={AVATAR_SIZE.MEDIUM}
+              user={props.author}
+              apiUrl={props.apiUrl}
+            />
+            <div className='comment__body__content__text'>
+              <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
+                {props.author.public_name}
+              </div>
 
-            <div
-              className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
-              title={props.createdFormated}
-            >
-              {props.createdDistance}
-            </div>
+              <div
+                className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
+                title={props.createdFormated}
+              >
+                {props.createdDistance}
+              </div>
 
-            <div
-              className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
-            >
-              <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
+              <div
+                className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
+              >
+                <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          className={classnames(`${props.customClass}__footer`, 'comment__footer')}
-        >
-          <TranslateButton
-            isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}
-            onClickTranslate={props.onClickTranslate}
-            onClickRestore={props.onClickRestore}
-          />
+          <div
+            className={classnames(`${props.customClass}__footer`, 'comment__footer')}
+          >
+            <TranslateButton
+              translationState={props.translationState}
+              onClickTranslate={props.onClickTranslate}
+              onClickRestore={props.onClickRestore}
+            />
+          </div>
         </div>
       </div>
     </li>
