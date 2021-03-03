@@ -15,6 +15,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -123,7 +124,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == author
+        assert workspace_created.author == UserDigestSchema().dump(author).data
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -174,7 +175,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == author
+        assert workspace_created.author == UserDigestSchema().dump(author).data
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -700,7 +701,7 @@ class TestWorkspaceEndpoint(object):
         (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == author
+        assert workspace_created.author == UserDigestSchema().dump(author).data
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -752,7 +753,7 @@ class TestWorkspaceEndpoint(object):
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == author
+        assert workspace_created.author == UserDigestSchema().dump(author).data
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -1569,6 +1570,7 @@ class TestWorkspaceMembersEndpoint(object):
         Create workspace member role
         :return:
         """
+        user_schema = UserDigestSchema()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # create workspace role
         params = {
@@ -1593,9 +1595,9 @@ class TestWorkspaceMembersEndpoint(object):
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
         assert last_event.workspace == workspace
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == user_schema.dump(author).data
         user = web_testapp.get("/api/users/2", status=200).json_body
-        assert last_event.user == user
+        assert last_event.user == user_schema.dump(user).data
         assert last_event.client_token is None
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
@@ -1914,6 +1916,7 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         uapi = user_api_factory.get()
+        user_schema = UserDigestSchema()
 
         profile = Profile.ADMIN
         admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
@@ -1957,11 +1960,11 @@ class TestWorkspaceMembersEndpoint(object):
         ).json_body
         assert last_event.workspace == workspace_dict
         author = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == user_schema.dump(author).data
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         user = web_testapp.get("/api/users/{}".format(user2.user_id), status=200).json_body
-        assert last_event.user == user
+        assert last_event.user == user_schema.dump(user).data
 
         # after
         res = web_testapp.get(
@@ -2238,14 +2241,15 @@ class TestWorkspaceMembersEndpoint(object):
             "do_notify": False,
         }
 
+        user_schema = UserDigestSchema()
         workspace_dict = web_testapp.get(
             "/api/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == workspace_dict
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == user_schema.dump(author).data
         user_dict = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
-        assert last_event.user == user_dict
+        assert last_event.user == user_schema.dump(user_dict).data
         assert last_event.client_token is None
 
         # after

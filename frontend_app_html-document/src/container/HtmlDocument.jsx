@@ -45,13 +45,14 @@ import {
   putUserConfiguration,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
-import { initWysiwyg } from '../helper.js'
+import { initWysiwyg, TRANSLATION_STATE } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead
+  putHtmlDocRead,
+  getHtmlDocTranslated
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -61,7 +62,9 @@ export class HtmlDocument extends React.Component {
 
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
-
+    const defaultTranslationState = param.config.system.config.translation_service__enabled
+      ? TRANSLATION_STATE.UNTRANSLATED
+      : TRANSLATION_STATE.DISABLED
     this.state = {
       appName: 'html-document',
       isVisible: true,
@@ -90,7 +93,10 @@ export class HtmlDocument extends React.Component {
       invalidMentionList: [],
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      showInvalidMentionPopupInContent: false
+      showInvalidMentionPopupInContent: false,
+      translatedRawContent: null,
+      defaultTranslationState: defaultTranslationState,
+      translationState: TRANSLATION_STATE.DISABLED
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -409,18 +415,22 @@ export class HtmlDocument extends React.Component {
     const hasLocalStorageRawContent = !!localStorageRawContent
 
     const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
-    this.setState({
-      mode: modeToRender,
-      content: {
-        ...resHtmlDocument.body,
-        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
-          ? localStorageRawContent
-          : rawContentBeforeEdit
-      },
-      newComment: localStorageComment || '',
-      rawContentBeforeEdit: rawContentBeforeEdit,
-      timeline: revisionWithComment,
-      isLastTimelineItemCurrentToken: false
+    this.setState(previousState => {
+      return {
+        mode: modeToRender,
+        content: {
+          ...resHtmlDocument.body,
+          raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
+            ? localStorageRawContent
+            : rawContentBeforeEdit
+        },
+        newComment: localStorageComment || '',
+        rawContentBeforeEdit: rawContentBeforeEdit,
+        timeline: revisionWithComment,
+        isLastTimelineItemCurrentToken: false,
+        translationState: previousState.defaultTranslationState,
+        translatedRawContent: null
+      }
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -525,15 +535,19 @@ export class HtmlDocument extends React.Component {
 
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
-        this.setState(prev => ({
-          mode: APP_FEATURE_MODE.VIEW,
-          content: {
-            ...prev.content,
-            raw_content: newDocumentForApiWithMention
-          },
-          oldInvalidMentionList: allInvalidMentionList,
-          showInvalidMentionPopupInContent: false
-        }))
+        this.setState(previousState => {
+          return {
+            mode: APP_FEATURE_MODE.VIEW,
+            content: {
+              ...previousState.content,
+              raw_content: newDocumentForApiWithMention
+            },
+            oldInvalidMentionList: allInvalidMentionList,
+            showInvalidMentionPopupInContent: false,
+            translatedRawContent: null,
+            translationState: previousState.defaultTranslationState
+          }
+        })
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
         )
@@ -651,18 +665,23 @@ export class HtmlDocument extends React.Component {
 
     if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        label: revision.label,
-        raw_content: revision.raw_content,
-        number: revision.number,
-        status: revision.status,
-        is_archived: prev.is_archived, // archived and delete should always be taken from last version
-        is_deleted: prev.is_deleted
-      },
-      mode: APP_FEATURE_MODE.REVISION
-    }))
+    this.setState(previousState => {
+      return {
+        content: {
+          ...previousState.content,
+          label: revision.label,
+          raw_content: revision.raw_content,
+          number: revision.number,
+          status: revision.status,
+          current_revision_id: revision.revision_id,
+          is_archived: previousState.is_archived, // archived and delete should always be taken from last version
+          is_deleted: previousState.is_deleted
+        },
+        translationState: previousState.defaultTranslationState,
+        translatedRawContent: null,
+        mode: APP_FEATURE_MODE.REVISION
+      }
+    })
   }
 
   handleClickLastVersion = () => {
@@ -685,12 +704,16 @@ export class HtmlDocument extends React.Component {
       raw_content: state.rawContentBeforeEdit
     }
 
-    this.setState(prev => ({
-      content: newObjectContent,
-      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
-      mode: APP_FEATURE_MODE.VIEW,
-      showRefreshWarning: false
-    }))
+    this.setState(previousState => {
+      return {
+        content: newObjectContent,
+        timeline: previousState.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
+        mode: APP_FEATURE_MODE.VIEW,
+        showRefreshWarning: false,
+        translatedRawContent: null,
+        translationState: previousState.defaultTranslationState
+      }
+    })
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
   }
@@ -743,10 +766,59 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
+  handleTranslateDocument = async () => {
+    const { props, state } = this
+    this.setState({ translationState: TRANSLATION_STATE.PENDING })
+    const response = await getHtmlDocTranslated(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      state.content.current_revision_id,
+      state.loggedUser.lang
+    )
+    if (!response.ok) {
+      const errors = [
+        { status: 502, message: props.t('Translation is not available') },
+        { status: 504, message: props.t('Translation is not available') }
+      ]
+      const error = errors.find(e => e.status === response.status) || { status: null, message: props.t('Unknown error') }
+      this.sendGlobalFlashMessage(
+        props.t(
+          'Error while translating the document: {{details}}',
+          { details: error.message }
+        )
+      )
+      this.setState(previousState => {
+        return { translationState: previousState.defaultTranslationState }
+      })
+      return
+    }
+    const translatedRawContent = await response.text()
+    this.setState({ translatedRawContent, translationState: TRANSLATION_STATE.TRANSLATED })
+  }
+
+  handleRestoreDocument = () => {
+    this.setState(previousState => {
+      return { translationState: previousState.defaultTranslationState }
+    })
+  }
+
   render () {
     const { props, state } = this
 
     if (!state.isVisible) return null
+
+    const displayTranslatedText = (
+      state.mode !== APP_FEATURE_MODE.EDIT &&
+        state.translationState === TRANSLATION_STATE.TRANSLATED
+    )
+    const HANDLE_TOGGLE_TRANSLATION = {
+      [TRANSLATION_STATE.UNTRANSLATED]: this.handleTranslateDocument,
+      [TRANSLATION_STATE.TRANSLATED]: this.handleRestoreDocument,
+      [TRANSLATION_STATE.PENDING]: null,
+      [TRANSLATION_STATE.DISABLED]: null
+    }
+    const handleToggleTranslation = HANDLE_TOGGLE_TRANSLATION[state.translationState]
 
     return (
       <PopinFixed
@@ -842,14 +914,14 @@ export class HtmlDocument extends React.Component {
             onClickValidateBtn={this.handleClickSaveDocument}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            text={state.content.raw_content}
+            text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
-            onClickRestoreArchived={this.handleClickRestoreArchive}
+            // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
@@ -865,6 +937,8 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
+            onClickToggleTranslation={handleToggleTranslation}
+            translationState={state.translationState}
           />
 
           <PopinFixedRightPart
