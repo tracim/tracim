@@ -36,3 +36,9 @@ export const setTranslationState = (object, translationState) => {
     translationState
   }
 }
+
+export const getDefaultTranslationState = (config) => {
+  return config.translation_service__enabled
+    ? TRANSLATION_STATE.UNTRANSLATED
+    : TRANSLATION_STATE.DISABLED
+}

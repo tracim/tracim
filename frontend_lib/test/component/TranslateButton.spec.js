@@ -1,12 +1,13 @@
-import { React } from 'react'
+import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { TranslateButton } from '../../src/component/Button/TranslateButton.jsx'
-import { TRANSLATION_STATE } from '../../src/helper.js'
+import { TRANSLATION_STATE } from '../../src/translation.js'
 
 const props = {
   translationState: TRANSLATION_STATE.DISABLED,
-  onClickToggleTranslation: () => {}
+  onClickToggleTranslation: () => {},
+  t: text => text
 }
 
 describe('<TranslateButton />', () => {
@@ -20,7 +21,7 @@ describe('<TranslateButton />', () => {
       },
       {
         description: 'with translation enabled',
-        state: TRANSLATION_STATE.ENABLED,
+        state: TRANSLATION_STATE.UNTRANSLATED,
         containedText: 'Show translation',
         expectation: 'should contain show translation'
       },
@@ -33,7 +34,7 @@ describe('<TranslateButton />', () => {
       {
         description: 'with translation done',
         state: TRANSLATION_STATE.TRANSLATED,
-        containedText: 'Restore original language',
+        containedText: 'Restore the original language',
         expectation: 'should contain restore translation'
       }
     ]

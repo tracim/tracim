@@ -28,7 +28,8 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -257,7 +258,12 @@ export class Thread extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -373,7 +379,7 @@ export class Thread extends React.Component {
   }
 
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -460,6 +466,14 @@ export class Thread extends React.Component {
               onInitWysiwyg={this.handleInitWysiwyg}
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
               searchForMentionInQuery={this.searchForMentionInQuery}
+              onClickTranslateComment={comment => props.handleTranslateComment(
+                comment,
+                state.content.workspace_id,
+                state.loggedUser.lang,
+                this.setState.bind(this)
+              )}
+              onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+
             />
           ) : null}
         </PopinFixedContent>

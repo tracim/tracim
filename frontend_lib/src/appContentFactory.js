@@ -24,6 +24,9 @@ import {
 } from './mention.js'
 
 import {
+  getTranslationApiErrorMessage,
+  setTranslatedRawContent,
+  setTranslationState,
   TRANSLATION_STATE
 } from './translation.js'
 
@@ -35,7 +38,8 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownMember
+  getMyselfKnownMember,
+  getCommentTranslated
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -402,6 +406,57 @@ export function appContentFactory (WrappedComponent) {
       ])
     }
 
+    onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+            previousState.timeline
+          )
+        }
+      })
+      const response = await getCommentTranslated(
+        this.apiUrl,
+        workspaceId,
+        comment.parent_id,
+        comment.content_id,
+        lang
+      )
+      const errorMessage = getTranslationApiErrorMessage(response)
+      if (errorMessage) {
+        this.sendGlobalFlashMessage(errorMessage, 'warning')
+        setState(previousState => {
+          return {
+            timeline: this.replaceComment(
+              setTranslationState(comment, TRANSLATION_STATE.PENDING),
+              previousState.timeline
+            )
+          }
+        })
+        return
+      }
+      const translatedRawContent = await response.text()
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            setTranslatedRawContent(comment, translatedRawContent),
+            previousState.timeline
+          )
+        }
+      })
+    }
+
+    onHandleRestoreComment = (comment, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+            previousState.timeline
+          )
+        }
+      })
+    }
+
     render () {
       return (
         <WrappedComponent
@@ -422,9 +477,10 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          replaceComment={this.replaceComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
+          handleTranslateComment={this.onHandleTranslateComment}
+          handleRestoreComment={this.onHandleRestoreComment}
         />
       )
     }
