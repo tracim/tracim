@@ -974,6 +974,9 @@ def user_search_fixture(
     rapi.create_one(
         riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
+
+    bob_user.custom_properties.fields = {"subfieldhtml": "<p>Hello</p>"}
+
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return (bob_user, riyad_user)
@@ -1069,7 +1072,44 @@ class TestElasticSearchUserSearch:
         """
         web_testapp.authorization = ("Basic", authorization)
         search_result = web_testapp.get(
-            "/api/advanced_search/user".format(), status=200, params=query_parameters
+            "/api/advanced_search/user", status=200, params=query_parameters
+        ).json_body
+        assert search_result["total_hits"] == total_hits
+        assert search_result["is_total_hits_accurate"] is True
+        user_ids = [user["user_id"] for user in search_result["users"]]
+        assert user_ids == expected_user_ids
+
+    @pytest.mark.parametrize(
+        "user_id, authorization, query_parameters, expected_user_ids, total_hits",
+        [
+            (
+                2,
+                ("bob", "password"),
+                {"search_string": "Hello", "search_fields": "custom_properties"},
+                [2],
+                1,
+            ),
+            (
+                2,
+                ("bob", "password"),
+                {"search_string": "Salut", "search_fields": "custom_properties"},
+                [],
+                0,
+            ),
+        ],
+    )
+    def test_api__elasticsearch_user_search__ok__custom_properties(
+        self,
+        web_testapp,
+        user_id: int,
+        authorization: typing.Tuple[str, str],
+        query_parameters: dict,
+        expected_user_ids: typing.List[int],
+        total_hits: int,
+    ) -> None:
+        web_testapp.authorization = ("Basic", authorization)
+        search_result = web_testapp.get(
+            "/api/advanced_search/user", status=200, params=query_parameters
         ).json_body
         assert search_result["total_hits"] == total_hits
         assert search_result["is_total_hits_accurate"] is True

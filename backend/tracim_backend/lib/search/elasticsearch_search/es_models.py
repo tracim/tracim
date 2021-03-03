@@ -167,7 +167,8 @@ class IndexedContent(Document):
 # format is currently only used for "string".
 
 # NOTE - 2021-03-02 - RJ
-# Everything is handled as text. A string search in the user's custom properties otherwise fails
+# Everything is handled as text instead of using Boolean(), Float() and Date() fields.
+# A string search in the user's custom properties otherwise fails
 # on a date field with the following error:
 # RequestError(400, 'search_phase_execution_exception', 'failed to parse date field [Hello] with format
 # [strict_date_optional_time||epoch_millis]: [failed to parse date field [Hello] with format
@@ -175,16 +176,17 @@ class IndexedContent(Document):
 # (with Hello being the search string)
 
 JSON_SCHEMA_TYPE_MAPPINGS = {
-    ("boolean", None): SimpleText(),  # Boolean(),
+    ("boolean", None): SimpleText(),
     ("object", None): Object(),
-    ("number", None): SimpleText(),  # Float(),
-    ("string", "date"): SimpleText(),  # Date(),
-    ("string", "date-time"): SimpleText(),  # Date(),
+    ("number", None): SimpleText(),
+    ("string", "date"): SimpleText(),
+    ("string", "date-time"): SimpleText(),
     ("string", "html"): HtmlText(),
     # default string field type
     ("string", None): SimpleText(),
+    ("null", None): SimpleText(),
     # default field type
-    (None, None): Field(),
+    (None, None): SimpleText(),
 }
 
 JsonSchemaDict = typing.Dict[str, typing.Any]
