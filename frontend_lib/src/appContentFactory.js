@@ -393,7 +393,7 @@ export function appContentFactory (WrappedComponent) {
       return mentionList
     }
 
-    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
       return sortTimelineByDate([
         ...timeline,
         {
@@ -402,7 +402,9 @@ export function appContentFactory (WrappedComponent) {
           created_raw: comment.created,
           created: displayDistanceDate(comment.created, loggedUser.lang),
           timelineType: comment.content_type,
-          hasBeenRead: hasBeenRead
+          hasBeenRead: hasBeenRead,
+          translatedRawContent: null,
+          translationState: initialCommentTranslationState
         }
       ])
     }
@@ -411,7 +413,7 @@ export function appContentFactory (WrappedComponent) {
       setState(previousState => {
         return {
           timeline: this.replaceComment(
-            setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
+            setTranslationState(comment, TRANSLATION_STATE.PENDING),
             previousState.timeline
           )
         }
@@ -429,7 +431,7 @@ export function appContentFactory (WrappedComponent) {
         setState(previousState => {
           return {
             timeline: this.replaceComment(
-              setTranslationState(comment, TRANSLATION_STATE.PENDING),
+              setTranslationState(comment, TRANSLATION_STATE.UNTRANSLATED),
               previousState.timeline
             )
           }
