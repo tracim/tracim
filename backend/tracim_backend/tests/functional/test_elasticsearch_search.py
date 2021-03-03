@@ -490,7 +490,9 @@ class TestElasticSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get(
-            "/api/advanced_search/content", status=200, params={"search_string": "*", "size": 0}
+            "/api/advanced_search/content",
+            status=200,
+            params={"search_string": "bob riyad", "size": 0},
         )
         search_result = res.json_body
         assert search_result
@@ -1033,8 +1035,8 @@ class TestElasticSearchUserSearch:
                 0,
             ),
             (("bob", "password"), {"search_string": "riyad"}, [3], 1),
-            (("bob", "password"), {"search_string": "*"}, [2, 3], 2),
-            (("bob", "password"), {"search_string": "*", "workspace_ids": [1]}, [2], 1),
+            (("bob", "password"), {"search_string": "bob riyad"}, [2, 3], 2),
+            (("bob", "password"), {"search_string": "bob riyad", "workspace_ids": [1]}, [2], 1),
             (("bob", "password"), {"search_string": "riy"}, [3], 1),
             (
                 ("bob", "password"),
@@ -1053,9 +1055,9 @@ class TestElasticSearchUserSearch:
             (("riyad", "password"), {"search_string": "bob"}, [2], 1),
             (("riyad", "password"), {"search_string": "TheAdmin"}, [], 0),
             (("TheAdmin", "admin@admin.admin"), {"search_string": "bob"}, [2], 1),
-            (("bob", "password"), {"search_string": "*", "page_nb": 1, "size": 1}, [2], 2),
-            (("bob", "password"), {"search_string": "*", "page_nb": 2, "size": 1}, [3], 2),
-            (("bob", "password"), {"search_string": "*", "size": 0}, [], 2),
+            (("bob", "password"), {"search_string": "bob riyad", "page_nb": 1, "size": 1}, [3], 2),
+            (("bob", "password"), {"search_string": "bob riyad", "page_nb": 2, "size": 1}, [2], 2),
+            (("bob", "password"), {"search_string": "bob riyad", "size": 0}, [], 2),
         ],
     )
     def test_api__elasticsearch_user_search__ok__nominal_cases(
@@ -1077,7 +1079,7 @@ class TestElasticSearchUserSearch:
         assert search_result["total_hits"] == total_hits
         assert search_result["is_total_hits_accurate"] is True
         user_ids = [user["user_id"] for user in search_result["users"]]
-        assert user_ids == expected_user_ids
+        assert set(user_ids) == set(expected_user_ids)
 
     @pytest.mark.parametrize(
         "user_id, authorization, query_parameters, expected_user_ids, total_hits",
@@ -1114,7 +1116,7 @@ class TestElasticSearchUserSearch:
         assert search_result["total_hits"] == total_hits
         assert search_result["is_total_hits_accurate"] is True
         user_ids = [user["user_id"] for user in search_result["users"]]
-        assert user_ids == expected_user_ids
+        assert set(user_ids) == set(expected_user_ids)
 
 
 @pytest.mark.usefixtures("workspace_search_fixture")
@@ -1182,8 +1184,8 @@ class TestElasticSearchWorkspaceSearch:
             (("bob", "password"), {"search_string": "bob", "page_nb": 1, "size": 1}, [1], 2),
             (("bob", "password"), {"search_string": "bob", "page_nb": 2, "size": 1}, [2], 2),
             (("bob", "password"), {"search_string": "bob", "size": 0}, [], 2),
-            (("bob", "password"), {"search_string": "*", "owner_ids": [3]}, [], 0),
-            (("bob", "password"), {"search_string": "*", "owner_ids": [2]}, [1, 2], 2),
+            (("bob", "password"), {"search_string": "bob riyad", "owner_ids": [3]}, [], 0),
+            (("bob", "password"), {"search_string": "bob riyad", "owner_ids": [2]}, [1, 2], 2),
         ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(
