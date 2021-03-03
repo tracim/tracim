@@ -11,26 +11,31 @@
     "date": {
       "type": "string"
     },
-    "subfield1": { "type": "string" },
-    "subfield2": { "type": "number" },
-    "subfield3": { "type": "boolean" },
-    "subfield4": { "type": "null" },
-    "subfield5": {"type": "array",
-        "items": {
+    "fields": {
+      "type": "object",
+      "properties": {
+        "subfield1": { "type": "string" },
+        "subfield2": { "type": "number" },
+        "subfield3": { "type": "boolean" },
+        "subfield4": { "type": "null" },
+        "subfield5": {
+          "type": "array",
+          "items": {
             "type": "string",
-            "enumNames":
-                [
-                "First",
-                "Second",
-                "Third"
-                ],
+            "enumNames": [
+              "First",
+              "Second",
+              "Third"
+            ],
             "enum": [
                 "first",
                 "second",
                 "third"
             ]
-        }
-    },
-    "subfieldhtml": { "type": "string", "format": "html" }
+          }
+        },
+        "subfieldhtml": { "type": "string", "format": "html" }
+      }
+    }
   }
 }
