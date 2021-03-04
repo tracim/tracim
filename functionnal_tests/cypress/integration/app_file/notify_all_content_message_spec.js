@@ -1,3 +1,5 @@
+/*
+FIXME - RJ - 2021-03-04 - Unstable test. See https://github.com/tracim/tracim/issues/4239
 import { PAGES as p } from '../../support/urls_commands'
 
 const fileTitle = 'FileTitle'
@@ -58,3 +60,4 @@ describe('In File', () => {
     }
   })
 })
+*/

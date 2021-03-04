@@ -21,7 +21,7 @@ const getRevisionTypeLabel = (revisionType, t) => {
     case 'creation':
       return t('created')
     case 'edition':
-      return t('edited')
+      return t('modified')
     case 'undeletion':
       return t('undeleted')
     case 'mention':
