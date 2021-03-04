@@ -155,7 +155,7 @@ export const revisionTypeList = [{
   label: 'Item restored'
 }, {
   id: 'move',
-  faIcon: 'fas arrows-alt',
+  faIcon: 'fas fa-arrows-alt',
   tradKey: i18n.t('Item moved'),
   label: 'Item moved'
 }, {
