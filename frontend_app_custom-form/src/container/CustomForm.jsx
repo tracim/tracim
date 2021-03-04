@@ -598,7 +598,7 @@ class CustomForm extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: this.state.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {t('Last version')}
                 </button>
               )}

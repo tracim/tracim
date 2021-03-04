@@ -825,7 +825,7 @@ export class Gallery extends React.Component {
                         data-cy='gallery__action__button__lightbox__fullscreen'
                         key='btn_fullscreen'
                       >
-                        <i className={classnames('fa-fw fas', state.fullscreen ? 'fa-compress' : 'fa-expand')} />
+                        <i className={classnames('fa-fw fas', state.fullscreen ? 'fa-compress' : 'fa-expand-arrows-alt')} />
                       </button>
                     ), (
                       <button

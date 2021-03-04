@@ -341,7 +341,7 @@ export class Agenda extends React.Component {
             id='agendaIframe'
             src='/assets/_caldavzap/index.tracim.html'
             allow='fullscreen'
-            allowfullscreen
+            allowFullScreen
             data-config={JSON.stringify(config)}
             ref={f => { this.agendaIframe = f }}
           />
