@@ -142,7 +142,6 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'fas fa-random',
-  tradKey: 'Status changed to {{status}}',
   label: (statusLabel) => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
