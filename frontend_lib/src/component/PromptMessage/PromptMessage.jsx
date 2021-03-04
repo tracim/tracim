@@ -41,7 +41,7 @@ PromptMessage.propTypes = {
     'button', 'link'
   ]),
   icon: PropTypes.string,
-  btnLabel: PropTypes.string,
+  btnLabel: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   onClickBtn: PropTypes.func,
   tooltip: PropTypes.string
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
-import { Badge, PAGE, ROLE } from 'tracim_frontend_lib'
+import { FilenameWithExtension, PAGE, ROLE } from 'tracim_frontend_lib'
 
 require('./RecentActivity.styl')
 
@@ -33,14 +33,7 @@ export const RecentActivity = props =>
             </div>
           )
 
-          const recentActivityItemName = (
-            <div className='recentactivity__list__item__name'>
-              {content.label}
-              {content.type === 'file' && (
-                <Badge text={content.fileExtension} customClass='badgeBackgroundColor' />
-              )}
-            </div>
-          )
+          const recentActivityItemName = <FilenameWithExtension file={content} customClass='recentactivity__list__item__name' />
 
           if (content.type === 'folder' && props.roleIdForLoggedUser < ROLE.contentManager.id) {
             return (

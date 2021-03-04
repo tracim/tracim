@@ -25,7 +25,7 @@ import {
   displayDistanceDate,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  Badge,
+  FilenameWithExtension,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -985,7 +985,7 @@ export class File extends React.Component {
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
-          componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
+          componentTitle={<FilenameWithExtension file={state.content} />}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
