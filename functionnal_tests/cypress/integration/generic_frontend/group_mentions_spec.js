@@ -26,6 +26,7 @@ describe('At the autocompletion popup', function () {
   describe('the group mention (all)', function () {
     it('should be translated in English', function () {
       cy.changeLanguage('en')
+      cy.contains('.dropdownlang__dropdown__btnlanguage', 'English')
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
@@ -35,6 +36,7 @@ describe('At the autocompletion popup', function () {
 
     it('should be translated in French', function () {
       cy.changeLanguage('fr')
+      cy.contains('.dropdownlang__dropdown__btnlanguage', 'Français')
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
@@ -44,6 +46,7 @@ describe('At the autocompletion popup', function () {
 
     it('should be translated in Portuguese', function () {
       cy.changeLanguage('pt')
+      cy.contains('.dropdownlang__dropdown__btnlanguage', 'Português')
       cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
