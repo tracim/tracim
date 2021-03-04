@@ -35,9 +35,9 @@ describe('In File', () => {
     })
 
     const languageTestCases = [
-      { code: 'en', mentionContains: '@all Please' },
-      { code: 'fr', mentionContains: '@tous Veuillez' },
-      { code: 'pt', mentionContains: '@todos reparem' }
+      { code: 'en', label: 'English', mentionContains: '@all Please' },
+      { code: 'fr', label: 'Français', mentionContains: '@tous Veuillez' },
+      { code: 'pt', label: 'Português', mentionContains: '@todos reparem' }
     ]
 
     for (const testCase of languageTestCases) {
@@ -46,12 +46,13 @@ describe('In File', () => {
           cy.changeLanguage(testCase.code)
           cy.get('[data-cy=popin_right_part_properties]').should('be.visible').click()
           cy.get('.fileProperties__content__detail__btndesc').should('be.visible').click()
+          cy.contains('.dropdownlang__dropdown__btnlanguage', testCase.label)
           cy.get('textarea').type(fileDescription)
           cy.get('.fileProperties__content__detail__description__editiondesc__btn__validate').should('not.be.disabled').click()
           cy.get('[data-cy=popin_right_part_timeline]').should('not.be.disabled').click()
           cy.get('.promptMessage').should('be.visible')
           cy.get('.buttonLink').click()
-          cy.contains('.comment__body__content', testCase.mentionContains).should('be.visible')
+          cy.contains('.file__contentpage__body__text', testCase.mentionContains).should('be.visible')
         })
       })
     }
