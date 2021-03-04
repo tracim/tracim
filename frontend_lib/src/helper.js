@@ -112,47 +112,57 @@ export const BREADCRUMBS_TYPE = {
 export const revisionTypeList = [{
   id: 'archiving',
   faIcon: 'fas fa-archive',
-  label: i18n.t('Item archived')
+  tradKey: i18n.t('Item archived'),
+  label: 'Item archived'
 }, {
   id: 'content-comment',
   faIcon: 'far fa-comment',
-  label: i18n.t('Comment')
+  tradKey: i18n.t('Comment'),
+  label: 'Comment'
 }, {
   id: 'creation',
   faIcon: 'fas fa-magic',
-  label: i18n.t('Item created')
+  tradKey: i18n.t('Item created'),
+  label: 'Item created'
 }, {
   id: 'deletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item deleted')
+  tradKey: i18n.t('Item deleted'),
+  label: 'Item deleted'
 }, {
   id: 'edition',
-  faIcon: 'fas fa-edit',
-  label: i18n.t('New revision')
+  faIcon: 'fas fa-history',
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'revision',
   faIcon: 'fas fa-history',
-  label: i18n.t('New revision')
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'status-update',
   faIcon: 'fas fa-random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
+  label: (statusLabel) => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
   faIcon: 'far fa-file-archive',
-  label: i18n.t('Item unarchived')
+  tradKey: i18n.t('Item unarchived'),
+  label: 'Item unarchived'
 }, {
   id: 'undeletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item restored')
+  tradKey: i18n.t('Item restored'),
+  label: 'Item restored'
 }, {
   id: 'move',
-  faIcon: 'fas arrows-alt',
-  label: i18n.t('Item moved')
+  faIcon: 'fas fa-arrows-alt',
+  tradKey: i18n.t('Item moved'),
+  label: 'Item moved'
 }, {
   id: 'copy',
   faIcon: 'far fa-copy',
-  label: i18n.t('Item copied')
+  tradKey: i18n.t('Item copied'),
+  label: 'Item copied'
 }]
 
 const WORKSPACE_MANAGER = {
