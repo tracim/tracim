@@ -43,9 +43,12 @@ import {
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getTranslationApiErrorMessage,
+  TRANSLATION_STATE,
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
-import { initWysiwyg, TRANSLATION_STATE } from '../helper.js'
+import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
@@ -62,9 +65,6 @@ export class HtmlDocument extends React.Component {
 
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
-    const defaultTranslationState = param.config.system.config.translation_service__enabled
-      ? TRANSLATION_STATE.UNTRANSLATED
-      : TRANSLATION_STATE.DISABLED
     this.state = {
       appName: 'html-document',
       isVisible: true,
@@ -95,7 +95,6 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInComment: false,
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
-      defaultTranslationState: defaultTranslationState,
       translationState: TRANSLATION_STATE.DISABLED
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -155,7 +154,7 @@ export class HtmlDocument extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -387,7 +386,12 @@ export class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     const localStorageComment = getLocalStorageItem(
       state.appName,
@@ -428,7 +432,7 @@ export class HtmlDocument extends React.Component {
         rawContentBeforeEdit: rawContentBeforeEdit,
         timeline: revisionWithComment,
         isLastTimelineItemCurrentToken: false,
-        translationState: previousState.defaultTranslationState,
+        translationState: getDefaultTranslationState(previousState.config.system.config),
         translatedRawContent: null
       }
     })
@@ -545,7 +549,7 @@ export class HtmlDocument extends React.Component {
             oldInvalidMentionList: allInvalidMentionList,
             showInvalidMentionPopupInContent: false,
             translatedRawContent: null,
-            translationState: previousState.defaultTranslationState
+            translationState: getDefaultTranslationState(previousState.config.system.config)
           }
         })
         const fetchPutUserConfiguration = await handleFetchResult(
@@ -677,7 +681,7 @@ export class HtmlDocument extends React.Component {
           is_archived: previousState.is_archived, // archived and delete should always be taken from last version
           is_deleted: previousState.is_deleted
         },
-        translationState: previousState.defaultTranslationState,
+        translationState: getDefaultTranslationState(previousState.config.system.config),
         translatedRawContent: null,
         mode: APP_FEATURE_MODE.REVISION
       }
@@ -711,7 +715,7 @@ export class HtmlDocument extends React.Component {
         mode: APP_FEATURE_MODE.VIEW,
         showRefreshWarning: false,
         translatedRawContent: null,
-        translationState: previousState.defaultTranslationState
+        translationState: getDefaultTranslationState(previousState.config.system.config)
       }
     })
     this.setHeadTitle(newObjectContent.label)
@@ -767,7 +771,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleTranslateDocument = async () => {
-    const { props, state } = this
+    const { state } = this
     this.setState({ translationState: TRANSLATION_STATE.PENDING })
     const response = await getHtmlDocTranslated(
       state.config.apiUrl,
@@ -776,20 +780,11 @@ export class HtmlDocument extends React.Component {
       state.content.current_revision_id,
       state.loggedUser.lang
     )
-    if (!response.ok) {
-      const errors = [
-        { status: 502, message: props.t('Translation is not available') },
-        { status: 504, message: props.t('Translation is not available') }
-      ]
-      const error = errors.find(e => e.status === response.status) || { status: null, message: props.t('Unknown error') }
-      this.sendGlobalFlashMessage(
-        props.t(
-          'Error while translating the document: {{details}}',
-          { details: error.message }
-        )
-      )
+    const errorMessage = getTranslationApiErrorMessage(response)
+    if (errorMessage) {
+      this.sendGlobalFlashMessage(errorMessage)
       this.setState(previousState => {
-        return { translationState: previousState.defaultTranslationState }
+        return { translationState: getDefaultTranslationState(previousState.config.system.config) }
       })
       return
     }
@@ -799,7 +794,7 @@ export class HtmlDocument extends React.Component {
 
   handleRestoreDocument = () => {
     this.setState(previousState => {
-      return { translationState: previousState.defaultTranslationState }
+      return { translationState: getDefaultTranslationState(previousState.config.system.config) }
     })
   }
 
@@ -812,14 +807,6 @@ export class HtmlDocument extends React.Component {
       state.mode !== APP_FEATURE_MODE.EDIT &&
         state.translationState === TRANSLATION_STATE.TRANSLATED
     )
-    const HANDLE_TOGGLE_TRANSLATION = {
-      [TRANSLATION_STATE.UNTRANSLATED]: this.handleTranslateDocument,
-      [TRANSLATION_STATE.TRANSLATED]: this.handleRestoreDocument,
-      [TRANSLATION_STATE.PENDING]: null,
-      [TRANSLATION_STATE.DISABLED]: null
-    }
-    const handleToggleTranslation = HANDLE_TOGGLE_TRANSLATION[state.translationState]
-
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -937,7 +924,8 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
-            onClickToggleTranslation={handleToggleTranslation}
+            onClickTranslateDocument={this.handleTranslateDocument}
+            onClickRestoreDocument={this.handleRestoreDocument}
             translationState={state.translationState}
           />
 
@@ -971,6 +959,13 @@ export class HtmlDocument extends React.Component {
                   onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
                   showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                   invalidMentionList={state.invalidMentionList}
+                  onClickTranslateComment={comment => props.handleTranslateComment(
+                    comment,
+                    this.state.content.workspace_id,
+                    this.state.loggedUser.lang,
+                    this.setState.bind(this)
+                  )}
+                  onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
                 />
               ) : null
             }]}

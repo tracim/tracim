@@ -132,5 +132,11 @@
   "Error while uploading file(s)": "Error while uploading file(s)",
   "Please wait until the upload ends": "Please wait until the upload ends",
   "Avatar of {{publicName}}": "Avatar of {{publicName}}",
-  "Close": "Close"
+  "Close": "Close",
+  "Restore the original language": "Restore the original language",
+  "Show translation": "Show translation",
+  "Translation pending…": "Translation pending…",
+  "Translation is not available": "Translation is not available",
+  "Unknown error": "Unknown error",
+  "Error while translating the document: {{details}}": "Error while translating the document: {{details}}"
 }

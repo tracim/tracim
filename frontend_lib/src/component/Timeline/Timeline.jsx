@@ -7,6 +7,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../helper.js'
+import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
@@ -132,9 +133,12 @@ export class Timeline extends React.Component {
                     author={content.author}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
-                    text={content.raw_content}
+                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
+                    onClickTranslate={() => { props.onClickTranslateComment(content) }}
+                    onClickRestore={() => { props.onClickRestoreComment(content) }}
+                    translationState={content.translationState}
                   />
                 )
               case 'revision':
@@ -270,7 +274,9 @@ Timeline.propTypes = {
   onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
   searchForMentionInQuery: PropTypes.func,
-  showInvalidMentionPopup: PropTypes.bool
+  showInvalidMentionPopup: PropTypes.bool,
+  onClickTranslateComment: PropTypes.func,
+  onClickRestoreComment: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -297,5 +303,7 @@ Timeline.defaultProps = {
   onClickSaveAnyway: () => { },
   showTitle: true,
   searchForMentionInQuery: () => { },
-  showInvalidMentionPopup: false
+  showInvalidMentionPopup: false,
+  onClickTranslateComment: content => {},
+  onClickRestoreComment: content => {}
 }

@@ -114,3 +114,8 @@ export const getContent = (apiUrl, contentId) =>
 
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
+
+export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, targetLanguageCode) => {
+  const name = `comment-${commentId}.html`
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}/translated/${name}?target_language_code=${targetLanguageCode}`)
+}

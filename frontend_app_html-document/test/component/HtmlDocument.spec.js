@@ -2,11 +2,11 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
-import { TRANSLATION_STATE } from '../../src/helper.js'
 import {
   TextAreaApp,
   PromptMessage,
-  APP_FEATURE_MODE
+  APP_FEATURE_MODE,
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 const props = {
@@ -139,51 +139,6 @@ describe('<HtmlDocument />', () => {
           .to.have.descendants(PromptMessage)
           .and
           .have.html().to.contains('far fa-hand-point-right')
-      )
-    })
-
-    describe('with translation enabled', () => {
-      const wrapper = mount(
-        <HtmlDocument
-          {...props}
-          translationState={TRANSLATION_STATE.UNTRANSLATED}
-        />
-      )
-
-      it('should display the "show translation" button', () =>
-        expect(wrapper.find(
-          '.html-document__contentpage__textnote__top__translation'
-        ).render().text()).to.contains('Show translation')
-      )
-    })
-
-    describe('with translation pending', () => {
-      const wrapper = mount(
-        <HtmlDocument
-          {...props}
-          translationState={TRANSLATION_STATE.PENDING}
-        />
-      )
-
-      it('should display the "translation pending" text', () =>
-        expect(wrapper.find(
-          '.html-document__contentpage__textnote__top__translation'
-        ).render().text()).to.contains('Translation pending')
-      )
-    })
-
-    describe('with translation done', () => {
-      const wrapper = mount(
-        <HtmlDocument
-          {...props}
-          translationState={TRANSLATION_STATE.TRANSLATED}
-        />
-      )
-
-      it('should display the "restore translation" button', () =>
-        expect(wrapper.find(
-          '.html-document__contentpage__textnote__top__translation'
-        ).render().text()).to.contains('Restore the original language')
       )
     })
   })

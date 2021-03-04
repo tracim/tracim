@@ -50,7 +50,8 @@ import {
   putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -196,7 +197,7 @@ export class File extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -343,7 +344,12 @@ export class File extends React.Component {
       return
     }
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -838,6 +844,13 @@ export class File extends React.Component {
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
+          onClickTranslateComment={comment => props.handleTranslateComment(
+            comment,
+            this.state.content.workspace_id,
+            this.state.loggedUser.lang,
+            this.setState.bind(this)
+          )}
+          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
         />
       ) : null
     }
