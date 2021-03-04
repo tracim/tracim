@@ -11,9 +11,9 @@ const color = require('color')
 const Revision = props => {
   const revisionType = revisionTypeList.find(r => r.id === props.revisionType) || { id: '', faIcon: '', label: '' }
 
-  const showLabel = (revisionType, status) => revisionType.id === 'status-update'
-    ? revisionType.label(props.t(status.label))
-    : revisionType.label
+  const label = revisionType.id === 'status-update'
+    ? revisionType.label(props.status.label)
+    : props.t(revisionType.label)
 
   return (
     <li
@@ -35,11 +35,11 @@ const Revision = props => {
 
         <span className='revision__data__nb'>{props.number}</span>
 
-        <i className={`fa-fw ${revisionType.faIcon} revision__data__icon`} />
+        <i title={label} className={`fa-fw ${revisionType.faIcon} revision__data__icon`} />
 
         <div className='revision__data__infos'>
           <div className='d-flex'>
-            <span className='revision__data__infos__label'>{props.t(showLabel(revisionType, props.status))}</span>
+            <span className='revision__data__infos__label'>{label}</span>
             <span className='revision__data__infos__created' title={props.createdFormated}>{props.createdDistance}</span>
           </div>
           <span className='revision__data__infos__author'>
