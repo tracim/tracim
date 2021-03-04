@@ -227,7 +227,7 @@ export class ReduxTlmDispatcher extends React.Component {
         newData.fields.user = updatedUser
       }
     } else {
-        newData = data
+      newData = data
     }
 
     props.dispatch(updateUser(newData.fields.user))

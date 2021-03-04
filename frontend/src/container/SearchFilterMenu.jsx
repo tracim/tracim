@@ -338,11 +338,11 @@ export class SearchFilterMenu extends React.Component {
               </div>
               {state.newestAuthoredContentRange.showFilter && currentSearch.newestAuthoredContentRange && (
                 <DateFilter
-                  id='modification'
+                  id='intervention'
                   from={currentSearch.newestAuthoredContentRange.from}
                   to={currentSearch.newestAuthoredContentRange.to}
-                  onChangeDate={this.handleChangeModifiedDate}
-                  onClickDateCheckbox={this.handleCheckboxModifiedRange}
+                  onChangeDate={this.handleChangeNewestAuthoredContentDate}
+                  onClickDateCheckbox={this.handleCheckboxNewestAuthoredContentDate}
                   isAfterCheckboxChecked={state.newestAuthoredContentRange.afterDateActive}
                   isBeforeCheckboxChecked={state.newestAuthoredContentRange.beforeDateActive}
                   afterDate={state.newestAuthoredContentRange.afterDate}

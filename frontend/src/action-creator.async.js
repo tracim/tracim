@@ -1114,6 +1114,7 @@ export const getAdvancedSearchResult = (
   searchFieldList,
   createdRange,
   modifiedRange,
+  newestAuthoredContentRange,
   searchFacets
 ) => dispatch => {
   const queryParameterList = []
@@ -1144,11 +1145,15 @@ export const getAdvancedSearchResult = (
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {
-    if (searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
+    if (searchFacets && searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
+    if (newestAuthoredContentRange) {
+      if (newestAuthoredContentRange.from) queryParameterList.push(`newest_authored_content_date_from=${newestAuthoredContentRange.from}`)
+      if (newestAuthoredContentRange.to) queryParameterList.push(`newest_authored_content_date_to=${newestAuthoredContentRange.to}`)
+    }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-    if (searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
-    if (searchFacets.owners) queryParameterList.push(`owner_ids=${searchFacets.owners}`)
+    if (searchFacets && searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
+    if (searchFacets && searchFacets.owners) queryParameterList.push(`owner_ids=${searchFacets.owners}`)
   }
 
   return fetchWrapper({

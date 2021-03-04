@@ -144,7 +144,7 @@ export class AdvancedSearch extends React.Component {
     }
   }
 
-  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters) => {
+  getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
     const { props } = this
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
@@ -163,9 +163,10 @@ export class AdvancedSearch extends React.Component {
       searchObject.showActive,
       searchObject.searchType,
       searchFieldList,
-      appliedFilters ? appliedFilters.createdRange : {},
-      appliedFilters ? appliedFilters.modifiedRange : {},
-      appliedFilters ? appliedFilters.searchFacets : {}
+      appliedFilters.createdRange || {},
+      appliedFilters.modifiedRange || {},
+      appliedFilters.newestAuthoredContentRange || {},
+      appliedFilters.searchFacets || {}
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -468,7 +469,9 @@ export class AdvancedSearch extends React.Component {
                 <div className='advancedSearch__content'>
                   {currentNumberSearchResults > 0 && (
                     <div className='advancedSearch__content__detail'>
-                      {this.getDisplayDetail()}
+                      <div className='advancedSearch__content__detail__count'>
+                        {this.getDisplayDetail()}
+                      </div>
 
                       {!state.isFilterMenuOpen && (
                         <IconButton
