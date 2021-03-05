@@ -77,6 +77,9 @@ class SystranTranslationService(TranslationService):
                 stream=True,
             )
         except requests.exceptions.Timeout:
+            # NOTE - S.G. - 2021-03-05 - Timeout is useful
+            # as the systran API sometimes takes a very long time before returning an error.
+            # Known cases: translation of an english file in english with some texts.
             msg = "Translation response took more than {} seconds to arrive".format(self.timeout)
             raise TranslationServiceTimeout(msg)
         if response.status_code == HTTPStatus.OK:
