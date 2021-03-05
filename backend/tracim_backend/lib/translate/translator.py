@@ -36,6 +36,10 @@ class UnavailableTranslationLanguagePair(TranslationServiceException):
     pass
 
 
+class TranslationServiceTimeout(TranslationServiceException):
+    pass
+
+
 class TranslationService(ABC):
     """
     Translation service: Class based on this should

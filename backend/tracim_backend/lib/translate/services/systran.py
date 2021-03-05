@@ -4,6 +4,7 @@ import re
 from typing import Any
 from typing import BinaryIO
 from typing import List
+from typing import Optional
 
 import requests
 
@@ -15,6 +16,7 @@ from tracim_backend.lib.translate.translator import TranslationService
 from tracim_backend.lib.translate.translator import TranslationServiceAccessRefused
 from tracim_backend.lib.translate.translator import TranslationServiceException
 from tracim_backend.lib.translate.translator import TranslationServiceServerError
+from tracim_backend.lib.translate.translator import TranslationServiceTimeout
 from tracim_backend.lib.translate.translator import UnavailableTranslationLanguagePair
 
 FILE_TRANSLATION_ENDPOINT = "/translation/file/translate"
@@ -34,9 +36,10 @@ class SystranFormat:
 
 
 class SystranTranslationService(TranslationService):
-    def __init__(self, api_url: str, api_key: str) -> None:
+    def __init__(self, api_url: str, api_key: str, timeout: Optional[float] = None) -> None:
         self.api_url = api_url
         self.api_key = api_key
+        self.timeout = timeout
 
     @property
     def name(self) -> str:
@@ -64,13 +67,18 @@ class SystranTranslationService(TranslationService):
         headers = self._add_auth_to_headers({})
         if format:
             params["format"] = format
-        response = requests.post(
-            "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
-            files={"input": (file_name, binary_io, mimetype)},
-            params=params,
-            headers=headers,
-            stream=True,
-        )
+        try:
+            response = requests.post(
+                "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
+                files={"input": (file_name, binary_io, mimetype)},
+                params=params,
+                headers=headers,
+                timeout=self.timeout,
+                stream=True,
+            )
+        except requests.exceptions.Timeout:
+            msg = "Translation response took more than {} seconds to arrive".format(self.timeout)
+            raise TranslationServiceTimeout(msg)
         if response.status_code == HTTPStatus.OK:
             return response.raw
         elif response.status_code == HTTPStatus.FORBIDDEN:

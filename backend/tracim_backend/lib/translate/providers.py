@@ -46,6 +46,7 @@ class TranslationLib:
             return SystranTranslationService(
                 api_url=self._config.TRANSLATION_SERVICE__SYSTRAN__API_URL,
                 api_key=self._config.TRANSLATION_SERVICE__SYSTRAN__API_KEY,
+                timeout=self._config.TRANSLATION_SERVICE__TIMEOUT,
             )
         elif self._config.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.TEST:
             logger.warning(self, "Running in test translation service !")
