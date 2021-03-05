@@ -92,6 +92,13 @@ class TranslationLib:
                 binary_io=bytes_io,
             )
         except TranslationInputLanguageEqualToOutput:
+            msg = (
+                "Input and output language are the same, "
+                "returning the original content id={}, revision_id={}".format(
+                    content_id, revision_id
+                )
+            )
+            logger.info(self, msg)
             file_object = BytesIO(content.raw_content.encode("utf-8"))
         return HapicFile(
             file_object=file_object,
