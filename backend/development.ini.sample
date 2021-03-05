@@ -770,6 +770,13 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ; translation_service.enabled = False
 
+
+## Translation service timeout in seconds.
+# This timeout will be applied to each translation request.
+; translation_service.timeout = 0
+# example:
+# translation_service.timeout = 5
+
 ## Translation provider, currently only "systran" is supported
 ; translation_service.provider =
 # example:
