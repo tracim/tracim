@@ -130,34 +130,17 @@ class HTMLDocumentController(Controller):
         """
         Translate a html-document
         """
-        api = ContentApi(
-            show_archived=True,
-            show_deleted=True,
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
-        )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        file = BytesIO(content.raw_content.encode("utf-8"))
-        translation_service = TranslationLib(
+        translation_lib = TranslationLib(
             config=request.app_config, current_user=request.current_user, session=request.dbsession
-        ).get_translation_service()
-        translated_file = translation_service.translate_file(
-            input_lang=hapic_data.query.source_language_code,
-            output_lang=hapic_data.query.target_language_code,
-            mimetype=CONTENT_TYPE_TEXT_HTML,
-            binary_io=file,
         )
-        filename = hapic_data.path.filename
-        if not filename or "raw":
-            filename = content.file_name
-
-        return HapicFile(
-            file_object=translated_file,
+        content_id = hapic_data.path.content_id
+        return translation_lib.translate_raw_content(
+            content_id=content_id,
+            source_language_code=hapic_data.query.source_language_code,
+            target_language_code=hapic_data.query.target_language_code,
+            force_download=hapic_data.query.force_download,
             mimetype=CONTENT_TYPE_TEXT_HTML,
-            filename=filename,
-            as_attachment=hapic_data.query.force_download,
-            last_modified=content.updated,
+            filename=hapic_data.path.filename,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])

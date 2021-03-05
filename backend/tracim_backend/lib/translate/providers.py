@@ -81,7 +81,7 @@ class TranslationLib:
         else:
             revision = content.current_revision
         if not filename or "raw":
-            filename = revision.file_name
+            output_filename = revision.file_name
         bytes_io = BytesIO(revision.raw_content.encode("utf-8"))
         translation_service = self.get_translation_service()
         try:
@@ -96,7 +96,7 @@ class TranslationLib:
         return HapicFile(
             file_object=file_object,
             mimetype=mimetype,
-            filename=filename,
+            filename=output_filename,
             as_attachment=force_download,
             last_modified=content.updated,
         )
