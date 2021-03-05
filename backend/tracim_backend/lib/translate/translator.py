@@ -28,6 +28,14 @@ class TranslationServiceServerError(TranslationServiceException):
     pass
 
 
+class TranslationInputLanguageEqualToOutput(TranslationServiceException):
+    pass
+
+
+class UnavailableTranslationLanguagePair(TranslationServiceException):
+    pass
+
+
 class TranslationService(ABC):
     """
     Translation service: Class based on this should
@@ -37,8 +45,8 @@ class TranslationService(ABC):
     def translate_file(
         self, input_lang: str, output_lang: str, binary_io: BinaryIO, mimetype: str, **options: Any
     ) -> BinaryIO:
-        current_node = TranslationLanguagePair(input_lang, output_lang)
-        return self._translate_file(current_node, binary_io, mimetype, **options)
+        language_pair = TranslationLanguagePair(input_lang, output_lang)
+        return self._translate_file(language_pair, binary_io, mimetype, **options)
 
     @abstractmethod
     def _translate_file(
