@@ -80,8 +80,10 @@ class TranslationLib:
             revision = api.get_one_revision(revision_id=revision_id, content=content)
         else:
             revision = content.current_revision
-        if not filename or "raw":
+        if not filename or filename == "raw":
             output_filename = revision.file_name
+        else:
+            output_filename = filename
         bytes_io = BytesIO(revision.raw_content.encode("utf-8"))
         translation_service = self.get_translation_service()
         try:
