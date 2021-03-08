@@ -550,3 +550,10 @@ translation_service.provider = systran
 translation_service.systran.api_url = https://translate.systran.net/
 translation_service.systran.api_key = your-systran-api-key
 ```
+
+To avoid waiting too long for a translation request you can tune its timeout (in which case an error will be displayed):
+
+```
+# timeout is in seconds
+translation_service.timeout = 5
+```
