@@ -87,39 +87,14 @@ export class AdvancedSearch extends React.Component {
 
   componentDidMount () {
     const { props } = this
-    const urlSearchObject = parseSearchUrl(qs.parse(props.location.search))
-    props.dispatch(resetAppliedFilter(urlSearchObject.searchType))
-
-    if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.CONTENT) {
-      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.CONTENT))
-      this.getSearchResult({
-        ...urlSearchObject,
-        currentPage: FIRST_PAGE,
-        searchType: ADVANCED_SEARCH_TYPE.CONTENT
-      }, props.contentSearch ? props.contentSearch.resultList.length : 0)
+    for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
+      props.dispatch(resetAppliedFilter(searchType))
     }
-
-    if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.USER) {
-      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.USER))
-      this.getSearchResult({
-        ...urlSearchObject,
-        currentPage: FIRST_PAGE,
-        searchType: ADVANCED_SEARCH_TYPE.USER
-      }, props.userSearch ? props.userSearch.resultList.length : 0)
-    }
-
-    if (urlSearchObject.searchType !== ADVANCED_SEARCH_TYPE.SPACE) {
-      props.dispatch(resetAppliedFilter(ADVANCED_SEARCH_TYPE.USER))
-      this.getSearchResult({
-        ...urlSearchObject,
-        currentPage: FIRST_PAGE,
-        searchType: ADVANCED_SEARCH_TYPE.SPACE
-      }, props.spaceSearch ? props.spaceSearch.resultList.length : 0)
-    }
-
     this.setHeadTitle()
     this.buildBreadcrumbs()
-    this.loadSearchUrl()
+    const search = parseSearchUrl(qs.parse(props.location.search))
+    this.getAllSearchResult(search)
+    this.setSearchTab(search.searchType)
   }
 
   componentDidUpdate (prevProps) {
@@ -129,11 +104,14 @@ export class AdvancedSearch extends React.Component {
 
     if (
       prevSearch.searchString !== currentSearch.searchString ||
-      prevSearch.currentPage !== currentSearch.currentPage ||
-      prevSearch.searchType !== currentSearch.searchType
+      prevSearch.currentPage !== currentSearch.currentPage
     ) {
-      this.loadSearchUrl()
+      this.getAllSearchResult(currentSearch)
     }
+    if (prevSearch.searchType !== currentSearch.searchType) {
+      this.setSearchTab(currentSearch.searchType)
+    }
+
     if (
       prevProps.system.config.instance_name !== props.system.config.instance_name ||
       prevSearch.searchString !== currentSearch.searchString
@@ -144,9 +122,17 @@ export class AdvancedSearch extends React.Component {
   }
 
   getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
-    const { props } = this
+    const { props, state } = this
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
+    const isOnlyFacet = Object.keys(appliedFilters).length == 0 && !searchObject.searchString
+
+    let pageSize = searchObject.numberResultsByPage
+    if (isOnlyFacet) {
+      pageSize = 0
+    } else {
+      pageSize = searchObject.numberResultsByPage * searchObject.currentPage
+    }
 
     const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
       searchObject.searchString,
@@ -154,9 +140,7 @@ export class AdvancedSearch extends React.Component {
       hasFirstPage
         ? searchObject.currentPage
         : FIRST_PAGE,
-      hasFirstPage
-        ? searchObject.numberResultsByPage
-        : searchObject.numberResultsByPage * searchObject.currentPage,
+      pageSize,
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive,
@@ -297,16 +281,30 @@ export class AdvancedSearch extends React.Component {
     )
   }
 
-  loadSearchUrl = () => {
+  getAllSearchResult = (searchObject) => {
     const { props } = this
-    const searchObject = parseSearchUrl(qs.parse(props.location.search))
-    if (Object.values(ADVANCED_SEARCH_TYPE).includes(searchObject.searchType)) {
-      this.setState({ searchType: searchObject.searchType })
-      const currentSearch = this.getCurrentSearchObject()
-      this.getSearchResult(searchObject, currentSearch.resultList.length)
+    for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
+      const searchTypeObject = this.getSearchObject(searchType)
+      this.getSearchResult({
+        ...searchObject,
+        currentPage: FIRST_PAGE,
+        searchType: searchType
+      }, searchTypeObject ? searchTypeObject.resultList.length : 0)
+    }
+  }
+
+  setSearchTab = (searchType) => {
+    const { props } = this
+    if (Object.values(ADVANCED_SEARCH_TYPE).includes(searchType)) {
+      this.setState({ searchType: searchType })
     } else {
+      // Default to content search (??)
+      const contentSearchQuery = qs.stringify(
+        { ...qs.parse(props.location.search), s: ADVANCED_SEARCH_TYPE.CONTENT },
+        { encode: true }
+      )
       props.history.push(
-        `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), s: ADVANCED_SEARCH_TYPE.CONTENT }, { encode: true })}`
+        `${PAGE.SEARCH_RESULT}?${contentSearchQuery}`
       )
     }
   }
@@ -351,22 +349,16 @@ export class AdvancedSearch extends React.Component {
   }
 
   getCurrentSearchObject = () => {
-    const { props, state } = this
-    let currentSearch = {}
+    const { state } = this
+    return this.getSearchObject(state.searchType)
+  }
 
-    if (state.searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
-      currentSearch = props.contentSearch
-    }
-
-    if (state.searchType === ADVANCED_SEARCH_TYPE.USER) {
-      currentSearch = props.userSearch
-    }
-
-    if (state.searchType === ADVANCED_SEARCH_TYPE.SPACE) {
-      currentSearch = props.spaceSearch
-    }
-
-    return currentSearch
+  getSearchObject = (searchType) => {
+    const { props } = this
+    if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) return props.contentSearch
+    if (searchType === ADVANCED_SEARCH_TYPE.USER) return props.userSearch
+    if (searchType === ADVANCED_SEARCH_TYPE.SPACE) return props.spaceSearch
+    return {}
   }
 
   handleClickSeeMore = async () => {
@@ -381,7 +373,6 @@ export class AdvancedSearch extends React.Component {
 
   handleClickSearch = searchString => {
     const { props } = this
-    const FIRST_PAGE = 1
     props.history.push(`${PAGE.SEARCH_RESULT}?${qs.stringify({
       ...qs.parse(props.location.search),
       q: searchString,
@@ -477,9 +468,11 @@ export class AdvancedSearch extends React.Component {
               <div className='advancedSearch__page'>
                 <div className='advancedSearch__content'>
                   <div className='advancedSearch__content__detail'>
-                    <div className='advancedSearch__content__detail__count'>
-                      {this.getDisplayDetail()}
-                    </div>
+                    {state.searchString && (
+                      <div className='advancedSearch__content__detail__count'>
+                        {this.getDisplayDetail()}
+                      </div>
+                    )}
 
                     {!state.isFilterMenuOpen && (
                       <IconButton

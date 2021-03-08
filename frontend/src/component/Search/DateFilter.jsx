@@ -141,7 +141,7 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T00:00:01Z`, DATE_FILTER_ELEMENT.AFTER)}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}`, DATE_FILTER_ELEMENT.AFTER)}
             placeholder={props.t('mm/dd/yyyy')}
             value={props.afterDate ? this.formatDate(props.afterDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />
@@ -172,7 +172,7 @@ export class DateFilter extends React.Component {
             }}
             format={FORMAT[props.user.lang]}
             formatDate={this.formatDate}
-            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}T23:59:59Z`, DATE_FILTER_ELEMENT.BEFORE)}
+            onDayChange={(day) => props.onChangeDate(`${day.toISOString().split('T')[0]}`, DATE_FILTER_ELEMENT.BEFORE)}
             placeholder={props.t('mm/dd/yyyy')}
             value={props.beforeDate ? this.formatDate(props.beforeDate, FORMAT[props.user.lang], props.user.lang) : ''}
           />

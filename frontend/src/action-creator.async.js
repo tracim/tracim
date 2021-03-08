@@ -6,6 +6,9 @@ import {
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+import {
+  formatISO
+} from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -1121,7 +1124,7 @@ export const getAdvancedSearchResult = (
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
   else queryParameterList.push('search_string=*')
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
-  if (pageSize) queryParameterList.push(`size=${searchString ? pageSize : 0}`)
+  if (Number.isInteger(pageSize)) queryParameterList.push(`size=${pageSize}`)
   if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
   if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
@@ -1129,12 +1132,20 @@ export const getAdvancedSearchResult = (
     if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
     if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
     if (createdRange) {
-      if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
-      if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
+      if (createdRange.from) queryParameterList.push(`created_from=${formatISO(new Date(createdRange.from))}`)
+      if (createdRange.to) {
+        const toDate = new Date(createdRange.to)
+        toDate.setDate(toDate.getDate() + 1)
+        queryParameterList.push(`created_to=${formatISO(toDate)}`)
+      }
     }
     if (modifiedRange) {
-      if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
-      if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
+      if (modifiedRange.from) queryParameterList.push(`modified_from=${formatISO(new Date(modifiedRange.from))}`)
+      if (modifiedRange.to) {
+        const toDate = new Date(createdRange.to)
+        toDate.setDate(toDate.getDate() + 1)
+        queryParameterList.push(`modified_to=${formatISO(toDate)}`)
+      }
     }
     if (searchFacets) {
       if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
