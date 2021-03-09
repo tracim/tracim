@@ -122,24 +122,24 @@ export class AdvancedSearch extends React.Component {
   }
 
   getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
-    const { props, state } = this
+    const { props } = this
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
-    const isOnlyFacet = Object.keys(appliedFilters).length == 0 && !searchObject.searchString
+    const onlyGetFacet = Object.keys(appliedFilters).length === 0 && !searchObject.searchString
 
+    let pageNumber = FIRST_PAGE
     let pageSize = searchObject.numberResultsByPage
-    if (isOnlyFacet) {
+    if (onlyGetFacet) {
       pageSize = 0
-    } else {
+    } else if (!hasFirstPage) {
+      pageNumber = searchObject.currentPage
       pageSize = searchObject.numberResultsByPage * searchObject.currentPage
     }
 
     const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
       searchObject.searchString,
       searchObject.contentTypes,
-      hasFirstPage
-        ? searchObject.currentPage
-        : FIRST_PAGE,
+      pageNumber,
       pageSize,
       searchObject.showArchived,
       searchObject.showDeleted,
@@ -282,7 +282,6 @@ export class AdvancedSearch extends React.Component {
   }
 
   getAllSearchResult = (searchObject) => {
-    const { props } = this
     for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
       const searchTypeObject = this.getSearchObject(searchType)
       this.getSearchResult({
