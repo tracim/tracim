@@ -1,3 +1,39 @@
+# 3.6.0 / 2021-03-xx
+
+### New Features
+
+- Translation of Note and comment directly in Tracim with Systran software
+- Advanced search available when search with Elasticsearch
+
+### Fixed Issues
+
+- Frontend: [#4218](https://github.com/tracim/tracim/issues/4218),
+[#4177](https://github.com/tracim/tracim/issues/4177),
+[#3575](https://github.com/tracim/tracim/issues/3575)
+- UX: [#3791](https://github.com/tracim/tracim/issues/3791),
+[#3553](https://github.com/tracim/tracim/issues/3553)
+- ElasticSearch: [#4147](https://github.com/tracim/tracim/issues/4147),
+[#4149](https://github.com/tracim/tracim/issues/4149),
+[#4146](https://github.com/tracim/tracim/issues/4146)
+- Agenda: [#3553](https://github.com/tracim/tracim/issues/3553)
+- Backend: [#2114](https://github.com/tracim/tracim/issues/2114)
+
+### Breaking Changes
+
+#### Backend configuration file (development.ini)
+
+- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+  - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias__prefix`
+You need to delete, create and populate again your ElasticSearch index.
+- **Some chnage in api =>** https://github.com/tracim/tracim/issues/4133
+
+### Other Changes
+
+- ElasticSearch: Refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command for this (issue #2660)
+- Sec: removing visibility of user email in Userschema used by the TLM
+- Translation service: new parameters available in the development.ini file to activate and configure this [translation-feature](backend/doc/setting.md#translation-feature)
+
+
 # 3.5.0 / 2021-02-11
 
 ### New Features
@@ -25,7 +61,7 @@
 ### Breaking Changes
 
 - Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
-- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](.backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
+- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
   - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
   - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
   - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`
