@@ -296,7 +296,7 @@ class ESSearchApi(SearchApi):
             raw_content=content_in_context.raw_content,
             # HACK - G.M - 2021-03-09 - properly handled the None size case here to
             # avoid broken search when broken content exist (content without valid depot file)
-            # see
+            # see #4267 for better solution.
             content_size=content_in_context.size or 0,
         )
         indexed_content.meta.id = content_in_context.content_id
