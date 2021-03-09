@@ -294,10 +294,7 @@ class ESSearchApi(SearchApi):
             archived_through_parent_id=content_in_context.archived_through_parent_id,
             deleted_through_parent_id=content_in_context.deleted_through_parent_id,
             raw_content=content_in_context.raw_content,
-            # HACK - G.M - 2021-03-09 - properly handled the None size case here to
-            # avoid broken search when broken content exist (content without valid depot file)
-            # see #4267 for better solution.
-            content_size=content_in_context.size or 0,
+            content_size=content_in_context.size,
         )
         indexed_content.meta.id = content_in_context.content_id
         content_index_alias = self._get_index_parameters(IndexedContent).alias
