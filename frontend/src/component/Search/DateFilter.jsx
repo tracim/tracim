@@ -6,13 +6,13 @@ import DayPickerInput from 'react-day-picker/DayPickerInput'
 import 'react-day-picker/lib/style.css'
 import dateFnsFormat from 'date-fns/format'
 import { DATE_FILTER_ELEMENT } from '../../util/helper.js'
-import { Checkbox } from 'tracim_frontend_lib'
+import { Checkbox, DATE_FNS_LOCALE } from 'tracim_frontend_lib'
 
 require('./DateFilter.styl')
 
 export class DateFilter extends React.Component {
   formatDate = (date, format, locale) => {
-    return dateFnsFormat(date, format, { locale })
+    return dateFnsFormat(new Date(date), format, { locale: DATE_FNS_LOCALE[locale] })
   }
 
   render () {
@@ -109,9 +109,9 @@ export class DateFilter extends React.Component {
     }
 
     const FORMAT = {
-      en: 'MM/DD/YYYY',
-      fr: 'DD/MM/YYYY',
-      pt: 'DD/MM/YYYY'
+      en: 'MM/dd/yyyy',
+      fr: 'dd/MM/yyyy',
+      pt: 'dd/MM/yyyy'
     }
 
     return (

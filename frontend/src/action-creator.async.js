@@ -6,9 +6,7 @@ import {
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
-import {
-  formatISO
-} from 'date-fns'
+import { formatISO, parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -1105,6 +1103,28 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
   })
 }
 
+const getUTCMidnight = (dateString) => parseISO(`${dateString}T00:00:00Z`)
+
+const getDateRangeParameters = (range) => {
+  const rangeParameterList = []
+  if (range.from) {
+    const fromDate = getUTCMidnight(range.from)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const fromDateString = formatISO(fromDate).split('.')[0] + 'Z'
+    rangeParameterList.push(`created_from=${fromDateString}`)
+  }
+  if (range.to) {
+    const toDate = getUTCMidnight(range.to)
+    toDate.setDate(toDate.getDate() + 1)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const toDateString = formatISO(toDate).split('.')[0] + 'Z'
+    rangeParameterList.push(`created_to=${toDateString}`)
+  }
+  return rangeParameterList
+}
+
 export const getAdvancedSearchResult = (
   searchString,
   contentTypes,
@@ -1120,7 +1140,7 @@ export const getAdvancedSearchResult = (
   newestAuthoredContentRange,
   searchFacets
 ) => dispatch => {
-  const queryParameterList = []
+  let queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
   else queryParameterList.push('search_string=*')
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
@@ -1131,22 +1151,8 @@ export const getAdvancedSearchResult = (
   if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
     if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
     if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
-    if (createdRange) {
-      if (createdRange.from) queryParameterList.push(`created_from=${formatISO(new Date(createdRange.from))}`)
-      if (createdRange.to) {
-        const toDate = new Date(createdRange.to)
-        toDate.setDate(toDate.getDate() + 1)
-        queryParameterList.push(`created_to=${formatISO(toDate)}`)
-      }
-    }
-    if (modifiedRange) {
-      if (modifiedRange.from) queryParameterList.push(`modified_from=${formatISO(new Date(modifiedRange.from))}`)
-      if (modifiedRange.to) {
-        const toDate = new Date(createdRange.to)
-        toDate.setDate(toDate.getDate() + 1)
-        queryParameterList.push(`modified_to=${formatISO(toDate)}`)
-      }
-    }
+    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange))
+    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange))
     if (searchFacets) {
       if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
       if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)

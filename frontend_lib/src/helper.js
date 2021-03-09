@@ -1,8 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { distanceInWords, isAfter } from 'date-fns'
+import { formatDistance, isAfter } from 'date-fns'
 import color from 'color'
+import dateFnsFr from 'date-fns/locale/fr'
+import dateFnsEn from 'date-fns/locale/en-US'
+import dateFnsPt from 'date-fns/locale/pt'
+
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -47,10 +51,10 @@ export const PAGE = {
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
 
-const dateFnsLocale = {
-  fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en'),
-  pt: require('date-fns/locale/pt')
+export const DATE_FNS_LOCALE = {
+  fr: dateFnsFr,
+  en: dateFnsEn,
+  pt: dateFnsPt
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -99,7 +103,13 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
+export const displayDistanceDate = (dateToDisplay, lang) => {
+  return formatDistance(
+    new Date(dateToDisplay),
+    new Date(),
+    { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
+  )
+}
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
