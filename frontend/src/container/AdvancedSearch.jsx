@@ -297,7 +297,7 @@ export class AdvancedSearch extends React.Component {
     if (Object.values(ADVANCED_SEARCH_TYPE).includes(searchType)) {
       this.setState({ searchType: searchType })
     } else {
-      // Default to content search (??)
+      // Default to content search
       const contentSearchQuery = qs.stringify(
         { ...qs.parse(props.location.search), s: ADVANCED_SEARCH_TYPE.CONTENT },
         { encode: true }
