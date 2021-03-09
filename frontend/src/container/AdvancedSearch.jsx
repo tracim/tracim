@@ -130,6 +130,8 @@ export class AdvancedSearch extends React.Component {
     let pageNumber = FIRST_PAGE
     let pageSize = searchObject.numberResultsByPage
     if (onlyGetFacet) {
+      // NOTE - S.G. - 2021-03-09 - setting pageSize to 0 allows to get the search facets
+      // without any results.
       pageSize = 0
     } else if (!hasFirstPage) {
       pageNumber = searchObject.currentPage
