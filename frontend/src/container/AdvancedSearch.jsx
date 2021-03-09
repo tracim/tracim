@@ -467,7 +467,7 @@ export class AdvancedSearch extends React.Component {
               <div className='advancedSearch__page'>
                 <div className='advancedSearch__content'>
                   <div className='advancedSearch__content__detail'>
-                    {state.searchString && (
+                    {currentNumberSearchResults > 0 && (
                       <div className='advancedSearch__content__detail__count'>
                         {this.getDisplayDetail()}
                       </div>
