@@ -185,8 +185,11 @@ class FileCreation(object):
     Simple parent_id object
     """
 
-    def __init__(self, parent_id: int = 0) -> None:
+    def __init__(
+        self, content_namespace: ContentNamespaces = ContentNamespaces.CONTENT, parent_id: int = 0
+    ) -> None:
         self.parent_id = parent_id
+        self.content_namespace = content_namespace
 
 
 class SetPassword(object):
@@ -609,10 +612,17 @@ class ContentCreation(object):
     Content creation model
     """
 
-    def __init__(self, label: str, content_type: str, parent_id: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        label: str,
+        content_type: str,
+        content_namespace: ContentNamespaces,
+        parent_id: Optional[int] = None,
+    ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
+        self.content_namespace = content_namespace
 
 
 class CommentCreation(object):

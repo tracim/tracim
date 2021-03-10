@@ -274,6 +274,9 @@ class FileCreationFormSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
         example=2, default=0, validate=positive_int_validator, allow_none=True
     )
+    content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
 
     @post_load
     def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1441,7 +1444,7 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, default=ContentNamespaces.CONTENT, example="content",
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
