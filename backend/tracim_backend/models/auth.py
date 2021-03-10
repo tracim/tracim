@@ -20,11 +20,8 @@ from depot.fields.sqlalchemy import UploadedFileField
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
-from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -121,8 +118,7 @@ class User(TrashableMixin, DeclarativeBase):
         ),
         {"mysql_charset": "utf8", "mysql_collate": "utf8_general_ci"},
     )
-    # TODO - G.M - 2021-03-10
-    # use CreationDateMixin instead
+    # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created = Column(DateTime, default=datetime.utcnow)
 
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
@@ -374,13 +370,3 @@ class User(TrashableMixin, DeclarativeBase):
         if difference > validity_seconds:
             return False
         return True
-
-
-class OwnerMixin:
-    @declared_attr
-    def owner_id(cls):
-        return Column("owner_id", Integer, ForeignKey(User.user_id), nullable=False)
-
-    @declared_attr
-    def owner(cls):
-        return relationship(User, primaryjoin=lambda: User.user_id == cls.owner_id)

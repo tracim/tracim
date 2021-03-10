@@ -1,15 +1,15 @@
 """add reaction table
 
-Revision ID: 4d40acd3238c
+Revision ID: 4c02f33fa18c
 Revises: 5d54d8602f5a
-Create Date: 2021-03-10 10:19:53.941096
+Create Date: 2021-03-10 11:13:33.335055
 
 """
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "4d40acd3238c"
+revision = "4c02f33fa18c"
 down_revision = "5d54d8602f5a"
 
 
@@ -20,8 +20,11 @@ def upgrade():
         sa.Column("reaction_id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("content_id", sa.Integer(), nullable=False),
         sa.Column("value", sa.Unicode(length=255), nullable=False),
-        sa.Column("owner_id", sa.Integer(), nullable=False),
+        sa.Column("author_id", sa.Integer(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["author_id"], ["users.user_id"], name=op.f("fk_reaction_author_id_users")
+        ),
         sa.ForeignKeyConstraint(
             ["content_id"],
             ["content.id"],
@@ -29,11 +32,10 @@ def upgrade():
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
-        sa.ForeignKeyConstraint(
-            ["owner_id"], ["users.user_id"], name=op.f("fk_reaction_owner_id_users")
-        ),
         sa.PrimaryKeyConstraint("reaction_id", "content_id", name=op.f("pk_reaction")),
-        sa.UniqueConstraint("owner_id", "content_id", "value", name=op.f("uq__reaction__owner_id")),
+        sa.UniqueConstraint(
+            "author_id", "content_id", "value", name=op.f("uq__reaction__author_id")
+        ),
     )
     # ### end Alembic commands ###
 

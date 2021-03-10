@@ -46,7 +46,6 @@ from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
-from tracim_backend.models.auth import OwnerMixin
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
@@ -63,7 +62,7 @@ class WorkspaceAccessType(enum.Enum):
     OPEN = "open"
 
 
-class Workspace(OwnerMixin, CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
+class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     FILEMANAGER_EXTENSION = ".space"
     ACCESSIBLE_TYPES = [WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST]
 
@@ -111,6 +110,9 @@ class Workspace(OwnerMixin, CreationDateMixin, UpdateDateMixin, TrashableMixin, 
         backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
         order_by="Workspace.workspace_id",
     )
+
+    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    owner = relationship("User", remote_side=[User.user_id])
 
     @property
     def recursive_children(self) -> List["Workspace"]:
@@ -289,6 +291,7 @@ class WorkspaceSubscription(DeclarativeBase):
         nullable=False,
         server_default=WorkspaceSubscriptionState.PENDING.name,
     )
+    # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     workspace_id = Column(
         Integer,
@@ -419,7 +422,6 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author" ?
-    # TODO - G.M - 2021-03-10 - use OwnerMixin instead
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
     owner = relationship("User", remote_side=[User.user_id])
 

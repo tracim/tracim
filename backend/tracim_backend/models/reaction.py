@@ -3,16 +3,17 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy import Unicode
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import Integer
 
-from tracim_backend.models.auth import OwnerMixin
+from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
 
 
-class Reaction(OwnerMixin, CreationDateMixin, DeclarativeBase):
+class Reaction(CreationDateMixin, DeclarativeBase):
     __tablename__ = "reaction"
-    __table_args__ = (UniqueConstraint("owner_id", "content_id", "value"),)
+    __table_args__ = (UniqueConstraint("author_id", "content_id", "value"),)
     MAX_REACTION_VALUE_LENGTH = 255
 
     reaction_id = Column(
@@ -25,10 +26,12 @@ class Reaction(OwnerMixin, CreationDateMixin, DeclarativeBase):
         primary_key=True,
     )
     value = Column(Unicode(MAX_REACTION_VALUE_LENGTH), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    author = relationship("User", remote_side=[User.user_id])
 
     def __repr__(self):
-        return "<Reaction(owner_id=%s, content_id=%s, value=%s)>" % (
-            repr(self.owner_id),
+        return "<Reaction(author_id=%s, content_id=%s, value=%s)>" % (
+            repr(self.author_id),
             repr(self.content_id),
             repr(self.value),
         )
