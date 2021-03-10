@@ -47,7 +47,7 @@ class ReactionController(Controller):
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         return reaction_lib.get_one(
-            content_id=hapic_data.path.content_id, reaction_id=hapic_data.path.reaction_id
+            content_id=request.current_content.content_id, reaction_id=hapic_data.path.reaction_id
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_REACTION_ENDPOINTS])
@@ -61,7 +61,7 @@ class ReactionController(Controller):
         Get all reactions related to a content in asc order (first is the oldest)
         """
         reaction_lib = ReactionLib(session=request.dbsession)
-        return reaction_lib.get_all(content_id=hapic_data.path.content_id,)
+        return reaction_lib.get_all(content_id=request.current_content.content_id,)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_REACTION_ENDPOINTS])
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
@@ -92,7 +92,7 @@ class ReactionController(Controller):
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         reaction = reaction_lib.get_one(
-            content_id=hapic_data.path.content_id, reaction_id=hapic_data.path.reaction_id,
+            content_id=request.current_content.content_id, reaction_id=hapic_data.path.reaction_id,
         )
         reaction_lib.delete(
             reaction=reaction, do_save=True,
