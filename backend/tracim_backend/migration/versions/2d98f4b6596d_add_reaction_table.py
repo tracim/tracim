@@ -1,15 +1,15 @@
 """add reaction table
 
-Revision ID: 4c02f33fa18c
+Revision ID: 2d98f4b6596d
 Revises: 5d54d8602f5a
-Create Date: 2021-03-10 11:13:33.335055
+Create Date: 2021-03-10 12:03:05.198986
 
 """
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "4c02f33fa18c"
+revision = "2d98f4b6596d"
 down_revision = "5d54d8602f5a"
 
 
@@ -32,7 +32,7 @@ def upgrade():
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint("reaction_id", "content_id", name=op.f("pk_reaction")),
+        sa.PrimaryKeyConstraint("reaction_id", name=op.f("pk_reaction")),
         sa.UniqueConstraint(
             "author_id", "content_id", "value", name=op.f("uq__reaction__author_id")
         ),

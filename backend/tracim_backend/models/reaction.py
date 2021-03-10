@@ -20,10 +20,7 @@ class Reaction(CreationDateMixin, DeclarativeBase):
         Integer, Sequence("seq__reaction__reaction_id"), autoincrement=True, primary_key=True
     )
     content_id = Column(
-        Integer,
-        ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",),
-        nullable=False,
-        primary_key=True,
+        Integer, ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",), nullable=False,
     )
     value = Column(Unicode(MAX_REACTION_VALUE_LENGTH), nullable=False)
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
