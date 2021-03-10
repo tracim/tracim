@@ -17,12 +17,14 @@ from typing import TYPE_CHECKING
 import uuid
 
 from depot.fields.sqlalchemy import UploadedFileField
-import sqlalchemy
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -34,6 +36,7 @@ from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import InvalidResetPasswordToken
 from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import TrashableMixin
 
 if TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
@@ -81,7 +84,7 @@ class Profile(enum.Enum):
         return profiles[0]
 
 
-class User(DeclarativeBase):
+class User(TrashableMixin, DeclarativeBase):
     """
     User definition.
     """
@@ -118,20 +121,16 @@ class User(DeclarativeBase):
         ),
         {"mysql_charset": "utf8", "mysql_collate": "utf8_general_ci"},
     )
+    # TODO - G.M - 2021-03-10
+    # use CreationDateMixin instead
+    created = Column(DateTime, default=datetime.utcnow)
 
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
     email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=True)
     username = Column(Unicode(MAX_USERNAME_LENGTH), unique=True, nullable=True)
     display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
-    created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
-    is_deleted = Column(
-        Boolean,
-        default=False,
-        nullable=False,
-        server_default=sqlalchemy.sql.expression.literal(False),
-    )
     imported_from = Column(Unicode(MAX_IMPORTED_FROM_LENGTH), nullable=True)
     # timezone as tz database format
     timezone = Column(Unicode(MAX_TIMEZONE_LENGTH), nullable=False, server_default="")
@@ -375,3 +374,13 @@ class User(DeclarativeBase):
         if difference > validity_seconds:
             return False
         return True
+
+
+class OwnerMixin:
+    @declared_attr
+    def owner_id(cls):
+        return Column("owner_id", Integer, ForeignKey(User.user_id), nullable=False)
+
+    @declared_attr
+    def owner(cls):
+        return relationship(User, primaryjoin=lambda: User.user_id == cls.owner_id)

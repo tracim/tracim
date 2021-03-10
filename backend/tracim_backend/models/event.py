@@ -18,6 +18,7 @@ from sqlalchemy.types import String
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
 
 
 class OperationType(enum.Enum):
@@ -103,7 +104,7 @@ class ReadStatus(enum.Enum):
         return [e.value for e in cls]
 
 
-class Event(DeclarativeBase):
+class Event(CreationDateMixin, DeclarativeBase):
     """
     Event definition.
     """
@@ -123,7 +124,6 @@ class Event(DeclarativeBase):
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
     entity_subtype = Column(String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
-    created = Column(DateTime, nullable=False, default=datetime.utcnow)
     fields = Column(JSON, nullable=False)
 
     # easier access to values stored in fields

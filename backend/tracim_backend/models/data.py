@@ -46,8 +46,12 @@ from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
+from tracim_backend.models.auth import OwnerMixin
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
+from tracim_backend.models.mixins import TrashableMixin
+from tracim_backend.models.mixins import UpdateDateMixin
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -59,7 +63,7 @@ class WorkspaceAccessType(enum.Enum):
     OPEN = "open"
 
 
-class Workspace(DeclarativeBase):
+class Workspace(OwnerMixin, CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     FILEMANAGER_EXTENSION = ".space"
     ACCESSIBLE_TYPES = [WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST]
 
@@ -75,12 +79,6 @@ class Workspace(DeclarativeBase):
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default="")
     description = Column(Text(), unique=False, nullable=False, default="")
-    #  Default value datetime.utcnow,
-    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    #  Default value datetime.utcnow,
-    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     revisions = relationship("ContentRevisionRO")
@@ -99,8 +97,6 @@ class Workspace(DeclarativeBase):
         default=False,
         server_default=sqlalchemy.sql.expression.literal(False),
     )
-    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    owner = relationship("User", remote_side=[User.user_id])
     access_type = Column(
         Enum(WorkspaceAccessType),
         nullable=False,
@@ -410,7 +406,7 @@ class ContentNamespaces(enum.Enum):
     UPLOAD = "upload"
 
 
-class ContentRevisionRO(DeclarativeBase):
+class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     """
     Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
     ContentRevisionUpdateError errors.
@@ -422,16 +418,18 @@ class ContentRevisionRO(DeclarativeBase):
     # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
-    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author" ?
+    # TODO - G.M - 2021-03-10 - use OwnerMixin instead
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    owner = relationship("User", remote_side=[User.user_id])
 
     label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
     file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
-    #  INFO - A.P - 2017-07-03 - Depot Doc
-    #  http://depot.readthedocs.io/en/latest/#attaching-files-to-models
+    # INFO - A.P - 2017-07-03 - Depot Doc
+    # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
     depot_file = Column(UploadedFileField, unique=False, nullable=True)
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
@@ -443,9 +441,6 @@ class ContentRevisionRO(DeclarativeBase):
         nullable=False,
         default=str(content_status_list.get_default_status().slug),
     )
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
     is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(Unicode(32), unique=False, nullable=False, default="")
@@ -459,8 +454,6 @@ class ContentRevisionRO(DeclarativeBase):
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
-    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-    owner = relationship("User", remote_side=[User.user_id])
     content_namespace = Column(
         Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
     )
