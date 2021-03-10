@@ -19,43 +19,52 @@ class ReactionLib:
     def _base_query(self):
         return self._session.query(Reaction)
 
-    def _get_one_rsc(self, user_id: int, content_id: int, value: str) -> Query:
+    def base_filter(
+        self,
+        query: Query,
+        reaction_id: typing.Optional[int] = None,
+        content_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
+        value: typing.Optional[str] = None,
+    ) -> Query:
         """
-        :param user_id:
-        :param workspace_id:
         :return: a Query object, filtered query but without fetching the object.
         """
-        return (
-            self._base_query()
-            .filter(Reaction.author_id == user_id)
-            .filter(Reaction.content_id == content_id)
-            .filter(Reaction.value == value)
-        )
+        if reaction_id:
+            query.filter(Reaction.reaction_id == reaction_id)
+        if content_id:
+            query = query.filter(Reaction.content_id == content_id)
+        if user_id:
+            query = query.filter(Reaction.author_id == user_id)
+        if value:
+            query = query.filter(Reaction.value == value)
+        return query
 
-    def get_one(self, user_id: int, content_id: int, value: str) -> Reaction:
+    def get_one(self, reaction_id: int, content_id: typing.Optional[int] = None) -> Reaction:
         try:
-            reaction = self._get_one_rsc(user_id, content_id, value).one()
+            reaction = self.base_filter(
+                self._base_query(), reaction_id=reaction_id, content_id=content_id
+            ).one()
         except NoResultFound:
             raise ReactionNotFound(
-                "Reaction of user {user_id} "
-                "on content {content_id} with value: {value} was not found.".format(
-                    user_id=user_id, content_id=content_id, value=value
-                )
+                "Reaction of id {reaction_id} was not found.".format(reaction_id=reaction_id)
             )
         return reaction
 
     def get_all(
         self, content_id: typing.Optional[int] = None, user_id: typing.Optional[int] = None
     ) -> typing.List[Reaction]:
-        query = self._base_query()
-        if content_id:
-            query = query.filter(Reaction.content_id == content_id)
-        if user_id:
-            query = query.filter(Reaction.author_id == user_id)
+        query = self.base_filter(self._base_query(), content_id=content_id, user_id=user_id)
+        query = query.order_by(Reaction.reaction_id)
         return query.all()
 
     def create(self, user: User, content: Content, value: str, do_save: bool) -> Reaction:
-        query = self._get_one_rsc(user.user_id, content.content_id, value)
+        query = self.base_filter(
+            query=self._base_query(),
+            user_id=user.user_id,
+            content_id=content.content_id,
+            value=value,
+        )
         if query.count() > 0:
             raise ReactionAlreadyExistError(
                 "Reaction of user {user_id} "
@@ -63,7 +72,7 @@ class ReactionLib:
                     user_id=user.user_id, content_id=content.content_id, value=value
                 )
             )
-        reaction = Reaction(user.user_id, content.content_id, value)
+        reaction = Reaction(author_id=user.user_id, content_id=content.content_id, value=value)
         self._session.add(reaction)
         if do_save:
             self._session.flush()
