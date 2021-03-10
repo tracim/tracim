@@ -66,6 +66,10 @@ class RoleAlreadyExistError(TracimError):
     error_code = ErrorCode.USER_ROLE_ALREADY_EXIST
 
 
+class ReactionAlreadyExistError(TracimError):
+    error_code = ErrorCode.REACTION_ALREADY_EXIST
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -164,6 +168,10 @@ class CaldavNotAuthorized(TracimException):
 
 class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
+
+
+class ReactionNotFound(NotFound):
+    error_code = ErrorCode.REACTION_NOT_FOUND
 
 
 class UploadPermissionNotFound(NotFound):
