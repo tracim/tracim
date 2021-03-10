@@ -125,7 +125,11 @@ export class AdvancedSearch extends React.Component {
     const { props } = this
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
-    const onlyGetFacet = Object.keys(appliedFilters).length === 0 && searchFieldList.length === 0 && !searchObject.searchString
+    const onlyGetFacet = (
+      Object.values(appliedFilters).filter(item => !Array.isArray(item)).every(item => Object.keys(item).length === 0) &&
+      searchFieldList.length === 0 &&
+      !searchObject.searchString
+    )
 
     let pageNumber = FIRST_PAGE
     let pageSize = searchObject.numberResultsByPage
@@ -195,7 +199,7 @@ export class AdvancedSearch extends React.Component {
     const { props, state } = this
     const currentSearch = this.getCurrentSearchObject()
 
-    const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchField || []
+    const oldAppliedSearchFieldList = currentSearch.appliedFilters.searchFieldList || []
 
     const newAppliedSearchFieldList = oldAppliedSearchFieldList.includes(field.id)
       ? oldAppliedSearchFieldList.filter(searchField => searchField !== field.id)
@@ -207,10 +211,7 @@ export class AdvancedSearch extends React.Component {
       { ...currentSearch, searchType: state.searchType },
       currentSearch.resultList.length,
       newAppliedSearchFieldList,
-      currentSearch.appliedFilters.newestAuthoredContentRange,
-      currentSearch.appliedFilters.createdRange,
-      currentSearch.appliedFilters.modifiedRange,
-      currentSearch.appliedFilters.searchFacets
+      currentSearch.appliedFilters
     )
   }
 
