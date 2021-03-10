@@ -283,6 +283,7 @@ export class AdvancedSearch extends React.Component {
   }
 
   getAllSearchResult = (searchObject) => {
+    const appliedFilters = searchObject.appliedFilters || {}
     for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
       const searchTypeObject = this.getSearchObject(searchType)
       this.getSearchResult(
@@ -291,9 +292,9 @@ export class AdvancedSearch extends React.Component {
           currentPage: FIRST_PAGE,
           searchType: searchType
         },
-        searchTypeObject ? searchTypeObject.resultList.length : 0,
-        searchTypeObject.searchType === searchObject.searchType ? searchObject.appliedFilters.searchFieldList : [],
-        searchTypeObject.searchType === searchObject.searchType ? searchObject.appliedFilters : {}
+        searchTypeObject && searchTypeObject.resultList ? searchTypeObject.resultList.length : 0,
+        searchTypeObject.searchType === searchObject.searchType ? appliedFilters.searchFieldList : [],
+        searchTypeObject.searchType === searchObject.searchType ? appliedFilters : {}
       )
     }
   }

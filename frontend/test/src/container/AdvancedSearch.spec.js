@@ -36,6 +36,8 @@ describe('In <AdvancedSearch />', () => {
   const props = {
     breadcrumbs: [],
     contentSearch: { ...searchResult, appliedFilters: { } },
+    userSearch: {},
+    spaceSearch: {},
     contentType: contentType,
     user: user,
     system: {

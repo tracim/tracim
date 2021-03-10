@@ -6,7 +6,7 @@ import {
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
-import { formatISO, parseISO } from 'date-fns'
+import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -1111,7 +1111,7 @@ const getDateRangeParameters = (range) => {
     const fromDate = getUTCMidnight(range.from)
     // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
     // does not handle them, but keep the UTC zone as it is mandatory.
-    const fromDateString = formatISO(fromDate).split('.')[0] + 'Z'
+    const fromDateString = fromDate.toISOString().split('.')[0] + 'Z'
     rangeParameterList.push(`created_from=${fromDateString}`)
   }
   if (range.to) {
@@ -1119,7 +1119,7 @@ const getDateRangeParameters = (range) => {
     toDate.setDate(toDate.getDate() + 1)
     // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
     // does not handle them, but keep the UTC zone as it is mandatory.
-    const toDateString = formatISO(toDate).split('.')[0] + 'Z'
+    const toDateString = toDate.toISOString().split('.')[0] + 'Z'
     rangeParameterList.push(`created_to=${toDateString}`)
   }
   return rangeParameterList
