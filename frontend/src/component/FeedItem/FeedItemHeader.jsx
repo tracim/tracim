@@ -15,18 +15,17 @@ import {
 } from 'tracim_frontend_lib'
 import TimedEvent from '../TimedEvent.jsx'
 
-require('./ContentActivityHeader.styl')
+require('./FeedItemHeader.styl')
 
-export class ContentActivityHeader extends React.Component {
-  getDisplayOperation (message) {
+export class FeedItemHeader extends React.Component {
+  getDisplayOperation (lastModification, lastModificationEntityType, lastModificationSubEntityType, currentRevisionType) {
     const { props } = this
 
-    if (message.fields.content.current_revision_type === 'status-update') return props.t('status modified')
-    const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
-    if (TLM_ET.MENTION === entityType) return props.t('mention made')
-    if (CONTENT_TYPE.COMMENT === subEntityType) return props.t('commented')
+    if (currentRevisionType === 'status-update') return props.t('status modified')
+    if (TLM_ET.MENTION === lastModificationEntityType) return props.t('mention made')
+    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) return props.t('commented')
 
-    switch (coreEventType) {
+    switch (lastModification) {
       case TLM_CET.CREATED:
         return props.t('created')
       case TLM_CET.MODIFIED:
@@ -41,40 +40,43 @@ export class ContentActivityHeader extends React.Component {
 
   render () {
     const { props } = this
-    const workspaceId = props.workspace.workspace_id
     const contentId = props.content.content_id
     const contentLabel = props.content.label
     const contentType = props.content.content_type
 
-    const newestMessage = props.newestMessage
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
     )
 
     return (
-      <div className='contentActivityHeader'>
+      <div className='feedItemHeader'>
         <Icon
-          customClass='contentActivityHeader__icon'
+          customClass='feedItemHeader__icon'
           color={app.hexcolor}
           title={app.label}
           icon={`fa-fw ${app.faIcon}`}
         />
-        <div className='contentActivityHeader__title'>
-          <Link to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}>
-            <span className='contentActivityHeader__label' data-cy='contentActivityHeader__label' title={contentLabel}>{contentLabel}</span>
+        <div className='feedItemHeader__title'>
+          <Link to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}>
+            <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
           <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
 
         <TimedEvent
-          customClass='contentActivityHeader__right'
-          operation={this.getDisplayOperation(newestMessage)}
-          date={newestMessage.created}
+          customClass='feedItemHeader__right'
+          operation={this.getDisplayOperation(
+            props.lastModification,
+            props.lastModificationEntityType,
+            props.lastModificationSubEntityType,
+            props.content.current_revision_type
+          )}
+          date={props.modifiedDate}
           lang={props.user.lang}
           author={{
-            publicName: newestMessage.fields.author.public_name,
-            userId: newestMessage.fields.author.user_id
+            publicName: props.lastModifier.public_name,
+            userId: props.lastModifier.user_id
           }}
           eventList={props.eventList}
           onEventClicked={props.onEventClicked}
@@ -82,12 +84,12 @@ export class ContentActivityHeader extends React.Component {
         />
 
         <DropdownMenu
-          buttonCustomClass='contentActivityHeader__actionMenu'
+          buttonCustomClass='feedItemHeader__actionMenu'
           buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
         >
           <IconButton
-            customClass='contentActivityHeader__actionMenu__item'
+            customClass='feedItemHeader__actionMenu__item'
             icon='fas fa-link'
             onClick={props.onClickCopyLink}
             text={props.t('Copy content link')}
@@ -95,9 +97,9 @@ export class ContentActivityHeader extends React.Component {
           />
 
           <Link
-            className='contentActivityHeader__actionMenu__item'
+            className='feedItemHeader__actionMenu__item'
             title={props.t('Open content')}
-            to={PAGE.WORKSPACE.CONTENT(workspaceId, contentType, contentId)}
+            to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
             key={`open-${contentId}`}
           >
             <i className={`fa-fw ${app.faIcon}`} />
@@ -110,18 +112,25 @@ export class ContentActivityHeader extends React.Component {
 }
 
 const mapStateToProps = ({ user, appList }) => ({ user, appList })
-export default connect(mapStateToProps)(translate()(ContentActivityHeader))
+export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
-ContentActivityHeader.propTypes = {
+FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  workspace: PropTypes.object.isRequired,
-  eventList: PropTypes.array.isRequired,
-  newestMessage: PropTypes.object.isRequired,
+  lastModification: PropTypes.string.isRequired,
+  lastModifier: PropTypes.object.isRequired,
+  modifiedDate: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
+  eventList: PropTypes.array,
+  lastModificationEntityType: PropTypes.string,
+  lastModificationSubEntityType: PropTypes.string,
   onEventClicked: PropTypes.func
 }
 
-ContentActivityHeader.defaultProps = {
-  breadcrumbsList: []
+FeedItemHeader.defaultProps = {
+  breadcrumbsList: [],
+  eventList: [],
+  lastModificationEntityType: '',
+  lastModificationSubEntityType: ''
 }

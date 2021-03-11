@@ -6,13 +6,14 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../helper.js'
+import { ROLE, formatAbsoluteDate } from '../../helper.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
+import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -23,59 +24,11 @@ export class Timeline extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
-
-    this.timelineContainerScrollHeight = 0
   }
 
   handleAllAppChangeLanguage = data => {
     console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     i18n.changeLanguage(data)
-  }
-
-  componentDidMount () {
-    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
-    if (window.innerWidth < 1200) return
-    this.timelineBottom.scrollIntoView({ behavior: 'instant' })
-  }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.shouldScrollToBottom && this.props.timelineData && prevProps.timelineData) {
-      this.scrollToBottom(prevProps.timelineData)
-    }
-    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
-  }
-
-  scrollToBottom = (prevTimeline) => {
-    const { props } = this
-
-    if (props.timelineData.length === 0) return
-
-    const lastCurrentTimelineItem = props.timelineData[props.timelineData.length - 1]
-    const isNewContent = prevTimeline.length > 0
-      ? this.getTimelineContentId(prevTimeline[prevTimeline.length - 1]) !== this.getTimelineContentId(lastCurrentTimelineItem)
-      : false
-
-    const scrollPosition = this.timelineContainer.scrollTop + this.timelineContainer.clientHeight
-    const isScrollAtTheBottom = scrollPosition === this.timelineContainerScrollHeight
-
-    const isLastTimelineItemAddedFromCurrentToken = props.isLastTimelineItemCurrentToken && props.newComment === ''
-    const isLastTimelineItemTypeComment = props.timelineData[props.timelineData.length - 1].content_type === CONTENT_TYPE.COMMENT
-
-    // GM - INFO - 2020-06-30 - When width >= 1200: Check if the timeline scroll is at the bottom
-    // or if the new item was created by the current session tokenId or if the content_id has changed.
-    // When width >= 1200: Check the if the new comment was created by the current session tokenId.
-    if (
-      (window.innerWidth >= 1200 && (isNewContent || isScrollAtTheBottom || isLastTimelineItemAddedFromCurrentToken)) ||
-      (window.innerWidth < 1200 && isLastTimelineItemAddedFromCurrentToken && isLastTimelineItemTypeComment)
-    ) {
-      const behavior = isScrollAtTheBottom && props.isLastTimelineItemCurrentToken ? 'smooth' : 'instant'
-      this.timelineBottom.scrollIntoView({ behavior })
-    }
-  }
-
-  getTimelineContentId = (content) => {
-    if (!content) return -1
-    return content.timelineType === TIMELINE_TYPE.COMMENT ? content.parent_id : content.content_id
   }
 
   render () {
@@ -121,46 +74,50 @@ export class Timeline extends React.Component {
           )}
         </div>
 
-        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')} ref={el => { this.timelineContainer = el }}>
-          {props.timelineData.map(content => {
-            switch (content.timelineType) {
-              case 'comment':
-                return (
-                  <Comment
-                    customClass={props.customClass}
-                    customColor={props.customColor}
-                    apiUrl={props.apiUrl}
-                    author={content.author}
-                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                    createdDistance={content.created}
-                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
-                    fromMe={props.loggedUser.userId === content.author.user_id}
-                    key={`comment_${content.content_id}`}
-                    onClickTranslate={() => { props.onClickTranslateComment(content) }}
-                    onClickRestore={() => { props.onClickRestoreComment(content) }}
-                    translationState={content.translationState}
-                  />
-                )
-              case 'revision':
-                return (
-                  <Revision
-                    customClass={props.customClass}
-                    customColor={props.customColor}
-                    revisionType={content.revision_type}
-                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                    createdDistance={content.created}
-                    number={content.number}
-                    status={props.availableStatusList.find(status => status.slug === content.status)}
-                    authorPublicName={content.author.public_name}
-                    allowClickOnRevision={props.allowClickOnRevision}
-                    onClickRevision={() => props.onClickRevisionBtn(content)}
-                    key={`revision_${content.revision_id}`}
-                  />
-                )
-            }
-          })}
-          <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
-        </ul>
+        <ScrollToBottomWrapper
+          customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
+          shouldScrollToBottom={props.shouldScrollToBottom}
+          itemList={props.timelineData}
+          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
+        >
+            {props.timelineData.map(content => {
+              switch (content.timelineType) {
+                case 'comment':
+                  return (
+                    <Comment
+                      customClass={props.customClass}
+                      customColor={props.customColor}
+                      apiUrl={props.apiUrl}
+                      author={content.author}
+                      createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
+                      createdDistance={content.created}
+                      text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
+                      fromMe={props.loggedUser.userId === content.author.user_id}
+                      key={`comment_${content.content_id}`}
+                      onClickTranslate={() => { props.onClickTranslateComment(content) }}
+                      onClickRestore={() => { props.onClickRestoreComment(content) }}
+                      translationState={content.translationState}
+                    />
+                  )
+                case 'revision':
+                  return (
+                    <Revision
+                      customClass={props.customClass}
+                      customColor={props.customColor}
+                      revisionType={content.revision_type}
+                      createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
+                      createdDistance={content.created}
+                      number={content.number}
+                      status={props.availableStatusList.find(status => status.slug === content.status)}
+                      authorPublicName={content.author.public_name}
+                      allowClickOnRevision={props.allowClickOnRevision}
+                      onClickRevision={() => props.onClickRevisionBtn(content)}
+                      key={`revision_${content.revision_id}`}
+                    />
+                  )
+              }
+            })}
+        </ScrollToBottomWrapper>
 
         {props.showInvalidMentionPopup && (
           <ConfirmPopup
@@ -304,6 +261,6 @@ Timeline.defaultProps = {
   showTitle: true,
   searchForMentionInQuery: () => { },
   showInvalidMentionPopup: false,
-  onClickTranslateComment: content => {},
-  onClickRestoreComment: content => {}
+  onClickTranslateComment: content => { },
+  onClickRestoreComment: content => { }
 }
