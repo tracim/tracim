@@ -116,7 +116,7 @@ class Preview extends React.Component {
     const src = ([mediaQuery, width]) => `${previewURL(width)} ${width}w`
 
     return (
-      <div className='activityFeed__preview__image'>
+      <div className='recentActivities__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
           title={content.label}
@@ -221,7 +221,7 @@ class Preview extends React.Component {
     }
 
     return (
-      <div className='activityFeed__preview__html'>
+      <div className='recentActivities__preview__html'>
         <HTMLContent>{this.state.previewHtmlCode}</HTMLContent>
       </div>
     )
@@ -255,10 +255,10 @@ class Preview extends React.Component {
     return (
       <div
         className={classnames(
-          'activityFeed__preview', {
-            activityFeed__preview__overflow: state.previewOverflow,
-            activityFeed__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
-            activityFeed__preview__loading: state.previewLoading
+          'recentActivities__preview', {
+            recentActivities__preview__overflow: state.previewOverflow,
+            recentActivities__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
+            recentActivities__preview__loading: state.previewLoading
           }
         )}
         ref={(ref) => this.receivePreviewRef(ref)}
@@ -266,7 +266,7 @@ class Preview extends React.Component {
         <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
           {this.getPreviewComponent()}
           {state.previewOverflow && (
-            <div className='activityFeed__preview__overflowOverlay' />
+            <div className='recentActivities__preview__overflowOverlay' />
           )}
         </Link>
       </div>

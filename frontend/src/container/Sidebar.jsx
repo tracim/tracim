@@ -185,7 +185,7 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
-                {this.getSidebarItem(props.t('Activity feed'), PAGE.ACTIVITY_FEED)}
+                {this.getSidebarItem(props.t('Recent activities'), PAGE.RECENT_ACTIVITIES)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>

@@ -22,7 +22,6 @@
   "0 contents": "0 contents",
   "0 members": "0 members",
   "Account Settings": "Account Settings",
-  "Activity feed": "Activity feed",
   "Copy content link": "Copy content link",
   "Empty note": "Empty note",
   "Empty thread": "Empty thread",
@@ -329,7 +328,6 @@
   "unknown": "unknown",
   "Unknown activity type": "Unknown activity type",
   "status modified": "status modified",
-  "Loading activity feed…": "Loading activity feed…",
   "No activity": "No activity",
   "Preview of {{content}}": "Preview of {{content}}",
   "No preview available": "No preview available",
@@ -411,5 +409,8 @@
   "Account restored": "Account restored",
   "New access": "New access",
   "Access removed": "Access removed",
-  "Requested access": "Requested access"
+  "Requested access": "Requested access",
+  "Recent activities": "Recent activities",
+  "Loading recent activities…": "Loading recent activities…",
+  "undeleted": "undeleted"
 }

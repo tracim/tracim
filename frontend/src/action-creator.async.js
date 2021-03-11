@@ -893,11 +893,11 @@ export const getNotificationList = (
     nextPageToken = null,
     workspaceId = null,
     includeNotSent = false,
-    activityFeedEvents = false,
+    recentActivitiesEvents = false,
     relatedContentId = null
   }) => async dispatch => {
   const queryParameterList = [
-    activityFeedEvents
+    recentActivitiesEvents
       ? activityExcludedEventTypesParam
       : defaultExcludedEventTypesParam
   ]

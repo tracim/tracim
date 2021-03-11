@@ -20,8 +20,8 @@ dashboard_menu_entry = WorkspaceMenuEntry(
 )
 activity_menu_entry = WorkspaceMenuEntry(
     slug="activity",
-    label="Activity feed",
-    route="/ui/workspaces/{workspace_id}/activity-feed",
+    label="Recent activities",
+    route="/ui/workspaces/{workspace_id}/recent-activities",
     hexcolor="#bbbbbb",
     fa_icon="far fa-newspaper",
 )

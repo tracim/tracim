@@ -22,9 +22,9 @@ import {
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
-require('../css/ActivityFeed.styl')
+require('../css/RecentActivities.styl')
 
-export class PersonalActivityFeed extends React.Component {
+export class PersonalRecentActivities extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(props.handleTlm)
@@ -46,7 +46,7 @@ export class PersonalActivityFeed extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    const headTitle = buildHeadTitle([props.t('Activity feed')])
+    const headTitle = buildHeadTitle([props.t('Recent activities')])
     props.dispatch(setHeadTitle(headTitle))
   }
 
@@ -54,9 +54,9 @@ export class PersonalActivityFeed extends React.Component {
     const { props } = this
 
     const breadcrumbsList = [{
-      link: PAGE.ACTIVITY_FEED,
+      link: PAGE.RECENT_ACTIVITIES,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Activity feed'),
+      label: props.t('Recent activities'),
       isALink: false
     }]
 
@@ -66,11 +66,11 @@ export class PersonalActivityFeed extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className='personalActivityFeed'>
+      <div className='personalRecentActivities'>
         <PageTitle
-          title={props.t('Activity feed')}
+          title={props.t('Recent activities')}
           icon='far fa-newspaper'
-          iconTooltip={props.t('Activity feed')}
+          iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
         />
         <ActivityList
@@ -86,7 +86,7 @@ export class PersonalActivityFeed extends React.Component {
   }
 }
 
-PersonalActivityFeed.propTypes = {
+PersonalRecentActivities.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
@@ -96,7 +96,7 @@ PersonalActivityFeed.propTypes = {
 
 const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
 const component = withActivity(
-  TracimComponent(PersonalActivityFeed),
+  TracimComponent(PersonalRecentActivities),
   setUserActivityList,
   setUserActivityNextPage,
   resetUserActivity,
