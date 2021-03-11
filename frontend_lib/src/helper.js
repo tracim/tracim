@@ -104,6 +104,7 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
 }
 
 export const displayDistanceDate = (dateToDisplay, lang) => {
+  if (!dateToDisplay) return ''
   return formatDistance(
     new Date(dateToDisplay),
     new Date(),
