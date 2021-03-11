@@ -16,7 +16,6 @@ import typing
 from typing import TYPE_CHECKING
 import uuid
 
-from depot.fields.sqlalchemy import UploadedFileField
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
@@ -34,6 +33,7 @@ from tracim_backend.exceptions import InvalidResetPasswordToken
 from tracim_backend.exceptions import ProfileDoesNotExist
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import TrashableMixin
+from tracim_backend.models.types import TracimUploadedFileField
 
 if TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
@@ -105,18 +105,11 @@ class User(TrashableMixin, DeclarativeBase):
     USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME = "ck_users_username_email"
 
     __tablename__ = "users"
-    # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
-    # utf8bm4 for mysql only in order to avoid max length of key issue with
-    # long varchar in utf8bm4 column. This issue is related to email
-    # field and is uniqueness. As far we search, there is to be no way to apply
-    # mysql specific (which is ignored by other database)
-    #  collation only on email field.
     __table_args__ = (
         CheckConstraint(
             "NOT (email IS NULL AND username IS NULL)",
             name=USERNAME_OR_EMAIL_REQUIRED_CONSTRAINT_NAME,
         ),
-        {"mysql_charset": "utf8", "mysql_collate": "utf8_general_ci"},
     )
     # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created = Column(DateTime, default=datetime.utcnow)
@@ -144,10 +137,10 @@ class User(TrashableMixin, DeclarativeBase):
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
-    avatar = Column(UploadedFileField, unique=False, nullable=True)
-    cropped_avatar = Column(UploadedFileField, unique=False, nullable=True)
-    cover = Column(UploadedFileField, unique=False, nullable=True)
-    cropped_cover = Column(UploadedFileField, unique=False, nullable=True)
+    avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
+    cropped_avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
+    cover = Column(TracimUploadedFileField, unique=False, nullable=True)
+    cropped_cover = Column(TracimUploadedFileField, unique=False, nullable=True)
 
     @hybrid_property
     def email_address(self):

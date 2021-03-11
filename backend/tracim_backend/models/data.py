@@ -11,7 +11,6 @@ from typing import Optional
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 import sqlalchemy
@@ -52,6 +51,7 @@ from tracim_backend.models.mixins import CreationDateMixin
 from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.mixins import UpdateDateMixin
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.types import TracimUploadedFileField
 
 
 class WorkspaceAccessType(enum.Enum):
@@ -433,7 +433,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     # INFO - A.P - 2017-07-03 - Depot Doc
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
-    depot_file = Column(UploadedFileField, unique=False, nullable=True)
+    depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
     type = Column(Unicode(32), unique=False, nullable=False)
