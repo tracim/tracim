@@ -27,6 +27,8 @@
         param = "color"
         color_change_value = 15
       %>
+      :root { --primaryColor: ${primary_color_str }}
+
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
@@ -76,7 +78,7 @@
       }
 
       body {
-        font-family: "Quicksand";
+        font-family: Quicksand;
       }
     </style>
 
@@ -88,6 +90,7 @@
 
   <body>
     <div id="content"></div>
+    <div id="emoji-picker-overlay"></div>
 
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>

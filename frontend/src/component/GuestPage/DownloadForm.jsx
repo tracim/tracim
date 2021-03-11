@@ -8,6 +8,7 @@ import {
 } from '../../action-creator.async.js'
 import {
   handleFetchResult,
+  sendGlobalFlashMessage,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 
@@ -26,15 +27,6 @@ class DownloadForm extends React.Component {
     }))
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   handleSubmit = async (e) => {
     const { props } = this
 
@@ -50,19 +42,19 @@ class DownloadForm extends React.Component {
           this.refs.test.submit()
           return true
         case 400:
-          this.sendGlobalFlashMessage(props.t('Error in the URL'))
+          sendGlobalFlashMessage(props.t('Error in the URL'))
           break
         case 403:
           switch (response.body.code) {
             case 2053:
-              this.sendGlobalFlashMessage(props.t('Invalid password'))
+              sendGlobalFlashMessage(props.t('Invalid password'))
               break
             default:
-              this.sendGlobalFlashMessage(props.t('Error while downloading file'))
+              sendGlobalFlashMessage(props.t('Error while downloading file'))
           }
           break
         default:
-          this.sendGlobalFlashMessage(props.t('Error while downloading file'))
+          sendGlobalFlashMessage(props.t('Error while downloading file'))
       }
     } else {
       this.refs.test.submit()

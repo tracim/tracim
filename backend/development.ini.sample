@@ -439,7 +439,7 @@ website.base_url = %(basic_setup.website_base_url)s
 # EVENT_TYPE   = created | modified | deleted | undeleted
 # CONTENT_TYPE = html-document | file | thread | folder | comment
 # To include all notifications, use web.notifications.excluded = ""
-; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified
+; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction
 
 ####
 # JOB EXECUTION

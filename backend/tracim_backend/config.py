@@ -392,7 +392,7 @@ class CFG(object):
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user.created,user.modified,user.deleted,user.undeleted,workspace.modified,workspace.deleted,workspace.undeleted,workspace_member.modified,content.modified",
+            "user.created,user.modified,user.deleted,user.undeleted,workspace.modified,workspace.deleted,workspace.undeleted,workspace_member.modified,content.modified,reaction",
         )
 
         # base url of the frontend

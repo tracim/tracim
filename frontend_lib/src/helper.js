@@ -62,7 +62,8 @@ export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
     apiResponse: fetchResult,
-    body: resultJson
+    body: resultJson,
+    ok: fetchResult.ok
   }))
 }
 
@@ -670,6 +671,18 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const andList = (elems) => {
+  switch (elems.length) {
+    case 0: return ''
+    case 1: return elems[0]
+    default: return (
+      elems.slice(0, elems.length - 1).join(', ') +
+      ' ' + i18n.t('and') + ' ' +
+      elems[elems.length - 1]
+    )
+  }
+}
+
 export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
   // RJ - 2020-11-05 - INFO
   //
@@ -722,6 +735,15 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
       throw new Error('Error getting breadcrumbs data')
   }
 }
+
+export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+  type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  data: {
+    msg: msg, // can be a string or a react element
+    type: type || 'warning',
+    delay: delay
+  }
+})
 
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 

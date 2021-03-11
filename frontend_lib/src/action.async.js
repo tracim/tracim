@@ -112,6 +112,15 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
+
+export const postContentReaction = (apiUrl, workspaceId, contentId, value) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`, { value })
+
+export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
+
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
 

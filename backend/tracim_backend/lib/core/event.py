@@ -106,17 +106,20 @@ class EventApi:
         if event_types:
             event_type_filters = []
             for event_type in event_types:
-                if event_type.subtype:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                        Event.entity_subtype == event_type.subtype,
-                    )
+                if event_type.operation:
+                    if event_type.subtype:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                            Event.entity_subtype == event_type.subtype,
+                        )
+                    else:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                        )
                 else:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                    )
+                    event_type_filter = Event.entity_type == event_type.entity
 
                 event_type_filters.append(event_type_filter)
 
@@ -137,8 +140,8 @@ class EventApi:
         read_status: ReadStatus = ReadStatus.ALL,
         event_id: Optional[int] = None,
         user_id: Optional[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: Optional[List[int]] = None,
         after_event_id: int = 0,
         workspace_ids: Optional[List[int]] = None,
@@ -175,17 +178,20 @@ class EventApi:
         if exclude_event_types:
             event_type_filters = []
             for event_type in exclude_event_types:
-                if event_type.subtype:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                        Event.entity_subtype != event_type.subtype,
-                    )
+                if event_type.operation:
+                    if event_type.subtype:
+                        event_type_filter = or_(
+                            Event.entity_type != event_type.entity,
+                            Event.operation != event_type.operation,
+                            Event.entity_subtype != event_type.subtype,
+                        )
+                    else:
+                        event_type_filter = or_(
+                            Event.entity_type != event_type.entity,
+                            Event.operation != event_type.operation,
+                        )
                 else:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                    )
+                    event_type_filter = Event.entity_type != event_type.entity
 
                 event_type_filters.append(event_type_filter)
 
@@ -254,8 +260,8 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         exclude_author_ids: List[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: Optional[int] = None,
         include_not_sent: bool = False,
@@ -278,9 +284,9 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_author_ids: List[int] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_author_ids: Optional[List[int]] = None,
         include_not_sent=False,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,

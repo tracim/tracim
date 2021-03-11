@@ -54,7 +54,10 @@ class EntityType(enum.Enum):
 
 class EventTypeDatabaseParameters:
     def __init__(
-        self, entity: EntityType, operation: OperationType, subtype: typing.Optional[str]
+        self,
+        entity: EntityType,
+        operation: typing.Optional[OperationType],
+        subtype: typing.Optional[str],
     ) -> None:
         self.entity = entity
         self.operation = operation
@@ -67,9 +70,11 @@ class EventTypeDatabaseParameters:
         database
         """
         event_type_data = event_type.split(".")
-        if not len(event_type_data) in [2, 3]:
-            raise ValidationError("event_type should have 2 to 3 part")
-        if len(event_type_data) == 2:
+        if len(event_type_data) > 3:
+            raise ValidationError("event_type should have 1, 2 to 3 part")
+        if len(event_type_data) < 2:
+            event_type_data.append(None)
+        if len(event_type_data) < 3:
             event_type_data.append(None)
         entity_str = event_type_data[0]
         operation_str = event_type_data[1]
@@ -82,12 +87,14 @@ class EventTypeDatabaseParameters:
                 'entity "{}" is not a valid entity type'.format(entity_str)
             ) from e
 
-        try:
-            operation = OperationType(operation_str)
-        except ValueError as e:
-            raise ValidationError(
-                'operation "{}" is not a valid operation type'.format(operation_str)
-            ) from e
+        operation = None
+        if operation_str:
+            try:
+                operation = OperationType(operation_str)
+            except ValueError as e:
+                raise ValidationError(
+                    'operation "{}" is not a valid operation type'.format(operation_str)
+                ) from e
 
         return EventTypeDatabaseParameters(entity, operation, subtype)
 
