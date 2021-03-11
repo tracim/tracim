@@ -55,7 +55,8 @@ import {
   lightenColor,
   PAGE,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  DATE_FNS_LOCALE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -387,5 +388,6 @@ export {
   ProfileNavigation,
   getCoverBaseUrl,
   TranslateButton,
-  getCommentTranslated
+  getCommentTranslated,
+  DATE_FNS_LOCALE
 }

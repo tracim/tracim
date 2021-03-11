@@ -37,7 +37,7 @@ export const ADVANCED_SEARCH_TYPE = {
 }
 
 export const ADVANCED_SEARCH_FILTER = {
-  SEARCH_FIELD: 'searchField',
+  SEARCH_FIELD: 'searchFieldList',
   NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
   CREATED_RANGE: 'createdRange',
   MODIFIED_RANGE: 'modifiedRange',
@@ -220,7 +220,7 @@ export const parseSearchUrl = (parsedQuery) => {
   const searchObject = {}
 
   searchObject.contentTypes = parsedQuery.t
-  searchObject.searchString = parsedQuery.q
+  searchObject.searchString = parsedQuery.q || ''
   searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
   searchObject.currentPage = parseInt(parsedQuery.p)
   searchObject.showArchived = !!(parseInt(parsedQuery.arc))
