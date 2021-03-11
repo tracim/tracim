@@ -98,7 +98,8 @@ export class Sidebar extends React.Component {
           {
             'sidebar__content__navigation__item__current primaryColorBorder':
               this.props.location.pathname.endsWith(to)
-          })}
+          }
+        )}
         to={to}
       >
         <div
