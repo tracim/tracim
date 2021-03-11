@@ -4,7 +4,7 @@
 
 This document is intended for developers.
 
-Migrations on `Tracim` uses on [alembic](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to SQLAlchemy.
+Migrations on `Tracim` uses [alembic](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to SQLAlchemy.
 
 In order to use the `tracimcli` commands, go to the root of the project and
 and activate the Tracim virtualenv:
@@ -114,6 +114,8 @@ See [ab7c7f4bcbc5_add_auth_type_enum_to_user.py]("../tracim_backend/migration/ab
 But updating an enum list is a bit more tricky so a custom alembic operation has been written to handle this case.
 
 [An example of its usage is available](../tracim_backend/migration/versions/78a01733957f_add_publication_namespace.py).
+
+The custom operation itself can be found in [env.py](../tracim_backend/migration/env.py), in the `ReplaceEnumOp` class.
 
 ## MySQL Always Requires the Type When Altering a Column
 
