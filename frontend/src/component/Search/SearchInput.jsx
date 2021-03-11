@@ -25,7 +25,9 @@ export class SearchInput extends React.Component {
     this.props.onClickSearch(this.state.searchString)
   }
 
-  handleKeyDown = e => e.key === 'Enter' && this.state.searchString !== '' && this.handleClickSearch()
+  handleKeyDown = e => {
+    if (e.key === 'Enter') this.handleClickSearch()
+  }
 
   render () {
     const { props } = this

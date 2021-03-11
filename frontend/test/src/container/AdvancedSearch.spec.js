@@ -1,11 +1,12 @@
 import React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { expect } from 'chai'
 import { AdvancedSearch as AdvancedSearchWithoutHOC } from '../../../src/container/AdvancedSearch.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
-import { searchResult } from '../../hocMock/redux/searchResult/searchResult.js'
+import { emptySearchResult, searchResult } from '../../hocMock/redux/searchResult/searchResult.js'
 import {
   APPLIED_FILTER,
   BREADCRUMBS,
@@ -14,7 +15,7 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { ADVANCED_SEARCH_FILTER, ADVANCED_SEARCH_TYPE } from '../../../src/util/helper.js'
 import { isFunction } from '../../hocMock/helper'
-import { shallow } from 'enzyme'
+import { mount, shallow } from 'enzyme'
 
 describe('In <AdvancedSearch />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
@@ -35,6 +36,8 @@ describe('In <AdvancedSearch />', () => {
   const props = {
     breadcrumbs: [],
     contentSearch: { ...searchResult, appliedFilters: { } },
+    userSearch: {},
+    spaceSearch: {},
     contentType: contentType,
     user: user,
     system: {
@@ -130,6 +133,25 @@ describe('In <AdvancedSearch />', () => {
           'Showing {{displayedResults}} of {{totalResults}} results'
         )
       })
+    })
+
+    describe('Filter button', () => {
+      const testCases = [
+        {
+          props: props,
+          description: 'with results'
+        },
+        {
+          props: { ...props, contentSearch: { ...emptySearchResult, appliedFilters: {} } },
+          description: 'without results'
+        }
+      ]
+      for (const testCase of testCases) {
+        const wrapper = mount(<MemoryRouter><AdvancedSearchWithHOC {...testCase.props} /></MemoryRouter>)
+        it(`should always exist (${testCase.description})`, () => {
+          expect(wrapper.find('.advancedSearch__content__detail__filter').length).to.equal(1)
+        })
+      }
     })
   })
 })

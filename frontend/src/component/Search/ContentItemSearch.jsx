@@ -24,7 +24,7 @@ export const ContentItemSearch = props => {
         <i className={`fa-fw ${props.faIcon}`} />
       </div>
 
-      <FilenameWithExtension file={props} />
+      <FilenameWithExtension file={props} customClass='content__name searchResultPage' />
 
       <div className='content__path' title={props.path}>
         {props.path}
