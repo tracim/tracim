@@ -80,7 +80,7 @@ export class FeedItemHeader extends React.Component {
           }}
           eventList={props.eventList}
           onEventClicked={props.onEventClicked}
-          dataCy='contentActivityTimedEvent'
+          dataCy='feedItemTimedEvent'
         />
 
         <DropdownMenu
