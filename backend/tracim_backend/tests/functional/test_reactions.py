@@ -160,7 +160,6 @@ class TestReactionsEndpoint(object):
         assert reaction_res["value"] == reaction_value
 
         reaction_id = reaction_res["reaction_id"]
-        created = reaction_res["created"]
 
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.created"
@@ -174,7 +173,7 @@ class TestReactionsEndpoint(object):
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
-        assert last_event.reaction["created"] == created
+        assert last_event.reaction["created"]
         assert last_event.reaction["value"] == reaction_value
 
     @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
@@ -255,7 +254,6 @@ class TestReactionsEndpoint(object):
             params=params,
         )
         reaction_id = res.json_body["reaction_id"]
-        created = res.json_body["created"]
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions/{reaction_id}".format(
                 workspace_id=test_workspace.workspace_id,
@@ -295,7 +293,7 @@ class TestReactionsEndpoint(object):
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
-        assert last_event.reaction["created"] == created
+        assert last_event.reaction["created"]
         assert last_event.reaction["value"] == reaction_value
 
     @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
