@@ -74,6 +74,11 @@ mariadb 10.3 or mysql 8.0.1 (We need database that are able to support recursive
 :warning: newest version of debian doesn't provide up to date mysql version, you should add official apt repository:
 https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/
 
+:warning: Tracim need complete utf-8 charset and collation to work correctly, so database provided should be using
+utf8mb4 charset, for collation, we suggest utf8mb4_0900_ai_ci for mysql 8.0.1+ and utf8mb4_unicode_520_ci for mariadb 10.3+.
+as there are the most up-to-date unicode collation algorithm available.
+
+
 if you want to use MariaDB as database engine
 
     sudo apt install mariadb-server
@@ -98,7 +103,7 @@ Connect to `MariaDB` with root user (password has been set at "Installation" -> 
 
 Create a database with following command:
 
-    CREATE DATABASE tracimdb CHARACTER SET = utf8;
+    CREATE DATABASE tracimdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
 
 Create a user with following command:
 

@@ -54,6 +54,9 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: "true"
     tmpfs:
       - ${TMPFS_DIR}
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_0900_ai_ci"
   mariadb:
     image: mariadb/server:10.3
     ports:
@@ -63,6 +66,9 @@ services:
       MARIADB_USER: user
       MARIADB_PASSWORD: secret
       MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_520_ci"
     tmpfs:
       - ${TMPFS_DIR}
   redis:
