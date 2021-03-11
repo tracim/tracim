@@ -3,8 +3,12 @@
 from __future__ import with_statement
 
 import os
+import typing
 
 from alembic import context
+from alembic.operations import MigrateOperation
+from alembic.operations import Operations
+from sqlalchemy import Enum
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -39,6 +43,71 @@ target_metadata = metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+# Custom operations definitions
+@Operations.register_operation("replace_enum")
+class ReplaceEnumOp(MigrateOperation):
+    """Replace an Enum()."""
+
+    def __init__(
+        self,
+        table_name: str,
+        column_name: str,
+        from_enum: Enum,
+        to_enum: Enum,
+        default_value: typing.Any,
+    ) -> None:
+        self.table_name = table_name
+        self.column_name = column_name
+        self.from_enum = from_enum
+        self.to_enum = to_enum
+        self.default_value = default_value
+
+    @classmethod
+    def replace_enum(
+        cls,
+        operations: Operations,
+        table_name: str,
+        column_name: str,
+        from_enum: Enum,
+        to_enum: Enum,
+        default_value: typing.Any,
+    ) -> Operations:
+        """Replace an enum with specific behaviour for PostgreSQL."""
+
+        op = ReplaceEnumOp(table_name, column_name, from_enum, to_enum, default_value)
+        return operations.invoke(op)
+
+
+@Operations.implementation_for(ReplaceEnumOp)
+def replace_enum(operations: Operations, operation: ReplaceEnumOp) -> None:
+    if operations.get_context().dialect.name == "postgresql":
+        operations.execute(
+            "ALTER TYPE {} RENAME TO {}_old".format(
+                operation.from_enum.name, operation.from_enum.name
+            )
+        )
+        operations.execute(
+            "ALTER TABLE {} alter {} drop default".format(
+                operation.table_name, operation.column_name
+            )
+        )
+        operation.to_enum.create(operations.get_bind(), checkfirst=False)
+        with operations.batch_alter_table(operation.table_name) as batch_op:
+            batch_op.alter_column(
+                operation.column_name,
+                type_=operation.to_enum,
+                postgresql_using="{}::text::{}".format(
+                    operation.column_name, operation.to_enum.name
+                ),
+                server_default=operation.default_value,
+            )
+        operations.execute("DROP TYPE {}_old".format(operation.from_enum.name))
+    else:
+        operation.to_enum.create(operations.get_bind(), checkfirst=False)
+        with operations.batch_alter_table(operation.table_name) as batch_op:
+            batch_op.alter_column(operation.column_name, type_=operation.to_enum)
 
 
 def run_migrations_offline():
