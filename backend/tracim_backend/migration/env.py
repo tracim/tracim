@@ -45,7 +45,7 @@ target_metadata = metadata
 # ... etc.
 
 
-# Custom operations definitions
+# Custom operations
 @Operations.register_operation("replace_enum")
 class ReplaceEnumOp(MigrateOperation):
     """Replace an Enum()."""
