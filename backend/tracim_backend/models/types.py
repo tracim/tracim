@@ -10,4 +10,4 @@ class TracimUploadedFileField(UploadedFileField):
     """
 
     def load_dialect_impl(self, dialect):
-        return dialect.type_descriptor(types.JSON)
+        return dialect.type_descriptor(types.TEXT)
