@@ -72,7 +72,7 @@ class ReactionLib:
                     user_id=user.user_id, content_id=content.content_id, value=value
                 )
             )
-        reaction = Reaction(author_id=user.user_id, content_id=content.content_id, value=value)
+        reaction = Reaction(author=user, content=content, value=value)
         self._session.add(reaction)
         if do_save:
             self._session.flush()

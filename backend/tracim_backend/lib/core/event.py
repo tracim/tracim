@@ -62,12 +62,14 @@ from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -88,6 +90,7 @@ class EventApi:
         FOLDER_TYPE: ContentSchema(),
         THREAD_TYPE: ContentSchema(),
     }
+    reaction_schema = ReactionSchema()
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
@@ -667,6 +670,19 @@ class EventBuilder:
     ) -> None:
         self._create_subscription_event(OperationType.DELETED, subscription, context)
 
+    # Reaction events
+    @hookimpl
+    def on_reaction_created(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.CREATED, reaction, context)
+
+    @hookimpl
+    def on_reaction_modified(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.MODIFIED, reaction, context)
+
+    @hookimpl
+    def on_reaction_deleted(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.DELETED, reaction, context)
+
     def _create_subscription_event(
         self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
@@ -689,6 +705,37 @@ class EventBuilder:
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _create_reaction_event(
+        self, operation: OperationType, reaction: Reaction, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(reaction.content.workspace_id)
+        )
+        content_api = ContentApi(context.dbsession, current_user, self._config)
+        content_in_context = content_api.get_content_in_context(reaction.content)
+        content_schema = EventApi.get_content_schema_for_type(reaction.content.type)
+        content_dict = content_schema.dump(content_in_context).data
+
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        reaction_author_in_context = user_api.get_user_with_context(reaction.author)
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
+            Event.CONTENT_FIELD: content_dict,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.REACTION,
             operation=operation,
             additional_fields=fields,
             context=context,

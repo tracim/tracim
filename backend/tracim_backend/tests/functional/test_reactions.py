@@ -6,6 +6,9 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.reaction import ReactionLib
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.views.core_api.schemas import UserDigestSchema
+
+SAMPLE_REACTION_LIST = (":custom_text:", "🐧", "🐻‍❄️", "👨‍👨‍👧‍👧", "👍🏾")
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -17,6 +20,10 @@ class TestReactionsEndpoint(object):
     endpoint
     """
 
+    @pytest.mark.parametrize(
+        "admin_reaction_values, ryiad_reaction_values",
+        [((":custom_text:", "😀", "🐧", "🦋",), ("🐧", "🐻‍❄️", "👨‍👨‍👧‍👧"))],
+    )
     def test_api__get_contents_reactions__ok_200__nominal_case(
         self,
         web_testapp,
@@ -26,6 +33,8 @@ class TestReactionsEndpoint(object):
         content_type_list,
         admin_user,
         riyad_user,
+        admin_reaction_values,
+        ryiad_reaction_values,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -38,10 +47,10 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         reaction_lib = ReactionLib(session)
-        reaction_lib.create(admin_user, folder, "😀", do_save=True)
-        reaction_lib.create(admin_user, folder, "🐧", do_save=True)
-        reaction_lib.create(admin_user, folder, "🦋", do_save=True)
-        reaction_lib.create(riyad_user, folder, "🐧", do_save=True)
+        for reaction in admin_reaction_values:
+            reaction_lib.create(admin_user, folder, reaction, do_save=True)
+        for reaction in ryiad_reaction_values:
+            reaction_lib.create(riyad_user, folder, reaction, do_save=True)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -51,24 +60,22 @@ class TestReactionsEndpoint(object):
             ),
             status=200,
         )
-        assert len(res.json_body) == 4
-        reaction_res = res.json_body[0]
-        assert reaction_res["author"]["user_id"] == admin_user.user_id
-        assert reaction_res["content_id"] == folder.content_id
-        assert reaction_res["value"] == "😀"
-        reaction_res = res.json_body[1]
-        assert reaction_res["author"]["user_id"] == admin_user.user_id
-        assert reaction_res["content_id"] == folder.content_id
-        assert reaction_res["value"] == "🐧"
-        reaction_res = res.json_body[2]
-        assert reaction_res["author"]["user_id"] == admin_user.user_id
-        assert reaction_res["content_id"] == folder.content_id
-        assert reaction_res["value"] == "🦋"
-        reaction_res = res.json_body[3]
-        assert reaction_res["author"]["user_id"] == riyad_user.user_id
-        assert reaction_res["content_id"] == folder.content_id
-        assert reaction_res["value"] == "🐧"
+        assert len(res.json_body) == len(admin_reaction_values) + len(ryiad_reaction_values)
+        reactions = iter(res.json_body)
+        for reaction_value in admin_reaction_values:
+            reaction_res = next(reactions)
+            assert reaction_res["author"]["user_id"] == admin_user.user_id
+            assert reaction_res["content_id"] == folder.content_id
+            assert reaction_res["value"] == reaction_value
+        for reaction_value in ryiad_reaction_values:
+            reaction_res = next(reactions)
+            assert reaction_res["author"]["user_id"] == riyad_user.user_id
+            assert reaction_res["content_id"] == folder.content_id
+            assert reaction_res["value"] == reaction_value
 
+    @pytest.mark.parametrize(
+        "reaction_value", SAMPLE_REACTION_LIST,
+    )
     def test_api__get_one_reaction__ok_200__nominal_case(
         self,
         web_testapp,
@@ -77,6 +84,7 @@ class TestReactionsEndpoint(object):
         content_api_factory,
         content_type_list,
         riyad_user,
+        reaction_value,
     ) -> None:
         """
         Get one specific reaction of a content
@@ -92,7 +100,7 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         reaction_lib = ReactionLib(session)
-        reaction = reaction_lib.create(riyad_user, folder, "🐧", do_save=True)
+        reaction = reaction_lib.create(riyad_user, folder, reaction_value, do_save=True)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -108,8 +116,9 @@ class TestReactionsEndpoint(object):
         assert reaction_res["author"]["user_id"] == riyad_user.user_id
         assert reaction_res["content_id"] == folder.content_id
         assert reaction_res["reaction_id"] == reaction.reaction_id
-        assert reaction_res["value"] == "🐧"
+        assert reaction_res["value"] == reaction_value
 
+    @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
     def test_api__post_content_reaction__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -119,6 +128,7 @@ class TestReactionsEndpoint(object):
         admin_user,
         content_type_list,
         event_helper,
+        reaction_value,
     ) -> None:
         """
         Create a reaction
@@ -135,7 +145,7 @@ class TestReactionsEndpoint(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"value": "😀"}
+        params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
@@ -147,8 +157,27 @@ class TestReactionsEndpoint(object):
         assert reaction_res["author"]["user_id"] == admin_user.user_id
         assert reaction_res["content_id"] == folder.content_id
         assert reaction_res["reaction_id"]
-        assert reaction_res["value"] == "😀"
+        assert reaction_res["value"] == reaction_value
 
+        reaction_id = reaction_res["reaction_id"]
+        created = reaction_res["created"]
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "reaction.created"
+        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
+        assert last_event.author == UserDigestSchema().dump(author).data
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace = web_testapp.get(
+            "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace
+        assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
+        assert last_event.reaction["content_id"] == folder.content_id
+        assert last_event.reaction["reaction_id"] == reaction_id
+        assert last_event.reaction["created"] == created
+        assert last_event.reaction["value"] == reaction_value
+
+    @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
     def test_api__post_content_reaction__err_400__already_exist(
         self,
         workspace_api_factory,
@@ -158,6 +187,7 @@ class TestReactionsEndpoint(object):
         admin_user,
         content_type_list,
         event_helper,
+        reaction_value,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -172,7 +202,7 @@ class TestReactionsEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"value": "😀"}
+        params = {"value": reaction_value}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
@@ -189,6 +219,7 @@ class TestReactionsEndpoint(object):
         )
         assert res.json_body["code"] == ErrorCode.REACTION_ALREADY_EXIST
 
+    @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
     def test_api__delete_content_reaction__ok_200__user_is_author_and_workspace_manager(
         self,
         workspace_api_factory,
@@ -198,6 +229,7 @@ class TestReactionsEndpoint(object):
         admin_user,
         content_type_list,
         event_helper,
+        reaction_value,
     ) -> None:
         """
         delete reaction (user is workspace_manager and owner)
@@ -213,9 +245,8 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"value": "😀"}
+        params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
@@ -224,6 +255,7 @@ class TestReactionsEndpoint(object):
             params=params,
         )
         reaction_id = res.json_body["reaction_id"]
+        created = res.json_body["created"]
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions/{reaction_id}".format(
                 workspace_id=test_workspace.workspace_id,
@@ -251,6 +283,22 @@ class TestReactionsEndpoint(object):
         )
         assert res.json_body["code"] == ErrorCode.REACTION_NOT_FOUND
 
+        last_event = event_helper.last_event
+        assert last_event.event_type == "reaction.deleted"
+        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
+        assert last_event.author == UserDigestSchema().dump(author).data
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace = web_testapp.get(
+            "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
+        ).json_body
+        assert last_event.workspace == workspace
+        assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
+        assert last_event.reaction["content_id"] == folder.content_id
+        assert last_event.reaction["reaction_id"] == reaction_id
+        assert last_event.reaction["created"] == created
+        assert last_event.reaction["value"] == reaction_value
+
+    @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
     def test_api__delete_content_reaction__ok_400__is_not_author_and_contributor(
         self,
         workspace_api_factory,
@@ -260,8 +308,8 @@ class TestReactionsEndpoint(object):
         web_testapp,
         admin_user,
         content_type_list,
-        event_helper,
         riyad_user,
+        reaction_value,
     ) -> None:
         """
         delete reaction (user is workspace_manager and owner)
@@ -283,7 +331,7 @@ class TestReactionsEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"value": "😀"}
+        params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id,

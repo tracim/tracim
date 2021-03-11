@@ -42,6 +42,7 @@ class EntityType(enum.Enum):
     WORKSPACE_SUBSCRIPTION = "workspace_subscription"
     CONTENT = "content"
     MENTION = "mention"
+    REACTION = "reaction"
 
     def __str__(self) -> str:
         return self.value
@@ -116,6 +117,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     CONTENT_FIELD = "content"
     MEMBER_FIELD = "member"
     SUBSCRIPTION_FIELD = "subscription"
+    REACTION_FIELD = "reaction"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
@@ -134,6 +136,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     member = index_property("fields", MEMBER_FIELD)
     subscription = index_property("fields", SUBSCRIPTION_FIELD)
     client_token = index_property("fields", CLIENT_TOKEN_FIELD)
+    reaction = index_property("fields", REACTION_FIELD)
 
     @property
     def event_type(self) -> str:

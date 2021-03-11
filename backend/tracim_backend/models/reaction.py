@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Integer
 
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
 
@@ -25,6 +26,7 @@ class Reaction(CreationDateMixin, DeclarativeBase):
     value = Column(Unicode(MAX_REACTION_VALUE_LENGTH), nullable=False)
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     author = relationship("User", remote_side=[User.user_id])
+    content = relationship("Content", remote_side=[Content.id])
 
     def __repr__(self):
         return "<Reaction(author_id=%s, content_id=%s, value=%s)>" % (
