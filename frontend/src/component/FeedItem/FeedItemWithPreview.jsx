@@ -12,7 +12,7 @@ export const FeedItemWithPreview = props => {
         breadcrumbsList={props.breadcrumbsList}
         content={props.content}
         eventList={props.eventList}
-        lastModification={props.lastModification}
+        lastModificationType={props.lastModificationType}
         lastModificationEntityType={props.lastModificationEntityType}
         lastModificationSubEntityType={props.lastModificationSubEntityType}
         lastModifier={props.lastModifier}
@@ -36,7 +36,7 @@ export default FeedItemWithPreview
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
-  lastModification: PropTypes.string.isRequired,
+  lastModificationType: PropTypes.string.isRequired,
   lastModifier: PropTypes.object.isRequired,
   modifiedDate: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,

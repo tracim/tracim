@@ -29,7 +29,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
           breadcrumbsList={breadcrumbsList}
-          lastModification={coreEventType}
+          lastModificationType={coreEventType}
           lastModificationEntityType={entityType}
           lastModificationSubEntityType={subEntityType}
         />
@@ -42,7 +42,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           eventList={activity.eventList}
           key={activity.id}
           lastModifier={activity.newestMessage.fields.author}
-          lastModification={coreEventType}
+          lastModificationType={coreEventType}
           lastModificationEntityType={entityType}
           lastModificationSubEntityType={subEntityType}
           modifiedDate={activity.newestMessage.created}

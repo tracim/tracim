@@ -18,14 +18,14 @@ import TimedEvent from '../TimedEvent.jsx'
 require('./FeedItemHeader.styl')
 
 export class FeedItemHeader extends React.Component {
-  getDisplayOperation (lastModification, lastModificationEntityType, lastModificationSubEntityType, currentRevisionType) {
+  getDisplayOperation (lastModificationType, lastModificationEntityType, lastModificationSubEntityType, currentRevisionType) {
     const { props } = this
 
     if (currentRevisionType === 'status-update') return props.t('status modified')
     if (TLM_ET.MENTION === lastModificationEntityType) return props.t('mention made')
     if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) return props.t('commented')
 
-    switch (lastModification) {
+    switch (lastModificationType) {
       case TLM_CET.CREATED:
         return props.t('created')
       case TLM_CET.MODIFIED:
@@ -67,7 +67,7 @@ export class FeedItemHeader extends React.Component {
         <TimedEvent
           customClass='feedItemHeader__right'
           operation={this.getDisplayOperation(
-            props.lastModification,
+            props.lastModificationType,
             props.lastModificationEntityType,
             props.lastModificationSubEntityType,
             props.content.current_revision_type
@@ -116,7 +116,7 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  lastModification: PropTypes.string.isRequired,
+  lastModificationType: PropTypes.string.isRequired,
   lastModifier: PropTypes.object.isRequired,
   modifiedDate: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,

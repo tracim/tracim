@@ -9,7 +9,7 @@ export const ContentWithoutPreviewActivity = props => {
       breadcrumbsList={props.breadcrumbsList}
       content={props.activity.newestMessage.fields.content}
       eventList={props.activity.eventList}
-      lastModification={props.lastModification}
+      lastModificationType={props.lastModificationType}
       lastModificationEntityType={props.lastModificationEntityType}
       lastModificationSubEntityType={props.lastModificationSubEntityType}
       lastModifier={props.activity.newestMessage.fields.author}
@@ -25,7 +25,7 @@ export default ContentWithoutPreviewActivity
 
 ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
-  lastModification: PropTypes.string.isRequired,
+  lastModificationType: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   breadcrumbsList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
