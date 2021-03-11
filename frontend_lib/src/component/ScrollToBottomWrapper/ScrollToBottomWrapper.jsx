@@ -1,6 +1,6 @@
 import React from 'react'
 import { CONTENT_TYPE } from '../../helper.js'
-
+import PropTypes from 'prop-types'
 
 export class ScrollToBottomWrapper extends React.Component {
   constructor (props) {
@@ -58,7 +58,7 @@ export class ScrollToBottomWrapper extends React.Component {
     const { props } = this
 
     return (
-      <ul  className={props.customClass} ref={el => { this.container = el }}>
+      <ul className={props.customClass} ref={el => { this.container = el }}>
         {props.children}
         <li style={{ visibility: 'hidden' }} ref={el => { this.containerBottom = el }} />
       </ul>
@@ -67,3 +67,16 @@ export class ScrollToBottomWrapper extends React.Component {
 }
 
 export default ScrollToBottomWrapper
+
+ScrollToBottomWrapper.propTypes = {
+  itemList: PropTypes.array.isRequired,
+  customClass: PropTypes.string,
+  isLastItemFromCurrentToken: PropTypes.bool,
+  shouldScrollToBottom: PropTypes.bool
+}
+
+ScrollToBottomWrapper.defaultProps = {
+  customClass: '',
+  isLastItemAddedFromCurrentToken: false,
+  shouldScrollToBottom: false
+}

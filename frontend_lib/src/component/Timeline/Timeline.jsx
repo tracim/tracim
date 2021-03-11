@@ -80,43 +80,43 @@ export class Timeline extends React.Component {
           itemList={props.timelineData}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
-            {props.timelineData.map(content => {
-              switch (content.timelineType) {
-                case 'comment':
-                  return (
-                    <Comment
-                      customClass={props.customClass}
-                      customColor={props.customColor}
-                      apiUrl={props.apiUrl}
-                      author={content.author}
-                      createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                      createdDistance={content.created}
-                      text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
-                      fromMe={props.loggedUser.userId === content.author.user_id}
-                      key={`comment_${content.content_id}`}
-                      onClickTranslate={() => { props.onClickTranslateComment(content) }}
-                      onClickRestore={() => { props.onClickRestoreComment(content) }}
-                      translationState={content.translationState}
-                    />
-                  )
-                case 'revision':
-                  return (
-                    <Revision
-                      customClass={props.customClass}
-                      customColor={props.customColor}
-                      revisionType={content.revision_type}
-                      createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                      createdDistance={content.created}
-                      number={content.number}
-                      status={props.availableStatusList.find(status => status.slug === content.status)}
-                      authorPublicName={content.author.public_name}
-                      allowClickOnRevision={props.allowClickOnRevision}
-                      onClickRevision={() => props.onClickRevisionBtn(content)}
-                      key={`revision_${content.revision_id}`}
-                    />
-                  )
-              }
-            })}
+          {props.timelineData.map(content => {
+            switch (content.timelineType) {
+              case 'comment':
+                return (
+                  <Comment
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    apiUrl={props.apiUrl}
+                    author={content.author}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
+                    fromMe={props.loggedUser.userId === content.author.user_id}
+                    key={`comment_${content.content_id}`}
+                    onClickTranslate={() => { props.onClickTranslateComment(content) }}
+                    onClickRestore={() => { props.onClickRestoreComment(content) }}
+                    translationState={content.translationState}
+                  />
+                )
+              case 'revision':
+                return (
+                  <Revision
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    revisionType={content.revision_type}
+                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
+                    createdDistance={content.created}
+                    number={content.number}
+                    status={props.availableStatusList.find(status => status.slug === content.status)}
+                    authorPublicName={content.author.public_name}
+                    allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevision={() => props.onClickRevisionBtn(content)}
+                    key={`revision_${content.revision_id}`}
+                  />
+                )
+            }
+          })}
         </ScrollToBottomWrapper>
 
         {props.showInvalidMentionPopup && (
