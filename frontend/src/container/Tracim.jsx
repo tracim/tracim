@@ -77,8 +77,8 @@ import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
-import PersonalActivityFeed from './PersonalActivityFeed.jsx'
-import WorkspaceActivityFeed from './WorkspaceActivityFeed.jsx'
+import PersonalRecentActivities from './PersonalRecentActivities.jsx'
+import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
@@ -429,7 +429,7 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.LOGIN} component={Login} />
 
-          <Route path={PAGE.ACTIVITY_FEED} component={PersonalActivityFeed} />
+          <Route path={PAGE.RECENT_ACTIVITIES} component={PersonalRecentActivities} />
 
           <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
 
@@ -441,8 +441,10 @@ export class Tracim extends React.Component {
             exact
             path={PAGE.HOME}
             component={() => {
-              if (!props.workspaceList.length) return <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />
-              return <Redirect to={{ pathname: PAGE.ACTIVITY_FEED, state: { from: props.location } }} />
+              if (!props.workspaceList.length) {
+                return <Home canCreateWorkspace={getUserProfile(props.user.profile).id >= PROFILE.manager.id} />
+              }
+              return <Redirect to={{ pathname: PAGE.RECENT_ACTIVITIES, state: { from: props.location } }} />
             }}
           />
 
@@ -486,8 +488,10 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.ACTIVITY_FEED(':idws')}
-                  render={(routerProps) => <WorkspaceActivityFeed workspaceId={routerProps.match.params.idws} />}
+                  path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
+                  render={(routerProps) => (
+                    <WorkspaceRecentActivities workspaceId={routerProps.match.params.idws} />
+                  )}
                 />
 
                 <Route
