@@ -216,7 +216,7 @@ class TestReactionsEndpoint(object):
             status=400,
             params=params,
         )
-        assert res.json_body["code"] == ErrorCode.REACTION_ALREADY_EXIST
+        assert res.json_body["code"] == ErrorCode.REACTION_ALREADY_EXISTS
 
     @pytest.mark.parametrize("reaction_value", SAMPLE_REACTION_LIST)
     def test_api__delete_content_reaction__ok_200__user_is_author_and_workspace_manager(

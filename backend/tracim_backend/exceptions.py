@@ -67,7 +67,7 @@ class RoleAlreadyExistError(TracimError):
 
 
 class ReactionAlreadyExistError(TracimError):
-    error_code = ErrorCode.REACTION_ALREADY_EXIST
+    error_code = ErrorCode.REACTION_ALREADY_EXISTS
 
 
 class ForceArgumentNeeded(TracimException):

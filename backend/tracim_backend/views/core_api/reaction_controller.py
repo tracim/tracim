@@ -33,7 +33,6 @@ SWAGGER_TAG__CONTENT_REACTION_SECTION = "Reactions"
 SWAGGER_TAG__CONTENT_REACTION_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_REACTION_SECTION
 )
-CONTENT_TYPE_TEXT_HTML = "text/html"
 
 
 class ReactionController(Controller):
@@ -72,7 +71,7 @@ class ReactionController(Controller):
     @hapic.output_body(ReactionSchema())
     def add_reaction(self, context, request: TracimRequest, hapic_data=None) -> Reaction:
         """
-        Add new reaction
+        Add new reaction to content
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         return reaction_lib.create(
@@ -88,7 +87,7 @@ class ReactionController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_reaction(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Delete comment
+        Delete a reaction associated to a content
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         reaction = reaction_lib.get_one(
