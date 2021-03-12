@@ -28,7 +28,7 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
-    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`,
+    RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
     PUBLICATION: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
@@ -47,7 +47,7 @@ export const PAGE = {
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
-  ACTIVITY_FEED: '/ui/activity-feed',
+  RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }

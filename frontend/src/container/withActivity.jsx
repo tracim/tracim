@@ -17,7 +17,7 @@ const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
 
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
- * activity feeds.
+ * recent activities.
  * @param {React.Component} WrappedComponent component you want to wrap with this HOC
  * @param {function} setActivityList a redux action that will set the activity.list prop when dispatched.
  * @param {function} setActivityNextPage a redux action that will set the
@@ -73,7 +73,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         props.user.userId,
         {
           notificationsPerPage: ACTIVITY_HISTORY_COUNT,
-          activityFeedEvents: true,
+          recentActivitiesEvents: true,
           relatedContentId: activity.content.content_id,
           workspaceId: activity.content.workspace_id,
           includeNotSent: true
@@ -112,7 +112,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * /api/users/<user_id>/messages
      * @param {Number} minActivityCount minimum activity count to load
      * @param {boolean} resetList if true the current activity list will be cleared before load
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace activity feed)
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
       const { props } = this
@@ -133,7 +133,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           {
             nextPageToken: nextPageToken,
             notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
-            activityFeedEvents: true,
+            recentActivitiesEvents: true,
             workspaceId: workspaceId,
             includeNotSent: true
           }

@@ -6,7 +6,7 @@ const fileTitle = 'FileTitle'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
-describe('At the space activity feed page', () => {
+describe('At the space recent activities page', () => {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -21,7 +21,7 @@ describe('At the space activity feed page', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+    cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
   })
 
   afterEach(function () {

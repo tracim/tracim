@@ -1,8 +1,8 @@
 import { PAGES, URLS } from '../../support/urls_commands.js'
 
 const activityPages = [
-  { name: 'Personal', page: PAGES.ACTIVITY_FEED, initialItemCount: 3 },
-  { name: 'Space', page: PAGES.WORKSPACE_ACTIVITY_FEED, initialItemCount: 1 }
+  { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
+  { name: 'Space', page: PAGES.WORKSPACE_RECENT_ACTIVITIES, initialItemCount: 1 }
 ]
 
 const fileName2 = 'png_exemple2.png'
@@ -16,7 +16,7 @@ const fileType = 'image/png'
 
 for (const pageTestCase of activityPages) {
   const { name, page, initialItemCount } = pageTestCase
-  describe(`The ${name} activity feed page`, () => {
+  describe(`The ${name} recent activities page`, () => {
     let workspaceId = null
     beforeEach(() => {
       cy.resetDB()
@@ -149,7 +149,7 @@ for (const pageTestCase of activityPages) {
           contentName
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
         cy.get('.feedItem__preview__overflow').should('not.exist')
 
@@ -180,7 +180,7 @@ for (const pageTestCase of activityPages) {
           'The Holy Tests'
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
         cy.get('.feedItem__preview__overflow').should('be.visible')
 

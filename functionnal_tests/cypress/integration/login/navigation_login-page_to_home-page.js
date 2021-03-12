@@ -14,13 +14,13 @@ describe('logging in tracim', function () {
     cy.get('[data-cy=avatar]')
     cy.contains(GREETING_MSG)
     cy.get('.homepagecard.card').should('be.visible')
-    cy.url().should('not.include', '/ui/activity-feed')
+    cy.url().should('not.include', '/ui/recent-activities')
   })
 
-  it('redirects to the activity feed when the user is a member of a workspace', function () {
+  it('redirects to the recent activities when the user is a member of a workspace', function () {
     cy.loginAs('users')
     cy.visit('/ui')
-    cy.url().should('include', '/ui/activity-feed')
-    cy.contains('Activity feed')
+    cy.url().should('include', '/ui/recent-activities')
+    cy.contains('Recent activities')
   })
 })
