@@ -14,7 +14,7 @@ from sqlalchemy import types
 revision = "7c6641d4f934"
 down_revision = "c459890b7103"
 
-REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON = 3000
+REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS = 3000
 
 
 # HACK - G.M -  2021-03-11 - reconvert to reduced size varchar instead of 4000

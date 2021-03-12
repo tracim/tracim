@@ -13,7 +13,7 @@ from sqlalchemy import VARCHAR
 revision = "bff384e7c14b"
 down_revision = "2d98f4b6596d"
 
-REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON = 3000
+REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS = 3000
 
 
 def upgrade():
@@ -35,10 +35,12 @@ def downgrade():
     # HACK - G.M -  2021-03-11 - reconvert to reduced size varchar instead of 4000
     # to be compliant with mysql/mariadb on utf8bm4
     with op.batch_alter_table("users") as batch_op:
-        batch_op.alter_column("avatar", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON))
-        batch_op.alter_column("cropped_avatar", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON))
-        batch_op.alter_column("cover", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON))
-        batch_op.alter_column("cropped_cover", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON))
+        batch_op.alter_column("avatar", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS))
+        batch_op.alter_column(
+            "cropped_avatar", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS)
+        )
+        batch_op.alter_column("cover", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS))
+        batch_op.alter_column("cropped_cover", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS))
 
     with op.batch_alter_table("content_revisions") as batch_op:
-        batch_op.alter_column("depot_file", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_JSON))
+        batch_op.alter_column("depot_file", type_=VARCHAR(REDUCED_SIZE_FOR_DEPOT_STORAGE_FIELDS))
