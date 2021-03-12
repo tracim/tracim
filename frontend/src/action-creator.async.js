@@ -1186,3 +1186,18 @@ export const getAdvancedSearchResult = (
     dispatch
   })
 }
+
+export const getPublicationList = (workspaceId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_PUBLICATION,
+    dispatch
+  })
+}

@@ -20,7 +20,7 @@ export class FeedItemFooter extends React.Component {
   render () {
     const { props } = this
     return (
-      <div>
+      <div className='feedItemFooter'>
         <div className='feedItemFooter__right'>
           {props.commentList.length}
           <IconButton

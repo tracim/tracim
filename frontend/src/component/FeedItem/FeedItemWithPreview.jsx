@@ -5,9 +5,11 @@ import FeedItemHeader from './FeedItemHeader.jsx'
 import FeedItemFooter from './FeedItemFooter.jsx'
 import Preview from './Preview.jsx'
 
+require('./FeedItemWithPreview.styl')
+
 export const FeedItemWithPreview = props => {
   return (
-    <div>
+    <div className='feedItem'>
       <FeedItemHeader
         breadcrumbsList={props.breadcrumbsList}
         content={props.content}

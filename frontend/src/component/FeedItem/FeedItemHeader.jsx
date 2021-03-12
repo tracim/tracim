@@ -61,7 +61,9 @@ export class FeedItemHeader extends React.Component {
           <Link to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}>
             <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
-          <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
+          {props.breadcrumbsList && (
+            <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
+          )}
         </div>
 
         <TimedEvent

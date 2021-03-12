@@ -124,7 +124,8 @@ const ActivityList = (props) => {
       {props.showRefresh && (
         <IconButton
           customClass='activityList__refresh'
-          text={props.t('Refresh')}
+          text={props.t('Reorder')}
+          icon='fas fa-redo-alt'
           intent='link'
           onClick={props.onRefreshClicked}
           dataCy='activityList__refresh'
