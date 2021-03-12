@@ -110,12 +110,12 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a "Comment" button, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityFooter__comment]').click()
+        cy.get('[data-cy=feedItemFooter__comment]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityHeader__label]').click()
+        cy.get('[data-cy=feedItemHeader__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
@@ -125,8 +125,8 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a button on last activity, clicking on it opens a short history', () => {
-        cy.get('[data-cy=contentActivityTimedEvent] > .dropdown').click()
-        cy.get('[data-cy=contentActivityTimedEvent] .dropdownMenu').should('exist')
+        cy.get('[data-cy=feedItemTimedEvent] > .dropdown').click()
+        cy.get('[data-cy=feedItemTimedEvent] .dropdownMenu').should('exist')
       })
     })
 
