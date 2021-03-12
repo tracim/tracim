@@ -16,6 +16,7 @@ from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
@@ -139,6 +140,51 @@ class DeleteDBCommand(AppContextCommand):
             print(force_arg_required)
             print("Database not deleted")
             raise ForceArgumentNeeded(force_arg_required)
+
+
+class MigrateMysqlToUTF8mb4Command(AppContextCommand):
+    auto_setup_context = False
+
+    def get_description(self) -> str:
+        return "migrate Mysql/mariadb to utf8mb4"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "--collation",
+            help="set database collation",
+            dest="collation",
+            required=False,
+            default=None,
+        )
+        return parser
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(MigrateMysqlToUTF8mb4Command, self).take_action(parsed_args)
+        config_uri = parsed_args.config_file
+        settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
+        app_config = CFG(settings)
+        app_config.configure_filedepot()
+        engine = get_engine(app_config)
+        inspector = reflection.Inspector.from_engine(engine)
+        database_name = engine.url.database
+        collation = parsed_args.collation or "utf8mb4_0900_ai_ci"
+        if not engine.dialect.name.startswith("mysql"):
+            raise ValueError("This command is only supported on Mysql/Mariadb databases")
+        logger.info(self, "Database not deleted")
+        set_database = "ALTER DATABASE {} CHARACTER SET utf8mb4 COLLATE {};".format(
+            database_name, collation
+        )
+        logger.debug(self, set_database)
+        engine.execute(set_database)
+        for table in inspector.get_table_names():
+            set_table = "ALTER TABLE {} CONVERT TO CHARACTER SET utf8mb4 COLLATE {};".format(
+                table, collation
+            )
+            logger.debug(self, set_table)
+            engine.execute(set_table)
+        print('Database setted to "utf8mb4" with collation "{}"'.format(collation))
 
 
 class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
