@@ -5,9 +5,9 @@ import { translate } from 'react-i18next'
 
 import { IconButton, PAGE } from 'tracim_frontend_lib'
 
-require('./ContentActivityFooter.styl')
+require('./FeedItemFooter.styl')
 
-export class ContentActivityFooter extends React.Component {
+export class FeedItemFooter extends React.Component {
   handleCommentClicked () {
     const { props } = this
     props.history.push(PAGE.WORKSPACE.CONTENT(
@@ -21,14 +21,14 @@ export class ContentActivityFooter extends React.Component {
     const { props } = this
     return (
       <div>
-        <div className='contentActivityFooter__right'>
+        <div className='feedItemFooter__right'>
           {props.commentList.length}
           <IconButton
             icon='far fa-comment'
             text={props.t('Comment')}
             intent='link'
             onClick={this.handleCommentClicked.bind(this)}
-            dataCy='contentActivityFooter__comment'
+            dataCy='feedItemFooter__comment'
           />
         </div>
       </div>
@@ -36,9 +36,9 @@ export class ContentActivityFooter extends React.Component {
   }
 }
 
-export default withRouter(translate()(ContentActivityFooter))
+export default withRouter(translate()(FeedItemFooter))
 
-ContentActivityFooter.propTypes = {
+FeedItemFooter.propTypes = {
   content: PropTypes.object.isRequired,
   reactionList: PropTypes.array.isRequired,
   commentList: PropTypes.array.isRequired
