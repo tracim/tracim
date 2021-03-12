@@ -142,11 +142,13 @@ class DeleteDBCommand(AppContextCommand):
             raise ForceArgumentNeeded(force_arg_required)
 
 
-class MigrateMysqlToUTF8mb4Command(AppContextCommand):
+class MigrateMysqlCharsetCommand(AppContextCommand):
     auto_setup_context = False
+    DEFAULT_COLLATION = "utf8mb4_unicode_520_ci"
+    DEFAULT_CHARSET = "utf8mb4"
 
     def get_description(self) -> str:
-        return "migrate Mysql/mariadb to utf8mb4"
+        return "change Mysql/Mariadb charset/collation"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -157,10 +159,13 @@ class MigrateMysqlToUTF8mb4Command(AppContextCommand):
             required=False,
             default=None,
         )
+        parser.add_argument(
+            "--charset", help="set database charset", dest="charset", required=False, default=None,
+        )
         return parser
 
     def take_action(self, parsed_args: argparse.Namespace) -> None:
-        super(MigrateMysqlToUTF8mb4Command, self).take_action(parsed_args)
+        super(MigrateMysqlCharsetCommand, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
         settings = get_appsettings(config_uri)
         settings.update(settings.global_conf)
@@ -169,22 +174,23 @@ class MigrateMysqlToUTF8mb4Command(AppContextCommand):
         engine = get_engine(app_config)
         inspector = reflection.Inspector.from_engine(engine)
         database_name = engine.url.database
-        collation = parsed_args.collation or "utf8mb4_0900_ai_ci"
+        collation = parsed_args.collation or self.DEFAULT_COLLATION
+        charset = parsed_args.charset or self.DEFAULT_CHARSET
         if not engine.dialect.name.startswith("mysql"):
             raise ValueError("This command is only supported on Mysql/Mariadb databases")
         logger.info(self, "Database not deleted")
-        set_database = "ALTER DATABASE {} CHARACTER SET utf8mb4 COLLATE {};".format(
-            database_name, collation
+        set_database = "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
+            database=database_name, charset=charset, collation=collation
         )
         logger.debug(self, set_database)
         engine.execute(set_database)
         for table in inspector.get_table_names():
-            set_table = "ALTER TABLE {} CONVERT TO CHARACTER SET utf8mb4 COLLATE {};".format(
-                table, collation
+            set_table = "ALTER TABLE {table} CONVERT TO CHARACTER SET {charset} COLLATE {collation};".format(
+                table=table, charset=charset, collation=collation
             )
             logger.debug(self, set_table)
             engine.execute(set_table)
-        print('Database setted to "utf8mb4" with collation "{}"'.format(collation))
+        print('Database setted to "{}" with collation "{}"'.format(charset, collation))
 
 
 class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
