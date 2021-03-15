@@ -540,6 +540,7 @@ class WorkspaceController(Controller):
             content_type_slug=creation_data.content_type,
             workspace=request.current_workspace,
             parent=parent,
+            content_namespace=creation_data.content_namespace,
         )
         api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)

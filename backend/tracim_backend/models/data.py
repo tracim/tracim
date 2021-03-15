@@ -729,9 +729,10 @@ class ContentChecker(object):
             return True
 
 
-class ContentNamespaces(enum.Enum):
+class ContentNamespaces(str, enum.Enum):
     CONTENT = "content"
     UPLOAD = "upload"
+    PUBLICATION = "publication"
 
 
 class ContentRevisionRO(DeclarativeBase):
