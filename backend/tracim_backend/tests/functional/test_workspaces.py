@@ -2,6 +2,8 @@
 """
 Tests for /api/workspaces subpath endpoints.
 """
+import typing
+
 from depot.io.utils import FileIntent
 import pytest
 import transaction
@@ -3001,12 +3003,12 @@ class TestWorkspaceContentsWithFixture(object):
     Tests for /api/workspaces/{workspace_id}/contents endpoint
     """
 
-    def test_api__get_workspace_content__ok_200__get_default(self, web_testapp):
+    def test_api__get_workspace_contents__ok_200__get_default(self, web_testapp):
         """
         Check obtain workspace contents with defaults filters
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 3
         content = res[0]
@@ -3062,7 +3064,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"content_type": "html-document"}
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 1
         content = res[0]
         assert content
@@ -3089,7 +3093,9 @@ class TestWorkspaceContentsWithFixture(object):
         set_html_document_slug_to_legacy(session_factory)
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -3141,7 +3147,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -3193,7 +3201,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_ids": "0,3", "show_archived": 1, "show_deleted": 1, "show_active": 1}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -3221,7 +3231,9 @@ class TestWorkspaceContentsWithFixture(object):
         res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
         content_id = res.json_body["content_id"]
         params = {"parent_ids": "1,2", "show_archived": 1, "show_deleted": 1, "show_active": 1}
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         assert [
@@ -3275,7 +3287,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -3350,7 +3364,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3423,7 +3439,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3466,7 +3484,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 0,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 5
         assert [
             content
@@ -3539,7 +3559,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3582,7 +3604,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 5
         assert [
             content
@@ -3632,7 +3656,9 @@ class TestWorkspaceContentsWithFixture(object):
             "label": "ew",
         }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 1
         content = res[0]
@@ -3656,7 +3682,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         content = res[1]
@@ -3680,7 +3708,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3703,7 +3733,9 @@ class TestWorkspaceContentsWithFixture(object):
          """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
 
         assert len(res) == 1
@@ -3729,7 +3761,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 0}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -3793,7 +3827,9 @@ class TestWorkspaceContentsWithFixture(object):
             "content_type": "thread",
         }
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "thread"
@@ -3871,7 +3907,9 @@ class TestWorkspaceContentsWithFixture(object):
             "content_type": "html-document",
         }
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 2
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3915,7 +3953,9 @@ class TestWorkspaceContentsWithFixture(object):
             #   'content_type': 'any'
         }
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 3
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3966,7 +4006,9 @@ class TestWorkspaceContentsWithFixture(object):
          """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"]
@@ -3991,7 +4033,9 @@ class TestWorkspaceContentsWithFixture(object):
          """
         params = {"parent_ids": 10, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -4008,13 +4052,42 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
+    @pytest.mark.parametrize(
+        "params, expected_content_ids, next_page_token",
+        [
+            ({"sort": "label:asc"}, [18, 19, 20, 8, 7, 9, 3, 10, 12, 4, 6], ""),
+            ({"sort": "label:desc"}, [6, 4, 12, 10, 3, 9, 7, 8, 18, 19, 20], ""),
+            ({"sort": "modified:asc"}, [3, 4, 8, 9, 10, 12, 18, 19, 20, 7, 6], ""),
+            ({"sort": "modified:desc"}, [6, 7, 20, 19, 18, 12, 10, 9, 8, 4, 3], ""),
+            ({"count": 3}, [18, 19, 20], ">s:~i:20"),
+            ({"count": 3, "page_token": ">s:~i:20"}, [8, 7, 9], ""),
+        ],
+    )
+    def test_api__get_workspace_content__ok_200__sort_and_paginate(
+        self,
+        web_testapp,
+        params: dict,
+        expected_content_ids: typing.List[int],
+        next_page_token: str,
+    ):
+        """
+        Test sorting and pagination of contents listing.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        assert res["next_page_token"] == next_page_token
+        content_ids = [content["content_id"] for content in res["items"]]
+        assert content_ids == expected_content_ids
+
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self, web_testapp):
         """
          Check obtain workspace folder deleted contents
          """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
 
         assert len(res) == 1
         content = res[0]
@@ -4039,7 +4112,9 @@ class TestWorkspaceContentsWithFixture(object):
         """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 0}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
+        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
