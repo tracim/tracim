@@ -12,7 +12,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 
-import ContentWithPreviewActivity from './ContentWithPreviewActivity.jsx'
+import FeedItemWithPreview from '../FeedItem/FeedItemWithPreview.jsx'
 import ContentWithoutPreviewActivity from './ContentWithoutPreviewActivity.jsx'
 import MemberActivity from './MemberActivity.jsx'
 
@@ -20,6 +20,7 @@ require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.CONTENT, (activity, breadcrumbsList, onCopyLinkClicked, onEventClicked) => {
+    const [entityType, coreEventType, subEntityType] = activity.newestMessage.event_type.split('.')
     return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
@@ -28,15 +29,27 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
           breadcrumbsList={breadcrumbsList}
+          lastModificationType={coreEventType}
+          lastModificationEntityType={entityType}
+          lastModificationSubEntityType={subEntityType}
         />
       )
       : (
-        <ContentWithPreviewActivity
-          activity={activity}
+        <FeedItemWithPreview
+          breadcrumbsList={breadcrumbsList}
+          commentList={activity.commentList}
+          content={activity.content}
+          eventList={activity.eventList}
           key={activity.id}
+          lastModifier={activity.newestMessage.fields.author}
+          lastModificationType={coreEventType}
+          lastModificationEntityType={entityType}
+          lastModificationSubEntityType={subEntityType}
+          modifiedDate={activity.newestMessage.created}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
-          breadcrumbsList={breadcrumbsList}
+          reactionList={activity.reactionList}
+          workspaceId={activity.newestMessage.fields.workspace.workspace_id}
         />
       )
   }],
@@ -83,7 +96,7 @@ const ActivityList = (props) => {
         () => props.onEventClicked(activity)
       )
       : <span>{props.t('Unknown activity type')}</span>
-    return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
+    return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
   const isSubscriptionRequestOrRejection = (activity) => {
@@ -118,11 +131,14 @@ const ActivityList = (props) => {
         />
       )}
       <div className='activityList__list' data-cy='activityList__list'>
-        {props.activity.list.length > 0
-          ? props.activity.list
-            .filter(activityDisplayFilter)
-            .map(renderActivityComponent)
-          : <div className='activityList__placeholder'>{props.activity.hasNextPage ? props.t('Loading activity feed…') : props.t('No activity')}</div>}
+        {(props.activity.list.length > 0
+          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)
+          : (
+            <div className='activityList__placeholder'>
+              {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
+            </div>
+          )
+        )}
       </div>
       {props.activity.list.length > 0 && props.activity.hasNextPage && (
         <IconButton

@@ -55,7 +55,8 @@ import {
   lightenColor,
   PAGE,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  DATE_FNS_LOCALE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -223,6 +224,8 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+
 export {
   TRANSLATION_STATE,
   getTranslationApiErrorMessage,
@@ -385,5 +388,6 @@ export {
   ProfileNavigation,
   getCoverBaseUrl,
   TranslateButton,
-  getCommentTranslated
+  getCommentTranslated,
+  DATE_FNS_LOCALE
 }

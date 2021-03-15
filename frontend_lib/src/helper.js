@@ -1,8 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { distanceInWords, isAfter } from 'date-fns'
+import { formatDistance, isAfter } from 'date-fns'
 import color from 'color'
+import dateFnsFr from 'date-fns/locale/fr'
+import dateFnsEn from 'date-fns/locale/en-US'
+import dateFnsPt from 'date-fns/locale/pt'
+
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -24,7 +28,8 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
-    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
+    RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
+    PUBLICATION: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -42,15 +47,15 @@ export const PAGE = {
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
-  ACTIVITY_FEED: '/ui/activity-feed',
+  RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
 
-const dateFnsLocale = {
-  fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en'),
-  pt: require('date-fns/locale/pt')
+export const DATE_FNS_LOCALE = {
+  fr: dateFnsFr,
+  en: dateFnsEn,
+  pt: dateFnsPt
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -99,7 +104,14 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
+export const displayDistanceDate = (dateToDisplay, lang) => {
+  if (!dateToDisplay) return ''
+  return formatDistance(
+    new Date(dateToDisplay),
+    new Date(),
+    { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
+  )
+}
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
@@ -112,47 +124,57 @@ export const BREADCRUMBS_TYPE = {
 export const revisionTypeList = [{
   id: 'archiving',
   faIcon: 'fas fa-archive',
-  label: i18n.t('Item archived')
+  tradKey: i18n.t('Item archived'),
+  label: 'Item archived'
 }, {
   id: 'content-comment',
   faIcon: 'far fa-comment',
-  label: i18n.t('Comment')
+  tradKey: i18n.t('Comment'),
+  label: 'Comment'
 }, {
   id: 'creation',
   faIcon: 'fas fa-magic',
-  label: i18n.t('Item created')
+  tradKey: i18n.t('Item created'),
+  label: 'Item created'
 }, {
   id: 'deletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item deleted')
+  tradKey: i18n.t('Item deleted'),
+  label: 'Item deleted'
 }, {
   id: 'edition',
-  faIcon: 'fas fa-edit',
-  label: i18n.t('New revision')
+  faIcon: 'fas fa-history',
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'revision',
   faIcon: 'fas fa-history',
-  label: i18n.t('New revision')
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'status-update',
   faIcon: 'fas fa-random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
+  label: (statusLabel) => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
   faIcon: 'far fa-file-archive',
-  label: i18n.t('Item unarchived')
+  tradKey: i18n.t('Item unarchived'),
+  label: 'Item unarchived'
 }, {
   id: 'undeletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item restored')
+  tradKey: i18n.t('Item restored'),
+  label: 'Item restored'
 }, {
   id: 'move',
-  faIcon: 'fas arrows-alt',
-  label: i18n.t('Item moved')
+  faIcon: 'fas fa-arrows-alt',
+  tradKey: i18n.t('Item moved'),
+  label: 'Item moved'
 }, {
   id: 'copy',
   faIcon: 'far fa-copy',
-  label: i18n.t('Item copied')
+  tradKey: i18n.t('Item copied'),
+  label: 'Item copied'
 }]
 
 const WORKSPACE_MANAGER = {

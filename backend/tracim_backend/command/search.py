@@ -11,6 +11,7 @@ from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import 
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESUserIndexer
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESWorkspaceIndexer
 from tracim_backend.lib.search.search_factory import SearchFactory
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 
 
@@ -136,6 +137,10 @@ class SearchIndexIndexCommand(IndexingCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
+        # INFO - G.M - 2021-03-04 - Force jobs processing mode to sync for command line based
+        # indexing, async mode doesn't work here and doesn't make much sense
+        logger.debug(self, "index tracim synchronously")
+        self._app_config.JOBS__PROCESSING_MODE = self._app_config.CST.SYNC
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )

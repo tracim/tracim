@@ -1,8 +1,8 @@
 import { PAGES, URLS } from '../../support/urls_commands.js'
 
 const activityPages = [
-  { name: 'Personal', page: PAGES.ACTIVITY_FEED, initialItemCount: 3 },
-  { name: 'Space', page: PAGES.WORKSPACE_ACTIVITY_FEED, initialItemCount: 1 }
+  { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
+  { name: 'Space', page: PAGES.WORKSPACE_RECENT_ACTIVITIES, initialItemCount: 1 }
 ]
 
 const fileName2 = 'png_exemple2.png'
@@ -16,7 +16,7 @@ const fileType = 'image/png'
 
 for (const pageTestCase of activityPages) {
   const { name, page, initialItemCount } = pageTestCase
-  describe(`The ${name} activity feed page`, () => {
+  describe(`The ${name} recent activities page`, () => {
     let workspaceId = null
     beforeEach(() => {
       cy.resetDB()
@@ -110,23 +110,23 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a "Comment" button, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityFooter__comment]').click()
+        cy.get('[data-cy=feedItemFooter__comment]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityHeader__label]').click()
+        cy.get('[data-cy=feedItemHeader__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a preview, clicking on it opens the content', () => {
-        cy.get('.activityFeed__preview__image > img').click()
+        cy.get('.recentActivities__preview__image > img').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a button on last activity, clicking on it opens a short history', () => {
-        cy.get('[data-cy=contentActivityTimedEvent] > .dropdown').click()
-        cy.get('[data-cy=contentActivityTimedEvent] .dropdownMenu').should('exist')
+        cy.get('[data-cy=feedItemTimedEvent] > .dropdown').click()
+        cy.get('[data-cy=feedItemTimedEvent] .dropdownMenu').should('exist')
       })
     })
 
@@ -149,11 +149,11 @@ for (const pageTestCase of activityPages) {
           contentName
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.activityFeed__preview__overflow').should('not.exist')
+        cy.get('.recentActivities__preview__overflow').should('not.exist')
 
-        cy.get('.activityFeed__preview__html')
+        cy.get('.recentActivities__preview__html')
           .should('contain.text', smallContent)
       })
 
@@ -180,11 +180,11 @@ for (const pageTestCase of activityPages) {
           'The Holy Tests'
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.activityFeed__preview__overflow').should('be.visible')
+        cy.get('.recentActivities__preview__overflow').should('be.visible')
 
-        cy.get('.activityFeed__preview__html')
+        cy.get('.recentActivities__preview__html')
           .click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId }))
       })

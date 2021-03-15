@@ -6,7 +6,7 @@
   right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
-  border 1px solid grey
+  border-left 1px solid grey
   background-color offWhite
   box-shadow shadow-right
   z-index 26
@@ -16,7 +16,6 @@
   overflow hidden
   transition 0.5s
   &__header
-    border-bottom 1px solid grey
     & div
       color fontColor
     &__close i
@@ -72,6 +71,10 @@
 .documentTitle
   &__highlight
     font-weight bold
+
+// INFO - MB - 20200204 - overrides ListItemWrapper styles because .content is used in many places
+.notification > .notification__list > .content
+  border-left none
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification

@@ -2,9 +2,9 @@
 
 ## Introduction ##
 
-This document is intended to developers.
+This document is intended for developers.
 
-Migrations on `Tracim` lays on [`alembic`](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to `SQLAlchemy`.
+Migrations on `Tracim` uses [alembic](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to SQLAlchemy.
 
 In order to use the `tracimcli` commands, go to the root of the project and
 and activate the Tracim virtualenv:
@@ -111,45 +111,11 @@ def downgrade():
 
 See [ab7c7f4bcbc5_add_auth_type_enum_to_user.py]("../tracim_backend/migration/ab7c7f4bcbc5_add_auth_type_enum_to_user.py")
 
-But updating an enum list is a bit more tricky:
+But updating an enum list is a bit more tricky so a custom alembic operation has been written to handle this case.
 
-```python
-from alembic import op
-import sqlalchemy as sa
+[An example of its usage is available](../tracim_backend/migration/versions/78a01733957f_add_publication_namespace.py).
 
-previous_auth_type_list = ["INTERNAL", "LDAP", "UNKNOWN"]
-new_elements = ["REMOTE"]
-new_auth_type_list = previous_auth_type_list + new_elements
-default_type = "INTERNAL"
-
-users = sa.Table("users", sa.MetaData(), sa.Column("auth_type"))
-
-
-def upgrade():
-    if op.get_context().dialect.name == "postgresql":
-        # INFO - G.M - 2018-11-27 - TO modify type in postgresq, we should
-        # create a new one set column type to this new one and remove old one
-        op.execute("ALTER TYPE authtype RENAME TO authtype_old;")
-        op.execute("ALTER TABLE users alter auth_type drop default;")
-        enum = sa.Enum(*new_auth_type_list, name="authtype")
-        enum.create(op.get_bind(), checkfirst=False)
-        with op.batch_alter_table("users") as batch_op:
-            batch_op.alter_column(
-                "auth_type",
-                type_=enum,
-                postgresql_using="auth_type::text::authtype",
-                server_default="INTERNAL",
-            )
-        op.execute("DROP TYPE authtype_old;")
-    else:
-        enum = sa.Enum(*new_auth_type_list, name="authtype")
-        enum.create(op.get_bind(), checkfirst=False)
-        with op.batch_alter_table("users") as batch_op:
-            batch_op.alter_column("auth_type", type_=enum)
-```
-
-
-See [182b9f7aa837_add_remote_value_to_auth_type_list.py]("../tracim_backend/migration/182b9f7aa837_add_remote_value_to_auth_type_list.py") for a complete working sample with downgrade.
+The custom operation itself can be found in [env.py](../tracim_backend/migration/env.py), in the `ReplaceEnumOp` class.
 
 ## MySQL Always Requires the Type When Altering a Column
 

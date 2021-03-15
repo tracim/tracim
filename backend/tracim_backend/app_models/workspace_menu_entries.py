@@ -19,11 +19,11 @@ dashboard_menu_entry = WorkspaceMenuEntry(
     fa_icon="fas fa-tachometer-alt",
 )
 activity_menu_entry = WorkspaceMenuEntry(
-    slug="activity",
-    label="Activity feed",
-    route="/ui/workspaces/{workspace_id}/activity-feed",
+    slug="publication",
+    label="Publications",
+    route="/ui/workspaces/{workspace_id}/publications",
     hexcolor="#bbbbbb",
-    fa_icon="far fa-newspaper",
+    fa_icon="fas fa-stream",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
     slug="contents/all",

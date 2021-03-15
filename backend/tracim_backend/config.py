@@ -827,6 +827,9 @@ class CFG(object):
         self.TRANSLATION_SERVICE__ENABLED = asbool(
             self.get_raw_config("{}.enabled".format(prefix), "False")
         )
+        self.TRANSLATION_SERVICE__TIMEOUT = (
+            float(self.get_raw_config("{}.timeout".format(prefix), "0")) or None
+        )
         self.TRANSLATION_SERVICE__PROVIDER = self.get_raw_config("{}.provider".format(prefix))
         self.TRANSLATION_SERVICE__SYSTRAN__API_URL = self.get_raw_config(
             "{}.systran.api_url".format(prefix)

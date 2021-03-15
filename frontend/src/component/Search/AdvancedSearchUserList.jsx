@@ -58,11 +58,11 @@ export const AdvancedSearchUserList = props => {
             </div>
 
             <div className='advancedSearchUser__information'>
-              <span title={searchItem.username}>{searchItem.username}</span>
               <Icon
                 icon='fa-fw fas fa-at'
                 title={props.t('Username')}
               />
+              <span title={searchItem.username}>{searchItem.username}</span>
             </div>
           </Link>
         </ListItemWrapper>

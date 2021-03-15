@@ -22,7 +22,6 @@
   "0 contents": "0 conteúdo",
   "0 members": "0 membro",
   "Account Settings": "Definições de conta",
-  "Activity feed": "Feed de atividades",
   "Empty note": "Nota vazia",
   "Empty thread": "Discussão vazia",
   "Are you sure you want to remove this member from the space?": "Tem a certeza de que quer remover este membro do espaço?",
@@ -329,7 +328,6 @@
   "unknown": "desconhecida",
   "Unknown activity type": "Tipo de atividade desconhecida",
   "status modified": "status modificado",
-  "Loading activity feed…": "Carregando o feed de atividade…",
   "No activity": "Nenhuma atividade",
   "Preview of {{content}}": "Pré-visualização de {{content}}",
   "No preview available": "Pré-visualização indisponível",
@@ -411,5 +409,9 @@
   "Account restored": "Conta restaurada",
   "New access": "Novo acesso",
   "Access removed": "Acesso rejeitado",
-  "Requested access": "Acesso solicitado"
+  "Requested access": "Acesso solicitado",
+  "Recent activities": "Atividades recentes",
+  "Loading recent activities…": "Carregando atividades recentes… ",
+  "undeleted": "restaurado",
+  "Publications": "Publicações"
 }

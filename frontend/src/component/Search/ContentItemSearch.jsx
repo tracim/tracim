@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { AVATAR_SIZE, Badge, Avatar } from 'tracim_frontend_lib'
+import { AVATAR_SIZE, FilenameWithExtension, Avatar } from 'tracim_frontend_lib'
 import { FETCH_CONFIG } from '../../util/helper.js'
 
 require('./ContentItemSearch.styl')
@@ -24,16 +24,7 @@ export const ContentItemSearch = props => {
         <i className={`fa-fw ${props.faIcon}`} />
       </div>
 
-      <div
-        className='content__name searchResultPage'
-        title={props.label}
-        data-cy='content__name'
-      >
-        {props.label}
-        {props.contentType.slug === 'file' && (
-          <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
-        )}
-      </div>
+      <FilenameWithExtension file={props} customClass='content__name searchResultPage' />
 
       <div className='content__path' title={props.path}>
         {props.path}

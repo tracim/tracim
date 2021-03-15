@@ -1,10 +1,14 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .advancedSearchContent
-  height 65px
-  width 100%
-  display flex
-  align-items center
+  color fontColor
+  &:hover
+    color fontColor
+  &__wrapper
+    height 65px
+    width 100%
+    display flex
+    align-items center
   &__typeAndTitle
     display none
   &__type
@@ -21,23 +25,38 @@
       margin 15px 25px
       text-align center
       align-self center
+  &__name_path
+    flex 2
+    text-overflow ellipsis
+    overflow hidden
+    width 0
   &__title
-    padding 0px 5px
+    padding 0 5px
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
     color fontColor
     align-self center
-    flex 1
+    flex 2
     width 0
   &__modification
     align-self center
-    margin-inline-end 90px
+    flex 1
+    &.timedEvent
+      margin-left 15px
+      margin-right 10px
+      overflow hidden
   &__information
     color fontColor
     align-self center
     margin-inline-end 5px
     width 160px
+    display flex
+    align-items center
+    &__comments
+      display inline-block
+      min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
+      padding-right 10px
     & > *
       font-size fontSizeSmall
     & > i
@@ -45,29 +64,8 @@
       margin-inline-start 2px
 
 .advancedSearch__openMenu
-  & .timedEvent.advancedSearchContent__modification .timedEvent__operation
-    display none
-  & .advancedSearch__content .content .breadcrumbs
-    display none
   & .advancedSearchContent .advancedSearchContent__title
     padding-bottom 0
-
-// INFO - G.B. - 20210210 - The rules below (and its media queries) are in absolute position because they come from code that would have nested links.
-// To avoid this, the components have been placed outside the top link and displayed in the right place using absolute.
-.timedEvent.advancedSearchContent__modification
-  position absolute
-  top 15px
-  right 250px
-  align-items flex-end
-  margin 0
-.advancedSearch__content .content .breadcrumbs
-  position absolute
-  top 35px
-  left 95px
-.advancedSearchContent .advancedSearchContent__title
-  padding-bottom 15px
-  padding-inline-end 210px
-
 
 @media (max-width: max-lg)
   .advancedSearchContent
@@ -79,30 +77,22 @@
         & > span
           display none
     &__modification
-      margin-inline-end 30px
-  .advancedSearch__content .content .breadcrumbs
-    left 55px
+      overflow hidden
+      text-overflow ellipsis
+    &__name_path
+      padding-inline-start 10px
   .timedEvent.advancedSearchContent__modification
-    right 195px
     & .timedEvent__operation
       display none
   .advancedSearch__openMenu
     & .advancedSearchContent
       &__information
         display none
-      &__modification
-        margin-inline-end 15px
-    & .timedEvent.advancedSearchContent__modification
-      right 0px
 
 @media (max-width: max-md)
   .advancedSearchContent
     &__information
       display none
-    &__modification
-      margin-inline-end 15px
-  .timedEvent.advancedSearchContent__modification
-    right 15px
 
 @media (max-width: max-sm)
   .advancedSearchContent
@@ -110,13 +100,13 @@
       &__type__content
         width 50px
       &__title
-        padding 0px 5px
+        padding 0 5px
     &__modification
       display none
     &__typeAndTitle
       display unset
       padding 15px 5px
-      flex 1
+      flex 2
   .content__header
     & .advancedSearchContent
       &__title

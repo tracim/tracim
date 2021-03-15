@@ -91,6 +91,7 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -274,6 +275,9 @@ class SimpleFileSchema(marshmallow.Schema):
 class FileCreationFormSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
         example=2, default=0, validate=positive_int_validator, allow_none=True
+    )
+    content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
 
     @post_load
@@ -1453,6 +1457,9 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = StrippedString(
         required=True, example="html-document", validate=all_content_types_validator
+    )
+    content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
     )
     parent_id = marshmallow.fields.Integer(
         example=35,

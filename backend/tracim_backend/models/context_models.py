@@ -185,8 +185,11 @@ class FileCreation(object):
     Simple parent_id object
     """
 
-    def __init__(self, parent_id: int = 0) -> None:
+    def __init__(
+        self, content_namespace: ContentNamespaces = ContentNamespaces.CONTENT, parent_id: int = 0
+    ) -> None:
         self.parent_id = parent_id
+        self.content_namespace = content_namespace
 
 
 class SetPassword(object):
@@ -620,10 +623,17 @@ class ContentCreation(object):
     Content creation model
     """
 
-    def __init__(self, label: str, content_type: str, parent_id: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        label: str,
+        content_type: str,
+        content_namespace: ContentNamespaces,
+        parent_id: Optional[int] = None,
+    ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
+        self.content_namespace = content_namespace
 
 
 class CommentCreation(object):
@@ -1359,7 +1369,11 @@ class ContentInContext(object):
             logger.warning(
                 self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-        return None
+        # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
+        # avoid broken search (both simple and elasticsearch)
+        # when broken content exist (content without valid depot file)
+        # see #4267 for better solution.
+        return 0
 
     @property
     def has_pdf_preview(self) -> bool:

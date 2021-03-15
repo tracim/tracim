@@ -262,7 +262,6 @@ class ESSearchApi(SearchApi):
             )
             for comment in content_in_context.comments
         ]
-
         indexed_content = IndexedContent(
             content_namespace=content_in_context.content_namespace,
             content_id=content_in_context.content_id,

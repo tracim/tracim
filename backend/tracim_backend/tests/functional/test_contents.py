@@ -2396,6 +2396,7 @@ class TestFiles(object):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
+    @pytest.mark.parametrize("content_namespace", ["content", "publication"])
     def test_api__create_file__ok__200__nominal_case(
         self,
         workspace_api_factory,
@@ -2404,6 +2405,7 @@ class TestFiles(object):
         web_testapp,
         admin_user,
         event_helper,
+        content_namespace: str,
     ) -> None:
         """
         create one file of a content at workspace root
@@ -2417,6 +2419,7 @@ class TestFiles(object):
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
+            params={"content_namespace": content_namespace},
             status=200,
         )
         res = res.json_body
@@ -2425,7 +2428,7 @@ class TestFiles(object):
         assert res["is_archived"] is False
         assert res["is_deleted"] is False
         assert res["is_editable"] is True
-        assert res["content_namespace"] == "content"
+        assert res["content_namespace"] == content_namespace
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
         content_id = res["content_id"]
@@ -2474,7 +2477,7 @@ class TestFiles(object):
         assert content["is_archived"] is False
         assert content["is_deleted"] is False
         assert content["is_editable"] is True
-        assert content["content_namespace"] == "content"
+        assert content["content_namespace"] == content_namespace
         assert content["workspace_id"] == business_workspace.workspace_id
         assert isinstance(content["content_id"], int)
         assert content["status"] == "open"

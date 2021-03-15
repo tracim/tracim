@@ -1,18 +1,23 @@
 from http import HTTPStatus
 import mimetypes
+import re
 from typing import Any
 from typing import BinaryIO
 from typing import List
+from typing import Optional
 
 import requests
 
 from tracim_backend.lib.translate.translator import InvalidParametersForTranslationService
+from tracim_backend.lib.translate.translator import TranslationInputLanguageEqualToOutput
 from tracim_backend.lib.translate.translator import TranslationLanguagePair
 from tracim_backend.lib.translate.translator import TranslationMimetypePair
 from tracim_backend.lib.translate.translator import TranslationService
 from tracim_backend.lib.translate.translator import TranslationServiceAccessRefused
 from tracim_backend.lib.translate.translator import TranslationServiceException
 from tracim_backend.lib.translate.translator import TranslationServiceServerError
+from tracim_backend.lib.translate.translator import TranslationServiceTimeout
+from tracim_backend.lib.translate.translator import UnavailableTranslationLanguagePair
 
 FILE_TRANSLATION_ENDPOINT = "/translation/file/translate"
 SUPPORTED_FORMAT_ENDPOINT = "/translation/supportedFormats"
@@ -31,9 +36,10 @@ class SystranFormat:
 
 
 class SystranTranslationService(TranslationService):
-    def __init__(self, api_url: str, api_key: str) -> None:
+    def __init__(self, api_url: str, api_key: str, timeout: Optional[float] = None) -> None:
         self.api_url = api_url
         self.api_key = api_key
+        self.timeout = timeout
 
     @property
     def name(self) -> str:
@@ -61,13 +67,21 @@ class SystranTranslationService(TranslationService):
         headers = self._add_auth_to_headers({})
         if format:
             params["format"] = format
-        response = requests.post(
-            "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
-            files={"input": (file_name, binary_io, mimetype)},
-            params=params,
-            headers=headers,
-            stream=True,
-        )
+        try:
+            response = requests.post(
+                "{}{}".format(self.api_url, FILE_TRANSLATION_ENDPOINT),
+                files={"input": (file_name, binary_io, mimetype)},
+                params=params,
+                headers=headers,
+                timeout=self.timeout,
+                stream=True,
+            )
+        except requests.exceptions.Timeout:
+            # NOTE - S.G. - 2021-03-05 - Timeout is useful
+            # as the systran API sometimes takes a very long time before returning an error.
+            # Known cases: translation of an english file in english with some texts.
+            msg = "Translation response took more than {} seconds to arrive".format(self.timeout)
+            raise TranslationServiceTimeout(msg)
         if response.status_code == HTTPStatus.OK:
             return response.raw
         elif response.status_code == HTTPStatus.FORBIDDEN:
@@ -85,6 +99,19 @@ class SystranTranslationService(TranslationService):
                     "Invalid parameters given for translation: {}".format(error["message"])
                 )
             elif error.get("statusCode") == HTTPStatus.INTERNAL_SERVER_ERROR:
+                # HACK - S.G. - 2021-03-05 - special error case
+                # when autodetected source is the same as the target language
+                regex = re.compile(".*Translate_(\\w+)_{}.*".format(language_pair.output_lang))
+                matches = regex.match(error.get("message", ""))
+                if matches:
+                    if matches.group(1) == language_pair.output_lang:
+                        raise TranslationInputLanguageEqualToOutput(error["message"])
+                    else:
+                        raise UnavailableTranslationLanguagePair(
+                            "source: {}, target: {}".format(
+                                matches.group(1), language_pair.output_lang
+                            )
+                        )
                 raise TranslationServiceServerError(
                     "Translation service server error: {}".format(error["message"])
                 )
@@ -128,23 +155,3 @@ class SystranTranslationService(TranslationService):
             target = pair["target"]
             language_pairs.append(TranslationLanguagePair(source, target))
         return language_pairs
-
-
-# TODO: remove this code as soon as tracim implement the api.
-if __name__ == "__main__":
-    import os
-
-    simple_html_file = "valid path"
-    translation_service = SystranTranslationService(
-        api_url=os.environ["SYSTRAN_API_URL"], api_key=os.environ["SYSTRAN_API_KEY"]
-    )
-    with open(simple_html_file, "rb") as my_file:
-        result = translation_service.translate_file(
-            "fr",
-            "ko",
-            my_file,
-            "text/html",
-            format="html",  # this one is optional, it is useful to force format for translation
-        )
-        with open("/tmp/test_result", "wb+") as new_file:
-            new_file.write(result.read())
