@@ -38,9 +38,6 @@ export default FeedItemWithPreview
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
-  lastModificationType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object.isRequired,
-  modifiedDate: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
@@ -48,6 +45,9 @@ FeedItemWithPreview.propTypes = {
   eventList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
+  lastModificationType: PropTypes.string,
+  lastModifier: PropTypes.object,
+  modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   reactionList: PropTypes.array
 }
@@ -58,5 +58,8 @@ FeedItemWithPreview.defaultProps = {
   eventList: [],
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
+  lastModificationType: '',
+  lastModifier: {},
+  modifiedDate: '',
   reactionList: []
 }

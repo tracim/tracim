@@ -101,6 +101,7 @@ import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
+import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
 
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
@@ -237,6 +238,7 @@ export {
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
+  CommentTextArea,
   createSpaceTree,
   DropdownMenu,
   getContentPath,
