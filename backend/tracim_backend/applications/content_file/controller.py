@@ -123,6 +123,7 @@ class FileController(Controller):
             content_type_slug=FILE_TYPE,
             workspace=request.current_workspace,
             parent=parent,
+            content_namespace=hapic_data.forms.content_namespace,
         )
         api.save(content, ActionDescription.CREATION)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):

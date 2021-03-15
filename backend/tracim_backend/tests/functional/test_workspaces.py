@@ -4083,8 +4083,9 @@ class TestWorkspaceContentsWithFixture(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
+    @pytest.mark.parametrize("content_namespace", ["content", "publication"])
     def test_api__post_content_create_generic_content__ok_200__nominal_case(
-        self, web_testapp
+        self, web_testapp, content_namespace: str
     ) -> None:
         """
         Create generic content as workspace root
@@ -4094,12 +4095,14 @@ class TestWorkspaceContentsWithFixture(object):
             "parent_id": None,
             "label": "GenericCreatedContent",
             "content_type": "html-document",
+            "content_namespace": content_namespace,
         }
         res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
         assert res
         assert res.json_body
         assert res.json_body["status"] == "open"
         assert res.json_body["content_id"]
+        assert res.json_body["content_namespace"] == content_namespace
         assert res.json_body["content_type"] == "html-document"
         assert res.json_body["is_archived"] is False
         assert res.json_body["is_deleted"] is False
@@ -4112,7 +4115,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert res.json_body["created"]
         assert res.json_body["file_extension"] == ".document.html"
         assert res.json_body["filename"] == "GenericCreatedContent.document.html"
-        params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_active = {
+            "parent_ids": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+            "namespaces_filter": content_namespace,
+        }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
