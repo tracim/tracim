@@ -31,7 +31,7 @@ class ReactionLib:
         :return: a Query object, filtered query but without fetching the object.
         """
         if reaction_id:
-            query.filter(Reaction.reaction_id == reaction_id)
+            query = query.filter(Reaction.reaction_id == reaction_id)
         if content_id:
             query = query.filter(Reaction.content_id == content_id)
         if user_id:

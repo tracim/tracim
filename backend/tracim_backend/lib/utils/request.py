@@ -256,7 +256,7 @@ class TracimContext(ABC):
         current_content = None
         if self._get_content_id_in_request():
             current_content = self.current_content
-        return reaction_lib.get_one(reaction_id, content_id=current_content.content_id)
+        return reaction_lib.get_one(reaction_id=reaction_id, content_id=current_content.content_id)
 
     def _get_content_type(
         self, content_type_slug_fetcher: typing.Callable[[], str]

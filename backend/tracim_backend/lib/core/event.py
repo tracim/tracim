@@ -842,6 +842,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+        EntityType.REACTION: _get_content_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:
