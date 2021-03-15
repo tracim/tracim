@@ -4060,7 +4060,7 @@ class TestWorkspaceContentsWithFixture(object):
             ({"sort": "modified:asc"}, [3, 4, 8, 9, 10, 12, 18, 19, 20, 7, 6], ""),
             ({"sort": "modified:desc"}, [6, 7, 20, 19, 18, 12, 10, 9, 8, 4, 3], ""),
             ({"count": 3}, [18, 19, 20], ">s:~i:20"),
-            ({"count": 3, "page_token": ">s:~i:20"}, [8, 7, 9], ""),
+            ({"count": 3, "page_token": ">s:~i:20"}, [8, 7, 9], ">s:Brownie Recipe~i:9"),
         ],
     )
     def test_api__get_workspace_content__ok_200__sort_and_paginate(
@@ -4191,7 +4191,7 @@ class TestWorkspaceContentsWithFixture(object):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
@@ -4228,7 +4228,7 @@ class TestWorkspaceContentsWithFixture(object):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
@@ -4267,7 +4267,7 @@ class TestWorkspaceContentsWithFixture(object):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
@@ -4339,7 +4339,7 @@ class TestWorkspaceContentsWithFixture(object):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
@@ -4659,20 +4659,20 @@ class TestWorkspaceContentsWithFixture(object):
         params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
         assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
@@ -4693,10 +4693,10 @@ class TestWorkspaceContentsWithFixture(object):
         params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
         assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
@@ -4704,10 +4704,10 @@ class TestWorkspaceContentsWithFixture(object):
         res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
@@ -4728,20 +4728,20 @@ class TestWorkspaceContentsWithFixture(object):
         params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
         assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
@@ -4762,20 +4762,20 @@ class TestWorkspaceContentsWithFixture(object):
         params_folder2 = {"parent_ids": 2, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
         assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
@@ -4865,7 +4865,7 @@ class TestWorkspaceContentsWithFixture(object):
         # verify coherence of workspace content first.
         projectA_workspace_contents = web_testapp.get(
             "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
-        ).json_body
+        ).json_body["items"]
         assert len(projectA_workspace_contents) == 4
         assert not [
             content
@@ -4874,7 +4874,7 @@ class TestWorkspaceContentsWithFixture(object):
         ]
         projectB_workspace_contents = web_testapp.get(
             "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
-        ).json_body
+        ).json_body["items"]
         assert len(projectB_workspace_contents) == 0
         assert not [
             content
@@ -4897,7 +4897,7 @@ class TestWorkspaceContentsWithFixture(object):
         # verify coherence of workspace after
         projectA_workspace_contents = web_testapp.get(
             "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
-        ).json_body
+        ).json_body["items"]
         assert len(projectA_workspace_contents) == 0
         assert not [
             content
@@ -4906,7 +4906,7 @@ class TestWorkspaceContentsWithFixture(object):
         ]
         projectB_workspace_contents = web_testapp.get(
             "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
-        ).json_body
+        ).json_body["items"]
         assert len(projectB_workspace_contents) == 4
         assert not [
             content
@@ -4927,20 +4927,20 @@ class TestWorkspaceContentsWithFixture(object):
         params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
         assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body
+        ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
@@ -4971,10 +4971,10 @@ class TestWorkspaceContentsWithFixture(object):
         params_deleted = {"parent_ids": 3, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in active_contents if content["content_id"] == 8]
         assert not [content for content in deleted_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
@@ -4985,10 +4985,10 @@ class TestWorkspaceContentsWithFixture(object):
         )
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         new_deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_active_contents if content["content_id"] == 8]
         assert [content for content in new_deleted_contents if content["content_id"] == 8]
 
@@ -5002,19 +5002,19 @@ class TestWorkspaceContentsWithFixture(object):
         params_archived = {"parent_ids": 3, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in active_contents if content["content_id"] == 8]
         assert not [content for content in archived_contents if content["content_id"] == 8]
         web_testapp.put_json("/api/workspaces/2/contents/8/archived", status=204)
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         new_archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in new_active_contents if content["content_id"] == 8]
         assert [content for content in new_archived_contents if content["content_id"] == 8]
 
@@ -5028,19 +5028,19 @@ class TestWorkspaceContentsWithFixture(object):
         params_deleted = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in active_contents if content["content_id"] == 14]
         assert [content for content in deleted_contents if content["content_id"] == 14]
         web_testapp.put_json("/api/workspaces/2/contents/14/trashed/restore", status=204)
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         new_deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in new_active_contents if content["content_id"] == 14]
         assert not [content for content in new_deleted_contents if content["content_id"] == 14]
 
@@ -5059,19 +5059,19 @@ class TestWorkspaceContentsWithFixture(object):
         }
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
-        ).json_body
+        ).json_body["items"]
         assert not [content for content in active_contents if content["content_id"] == 13]
         assert [content for content in archived_contents if content["content_id"] == 13]
         web_testapp.put_json("/api/workspaces/2/contents/13/archived/restore", status=204)
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
-        ).json_body
+        ).json_body["items"]
         new_archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
-        ).json_body
+        ).json_body["items"]
         assert [content for content in new_active_contents if content["content_id"] == 13]
         assert not [content for content in new_archived_contents if content["content_id"] == 13]
 
