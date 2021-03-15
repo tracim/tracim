@@ -190,7 +190,7 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
             )
             logger.debug(self, set_table)
             engine.execute(set_table)
-        print('Database setted to "{}" with collation "{}"'.format(charset, collation))
+        print('Database set to "{}" character set with "{}" collation '.format(charset, collation))
 
 
 class UpdateNamingConventionsV1ToV2Command(AppContextCommand):

@@ -36,11 +36,9 @@ Useful to migrate old databases, to run before applying v3.0.0 migration scripts
 
 ### Migrate Mysql/Mariadb database to utf8mb4 (added for tracim 3.7)
 
-:warning: This will modify charset/collation of the database and all existing tables in the database. We strongly suggest
-you to do a backup before applying this command.
+:warning: This will modify the character set and collation of Tracim's database, including the already existing tables. We strongly suggest you to do a backup before applying this command.
 
-Useful to migrate old databases on mysql or mariadb, in order to have full unicode support, to support symbols like
-emoji. This is mandatory for proper working reaction.
+Useful to migrate old databases on mysql or mariadb in order to have full unicode support. This is mandatory starting with version 3.7 to support emoji reactions.
 
 For mysql 8.0.1+ (force collation to `utf8mb4_0900_ai_ci` as this is better than `utf8mb4_unicode_520_ci`):
 ```bash

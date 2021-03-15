@@ -1,4 +1,4 @@
-"""use json for upload file field
+"""use TEXT type for upload file field
 
 Revision ID: bff384e7c14b
 Revises: 2d98f4b6596d
