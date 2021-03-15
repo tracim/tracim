@@ -1,7 +1,7 @@
 """add reaction table
 
 Revision ID: 2d98f4b6596d
-Revises: 5d54d8602f5a
+Revises: 78a01733957f
 Create Date: 2021-03-10 12:03:05.198986
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "2d98f4b6596d"
-down_revision = "5d54d8602f5a"
+down_revision = "78a01733957f"
 
 
 def upgrade():
