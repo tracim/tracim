@@ -150,10 +150,6 @@ class ContentTypeInContext(object):
         return self.content_type.slug_aliases
 
     @property
-    def allow_sub_content(self) -> bool:
-        return self.content_type.allow_sub_content
-
-    @property
     def minimal_role_content_creation(self) -> WorkspaceRoles:
         return self.content_type.minimal_role_content_creation
 
@@ -283,14 +279,9 @@ class ContentTypeList(object):
         return allowed_types_slug
 
     def default_allowed_content_properties(self, slug: str) -> dict:
-        content_type = self.get_one_by_slug(slug)
-        if content_type.allow_sub_content:
-            sub_content_allowed = self.endpoint_allowed_types_slug()
-        else:
-            sub_content_allowed = [self.Comment.slug]
-
+        allowed_sub_contents = self.endpoint_allowed_types_slug()
         properties_dict = {}
-        for elem in sub_content_allowed:
+        for elem in allowed_sub_contents:
             properties_dict[elem] = True
         return properties_dict
 
