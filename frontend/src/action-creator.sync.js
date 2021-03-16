@@ -243,5 +243,10 @@ export const setUserActivityNextPage = (hasNextPage, nextPageToken) => ({
 export const resetUserActivity = () => ({ type: `${RESET}/${USER_ACTIVITY}` })
 export const setUserActivityEventList = (activityId, messageList) => ({ type: `${SET}/${USER_ACTIVITY}/${EVENT_LIST}`, activityId, messageList })
 
-export const WORKSPACE_PUBLICATION_LIST = `${WORKSPACE}/PublicationList`
-export const PUBLICATION_THREAD = 'Publication/Thread'
+export const PUBLICATION = 'Publication'
+export const WORKSPACE_PUBLICATION_LIST = `${WORKSPACE}/${PUBLICATION}List`
+export const PUBLICATION_THREAD = `${PUBLICATION}/Thread`
+export const setPublicationList = (publicationList) => ({ type: `${SET}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
+export const updatePublicationList = () => ({ type: `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}` })
+export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLICATION}`, publicationId })
+export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })

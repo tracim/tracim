@@ -8,12 +8,16 @@ import {
   buildHeadTitle,
   CommentTextArea,
   CUSTOM_EVENT,
+  getOrCreateSessionClientToken,
   IconButton,
   PAGE,
   postNewComment,
   ROLE,
   ROLE_LIST,
   ScrollToBottomWrapper,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -28,11 +32,15 @@ import {
   postThreadPublication
 } from '../action-creator.async.js'
 import {
+  appendPublication,
+  newFlashMessage,
+  removePublication,
   setBreadcrumbs,
   setHeadTitle,
-  newFlashMessage,
+  setPublicationList,
   setWorkspaceDetail,
-  setWorkspaceMemberList
+  setWorkspaceMemberList,
+  updatePublicationList
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
@@ -45,10 +53,19 @@ export class Publications extends React.Component {
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented }
+    ])
+
     this.state = {
       newPublication: '',
       publicationList: [],
-      publicationWysiwyg: false
+      publicationWysiwyg: false,
+      showReorderButton: false
     }
   }
 
@@ -78,9 +95,45 @@ export class Publications extends React.Component {
     globalThis.tinymce.remove('#wysiwygPublication')
   }
 
+  sortByModifiedDate = (arrayToSort) => {
+    return arrayToSort.sort(function (a, b) {
+      if (a.modified > b.modified) return 1
+      if (a.modified < b.modified) return -1
+      return 0
+    })
+  }
+
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     this.setHeadTitle()
+  }
+
+  handleContentCreatedOrRestored = (data) => {
+    if (data.fields.content.content_namespace !== 'publication') return
+    if (data.fields.client_token === getOrCreateSessionClientToken()) return
+    this.props.dispatch(appendPublication(data.fields.content))
+    const newPublicationList = this.state.publicationList
+    newPublicationList.push(data.fields.content)
+    this.setState({ publicationList: this.sortByModifiedDate(newPublicationList) })
+  }
+
+  handleContentCommented = (data) => {
+    const lastPublicationId = this.state.publicationList[this.state.publicationList.length - 1].content_id
+    if (data.fields.content.parent_id === lastPublicationId) return
+    // this.setState({ showReorderButton: true }) Update
+  }
+
+  handleContentModified = (data) => {
+    const lastPublicationId = this.state.publicationList[this.state.publicationList.length - 1].content_id
+    if (data.fields.content.content_namespace !== 'publication' || data.fields.content.content_id === lastPublicationId) return
+    this.setState({ showReorderButton: true })
+  }
+
+  handleContentDeleted = (data) => {
+    if (data.fields.content.content_namespace !== 'publication') return
+    this.props.dispatch(removePublication(data.fields.content.content_id))
+    const newPublicationList = this.state.publicationList.filter(publication => data.fields.content.content_id !== publication.content_id)
+    this.setState({ publicationList: this.sortByModifiedDate(newPublicationList) })
   }
 
   loadWorkspaceDetail = async () => {
@@ -150,7 +203,8 @@ export class Publications extends React.Component {
     const fetchGetPublicationList = await props.dispatch(getPublicationList(props.match.params.idws))
     switch (fetchGetPublicationList.status) {
       case 200:
-        this.setState({ publicationList: fetchGetPublicationList.json })
+        props.dispatch(setPublicationList(fetchGetPublicationList.json))
+        this.setState({ publicationList: this.sortByModifiedDate(fetchGetPublicationList.json) })
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning')); break
     }
@@ -178,6 +232,7 @@ export class Publications extends React.Component {
         )
         switch (fetchPostNewComment.status) {
           case 200: {
+            props.dispatch(appendPublication(fetchPostThreadPublication.json))
             const newPublicationList = state.publicationList
             newPublicationList.push(fetchPostThreadPublication.json)
             this.setState({
@@ -215,6 +270,10 @@ export class Publications extends React.Component {
     }
   }
 
+  handleClickReorder = () => {
+    this.props.dispatch(updatePublicationList())
+  }
+
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
@@ -242,13 +301,13 @@ export class Publications extends React.Component {
             />
           )}
 
-          {props.showRefresh && (
+          {state.showReorderButton && (
             <IconButton
-              customClass='activityList__refresh' // Update
+              customClass='publications__reorder'
               text={props.t('Reorder')}
               icon='fas fa-redo-alt'
               intent='link'
-              onClick={props.onRefreshClicked}
+              onClick={this.handleClickReorder}
             />
           )}
 
@@ -270,7 +329,7 @@ export class Publications extends React.Component {
                   intent='link'
                   mode='light'
                   onClick={this.handleToggleWysiwyg}
-                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')} // update
+                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 />
 
                 <IconButton
@@ -291,5 +350,10 @@ export class Publications extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, breadcrumbs }) => ({ user, currentWorkspace, breadcrumbs })
+const mapStateToProps = ({
+  breadcrumbs,
+  currentWorkspace,
+  publicationList,
+  user
+}) => ({ breadcrumbs, currentWorkspace, publicationList, user })
 export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(Publications))))

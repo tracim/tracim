@@ -59,7 +59,7 @@ export class ScrollToBottomWrapper extends React.Component {
     return (
       <ul className={props.customClass} ref={el => { this.container = el }}>
         {props.children}
-        <li style={{ visibility: 'hidden' }} ref={el => { this.containerBottom = el }} />
+        <li style={{ visibility: 'hidden', height: '0' }} ref={el => { this.containerBottom = el }} />
       </ul>
     )
   }
