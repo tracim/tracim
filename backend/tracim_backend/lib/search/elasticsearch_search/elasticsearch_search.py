@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import IndexingError
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
@@ -899,7 +900,7 @@ class ESContentIndexer:
         content = self._get_main_content(content)
         try:
             self.index_contents([content], context)
-        except Exception:
+        except IndexingError:
             logger.exception(
                 self, "Exception while indexing created content {}".format(content.content_id)
             )
@@ -935,7 +936,7 @@ class ESContentIndexer:
         )
         try:
             self.index_contents(content_api.get_all_query(workspace=workspace), context)
-        except Exception:
+        except IndexingError:
             logger.exception(
                 self,
                 "Exception while indexing modified contents of workspace {}".format(
@@ -960,7 +961,7 @@ class ESContentIndexer:
         )
         try:
             self.index_contents(content_api.get_all_query(user=user), context)
-        except Exception:
+        except IndexingError:
             logger.exception(
                 self,
                 "Exception while indexing contents authored/modified by user {}".format(
@@ -980,11 +981,24 @@ class ESContentIndexer:
 
             listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
         else:
-            search_api = ESSearchApi(
-                session=context.dbsession, config=context.app_config, current_user=None
-            )
-            for content in self._filter_excluded_content_types(contents):
+            indexing_error_count = self.sync_index_contents(contents, context)
+            if indexing_error_count:
+                raise IndexingError()
+
+    def sync_index_contents(self, contents: typing.List[Content], context: TracimContext) -> int:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        indexing_error_count = 0
+        for content in self._filter_excluded_content_types(contents):
+            try:
                 search_api.index_content(content)
+            except Exception:
+                logger.exception(
+                    self, "Exception while indexing content {}".format(content.content_id)
+                )
+                indexing_error_count += 1
+        return indexing_error_count
 
     def _index_contents_from_ids(self, content_ids: typing.List[int]) -> None:
         """Index contents whose ids are given.
@@ -997,8 +1011,17 @@ class ESContentIndexer:
             search_api = ESSearchApi(
                 session=context.dbsession, config=context.app_config, current_user=None
             )
+            indexing_error_count = 0
             for content_id in content_ids:
-                search_api.index_content(capi.get_one(content_id))
+                try:
+                    search_api.index_content(capi.get_one(content_id))
+                except Exception:
+                    indexing_error_count += 1
+                    logger.exception(self, "Exception while indexing content {}".format(content_id))
+            if indexing_error_count:
+                raise IndexingError(
+                    "Got error(s) while indexing content ids {}".format(content_ids)
+                )
 
     @classmethod
     def _get_main_content(cls, content: Content) -> Content:
