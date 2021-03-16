@@ -2,15 +2,18 @@
 """
 Tests for /api/workspaces subpath endpoints.
 """
+import datetime
 import typing
 
 from depot.io.utils import FileIntent
+from freezegun import freeze_time
 import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -18,6 +21,31 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+
+
+@pytest.fixture
+def contents_for_pagination(
+    session, app_config, workspace_api_factory, content_api_factory
+) -> Workspace:
+    """Create a workspace with some contents appropriate for sorting and paginating.
+
+    Time is frozen/changed to ensure that the contents' created/modified values are different
+    by at least 1 second as MySQL/mariadb stores it only with one second precision.
+    """
+    wapi = workspace_api_factory.get()
+    workspace = wapi.create_workspace("test", save_now=True)
+    capi = content_api_factory.get()
+    with freeze_time("2021-03-16T08:47:00Z") as frozen_time:
+        for label in ("World", "Spam", "Eggs", "Hello"):
+            content = capi.create(
+                content_type_slug="html-document", workspace=workspace, label=label, do_save=True,
+            )
+            with new_revision(session, transaction, content):
+                content.modified = datetime.datetime.utcnow()
+                capi.save(content, do_notify=False)
+            frozen_time.tick(1)
+    transaction.commit()
+    return workspace
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -4052,33 +4080,6 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    @pytest.mark.parametrize(
-        "params, expected_content_ids, next_page_token",
-        [
-            ({"sort": "label:asc"}, [18, 19, 20, 8, 7, 9, 3, 10, 12, 4, 6], ""),
-            ({"sort": "label:desc"}, [6, 4, 12, 10, 3, 9, 7, 8, 18, 19, 20], ""),
-            ({"sort": "modified:asc"}, [3, 4, 8, 9, 10, 12, 18, 19, 20, 7, 6], ""),
-            ({"sort": "modified:desc"}, [6, 7, 20, 19, 18, 12, 10, 9, 8, 4, 3], ""),
-            ({"count": 3}, [18, 19, 20], ">s:~i:20"),
-            ({"count": 3, "page_token": ">s:~i:20"}, [8, 7, 9], ">s:Brownie Recipe~i:9"),
-        ],
-    )
-    def test_api__get_workspace_content__ok_200__sort_and_paginate(
-        self,
-        web_testapp,
-        params: dict,
-        expected_content_ids: typing.List[int],
-        next_page_token: str,
-    ):
-        """
-        Test sorting and pagination of contents listing.
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body
-        assert res["next_page_token"] == next_page_token
-        content_ids = [content["content_id"] for content in res["items"]]
-        assert content_ids == expected_content_ids
-
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self, web_testapp):
         """
          Check obtain workspace folder deleted contents
@@ -5168,3 +5169,47 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][0]["content_id"] == another_content.content_id
         assert my_file_path["items"][0]["label"] == another_content.label
         assert my_file_path["items"][0]["content_type"] == "html-document"
+
+
+@pytest.mark.usefixtures("base_fixture")
+class TestGetContentsPaginationAndSort:
+    @pytest.mark.parametrize(
+        "params, expected_content_ids, next_page_token",
+        [
+            pytest.param({"sort": "label:asc"}, [3, 4, 2, 1], "", id="sort by ascending label",),
+            pytest.param({"sort": "label:desc"}, [1, 2, 4, 3], "", id="sort by descending label",),
+            pytest.param(
+                {"sort": "modified:asc"}, [1, 2, 3, 4], "", id="sort by ascending modified",
+            ),
+            pytest.param(
+                {"sort": "modified:desc"}, [4, 3, 2, 1], "", id="sort by descending modified",
+            ),
+            pytest.param({"count": 2}, [3, 4], ">s:Hello~i:4", id="paginate (count=2)"),
+            pytest.param(
+                {"count": 2, "page_token": ">s:Hello~i:4"},
+                [2, 1],
+                ">s:World~i:1",
+                id="second page (count=2)",
+            ),
+        ],
+    )
+    def test_api__get_workspace_contents__ok_200__sort_and_paginate(
+        self,
+        contents_for_pagination: Workspace,
+        web_testapp,
+        params: dict,
+        expected_content_ids: typing.List[int],
+        next_page_token: str,
+    ):
+        """
+        Test sorting and pagination of contents listing.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/contents".format(contents_for_pagination.workspace_id),
+            status=200,
+            params=params,
+        ).json_body
+        assert res["next_page_token"] == next_page_token
+        content_ids = [content["content_id"] for content in res["items"]]
+        assert content_ids == expected_content_ids
