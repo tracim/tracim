@@ -95,7 +95,7 @@ requests==2.25.0          # via caldav, pubcontrol, tracim_backend (setup.py)
 rq==0.12.0                # via tracim_backend (setup.py)
 six==1.11.0               # via caldav, cliff, elasticsearch-dsl, gripcontrol, imapclient, jsonschema, python-dateutil, stevedore
 smmap==3.0.4              # via gitdb
-sqlakeyset==1.0.1595476224  # via tracim_backend (setup.py)
+sqlakeyset==1.0.1615859905  # via tracim_backend (setup.py)
 sqlalchemy==1.3.18        # via alembic, sqlakeyset, tracim_backend (setup.py), zope.sqlalchemy
 stevedore==1.30.0         # via cliff
 tinycss2==1.0.2           # via cairosvg, cssselect2
