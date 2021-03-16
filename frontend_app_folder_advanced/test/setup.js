@@ -21,6 +21,7 @@ if (!global.window && !global.document) {
   global.document = window.document
   global.navigator = window.navigator
   global.GLOBAL_primaryColor = '#aaaaaa'
+  global.FormData = window.FormData
 
   const nodeCrypto = require('crypto')
   global.crypto = {

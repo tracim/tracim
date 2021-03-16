@@ -90,16 +90,16 @@ describe('helper.js', () => {
 
     it('should return the proper Response when status: 300', (done) => {
       const cloneFetchResult = {
+        ok: true,
         json: () => 'jsonTest'
       }
       const fetchResult = Promise.resolve({
         ok: true,
         status: 300,
-        clone: () => ({ json: () => 'jsonTest' })
+        clone: () => ({ json: () => 'jsonTest', ok: true })
       })
       fetchResult.then((response) => {
-        handleFetchResult(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: cloneFetchResult.ok })
         }).then(done, done)
       })
     })
@@ -108,16 +108,17 @@ describe('helper.js', () => {
   describe('generateFetchResponse()', () => {
     it('should return the proper Response when status: 200', (done) => {
       const cloneFetchResult = {
-        json: () => 'jsonTest'
+        json: () => 'jsonTest',
+        ok: true
       }
       const fetchResult = Promise.resolve({
         ok: true,
         status: 200,
-        clone: () => ({ json: () => 'jsonTest' })
+        clone: () => ({ json: () => 'jsonTest', ok: true })
       })
       fetchResult.then((response) => {
         generateFetchResponse(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: cloneFetchResult.ok })
         }).then(done, done)
       })
     })

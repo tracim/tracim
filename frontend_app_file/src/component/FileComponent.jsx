@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
+import Kanban from './Kanban.jsx'
 import {
   APP_FEATURE_MODE,
   PromptMessage,
@@ -66,6 +67,7 @@ export class FileComponent extends React.Component {
 
   render () {
     const { props } = this
+    const isKanban = props.content.file_extension === '.kanban'
     return (
       <div
         className={classnames(
@@ -121,7 +123,11 @@ export class FileComponent extends React.Component {
           />
         )}
 
-        {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
+        {(isKanban && (props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION)) && (
+          <Kanban mode={props.mode} content={props.content} config={props.config} />
+        )}
+
+        {(!isKanban && (props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION)) && (
           <PreviewComponent
             color={props.customColor}
             downloadRawUrl={props.downloadRawUrl}

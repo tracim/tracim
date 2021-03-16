@@ -7,7 +7,9 @@ import {
   buildHeadTitle,
   TracimComponent,
   putMyselfFileRead,
-  PopupUploadFile
+  PopupUploadFile,
+  handleFetchResult,
+  postNewEmptyContent
 } from 'tracim_frontend_lib'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
@@ -68,6 +70,17 @@ class PopupCreateFile extends React.Component {
     }
   }
 
+  openContent (content) {
+    GLOBAL_dispatchEvent({
+      type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+      data: {
+        workspaceId: content.workspace_id,
+        contentType: this.state.appName,
+        contentId: content.content_id
+      }
+    })
+  }
+
   handleUploadSuccess = async (fileUploadList) => {
     const { state } = this
 
@@ -82,14 +95,7 @@ class PopupCreateFile extends React.Component {
     this.handleClosePopup()
     if (fileUploadList.length !== 1) return
 
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.OPEN_CONTENT_URL,
-      data: {
-        workspaceId: fileUploadList[0].responseJson.workspace_id,
-        contentType: state.appName,
-        contentId: fileUploadList[0].responseJson.content_id
-      }
-    })
+    this.openContent(fileUploadList[0].responseJson)
   }
 
   handleClosePopup = () => {
@@ -99,6 +105,32 @@ class PopupCreateFile extends React.Component {
         name: this.state.appName
       }
     })
+  }
+
+  handleCreateBoardClick = async () => {
+    const label = window.prompt('Please enter the name of the board you want to create')
+    if (!label) return
+
+    const { state } = this
+
+    const response = await handleFetchResult(await postNewEmptyContent(
+      state.config.apiUrl,
+      state.workspaceId,
+      state.folderId || 0,
+      'file',
+      label,
+      '.kanban'
+    ))
+
+    switch (response.apiResponse.status) {
+      case 200: {
+        this.handleClosePopup()
+        this.openContent(response.body)
+        break
+      }
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while creating the board'))
+    }
   }
 
   render () {
@@ -127,6 +159,7 @@ class PopupCreateFile extends React.Component {
         uploadErrorMessageList={errorMessageList}
         defaultUploadErrorMessage={defaultErrorMessage}
         additionalFormData={additionalFormData}
+        onCreateBoardClick={this.handleCreateBoardClick}
         multipleFiles
       />
     )

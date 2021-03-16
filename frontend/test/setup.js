@@ -37,6 +37,7 @@ if (!global.window && !global.document) {
   global.fetch = require('node-fetch')
   global.GLOBAL_excludedNotifications = []
   global.DOMParser = window.DOMParser
+  global.FormData = window.FormData
 }
 
 Enzyme.configure({ adapter: new Adapter() })

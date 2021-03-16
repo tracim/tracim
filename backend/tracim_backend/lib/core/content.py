@@ -486,6 +486,7 @@ class ContentApi(object):
         parent: Content = None,
         label: str = "",
         filename: str = "",
+        file_extension: str = "",
         do_save=False,
         is_temporary: bool = False,
         do_notify=True,
@@ -520,8 +521,7 @@ class ContentApi(object):
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
         if label:
-            file_extension = ""
-            if content_type.file_extension:
+            if not file_extension and content_type.file_extension:
                 file_extension = content_type.file_extension
             filename = self._prepare_filename(label, file_extension)
             self._is_filename_available_or_raise(filename, workspace, parent, content_namespace)

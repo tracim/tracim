@@ -549,6 +549,7 @@ class WorkspaceController(Controller):
                 ) from exc
         content = api.create(
             label=creation_data.label,
+            file_extension=creation_data.file_extension,
             content_type_slug=creation_data.content_type,
             workspace=request.current_workspace,
             parent=parent,

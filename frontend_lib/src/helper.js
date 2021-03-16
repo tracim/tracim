@@ -60,13 +60,18 @@ export const DATE_FNS_LOCALE = {
   pt: dateFnsPt
 }
 
-export const generateFetchResponse = async fetchResult => {
-  const resultJson = await fetchResult.clone().json()
-  return new Promise((resolve, reject) => resolve({
+export const generateFetchResponse = async (fetchResult, bodyAsText) => {
+  const body = await (
+    bodyAsText
+      ? fetchResult.clone().text()
+      : fetchResult.clone().json()
+  )
+
+  return {
+    ok: fetchResult.ok,
     apiResponse: fetchResult,
-    body: resultJson,
-    ok: fetchResult.ok
-  }))
+    body
+  }
 }
 
 export const errorFlashMessageTemplateObject = errorMsg => ({
@@ -78,24 +83,24 @@ export const errorFlashMessageTemplateObject = errorMsg => ({
   }
 })
 
-export const handleFetchResult = async fetchResult => {
+export const handleFetchResult = async (fetchResult, bodyAsText = false) => {
   const status = fetchResult.status
 
   if (status === 204) return fetchResult // no result
-  if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult)
-  if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult)
+  if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult, bodyAsText)
+  if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult, bodyAsText)
   if (status === 401) { // unauthorized
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {} })
-    return generateFetchResponse(fetchResult)
+    return generateFetchResponse(fetchResult, bodyAsText)
   }
-  if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult) // let specific handler handle it with fetchResult.body.code
+  if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult, bodyAsText) // let specific handler handle it with fetchResult.body.code
   if (status >= 500 && status <= 599) {
     GLOBAL_dispatchEvent(errorFlashMessageTemplateObject(`Unexpected api error with http status ${status}`)) // no need for translation
-    return generateFetchResponse(fetchResult)
+    return generateFetchResponse(fetchResult, bodyAsText)
   }
 
   GLOBAL_dispatchEvent(errorFlashMessageTemplateObject(`Unknown http status ${status}`)) // no need for translation
-  return generateFetchResponse(fetchResult)
+  return generateFetchResponse(fetchResult, bodyAsText)
 }
 
 export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
@@ -411,15 +416,21 @@ export const getOrCreateSessionClientToken = () => {
   return token
 }
 
+export const HTTP_HEADERS = {
+  X_TRACIM_CLIENTTOKEN: 'X-Tracim-ClientToken',
+  ACCEPT: 'Accept',
+  CONTENT_TYPE: 'Content-Type'
+}
+
 export const COMMON_REQUEST_HEADERS = {
-  Accept: 'application/json',
-  'X-Tracim-ClientToken': getOrCreateSessionClientToken()
+  [HTTP_HEADERS.ACCEPT]: 'application/json',
+  [HTTP_HEADERS.X_TRACIM_CLIENTTOKEN]: getOrCreateSessionClientToken()
 }
 
 export const FETCH_CONFIG = {
   headers: {
     ...COMMON_REQUEST_HEADERS,
-    'Content-Type': 'application/json'
+    [HTTP_HEADERS.CONTENT_TYPE]: 'application/json'
   }
 }
 

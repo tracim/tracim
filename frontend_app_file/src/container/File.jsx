@@ -1193,6 +1193,8 @@ export class File extends React.Component {
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            content={state.content}
+            config={state.config}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}

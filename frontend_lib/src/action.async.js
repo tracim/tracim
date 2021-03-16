@@ -1,12 +1,22 @@
-import { CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
+import { CONTENT_NAMESPACE, FETCH_CONFIG, HTTP_HEADERS } from './helper.js'
 
-export const baseFetch = (method, url, body) =>
-  fetch(url, {
+export function baseFetch (method, url, body = undefined) {
+  let headers = FETCH_CONFIG.headers
+
+  if (body instanceof FormData) {
+    headers = { ...headers }
+    delete headers[HTTP_HEADERS.CONTENT_TYPE]
+  } else {
+    body = JSON.stringify(body)
+  }
+
+  return fetch(url, {
     credentials: 'include',
-    headers: FETCH_CONFIG.headers,
-    method: method,
-    body: body ? JSON.stringify(body) : undefined
+    headers,
+    method,
+    body
   })
+}
 
 export const getContentPath = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/path`)
@@ -17,6 +27,14 @@ export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle
     label: newTitle,
     raw_content: newContent,
     ...propertiesToAddToBody
+  })
+
+export const postNewEmptyContent = (apiUrl, workspaceId, parentId, contentType, label, fileExtension) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents`, {
+    content_type: contentType,
+    parent_id: parentId || null,
+    label,
+    file_extension: fileExtension
   })
 
 export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
@@ -105,6 +123,9 @@ export const getFolderDetail = (apiUrl, workspaceId, contentId) =>
 export const getFileContent = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}`)
 
+export const getRawFileContent = (apiUrl, workspaceId, contentId, revisionId, filename) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/raw/${filename}`)
+
 export const getWorkspaceContentList = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=0`)
 
@@ -122,6 +143,12 @@ export const putFileDescription = (apiUrl, workspaceId, contentId, label, newDes
     label: label,
     description: newDescription
   })
+
+export const putRawFileContent = (apiUrl, workspaceId, contentId, filename, newContent, type = 'text/plain') => {
+  const formData = new FormData()
+  formData.append('files', new File([newContent], filename, { type }))
+  return baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}`, formData)
+}
 
 export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/users/me/workspaces/${workspaceId}/contents/${contentId}/read`)

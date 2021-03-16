@@ -57,6 +57,11 @@ class PopupCreateContent extends React.Component {
                   />
                 )}
               <div className='createcontent__form__button'>
+                {(props.onCreateBoardClick && (
+                  <button type='button' onClick={props.onCreateBoardClick}>
+                    Create a board
+                  </button>
+                ))}
                 <button
                   type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page
                   className='createcontent__form__button btn highlightBtn'

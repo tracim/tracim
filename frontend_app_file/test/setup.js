@@ -26,6 +26,8 @@ if (!global.window && !global.document) {
     getItem: () => {}
   }
   global.GLOBAL_primaryColor = '#aaaaaa'
+  global.FormData = window.FormData
+  global.Element = window.Element
   const nodeCrypto = require('crypto')
   global.crypto = {
     getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }

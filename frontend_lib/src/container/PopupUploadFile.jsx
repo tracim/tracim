@@ -182,6 +182,7 @@ class PopupUploadFile extends React.Component {
         faIcon={props.faIcon}
         contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
+        onCreateBoardClick={props.onCreateBoardClick}
         btnValidateLabel={props.validateLabel || props.t('Validate')}
         customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
       >

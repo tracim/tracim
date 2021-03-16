@@ -659,11 +659,13 @@ class ContentCreation(object):
         content_type: str,
         content_namespace: ContentNamespaces,
         parent_id: Optional[int] = None,
+        file_extension: Optional[str] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
         self.content_namespace = content_namespace
+        self.file_extension = file_extension
 
 
 class CommentCreation(object):
