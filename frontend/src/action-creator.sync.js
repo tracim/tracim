@@ -243,4 +243,5 @@ export const setUserActivityNextPage = (hasNextPage, nextPageToken) => ({
 export const resetUserActivity = () => ({ type: `${RESET}/${USER_ACTIVITY}` })
 export const setUserActivityEventList = (activityId, messageList) => ({ type: `${SET}/${USER_ACTIVITY}/${EVENT_LIST}`, activityId, messageList })
 
-export const WORKSPACE_PUBLICATION = `${WORKSPACE}/Publication`
+export const WORKSPACE_PUBLICATION_LIST = `${WORKSPACE}/PublicationList`
+export const PUBLICATION_THREAD = 'Publication/Thread'

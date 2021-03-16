@@ -1,13 +1,16 @@
 import React from 'react'
 
-import { NUMBER_RESULTS_BY_PAGE, PAGE } from 'tracim_frontend_lib'
+import { CONTENT_TYPE, NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
 
 import {
   mergeWithActivityList,
   addMessageToActivityList,
   sortActivityList
 } from '../util/activity.js'
-import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  handleClickCopyLink
+} from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
@@ -52,18 +55,14 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     handleClickCopyLink = content => {
       const { props } = this
-      // INFO - GB - 2020-11-20 - Algorithm based on
-      // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
-      const tmp = document.createElement('textarea')
-      document.body.appendChild(tmp)
-      tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
-        props.workspaceId,
-        content.content_type,
-        content.content_id
-      )}`
-      tmp.select()
-      document.execCommand('copy')
-      document.body.removeChild(tmp)
+      handleClickCopyLink(content.content_type === CONTENT_TYPE.COMMENT
+        ? {
+          content_id: content.parent_id,
+          workspace_id: props.workspaceId,
+          content_type: content.parent_content_type
+        }
+        : content
+      )
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }
 

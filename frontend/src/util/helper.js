@@ -230,3 +230,19 @@ export const parseSearchUrl = (parsedQuery) => {
 
   return searchObject
 }
+
+export const handleClickCopyLink = (content) => {
+  console.log(content)
+  // INFO - GB - 2020-11-20 - Algorithm based on
+  // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+  const tmp = document.createElement('textarea')
+  document.body.appendChild(tmp)
+  tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+    content.workspace_id,
+    content.content_type,
+    content.content_id
+  )}`
+  tmp.select()
+  document.execCommand('copy')
+  document.body.removeChild(tmp)
+}

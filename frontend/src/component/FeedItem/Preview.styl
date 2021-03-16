@@ -1,29 +1,9 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 previewBorderColor = mediumGrey
-previewHeight = 300px
 linkColor = #007bff // This color comes from bootstrap
 
 .feedItem__preview
-  box-sizing content-box
-  position relative
-  overflow hidden
-  background-color veryLightGrey
-  max-height previewHeight
-  margin 10px 0
-  border-radius 5px
-
-  &__overflowOverlay
-    background-image:
-      linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent),
-      radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1), transparent)
-    background-repeat no-repeat
-    background-position bottom
-    position absolute
-    bottom 0
-    height 25%
-    width 100%
-
   & > a
     display flex
     min-height 100%
@@ -46,9 +26,6 @@ linkColor = #007bff // This color comes from bootstrap
       color linkColor
 
     > .html-content
-      background offWhite
-      border 1px solid previewBorderColor
-      padding 10px
       align-self stretch
 
   &__unavailable
@@ -57,9 +34,6 @@ linkColor = #007bff // This color comes from bootstrap
 
     & > a
       display block
-
-    .far
-      font-size fontSizeMedium
 
     .far, span
       display inline-block

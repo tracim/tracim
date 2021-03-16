@@ -1,9 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
-
+import { v4 as uuidv4 } from 'uuid'
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
@@ -11,15 +10,22 @@ import {
   CUSTOM_EVENT,
   IconButton,
   PAGE,
+  postNewComment,
   ROLE,
   ROLE_LIST,
+  // ScrollToBottomWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
   FETCH_CONFIG,
-  findUserRoleIdInWorkspace
+  findUserRoleIdInWorkspace,
+  handleClickCopyLink
 } from '../util/helper.js'
-import { getPublicationList, getWorkspaceDetail } from '../action-creator.async.js'
+import {
+  getPublicationList,
+  getWorkspaceDetail,
+  postThreadPublication
+} from '../action-creator.async.js'
 import {
   setBreadcrumbs,
   setHeadTitle,
@@ -38,8 +44,9 @@ export class Publications extends React.Component {
     ])
 
     this.state = {
+      newPublication: '',
       publicationList: [],
-      newPublication: ''
+      publicationWysiwyg: false
     }
   }
 
@@ -50,12 +57,18 @@ export class Publications extends React.Component {
     this.getPublicationList()
   }
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.match.params.idws === this.props.match.params.idws) return
+  componentDidUpdate (prevProps, prevState) {
+    const { props, state } = this
+    if (prevProps.match.params.idws === props.match.params.idws) return
     this.loadWorkspaceDetail()
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.getPublicationList()
+    if (prevState.publicationWysiwyg && !state.publicationWysiwyg) globalThis.tinymce.remove('#wysiwygPublication')
+  }
+
+  componentWillUnmount () {
+    globalThis.tinymce.remove('#wysiwygPublication')
   }
 
   handleAllAppChangeLanguage = () => {
@@ -80,6 +93,20 @@ export class Publications extends React.Component {
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
+
+  handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      '#wysiwygPublication',
+      this.props.user.lang,
+      this.handleChangeNewPublication,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
+  }
+
+  handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
 
   buildBreadcrumbs = () => {
     const { props } = this
@@ -125,7 +152,49 @@ export class Publications extends React.Component {
   handleChangeNewPublication = e => this.setState({ newPublication: e.target.value })
 
   handleClickPublish = async () => {
+    const { props, state } = this
+    const workspaceId = props.match.params.idws
+    const randomNumber = uuidv4()
 
+    const fetchPostThreadPublication = await props.dispatch(postThreadPublication(
+      workspaceId,
+      `thread_${randomNumber}`
+    ))
+
+    switch (fetchPostThreadPublication.status) {
+      case 200: {
+        const fetchPostNewComment = await postNewComment(
+          FETCH_CONFIG.apiUrl,
+          workspaceId,
+          fetchPostThreadPublication.json.content_id,
+          state.newPublication
+        )
+        switch (fetchPostNewComment.status) {
+          case 200: {
+            const newPublicationList = state.publicationList
+            newPublicationList.push(fetchPostThreadPublication.json)
+            this.setState({
+              publicationList: newPublicationList,
+              newPublication: ''
+            })
+            break
+          }
+          default:
+            props.dispatch(newFlashMessage(`${props.t('Error while saving new comment')}`, 'warning'))
+            break
+        }
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(`${props.t('Error while saving new publication')}`, 'warning'))
+        break
+    }
+  }
+
+  handleClickCopyLink = content => {
+    const { props } = this
+    handleClickCopyLink(content)
+    props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
   render () {
@@ -140,59 +209,68 @@ export class Publications extends React.Component {
           breadcrumbs={props.breadcrumbs}
         />
 
-        {state.publicationList.map(publication =>
-          <FeedItemWithPreview
-            key={`publication_${publication.content_id}`}
-            content={publication}
-            onClickCopyLink={() => { }} // update
-            workspaceId={Number(publication.workspace_id)}
-          // breadcrumbsList: PropTypes.array,
-          // commentList: PropTypes.array
-          />
-        )}
-
-        {props.showRefresh && (
-          <IconButton
-            customClass='activityList__refresh' // Update
-            text={props.t('Reorder')}
-            icon='fas fa-redo-alt'
-            intent='link'
-            onClick={props.onRefreshClicked}
-          />
-        )}
-
-        {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <div className='publications__publishArea pageContentGeneric'>
-            <CommentTextArea
-              id='publication'
-              apiUrl={FETCH_CONFIG.apiUrl}
-              newComment={state.newPublication}
-              onChangeNewComment={this.handleChangeNewPublication}
-            // wysiwyg: PropTypes.bool,
-            // searchForMentionInQuery: PropTypes.func
+        {/* <ScrollToBottomWrapper
+          itemList={state.publicationList}
+          // customClass='pageContentGeneric'
+          // isLastItemFromCurrentToken: PropTypes.bool,
+          shouldScrollToBottom={true}
+        > */}
+        <div className='pageContentGeneric'>
+          {state.publicationList.map(publication =>
+            <FeedItemWithPreview
+              key={`publication_${publication.content_id}`}
+              content={publication}
+              onClickCopyLink={() => this.handleClickCopyLink(publication)}
+              workspaceId={Number(publication.workspace_id)}
+            // commentList: PropTypes.array
             />
+          )}
 
-            <div className='publications__publishArea__buttons'>
-              <IconButton
-                customClass='publications__publishArea__buttons__advancedEdition'
-                intent='link'
-                mode='light'
-                onClick={() => {}} // update
-                text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')} // update
+          {props.showRefresh && (
+            <IconButton
+              customClass='activityList__refresh' // Update
+              text={props.t('Reorder')}
+              icon='fas fa-redo-alt'
+              intent='link'
+              onClick={props.onRefreshClicked}
+            />
+          )}
+
+          {userRoleIdInWorkspace >= ROLE.contributor.id && (
+            <div className='publications__publishArea'>
+              <CommentTextArea
+                apiUrl={FETCH_CONFIG.apiUrl}
+                id='wysiwygPublication'
+                newComment={state.newPublication}
+                onChangeNewComment={this.handleChangeNewPublication}
+                onInitWysiwyg={this.handleInitPublicationWysiwyg}
+                searchForMentionInQuery={() => { }} // Update
+                wysiwyg={state.publicationWysiwyg}
               />
 
-              <IconButton
-                color={publicationColor}
-                disabled={state.newPublication === ''}
-                intent='primary'
-                mode='light'
-                onClick={this.handleClickPublish}
-                text={<span>{props.t('Publish')}&nbsp;<i className='far fa-paper-plane' /></span>}
-                title={props.t('Publish')}
-              />
+              <div className='publications__publishArea__buttons'>
+                <IconButton
+                  customClass='publications__publishArea__buttons__advancedEdition'
+                  intent='link'
+                  mode='light'
+                  onClick={this.handleToggleWysiwyg}
+                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')} // update
+                />
+
+                <IconButton
+                  color={publicationColor}
+                  disabled={state.newPublication === ''}
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickPublish}
+                  text={<span>{props.t('Publish')}&nbsp;<i className='far fa-paper-plane' /></span>}
+                  title={props.t('Publish')}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        {/* </ScrollToBottomWrapper> */}
       </div>
     )
   }
@@ -200,6 +278,3 @@ export class Publications extends React.Component {
 
 const mapStateToProps = ({ user, currentWorkspace, breadcrumbs }) => ({ user, currentWorkspace, breadcrumbs })
 export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(Publications))))
-
-Publications.propTypes = {
-}

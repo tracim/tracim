@@ -21,6 +21,7 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   NOTIFICATION_NOT_READ_COUNT,
+  PUBLICATION_THREAD,
   SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
@@ -50,7 +51,7 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
-  WORKSPACE_PUBLICATION,
+  WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -1190,7 +1191,7 @@ export const getAdvancedSearchResult = (
 
 export const getPublicationList = (workspaceId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`,
     param: {
       credentials: 'include',
       headers: {
@@ -1198,7 +1199,28 @@ export const getPublicationList = (workspaceId) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_PUBLICATION,
+    actionName: WORKSPACE_PUBLICATION_LIST,
+    dispatch
+  })
+}
+
+export const postThreadPublication = (workspaceId, newContentName) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        parent_id: null,
+        content_type: 'thread',
+        content_namespace: 'publication',
+        label: newContentName
+      })
+    },
+    actionName: PUBLICATION_THREAD,
     dispatch
   })
 }

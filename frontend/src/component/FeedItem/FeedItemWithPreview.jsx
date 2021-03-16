@@ -23,12 +23,14 @@ export const FeedItemWithPreview = props => {
         onEventClicked={props.onEventClicked}
         workspaceId={props.workspaceId}
       />
-      <Preview content={props.content} />
-      <FeedItemFooter
-        commentList={props.commentList}
-        content={props.content}
-        reactionList={props.reactionList}
-      />
+      <div className='feedItem__content'>
+        <Preview content={props.content} />
+        <FeedItemFooter
+          commentList={props.commentList}
+          content={props.content}
+          reactionList={props.reactionList}
+        />
+      </div>
       {props.children}
     </div>
   )

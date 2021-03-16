@@ -3,6 +3,8 @@
 
 backgroundColor = grey-hover
 spacingSize = 10px
+feedWidth = 800px
+smallScreenFeedWidth = 400px
 
 .feedItem
   background-color backgroundColor
@@ -10,3 +12,16 @@ spacingSize = 10px
   border-radius 5px
   padding spacingSize
   margin-bottom spacingSize
+  margin-inline-end auto
+  margin-inline-start auto
+  width feedWidth
+  &__content
+    position relative
+    background-color offWhite
+    margin spacingSize 0
+    border-radius 5px
+
+
+@media (max-width: max-sm)
+  .feedItem
+    width smallScreenFeedWidth
