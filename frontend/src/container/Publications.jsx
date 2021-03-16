@@ -13,7 +13,7 @@ import {
   postNewComment,
   ROLE,
   ROLE_LIST,
-  // ScrollToBottomWrapper,
+  ScrollToBottomWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -24,13 +24,15 @@ import {
 import {
   getPublicationList,
   getWorkspaceDetail,
+  getWorkspaceMemberList,
   postThreadPublication
 } from '../action-creator.async.js'
 import {
   setBreadcrumbs,
   setHeadTitle,
   newFlashMessage,
-  setWorkspaceDetail
+  setWorkspaceDetail,
+  setWorkspaceMemberList
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
@@ -55,16 +57,21 @@ export class Publications extends React.Component {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.getPublicationList()
+    if (this.props.currentWorkspace.memberList.length === 0) this.loadMemberList()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
-    if (prevProps.match.params.idws === props.match.params.idws) return
-    this.loadWorkspaceDetail()
-    this.setHeadTitle()
-    this.buildBreadcrumbs()
-    this.getPublicationList()
-    if (prevState.publicationWysiwyg && !state.publicationWysiwyg) globalThis.tinymce.remove('#wysiwygPublication')
+    if (prevProps.match.params.idws !== props.match.params.idws) {
+      this.loadWorkspaceDetail()
+      this.setHeadTitle()
+      this.buildBreadcrumbs()
+      this.getPublicationList()
+    }
+    if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygPublication')
+    }
+    if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
   }
 
   componentWillUnmount () {
@@ -197,6 +204,17 @@ export class Publications extends React.Component {
     props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
+  loadMemberList = async () => {
+    const { props } = this
+
+    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
+    switch (fetchWorkspaceMemberList.status) {
+      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
+      case 400: break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+    }
+  }
+
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
@@ -209,20 +227,18 @@ export class Publications extends React.Component {
           breadcrumbs={props.breadcrumbs}
         />
 
-        {/* <ScrollToBottomWrapper
+        <ScrollToBottomWrapper
           itemList={state.publicationList}
-          // customClass='pageContentGeneric'
+          customClass='pageContentGeneric'
           // isLastItemFromCurrentToken: PropTypes.bool,
-          shouldScrollToBottom={true}
-        > */}
-        <div className='pageContentGeneric'>
+          shouldScrollToBottom
+        >
           {state.publicationList.map(publication =>
             <FeedItemWithPreview
               key={`publication_${publication.content_id}`}
               content={publication}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
               workspaceId={Number(publication.workspace_id)}
-            // commentList: PropTypes.array
             />
           )}
 
@@ -269,8 +285,7 @@ export class Publications extends React.Component {
               </div>
             </div>
           )}
-        </div>
-        {/* </ScrollToBottomWrapper> */}
+        </ScrollToBottomWrapper>
       </div>
     )
   }

@@ -103,6 +103,8 @@ import Badge from './component/Badge/Badge.jsx'
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
 
+import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
+
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
@@ -244,6 +246,7 @@ export {
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
+  ScrollToBottomWrapper,
   sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,

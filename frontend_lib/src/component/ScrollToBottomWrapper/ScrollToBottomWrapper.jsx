@@ -50,7 +50,6 @@ export class ScrollToBottomWrapper extends React.Component {
 
   getContentId = (content) => {
     if (!content) return -1
-    console.log(content)
     return content.timelineType === CONTENT_TYPE.COMMENT ? content.parent_id : content.content_id
   }
 

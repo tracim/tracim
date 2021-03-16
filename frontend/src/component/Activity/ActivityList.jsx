@@ -88,7 +88,6 @@ const ActivityList = (props) => {
 
   const renderActivityComponent = (activity) => {
     const componentConstructor = ENTITY_TYPE_COMPONENT_CONSTRUCTOR.get(activity.entityType)
-    console.log(activity.newestMessage.fields.content)
     const component = componentConstructor
       ? componentConstructor(
         activity,
