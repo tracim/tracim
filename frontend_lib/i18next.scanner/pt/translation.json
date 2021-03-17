@@ -139,7 +139,7 @@
   "Translation is not available": "A tradução não está disponível",
   "Unknown error": "Erro desconhecido",
   "Error while translating the document: {{details}}": "Erro ao traduzir o documento: {{details}}",
-  "Error while fetching a list of reactions": "__NOT_TRANSLATED__",
+  "Error while fetching a list of reactions": "Erro ao obter uma lista de reacções",
   "Error while adding your reaction": "__NOT_TRANSLATED__",
   "Error while removing your reaction": "__NOT_TRANSLATED__",
   "React": "__NOT_TRANSLATED__",
