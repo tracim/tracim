@@ -148,7 +148,7 @@
   "{{user}} reacted with {{reaction}}": "{{user}} reagiu com {{reaction}}",
   "{{users}} reacted with {{reaction}}_them": "{{users}} reagiram com {{reaction}}",
   "You reacted with {{reaction}}": "Você reagiu com {{reaction}}",
-  "{{users}} reacted with {{reaction}}_you": "__NOT_TRANSLATED__",
+  "{{users}} reacted with {{reaction}}_you": "{{users}} reagiram com {{reaction}}",
   "and": "__NOT_TRANSLATED__",
   "Search": "__NOT_TRANSLATED__",
   "Clear": "__NOT_TRANSLATED__",
