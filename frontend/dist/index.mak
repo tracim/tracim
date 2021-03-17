@@ -90,7 +90,6 @@
 
   <body>
     <div id="content"></div>
-    <div id="emoji-picker-overlay"></div>
 
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>

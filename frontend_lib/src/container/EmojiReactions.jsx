@@ -16,12 +16,12 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from '../tracimLiveMessage.js'
 
-import EmojiReactionButtonsComponent from '../component/EmojiReactions/EmojiReactionButtons.jsx'
+import EmojiReactionsComponent from '../component/EmojiReactions/EmojiReactions.jsx'
 
 const ERR_REACTION_ALREADY_EXISTS = 3013
 const ERR_REACTION_NOT_FOUND = 1022
 
-class EmojiReactionButtons extends React.Component {
+class EmojiReactions extends React.Component {
   constructor (props) {
     super(props)
     this.state = { reactionList: [] }
@@ -61,7 +61,7 @@ class EmojiReactionButtons extends React.Component {
   render () {
     const { props, state } = this
     return (
-      <EmojiReactionButtonsComponent
+      <EmojiReactionsComponent
         loggedUserId={props.loggedUserId}
         contentId={props.contentId}
         workspaceId={props.workspaceId}
@@ -120,11 +120,11 @@ class EmojiReactionButtons extends React.Component {
   }
 }
 
-EmojiReactionButtons.propTypes = {
+EmojiReactions.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   loggedUserId: PropTypes.number.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired
 }
 
-export default translate()(TracimComponent(EmojiReactionButtons))
+export default translate()(TracimComponent(EmojiReactions))

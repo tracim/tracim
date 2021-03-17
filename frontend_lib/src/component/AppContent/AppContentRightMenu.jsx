@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { ROLE, APP_FEATURE_MODE } from '../../helper.js'
-import EmojiReactionButtons from '../../container/EmojiReactionButtons.jsx'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
 import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
 import ArchiveDeleteContent from '../OptionComponent/ArchiveDeleteContent.jsx'
 // require('./AppContentRightMenu.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -10,7 +10,7 @@ const AppContentRightMenu = (props) => (
   <div className='appContentRightMenu'>
     {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
       <>
-        <EmojiReactionButtons
+        <EmojiReactions
           apiUrl={props.apiUrl}
           loggedUserId={props.loggedUser.userId}
           contentId={props.content.content_id}
@@ -45,8 +45,13 @@ AppContentRightMenu.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   loggedUser: PropTypes.object.isRequired,
-  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE)), // not required
-  mobileVersion: PropTypes.object // not required
+  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE)),
+  mobileVersion: PropTypes.object
+}
+
+AppContentRightMenu.defaultProps = {
+  mode: undefined,
+  mobileVersion: undefined
 }
 
 export default AppContentRightMenu

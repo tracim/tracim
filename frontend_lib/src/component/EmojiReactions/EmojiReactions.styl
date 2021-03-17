@@ -3,19 +3,19 @@
 .EmojiPickerPopover .popover
   max-width unset
 
-.EmojiReactionButtons
+.EmojiReactions
   display flex
   align-items center
   justify-content flex-end
   flex 1
 
-.ReactionButton__button, .ReactionButton__buttonpicker
+.EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
   background transparent
   cursor pointer
   border-radius 3px
   margin 2px
 
-.ReactionButton__button
+.EmojiReactionButton__button
   border 1px solid lightDarkGrey
   &__value
     font-family 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', 'Twemoji Mozilla', 'Noto Color Emoji', 'Android Emoji', sans-serif
@@ -25,18 +25,18 @@
     text-align left
     min-width 2ex // RJ - 2021-03-17 - NOTE: prevent the button from resizing when the count changes
 
-.ReactionButton__buttonpicker
+.EmojiReactionButton__buttonpicker
   border 1px solid transparent
   &.active
     background-color mediumDarkGrey
     border 1px solid mediumDarkGrey
 
-.ReactionButton__button:hover, .ReactionButton__buttonpicker:hover:not(.active)
+.EmojiReactionButton__button:hover, .EmojiReactionButton__buttonpicker:hover:not(.active)
   background-color grey-hover
   border 1px solid mediumGrey
 
 .highlighted
-  &.ReactionButton__button
+  &.EmojiReactionButton__button
     background-color lighten(primaryColor, 85%)
     border 1px solid primaryColor
 

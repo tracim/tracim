@@ -671,7 +671,7 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
-export const andList = (list) => {
+export const humanAndList = (list) => {
   // RJ - 2021-17-03 - INFO
   // This function return a localized string that looks like:
   //  - 'elem1' (one element in list)
@@ -682,11 +682,11 @@ export const andList = (list) => {
   switch (list.length) {
     case 0: return ''
     case 1: return list[0]
-    default: return (
-      list.slice(0, list.length - 1).join(', ') +
-      ' ' + i18n.t('and') + ' ' +
-      list[list.length - 1]
-    )
+    default: {
+      const allButLast = list.slice(0, list.length - 1).join(', ')
+      const last = list[list.length - 1]
+      return `${allButLast} ${i18n.t('and')} ${last}`
+    }
   }
 }
 

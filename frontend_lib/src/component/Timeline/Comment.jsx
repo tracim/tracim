@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
-import EmojiReactionButtons from '../../container/EmojiReactionButtons.jsx'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -59,7 +59,7 @@ const Comment = props => {
               onClickRestore={props.onClickRestore}
               dataCy='commentTranslateButton'
             />
-            <EmojiReactionButtons
+            <EmojiReactions
               apiUrl={props.apiUrl}
               loggedUserId={props.loggedUserId}
               contentId={props.contentId}
