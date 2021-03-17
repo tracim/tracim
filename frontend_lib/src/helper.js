@@ -671,14 +671,21 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
-export const andList = (elems) => {
-  switch (elems.length) {
+export const andList = (list) => {
+  // RJ - 2021-17-03 - INFO
+  // This function return a localized string that looks like:
+  //  - 'elem1' (one element in list)
+  //  - 'elem1 and elem2' (two elements)
+  //  - 'elem1, elem2 and elem3' (three elements and more)
+  //  - 'elem1, elem2, elem3 and elem4'
+
+  switch (list.length) {
     case 0: return ''
-    case 1: return elems[0]
+    case 1: return list[0]
     default: return (
-      elems.slice(0, elems.length - 1).join(', ') +
+      list.slice(0, list.length - 1).join(', ') +
       ' ' + i18n.t('and') + ' ' +
-      elems[elems.length - 1]
+      list[list.length - 1]
     )
   }
 }

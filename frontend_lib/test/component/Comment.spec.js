@@ -10,6 +10,10 @@ describe('<Comment />', () => {
     text: 'randomText',
     createdFormated: 'randomCreatedFormated',
     createdDistance: 'randomCreatedDistance',
+    contentId: 1337,
+    workspaceId: 42,
+    onClickTranslate: () => {},
+    onClickRestore: () => {},
     fromMe: true
   }
 

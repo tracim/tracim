@@ -185,17 +185,19 @@ const ReactionButton = translate()(function ReactionButton (props) {
 })
 
 ReactionButton.propTypes = {
+  reactionList: PropTypes.array.isRequired,
+  userReactionId: PropTypes.number.isRequired,
   onRemoveReaction: PropTypes.func.isRequired,
   onAddReaction: PropTypes.func.isRequired
 }
 
-const EmojiReactionButtons = (props) => {
-  const reactionListByValue = {}
+function groupReactionsByValue (reactionList) {
+  const reactionListsByValue = {}
 
-  for (const reaction of props.reactionList) {
+  for (const reaction of reactionList) {
     const bucket = (
-      reactionListByValue[reaction.value] || (
-        reactionListByValue[reaction.value] = {
+      reactionListsByValue[reaction.value] || (
+        reactionListsByValue[reaction.value] = {
           firstCreation: reaction.created,
           reactionList: []
         }
@@ -209,7 +211,11 @@ const EmojiReactionButtons = (props) => {
     }
   }
 
-  const reactionListsByCreation = Object.values(reactionListByValue).sort(
+  return Object.values(reactionListsByValue)
+}
+
+const EmojiReactionButtons = (props) => {
+  const reactionListsByCreation = groupReactionsByValue(props.reactionList).sort(
     (bucketA, bucketB) => bucketA.firstCreation < bucketB.firstCreation
   )
 
