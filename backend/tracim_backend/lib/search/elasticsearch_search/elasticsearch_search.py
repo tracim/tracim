@@ -4,9 +4,9 @@ import typing
 from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
-from elasticsearch import RequestError
 from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Document
+from elasticsearch_dsl import Index
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response.aggs import Bucket
 import pluggy
@@ -124,13 +124,12 @@ class ESSearchApi(SearchApi):
         indices_parameters = self._get_indices_parameters()
         for parameters in indices_parameters:
             self.create_template(parameters)
-            index_name = self._get_index_name(parameters)
-            try:
+            # NOTE - 2021-03-17 - S.G. - Testing the existence of the index through its
+            # alias name as the indice names have the datetime of creation included.
+            current_index = Index(parameters.alias)
+            if not current_index.exists(using=self.es):
+                index_name = self._get_index_name(parameters)
                 self.es.indices.create(index=index_name)
-            except RequestError:
-                # Ignoring error if the index already exists
-                pass
-            else:
                 self.set_alias(parameters, index_name)
 
         logger.info(self, "ES indices are ready")
