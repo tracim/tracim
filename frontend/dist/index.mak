@@ -27,7 +27,6 @@
         param = "color"
         color_change_value = 15
       %>
-      :root { --primaryColor: ${primary_color_str }}
 
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
