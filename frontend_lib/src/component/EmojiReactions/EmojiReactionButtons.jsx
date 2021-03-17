@@ -2,15 +2,14 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import 'emoji-mart/css/emoji-mart.css'
 import emojiData from 'emoji-mart/data/all.json'
-import { getEmojiDataFromNative} from 'emoji-mart'
-import { Picker } from 'emoji-mart'
+import { getEmojiDataFromNative, Picker } from 'emoji-mart'
+
 import { UncontrolledPopover, PopoverBody } from 'reactstrap'
 
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import { andList } from '../../helper.js'
-import IconButton from '../Button/IconButton.jsx'
 
 class EmojiPickerButton extends React.Component {
   constructor (props) {
@@ -100,7 +99,7 @@ class EmojiPickerButton extends React.Component {
         {(this.state.pickerDisplayed
           ? (
             <UncontrolledPopover
-              className="EmojiPickerPopover"
+              className='EmojiPickerPopover'
               toggle={props.onCancel} // eslint-disable-line react/jsx-handler-names
               placement='left'
               isOpen
@@ -109,7 +108,7 @@ class EmojiPickerButton extends React.Component {
               <PopoverBody>
                 <Picker
                   native
-                  emojiTooltip={true}
+                  emojiTooltip
                   title=''
                   i18n={emojiMartI18n}
                   onSelect={this.handleSelect}

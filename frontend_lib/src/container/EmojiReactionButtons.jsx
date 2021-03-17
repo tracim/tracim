@@ -76,7 +76,7 @@ class EmojiReactionButtons extends React.Component {
     const reaction = data.fields.reaction
     if (reaction.content_id !== this.props.contentId) return
 
-      this.setState(prev => ({
+    this.setState(prev => ({
       reactionList: [
         ...prev.reactionList,
         reaction
