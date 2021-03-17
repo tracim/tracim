@@ -74,9 +74,8 @@ mariadb 10.3 or mysql 8.0.1 (We need database that are able to support recursive
 :warning: newest version of debian doesn't provide up to date mysql version, you should add official apt repository:
 https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/
 
-:warning: Tracim needs a complete utf-8 charset and collation to work properly, so its database should be using
-utf8mb4 charset. For the collation we suggest `utf8mb4_0900_ai_ci` for mysql 8.0.1+ and `utf8mb4_unicode_520_ci` for mariadb 10.3+.
-as there are the most up-to-date unicode collation algorithm available.
+:warning: Tracim requires proper support for UFT-8 to work properly. On MySQL and MariaDB, this means you hould be using `utf8mb4`. For the collation we suggest using `utf8mb4_0900_ai_ci` on MySQL 8.0.1+ and `utf8mb4_unicode_520_ci` on MariaDB 10.3+.
+as they are the most up-to-date Unicode collation algorithms available.
 
 If you need to upgrade to tracim 3.7+ on mysql/mariadb, please use [utf8mb4 migration command line](cli.md) (section "Migrate Mysql/Mariadb database to utf8mb4").
 if you want to use MariaDB as database engine
