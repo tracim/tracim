@@ -57,11 +57,15 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       const { props } = this
       handleClickCopyLink(content.content_type === CONTENT_TYPE.COMMENT
         ? {
-          content_id: content.parent_id,
-          workspace_id: props.workspaceId,
-          content_type: content.parent_content_type
+          id: content.parent_id,
+          workspaceId: props.workspaceId,
+          type: content.parent_content_type
         }
-        : content
+        : {
+          id: content.content_id,
+          workspaceId: content.workspace_id,
+          type: content.content_type
+        }
       )
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }

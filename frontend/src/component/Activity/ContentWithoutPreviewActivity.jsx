@@ -8,7 +8,7 @@ export const ContentWithoutPreviewActivity = props => {
     <div className='feedItem'>
       <FeedItemHeader
         breadcrumbsList={props.breadcrumbsList}
-        content={props.activity.newestMessage.fields.content}
+        content={props.content}
         eventList={props.activity.eventList}
         lastModificationType={props.lastModificationType}
         lastModificationEntityType={props.lastModificationEntityType}
@@ -27,6 +27,7 @@ export default ContentWithoutPreviewActivity
 
 ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
+  content: PropTypes.object.isRequired,
   lastModificationType: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   breadcrumbsList: PropTypes.array,

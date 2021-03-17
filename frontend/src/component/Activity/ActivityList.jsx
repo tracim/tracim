@@ -7,12 +7,13 @@ import {
   CONTENT_TYPE,
   IconButton,
   PAGE,
+  serialize,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
-
-import FeedItemWithPreview from '../FeedItem/FeedItemWithPreview.jsx'
+import { serializeContentProps } from '../../reducer/workspaceContentList.js'
+import FeedItemWithPreview from '../../container/FeedItemWithPreview.jsx'
 import ContentWithoutPreviewActivity from './ContentWithoutPreviewActivity.jsx'
 import MemberActivity from './MemberActivity.jsx'
 
@@ -32,13 +33,14 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           lastModificationType={coreEventType}
           lastModificationEntityType={entityType}
           lastModificationSubEntityType={subEntityType}
+          content={serialize(activity.newestMessage.fields.content, serializeContentProps)}
         />
       )
       : (
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
           commentList={activity.commentList}
-          content={activity.content}
+          content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
           key={activity.id}
           lastModifier={activity.newestMessage.fields.author}

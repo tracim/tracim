@@ -146,7 +146,7 @@ export class Timeline extends React.Component {
               )}
             >
               <CommentTextArea
-                id='wysiwygTimelineComment'
+                id={`wysiwygTimelineComment${props.id}`}
                 apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
@@ -211,10 +211,15 @@ Timeline.propTypes = {
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
+  availableStatusList: PropTypes.array,
+  deprecatedStatus: PropTypes.object,
   disableComment: PropTypes.bool,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
+  id: PropTypes.string,
+  isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object,
+  onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
@@ -237,14 +242,21 @@ Timeline.propTypes = {
 }
 
 Timeline.defaultProps = {
+  availableStatusList: [],
+  deprecatedStatus: {
+    faIcon: ''
+  },
   disableComment: false,
   customClass: '',
   customColor: '',
+  id: '',
+  isDeprecated: false,
   loggedUser: {
     userId: '',
     name: '',
     userRoleIdInWorkspace: ROLE.reader.id
   },
+  onInitWysiwyg: () => { },
   timelineData: [],
   wysiwyg: false,
   onClickWysiwygBtn: () => { },

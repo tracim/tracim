@@ -11,9 +11,9 @@ export class FeedItemFooter extends React.Component {
   handleCommentClicked () {
     const { props } = this
     props.history.push(PAGE.WORKSPACE.CONTENT(
-      props.content.workspace_id,
-      props.content.content_type,
-      props.content.content_id
+      props.content.workspaceId,
+      props.content.type,
+      props.content.id
     ))
   }
 

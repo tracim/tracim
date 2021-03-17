@@ -8,7 +8,10 @@ import {
   buildHeadTitle,
   CommentTextArea,
   CUSTOM_EVENT,
+  displayDistanceDate,
+  getContentComment,
   getOrCreateSessionClientToken,
+  handleFetchResult,
   IconButton,
   PAGE,
   postNewComment,
@@ -18,7 +21,8 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 import {
   FETCH_CONFIG,
@@ -32,6 +36,8 @@ import {
   postThreadPublication
 } from '../action-creator.async.js'
 import {
+  addCommentListToPublication,
+  appendCommentToPublication,
   appendPublication,
   newFlashMessage,
   removePublication,
@@ -40,11 +46,12 @@ import {
   setPublicationList,
   setWorkspaceDetail,
   setWorkspaceMemberList,
+  updatePublication,
   updatePublicationList
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
-import { FeedItemWithPreview } from '../component/FeedItem/FeedItemWithPreview.jsx'
+import { FeedItemWithPreview } from './FeedItemWithPreview.jsx'
 
 export class Publications extends React.Component {
   constructor (props) {
@@ -63,7 +70,6 @@ export class Publications extends React.Component {
 
     this.state = {
       newPublication: '',
-      publicationList: [],
       publicationWysiwyg: false,
       showReorderButton: false
     }
@@ -95,14 +101,6 @@ export class Publications extends React.Component {
     globalThis.tinymce.remove('#wysiwygPublication')
   }
 
-  sortByModifiedDate = (arrayToSort) => {
-    return arrayToSort.sort(function (a, b) {
-      if (a.modified > b.modified) return 1
-      if (a.modified < b.modified) return -1
-      return 0
-    })
-  }
-
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     this.setHeadTitle()
@@ -112,28 +110,29 @@ export class Publications extends React.Component {
     if (data.fields.content.content_namespace !== 'publication') return
     if (data.fields.client_token === getOrCreateSessionClientToken()) return
     this.props.dispatch(appendPublication(data.fields.content))
-    const newPublicationList = this.state.publicationList
-    newPublicationList.push(data.fields.content)
-    this.setState({ publicationList: this.sortByModifiedDate(newPublicationList) })
   }
 
   handleContentCommented = (data) => {
-    const lastPublicationId = this.state.publicationList[this.state.publicationList.length - 1].content_id
-    if (data.fields.content.parent_id === lastPublicationId) return
-    // this.setState({ showReorderButton: true }) Update
+    const { props } = this
+    const lastPublicationId = props.publicationList[props.publicationList.length - 1].id
+    const publicationId = data.fields.content.parent_id
+    if (!props.publicationList.find(publication => publication.id === publicationId)) return
+    props.dispatch(appendCommentToPublication(publicationId, data.fields.content))
+    props.dispatch(updatePublication(props.publicationList.find(publication => publication.id === publicationId)))
+    if (publicationId !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleContentModified = (data) => {
-    const lastPublicationId = this.state.publicationList[this.state.publicationList.length - 1].content_id
-    if (data.fields.content.content_namespace !== 'publication' || data.fields.content.content_id === lastPublicationId) return
-    this.setState({ showReorderButton: true })
+    const { props } = this
+    if (data.fields.content.content_namespace !== 'publication') return
+    props.dispatch(updatePublication(data.fields.content))
+    const lastPublicationId = props.publicationList[props.publicationList.length - 1].id
+    if (data.fields.content.content_id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleContentDeleted = (data) => {
     if (data.fields.content.content_namespace !== 'publication') return
     this.props.dispatch(removePublication(data.fields.content.content_id))
-    const newPublicationList = this.state.publicationList.filter(publication => data.fields.content.content_id !== publication.content_id)
-    this.setState({ publicationList: this.sortByModifiedDate(newPublicationList) })
   }
 
   loadWorkspaceDetail = async () => {
@@ -199,14 +198,37 @@ export class Publications extends React.Component {
 
   getPublicationList = async () => {
     const { props } = this
-
-    const fetchGetPublicationList = await props.dispatch(getPublicationList(props.match.params.idws))
+    const workspaceId = props.match.params.idws
+    const fetchGetPublicationList = await props.dispatch(getPublicationList(workspaceId))
     switch (fetchGetPublicationList.status) {
-      case 200:
+      case 200: {
+        fetchGetPublicationList.json.forEach(publication => this.getCommentList(publication))
         props.dispatch(setPublicationList(fetchGetPublicationList.json))
-        this.setState({ publicationList: this.sortByModifiedDate(fetchGetPublicationList.json) })
         break
+      }
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning')); break
+    }
+  }
+
+  getCommentList = async (publication) => {
+    const { props } = this
+    const workspaceId = props.match.params.idws
+    const fetchGetContentComment = await handleFetchResult(await getContentComment(FETCH_CONFIG.apiUrl, workspaceId, publication.content_id))
+    switch (fetchGetContentComment.apiResponse.status) {
+      case 200: {
+        const commentList = fetchGetContentComment.body.map(c => ({
+          ...c,
+          timelineType: c.content_type,
+          created_raw: c.created,
+          created: displayDistanceDate(c.created, props.user.lang),
+          // raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username), Update
+          translatedRawContent: null,
+          translationState: TRANSLATION_STATE.DISABLED
+        }))
+        props.dispatch(addCommentListToPublication(publication.content_id, commentList))
+        break
+      }
+      default: props.dispatch(newFlashMessage(`${props.t('Error')}`, 'warning')); break
     }
   }
 
@@ -233,12 +255,7 @@ export class Publications extends React.Component {
         switch (fetchPostNewComment.status) {
           case 200: {
             props.dispatch(appendPublication(fetchPostThreadPublication.json))
-            const newPublicationList = state.publicationList
-            newPublicationList.push(fetchPostThreadPublication.json)
-            this.setState({
-              publicationList: newPublicationList,
-              newPublication: ''
-            })
+            this.setState({ newPublication: '' })
             break
           }
           default:
@@ -272,6 +289,7 @@ export class Publications extends React.Component {
 
   handleClickReorder = () => {
     this.props.dispatch(updatePublicationList())
+    this.setState({ showReorderButton: false })
   }
 
   render () {
@@ -287,17 +305,25 @@ export class Publications extends React.Component {
         />
 
         <ScrollToBottomWrapper
-          itemList={state.publicationList}
+          itemList={props.publicationList}
           customClass='pageContentGeneric'
           // isLastItemFromCurrentToken: PropTypes.bool,
           shouldScrollToBottom
         >
-          {state.publicationList.map(publication =>
+          {props.publicationList.map(publication =>
             <FeedItemWithPreview
-              key={`publication_${publication.content_id}`}
+              commentList={publication.commentList}
               content={publication}
+              customColor={publicationColor}
+              key={`publication_${publication.id}`}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
-              workspaceId={Number(publication.workspace_id)}
+              showTimeline
+              user={{
+                userId: props.user.userId,
+                name: props.user.publicName,
+                userRoleIdInWorkspace: userRoleIdInWorkspace
+              }}
+              workspaceId={Number(publication.workspaceId)}
             />
           )}
 

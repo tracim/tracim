@@ -1,6 +1,9 @@
 import { uniqBy } from 'lodash'
 import {
+  ADD,
   APPEND,
+  COMMENT,
+  COMMENT_LIST,
   PUBLICATION,
   REMOVE,
   SET,
@@ -24,7 +27,7 @@ function uniqByContentId (array) {
 
 const defaultPublicationList = []
 
-export default function publicationList(state = defaultPublicationList, action) {
+export default function publicationList (state = defaultPublicationList, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_PUBLICATION_LIST}`:
       return uniqByContentId(sortByModifiedDate(
@@ -34,13 +37,36 @@ export default function publicationList(state = defaultPublicationList, action) 
     case `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}`:
       return uniqByContentId(sortByModifiedDate(state))
 
+    case `${UPDATE}/${PUBLICATION}`:
+      return uniqByContentId(state.map(publication => action.publication.content_id === publication.id
+        ? serialize(action.publication, serializeContentProps)
+        : publication
+      ))
+
     case `${REMOVE}/${PUBLICATION}`:
-      return state.filter(publication => action.publicationId !== publication.contentId)
+      return state.filter(publication => action.publicationId !== publication.id)
 
     case `${APPEND}/${PUBLICATION}`: {
       const newPublicationList = state
-      newPublicationList.push(action.publication)
+      newPublicationList.push(serialize(action.publication, serializeContentProps))
       return uniqByContentId(newPublicationList)
+    }
+
+    case `${ADD}/${PUBLICATION}/${COMMENT_LIST}`:
+      return uniqByContentId(state.map(publication => action.publicationId === publication.id
+        ? { ...publication, commentList: action.commentList }
+        : publication
+      ))
+
+    case `${APPEND}/${PUBLICATION}/${COMMENT}`: {
+      // Not working
+      return uniqByContentId(state.map(publication => {
+        console.log(action.publicationId, publication, action.comment)
+        if (action.publicationId === publication.id) {
+          const newCommentList = publication.commentList.push(action.comment)
+          return { ...publication, commentList: newCommentList }
+        } else return publication
+      }))
     }
 
     default:

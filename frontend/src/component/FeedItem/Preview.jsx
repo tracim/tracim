@@ -43,7 +43,7 @@ class Preview extends React.Component {
   }
 
   isHtmlPreview () {
-    const type = this.props.content.content_type
+    const type = this.props.content.type
     return type === CONTENT_TYPE.HTML_DOCUMENT || type === CONTENT_TYPE.THREAD
   }
 
@@ -60,14 +60,14 @@ class Preview extends React.Component {
   }
 
   async getHTMLPreviewCode (content) {
-    if (content.content_type === CONTENT_TYPE.HTML_DOCUMENT) {
-      return content.raw_content
+    if (content.type === CONTENT_TYPE.HTML_DOCUMENT) {
+      return content.rawContent
     }
 
     const fetchResultGetHTMLPreview = await getHTMLPreview(
-      content.workspace_id,
-      content.content_type,
-      content.content_id,
+      content.workspaceId,
+      content.type,
+      content.id,
       content.label
     )
 
@@ -97,15 +97,15 @@ class Preview extends React.Component {
 
   getJPEGPreviewComponent (previewUrl) {
     const { content } = this.props
-    const filenameNoExtension = removeExtensionOfFilename(content.filename)
+    const filenameNoExtension = removeExtensionOfFilename(content.fileName)
     const FIRST_PAGE = 1
 
     const previewURL = (width) => (
       jpgPreviewUrl(
         FETCH_CONFIG.apiUrl,
-        content.workspace_id,
-        content.content_id,
-        content.current_revision_id,
+        content.workspaceId,
+        content.id,
+        content.currentRevisionId,
         filenameNoExtension,
         FIRST_PAGE,
         width,
@@ -166,14 +166,14 @@ class Preview extends React.Component {
   componentDidUpdate (prevProps) {
     if (prevProps.content === this.props.content) {
       this.testPreviewOverflow()
-    } else if (prevProps.content.current_revision_id !== this.props.content.current_revision_id) {
+    } else if (prevProps.content.currentRevisionId !== this.props.content.currentRevisionId) {
       this.updatePreview()
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.content.current_revision_id !== this.props.content.current_revision_id ||
+      nextProps.content.currentRevisionId !== this.props.content.currentRevisionId ||
       Object.entries(nextState).some(([key, val]) => val !== this.state[key])
     )
   }
@@ -263,7 +263,7 @@ class Preview extends React.Component {
         )}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
-        <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
+        <Link to={PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}>
           {this.getPreviewComponent()}
           {state.previewOverflow && (
             <div className='feedItem__preview__overflowOverlay' />

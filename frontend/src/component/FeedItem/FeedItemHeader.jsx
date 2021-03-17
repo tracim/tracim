@@ -40,14 +40,14 @@ export class FeedItemHeader extends React.Component {
 
   render () {
     const { props } = this
-    const contentId = props.content.content_id
+    const contentId = props.content.id
     const contentLabel = props.content.label
-    const contentType = props.content.content_type
+    const contentType = props.content.type
     const showLastModification = (
       props.lastModificationType &&
       props.lastModificationEntityType &&
       props.lastModificationSubEntityType &&
-      props.content.current_revision_type &&
+      props.content.currentRevisionType &&
       props.lastModifier
     )
 
@@ -80,7 +80,7 @@ export class FeedItemHeader extends React.Component {
               props.lastModificationType,
               props.lastModificationEntityType,
               props.lastModificationSubEntityType,
-              props.content.current_revision_type
+              props.content.currentRevisionType
             )}
             date={props.modifiedDate}
             lang={props.user.lang}

@@ -237,9 +237,9 @@ export const handleClickCopyLink = (content) => {
   const tmp = document.createElement('textarea')
   document.body.appendChild(tmp)
   tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
-    content.workspace_id,
-    content.content_type,
-    content.content_id
+    content.workspaceId,
+    content.type,
+    content.id
   )}`
   tmp.select()
   document.execCommand('copy')
