@@ -145,7 +145,7 @@
   "React": "Reagir",
   "You": "Você",
   "you": "você",
-  "{{user}} reacted with {{reaction}}": "__NOT_TRANSLATED__",
+  "{{user}} reacted with {{reaction}}": "{{user}} reagiu com {{reaction}}",
   "{{users}} reacted with {{reaction}}_them": "__NOT_TRANSLATED__",
   "You reacted with {{reaction}}": "__NOT_TRANSLATED__",
   "{{users}} reacted with {{reaction}}_you": "__NOT_TRANSLATED__",
