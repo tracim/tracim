@@ -1,4 +1,10 @@
-"""taking care of moved contents properties
+"""Remove the 'allowed_content' property from content revisions which are not folder/event.
+
+Removing this property ensures that the default value from the code will be used.
+Done as we now want to allow any content child of any.
+
+Folders (and events) are not updated as the allowed_content property can have been changed
+by users for those content types.
 
 Revision ID: ae30497b6168
 Revises: 78a01733957f
