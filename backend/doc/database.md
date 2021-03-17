@@ -78,7 +78,7 @@ https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/
 utf8mb4 charset. For the collation we suggest `utf8mb4_0900_ai_ci` for mysql 8.0.1+ and `utf8mb4_unicode_520_ci` for mariadb 10.3+.
 as there are the most up-to-date unicode collation algorithm available.
 
-
+If you need to upgrade to tracim 3.7+ on mysql/mariadb, please use [utf8mb4 migration command line](cli.md) (section "Migrate Mysql/Mariadb database to utf8mb4").
 if you want to use MariaDB as database engine
 
     sudo apt install mariadb-server
