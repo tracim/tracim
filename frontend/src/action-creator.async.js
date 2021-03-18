@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   ADVANCED_SEARCH_TYPE,
+  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
@@ -61,6 +62,7 @@ import {
   USER_PUBLIC_PROFILE
 } from './action-creator.sync.js'
 import {
+  CONTENT_TYPE,
   ErrorFlashMessageTemplateHtml,
   updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
@@ -1215,8 +1217,8 @@ export const postThreadPublication = (workspaceId, newContentName) => dispatch =
       method: 'POST',
       body: JSON.stringify({
         parent_id: null,
-        content_type: 'thread',
-        content_namespace: 'publication',
+        content_type: CONTENT_TYPE.THREAD,
+        content_namespace: CONTENT_NAMESPACE.PUBLICATION,
         label: newContentName
       })
     },

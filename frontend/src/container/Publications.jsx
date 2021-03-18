@@ -4,17 +4,20 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import {
+  addClassToMentionsOfUser,
+  appContentFactory,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CommentTextArea,
+  ConfirmPopup,
   CUSTOM_EVENT,
   displayDistanceDate,
   getContentComment,
   getOrCreateSessionClientToken,
   handleFetchResult,
+  handleInvalidMentionInComment,
   IconButton,
   PAGE,
-  postNewComment,
   ROLE,
   ROLE_LIST,
   ScrollToBottomWrapper,
@@ -25,6 +28,7 @@ import {
   TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 import {
+  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace,
   handleClickCopyLink
@@ -56,6 +60,7 @@ import { FeedItemWithPreview } from './FeedItemWithPreview.jsx'
 export class Publications extends React.Component {
   constructor (props) {
     super(props)
+    props.setApiUrl(FETCH_CONFIG.apiUrl)
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
@@ -69,8 +74,10 @@ export class Publications extends React.Component {
     ])
 
     this.state = {
-      newPublication: '',
+      invalidMentionList: [],
+      newComment: '',
       publicationWysiwyg: false,
+      showInvalidMentionPopupInComment: false,
       showReorderButton: false
     }
   }
@@ -92,46 +99,73 @@ export class Publications extends React.Component {
       this.getPublicationList()
     }
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      globalThis.tinymce.remove('#wysiwygPublication')
+      globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
     }
     if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove('#wysiwygPublication')
+    globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
   }
 
-  handleAllAppChangeLanguage = () => {
+  handleAllAppChangeLanguage = (data) => {
+    if (this.state.publicationWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
+      globalThis.wysiwyg('#wysiwygTimelineCommentPublication', data, this.handleChangeNewPublication)
+    }
     this.buildBreadcrumbs()
     this.setHeadTitle()
   }
 
+  handleClickPublish = () => {
+    const { props, state } = this
+
+    if (!handleInvalidMentionInComment(
+      props.currentWorkspace.memberList,
+      state.publicationWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnyway()
+    }
+  }
+
   handleContentCreatedOrRestored = (data) => {
-    if (data.fields.content.content_namespace !== 'publication') return
+    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     if (data.fields.client_token === getOrCreateSessionClientToken()) return
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
   handleContentCommented = (data) => {
     const { props } = this
-    const lastPublicationId = props.publicationList[props.publicationList.length - 1].id
+    const lastPublicationId = props.publicationList[props.publicationList.length - 1]
+      ? props.publicationList[props.publicationList.length - 1].id
+      : undefined
     const publicationId = data.fields.content.parent_id
+
     if (!props.publicationList.find(publication => publication.id === publicationId)) return
-    props.dispatch(appendCommentToPublication(publicationId, data.fields.content))
-    props.dispatch(updatePublication(props.publicationList.find(publication => publication.id === publicationId)))
+
+    props.dispatch(appendCommentToPublication(data.fields.content))
+    props.dispatch(updatePublication({
+      ...props.publicationList.find(publication => publication.id === publicationId),
+      modified: data.fields.content.created
+    }))
+
     if (publicationId !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleContentModified = (data) => {
     const { props } = this
-    if (data.fields.content.content_namespace !== 'publication') return
+    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
+
     props.dispatch(updatePublication(data.fields.content))
+
     const lastPublicationId = props.publicationList[props.publicationList.length - 1].id
     if (data.fields.content.content_id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleContentDeleted = (data) => {
-    if (data.fields.content.content_namespace !== 'publication') return
+    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
 
@@ -155,7 +189,7 @@ export class Publications extends React.Component {
 
   handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
-      '#wysiwygPublication',
+      '#wysiwygTimelineCommentPublication',
       this.props.user.lang,
       this.handleChangeNewPublication,
       handleTinyMceInput,
@@ -221,7 +255,7 @@ export class Publications extends React.Component {
           timelineType: c.content_type,
           created_raw: c.created,
           created: displayDistanceDate(c.created, props.user.lang),
-          // raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username), Update
+          raw_content: addClassToMentionsOfUser(c.raw_content, props.user.username),
           translatedRawContent: null,
           translationState: TRANSLATION_STATE.DISABLED
         }))
@@ -232,9 +266,11 @@ export class Publications extends React.Component {
     }
   }
 
-  handleChangeNewPublication = e => this.setState({ newPublication: e.target.value })
+  handleChangeNewPublication = e => this.setState({ newComment: e.target.value })
 
-  handleClickPublish = async () => {
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
+
+  handleClickValidateAnyway = async () => {
     const { props, state } = this
     const workspaceId = props.match.params.idws
     const randomNumber = uuidv4()
@@ -246,22 +282,20 @@ export class Publications extends React.Component {
 
     switch (fetchPostThreadPublication.status) {
       case 200: {
-        const fetchPostNewComment = await postNewComment(
-          FETCH_CONFIG.apiUrl,
-          workspaceId,
-          fetchPostThreadPublication.json.content_id,
-          state.newPublication
-        )
-        switch (fetchPostNewComment.status) {
-          case 200: {
-            props.dispatch(appendPublication(fetchPostThreadPublication.json))
-            this.setState({ newPublication: '' })
-            break
-          }
-          default:
-            props.dispatch(newFlashMessage(`${props.t('Error while saving new comment')}`, 'warning'))
-            break
+        try {
+          props.appContentSaveNewComment(
+            fetchPostThreadPublication.json,
+            state.publicationWysiwyg,
+            state.newComment,
+            this.setState.bind(this),
+            '',
+            props.user.username,
+            'Publication'
+          )
+        } catch (e) {
+          this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
         }
+        props.dispatch(appendPublication(fetchPostThreadPublication.json))
         break
       }
       default:
@@ -290,6 +324,10 @@ export class Publications extends React.Component {
   handleClickReorder = () => {
     this.props.dispatch(updatePublicationList())
     this.setState({ showReorderButton: false })
+  }
+
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.props.match.params.idws)
   }
 
   render () {
@@ -337,16 +375,35 @@ export class Publications extends React.Component {
             />
           )}
 
+          {state.showInvalidMentionPopup && (
+            <ConfirmPopup
+              onConfirm={this.handleCancelSave}
+              onClose={this.handleCancelSave}
+              onCancel={this.handleClickValidateAnyway}
+              msg={
+                <>
+                  {props.t('Your text contains mentions that do not match any member of this space:')}
+                  <div className='timeline__texteditor__mentions'>
+                    {state.invalidMentionList.join(', ')}
+                  </div>
+                </>
+              }
+              confirmLabel={props.t('Edit')}
+              cancelLabel={props.t('Validate anyway')}
+            />
+          )}
+
           {userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='publications__publishArea'>
               <CommentTextArea
                 apiUrl={FETCH_CONFIG.apiUrl}
-                id='wysiwygPublication'
-                newComment={state.newPublication}
+                id='wysiwygTimelineCommentPublication'
+                newComment={state.newComment}
                 onChangeNewComment={this.handleChangeNewPublication}
                 onInitWysiwyg={this.handleInitPublicationWysiwyg}
-                searchForMentionInQuery={() => { }} // Update
+                searchForMentionInQuery={this.searchForMentionInQuery}
                 wysiwyg={state.publicationWysiwyg}
+                disableAutocompletePosition
               />
 
               <div className='publications__publishArea__buttons'>
@@ -360,7 +417,7 @@ export class Publications extends React.Component {
 
                 <IconButton
                   color={publicationColor}
-                  disabled={state.newPublication === ''}
+                  disabled={state.newComment === ''}
                   intent='primary'
                   mode='light'
                   onClick={this.handleClickPublish}
@@ -382,4 +439,4 @@ const mapStateToProps = ({
   publicationList,
   user
 }) => ({ breadcrumbs, currentWorkspace, publicationList, user })
-export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(Publications))))
+export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))

@@ -254,4 +254,4 @@ export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLIC
 export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })
 export const updatePublication = (publication) => ({ type: `${UPDATE}/${PUBLICATION}`, publication })
 export const addCommentListToPublication = (publicationId, commentList) => ({ type: `${ADD}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })
-export const appendCommentToPublication = (publicationId, comment) => ({ type: `${APPEND}/${PUBLICATION}/${COMMENT}`, publicationId, comment })
+export const appendCommentToPublication = (comment) => ({ type: `${APPEND}/${PUBLICATION}/${COMMENT}`, comment })

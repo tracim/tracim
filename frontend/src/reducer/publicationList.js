@@ -59,11 +59,10 @@ export default function publicationList (state = defaultPublicationList, action)
       ))
 
     case `${APPEND}/${PUBLICATION}/${COMMENT}`: {
-      // Not working
       return uniqByContentId(state.map(publication => {
-        console.log(action.publicationId, publication, action.comment)
-        if (action.publicationId === publication.id) {
-          const newCommentList = publication.commentList.push(action.comment)
+        if (action.comment.parent_id === publication.id) {
+          const newCommentList = publication.commentList || []
+          newCommentList.push(action.comment)
           return { ...publication, commentList: newCommentList }
         } else return publication
       }))

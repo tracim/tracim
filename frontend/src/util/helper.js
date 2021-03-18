@@ -164,7 +164,8 @@ export const compareContents = (a, b, lang) => {
 
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
-  UPLOAD: 'upload'
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
 }
 
 export const sortContentList = (workspaceContents, lang) => {
