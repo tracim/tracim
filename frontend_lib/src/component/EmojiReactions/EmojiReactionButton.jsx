@@ -10,7 +10,7 @@ import Radium from 'radium'
 const color = require('color')
 
 const primaryColor = GLOBAL_primaryColor // eslint-disable-line camelcase
-const BUTTON_STYLE = {
+const HIGHLIGHTED_BUTTON_STYLE = {
   backgroundColor: color(primaryColor).lighten(1.85).hex(),
   ':hover': {
     backgroundColor: color(primaryColor).lighten(1.5).hex(),
@@ -79,7 +79,7 @@ function EmojiReactionButton (props) {
           highlighted
         }
       )}
-      style={BUTTON_STYLE}
+      style={highlighted ? HIGHLIGHTED_BUTTON_STYLE : {}}
     >
       <span className='EmojiReactionButton__button__value'>{reactionList[0].value}</span>
       <span className='EmojiReactionButton__button__count'>{reactionList.length}</span>
