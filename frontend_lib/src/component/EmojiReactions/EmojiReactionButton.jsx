@@ -13,7 +13,7 @@ const primaryColor = GLOBAL_primaryColor // eslint-disable-line camelcase
 const HIGHLIGHTED_BUTTON_STYLE = {
   backgroundColor: color(primaryColor).lighten(1.85).hex(),
   ':hover': {
-    backgroundColor: color(primaryColor).lighten(1.5).hex(),
+    backgroundColor: color(primaryColor).lighten(1.5).hex()
   }
 }
 
@@ -75,7 +75,7 @@ function EmojiReactionButton (props) {
       title={title}
       className={classnames(
         'EmojiReactionButton__button', {
-          'primaryColorBorder': highlighted,
+          primaryColorBorder: highlighted,
           highlighted
         }
       )}
