@@ -14,7 +14,6 @@ import {
   PopinFixedContent,
   Timeline,
   AppContentRightMenu,
-  ROLE,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -410,13 +409,13 @@ export class Thread extends React.Component {
             )}
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
-              handleChangeStatus={this.handleChangeStatus}
+              onChangeStatus={this.handleChangeStatus}
               content={state.content}
               availableStatuses={state.config.availableStatuses}
               loggedUser={state.loggedUser}
               hexcolor={state.config.hexcolor}
-              handleClickArchive={this.handleClickArchive}
-              handleClickDelete={this.handleClickDelete}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
             />
           </div>
         </PopinFixedOption>

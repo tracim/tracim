@@ -8,8 +8,7 @@ import {
 } from '../../action-creator.async.js'
 import {
   handleFetchResult,
-  sendGlobalFlashMessage,
-  CUSTOM_EVENT
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 class DownloadForm extends React.Component {
