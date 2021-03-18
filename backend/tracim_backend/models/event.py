@@ -20,6 +20,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
 
+ANY_OPERATION_SYMBOL = "*"
+
 
 class OperationType(enum.Enum):
     CREATED = "created"
@@ -88,7 +90,7 @@ class EventTypeDatabaseParameters:
             ) from e
 
         operation = None
-        if operation_str:
+        if operation_str and operation_str != ANY_OPERATION_SYMBOL:
             try:
                 operation = OperationType(operation_str)
             except ValueError as e:
