@@ -672,7 +672,7 @@ export const sortWorkspaceList = (workspaceList, lang) => {
 }
 
 export const humanAndList = (list) => {
-  // RJ - 2021-17-03 - INFO
+  // INFO - RJ - 2021-17-03
   // This function return a localized string that looks like:
   //  - 'elem1' (one element in list)
   //  - 'elem1 and elem2' (two elements)
