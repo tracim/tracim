@@ -47,6 +47,7 @@ from tracim_backend.models.context_models import CommentPathFilename
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentSortOrder
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -234,6 +235,14 @@ class RFCEmail(ValidatedField, String):
         if value is None:
             return None
         return RFCEmailValidator(error=self.error_messages["invalid"])(value)
+
+
+class BasePaginatedSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
 
 
 class CollaborativeFileTypeSchema(marshmallow.Schema):
@@ -939,6 +948,23 @@ class FilterContentQuerySchema(marshmallow.Schema):
     label = StrippedString(
         example="myfilename", default=None, allow_none=True, description="Filter by content label"
     )
+    sort = EnumField(
+        ContentSortOrder,
+        missing=ContentSortOrder.LABEL_ASC,
+        description="Order of the returned contents, default is to sort by labels",
+    )
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=positive_int_validator,
+        missing=0,
+        default=0,
+        allow_none=False,
+        description="Allows to paginate the results in combination with page_token, by default all results are returned",
+    )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first elements",
+        validate=page_token_validator,
+    )
 
     @post_load
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1467,7 +1493,12 @@ class ContentMinimalSchema(marshmallow.Schema):
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 
-class ContentDigestSchema(marshmallow.Schema):
+class UserInfoContentAbstractSchema(marshmallow.Schema):
+    author = marshmallow.fields.Nested(UserDigestSchema)
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ContentDigestSchema(UserInfoContentAbstractSchema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
@@ -1518,6 +1549,10 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
+class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(ContentDigestSchema, many=True)
+
+
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
@@ -1526,12 +1561,7 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-class UserInfoContentAbstractSchema(marshmallow.Schema):
-    author = marshmallow.fields.Nested(UserDigestSchema)
-    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
-
-
-class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
+class ContentSchema(ContentDigestSchema):
     description = StrippedString(
         required=True, description="raw text or html description of the content"
     )
@@ -1721,14 +1751,6 @@ class LiveMessageSchema(marshmallow.Schema):
     read = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="read date", allow_none=True
     )
-
-
-class BasePaginatedSchemaPage(marshmallow.Schema):
-    previous_page_token = marshmallow.fields.String()
-    next_page_token = marshmallow.fields.String()
-    has_next = marshmallow.fields.Bool()
-    has_previous = marshmallow.fields.Bool()
-    per_page = marshmallow.fields.Int()
 
 
 class LiveMessageSchemaPage(BasePaginatedSchemaPage):
