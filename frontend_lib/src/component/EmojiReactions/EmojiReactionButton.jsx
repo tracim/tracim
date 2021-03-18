@@ -12,10 +12,8 @@ const color = require('color')
 const primaryColor = GLOBAL_primaryColor // eslint-disable-line camelcase
 const BUTTON_STYLE = {
   backgroundColor: color(primaryColor).lighten(1.85).hex(),
-  border: `1px solid ${primaryColor}`,
   ':hover': {
     backgroundColor: color(primaryColor).lighten(1.5).hex(),
-    border: `1px solid ${primaryColor}`
   }
 }
 
@@ -68,7 +66,12 @@ function EmojiReactionButton (props) {
     <button
       onClick={highlighted ? props.onRemoveReaction : props.onAddReaction}
       title={title}
-      className={classnames('EmojiReactionButton__button', { highlighted })}
+      className={classnames(
+        'EmojiReactionButton__button', {
+          'primaryColorBorder': highlighted,
+          highlighted
+        }
+      )}
       style={BUTTON_STYLE}
     >
       <span className='EmojiReactionButton__button__value'>{reactionList[0].value}</span>
