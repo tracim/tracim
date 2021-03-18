@@ -16,7 +16,10 @@
   margin 2px
 
 .EmojiReactionButton__button
-  border 1px solid lightDarkGrey
+  border 1px solid mediumGrey
+  &:hover
+    border 1px solid lightDarkGrey
+
   &__value
     font-family 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', 'Twemoji Mozilla', 'Noto Color Emoji', 'Android Emoji', sans-serif
   &__count
@@ -31,6 +34,6 @@
     background-color mediumDarkGrey
     border 1px solid mediumDarkGrey
 
-.EmojiReactionButton__button:not(.highlighted):hover, .EmojiReactionButton__buttonpicker:hover:not(.active)
+.EmojiReactionButton__button:hover:not(.highlighted), .EmojiReactionButton__buttonpicker:hover:not(.active)
   background-color grey-hover
   border 1px solid mediumGrey
