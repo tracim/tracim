@@ -175,31 +175,6 @@ class EventApi:
         query = self._filter_event_types(query, include_event_types, False)
         query = self._filter_event_types(query, exclude_event_types, True)
 
-        if exclude_event_types:
-            event_type_filters = []
-            for event_type in exclude_event_types:
-                if event_type.operation:
-                    if event_type.subtype:
-                        event_type_filter = or_(
-                            Event.entity_type != event_type.entity,
-                            Event.operation != event_type.operation,
-                            Event.entity_subtype != event_type.subtype,
-                        )
-                    else:
-                        event_type_filter = or_(
-                            Event.entity_type != event_type.entity,
-                            Event.operation != event_type.operation,
-                        )
-                else:
-                    event_type_filter = Event.entity_type != event_type.entity
-
-                event_type_filters.append(event_type_filter)
-
-            if len(event_type_filters) > 1:
-                query = query.filter(and_(*event_type_filters))
-            else:
-                query = query.filter(event_type_filters[0])
-
         if exclude_author_ids:
             for author_id in exclude_author_ids:
                 # RJ & SG - 2020-09-11 - HACK
