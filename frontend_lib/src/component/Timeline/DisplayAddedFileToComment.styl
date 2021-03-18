@@ -1,0 +1,42 @@
+@import '../../css/Variable.styl'
+
+.DisplayAddedFileToComment
+  color fontColor
+  &__message
+    display flex
+    align-items center
+    width max-content
+    padding-inline-start 8px
+    cursor pointer
+    font-size fontSizeSmall
+    & > &__iconFile, & > &__text
+      margin-inline-end 5px
+    & > &__iconFile, & > &__listIcon
+      font-size 16px
+    &__listIcon
+      color mediumDarkGrey
+    &:hover
+      & .DisplayAddedFileToComment__message__listIcon
+        color darkGrey
+        text-decoration underline
+  &__popover__item
+    display flex
+    align-items center
+    padding-top 8px
+    padding-bottom 8px
+    padding-inline 12px
+    &:not(:last-child)
+      border-bottom 1px solid mediumDarkGrey
+    & > &__iconFile, & > &__text
+      margin-inline-end 5px
+    &__text
+      flex-grow 1
+      overflow hidden
+      white-space nowrap
+      text-overflow ellipsis
+    &__deleteBtn
+      cursor pointer
+
+.popoverAddedFileToCommentList
+  & .popover-body
+    padding 0

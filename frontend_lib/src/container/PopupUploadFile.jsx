@@ -97,6 +97,12 @@ class PopupUploadFile extends React.Component {
   handleValidate = async () => {
     const { state, props } = this
 
+    // INFO - CH - 20210315 - this allows to handle the upload outside of this component
+    if (props.onValidateOverride !== false) {
+      props.onValidateOverride(state.fileUploadList)
+      return
+    }
+
     this.setState({ uploadStarted: true })
     const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
     const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !isFileUploadInErrorState(fileUpload))
@@ -225,7 +231,8 @@ PopupUploadFile.propTypes = {
   maximumFileSize: PropTypes.number,
   uploadErrorMessageList: PropTypes.array,
   defaultUploadErrorMessage: PropTypes.string,
-  validateLabel: PropTypes.string
+  validateLabel: PropTypes.string,
+  onValidateOverride: PropTypes.oneOfType([PropTypes.func, PropTypes.bool])
 }
 
 PopupUploadFile.defaultProps = {
@@ -237,7 +244,8 @@ PopupUploadFile.defaultProps = {
   onSuccess: () => {},
   onFailure: () => {},
   onClose: () => {},
-  uploadErrorMessageList: []
+  uploadErrorMessageList: [],
+  onValidateOverride: false
 }
 
 export default translate()(TracimComponent(PopupUploadFile))

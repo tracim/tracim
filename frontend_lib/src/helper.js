@@ -487,6 +487,7 @@ export const CONTENT_TYPE = {
 
 export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
+  COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
 }
 

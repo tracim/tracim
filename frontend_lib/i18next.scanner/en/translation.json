@@ -138,5 +138,11 @@
   "Translation pending…": "Translation pending…",
   "Translation is not available": "Translation is not available",
   "Unknown error": "Unknown error",
-  "Error while translating the document: {{details}}": "Error while translating the document: {{details}}"
+  "Error while translating the document: {{details}}": "Error while translating the document: {{details}}",
+  "Upload a file": "Upload a file",
+  "A content with the same name already exists": "A content with the same name already exists",
+  "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
+  "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
+  "{{numberOfFile}} files added": "{{numberOfFile}} files added"
 }

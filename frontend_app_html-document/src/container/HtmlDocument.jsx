@@ -40,6 +40,7 @@ import {
   setLocalStorageItem,
   removeLocalStorageItem,
   getContentComment,
+  getContentCommentAsFile,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
@@ -81,6 +82,7 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -378,17 +380,20 @@ export class HtmlDocument extends React.Component {
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultCommentAsFile = getContentCommentAsFile(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
-    const [resHtmlDocument, resComment, resRevision] = await Promise.all([
+    const [resHtmlDocument, resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
       handleFetchResult(await fetchResultComment),
+      handleFetchResult(await fetchResultCommentAsFile),
       handleFetchResult(await fetchResultRevision)
     ])
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(
       resComment.body,
       resRevision.body,
+      resCommentAsFile.body,
       state.loggedUser,
       getDefaultTranslationState(state.config.system.config)
     )
@@ -591,6 +596,14 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
@@ -602,6 +615,7 @@ export class HtmlDocument extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -943,11 +957,14 @@ export class HtmlDocument extends React.Component {
                   loggedUser={state.loggedUser}
                   timelineData={state.timeline}
                   newComment={state.newComment}
+                  newCommentAsFileList={state.newCommentAsFileList}
                   apiUrl={state.config.apiUrl}
                   disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
                   availableStatusList={state.config.availableStatuses}
                   wysiwyg={state.timelineWysiwyg}
                   onChangeNewComment={this.handleChangeNewComment}
+                  onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                  onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                   onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
@@ -961,8 +978,8 @@ export class HtmlDocument extends React.Component {
                   invalidMentionList={state.invalidMentionList}
                   onClickTranslateComment={comment => props.handleTranslateComment(
                     comment,
-                    this.state.content.workspace_id,
-                    this.state.loggedUser.lang,
+                    state.content.workspace_id,
+                    state.loggedUser.lang,
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}

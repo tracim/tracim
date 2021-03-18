@@ -192,6 +192,7 @@ import {
   putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getContentCommentAsFile,
   getContent,
   getWorkspaceContent,
   getCommentTranslated
@@ -360,6 +361,7 @@ export {
   putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getContentCommentAsFile,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,

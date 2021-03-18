@@ -42,6 +42,7 @@ import {
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
+import { uploadFile } from './fileUpload.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -170,9 +171,28 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
-      this.checkApiUrl()
+    appContentAddCommentAsFile = (fileToUploadList, setState) => {
+      if (!fileToUploadList.length) return
+      setState(prev => {
+        const fileToUploadListWithoutDuplicate = fileToUploadList.filter(fileToAdd =>
+          !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
+        )
+        return {
+          newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
+        }
+      })
+    }
 
+    appContentRemoveCommentAsFile = (fileToRemove, setState) => {
+      if (!fileToRemove) return
+      setState(prev => ({
+        newCommentAsFileList: prev.newCommentAsFileList.filter(
+          commentAsFile => commentAsFile.file.name !== fileToRemove.file.name
+        )
+      }))
+    }
+
+    saveCommentSimple = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
@@ -224,6 +244,49 @@ export function appContentFactory (WrappedComponent) {
       }
 
       return response
+    }
+
+    saveCommentAsFile = async (content, newCommentAsFile) => {
+      const errorMessageList = [
+        { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
+        { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
+        { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
+        { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+      ]
+      return uploadFile(
+        newCommentAsFile,
+        `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
+        {
+          additionalFormData: { parent_id: content.content_id },
+          httpMethod: 'POST',
+          progressEventHandler: () => {},
+          errorMessageList: errorMessageList,
+          defaultErrorMessage: i18n.t('Error while uploading file')
+        }
+      )
+    }
+
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername) => {
+      this.checkApiUrl()
+
+      console.log('newComment', newComment)
+      console.log('newCommentAsFileList', newCommentAsFileList)
+
+      if (newComment) {
+        const responseCommentSimple = await this.saveCommentSimple(
+          content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername
+        )
+        console.log('responseCommentSimple', responseCommentSimple)
+      }
+
+      if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        const responseList = await Promise.all(
+          newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
+        )
+        const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
+        console.log('responseList', responseList)
+        setState({ newCommentAsFileList: uploadFailedList })
+      }
     }
 
     appContentChangeStatus = async (content, newStatus, appSlug) => {
@@ -347,30 +410,45 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED) => {
-      const timelineCommentList = commentList.map(c => ({
-        ...c,
-        timelineType: TIMELINE_TYPE.COMMENT,
-        created_raw: c.created,
-        created: displayDistanceDate(c.created, loggedUser.lang),
-        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username),
-        translatedRawContent: null,
-        translationState: initialCommentTranslationState
-      }))
+    buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
+      ...content,
+      timelineType: TIMELINE_TYPE.COMMENT,
+      created_raw: content.created,
+      created: displayDistanceDate(content.created, loggedUser.lang),
+      raw_content: addClassToMentionsOfUser(content.raw_content, loggedUser.username),
+      translatedRawContent: null,
+      translationState: initialCommentTranslationState
+    })
 
-      return revisionList
-        .map((revision, i) => ({
-          ...revision,
-          created_raw: revision.created,
-          created: displayDistanceDate(revision.created, loggedUser.lang),
-          timelineType: TIMELINE_TYPE.REVISION,
-          commentList: revision.comment_ids.map(commentId => (
-            timelineCommentList.find(comment => comment.content_id === commentId)
-          )),
-          number: i + 1,
-          hasBeenRead: true
-        }))
-        .flatMap(revision => [revision, ...revision.commentList])
+    buildTimelineItemCommentAsFile = (content, loggedUser) => ({
+      ...content,
+      timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
+      created_raw: content.created,
+      created: displayDistanceDate(content.created, loggedUser.lang)
+    })
+
+    buildTimelineItemRevision = (revision, loggedUser, number) => ({
+      ...revision,
+      created_raw: revision.created,
+      created: displayDistanceDate(revision.created, loggedUser.lang),
+      timelineType: TIMELINE_TYPE.REVISION,
+      number: number
+    })
+
+    buildTimelineFromCommentAndRevision = (
+      commentList, commentAsFileList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED
+    ) => {
+      const timelineCommentList = commentList.map(c => this.buildTimelineItemComment(c, loggedUser, initialCommentTranslationState))
+      const timelineCommentAsFileList = commentAsFileList.map(c => this.buildTimelineItemCommentAsFile(c, loggedUser))
+      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser, i + 1))
+
+      const fullTimeline = [
+        ...timelineCommentList,
+        ...timelineCommentAsFileList,
+        ...timelineRevisionList
+      ]
+
+      return sortTimelineByDate(fullTimeline)
     }
 
     replaceComment = (comment, timeline) => {
@@ -391,20 +469,13 @@ export function appContentFactory (WrappedComponent) {
       return mentionList
     }
 
+    // INFO - CH - 20210318 - This function can add comment and comment as file
     addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
-      return sortTimelineByDate([
-        ...timeline,
-        {
-          ...comment,
-          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
-          created_raw: comment.created,
-          created: displayDistanceDate(comment.created, loggedUser.lang),
-          timelineType: comment.content_type,
-          hasBeenRead: hasBeenRead,
-          translatedRawContent: null,
-          translationState: initialCommentTranslationState
-        }
-      ])
+      const commentForTimeline = comment.content_type === TIMELINE_TYPE.COMMENT
+        ? this.buildTimelineItemComment(comment, loggedUser, initialCommentTranslationState)
+        : this.buildTimelineItemCommentAsFile(comment, loggedUser)
+
+      return sortTimelineByDate([...timeline, commentForTimeline])
     }
 
     onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
@@ -474,6 +545,8 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentAddCommentAsFile={this.appContentAddCommentAsFile}
+          appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}

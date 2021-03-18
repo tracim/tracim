@@ -59,7 +59,7 @@
     "mocha": "^7.1.1",
     "pnp-webpack-plugin": "^1.6.4",
     "radium": "^0.25.2",
-    "reactstrap": "^8.0.0",
+    "reactstrap": "^8.9.0",
     "sinon": "^7.4.1",
     "standard": "^14",
     "standard-loader": "^7.0.0",

@@ -138,5 +138,11 @@
   "Translation pending…": "Traduction en cours…",
   "Translation is not available": "La traduction est indisponible",
   "Unknown error": "Erreur inconnue",
-  "Error while translating the document: {{details}}": "Erreur pendant la traduction du document : {{details}}"
+  "Error while translating the document: {{details}}": "Erreur pendant la traduction du document : {{details}}",
+  "Upload a file": "__NOT_TRANSLATED__",
+  "A content with the same name already exists": "__NOT_TRANSLATED__",
+  "The file is larger than the maximum file size allowed": "__NOT_TRANSLATED__",
+  "Error, the space exceed its maximum size": "__NOT_TRANSLATED__",
+  "You have reach your storage limit, you cannot add new files": "__NOT_TRANSLATED__",
+  "{{numberOfFile}} files added": "__NOT_TRANSLATED__"
 }
