@@ -746,7 +746,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
 export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
-    msg: msg, // RJ - 2021-03-17 - INFO: can be a string or a react element
+    msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
     type: type || 'warning',
     delay: delay
   }
