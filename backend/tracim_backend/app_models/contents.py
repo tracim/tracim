@@ -165,17 +165,8 @@ HTML_DOCUMENTS_TYPE = "html-document"
 FOLDER_TYPE = "folder"
 COMMENT_TYPE = "comment"
 
-# TODO - G.M - 31-05-2018 - Set Better Event params
-event_type = TracimContentType(
-    slug="event",
-    fa_icon="",
-    label="Event",
-    creation_label="Event",
-    available_statuses=content_status_list.get_all(),
-    app=None,
-)
 
-# TODO - G.M - 31-05-2018 - Set Better Event params
+# TODO - G.M - 31-05-2018 - Set Better Comment params
 comment_type = TracimContentType(
     slug=COMMENT_TYPE,
     fa_icon="",
@@ -192,7 +183,6 @@ class ContentTypeList(object):
 
     Any_SLUG = "any"
     Comment = comment_type
-    Event = event_type
 
     @property
     def Folder(self) -> TracimContentType:
@@ -228,7 +218,6 @@ class ContentTypeList(object):
         """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)
-        content_types.append(self.Event)
         for item in content_types:
             if item.slug == slug or (item.slug_aliases and slug in item.slug_aliases):
                 return item
