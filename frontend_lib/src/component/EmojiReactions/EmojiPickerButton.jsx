@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { UncontrolledPopover, PopoverBody } from 'reactstrap'
+import { Popover, PopoverBody } from 'reactstrap'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { Picker } from 'emoji-mart'
@@ -85,7 +85,7 @@ class EmojiPickerButton extends React.Component {
         >
           <i className='far fa-smile' />
         </button>
-        <UncontrolledPopover
+        <Popover
           className='EmojiPickerPopover'
           toggle={props.onCancel} // eslint-disable-line react/jsx-handler-names
           placement='left'
@@ -101,7 +101,7 @@ class EmojiPickerButton extends React.Component {
               onSelect={this.handleSelect}
             />
           </PopoverBody>
-        </UncontrolledPopover>
+        </Popover>
       </>
     )
   }

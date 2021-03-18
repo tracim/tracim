@@ -5,6 +5,19 @@ import { translate } from 'react-i18next'
 import { humanAndList } from '../../helper.js'
 import { getEmojiDataFromNative } from 'emoji-mart'
 import emojiData from 'emoji-mart/data/all.json'
+import Radium from 'radium'
+
+const color = require('color')
+
+const primaryColor = GLOBAL_primaryColor // eslint-disable-line camelcase
+const BUTTON_STYLE = {
+  backgroundColor: color(primaryColor).lighten(1.85).hex(),
+  border: `1px solid ${primaryColor}`,
+  ':hover': {
+    backgroundColor: color(primaryColor).lighten(1.5).hex(),
+    border: `1px solid ${primaryColor}`
+  }
+}
 
 function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
   const youLabel = (
@@ -49,15 +62,14 @@ function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
 
 function EmojiReactionButton (props) {
   const { reactionList, userReactionId, t } = props
-
   const highlighted = userReactionId !== -1
   const title = getEmojiReactionButtonTitle(reactionList, userReactionId, t)
-
   return (
     <button
       onClick={highlighted ? props.onRemoveReaction : props.onAddReaction}
       title={title}
       className={classnames('EmojiReactionButton__button', { highlighted })}
+      style={BUTTON_STYLE}
     >
       <span className='EmojiReactionButton__button__value'>{reactionList[0].value}</span>
       <span className='EmojiReactionButton__button__count'>{reactionList.length}</span>
@@ -72,4 +84,4 @@ EmojiReactionButton.propTypes = {
   onAddReaction: PropTypes.func.isRequired
 }
 
-export default translate()(EmojiReactionButton)
+export default translate()(Radium(EmojiReactionButton))
