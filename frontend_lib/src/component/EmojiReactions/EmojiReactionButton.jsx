@@ -18,6 +18,13 @@ const BUTTON_STYLE = {
 }
 
 function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
+  // INFO - RJ - 2021-03-18 - this function builds a title like:
+  //  - X, Y, Z and W reacted with joy
+  //  - You, X and Z reacted with joy
+  //  - X, you and Z reacted with joy
+
+  // INFO - RJ - 2021-03-18 - if the first reaction belongs to the user,
+  // "you" will be capitalized ("You")
   const youLabel = (
     reactionList[0].reaction_id === userReactionId
       ? t('You')
@@ -27,6 +34,7 @@ function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
   const value = reactionList[0].value
   const emoji = getEmojiDataFromNative(value, '', emojiData)
 
+  // INFO - RJ - 2021-03-18 - We build the list of users who reacted
   const users = humanAndList(
     reactionList.map(
       ({ author, reaction_id: reactionId }) => (
@@ -39,15 +47,14 @@ function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
 
   const i18nOpts = {
     reaction: emoji ? (emoji.id || emoji.name) : value,
-    users: users,
-    user: users
+    users: users
   }
 
   return (
     userReactionId === -1
       ? (
         reactionList.length === 1
-          ? t('{{user}} reacted with {{reaction}}', i18nOpts)
+          ? t('{{users}} reacted with {{reaction}}', i18nOpts)
           : t('{{users}} reacted with {{reaction}}_them', i18nOpts)
       )
       : (

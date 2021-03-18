@@ -145,7 +145,7 @@
   "React": "Réagir",
   "You": "Vous",
   "you": "vous",
-  "{{user}} reacted with {{reaction}}": "{{user}} a réagi avec {{reaction}}",
+  "{{users}} reacted with {{reaction}}": "{{users}} a réagi avec {{reaction}}",
   "{{users}} reacted with {{reaction}}_them": "{{users}} ont réagi avec {{reaction}}",
   "You reacted with {{reaction}}": "Vous avez réagi avec {{reaction}}",
   "{{users}} reacted with {{reaction}}_you": "{{users}} avez réagi avec {{reaction}}",

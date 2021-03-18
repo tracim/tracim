@@ -145,7 +145,7 @@
   "React": "React",
   "You": "You",
   "you": "you",
-  "{{user}} reacted with {{reaction}}": "{{user}} reacted with {{reaction}}",
+  "{{users}} reacted with {{reaction}}": "{{users}} reacted with {{reaction}}",
   "{{users}} reacted with {{reaction}}_them": "{{users}} reacted with {{reaction}}",
   "{{users}} reacted with {{reaction}}_you": "{{users}} reacted with {{reaction}}",
   "You reacted with {{reaction}}": "You reacted with {{reaction}}",
