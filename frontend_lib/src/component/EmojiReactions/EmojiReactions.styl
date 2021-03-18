@@ -16,7 +16,10 @@
   margin 2px
 
 .EmojiReactionButton__button
-  border 1px solid mediumGrey
+  border-width 1px
+  border-style solid
+  &:not(.highlighted)
+    border-color mediumGrey
   &:hover
     border 1px solid lightDarkGrey
 
@@ -37,3 +40,7 @@
 .EmojiReactionButton__button:hover:not(.highlighted), .EmojiReactionButton__buttonpicker:hover:not(.active)
   background-color grey-hover
   border 1px solid mediumGrey
+
+.emoji-mart button, .emoji-mart-category button.emoji-mart-emoji span
+  // INFO - RJ - 2021-03-18 - This class is intentionally specific to overwrite emoji-mart's own CSS rule
+  cursor pointer

@@ -26,6 +26,7 @@ const defaultNotificationsObject = {
 // See https://github.com/tracim/tracim/issues/3229
 export const serializeNotification = notification => {
   return {
+    ...notification.fields,
     author: {
       publicName: notification.fields.author.public_name,
       userId: notification.fields.author.user_id,

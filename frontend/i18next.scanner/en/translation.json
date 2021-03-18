@@ -413,5 +413,9 @@
   "Recent activities": "Recent activities",
   "Loading recent activities…": "Loading recent activities…",
   "undeleted": "restored",
-  "Publications": "Publications"
+  "Publications": "Publications",
+  "Reaction created": "Reaction created",
+  "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reacted to {{content}} with {{reaction}}",
+  "Reaction deleted": "Reaction deleted",
+  "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} removed their reaction {{reaction}} to {{content}}"
 }
