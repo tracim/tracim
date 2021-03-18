@@ -3021,7 +3021,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert content["modified"]
         assert content["created"]
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 1
         content = res[1]
         assert content["content_id"] == 2
@@ -3102,7 +3108,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("bad-fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3116,7 +3128,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3130,7 +3148,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3154,7 +3178,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("bad-fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3168,7 +3198,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3182,7 +3218,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3645,7 +3687,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3669,7 +3717,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3692,7 +3746,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3717,7 +3777,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("bad-fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 3
         assert content["modified"]
         assert content["created"]
@@ -3805,7 +3871,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "test-thread"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 1
         assert content["modified"]
         assert content["created"]
@@ -3883,7 +3955,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "test-html-page"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 1
         assert res[0]["content_id"] != res[1]["content_id"]
         assert content["modified"]
