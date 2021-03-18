@@ -41,7 +41,7 @@ const EmojiReactions = (props) => {
             reaction => reaction.author.user_id === props.loggedUserId
           )
 
-          // RJ - 2021-03-17 - INFO
+          // INFO - RJ - 2021-03-17
           // userReactionId is -1 if the user hasn't reacted with this emoji
           const userReactionId = userReaction ? userReaction.reaction_id : -1
 
