@@ -58,20 +58,6 @@ class EmojiReactions extends React.Component {
     }
   }
 
-  render () {
-    const { props, state } = this
-    return (
-      <EmojiReactionsComponent
-        loggedUserId={props.loggedUserId}
-        contentId={props.contentId}
-        workspaceId={props.workspaceId}
-        reactionList={state.reactionList}
-        onAddReaction={this.handleAddReaction}
-        onRemoveReaction={this.handleRemoveReaction}
-      />
-    )
-  }
-
   handleLiveMessageReactionAdded = (data) => {
     const reaction = data.fields.reaction
     if (reaction.content_id !== this.props.contentId) return
@@ -117,6 +103,20 @@ class EmojiReactions extends React.Component {
     if (!fetchDeleteReaction.ok && !(fetchDeleteReaction.body && fetchDeleteReaction.body.code === ERR_REACTION_NOT_FOUND)) {
       sendGlobalFlashMessage(props.t('Error while removing your reaction'))
     }
+  }
+
+  render () {
+    const { props, state } = this
+    return (
+      <EmojiReactionsComponent
+        loggedUserId={props.loggedUserId}
+        contentId={props.contentId}
+        workspaceId={props.workspaceId}
+        reactionList={state.reactionList}
+        onAddReaction={this.handleAddReaction}
+        onRemoveReaction={this.handleRemoveReaction}
+      />
+    )
   }
 }
 
