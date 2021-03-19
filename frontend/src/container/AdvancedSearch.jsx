@@ -208,8 +208,9 @@ export class AdvancedSearch extends React.Component {
     props.dispatch(setAppliedFilter(ADVANCED_SEARCH_FILTER.SEARCH_FIELD, newAppliedSearchFieldList, state.searchType))
 
     this.getSearchResult(
-      { ...currentSearch, currentPage: FIRST_PAGE, searchType: state.searchType },
-      currentSearch.resultList.length,
+      { ...currentSearch, searchType: state.searchType },
+      0, // INFO - CH - 20210319 - Force to 0 to force hasFirstPage (from getSearchResult()) to be evaluated to false to
+      // load previous pages in case we already clicked on "see more" button
       newAppliedSearchFieldList,
       currentSearch.appliedFilters
     )
@@ -273,8 +274,9 @@ export class AdvancedSearch extends React.Component {
 
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
     this.getSearchResult(
-      { ...currentSearch, currentPage: FIRST_PAGE, searchType: state.searchType },
-      currentSearch.resultList.length,
+      { ...currentSearch, searchType: state.searchType },
+      0, // INFO - CH - 20210319 - Force to 0 to force hasFirstPage (from getSearchResult()) to be evaluated to false to
+      // load previous pages in case we already clicked on "see more" button
       currentSearch.appliedFilters.searchFieldList,
       {
         ...currentSearch.appliedFilters,
@@ -284,7 +286,6 @@ export class AdvancedSearch extends React.Component {
   }
 
   getAllSearchResult = (searchObject) => {
-    const appliedFilters = searchObject.appliedFilters
     for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
       const searchTypeObject = this.getSearchObject(searchType)
       this.getSearchResult(
@@ -294,8 +295,8 @@ export class AdvancedSearch extends React.Component {
           searchType: searchType
         },
         searchTypeObject && searchTypeObject.resultList ? searchTypeObject.resultList.length : 0,
-        searchObject.searchType === searchType ? appliedFilters.searchFieldList : [],
-        searchObject.searchType === searchType ? appliedFilters : {}
+        searchObject.searchType === searchType ? searchTypeObject.appliedFilters.searchFieldList : [],
+        searchObject.searchType === searchType ? searchTypeObject.appliedFilters : {}
       )
     }
   }
