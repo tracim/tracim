@@ -32,24 +32,28 @@ export class FeedItemWithPreview extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove(`#wysiwygTimelineComment${props.content.id}`)
+    if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
+      globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
+    }
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(`#wysiwygTimelineComment${this.props.content.id}`)
+    const { props } = this
+    if (props.showTimeline) globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
   }
 
   handleAllAppChangeLanguage = (data) => {
     const { props, state } = this
     if (state.timelineWysiwyg) {
-      globalThis.tinymce.remove(`#wysiwygTimelineComment${props.content.id}`)
-      globalThis.wysiwyg(`wysiwygTimelineComment${props.content.id}`, data, this.handleChangeNewComment)
+      const wysiwygId = this.getWysiwygId(props.content.id)
+      globalThis.tinymce.remove(wysiwygId)
+      globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
     }
   }
 
   handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
-      `#wysiwygTimelineComment${this.props.content.id}`,
+      this.getWysiwygId(this.props.content.id),
       this.props.user.lang,
       this.handleChangeNewComment,
       handleTinyMceInput,
@@ -58,6 +62,8 @@ export class FeedItemWithPreview extends React.Component {
       handleTinyMceSelectionChange
     )
   }
+
+  getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 

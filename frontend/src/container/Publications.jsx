@@ -57,6 +57,8 @@ import {
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview from './FeedItemWithPreview.jsx'
 
+const wysiwygId = 'wysiwygTimelineCommentPublication'
+
 export class Publications extends React.Component {
   constructor (props) {
     super(props)
@@ -99,19 +101,19 @@ export class Publications extends React.Component {
       this.getPublicationList()
     }
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
+      globalThis.tinymce.remove(`#${wysiwygId}`)
     }
     if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
+    globalThis.tinymce.remove(`#${wysiwygId}`)
   }
 
   handleAllAppChangeLanguage = (data) => {
     if (this.state.publicationWysiwyg) {
-      globalThis.tinymce.remove('#wysiwygTimelineCommentPublication')
-      globalThis.wysiwyg('#wysiwygTimelineCommentPublication', data, this.handleChangeNewPublication)
+      globalThis.tinymce.remove(`#${wysiwygId}`)
+      globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
     }
     this.buildBreadcrumbs()
     this.setHeadTitle()
@@ -206,7 +208,7 @@ export class Publications extends React.Component {
 
   handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
-      '#wysiwygTimelineCommentPublication',
+      `#${wysiwygId}`,
       this.props.user.lang,
       this.handleChangeNewPublication,
       handleTinyMceInput,
@@ -416,7 +418,7 @@ export class Publications extends React.Component {
             <div className='publications__publishArea'>
               <CommentTextArea
                 apiUrl={FETCH_CONFIG.apiUrl}
-                id='wysiwygTimelineCommentPublication'
+                id={wysiwygId}
                 newComment={state.newComment}
                 onChangeNewComment={this.handleChangeNewPublication}
                 onInitWysiwyg={this.handleInitPublicationWysiwyg}
