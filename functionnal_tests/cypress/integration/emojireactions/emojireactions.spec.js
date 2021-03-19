@@ -30,7 +30,13 @@ function addEmojiReaction (container, title, emoji) {
     .contains(emoji)
 }
 
-function addAdminEmoji () {
+function addAdminEmoji (contentType, contentId) {
+  contentIdByType[contentType] = contentId
+  cy.visitPage({
+    pageName: PAGES.CONTENT_OPEN,
+    params: { workspaceId, contentType, contentId }
+  })
+
   addEmojiReaction(appContentRightMenuClassName, 'grinning', '😀')
 }
 
@@ -41,37 +47,21 @@ describe('Reactions', function () {
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
-      cy.createFile(fullFilename, mimeType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
-        const contentType = 'file'
-        contentIdByType[contentType] = contentId
-        cy.visitPage({
-          pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId }
-        })
-        addAdminEmoji()
-      })
-
-      cy.createHtmlDocument(htmlDocTitle, workspaceId).then(({ content_id: contentId }) => {
-        const contentType = 'html-document'
-        contentIdByType[contentType] = contentId
-        cy.visitPage({
-          pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId }
-        })
-        addAdminEmoji()
-      })
 
       cy.createThread(threadTitle, workspaceId).then(({ content_id: contentId }) => {
-        const contentType = 'thread'
-        contentIdByType[contentType] = contentId
-        cy.visitPage({
-          pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId }
-        })
+        addAdminEmoji('thread', contentId)
         cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
           .type(commentContent)
         cy.get('.timeline__texteditor__submit__btn')
           .click()
+      })
+
+      cy.createHtmlDocument(htmlDocTitle, workspaceId).then(({ content_id: contentId }) => {
+        addAdminEmoji('html-document', contentId)
+      })
+
+      cy.createFile(fullFilename, mimeType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
+        addAdminEmoji('file', contentId)
       })
     })
   })
