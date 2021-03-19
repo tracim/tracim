@@ -170,7 +170,7 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id='') => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id = '') => {
       this.checkApiUrl()
 
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
