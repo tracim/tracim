@@ -1307,6 +1307,16 @@ class ContentApi(object):
         """
         Copy all content, revision and children included (children are included
         recursively).
+
+        This method copy :
+        - The content with all theses revisions (content and content_revisions table)
+        - His children content (not only comments) recursively with all theses revisions
+        (content and content_revisions table)
+
+        This method does NOT copy some info related to content:
+        - reactions on content or children (reaction table)
+        - content share link (content_shares_table element) on content or children content
+
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
         :param new_label: new label of the new copied item
