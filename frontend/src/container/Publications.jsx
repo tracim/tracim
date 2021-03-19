@@ -278,7 +278,7 @@ export class Publications extends React.Component {
           translatedRawContent: null,
           translationState: TRANSLATION_STATE.DISABLED
         }))
-        // INFO - G.B. - 2021-03-19 - We remove the first element because it's already showed in the preview
+        // INFO - G.B. - 2021-03-19 - We remove the first element because it's already shown in the preview
         props.dispatch(addCommentListToPublication(publication.content_id, commentList.slice(1)))
         break
       }
