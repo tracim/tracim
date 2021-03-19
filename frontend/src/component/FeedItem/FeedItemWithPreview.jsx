@@ -25,7 +25,6 @@ export const FeedItemWithPreview = props => {
       <FeedItemFooter
         commentList={props.commentList}
         content={props.content}
-        reactionList={props.reactionList}
       />
       {props.children}
     </div>
@@ -46,8 +45,7 @@ FeedItemWithPreview.propTypes = {
   eventList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
-  onEventClicked: PropTypes.func,
-  reactionList: PropTypes.array
+  onEventClicked: PropTypes.func
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -55,6 +53,5 @@ FeedItemWithPreview.defaultProps = {
   commentList: [],
   eventList: [],
   lastModificationEntityType: '',
-  lastModificationSubEntityType: '',
-  reactionList: []
+  lastModificationSubEntityType: ''
 }

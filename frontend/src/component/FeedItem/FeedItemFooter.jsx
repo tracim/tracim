@@ -2,8 +2,10 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
 
-import { IconButton, PAGE } from 'tracim_frontend_lib'
+import { IconButton, PAGE, EmojiReactions } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 require('./FeedItemFooter.styl')
 
@@ -22,24 +24,32 @@ export class FeedItemFooter extends React.Component {
     return (
       <div>
         <div className='feedItemFooter__right'>
-          {props.commentList.length}
-          <IconButton
-            icon='far fa-comment'
-            text={props.t('Comment')}
-            intent='link'
-            onClick={this.handleCommentClicked.bind(this)}
-            dataCy='feedItemFooter__comment'
+          <EmojiReactions
+            apiUrl={FETCH_CONFIG.apiUrl}
+            loggedUserId={props.user.userId}
+            contentId={props.content.content_id}
+            workspaceId={props.content.workspace_id}
           />
+          <div className='feedItemFooter__comments'>
+            {props.commentList.length}
+            <IconButton
+              icon='far fa-comment'
+              text={props.t('Comment')}
+              intent='link'
+              onClick={this.handleCommentClicked.bind(this)}
+              dataCy='feedItemFooter__comment'
+            />
+          </div>
         </div>
       </div>
     )
   }
 }
 
-export default withRouter(translate()(FeedItemFooter))
+const mapStateToProps = ({ user }) => ({ user })
+export default connect(mapStateToProps)(withRouter(translate()(FeedItemFooter)))
 
 FeedItemFooter.propTypes = {
   content: PropTypes.object.isRequired,
-  reactionList: PropTypes.array.isRequired,
   commentList: PropTypes.array.isRequired
 }

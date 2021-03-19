@@ -22,7 +22,6 @@ const createSingleMessageActivity = (activityParams, messageList) => {
   return {
     ...activityParams,
     eventList: [],
-    reactionList: [],
     commentList: [],
     newestMessage: message
   }
@@ -56,7 +55,6 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   return {
     ...activityParams,
     eventList: [],
-    reactionList: [],
     commentList: commentList,
     newestMessage: first,
     content: content,
