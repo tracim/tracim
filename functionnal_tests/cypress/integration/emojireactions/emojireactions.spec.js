@@ -78,7 +78,8 @@ describe('Reactions', function () {
       cy.loginAs('users')
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType, contentId }
+        params: { workspaceId, contentType, contentId },
+        waitForTlm: true
       })
     })
 
@@ -113,7 +114,8 @@ describe('Reactions', function () {
         cy.loginAs('users')
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId }
+          params: { workspaceId, contentType, contentId },
+          waitForTlm: true
         })
 
         cy.contains(container + ' .EmojiReactionButton__button__value', '😀')
