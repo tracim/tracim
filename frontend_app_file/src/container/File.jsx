@@ -20,8 +20,7 @@ import {
   Timeline,
   NewVersionBtn,
   GenericButton,
-  ArchiveDeleteContent,
-  SelectStatus,
+  AppContentRightMenu,
   displayDistanceDate,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -844,6 +843,7 @@ export class File extends React.Component {
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
+          workspaceId={state.content.workspace_id}
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,
             this.state.content.workspace_id,
@@ -1054,27 +1054,18 @@ export class File extends React.Component {
                 />
               )}
             </div>
-
-            <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                  mobileVersion={onlineEditionAction}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              appMode={state.mode}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onChangeStatus={this.handleChangeStatus}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+              mobileVersion={onlineEditionAction}
+            />
           </div>
         </PopinFixedOption>
 
@@ -1114,6 +1105,7 @@ export class File extends React.Component {
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
+            workspaceId={state.content.workspace_id}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}

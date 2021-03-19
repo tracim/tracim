@@ -14,12 +14,15 @@ from tracim_backend.exceptions import ContentNotFoundInTracimRequest
 from tracim_backend.exceptions import ContentTypeNotInTracimRequest
 from tracim_backend.exceptions import InvalidCommentId
 from tracim_backend.exceptions import InvalidContentId
+from tracim_backend.exceptions import InvalidReactionId
 from tracim_backend.exceptions import InvalidUserId
 from tracim_backend.exceptions import InvalidWorkspaceId
 from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import ReactionNotFoundInTracimRequest
 from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.reaction import ReactionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.app import TracimContentType
@@ -27,6 +30,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import Event
+from tracim_backend.models.reaction import Reaction
 
 
 class TracimContext(ABC):
@@ -43,6 +47,8 @@ class TracimContext(ABC):
         self._current_content = None  # type: Content
         # Current comment, found in request path
         self._current_comment = None  # type: Content
+        # Current reaction, found in request path
+        self._current_reaction = None  # type: Reaction
         # Candidate user found in request body
         self._candidate_user = None  # type: User
         # Candidate workspace found in request body
@@ -124,6 +130,16 @@ class TracimContext(ABC):
         )
 
     @property
+    def current_reaction(self) -> Reaction:
+        """
+        Current reaction if exist, if you are deleting reaction 8 of content 21,
+        current reaction will be 8.
+        """
+        return self._generate_if_none(
+            self._current_reaction, self._get_reaction, self._get_current_reaction_id
+        )
+
+    @property
     def candidate_user(self) -> User:
         """
         User which is not authenticated user but needed for an action,
@@ -201,6 +217,18 @@ class TracimContext(ABC):
         except WorkspaceNotFoundInTracimRequest:
             return None
 
+    def _get_content_id_in_request(self) -> typing.Optional[int]:
+        """
+        Return content_id if exist, return None if content_id doesn't exist
+        This differ from _get_content_reaction_id as it does not raise exception
+        but None in case content_id doesn't exist
+        :return:
+        """
+        try:
+            return self._get_current_content_id()
+        except ContentNotFoundInTracimRequest:
+            return None
+
     def _get_content(self, content_id_fetcher: typing.Callable[[], int]) -> Content:
         content_id = content_id_fetcher()
         api = ContentApi(
@@ -221,6 +249,14 @@ class TracimContext(ABC):
             workspace=current_workspace,
             content_type=content_type_list.Any_SLUG,
         )
+
+    def _get_reaction(self, reaction_id_fetcher: typing.Callable[[], int]) -> Reaction:
+        reaction_id = reaction_id_fetcher()
+        reaction_lib = ReactionLib(self.dbsession)
+        current_content = None
+        if self._get_content_id_in_request():
+            current_content = self.current_content
+        return reaction_lib.get_one(reaction_id=reaction_id, content_id=current_content.content_id)
 
     def _get_content_type(
         self, content_type_slug_fetcher: typing.Callable[[], str]
@@ -279,6 +315,9 @@ class TracimContext(ABC):
         raise NotImplementedError()
 
     def _get_current_comment_id(self) -> int:
+        raise NotImplementedError()
+
+    def _get_current_reaction_id(self) -> int:
         raise NotImplementedError()
 
     def _get_candidate_user_id(self) -> int:
@@ -414,6 +453,13 @@ class TracimRequest(TracimContext, Request):
         )
         exception_if_invalid_id = InvalidCommentId("comment_id is not a correct integer")
         return self._get_path_id("comment_id", exception_if_none, exception_if_invalid_id)
+
+    def _get_current_reaction_id(self) -> int:
+        exception_if_none = ReactionNotFoundInTracimRequest(
+            "No reaction_id property found in request"
+        )
+        exception_if_invalid_id = InvalidReactionId("comment_id is not a correct integer")
+        return self._get_path_id("reaction_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_user_id(self) -> int:
         exception_if_none = UserNotFoundInTracimRequest(

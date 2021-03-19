@@ -47,6 +47,7 @@ from tracim_backend.models.context_models import CommentPathFilename
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentSortOrder
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -61,6 +62,8 @@ from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
 from tracim_backend.models.context_models import RadicaleUserSubitemsPath
 from tracim_backend.models.context_models import RadicaleWorkspaceSubitemsPath
+from tracim_backend.models.context_models import ReactionCreation
+from tracim_backend.models.context_models import ReactionPath
 from tracim_backend.models.context_models import ResetPasswordCheckToken
 from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
@@ -234,6 +237,14 @@ class RFCEmail(ValidatedField, String):
         if value is None:
             return None
         return RFCEmailValidator(error=self.error_messages["invalid"])(value)
+
+
+class BasePaginatedSchemaPage(marshmallow.Schema):
+    previous_page_token = marshmallow.fields.String()
+    next_page_token = marshmallow.fields.String()
+    has_next = marshmallow.fields.Bool()
+    has_previous = marshmallow.fields.Bool()
+    per_page = marshmallow.fields.Int()
 
 
 class CollaborativeFileTypeSchema(marshmallow.Schema):
@@ -795,6 +806,19 @@ class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
         return WorkspaceAndUserPath(**data)
 
 
+class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
+    reaction_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid reaction related to content content_id",
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ReactionPath(**data)
+
+
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
         example=6,
@@ -938,6 +962,23 @@ class FilterContentQuerySchema(marshmallow.Schema):
     )
     label = StrippedString(
         example="myfilename", default=None, allow_none=True, description="Filter by content label"
+    )
+    sort = EnumField(
+        ContentSortOrder,
+        missing=ContentSortOrder.LABEL_ASC,
+        description="Order of the returned contents, default is to sort by labels",
+    )
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=positive_int_validator,
+        missing=0,
+        default=0,
+        allow_none=False,
+        description="Allows to paginate the results in combination with page_token, by default all results are returned",
+    )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first elements",
+        validate=page_token_validator,
     )
 
     @post_load
@@ -1467,7 +1508,12 @@ class ContentMinimalSchema(marshmallow.Schema):
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 
-class ContentDigestSchema(marshmallow.Schema):
+class UserInfoContentAbstractSchema(marshmallow.Schema):
+    author = marshmallow.fields.Nested(UserDigestSchema)
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ContentDigestSchema(UserInfoContentAbstractSchema):
     content_namespace = marshmallow.fields.String(example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
@@ -1518,6 +1564,10 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
+class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(ContentDigestSchema, many=True)
+
+
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
@@ -1526,12 +1576,7 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-class UserInfoContentAbstractSchema(marshmallow.Schema):
-    author = marshmallow.fields.Nested(UserDigestSchema)
-    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
-
-
-class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
+class ContentSchema(ContentDigestSchema):
     description = StrippedString(
         required=True, description="raw text or html description of the content"
     )
@@ -1602,6 +1647,16 @@ class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
     )
 
 
+class ReactionSchema(marshmallow.Schema):
+    reaction_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    author = marshmallow.fields.Nested(UserDigestSchema)
+    value = StrippedString(example="😀")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="reaction creation date"
+    )
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1626,6 +1681,14 @@ class SetCommentSchema(marshmallow.Schema):
     @post_load()
     def create_comment(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentCreation(**data)
+
+
+class SetReactionSchema(marshmallow.Schema):
+    value = StrippedString(example="😀", validate=not_empty_string_validator, required=True,)
+
+    @post_load()
+    def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ReactionCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
@@ -1721,14 +1784,6 @@ class LiveMessageSchema(marshmallow.Schema):
     read = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="read date", allow_none=True
     )
-
-
-class BasePaginatedSchemaPage(marshmallow.Schema):
-    previous_page_token = marshmallow.fields.String()
-    next_page_token = marshmallow.fields.String()
-    has_next = marshmallow.fields.Bool()
-    has_previous = marshmallow.fields.Bool()
-    per_page = marshmallow.fields.Int()
 
 
 class LiveMessageSchemaPage(BasePaginatedSchemaPage):

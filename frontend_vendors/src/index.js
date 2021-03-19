@@ -14,5 +14,6 @@ module.exports = {
   // INFO - CH - Keep the line below or <Link> components will fail
   // See https://github.com/tracim/tracim/issues/3999
   'react-router-dom': require('react-router-dom'),
+  'reactstrap': require('reactstrap'),
   'regenerator-runtime/runtime': require('regenerator-runtime/runtime')
 }

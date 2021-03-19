@@ -27,6 +27,7 @@
         param = "color"
         color_change_value = 15
       %>
+
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
@@ -76,7 +77,7 @@
       }
 
       body {
-        font-family: "Quicksand";
+        font-family: Quicksand;
       }
     </style>
 

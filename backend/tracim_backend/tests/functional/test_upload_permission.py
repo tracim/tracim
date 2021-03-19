@@ -541,7 +541,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
-        res = res.json_body
+        res = res.json_body["items"]
         assert len(res) == 3
         comment = res[0]
         assert comment["label"] == ""
@@ -582,7 +582,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
-        assert len(res.json_body) == 0
+        assert len(res.json_body["items"]) == 0
 
     def test_api__guest_upload_content__err_403__wrong_password(
         self,
@@ -709,7 +709,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
-        res = res.json_body
+        res = res.json_body["items"]
         assert len(res) == 3
         comment = res[0]
         assert comment["label"] == ""
@@ -750,7 +750,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
-        assert len(res.json_body) == 0
+        assert len(res.json_body["items"]) == 0
 
     def test_api__guest_upload_content__ok_200__empty_message(
         self,
@@ -789,7 +789,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
-        res = res.json_body
+        res = res.json_body["items"]
         assert len(res) == 3
         comment = res[0]
         assert comment["label"] == ""
@@ -830,7 +830,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
-        assert len(res.json_body) == 0
+        assert len(res.json_body["items"]) == 0
 
     def test_api__guest_upload_content__ok_200__10_files(
         self,
@@ -881,7 +881,7 @@ class TestGuestUploadEndpoints(object):
             params=params,
         )
         res = res.json_body
-        assert len(res) == 21
+        assert len(res["items"]) == 21
 
     def test_api__guest_upload_content__err_400__no_file_given(
         self,
@@ -949,7 +949,7 @@ class TestGuestUploadEndpoints(object):
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
-        res = res.json_body
+        res = res.json_body["items"]
         assert len(res) == 0
 
     def test_api__guest_upload_check__err_403__wrong_password(
@@ -1067,8 +1067,9 @@ class TestGuestUploadEndpoints(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
+            status=200,
         )
-        res = res.json_body
+        res = res.json_body["items"]
         assert len(res) == 0
 
     def test_api__guest_upload_info__ok_200__with_password(

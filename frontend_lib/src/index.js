@@ -53,6 +53,7 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
@@ -214,6 +215,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
+export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
 
@@ -375,6 +377,7 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   TextInput,

@@ -2,6 +2,7 @@
 import base64
 import cgi
 from datetime import datetime
+import enum
 from typing import Generic
 from typing import List
 from typing import Optional
@@ -425,6 +426,17 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
+class ReactionPath(object):
+    """
+    Paths params with workspace id and content_id and reaction_id model
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, reaction_id: int) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.reaction_id = reaction_id
+
+
 class CommentPathFilename(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -487,6 +499,13 @@ class PageQuery(object):
         self.page = page
 
 
+class ContentSortOrder(str, enum.Enum):
+    LABEL_ASC = "label:asc"
+    MODIFIED_ASC = "modified:asc"
+    LABEL_DESC = "label:desc"
+    MODIFIED_DESC = "modified:desc"
+
+
 class ContentFilter(object):
     """
     Content filter model
@@ -494,17 +513,20 @@ class ContentFilter(object):
 
     def __init__(
         self,
-        workspace_id: int = None,
-        complete_path_to_id: int = None,
-        parent_ids: str = None,
-        show_archived: int = 0,
-        show_deleted: int = 0,
-        show_active: int = 1,
-        content_type: str = None,
-        label: str = None,
-        page_nb: int = None,
-        limit: int = None,
-        namespaces_filter: str = None,
+        workspace_id: Optional[int] = None,
+        complete_path_to_id: Optional[int] = None,
+        parent_ids: Optional[str] = None,
+        show_archived: Optional[int] = 0,
+        show_deleted: Optional[int] = 0,
+        show_active: Optional[int] = 1,
+        content_type: Optional[str] = None,
+        label: Optional[str] = None,
+        page_nb: Optional[int] = None,
+        limit: Optional[int] = None,
+        namespaces_filter: Optional[str] = None,
+        sort: Optional[ContentSortOrder] = None,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
         self.namespaces_filter = string_to_list(namespaces_filter, ",", ContentNamespaces)
@@ -517,6 +539,9 @@ class ContentFilter(object):
         self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
+        self.sort = sort or ContentSortOrder.LABEL_ASC
+        self.page_token = page_token
+        self.count = count
 
 
 class ActiveContentFilter(object):
@@ -632,6 +657,15 @@ class CommentCreation(object):
 
     def __init__(self, raw_content: str) -> None:
         self.raw_content = raw_content
+
+
+class ReactionCreation(object):
+    """
+    reaction creation model
+    """
+
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 
 class SetContentStatus(object):
@@ -1731,13 +1765,20 @@ class RevisionInContext(object):
 
 
 class PaginatedObject(object):
-    def __init__(self, page: Page) -> None:
-        self.previous_page_token = page.paging.bookmark_previous
-        self.next_page_token = page.paging.bookmark_next
-        self.has_previous = page.paging.has_previous
-        self.has_next = page.paging.has_next
-        self.per_page = page.paging.per_page
-        self.items = page
+    def __init__(self, page: Page, items: Optional[list] = None) -> None:
+        self.items = items or page
+        if page.paging:
+            self.previous_page_token = page.paging.bookmark_previous
+            self.next_page_token = page.paging.bookmark_next
+            self.has_previous = page.paging.has_previous
+            self.has_next = page.paging.has_next
+            self.per_page = page.paging.per_page
+        else:
+            self.previous_page_token = ""
+            self.next_page_token = ""
+            self.has_previous = False
+            self.has_next = False
+            self.per_page = len(self.items)
 
 
 T = TypeVar("T")

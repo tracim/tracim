@@ -16,7 +16,6 @@ class ContentFileApp(TracimApplication):
             label="File",
             creation_label="Upload files",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=False,
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=self,
         )

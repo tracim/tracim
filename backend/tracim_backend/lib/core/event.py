@@ -62,12 +62,14 @@ from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -88,6 +90,7 @@ class EventApi:
         FOLDER_TYPE: ContentSchema(),
         THREAD_TYPE: ContentSchema(),
     }
+    reaction_schema = ReactionSchema()
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
@@ -103,17 +106,20 @@ class EventApi:
         if event_types:
             event_type_filters = []
             for event_type in event_types:
-                if event_type.subtype:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                        Event.entity_subtype == event_type.subtype,
-                    )
+                if event_type.operation:
+                    if event_type.subtype:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                            Event.entity_subtype == event_type.subtype,
+                        )
+                    else:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                        )
                 else:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                    )
+                    event_type_filter = Event.entity_type == event_type.entity
 
                 event_type_filters.append(event_type_filter)
 
@@ -134,8 +140,8 @@ class EventApi:
         read_status: ReadStatus = ReadStatus.ALL,
         event_id: Optional[int] = None,
         user_id: Optional[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: Optional[List[int]] = None,
         after_event_id: int = 0,
         workspace_ids: Optional[List[int]] = None,
@@ -168,28 +174,6 @@ class EventApi:
 
         query = self._filter_event_types(query, include_event_types, False)
         query = self._filter_event_types(query, exclude_event_types, True)
-
-        if exclude_event_types:
-            event_type_filters = []
-            for event_type in exclude_event_types:
-                if event_type.subtype:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                        Event.entity_subtype != event_type.subtype,
-                    )
-                else:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                    )
-
-                event_type_filters.append(event_type_filter)
-
-            if len(event_type_filters) > 1:
-                query = query.filter(and_(*event_type_filters))
-            else:
-                query = query.filter(event_type_filters[0])
 
         if exclude_author_ids:
             for author_id in exclude_author_ids:
@@ -251,8 +235,8 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         exclude_author_ids: List[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: Optional[int] = None,
         include_not_sent: bool = False,
@@ -275,9 +259,9 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_author_ids: List[int] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_author_ids: Optional[List[int]] = None,
         include_not_sent=False,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
@@ -667,6 +651,19 @@ class EventBuilder:
     ) -> None:
         self._create_subscription_event(OperationType.DELETED, subscription, context)
 
+    # Reaction events
+    @hookimpl
+    def on_reaction_created(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.CREATED, reaction, context)
+
+    @hookimpl
+    def on_reaction_modified(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.MODIFIED, reaction, context)
+
+    @hookimpl
+    def on_reaction_deleted(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.DELETED, reaction, context)
+
     def _create_subscription_event(
         self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
@@ -689,6 +686,37 @@ class EventBuilder:
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _create_reaction_event(
+        self, operation: OperationType, reaction: Reaction, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(reaction.content.workspace_id)
+        )
+        content_api = ContentApi(context.dbsession, current_user, self._config)
+        content_in_context = content_api.get_content_in_context(reaction.content)
+        content_schema = EventApi.get_content_schema_for_type(reaction.content.type)
+        content_dict = content_schema.dump(content_in_context).data
+
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        reaction_author_in_context = user_api.get_user_with_context(reaction.author)
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
+            Event.CONTENT_FIELD: content_dict,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.REACTION,
             operation=operation,
             additional_fields=fields,
             context=context,
@@ -795,6 +823,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+        EntityType.REACTION: _get_content_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:

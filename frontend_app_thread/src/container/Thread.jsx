@@ -13,9 +13,7 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   Timeline,
-  SelectStatus,
-  ArchiveDeleteContent,
-  ROLE,
+  AppContentRightMenu,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -409,26 +407,16 @@ export class Thread extends React.Component {
                 onClickRefresh={this.handleClickRefresh}
               />
             )}
-
-            <div className='thread__rightMenu'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              onChangeStatus={this.handleChangeStatus}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
@@ -464,6 +452,7 @@ export class Thread extends React.Component {
               onClickCancelSave={this.handleCancelSave}
               onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
               onInitWysiwyg={this.handleInitWysiwyg}
+              workspaceId={state.content.workspace_id}
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
               searchForMentionInQuery={this.searchForMentionInQuery}
               onClickTranslateComment={comment => props.handleTranslateComment(
@@ -473,7 +462,6 @@ export class Thread extends React.Component {
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-
             />
           ) : null}
         </PopinFixedContent>

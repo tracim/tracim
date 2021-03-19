@@ -54,6 +54,7 @@ class TestCommandsList(object):
         assert output.find("db init") > 0
         assert output.find("db delete") > 0
         assert output.find("db update-naming-conventions") > 0
+        assert output.find("db migrate-mysql-charset") > 0
         # search
         assert output.find("search index-create") > 0
         assert output.find("search index-populate") > 0

@@ -396,7 +396,7 @@ export class Gallery extends React.Component {
     switch (fetchContentList.apiResponse.status) {
       case 200: {
         const imagePreviewList = await this.loadPreviewList(
-          fetchContentList.body
+          fetchContentList.body.items
             .filter(c => c.content_type === 'file')
             .map(c => c.content_id)
         )

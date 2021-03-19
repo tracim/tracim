@@ -88,7 +88,10 @@ export class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
+                    contentId={Number(content.content_id)}
+                    workspaceId={Number(props.workspaceId)}
                     author={content.author}
+                    loggedUserId={Number(props.loggedUser.userId)}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
@@ -208,6 +211,7 @@ export default translate()(Radium(TracimComponent(Timeline)))
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
