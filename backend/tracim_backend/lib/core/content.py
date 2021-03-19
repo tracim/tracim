@@ -1322,7 +1322,7 @@ class ContentApi(object):
 
         This method does NOT copy some info related to content:
         - reactions on content or children (reaction table)
-        - content share link (content_shares_table element) on content or children content
+        - content share link (content_shares table element) on content or children content
 
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
