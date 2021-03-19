@@ -160,15 +160,7 @@ class TestContentApi(object):
         }
         api._set_allowed_content(folder, allowed_content_dict=allowed_content_dict)
         api.save(content=folder)
-        # not in list -> do not allow
-        with pytest.raises(UnallowedSubContent):
-            api.create(
-                content_type_slug=content_type_list.Event.slug,
-                workspace=workspace,
-                parent=folder,
-                label="lapin",
-                do_save=True,
-            )
+
         # in list but false -> do not allow
         with pytest.raises(UnallowedSubContent):
             api.create(
@@ -186,25 +178,6 @@ class TestContentApi(object):
             label="lapin",
             do_save=True,
         )
-
-    def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(
-        self, user_api_factory, workspace_api_factory, content_type_list, session, app_config
-    ):
-        uapi = user_api_factory.get()
-        profile = Profile.ADMIN
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
-        workspace = workspace_api_factory.get(user).create_workspace(
-            "test workspace", save_now=True
-        )
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        with pytest.raises(UnallowedSubContent):
-            api.create(
-                content_type_slug=content_type_list.Event.slug,
-                workspace=workspace,
-                parent=None,
-                label="lapin",
-                do_save=True,
-            )
 
     def test_unit__create_content__err_same_label_as_another_content(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list

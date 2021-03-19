@@ -22,7 +22,6 @@ class TracimContentType(object):
         available_statuses: typing.List["ContentStatus"],
         app: "TracimApplication" = None,
         slug_aliases: typing.List[str] = None,
-        allow_sub_content: bool = False,
         file_extension: typing.Optional[str] = None,
         minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ) -> None:
@@ -35,7 +34,6 @@ class TracimContentType(object):
         :param available_statuses: status available for this content type
         :param app: associated app
         :param slug_aliases: list of alias slug which refer to same content-type
-        :param allow_sub_content: should be true for folder-like content type, false for other
         :param file_extension: default file extension of content_type. ex: ".document.html"
         :param minimal_role_content_creation: minimal workspace role needed for create content of
         this kind.
@@ -46,7 +44,6 @@ class TracimContentType(object):
         self.creation_label = creation_label
         self.available_statuses = available_statuses
         self.slug_aliases = slug_aliases
-        self.allow_sub_content = allow_sub_content
         self.file_extension = file_extension
         self.minimal_role_content_creation = minimal_role_content_creation
         self.app = app
@@ -107,7 +104,6 @@ class TracimApplication(ABC):
         ...         creation_label="Write a note",
         ...         available_statuses=content_status_list.get_all(),
         ...         slug_aliases=["page"],
-        ...         allow_sub_content=False,
         ...         file_extension=".document.html",
         ...         minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
         ...         app=self,
