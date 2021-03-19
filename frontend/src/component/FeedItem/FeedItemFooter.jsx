@@ -10,7 +10,7 @@ import { FETCH_CONFIG } from '../../util/helper.js'
 require('./FeedItemFooter.styl')
 
 export class FeedItemFooter extends React.Component {
-  handleCommentClicked () {
+  handleCommentClicked = () => {
     const { props } = this
     props.history.push(PAGE.WORKSPACE.CONTENT(
       props.content.workspace_id,
@@ -36,7 +36,7 @@ export class FeedItemFooter extends React.Component {
               icon='far fa-comment'
               text={props.t('Comment')}
               intent='link'
-              onClick={this.handleCommentClicked.bind(this)}
+              onClick={this.handleCommentClicked}
               dataCy='feedItemFooter__comment'
             />
           </div>
