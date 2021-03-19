@@ -49,7 +49,12 @@ describe('Reactions', function () {
       workspaceId = workspace.workspace_id
 
       cy.createThread(threadTitle, workspaceId).then(({ content_id: contentId }) => {
-        addAdminEmoji('thread', contentId)
+        const contentType = 'thread'
+        contentIdByType[contentType] = contentId
+        cy.visitPage({
+          pageName: PAGES.CONTENT_OPEN,
+          params: { workspaceId, contentType, contentId }
+        })
         cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
           .type(commentContent)
         cy.get('.timeline__texteditor__submit__btn')
@@ -63,6 +68,7 @@ describe('Reactions', function () {
       cy.createFile(fullFilename, mimeType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
         addAdminEmoji('file', contentId)
       })
+      cy.loginAs('users')
     })
   })
 
