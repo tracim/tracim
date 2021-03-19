@@ -26,8 +26,7 @@ function addEmojiReaction (container, title, emoji) {
     .should('not.exist')
   cy.get(container + ' .EmojiReactionButton__button.highlighted')
     .should('be.visible')
-  cy.get(container + ' .EmojiReactionButton__button__value')
-    .contains(emoji)
+  cy.contains(container + ' .EmojiReactionButton__button__value', emoji)
 }
 
 function addAdminEmoji (contentType, contentId) {
@@ -91,11 +90,9 @@ describe('Reactions', function () {
         cy.get(container + ' .EmojiReactionButton__button')
           .should('not.exist')
         addEmojiReaction(container, 'grinning', '😀')
-        cy.get(container + ' .EmojiReactionButton__button__count')
-          .contains('1')
+        cy.contains(container + ' .EmojiReactionButton__button__count', '1')
         addEmojiReaction(container, '+1', '👍')
-        cy.get(container + ' .EmojiReactionButton__button__count')
-          .contains('1')
+        cy.contains(container + ' .EmojiReactionButton__button__count', '1')
         cy.get(container + ' .EmojiReactionButton__button')
           .first()
           .click()
@@ -118,17 +115,15 @@ describe('Reactions', function () {
           pageName: PAGES.CONTENT_OPEN,
           params: { workspaceId, contentType, contentId }
         })
-        cy.get(container + ' .EmojiReactionButton__button__value')
-          .contains('😀')
-        cy.get(container + ' .EmojiReactionButton__button__count')
-          .contains('1')
+
+        cy.contains(container + ' .EmojiReactionButton__button__value', '😀')
+        cy.contains(container + ' .EmojiReactionButton__button__count', '1')
 
         cy.get(container + ' .EmojiReactionButton__button').click()
-        cy.get(container + ' .EmojiReactionButton__button__count')
-          .contains('2')
+        cy.contains(container + ' .EmojiReactionButton__button__count', '2')
+
         cy.get(container + ' .EmojiReactionButton__button').click()
-        cy.get(container + ' .EmojiReactionButton__button__count')
-          .contains('1')
+        cy.contains(container + ' .EmojiReactionButton__button__count', '1')
       })
     }
   })
