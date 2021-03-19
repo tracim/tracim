@@ -58,7 +58,7 @@ const EmojiReactions = (props) => {
           )
         })
       }
-      <EmojiPickerButton onAddReaction={props.onAddReaction} />
+      {(props.readOnly  || true) && <EmojiPickerButton onAddReaction={props.onAddReaction} />}
     </div>
   )
 }
@@ -69,7 +69,8 @@ EmojiReactions.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   reactionList: PropTypes.array.isRequired,
   onRemoveReaction: PropTypes.func.isRequired,
-  onAddReaction: PropTypes.func.isRequired
+  onAddReaction: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired
 }
 
 export default EmojiReactions

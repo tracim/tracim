@@ -115,6 +115,7 @@ class EmojiReactions extends React.Component {
         reactionList={state.reactionList}
         onAddReaction={this.handleAddReaction}
         onRemoveReaction={this.handleRemoveReaction}
+        readOnly={props.readOnly}
       />
     )
   }
@@ -124,7 +125,8 @@ EmojiReactions.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   loggedUserId: PropTypes.number.isRequired,
   contentId: PropTypes.number.isRequired,
-  workspaceId: PropTypes.number.isRequired
+  workspaceId: PropTypes.number.isRequired,
+  readOnly: PropTypes.bool.isRequired
 }
 
 export default translate()(TracimComponent(EmojiReactions))

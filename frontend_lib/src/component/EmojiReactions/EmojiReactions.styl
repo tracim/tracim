@@ -8,28 +8,37 @@
   align-items center
   justify-content flex-end
   flex 1
+  flex-wrap wrap
+  overflow auto
+  height 100%
 
 .EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
   background transparent
   cursor pointer
   border-radius 3px
+  white-space pre
   margin 2px
 
 .EmojiReactionButton__button
   border-width 1px
   border-style solid
+  font-size fontSizeSmall
+  padding 1px 4px
+
   &:not(.highlighted)
     border-color mediumGrey
+
   &:hover
     border 1px solid lightDarkGrey
 
   &__value
     font-family 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', 'Twemoji Mozilla', 'Noto Color Emoji', 'Android Emoji', sans-serif
   &__count
-    padding-inline-start 4px
     display inline-block
     text-align right
-    min-width 2ex // INFO - RJ - 2021-03-17 - prevent the button from resizing when the count changes
+
+    @media (min-width: min-lg)
+      min-width 1.5ex // INFO - RJ - 2021-03-17 - prevent the button from resizing when the count changes
 
 .EmojiReactionButton__buttonpicker
   border 1px solid transparent
