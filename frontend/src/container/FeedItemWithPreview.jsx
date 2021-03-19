@@ -159,6 +159,7 @@ export class FeedItemWithPreview extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnyway}
             searchForMentionInQuery={this.searchForMentionInQuery}
+            workspaceId={props.workspaceId}
           />
         )}
       </div>
