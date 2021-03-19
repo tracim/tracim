@@ -164,20 +164,23 @@ class Preview extends React.Component {
     this.testPreviewOverflow()
   }
 
+  isContentDifferent = (oldContent, newContent) => (
+    newContent.commentList !== oldContent.commentList ||
+    newContent.currentRevisionId !== oldContent.currentRevisionId
+  )
+
   componentDidUpdate (prevProps) {
     const { props } = this
     if (prevProps.content === props.content) {
       this.testPreviewOverflow()
-    } else if (prevProps.content.commentList !== props.content.commentList ||
-      prevProps.content.currentRevisionId !== props.content.currentRevisionId) {
+    } else if (this.isContentDifferent(prevProps.content, props.content)) {
       this.updatePreview()
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.content.commentList !== this.props.content.commentList ||
-      nextProps.content.currentRevisionId !== this.props.content.currentRevisionId ||
+      this.isContentDifferent(this.props.content, nextProps.content) ||
       Object.entries(nextState).some(([key, val]) => val !== this.state[key])
     )
   }
