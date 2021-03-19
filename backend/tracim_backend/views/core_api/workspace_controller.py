@@ -46,6 +46,7 @@ from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
+from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
@@ -53,6 +54,7 @@ from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.utils import get_sort_expression
 from tracim_backend.views import BASE_API
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
@@ -62,6 +64,7 @@ from tracim_backend.views.core_api.schemas import ContentMoveSchema
 from tracim_backend.views.core_api.schemas import ContentPathInfoSchema
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import PaginatedContentDigestSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
@@ -470,10 +473,10 @@ class WorkspaceController(Controller):
     @check_right(is_reader)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(FilterContentQuerySchema())
-    @hapic.output_body(ContentDigestSchema(many=True))
+    @hapic.output_body(PaginatedContentDigestSchema())
     def workspace_content(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[ContentInContext]:
+    ) -> PaginatedObject:
         """
         return a list of contents of the space.
         This is NOT the full content list: by default, returned contents are the ones at root level.
@@ -491,16 +494,21 @@ class WorkspaceController(Controller):
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
         )
-        contents = api.get_all(
+        paged_contents = api.get_all(
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
             workspace=request.current_workspace,
             content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,
-            order_by_properties=[Content.label],
+            order_by_properties=[
+                get_sort_expression(content_filter.sort, Content, {"modified": "updated"}),
+                Content.content_id,
+            ],
+            count=content_filter.count,
+            page_token=content_filter.page_token,
         )
-        contents = [api.get_content_in_context(content) for content in contents]
-        return contents
+        contents = [api.get_content_in_context(content) for content in paged_contents]
+        return PaginatedObject(paged_contents, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -540,6 +548,7 @@ class WorkspaceController(Controller):
             content_type_slug=creation_data.content_type,
             workspace=request.current_workspace,
             parent=parent,
+            content_namespace=creation_data.content_namespace,
         )
         api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)

@@ -289,11 +289,12 @@ export class WorkspaceContent extends React.Component {
 
     switch (fetchContentList.status) {
       case 200: {
+        const contentList = fetchContentList.json.items
         const folderToOpen = [
           ...folderIdInUrl,
-          ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
+          ...contentList.filter(c => c.parent_id !== null).map(c => c.parent_id)
         ]
-        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen, parseInt(workspaceId)))
+        props.dispatch(setWorkspaceContentList(contentList, folderToOpen, parseInt(workspaceId)))
         break
       }
       case 400:
@@ -473,7 +474,7 @@ export class WorkspaceContent extends React.Component {
       : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
 
     if (fetchContentList.status === 200) {
-      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json))
+      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json.items))
     }
   }
 
@@ -579,7 +580,7 @@ export class WorkspaceContent extends React.Component {
 
     switch (response.status) {
       case 200: {
-        const publicSharedContentList = response.json.map(file => file.parent_id === null
+        const publicSharedContentList = response.json.items.map(file => file.parent_id === null
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )

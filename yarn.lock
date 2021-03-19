@@ -1362,21 +1362,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.12.5":
+  version: 7.13.10
+  resolution: "@babel/runtime@npm:7.13.10"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 22014226b96a8c8e8d4e8bcdb011f317d1b32881aef424a669dc6ceaee14993d3609172967853cbf9c25c724c25145d45885b6c9df56ba241c12820776607f1f
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.10.2
   resolution: "@babel/runtime@npm:7.10.2"
   dependencies:
     regenerator-runtime: ^0.13.4
   checksum: 0f3466d63518eca76e58ee523a21d9181949e10eb6d51d4e84d42702da5fae06f90f5e1e0a8e51420feb432ee73d7b6aae4a03d2210ac5c8aeaba3d2de7f2bf9
-  languageName: node
-  linkType: hard
-
-"@babel/runtime@npm:^7.12.5":
-  version: 7.13.10
-  resolution: "@babel/runtime@npm:7.13.10"
-  dependencies:
-    regenerator-runtime: ^0.13.4
-  checksum: 22014226b96a8c8e8d4e8bcdb011f317d1b32881aef424a669dc6ceaee14993d3609172967853cbf9c25c724c25145d45885b6c9df56ba241c12820776607f1f
   languageName: node
   linkType: hard
 
@@ -4816,6 +4816,18 @@ __metadata:
     minimalistic-assert: ^1.0.0
     minimalistic-crypto-utils: ^1.0.0
   checksum: 84df133c94a0985c359a5f0a45a27f8208b5dcbc486e5557480fcbf6d50041e3bccb0de7ab4b021f313755bf8657a79f53ff67c555203eecb6d81bfc10292825
+  languageName: node
+  linkType: hard
+
+"emoji-mart@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "emoji-mart@npm:3.0.1"
+  dependencies:
+    "@babel/runtime": ^7.0.0
+    prop-types: ^15.6.0
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0-0 || ^16.0.0 || ^17.0.0
+  checksum: 82239f4f25ec728bc6cb3f32949fdde6b6c6364ff5bd2b04785afa81a5c8b8c624ba2b37ed6d0ee31215db231e60cc86adf19f6441f38db98d538b50cca1976b
   languageName: node
   linkType: hard
 
@@ -13954,6 +13966,7 @@ fsevents@^1.2.7:
     core-js: ^3.6.4
     css-loader: ^3.5.1
     date-fns: ^2.19.0
+    emoji-mart: ^3.0.1
     enzyme: ^3.10.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
@@ -14015,6 +14028,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0

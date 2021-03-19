@@ -8,6 +8,7 @@ import FileDropzone from '../component/FileDropzone/FileDropzone.jsx'
 import FileUploadList from '../component/FileDropzone/FileUploadList.jsx'
 import {
   computeProgressionPercentage,
+  sendGlobalFlashMessage,
   FILE_PREVIEW_STATE
 } from '../helper.js'
 import {
@@ -16,9 +17,6 @@ import {
   isFileUploadInList,
   isFileUploadInErrorState
 } from '../fileUpload.js'
-import {
-  CUSTOM_EVENT
-} from '../customEvent.js'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
 
 const MAX_PREVIEW_IMAGE_SIZE = 20 * 1024 * 1024 // 20 MBytes
@@ -40,7 +38,7 @@ class PopupUploadFile extends React.Component {
     if (!droppedFileList || droppedFileList.length === 0) return
 
     if (!props.multipleFiles && state.fileUploadList.length > 0) {
-      this.sendGlobalFlashMessage(props.t('Only one file is allowed'))
+      sendGlobalFlashMessage(props.t('Only one file is allowed'))
       return
     }
 
@@ -51,7 +49,7 @@ class PopupUploadFile extends React.Component {
       const alreadyPresentFilenameList = droppedFileUploadList
         .filter((fileUpload) => isFileUploadInList(fileUpload, state.fileUploadList))
         .map(fileUpload => fileUpload.file.name)
-      this.sendGlobalFlashMessage(
+      sendGlobalFlashMessage(
         <div>
           {props.t('Files already added:')}<br />
           <ul>{alreadyPresentFilenameList.map(filename => <li key={filename}>{filename}</li>)}</ul>
@@ -112,7 +110,7 @@ class PopupUploadFile extends React.Component {
       this.setState({
         fileUploadList: failedFileUploadList
       })
-      this.sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
+      sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
       props.onFailure(failedFileUploadList)
     } else props.onSuccess(successfulFileUploadList)
     this.setState({ uploadStarted: false })
@@ -128,7 +126,7 @@ class PopupUploadFile extends React.Component {
   handleClose = () => {
     const { props, state } = this
     if (state.uploadStarted) {
-      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
       return
     }
     props.onClose()
@@ -165,15 +163,6 @@ class PopupUploadFile extends React.Component {
       this.setState({ fileUploadPreview: FILE_PREVIEW_STATE.NO_FILE })
     }
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   render () {
     const { props, state } = this

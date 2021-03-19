@@ -33,7 +33,7 @@ class TracimAuthenticationPolicy(ABC):
     Abstract class with some helper for Pyramid TracimAuthentificationPolicy
     """
 
-    def _get_user_api(self, request: Request) -> UserApi:
+    def _get_user_api(self, request: Request) -> "UserApi":
         app_config = request.registry.settings["CFG"]  # type: CFG
         return UserApi(None, session=request.dbsession, config=app_config)
 

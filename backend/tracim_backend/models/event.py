@@ -18,6 +18,9 @@ from sqlalchemy.types import String
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
+
+ANY_OPERATION_SYMBOL = "*"
 
 
 class OperationType(enum.Enum):
@@ -41,6 +44,7 @@ class EntityType(enum.Enum):
     WORKSPACE_SUBSCRIPTION = "workspace_subscription"
     CONTENT = "content"
     MENTION = "mention"
+    REACTION = "reaction"
 
     def __str__(self) -> str:
         return self.value
@@ -52,7 +56,10 @@ class EntityType(enum.Enum):
 
 class EventTypeDatabaseParameters:
     def __init__(
-        self, entity: EntityType, operation: OperationType, subtype: typing.Optional[str]
+        self,
+        entity: EntityType,
+        operation: typing.Optional[OperationType],
+        subtype: typing.Optional[str],
     ) -> None:
         self.entity = entity
         self.operation = operation
@@ -65,9 +72,11 @@ class EventTypeDatabaseParameters:
         database
         """
         event_type_data = event_type.split(".")
-        if not len(event_type_data) in [2, 3]:
-            raise ValidationError("event_type should have 2 to 3 part")
-        if len(event_type_data) == 2:
+        if len(event_type_data) > 3:
+            raise ValidationError("event_type should have 1, 2 to 3 part")
+        if len(event_type_data) < 2:
+            event_type_data.append(None)
+        if len(event_type_data) < 3:
             event_type_data.append(None)
         entity_str = event_type_data[0]
         operation_str = event_type_data[1]
@@ -80,12 +89,14 @@ class EventTypeDatabaseParameters:
                 'entity "{}" is not a valid entity type'.format(entity_str)
             ) from e
 
-        try:
-            operation = OperationType(operation_str)
-        except ValueError as e:
-            raise ValidationError(
-                'operation "{}" is not a valid operation type'.format(operation_str)
-            ) from e
+        operation = None
+        if operation_str and operation_str != ANY_OPERATION_SYMBOL:
+            try:
+                operation = OperationType(operation_str)
+            except ValueError as e:
+                raise ValidationError(
+                    'operation "{}" is not a valid operation type'.format(operation_str)
+                ) from e
 
         return EventTypeDatabaseParameters(entity, operation, subtype)
 
@@ -103,7 +114,7 @@ class ReadStatus(enum.Enum):
         return [e.value for e in cls]
 
 
-class Event(DeclarativeBase):
+class Event(CreationDateMixin, DeclarativeBase):
     """
     Event definition.
     """
@@ -115,6 +126,7 @@ class Event(DeclarativeBase):
     CONTENT_FIELD = "content"
     MEMBER_FIELD = "member"
     SUBSCRIPTION_FIELD = "subscription"
+    REACTION_FIELD = "reaction"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
@@ -123,7 +135,6 @@ class Event(DeclarativeBase):
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
     entity_subtype = Column(String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
-    created = Column(DateTime, nullable=False, default=datetime.utcnow)
     fields = Column(JSON, nullable=False)
 
     # easier access to values stored in fields
@@ -134,6 +145,7 @@ class Event(DeclarativeBase):
     member = index_property("fields", MEMBER_FIELD)
     subscription = index_property("fields", SUBSCRIPTION_FIELD)
     client_token = index_property("fields", CLIENT_TOKEN_FIELD)
+    reaction = index_property("fields", REACTION_FIELD)
 
     @property
     def event_type(self) -> str:

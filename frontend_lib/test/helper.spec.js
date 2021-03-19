@@ -81,7 +81,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         handleFetchResult(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })
@@ -97,7 +97,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         handleFetchResult(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })
@@ -115,7 +115,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         generateFetchResponse(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })

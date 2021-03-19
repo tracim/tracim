@@ -20,7 +20,6 @@ class ContentHTMLDocumentApp(TracimApplication):
             creation_label="Write a note",
             available_statuses=content_status_list.get_all(),
             slug_aliases=["page"],
-            allow_sub_content=False,
             file_extension=".document.html",
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=self,

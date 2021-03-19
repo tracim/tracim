@@ -1,4 +1,3 @@
-from datetime import datetime
 import enum
 from hashlib import sha256
 import os
@@ -18,6 +17,7 @@ from sqlalchemy.orm import synonym
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
 
 
 class ContentShareType(enum.Enum):
@@ -25,7 +25,7 @@ class ContentShareType(enum.Enum):
     PUBLIC_LINK = "public-link"
 
 
-class ContentShare(DeclarativeBase):
+class ContentShare(CreationDateMixin, DeclarativeBase):
 
     MIN_PASSWORD_LENGTH = 6
     MAX_PASSWORD_LENGTH = 512
@@ -54,7 +54,6 @@ class ContentShare(DeclarativeBase):
         default=True,
         server_default=sqlalchemy.sql.expression.literal(True),
     )
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     disabled = Column(DateTime, unique=False, nullable=True, default=None)
     author = relationship("User", remote_side=[User.user_id])
 

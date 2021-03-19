@@ -7,7 +7,6 @@ import {
   addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
-  ArchiveDeleteContent,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   CUSTOM_EVENT,
@@ -24,7 +23,7 @@ import {
   PopinFixedRightPart,
   RefreshWarningMessage,
   ROLE,
-  SelectStatus,
+  AppContentRightMenu,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -872,28 +871,18 @@ export class HtmlDocument extends React.Component {
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
-
             </div>
-
-            <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              appMode={state.mode}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onChangeStatus={this.handleChangeStatus}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
@@ -976,6 +965,7 @@ export class HtmlDocument extends React.Component {
                   onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
                   showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                   invalidMentionList={state.invalidMentionList}
+                  workspaceId={state.content.workspace_id}
                   onClickTranslateComment={comment => props.handleTranslateComment(
                     comment,
                     state.content.workspace_id,
