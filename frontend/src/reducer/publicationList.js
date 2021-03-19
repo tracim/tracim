@@ -39,7 +39,10 @@ export default function publicationList (state = defaultPublicationList, action)
 
     case `${UPDATE}/${PUBLICATION}`:
       return uniqByContentId(state.map(publication => action.publication.content_id === publication.id
-        ? serialize(action.publication, serializeContentProps)
+        ? {
+          ...serialize(action.publication, serializeContentProps),
+          commentList: publication.commentList
+        }
         : publication
       ))
 

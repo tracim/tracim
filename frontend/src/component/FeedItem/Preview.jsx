@@ -91,7 +91,8 @@ class Preview extends React.Component {
     }
 
     this.setState({
-      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode)
+      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode),
+      previewUnavailable: htmlCode === null
     })
   }
 
@@ -164,15 +165,18 @@ class Preview extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.content === this.props.content) {
+    const { props } = this
+    if (prevProps.content === props.content) {
       this.testPreviewOverflow()
-    } else if (prevProps.content.currentRevisionId !== this.props.content.currentRevisionId) {
+    } else if (prevProps.content.commentList !== props.content.commentList ||
+      prevProps.content.currentRevisionId !== props.content.currentRevisionId) {
       this.updatePreview()
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
+      nextProps.content.commentList !== this.props.content.commentList ||
       nextProps.content.currentRevisionId !== this.props.content.currentRevisionId ||
       Object.entries(nextState).some(([key, val]) => val !== this.state[key])
     )
@@ -214,7 +218,7 @@ class Preview extends React.Component {
       const { props } = this
 
       return this.noPreviewComponent(
-        props.content.content_type === CONTENT_TYPE.THREAD
+        props.content.type === CONTENT_TYPE.THREAD
           ? props.t('Empty thread')
           : props.t('Empty note')
       )

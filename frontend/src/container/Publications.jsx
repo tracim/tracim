@@ -55,7 +55,7 @@ import {
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
-import { FeedItemWithPreview } from './FeedItemWithPreview.jsx'
+import FeedItemWithPreview from './FeedItemWithPreview.jsx'
 
 export class Publications extends React.Component {
   constructor (props) {
@@ -141,17 +141,34 @@ export class Publications extends React.Component {
     const lastPublicationId = props.publicationList[props.publicationList.length - 1]
       ? props.publicationList[props.publicationList.length - 1].id
       : undefined
-    const publicationId = data.fields.content.parent_id
+    const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
 
-    if (!props.publicationList.find(publication => publication.id === publicationId)) return
+    // INFO - G.B. - 2021-03-19 - First check if the comment was made in a publication, then check if
+    // this publication doesn't have a loaded comment list, if there is the case we load the whole list
+    // with this comment included, so we does not need to continue the function
+    if (!parentPublication) return
 
-    props.dispatch(appendCommentToPublication(data.fields.content))
+    if (!parentPublication.commentList) {
+      this.getCommentList({ content_id: parentPublication.id })
+      return
+    }
+
+    const newComment = {
+      ...data.fields.content,
+      timelineType: data.fields.content.content_type,
+      created_raw: data.fields.content.created,
+      created: displayDistanceDate(data.fields.content.created, props.user.lang),
+      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, props.user.username),
+      translatedRawContent: null,
+      translationState: TRANSLATION_STATE.DISABLED
+    }
+    props.dispatch(appendCommentToPublication(newComment))
     props.dispatch(updatePublication({
-      ...props.publicationList.find(publication => publication.id === publicationId),
+      ...parentPublication,
       modified: data.fields.content.created
     }))
 
-    if (publicationId !== lastPublicationId) this.setState({ showReorderButton: true })
+    if (parentPublication.id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleContentModified = (data) => {
@@ -259,7 +276,8 @@ export class Publications extends React.Component {
           translatedRawContent: null,
           translationState: TRANSLATION_STATE.DISABLED
         }))
-        props.dispatch(addCommentListToPublication(publication.content_id, commentList))
+        // INFO - G.B. - 2021-03-19 - We remove the first element because it's already showed in the preview
+        props.dispatch(addCommentListToPublication(publication.content_id, commentList.slice(1)))
         break
       }
       default: props.dispatch(newFlashMessage(`${props.t('Error')}`, 'warning')); break
@@ -345,7 +363,6 @@ export class Publications extends React.Component {
         <ScrollToBottomWrapper
           itemList={props.publicationList}
           customClass='pageContentGeneric'
-          // isLastItemFromCurrentToken: PropTypes.bool,
           shouldScrollToBottom
         >
           {props.publicationList.map(publication =>
@@ -354,10 +371,12 @@ export class Publications extends React.Component {
               content={publication}
               customColor={publicationColor}
               key={`publication_${publication.id}`}
+              memberList={props.currentWorkspace.memberList}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
               showTimeline
               user={{
                 userId: props.user.userId,
+                username: props.user.username,
                 name: props.user.publicName,
                 userRoleIdInWorkspace: userRoleIdInWorkspace
               }}
@@ -375,7 +394,7 @@ export class Publications extends React.Component {
             />
           )}
 
-          {state.showInvalidMentionPopup && (
+          {state.showInvalidMentionPopupInComment && (
             <ConfirmPopup
               onConfirm={this.handleCancelSave}
               onClose={this.handleCancelSave}

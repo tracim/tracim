@@ -5,10 +5,10 @@ import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview from '../component/FeedItem/Preview.jsx'
 import { FETCH_CONFIG } from '../util/helper.js'
-import { newFlashMessage } from '../action-creator.sync.js'
 import {
-  // CUSTOM_EVENT,
-  postNewComment,
+  appContentFactory,
+  CUSTOM_EVENT,
+  handleInvalidMentionInComment,
   Timeline,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -16,12 +16,16 @@ import {
 export class FeedItemWithPreview extends React.Component {
   constructor (props) {
     super(props)
-    // props.registerCustomEventHandlerList([
-    //   { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
-    // ]) why
+    props.setApiUrl(FETCH_CONFIG.apiUrl)
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
 
     this.state = {
+      invalidMentionList: [],
       newComment: '',
+      showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false
     }
   }
@@ -57,31 +61,49 @@ export class FeedItemWithPreview extends React.Component {
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
-  handleChangeNewComment = (e) => this.setState({ newComment: e.target.value })
+  handleChangeNewComment = e => {
+    const { props } = this
+    props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
+  }
 
-  handleClickSend = async () => {
+  handleClickSend = () => {
     const { props, state } = this
 
-    const fetchPostNewComment = await postNewComment(
-      FETCH_CONFIG.apiUrl,
-      props.workspaceId,
-      props.content.id,
-      state.newComment
-    )
-    switch (fetchPostNewComment.status) {
-      case 200:
-        this.setState({ newComment: '' })
-        break
-      case 400:
-        props.dispatch(newFlashMessage(fetchPostNewComment.body.code === 2044
-          ? `${props.t('You must change the status or restore this content to comment')}`
-          : `${props.t('Error while saving new comment')}`
-        , 'warning'))
-        break
-      default:
-        props.dispatch(newFlashMessage(`${props.t('Error while saving new comment')}`, 'warning'))
-        break
+    if (!handleInvalidMentionInComment(
+      props.memberList,
+      state.timelineWysiwyg,
+      state.newComment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnyway()
     }
+  }
+
+  handleClickValidateAnyway = async () => {
+    const { props, state } = this
+    try {
+      props.appContentSaveNewComment(
+        {
+          ...props.content,
+          content_id: props.content.id,
+          workspace_id: props.content.workspaceId
+        },
+        state.timelineWysiwyg,
+        state.newComment,
+        this.setState.bind(this),
+        props.content.slug,
+        props.user.username,
+        props.content.id
+      )
+    } catch (e) {
+      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+    }
+  }
+
+  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
+
+  searchForMentionInQuery = async (query) => {
+    return await this.props.searchForMentionInQuery(query, this.props.workspaceId)
   }
 
   render () {
@@ -116,6 +138,7 @@ export class FeedItemWithPreview extends React.Component {
             customClass='feedItem__timeline'
             customColor={props.customColor}
             id={props.content.id}
+            invalidMentionList={state.invalidMentionList}
             loggedUser={props.user}
             newComment={state.newComment}
             onChangeNewComment={this.handleChangeNewComment}
@@ -123,24 +146,20 @@ export class FeedItemWithPreview extends React.Component {
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onInitWysiwyg={this.handleInitWysiwyg}
             shouldScrollToBottom={false}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             showTitle={false}
             timelineData={props.commentList}
             wysiwyg={state.timelineWysiwyg}
-          // invalidMentionList: PropTypes.array,
-          // rightPartOpen: PropTypes.bool,
-          // onClickCancelSave: PropTypes.func,
-          // onClickSaveAnyway: PropTypes.func,
-          // searchForMentionInQuery: PropTypes.func,
-          // showInvalidMentionPopup: PropTypes.bool,
-          // onClickTranslateComment: PropTypes.func,
-          // onClickRestoreComment: PropTypes.func translation
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleClickValidateAnyway}
+            searchForMentionInQuery={this.searchForMentionInQuery}
           />
         )}
       </div>
     )
   }
 }
-export default translate()(TracimComponent(FeedItemWithPreview))
+export default translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
@@ -154,10 +173,12 @@ FeedItemWithPreview.propTypes = {
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
+  memberList: PropTypes.array,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   reactionList: PropTypes.array,
-  showTimeline: PropTypes.bool
+  showTimeline: PropTypes.bool,
+  user: PropTypes.object
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -169,7 +190,9 @@ FeedItemWithPreview.defaultProps = {
   lastModificationSubEntityType: '',
   lastModificationType: '',
   lastModifier: {},
+  memberList: [],
   modifiedDate: '',
   reactionList: [],
-  showTimeline: false
+  showTimeline: false,
+  user: {}
 }
