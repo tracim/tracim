@@ -61,6 +61,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     contentPath: contentPath
   }
 }
+
 const getActivityParams = (message) => {
   const [entityType, , subEntityType] = message.event_type.split('.')
   switch (entityType) {
