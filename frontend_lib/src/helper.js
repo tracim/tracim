@@ -62,7 +62,8 @@ export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
     apiResponse: fetchResult,
-    body: resultJson
+    body: resultJson,
+    ok: fetchResult.ok
   }))
 }
 
@@ -670,6 +671,25 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const humanAndList = (list) => {
+  // INFO - RJ - 2021-17-03
+  // This function return a localized string that looks like:
+  //  - 'elem1' (one element in list)
+  //  - 'elem1 and elem2' (two elements)
+  //  - 'elem1, elem2 and elem3' (three elements and more)
+  //  - 'elem1, elem2, elem3 and elem4'
+
+  switch (list.length) {
+    case 0: return ''
+    case 1: return list[0]
+    default: {
+      const allButLast = list.slice(0, list.length - 1).join(', ')
+      const last = list[list.length - 1]
+      return `${allButLast} ${i18n.t('and')} ${last}`
+    }
+  }
+}
+
 export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
   // RJ - 2020-11-05 - INFO
   //
@@ -722,6 +742,15 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
       throw new Error('Error getting breadcrumbs data')
   }
 }
+
+export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+  type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  data: {
+    msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
+    type: type || 'warning',
+    delay: delay
+  }
+})
 
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 

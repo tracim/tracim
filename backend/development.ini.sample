@@ -439,7 +439,9 @@ website.base_url = %(basic_setup.website_base_url)s
 # EVENT_TYPE   = created | modified | deleted | undeleted
 # CONTENT_TYPE = html-document | file | thread | folder | comment
 # To include all notifications, use web.notifications.excluded = ""
-; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified
+# To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
+# will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
+; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*
 
 ####
 # JOB EXECUTION

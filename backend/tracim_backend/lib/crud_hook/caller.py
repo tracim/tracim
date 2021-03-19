@@ -7,6 +7,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
 
@@ -42,6 +43,8 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_subscription_created(
                     subscription=obj, context=session.context
                 )
+            elif isinstance(obj, Reaction):
+                self._plugin_manager.hook.on_reaction_created(reaction=obj, context=session.context)
 
         for obj in session.dirty:
             # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be
@@ -67,6 +70,10 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_subscription_modified(
                     subscription=obj, context=session.context
                 )
+            elif isinstance(obj, Reaction):
+                self._plugin_manager.hook.on_reaction_modified(
+                    reaction=obj, context=session.context
+                )
 
         for obj in session.deleted:
             if isinstance(obj, User):
@@ -85,3 +92,5 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_subscription_deleted(
                     subscription=obj, context=session.context
                 )
+            elif isinstance(obj, Reaction):
+                self._plugin_manager.hook.on_reaction_deleted(reaction=obj, context=session.context)

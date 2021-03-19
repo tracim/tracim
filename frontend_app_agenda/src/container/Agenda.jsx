@@ -6,6 +6,7 @@ import {
   handleFetchResult,
   getWorkspaceDetail,
   getWorkspaceMemberList,
+  sendGlobalFlashMessage,
   PageContent,
   PageTitle,
   PageWrapper,
@@ -173,10 +174,10 @@ export class Agenda extends React.Component {
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
-          default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
+          default: sendGlobalFlashMessage(props.t('Error while loading space list'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading space list'))
+      default: sendGlobalFlashMessage(props.t('Error while loading space list'))
     }
   }
 
@@ -195,7 +196,7 @@ export class Agenda extends React.Component {
     )
 
     const fetchResultSuccess = fetchResultList.filter(result => result.apiResponse.status === 200)
-    if (fetchResultSuccess.length < fetchResultList.length) this.sendGlobalFlashMessage(props.t('Some agenda could not be loaded'))
+    if (fetchResultSuccess.length < fetchResultList.length) sendGlobalFlashMessage(props.t('Some agenda could not be loaded'))
 
     const workspaceListMemberList = fetchResultSuccess.map(result => ({
       workspaceId: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member

@@ -62,6 +62,8 @@ from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
 from tracim_backend.models.context_models import RadicaleUserSubitemsPath
 from tracim_backend.models.context_models import RadicaleWorkspaceSubitemsPath
+from tracim_backend.models.context_models import ReactionCreation
+from tracim_backend.models.context_models import ReactionPath
 from tracim_backend.models.context_models import ResetPasswordCheckToken
 from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
@@ -802,6 +804,19 @@ class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndUserPath(**data)
+
+
+class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
+    reaction_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid reaction related to content content_id",
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ReactionPath(**data)
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
@@ -1632,6 +1647,16 @@ class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
     )
 
 
+class ReactionSchema(marshmallow.Schema):
+    reaction_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    author = marshmallow.fields.Nested(UserDigestSchema)
+    value = StrippedString(example="😀")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="reaction creation date"
+    )
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1656,6 +1681,14 @@ class SetCommentSchema(marshmallow.Schema):
     @post_load()
     def create_comment(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentCreation(**data)
+
+
+class SetReactionSchema(marshmallow.Schema):
+    value = StrippedString(example="😀", validate=not_empty_string_validator, required=True,)
+
+    @post_load()
+    def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ReactionCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):

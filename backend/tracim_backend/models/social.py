@@ -17,6 +17,7 @@ class UserFollower(DeclarativeBase):
     follower = relationship("User", remote_side=[User.user_id], foreign_keys=[follower_id])
     leader_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
     leader = relationship("User", remote_side=[User.user_id], foreign_keys=[leader_id])
+    # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created_date = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):

@@ -7,6 +7,7 @@ import {
   convertBackslashNToBr,
   displayDistanceDate,
   sortTimelineByDate,
+  sendGlobalFlashMessage,
   TIMELINE_TYPE
 } from './helper.js'
 
@@ -56,15 +57,6 @@ export function appContentFactory (WrappedComponent) {
     }
 
     setApiUrl = url => { this.apiUrl = url }
-
-    sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.ADD_FLASH_MSG,
-      data: {
-        msg: msg,
-        type: type || 'warning',
-        delay: delay || undefined
-      }
-    })
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
     appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
@@ -148,11 +140,11 @@ export function appContentFactory (WrappedComponent) {
           case 400:
             switch (response.body.code) {
               case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-              case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-              default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
+              case 3002: sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
+              default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
             }
             break
-          default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
+          default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
       return response
@@ -207,20 +199,20 @@ export function appContentFactory (WrappedComponent) {
         case 400:
           switch (response.body.code) {
             case 2067:
-              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
               break
             case 2003:
-              this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
+              sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
-              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
               break
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
+              sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response
@@ -236,7 +228,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       if (response.status !== 204) {
-        this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
+        sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
       }
 
       return response
@@ -386,7 +378,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
         case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: this.sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+        default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
       }
       return mentionList
     }
@@ -425,7 +417,7 @@ export function appContentFactory (WrappedComponent) {
       )
       const errorMessage = getTranslationApiErrorMessage(response)
       if (errorMessage) {
-        this.sendGlobalFlashMessage(errorMessage, 'warning')
+        sendGlobalFlashMessage(errorMessage, 'warning')
         setState(previousState => {
           return {
             timeline: this.replaceComment(

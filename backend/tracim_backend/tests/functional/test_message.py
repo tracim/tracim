@@ -11,12 +11,16 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 def create_events_and_messages(
-    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+    session,
+    unread: bool = False,
+    sent_date: typing.Optional[datetime.datetime] = None,
+    remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
-        session.query(tracim_event.Message).delete()
+        if remove_existing_events:
+            session.query(tracim_event.Message).delete()
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
@@ -54,12 +58,16 @@ def create_events_and_messages(
 
 
 def create_workspace_messages(
-    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+    session,
+    unread: bool = False,
+    sent_date: typing.Optional[datetime.datetime] = None,
+    remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
-        session.query(tracim_event.Message).delete()
+        if remove_existing_events:
+            session.query(tracim_event.Message).delete()
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.WORKSPACE,
             operation=tracim_event.OperationType.CREATED,
@@ -97,12 +105,16 @@ def create_workspace_messages(
 
 
 def create_content_messages(
-    session, unread: bool = False, sent_date: typing.Optional[datetime.datetime] = None
+    session,
+    unread: bool = False,
+    sent_date: typing.Optional[datetime.datetime] = None,
+    remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
-        session.query(tracim_event.Message).delete()
+        if remove_existing_events:
+            session.query(tracim_event.Message).delete()
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
@@ -274,6 +286,102 @@ class TestMessages(object):
                 "read": message.read.strftime(DATETIME_FORMAT) if message.read else None,
             } == message_dict
 
+    @pytest.mark.parametrize(
+        "include_event_types, exclude_event_types, valid_event_types",
+        [
+            pytest.param(
+                (),
+                (),
+                (
+                    "user.modified",
+                    "user.created",
+                    "workspace.created",
+                    "workspace_member.modified",
+                    "content.created",
+                ),
+                id="get all events type created",
+            ),
+            pytest.param(
+                ("user.*",), (), ("user.modified", "user.created"), id="include only user type",
+            ),
+            pytest.param(
+                ("user",), (), ("user.modified", "user.created"), id="include only user type bis",
+            ),
+            pytest.param(
+                ("user.modified", "user.created"),
+                (),
+                ("user.modified", "user.created"),
+                id="include only user type, explicit",
+            ),
+            pytest.param(
+                ("user.*",),
+                ("user.modified",),
+                ("user.created",),
+                id="include only user type but excluded modified event",
+            ),
+            pytest.param(
+                ("user.*", "workspace.*", "content.created"),
+                ("user.modified", "workspace.modified"),
+                ("content.created", "user.created", "content.created", "workspace.created"),
+                id="include and exclude complex case",
+            ),
+            pytest.param(
+                (),
+                ("user.*",),
+                ("workspace.created", "workspace_member.modified", "content.created"),
+                id="exclude wildcard user",
+            ),
+            pytest.param(
+                (),
+                ("user.created",),
+                (
+                    "workspace.created",
+                    "workspace_member.modified",
+                    "content.created",
+                    "user.modified",
+                ),
+                id="exclude simple case",
+            ),
+        ],
+    )
+    def test_api__get_messages__ok_200__include_exclude_event_type_filters(
+        self,
+        session,
+        web_testapp,
+        include_event_types: typing.List[str],
+        exclude_event_types: typing.List[str],
+        valid_event_types: typing.List[str],
+    ) -> None:
+        """
+        Get messages through the classic HTTP endpoint. Filter by event_type
+        """
+        messages = create_events_and_messages(
+            session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
+        )
+        messages.extend(
+            create_content_messages(
+                session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
+            )
+        )
+        messages.extend(
+            create_workspace_messages(
+                session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
+            )
+        )
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        include_events_type_str = ",".join(include_event_types)
+        exclude_events_type_str = ",".join(exclude_event_types)
+        result = web_testapp.get(
+            "/api/users/1/messages?include_event_types={}&exclude_event_types={}".format(
+                include_events_type_str, exclude_events_type_str
+            ),
+            status=200,
+        ).json_body
+        message_dicts = result.get("items")
+        for message_dict in message_dicts:
+            assert message_dict["event_type"] in valid_event_types
+
     @pytest.mark.parametrize("workspace_ids", [[], [1, 2], [1], [2]])
     def test_api__get_messages__ok_200__workspace_filter(
         self, session, web_testapp, workspace_ids
@@ -341,7 +449,7 @@ class TestMessages(object):
 
     @pytest.mark.parametrize(
         "event_type",
-        ["user", "user.modified.subtype.subsubtype", "user.donothing", "nothing.deleted"],
+        ["something", "user.modified.subtype.subsubtype", "user.donothing", "nothing.deleted"],
     )
     def test_api__get_messages__err_400__invalid_event_type_filter(
         self, session, web_testapp, event_type: str

@@ -426,6 +426,17 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
+class ReactionPath(object):
+    """
+    Paths params with workspace id and content_id and reaction_id model
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, reaction_id: int) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.reaction_id = reaction_id
+
+
 class CommentPathFilename(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -646,6 +657,15 @@ class CommentCreation(object):
 
     def __init__(self, raw_content: str) -> None:
         self.raw_content = raw_content
+
+
+class ReactionCreation(object):
+    """
+    reaction creation model
+    """
+
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 
 class SetContentStatus(object):

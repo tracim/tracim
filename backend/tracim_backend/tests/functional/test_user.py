@@ -3346,6 +3346,28 @@ class TestUserEndpoint(object):
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.fields["author"] == UserDigestSchema().dump(author).data
 
+    @pytest.mark.parametrize("public_name_value", ("🐻‍❄👨‍👨‍👧‍👧️ Emoji Lover",))
+    def test_api__create_user__ok_200__with_emoji_as_public_name(
+        self, web_testapp, user_api_factory, event_helper, public_name_value
+    ):
+        """
+        Non-regression test for emoji char in users table. Emoji use to not work
+        in user table for mysql/mariadb due to specific hack.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": public_name_value,
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        res = res.json_body
+        assert res["public_name"] == public_name_value
+
     @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
     def test_api__create_user__with_only_username(
         self, web_testapp, user_api_factory, email_required, status
