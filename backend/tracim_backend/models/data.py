@@ -382,26 +382,13 @@ class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if item.type == content_type_list.Event.slug:
-            if "name" not in properties.keys():
-                return False
-            if "raw" not in properties.keys():
-                return False
-            if "start" not in properties.keys():
-                return False
-            if "end" not in properties.keys():
-                return False
-            return True
-        else:
-            if "allowed_content" in properties.keys():
-                for content_slug, value in properties["allowed_content"].items():
-                    if not isinstance(value, bool):
-                        return False
-                    if content_slug not in content_type_list.endpoint_allowed_types_slug():
-                        return False
-            if "origin" in properties.keys():
-                pass
-            return True
+        if "allowed_content" in properties.keys():
+            for content_slug, value in properties["allowed_content"].items():
+                if not isinstance(value, bool):
+                    return False
+                if content_slug not in content_type_list.endpoint_allowed_types_slug():
+                    return False
+        return True
 
 
 class ContentNamespaces(str, enum.Enum):
@@ -1172,11 +1159,10 @@ class Content(DeclarativeBase):
             properties = {}
         else:
             properties = json.loads(self._properties)
-        if content_type_list.get_one_by_slug(self.type) != content_type_list.Event:
-            if "allowed_content" not in properties:
-                properties[
-                    "allowed_content"
-                ] = content_type_list.default_allowed_content_properties(self.type)
+        if "allowed_content" not in properties:
+            properties["allowed_content"] = content_type_list.default_allowed_content_properties(
+                self.type
+            )
         return properties
 
     @properties.setter

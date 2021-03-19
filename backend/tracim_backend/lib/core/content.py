@@ -8,6 +8,8 @@ from depot.io.utils import FileIntent
 from hapic.data import HapicFile
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
+from sqlakeyset import Page
+from sqlakeyset import get_page
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -936,15 +938,17 @@ class ContentApi(object):
 
     def get_all(
         self,
-        parent_ids: typing.List[int] = None,
+        parent_ids: typing.Optional[typing.List[int]] = None,
         content_type: str = content_type_list.Any_SLUG,
-        workspace: Workspace = None,
-        label: str = None,
+        workspace: typing.Optional[Workspace] = None,
+        label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
         ] = None,
-        complete_path_to_id: int = None,
-    ) -> typing.List[Content]:
+        complete_path_to_id: typing.Optional[int] = None,
+        page_token: typing.Optional[str] = None,
+        count: typing.Optional[int] = None,
+    ) -> Page:
         """
         Return all content using some filters
         :param parent_ids: filter by parent_id
@@ -957,9 +961,12 @@ class ContentApi(object):
         QueryableAttribute object)
         :return: List of contents
         """
-        return self.get_all_query(
+        query = self.get_all_query(
             parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id
-        ).all()
+        )
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
