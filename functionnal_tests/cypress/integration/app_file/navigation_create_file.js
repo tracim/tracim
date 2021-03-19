@@ -21,7 +21,7 @@ describe('navigate :: workspace > create_new > file', function () {
     cy.get('.cardPopup__container .createcontent__contentname__title').should('be.visible')
     cy.get('.cardPopup__container .filecontent__form').should('be.visible')
     cy.get('.cardPopup__container .createcontent__form__button').should('be.visible')
-    cy.get('.cardPopup__container .cardPopup__close').should('be.visible').click()
+    cy.get('.cardPopup__container .cardPopup__close button').should('be.visible').click()
     cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
     cy.get('[data-cy=dropdownCreateBtn]')
       .should('be.visible')
@@ -36,7 +36,7 @@ describe('navigate :: workspace > create_new > file', function () {
     cy.get('.cardPopup__container .filecontent__form').should('be.visible')
     cy.get('.cardPopup__container .createcontent__form__button').should('be.visible')
     cy
-      .get('.cardPopup__container .cardPopup__close')
+      .get('.cardPopup__container .cardPopup__close button')
       .should('be.visible')
       .click()
     cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
