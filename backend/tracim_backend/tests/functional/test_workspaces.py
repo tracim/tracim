@@ -3081,7 +3081,13 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["show_in_ui"] is True
         assert content["slug"] == "current-menu"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}
+        assert set(content["sub_content_types"]) == {
+            "comment",
+            "folder",
+            "thread",
+            "file",
+            "html-document",
+        }
         assert content["workspace_id"] == 1
         assert content["modified"]
         assert content["created"]
