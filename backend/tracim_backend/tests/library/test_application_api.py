@@ -52,7 +52,6 @@ class TestApplicationApi(object):
             creation_label="Start a topic",
             available_statuses=content_status_list.get_all(),
             slug_aliases=["page"],
-            allow_sub_content=False,
             file_extension=".thread.html",
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=thread,
@@ -73,7 +72,6 @@ class TestApplicationApi(object):
             label="Rich Markdown File",
             creation_label="Create a Markdown document",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=False,
             file_extension=".md",
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=thread,
@@ -112,7 +110,6 @@ class TestApplicationApi(object):
             label="Folder",
             creation_label="Create a folder",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=True,
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
             app=folder,
         )
