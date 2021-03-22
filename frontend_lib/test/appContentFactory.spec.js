@@ -340,7 +340,9 @@ describe('appContentFactory.js', () => {
 
         const isCommentWysiwyg = true
         mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
-        response = await wrapper.instance().appContentSaveNewComment(fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, 'foo')
+        response = await wrapper.instance().appContentSaveNewComment(
+          fakeContent, isCommentWysiwyg, newComment, [], fakeSetState, appContentSlug, 'foo'
+        )
       })
 
       after(() => {
