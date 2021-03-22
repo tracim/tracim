@@ -255,8 +255,8 @@ export class Publications extends React.Component {
     const fetchGetPublicationList = await props.dispatch(getPublicationList(workspaceId))
     switch (fetchGetPublicationList.status) {
       case 200: {
-        fetchGetPublicationList.json.forEach(publication => this.getCommentList(publication))
-        props.dispatch(setPublicationList(fetchGetPublicationList.json))
+        fetchGetPublicationList.json.items.forEach(publication => this.getCommentList(publication))
+        props.dispatch(setPublicationList(fetchGetPublicationList.json.items))
         break
       }
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning')); break
