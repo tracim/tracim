@@ -109,11 +109,6 @@ for (const pageTestCase of activityPages) {
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
 
-      it('should have a "Comment" button, clicking on it opens the content', () => {
-        cy.get('[data-cy=feedItemFooter__comment]').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
-      })
-
       it('should have a title link, clicking on it opens the content', () => {
         cy.get('[data-cy=feedItemHeader__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
