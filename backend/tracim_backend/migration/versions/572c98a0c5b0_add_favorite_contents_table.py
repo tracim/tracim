@@ -1,7 +1,7 @@
 """add favorite contents table
 
 Revision ID: 572c98a0c5b0
-Revises: bff384e7c14b
+Revises: bf040d1a4922
 Create Date: 2021-03-22 11:11:05.196195
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "572c98a0c5b0"
-down_revision = "bff384e7c14b"
+down_revision = "bf040d1a4922"
 
 
 def upgrade():
