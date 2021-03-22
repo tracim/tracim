@@ -13,22 +13,22 @@ export class FeedItemFooter extends React.Component {
   handleCommentClicked = () => {
     const { props } = this
     props.history.push(PAGE.WORKSPACE.CONTENT(
-      props.content.workspace_id,
-      props.content.content_type,
-      props.content.content_id
+      props.content.workspaceId,
+      props.content.type,
+      props.content.id
     ))
   }
 
   render () {
     const { props } = this
     return (
-      <div>
+      <div className='feedItemFooter'>
         <div className='feedItemFooter__right'>
           <EmojiReactions
             apiUrl={FETCH_CONFIG.apiUrl}
             loggedUserId={props.user.userId}
-            contentId={props.content.content_id}
-            workspaceId={props.content.workspace_id}
+            contentId={props.content.id}
+            workspaceId={props.content.workspaceId}
           />
           <div className='feedItemFooter__comments'>
             {props.commentList.length}

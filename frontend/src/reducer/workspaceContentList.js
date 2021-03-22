@@ -18,8 +18,12 @@ import { CONTENT_NAMESPACE } from '../util/helper'
 
 export const serializeContentProps = {
   content_id: 'id',
+  content_namespace: 'contentNamespace',
+  current_revision_id: 'currentRevisionId',
   label: 'label',
+  modified: 'modified',
   slug: 'slug',
+  raw_content: 'rawContent',
   content_type: 'type',
   filename: 'fileName',
   file_extension: 'fileExtension',

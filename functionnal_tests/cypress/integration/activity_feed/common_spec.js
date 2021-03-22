@@ -120,7 +120,7 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a preview, clicking on it opens the content', () => {
-        cy.get('.recentActivities__preview__image > img').click()
+        cy.get('.feedItem__preview__image > img').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
@@ -151,9 +151,9 @@ for (const pageTestCase of activityPages) {
 
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.recentActivities__preview__overflow').should('not.exist')
+        cy.get('.feedItem__preview__overflow').should('not.exist')
 
-        cy.get('.recentActivities__preview__html')
+        cy.get('.feedItem__preview__html')
           .should('contain.text', smallContent)
       })
 
@@ -182,9 +182,9 @@ for (const pageTestCase of activityPages) {
 
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.recentActivities__preview__overflow').should('be.visible')
+        cy.get('.feedItem__preview__overflow').should('be.visible')
 
-        cy.get('.recentActivities__preview__html')
+        cy.get('.feedItem__preview__html')
           .click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId }))
       })

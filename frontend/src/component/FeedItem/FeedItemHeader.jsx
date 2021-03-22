@@ -40,9 +40,16 @@ export class FeedItemHeader extends React.Component {
 
   render () {
     const { props } = this
-    const contentId = props.content.content_id
+    const contentId = props.content.id
     const contentLabel = props.content.label
-    const contentType = props.content.content_type
+    const contentType = props.content.type
+    const showLastModification = (
+      props.lastModificationType &&
+      props.lastModificationEntityType &&
+      props.lastModificationSubEntityType &&
+      props.content.currentRevisionType &&
+      props.lastModifier
+    )
 
     const app = (
       props.appList.find(a => a.slug === `contents/${contentType}`) ||
@@ -61,27 +68,31 @@ export class FeedItemHeader extends React.Component {
           <Link to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}>
             <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
-          <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
+          {props.breadcrumbsList && (
+            <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
+          )}
         </div>
 
-        <TimedEvent
-          customClass='feedItemHeader__right'
-          operation={this.getDisplayOperation(
-            props.lastModificationType,
-            props.lastModificationEntityType,
-            props.lastModificationSubEntityType,
-            props.content.current_revision_type
-          )}
-          date={props.modifiedDate}
-          lang={props.user.lang}
-          author={{
-            publicName: props.lastModifier.public_name,
-            userId: props.lastModifier.user_id
-          }}
-          eventList={props.eventList}
-          onEventClicked={props.onEventClicked}
-          dataCy='feedItemTimedEvent'
-        />
+        {showLastModification && (
+          <TimedEvent
+            customClass='feedItemHeader__right'
+            operation={this.getDisplayOperation(
+              props.lastModificationType,
+              props.lastModificationEntityType,
+              props.lastModificationSubEntityType,
+              props.content.currentRevisionType
+            )}
+            date={props.modifiedDate}
+            lang={props.user.lang}
+            author={{
+              publicName: props.lastModifier.public_name,
+              userId: props.lastModifier.user_id
+            }}
+            eventList={props.eventList}
+            onEventClicked={props.onEventClicked}
+            dataCy='feedItemTimedEvent'
+          />
+        )}
 
         <DropdownMenu
           buttonCustomClass='feedItemHeader__actionMenu'
@@ -116,15 +127,15 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  lastModificationType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object.isRequired,
-  modifiedDate: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
+  lastModificationType: PropTypes.string,
+  lastModifier: PropTypes.object,
+  modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func
 }
 
@@ -132,5 +143,8 @@ FeedItemHeader.defaultProps = {
   breadcrumbsList: [],
   eventList: [],
   lastModificationEntityType: '',
-  lastModificationSubEntityType: ''
+  lastModificationSubEntityType: '',
+  lastModificationType: '',
+  lastModifier: {},
+  modifiedDate: ''
 }

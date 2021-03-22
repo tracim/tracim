@@ -208,7 +208,7 @@ export function appContentFactory (WrappedComponent) {
       switch (response.apiResponse.status) {
         case 200:
           setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
 
           removeLocalStorageItem(
             appSlug,
