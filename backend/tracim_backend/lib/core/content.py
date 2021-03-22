@@ -67,6 +67,7 @@ from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -1323,6 +1324,7 @@ class ContentApi(object):
         This method does NOT copy some info related to content:
         - reactions on content or children (reaction table)
         - content share link (content_shares table element) on content or children content
+        - user content favorites (favorite_contents table)
 
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
@@ -2100,3 +2102,78 @@ class ContentApi(object):
             return query.one()
         except NoResultFound as exc:
             raise ContentNotFound("User {} did not author any content".format(user_id)) from exc
+
+    def get_all_user_favorites(
+        self,
+        user_id: int,
+        content_type: str = content_type_list.Any_SLUG,
+        order_by_properties: typing.Optional[
+            typing.List[typing.Union[str, QueryableAttribute]]
+        ] = None,
+        page_token: typing.Optional[str] = None,
+        count: typing.Optional[int] = None,
+    ) -> Page:
+        """
+        Return all user favorite content using some filters
+        :param content_type: filter by content_type slug
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: List of contents
+        """
+        query = (
+            self.get_all_query(
+                parent_ids=None, content_type_slug=content_type, workspace=None, label=None,
+            )
+            .join(FavoriteContent, Content.id == FavoriteContent.content_id)
+            .filter(FavoriteContent.user_id == user_id)
+        )
+        for _property in order_by_properties:
+            query = query.order_by(_property)
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
+
+    def get_one_user_favorite_content(self, user_id: int, content_id: int):
+        try:
+            return (
+                self.get_all_query()
+                .join(FavoriteContent, Content.id == FavoriteContent.content_id)
+                .filter(
+                    FavoriteContent.user_id == user_id, FavoriteContent.content_id == content_id
+                )
+                .one()
+            )
+        except NoResultFound:
+            raise ContentNotFound(
+                "Content of id {content_id} was not found as user {user_id} favorite.".format(
+                    content_id=content_id, user_id=user_id
+                )
+            )
+
+    def set_favorite(self, content: Content, do_save: bool = True) -> FavoriteContent:
+        try:
+            # INFO - G.M - 2021-03-22 - If favorite already exist, accept without
+            # recreating the favorite
+            favorite = self.get_one_user_favorite_content(
+                user_id=self._user.user_id, content_id=content.content_id
+            )
+        except ContentNotFound:
+            favorite = FavoriteContent(user=self._user, content=content)
+            self._session.add(favorite)
+            if do_save:
+                self._session.flush()
+        return favorite
+
+    def remove_favorite(self, content: Content, do_save: bool = True) -> None:
+        try:
+            self._session.query(FavoriteContent).filter(
+                FavoriteContent.user_id == self._user.user_id,
+                FavoriteContent.content_id == content.content_id,
+            ).delete()
+            if do_save:
+                self._session.flush()
+        except ContentNotFound:
+            # INFO - G.M - 2021-03-22 - If favorite already exist, accept without
+            # doing nothing
+            pass

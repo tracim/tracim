@@ -14,6 +14,7 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import unprotected_content_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -271,6 +272,7 @@ class TestCleanupLib(object):
             do_save=True,
             do_notify=False,
         )
+        content_api.set_favorite(folder, do_save=True)
         file_id = file_.content_id
         comment = content_api.create_comment(
             workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
@@ -325,6 +327,10 @@ class TestCleanupLib(object):
         with pytest.raises(NoResultFound):
             session.query(UploadPermission).filter(
                 UploadPermission.upload_permission_id == upload_permission_id
+            ).one()
+        with pytest.raises(NoResultFound):
+            session.query(FavoriteContent).filter(
+                FavoriteContent.user_id == admin_user.user_id
             ).one()
 
     def test_unit__delete_revision__ok__delete_last_revision(

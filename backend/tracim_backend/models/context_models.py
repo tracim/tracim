@@ -384,6 +384,16 @@ class WorkspaceAndUserPath(object):
         self.user_id = user_id
 
 
+class ContentAndUserPath(object):
+    """
+    Paths params with content id and user_id
+    """
+
+    def __init__(self, content_id: int, user_id: int) -> None:
+        self.content_id = content_id
+        self.user_id = user_id
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem

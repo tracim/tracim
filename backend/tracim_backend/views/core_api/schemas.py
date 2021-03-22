@@ -44,6 +44,7 @@ from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
+from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -709,6 +710,15 @@ class ContentIdPathSchema(marshmallow.Schema):
     )
 
 
+class ContentIdBodySchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        required=True,
+        description="id of a valid content",
+        validate=strictly_positive_int_validator,
+    )
+
+
 class RevisionIdPathSchema(marshmallow.Schema):
     revision_id = marshmallow.fields.Int(example=6, required=True)
 
@@ -804,6 +814,12 @@ class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndUserPath(**data)
+
+
+class UserContentIdPathSchema(UserIdPathSchema, ContentIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentAndUserPath(**data)
 
 
 class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
