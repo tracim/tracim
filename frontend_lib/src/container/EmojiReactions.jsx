@@ -124,7 +124,7 @@ EmojiReactions.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
-  workspaceId: PropTypes.number.isRequired,
+  workspaceId: PropTypes.number.isRequired
 }
 
 export default translate()(TracimComponent(EmojiReactions))

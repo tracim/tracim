@@ -74,7 +74,7 @@ EmojiReactions.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   reactionList: PropTypes.array.isRequired,
   onRemoveReaction: PropTypes.func.isRequired,
-  onAddReaction: PropTypes.func.isRequired,
+  onAddReaction: PropTypes.func.isRequired
 }
 
 export default EmojiReactions
