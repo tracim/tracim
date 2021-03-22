@@ -78,7 +78,8 @@ describe('Reactions', function () {
       cy.loginAs('users')
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType, contentId }
+        params: { workspaceId, contentType, contentId },
+        waitForTlm: true
       })
     })
 
@@ -113,7 +114,8 @@ describe('Reactions', function () {
         cy.loginAs('users')
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId }
+          params: { workspaceId, contentType, contentId },
+          waitForTlm: true
         })
 
         cy.contains(container + ' .EmojiReactionButton__button__value', '😀')
@@ -126,5 +128,21 @@ describe('Reactions', function () {
         cy.contains(container + ' .EmojiReactionButton__button__count', '1')
       })
     }
+  })
+
+  describe('In the recent activities', () => {
+    const container = '.feedItemFooter__right'
+    it('should allow creating and deleting reactions', () => {
+      cy.loginAs('users')
+      cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+      cy.contains(container + ' .EmojiReactionButton__button__value', '😀')
+      cy.contains(container + ' .EmojiReactionButton__button__count', '1')
+
+      cy.get(container + ' .EmojiReactionButton__button').first().click()
+      cy.contains(container + ' .EmojiReactionButton__button__count', '2')
+
+      cy.get(container + ' .EmojiReactionButton__button').first().click()
+      cy.contains(container + ' .EmojiReactionButton__button__count', '1')
+    })
   })
 })

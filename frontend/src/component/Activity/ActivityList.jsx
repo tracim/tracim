@@ -48,7 +48,6 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           modifiedDate={activity.newestMessage.created}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
-          reactionList={activity.reactionList}
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
         />
       )
