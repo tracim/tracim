@@ -34,8 +34,6 @@ export class FeedItemFooter extends React.Component {
                 ROLE_LIST
               )
             }}
-            contentId={props.content.content_id}
-            workspaceId={props.content.workspace_id}
             contentId={props.content.id}
             workspaceId={props.content.workspaceId}
           />
