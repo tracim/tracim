@@ -1,0 +1,31 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.publications
+  height 100%
+  overflow auto
+  &__reorder
+    margin auto auto 10px
+  &__publishArea
+    display flex
+    flex-direction column
+    margin-top auto
+    & textarea
+      width 100%
+      order 2
+      &:focus
+        outline-color #661F98
+    & .mce-container
+      order 2
+    & .autocomplete
+      order 1
+    &__buttons
+      display flex
+      margin-top 10px
+      order 3
+      &__advancedEdition
+        margin-inline-end auto
+        font-size fontSizeSmall
+  & .pageContentGeneric
+    height calc(100% - 85px)
+    display flex
+    flex-direction column

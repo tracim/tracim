@@ -206,7 +206,7 @@ export class CommentTextArea extends React.Component {
         {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
           <MentionAutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
-            style={style}
+            style={props.disableAutocompletePosition ? {} : style}
             apiUrl={props.apiUrl}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             onClickAutoCompleteItem={(m) => props.wysiwyg ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this)) : this.handleClickAutoCompleteItem(m)}
@@ -242,18 +242,22 @@ CommentTextArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
+  disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
   searchForMentionInQuery: PropTypes.func,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  onInitWysiwyg: PropTypes.func
 }
 
 CommentTextArea.defaultProps = {
+  disableAutocompletePosition: false,
   disableComment: false,
   customClass: '',
   id: '',
   newComment: '',
   onChangeNewComment: () => {},
   wysiwyg: false,
-  searchForMentionInQuery: () => {}
+  searchForMentionInQuery: () => {},
+  onInitWysiwyg: () => {}
 }

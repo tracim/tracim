@@ -57,7 +57,7 @@ describe('<CardPopup />', () => {
 
   describe('Handlers', () => {
     it('should call props.onClose when handler onClose is called', () => {
-      wrapper.find('.cardPopup__close').simulate('click')
+      wrapper.find('.cardPopup__close button').simulate('click')
       expect(onCloseCallBack.called).to.equal(true)
     })
   })

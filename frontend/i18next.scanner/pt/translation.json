@@ -318,7 +318,6 @@
   "You can join an existing space": "Você pode juntar-se a um espaço já existente",
   "You joined the space {{space}}": "Você juntou-se ao espaço {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "O seu pedido de acesso ao {{space}} será processado por um gestor do espaço. O resultado será mostrado no muro de notificação.",
-  "Refresh": "Actualizar",
   "Request accepted": "Pedido aceito",
   "Comment": "Comentar",
   "commented": "comentou",
@@ -417,5 +416,14 @@
   "Recent activities": "Atividades recentes",
   "Loading recent activities…": "Carregando atividades recentes… ",
   "undeleted": "restaurado",
-  "Publications": "Publicações"
+  "Publications": "Publicações",
+  "Error while saving the comment": "Erro ao salvar o comentário",
+  "publication list": "lista de publicações",
+  "Error while saving new publication": "Erro ao salvar a nova publicação",
+  "Reorder": "Reordenar",
+  "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
+  "Validate anyway": "Validar de qualquer forma",
+  "Simple edition": "Edição simples",
+  "Advanced edition": "Edição avançada",
+  "Publish": "Publicar"
 }

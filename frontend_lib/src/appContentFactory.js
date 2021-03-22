@@ -162,7 +162,7 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
+    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id = '') => {
       this.checkApiUrl()
 
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
@@ -188,7 +188,7 @@ export function appContentFactory (WrappedComponent) {
       switch (response.apiResponse.status) {
         case 200:
           setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
 
           removeLocalStorageItem(
             appSlug,

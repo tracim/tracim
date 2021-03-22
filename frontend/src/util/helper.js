@@ -164,7 +164,8 @@ export const compareContents = (a, b, lang) => {
 
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
-  UPLOAD: 'upload'
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
 }
 
 export const sortContentList = (workspaceContents, lang) => {
@@ -229,4 +230,19 @@ export const parseSearchUrl = (parsedQuery) => {
   searchObject.searchType = parsedQuery.s
 
   return searchObject
+}
+
+export const handleClickCopyLink = (content) => {
+  // INFO - GB - 2020-11-20 - Algorithm based on
+  // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+  const tmp = document.createElement('textarea')
+  document.body.appendChild(tmp)
+  tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+    content.workspaceId,
+    content.type,
+    content.id
+  )}`
+  tmp.select()
+  document.execCommand('copy')
+  document.body.removeChild(tmp)
 }

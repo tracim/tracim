@@ -318,7 +318,6 @@
   "You can join an existing space": "Vous pouvez rejoindre un espace existant",
   "You joined the space {{space}}": "Vous avez rejoint l'espace {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Votre demande pour rejoindre {{space}} sera traitée par un responsable. Le résultat sera affiché sur le mur de notification.",
-  "Refresh": "Rafraîchir",
   "Request accepted": "Demande acceptée",
   "Comment": "Commenter",
   "commented": "commenté",
@@ -417,5 +416,14 @@
   "Recent activities": "Activités récentes",
   "Loading recent activities…": "Chargement des activités récentes…",
   "undeleted": "restauré",
-  "Publications": "Publications"
+  "Publications": "Publications",
+  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
+  "publication list": "liste de publications",
+  "Error while saving new publication": "Erreur lors de l'enregistrement de la nouvelle publication",
+  "Reorder": "Réorganiser",
+  "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
+  "Validate anyway": "Valider quand même",
+  "Simple edition": "Édition simple",
+  "Advanced edition": "Édition avancée",
+  "Publish": "Publier"
 }

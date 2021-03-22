@@ -19,7 +19,7 @@ describe('Notification Wall', () => {
   })
 
   it('should mark the notification as read on click', () => {
-    cy.get('.notification__list__item').first().get('.notification__list__item__circle').click()
+    cy.get('.notification__list__item').get('.notification__list__item__circle').first().click()
     cy.get('.notification__header__title').contains('Notifications').should('not.be.visible')
     cy.get('.notificationButton').click()
     cy.get('.notification__list__item').first().should('have.class', 'itemRead')
