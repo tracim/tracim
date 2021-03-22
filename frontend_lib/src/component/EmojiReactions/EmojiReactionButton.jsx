@@ -92,7 +92,7 @@ EmojiReactionButton.propTypes = {
   reactionList: PropTypes.array.isRequired,
   userReactionId: PropTypes.number.isRequired,
   onRemoveReaction: PropTypes.func.isRequired,
-  readOnly:PropTypes.bool.isRequired,
+  readOnly: PropTypes.bool.isRequired,
   onAddReaction: PropTypes.func.isRequired
 }
 
