@@ -184,7 +184,7 @@ export function appContentFactory (WrappedComponent) {
       }))
     }
 
-    saveCommentSimple = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
+    saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
@@ -262,7 +262,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       if (newComment) {
-        await this.saveCommentSimple(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername)
+        await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
