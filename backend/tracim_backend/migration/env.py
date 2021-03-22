@@ -72,7 +72,7 @@ class ReplaceEnumOp(MigrateOperation):
         column_name: str,
         from_enum: Enum,
         to_enum: Enum,
-        default_value: typing.Any,
+        default_value: typing.Any = None,
     ) -> Operations:
         """Replace an enum with specific behaviour for PostgreSQL."""
 
