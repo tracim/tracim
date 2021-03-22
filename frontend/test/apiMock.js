@@ -225,7 +225,14 @@ const mockGetContentPath200 = (apiUrl, workspaceId, contentId, contentPath) => {
     .reply(200, { items: contentPath })
 }
 
+const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`)
+    .reply(200, { items: publicationList })
+}
+
 export {
+  mockGetPublicationList200,
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
   mockGetMyselfWorkspaceList200,
