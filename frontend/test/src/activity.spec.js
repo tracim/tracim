@@ -76,7 +76,6 @@ describe('In activity.js module', () => {
     id: 'workspace_member-e6',
     entityType: TLM_ET.SHAREDSPACE_MEMBER,
     eventList: [],
-    reactionList: [],
     commentList: [],
     newestMessage: messageList[0]
   }
@@ -86,7 +85,6 @@ describe('In activity.js module', () => {
     contentPath: [],
     entityType: TLM_ET.CONTENT,
     eventList: [],
-    reactionList: [],
     commentList: [],
     newestMessage: messageList[1],
     content: fileContent
@@ -96,7 +94,6 @@ describe('In activity.js module', () => {
     id: 'workspace_subscription-e4',
     entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION,
     eventList: [],
-    reactionList: [],
     commentList: [],
     newestMessage: messageList[2]
   }
@@ -191,7 +188,6 @@ describe('In activity.js module', () => {
         id: 'content-12',
         entityType: TLM_ET.CONTENT,
         eventList: [],
-        reactionList: [],
         commentList: [],
         newestMessage: message,
         content: otherFileContent,

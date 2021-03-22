@@ -135,7 +135,6 @@ export class FeedItemWithPreview extends React.Component {
           <FeedItemFooter
             commentList={props.commentList}
             content={props.content}
-            reactionList={props.reactionList}
           />
         </div>
         {props.showTimeline && (
