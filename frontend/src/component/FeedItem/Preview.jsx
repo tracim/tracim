@@ -43,7 +43,7 @@ class Preview extends React.Component {
   }
 
   isHtmlPreview () {
-    const type = this.props.content.content_type
+    const type = this.props.content.type
     return type === CONTENT_TYPE.HTML_DOCUMENT || type === CONTENT_TYPE.THREAD
   }
 
@@ -60,14 +60,14 @@ class Preview extends React.Component {
   }
 
   async getHTMLPreviewCode (content) {
-    if (content.content_type === CONTENT_TYPE.HTML_DOCUMENT) {
-      return content.raw_content
+    if (content.type === CONTENT_TYPE.HTML_DOCUMENT) {
+      return content.rawContent
     }
 
     const fetchResultGetHTMLPreview = await getHTMLPreview(
-      content.workspace_id,
-      content.content_type,
-      content.content_id,
+      content.workspaceId,
+      content.type,
+      content.id,
       content.label
     )
 
@@ -91,21 +91,22 @@ class Preview extends React.Component {
     }
 
     this.setState({
-      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode)
+      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode),
+      previewUnavailable: htmlCode === null
     })
   }
 
   getJPEGPreviewComponent (previewUrl) {
     const { content } = this.props
-    const filenameNoExtension = removeExtensionOfFilename(content.filename)
+    const filenameNoExtension = removeExtensionOfFilename(content.fileName)
     const FIRST_PAGE = 1
 
     const previewURL = (width) => (
       jpgPreviewUrl(
         FETCH_CONFIG.apiUrl,
-        content.workspace_id,
-        content.content_id,
-        content.current_revision_id,
+        content.workspaceId,
+        content.id,
+        content.currentRevisionId,
         filenameNoExtension,
         FIRST_PAGE,
         width,
@@ -116,7 +117,7 @@ class Preview extends React.Component {
     const src = ([mediaQuery, width]) => `${previewURL(width)} ${width}w`
 
     return (
-      <div className='recentActivities__preview__image'>
+      <div className='feedItem__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
           title={content.label}
@@ -163,17 +164,23 @@ class Preview extends React.Component {
     this.testPreviewOverflow()
   }
 
+  isContentDifferent = (oldContent, newContent) => (
+    newContent.commentList !== oldContent.commentList ||
+    newContent.currentRevisionId !== oldContent.currentRevisionId
+  )
+
   componentDidUpdate (prevProps) {
-    if (prevProps.content === this.props.content) {
+    const { props } = this
+    if (prevProps.content === props.content) {
       this.testPreviewOverflow()
-    } else if (prevProps.content.current_revision_id !== this.props.content.current_revision_id) {
+    } else if (this.isContentDifferent(prevProps.content, props.content)) {
       this.updatePreview()
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.content.current_revision_id !== this.props.content.current_revision_id ||
+      this.isContentDifferent(this.props.content, nextProps.content) ||
       Object.entries(nextState).some(([key, val]) => val !== this.state[key])
     )
   }
@@ -214,14 +221,14 @@ class Preview extends React.Component {
       const { props } = this
 
       return this.noPreviewComponent(
-        props.content.content_type === CONTENT_TYPE.THREAD
+        props.content.type === CONTENT_TYPE.THREAD
           ? props.t('Empty thread')
           : props.t('Empty note')
       )
     }
 
     return (
-      <div className='recentActivities__preview__html'>
+      <div className='feedItem__preview__html'>
         <HTMLContent>{this.state.previewHtmlCode}</HTMLContent>
       </div>
     )
@@ -255,18 +262,18 @@ class Preview extends React.Component {
     return (
       <div
         className={classnames(
-          'recentActivities__preview', {
-            recentActivities__preview__overflow: state.previewOverflow,
-            recentActivities__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
-            recentActivities__preview__loading: state.previewLoading
+          'feedItem__preview', {
+            feedItem__preview__overflow: state.previewOverflow,
+            feedItem__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
+            feedItem__preview__loading: state.previewLoading
           }
         )}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
-        <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
+        <Link to={PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}>
           {this.getPreviewComponent()}
           {state.previewOverflow && (
-            <div className='recentActivities__preview__overflowOverlay' />
+            <div className='feedItem__preview__overflowOverlay' />
           )}
         </Link>
       </div>

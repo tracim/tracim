@@ -80,6 +80,7 @@ import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalRecentActivities from './PersonalRecentActivities.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
+import Publications from './Publications.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -483,6 +484,15 @@ export class Tracim extends React.Component {
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Dashboard />
+                    </div>
+                  )}
+                />
+
+                <Route
+                  path={PAGE.WORKSPACE.PUBLICATION(':idws')}
+                  render={() => (
+                    <div className='tracim__content fullWidthFullHeight'>
+                      <Publications />
                     </div>
                   )}
                 />
