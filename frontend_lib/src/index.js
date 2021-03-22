@@ -227,6 +227,7 @@ export {
 } from './localStorage.js'
 
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 
 export {
   TRANSLATION_STATE,

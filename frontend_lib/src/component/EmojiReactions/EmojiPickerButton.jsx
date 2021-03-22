@@ -30,9 +30,13 @@ class EmojiPickerButton extends React.Component {
       parent = parent.parentNode
     }
 
-    this.setState({ pickerDisplayed: false })
+    this.handleCancel()
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  handleCancel = () => {
+    this.setState({ pickerDisplayed: false })
   }
 
   render () {
@@ -87,7 +91,7 @@ class EmojiPickerButton extends React.Component {
         </button>
         <Popover
           className='EmojiPickerPopover'
-          toggle={props.onCancel} // eslint-disable-line react/jsx-handler-names
+          toggle={this.handleCancel} // eslint-disable-line react/jsx-handler-names
           placement='left'
           isOpen={this.state.pickerDisplayed}
           target={() => this.buttonRef.current}
@@ -108,8 +112,7 @@ class EmojiPickerButton extends React.Component {
 }
 
 EmojiPickerButton.propTypes = {
-  onAddReaction: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
+  onAddReaction: PropTypes.func.isRequired
 }
 
 export default translate()(onClickOutside(EmojiPickerButton))
