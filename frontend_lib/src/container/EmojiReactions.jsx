@@ -53,7 +53,7 @@ class EmojiReactions extends React.Component {
   componentDidUpdate (prevProps) {
     const { props } = this
 
-    if (prevProps.contentId !== props.contentId || prevProps.loggedUserId !== props.loggedUserId) {
+    if (prevProps.contentId !== props.contentId || prevProps.loggedUser.userId !== props.loggedUser.userId) {
       this.updateReactionList()
     }
   }
@@ -109,13 +109,12 @@ class EmojiReactions extends React.Component {
     const { props, state } = this
     return (
       <EmojiReactionsComponent
-        loggedUserId={props.loggedUserId}
+        loggedUser={props.loggedUser}
         contentId={props.contentId}
         workspaceId={props.workspaceId}
         reactionList={state.reactionList}
         onAddReaction={this.handleAddReaction}
         onRemoveReaction={this.handleRemoveReaction}
-        readOnly={props.readOnly}
       />
     )
   }
@@ -123,10 +122,9 @@ class EmojiReactions extends React.Component {
 
 EmojiReactions.propTypes = {
   apiUrl: PropTypes.string.isRequired,
-  loggedUserId: PropTypes.number.isRequired,
+  loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  readOnly: PropTypes.bool.isRequired
 }
 
 export default translate()(TracimComponent(EmojiReactions))

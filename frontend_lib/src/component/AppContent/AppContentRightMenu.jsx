@@ -10,10 +10,9 @@ const AppContentRightMenu = (props) => (
   <div className='appContentRightMenu'>
     <EmojiReactions
       apiUrl={props.apiUrl}
-      loggedUserId={props.loggedUser.userId}
+      loggedUser={props.loggedUser}
       contentId={props.content.content_id}
       workspaceId={props.content.workspace_id}
-      readOnly={props.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id}
     />
 
     {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (

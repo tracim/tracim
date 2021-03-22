@@ -14,10 +14,11 @@
 
 .EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
   background transparent
-  cursor pointer
   border-radius 3px
   white-space pre
   margin 2px
+  &:not(:disabled)
+    cursor pointer
 
 .EmojiReactionButton__button
   border-width 1px
@@ -28,7 +29,7 @@
   &:not(.highlighted)
     border-color mediumGrey
 
-  &:hover
+  &:hover:not(:disabled)
     border 1px solid lightDarkGrey
 
   &__value
@@ -40,13 +41,16 @@
     @media (min-width: min-lg)
       min-width 1.5ex // INFO - RJ - 2021-03-17 - prevent the button from resizing when the count changes
 
+  > *
+    color fontColor
+
 .EmojiReactionButton__buttonpicker
   border 1px solid transparent
   &.active
     background-color mediumDarkGrey
     border 1px solid mediumDarkGrey
 
-.EmojiReactionButton__button:hover:not(.highlighted), .EmojiReactionButton__buttonpicker:hover:not(.active)
+.EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)
   background-color grey-hover
   border 1px solid mediumGrey
 
