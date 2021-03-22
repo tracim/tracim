@@ -14,6 +14,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import TimedEvent from '../TimedEvent.jsx'
+import { publicationColor } from '../../util/helper.js'
 
 require('./FeedItemHeader.styl')
 
@@ -60,12 +61,16 @@ export class FeedItemHeader extends React.Component {
       <div className='feedItemHeader'>
         <Icon
           customClass='feedItemHeader__icon'
-          color={app.hexcolor}
+          color={props.isPublication ? publicationColor : app.hexcolor}
           title={app.label}
           icon={`fa-fw ${app.faIcon}`}
         />
         <div className='feedItemHeader__title'>
-          <Link to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}>
+          <Link
+            to={props.isPublication
+              ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId)
+              : PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+          >
             <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
           </Link>
           {props.breadcrumbsList && (
@@ -131,6 +136,7 @@ FeedItemHeader.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
+  isPublication: PropTypes.bool,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
@@ -142,6 +148,7 @@ FeedItemHeader.propTypes = {
 FeedItemHeader.defaultProps = {
   breadcrumbsList: [],
   eventList: [],
+  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',

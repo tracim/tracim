@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
+import { CONTENT_NAMESPACE } from '../../util/helper.js'
 import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -42,6 +42,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           commentList={activity.commentList}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
+          isPublication={activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION}
           key={activity.id}
           lastModifier={activity.newestMessage.fields.author}
           lastModificationType={coreEventType}

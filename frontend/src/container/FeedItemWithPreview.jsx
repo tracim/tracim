@@ -120,6 +120,7 @@ export class FeedItemWithPreview extends React.Component {
         <FeedItemHeader
           breadcrumbsList={props.breadcrumbsList}
           content={props.content}
+          isPublication={props.isPublication}
           eventList={props.eventList}
           lastModificationType={props.lastModificationType}
           lastModificationEntityType={props.lastModificationEntityType}
@@ -133,7 +134,6 @@ export class FeedItemWithPreview extends React.Component {
         <div className='feedItem__content'>
           <Preview content={props.content} />
           <FeedItemFooter
-            commentList={props.commentList}
             content={props.content}
           />
         </div>
@@ -175,6 +175,7 @@ FeedItemWithPreview.propTypes = {
   commentList: PropTypes.array,
   customColor: PropTypes.string,
   eventList: PropTypes.array,
+  isPublication: PropTypes.bool,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
@@ -192,6 +193,7 @@ FeedItemWithPreview.defaultProps = {
   commentList: [],
   customColor: '',
   eventList: [],
+  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',
