@@ -43,7 +43,7 @@ import {
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
-import { uploadFile } from './fileUpload.js'
+import { isFileUploadInErrorState, uploadFile } from './fileUpload.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -261,14 +261,8 @@ export function appContentFactory (WrappedComponent) {
     appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername) => {
       this.checkApiUrl()
 
-      console.log('newComment', newComment)
-      console.log('newCommentAsFileList', newCommentAsFileList)
-
       if (newComment) {
-        const responseCommentSimple = await this.saveCommentSimple(
-          content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername
-        )
-        console.log('responseCommentSimple', responseCommentSimple)
+        await this.saveCommentSimple(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
@@ -276,7 +270,8 @@ export function appContentFactory (WrappedComponent) {
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
         const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
-        console.log('responseList', responseList)
+        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage, 'warning'))
+
         setState({ newCommentAsFileList: uploadFailedList })
       }
     }

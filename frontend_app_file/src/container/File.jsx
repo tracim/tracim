@@ -353,7 +353,7 @@ export class File extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(
       resComment.body,
-      resCommentAsFile.body,
+      resCommentAsFile.body.items,
       resRevision.body,
       state.loggedUser,
       getDefaultTranslationState(state.config.system.config)

@@ -212,7 +212,7 @@ export class Timeline extends React.Component {
                   type='button'
                   className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn btn highlightBtn')}
                   onClick={props.onClickValidateNewCommentBtn}
-                  disabled={props.disableComment || props.newComment === ''}
+                  disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
                   style={{
                     backgroundColor: props.customColor,
                     color: '#fdfdfd',
@@ -245,6 +245,7 @@ Timeline.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   newComment: PropTypes.string.isRequired,
+  newCommentAsFileList: PropTypes.array.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
   disableComment: PropTypes.bool,

@@ -7,6 +7,7 @@ import {
   formatAbsoluteDate,
   removeExtensionOfFilename
 } from '../../helper.js'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
 
 export const CommentAsFile = props => {
   const styleSent = {
@@ -60,12 +61,23 @@ export const CommentAsFile = props => {
               <div
                 className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
               >
-                <img src={previewUrl} alt='' />
+                <img
+                  className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
+                  src={previewUrl}
+                  alt=''
+                />
               </div>
             </div>
           </div>
 
-          <div className={classnames(`${props.customClass}__footer`, 'comment__footer')} />
+          <div className={classnames(`${props.customClass}__footer`, 'comment__footer')}>
+            <EmojiReactions
+              apiUrl={props.apiUrl}
+              loggedUserId={props.loggedUser.userId}
+              contentId={props.apiContent.content_id}
+              workspaceId={props.apiContent.workspace_id}
+            />
+          </div>
         </div>
       </div>
     </li>

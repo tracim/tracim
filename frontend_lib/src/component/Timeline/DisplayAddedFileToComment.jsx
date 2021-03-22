@@ -52,22 +52,30 @@ export class DisplayAddedFileToComment extends React.Component {
             <PopoverBody>
               {props.fileList.map((file, i) => {
                 if (!file || !file.file) return null
+                const isFileInError = file.errorMessage !== ''
                 return (
                   <div
                     className='DisplayAddedFileToComment__popover__item'
+                    title={isFileInError ? file.errorMessage : ''}
                     key={`${file.file.name}_${i}`}
                   >
-                    <i className='DisplayAddedFileToComment__popover__item__iconFile fas fa-paperclip' />
+                    {(isFileInError
+                      ? <i className='DisplayAddedFileToComment__popover__item__iconFile inError fas fa-fw fa-exclamation-triangle' />
+                      : <i className='DisplayAddedFileToComment__popover__item__iconFile fas fa-fw fa-paperclip' />
+                    )}
+
                     <div
                       className='DisplayAddedFileToComment__popover__item__text'
                       title={file.file.name}
                     >
                       {file.file.name}
                     </div>
+
                     <i
                       className='DisplayAddedFileToComment__popover__item__deleteBtn far fa-trash-alt'
                       onClick={e => {
                         props.onRemoveCommentAsFile(file)
+                        if (props.fileList.length === 1) this.setState({ showPopoverFileList: false })
                         scheduleUpdate(e)
                       }}
                     />

@@ -493,7 +493,12 @@ export const TIMELINE_TYPE = {
 }
 
 export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
+  return timeline.sort((a, b) => {
+    // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
+    // may very happen. So we sort on content_id in that case. This isn't ideal
+    if (a.created_raw === b.created_raw) return parseInt(a.content_id) - parseInt(b.content_id)
+    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
+  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
