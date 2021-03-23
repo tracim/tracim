@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import onClickOutside from 'react-onclickoutside'
 import { Popover, PopoverBody } from 'reactstrap'
+import Icon from '../Icon/Icon.jsx'
+import IconButton from '../Button/IconButton.jsx'
 // require('./DisplayAddedFileToComment.styl) // see https://github.com/tracim/tracim/issues/1156
 
 export class DisplayAddedFileToComment extends React.Component {
@@ -14,8 +16,11 @@ export class DisplayAddedFileToComment extends React.Component {
   }
 
   handleClickOutside = e => {
-    // INFO - CH - 20210317 - test bellow is to avoid closing the popup when wanting to click on the delete button
-    if (e.target.className && e.target.className.includes('DisplayAddedFileToComment__popover__item__deleteBtn')) return
+    // INFO - CH - 20210317 - test below is to avoid closing the popup when wanting to click on the delete button
+    if (
+      e.target.parentNode.className &&
+      e.target.parentNode.className.includes('DisplayAddedFileToComment__popover__item__deleteBtn')
+    ) return
     this.setState({ showPopoverFileList: false })
   }
 
@@ -29,14 +34,20 @@ export class DisplayAddedFileToComment extends React.Component {
         <div
           className='DisplayAddedFileToComment__message'
           onClick={this.handleTogglePopupFileList}
+          id='popoverAddedFileToCommentList'
         >
-          <i className='DisplayAddedFileToComment__message__iconFile fas fa-paperclip' />
+          <Icon
+            icon='fas fa-paperclip'
+            customClass='DisplayAddedFileToComment__message__iconFile'
+            title={props.t('See files')}
+          />
           <div className='DisplayAddedFileToComment__message__text'>
             {props.t('{{numberOfFile}} files added', { numberOfFile: props.fileList.length })}
           </div>
-          <i
-            className='DisplayAddedFileToComment__message__listIcon fas fa-th-list'
-            id='popoverAddedFileToCommentList'
+          <Icon
+            icon='fas fa-th-list'
+            customClass='DisplayAddedFileToComment__message__listIcon'
+            title={props.t('See files')}
           />
         </div>
 
@@ -60,8 +71,20 @@ export class DisplayAddedFileToComment extends React.Component {
                     key={`${file.file.name}_${i}`}
                   >
                     {(isFileInError
-                      ? <i className='DisplayAddedFileToComment__popover__item__iconFile inError fas fa-fw fa-exclamation-triangle' />
-                      : <i className='DisplayAddedFileToComment__popover__item__iconFile fas fa-fw fa-paperclip' />
+                      ? (
+                        <Icon
+                          icon='fas fa-fw fa-exclamation-triangle'
+                          customClass='DisplayAddedFileToComment__popover__item__iconFile inError'
+                          title=''
+                        />
+                      )
+                      : (
+                        <Icon
+                          icon='fas fa-fw fa-paperclip'
+                          customClass='DisplayAddedFileToComment__popover__item__iconFile'
+                          title=''
+                        />
+                      )
                     )}
 
                     <div
@@ -71,8 +94,13 @@ export class DisplayAddedFileToComment extends React.Component {
                       {file.file.name}
                     </div>
 
-                    <i
-                      className='DisplayAddedFileToComment__popover__item__deleteBtn far fa-trash-alt'
+                    <IconButton
+                      customClass='DisplayAddedFileToComment__popover__item__deleteBtn'
+                      intent='link'
+                      icon='far fa-trash-alt'
+                      color={props.color}
+                      title={props.t('Remove file')}
+                      mode='dark'
                       onClick={e => {
                         props.onRemoveCommentAsFile(file)
                         if (props.fileList.length === 1) this.setState({ showPopoverFileList: false })
@@ -94,10 +122,12 @@ export default translate()(onClickOutside(DisplayAddedFileToComment))
 
 DisplayAddedFileToComment.propTypes = {
   fileList: PropTypes.array,
-  onRemoveCommentAsFile: PropTypes.func
+  onRemoveCommentAsFile: PropTypes.func,
+  color: PropTypes.string
 }
 
 DisplayAddedFileToComment.defaultProps = {
   fileList: [],
-  onRemoveCommentAsFile: () => {}
+  onRemoveCommentAsFile: () => {},
+  color: ''
 }

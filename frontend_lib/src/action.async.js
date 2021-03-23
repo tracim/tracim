@@ -27,7 +27,7 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
 export const getContentComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
 
-export const getContentCommentAsFile = (apiUrl, workspaceId, contentId) =>
+export const getFileChildContent = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file`)
 
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>

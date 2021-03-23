@@ -1,11 +1,15 @@
 @import '../../css/Variable.styl'
 
 .DisplayAddedFileToComment
-  color fontColor
+  // color mediumDarkGrey
+  width max-content
+  &:hover
+    color fontColor
+    .DisplayAddedFileToComment__message__text
+      text-decoration underline
   &__message
     display flex
     align-items center
-    width max-content
     padding-inline-start 8px
     cursor pointer
     font-size fontSizeSmall
@@ -15,10 +19,6 @@
       font-size 16px
     &__listIcon
       color mediumDarkGrey
-    &:hover
-      & .DisplayAddedFileToComment__message__listIcon
-        color darkGrey
-        text-decoration underline
   &__popover__item
     display flex
     align-items center
@@ -26,7 +26,7 @@
     padding-bottom 8px
     padding-inline 12px
     &:not(:last-child)
-      border-bottom 1px solid mediumDarkGrey
+      border-bottom 1px solid grey
     & > &__iconFile, & > &__text
       margin-inline-end 5px
     &__iconFile.inError

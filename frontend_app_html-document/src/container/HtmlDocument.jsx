@@ -39,7 +39,7 @@ import {
   setLocalStorageItem,
   removeLocalStorageItem,
   getContentComment,
-  getContentCommentAsFile,
+  getFileChildContent,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
@@ -381,13 +381,13 @@ export class HtmlDocument extends React.Component {
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultCommentAsFile = getContentCommentAsFile(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resHtmlDocument, resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
       handleFetchResult(await fetchResultComment),
-      handleFetchResult(await fetchResultCommentAsFile),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 

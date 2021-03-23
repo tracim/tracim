@@ -96,8 +96,14 @@ class PopupUploadFile extends React.Component {
     const { state, props } = this
 
     // INFO - CH - 20210315 - this allows to handle the upload outside of this component
-    if (props.onValidateOverride !== false) {
+    if (props.onValidateOverride !== undefined) {
       props.onValidateOverride(state.fileUploadList)
+      return
+    }
+
+    if (!props.uploadUrl) {
+      console.error("Error in PopupUploadFile, props uploadUrl isn't set.")
+      sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
       return
     }
 
@@ -207,7 +213,7 @@ class PopupUploadFile extends React.Component {
 
 PopupUploadFile.propTypes = {
   label: PropTypes.string.isRequired,
-  uploadUrl: PropTypes.string.isRequired,
+  uploadUrl: PropTypes.string,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,
   color: PropTypes.string.isRequired,
@@ -221,10 +227,11 @@ PopupUploadFile.propTypes = {
   uploadErrorMessageList: PropTypes.array,
   defaultUploadErrorMessage: PropTypes.string,
   validateLabel: PropTypes.string,
-  onValidateOverride: PropTypes.oneOfType([PropTypes.func, PropTypes.bool])
+  onValidateOverride: PropTypes.func
 }
 
 PopupUploadFile.defaultProps = {
+  uploadUrl: '',
   additionalFormData: {},
   multipleFiles: false,
   faIcon: 'fas fa-upload',
@@ -234,7 +241,7 @@ PopupUploadFile.defaultProps = {
   onFailure: () => {},
   onClose: () => {},
   uploadErrorMessageList: [],
-  onValidateOverride: false
+  onValidateOverride: undefined
 }
 
 export default translate()(TracimComponent(PopupUploadFile))

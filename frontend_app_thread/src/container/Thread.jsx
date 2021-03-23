@@ -26,7 +26,7 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
-  getContentCommentAsFile,
+  getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState
 } from 'tracim_frontend_lib'
@@ -253,12 +253,12 @@ export class Thread extends React.Component {
     const { props, state } = this
 
     const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultThreadCommentAsFile = getContentCommentAsFile(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
     const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultThreadComment),
-      handleFetchResult(await fetchResultThreadCommentAsFile),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 

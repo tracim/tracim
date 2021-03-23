@@ -43,7 +43,7 @@ import {
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
   getContentComment,
-  getContentCommentAsFile,
+  getFileChildContent,
   getFileContent,
   getFileRevision,
   PAGE,
@@ -337,7 +337,7 @@ export class File extends React.Component {
 
     const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
-      handleFetchResult(await getContentCommentAsFile(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 

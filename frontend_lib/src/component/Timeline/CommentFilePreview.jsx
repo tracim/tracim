@@ -9,7 +9,7 @@ import {
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 
-export const CommentAsFile = props => {
+export const CommentFilePreview = props => {
   const styleSent = {
     borderColor: props.customColor
   }
@@ -64,7 +64,7 @@ export const CommentAsFile = props => {
                 <img
                   className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
                   src={previewUrl}
-                  alt=''
+                  alt={props.apiContent.filename}
                 />
               </div>
             </div>
@@ -84,9 +84,9 @@ export const CommentAsFile = props => {
   )
 }
 
-export default CommentAsFile
+export default CommentFilePreview
 
-CommentAsFile.propTypes = {
+CommentFilePreview.propTypes = {
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   apiUrl: PropTypes.string,
@@ -94,7 +94,7 @@ CommentAsFile.propTypes = {
   loggedUser: PropTypes.object
 }
 
-CommentAsFile.defaultProps = {
+CommentFilePreview.defaultProps = {
   customClass: '',
   customColor: '',
   apiUrl: '',

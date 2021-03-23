@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
 import Comment from './Comment.jsx'
-import CommentAsFile from './CommentAsFile.jsx'
+import CommentFilePreview from './CommentFilePreview.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
@@ -15,7 +15,7 @@ import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
-import AddFileToCommentButton from './AddFileToCommentButton.jsx'
+import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayAddedFileToComment from './DisplayAddedFileToComment.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -125,7 +125,7 @@ export class Timeline extends React.Component {
                 )
               case TIMELINE_TYPE.COMMENT_AS_FILE:
                 return (
-                  <CommentAsFile
+                  <CommentFilePreview
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
@@ -194,13 +194,14 @@ export class Timeline extends React.Component {
                   <DisplayAddedFileToComment
                     fileList={props.newCommentAsFileList}
                     onRemoveCommentAsFile={props.onRemoveCommentAsFile}
+                    color={props.customColor}
                   />
                 </div>
               </div>
 
               <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
                 <div>
-                  <AddFileToCommentButton
+                  <AddFileToUploadButton
                     apiUrl={props.apiUrl}
                     workspaceId={props.workspaceId}
                     color={props.customColor}
