@@ -172,5 +172,13 @@
   "Medium-Light Skin Tone": "Peau légèrement claire",
   "Medium Skin Tone": "Peau moyennement claire",
   "Medium-Dark Skin Tone": "Peau moyennement foncée",
-  "Dark Skin Tone": "Peau foncée"
+  "Dark Skin Tone": "Peau foncée",
+  "Upload a file": "Téléverser un fichier",
+  "See files": "Voir les fichiers",
+  "{{numberOfFile}} files added": "{{numberOfFile}} fichiers ajoutés",
+  "Remove file": "Supprimer le fichier",
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+  "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
+  "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
+  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
 }
