@@ -5,9 +5,9 @@ import onClickOutside from 'react-onclickoutside'
 import { Popover, PopoverBody } from 'reactstrap'
 import Icon from '../Icon/Icon.jsx'
 import IconButton from '../Button/IconButton.jsx'
-// require('./DisplayAddedFileToComment.styl) // see https://github.com/tracim/tracim/issues/1156
+// require('./DisplayFileToUpload.styl) // see https://github.com/tracim/tracim/issues/1156
 
-export class DisplayAddedFileToComment extends React.Component {
+export class DisplayFileToUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -19,7 +19,7 @@ export class DisplayAddedFileToComment extends React.Component {
     // INFO - CH - 20210317 - test below is to avoid closing the popup when wanting to click on the delete button
     if (
       e.target.parentNode.className &&
-      e.target.parentNode.className.includes('DisplayAddedFileToComment__popover__item__deleteBtn')
+      e.target.parentNode.className.includes('DisplayFileToUpload__popover__item__deleteBtn')
     ) return
     this.setState({ showPopoverFileList: false })
   }
@@ -30,23 +30,23 @@ export class DisplayAddedFileToComment extends React.Component {
     const { props, state } = this
     if (props.fileList.length === 0) return null
     return (
-      <div className='DisplayAddedFileToComment'>
+      <div className='DisplayFileToUpload'>
         <div
-          className='DisplayAddedFileToComment__message'
+          className='DisplayFileToUpload__message'
           onClick={this.handleTogglePopupFileList}
-          id='popoverAddedFileToCommentList'
+          id='popoverFileToUploadList'
         >
           <Icon
             icon='fas fa-paperclip'
-            customClass='DisplayAddedFileToComment__message__iconFile'
+            customClass='DisplayFileToUpload__message__iconFile'
             title={props.t('See files')}
           />
-          <div className='DisplayAddedFileToComment__message__text'>
+          <div className='DisplayFileToUpload__message__text'>
             {props.t('{{numberOfFile}} files added', { numberOfFile: props.fileList.length })}
           </div>
           <Icon
             icon='fas fa-th-list'
-            customClass='DisplayAddedFileToComment__message__listIcon'
+            customClass='DisplayFileToUpload__message__listIcon'
             title={props.t('See files')}
           />
         </div>
@@ -54,8 +54,8 @@ export class DisplayAddedFileToComment extends React.Component {
         <Popover
           placement='top'
           isOpen={state.showPopoverFileList}
-          target='popoverAddedFileToCommentList'
-          className='popoverAddedFileToCommentList'
+          target='popoverFileToUploadList'
+          className='popoverFileToUploadList'
           toggle={this.handleTogglePopupFileList} // eslint-disable-line react/jsx-handler-names
           trigger='click'
         >
@@ -66,7 +66,7 @@ export class DisplayAddedFileToComment extends React.Component {
                 const isFileInError = file.errorMessage !== ''
                 return (
                   <div
-                    className='DisplayAddedFileToComment__popover__item'
+                    className='DisplayFileToUpload__popover__item'
                     title={isFileInError ? file.errorMessage : ''}
                     key={`${file.file.name}_${i}`}
                   >
@@ -74,28 +74,28 @@ export class DisplayAddedFileToComment extends React.Component {
                       ? (
                         <Icon
                           icon='fas fa-fw fa-exclamation-triangle'
-                          customClass='DisplayAddedFileToComment__popover__item__iconFile inError'
+                          customClass='DisplayFileToUpload__popover__item__iconFile inError'
                           title=''
                         />
                       )
                       : (
                         <Icon
                           icon='fas fa-fw fa-paperclip'
-                          customClass='DisplayAddedFileToComment__popover__item__iconFile'
+                          customClass='DisplayFileToUpload__popover__item__iconFile'
                           title=''
                         />
                       )
                     )}
 
                     <div
-                      className='DisplayAddedFileToComment__popover__item__text'
+                      className='DisplayFileToUpload__popover__item__text'
                       title={file.file.name}
                     >
                       {file.file.name}
                     </div>
 
                     <IconButton
-                      customClass='DisplayAddedFileToComment__popover__item__deleteBtn'
+                      customClass='DisplayFileToUpload__popover__item__deleteBtn'
                       intent='link'
                       icon='far fa-trash-alt'
                       color={props.color}
@@ -118,15 +118,15 @@ export class DisplayAddedFileToComment extends React.Component {
   }
 }
 
-export default translate()(onClickOutside(DisplayAddedFileToComment))
+export default translate()(onClickOutside(DisplayFileToUpload))
 
-DisplayAddedFileToComment.propTypes = {
+DisplayFileToUpload.propTypes = {
   fileList: PropTypes.array,
   onRemoveCommentAsFile: PropTypes.func,
   color: PropTypes.string
 }
 
-DisplayAddedFileToComment.defaultProps = {
+DisplayFileToUpload.defaultProps = {
   fileList: [],
   onRemoveCommentAsFile: () => {},
   color: ''

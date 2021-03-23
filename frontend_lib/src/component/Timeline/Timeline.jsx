@@ -16,7 +16,7 @@ import CommentTextArea from './CommentTextArea.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
-import DisplayAddedFileToComment from './DisplayAddedFileToComment.jsx'
+import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -191,7 +191,7 @@ export class Timeline extends React.Component {
                 </button>
 
                 <div>
-                  <DisplayAddedFileToComment
+                  <DisplayFileToUpload
                     fileList={props.newCommentAsFileList}
                     onRemoveCommentAsFile={props.onRemoveCommentAsFile}
                     color={props.customColor}
