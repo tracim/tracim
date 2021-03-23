@@ -8,22 +8,20 @@ import ArchiveDeleteContent from '../OptionComponent/ArchiveDeleteContent.jsx'
 
 const AppContentRightMenu = (props) => (
   <div className='appContentRightMenu'>
+    <EmojiReactions
+      apiUrl={props.apiUrl}
+      loggedUser={props.loggedUser}
+      contentId={props.content.content_id}
+      workspaceId={props.content.workspace_id}
+    />
+
     {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-      <>
-        <EmojiReactions
-          apiUrl={props.apiUrl}
-          loggedUserId={props.loggedUser.userId}
-          contentId={props.content.content_id}
-          workspaceId={props.content.workspace_id}
-        />
-        <SelectStatus
-          selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
-          availableStatus={props.availableStatuses}
-          onChangeStatus={props.onChangeStatus}
-          disabled={props.mode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
-          mobileVersion={props.mobileVersion}
-        />
-      </>
+      <SelectStatus
+        selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
+        availableStatus={props.availableStatuses}
+        onChangeStatus={props.onChangeStatus}
+        disabled={props.mode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
+      />
     )}
 
     {props.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
@@ -45,13 +43,11 @@ AppContentRightMenu.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   loggedUser: PropTypes.object.isRequired,
-  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE)),
-  mobileVersion: PropTypes.object
+  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE))
 }
 
 AppContentRightMenu.defaultProps = {
-  mode: undefined,
-  mobileVersion: undefined
+  mode: undefined
 }
 
 export default AppContentRightMenu

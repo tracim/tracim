@@ -3,7 +3,6 @@ import classnames from 'classnames'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
-
 import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
@@ -61,7 +60,7 @@ const Comment = props => {
             />
             <EmojiReactions
               apiUrl={props.apiUrl}
-              loggedUserId={props.loggedUserId}
+              loggedUser={props.loggedUser}
               contentId={props.contentId}
               workspaceId={props.workspaceId}
             />
@@ -77,7 +76,7 @@ export default Comment
 Comment.propTypes = {
   customClass: PropTypes.string,
   author: PropTypes.object.isRequired,
-  loggedUserId: PropTypes.number.isRequired,
+  loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
   text: PropTypes.string,

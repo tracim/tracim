@@ -91,7 +91,7 @@ export class Timeline extends React.Component {
                     contentId={Number(content.content_id)}
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
-                    loggedUserId={Number(props.loggedUser.userId)}
+                    loggedUser={props.loggedUser}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}

@@ -93,6 +93,7 @@ class EmojiPickerButton extends React.Component {
           className='EmojiPickerPopover'
           toggle={this.handleCancel} // eslint-disable-line react/jsx-handler-names
           placement='left'
+          boundariesElement='viewport'
           isOpen={this.state.pickerDisplayed}
           target={() => this.buttonRef.current}
         >
@@ -100,6 +101,7 @@ class EmojiPickerButton extends React.Component {
             <Picker
               native
               emojiTooltip
+              autoFocus
               title=''
               i18n={emojiMartI18n}
               onSelect={this.handleSelect}

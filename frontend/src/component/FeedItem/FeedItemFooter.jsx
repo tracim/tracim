@@ -3,8 +3,8 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
-import { PAGE, EmojiReactions } from 'tracim_frontend_lib'
-import { FETCH_CONFIG } from '../../util/helper.js'
+import { PAGE, ROLE_LIST, EmojiReactions } from 'tracim_frontend_lib'
+import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 
 require('./FeedItemFooter.styl')
 
@@ -20,14 +20,23 @@ export class FeedItemFooter extends React.Component {
 
   render () {
     const { props } = this
+    const { content } = props
+    const { workspaceId } = content
     return (
       <div className='feedItemFooter'>
         <div className='feedItemFooter__right'>
           <EmojiReactions
             apiUrl={FETCH_CONFIG.apiUrl}
-            loggedUserId={props.user.userId}
-            contentId={props.content.id}
-            workspaceId={props.content.workspaceId}
+            loggedUser={{
+              ...props.user,
+              userRoleIdInWorkspace: findUserRoleIdInWorkspace(
+                props.user.userId,
+                (props.workspaceList.find(workspace => workspace.id === workspaceId) || {}).memberList || [],
+                ROLE_LIST
+              )
+            }}
+            contentId={content.id}
+            workspaceId={workspaceId}
           />
         </div>
       </div>
@@ -35,7 +44,7 @@ export class FeedItemFooter extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(withRouter(translate()(FeedItemFooter)))
 
 FeedItemFooter.propTypes = {

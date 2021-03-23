@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import EmojiReactionButton from './EmojiReactionButton.jsx'
 import EmojiPickerButton from './EmojiPickerButton.jsx'
 import { isBefore, compareAsc, parseISO } from 'date-fns'
+import { ROLE } from '../../helper.js'
 
 function groupReactionsByValue (reactionList) {
   const reactionListsByValueObject = {}
@@ -33,12 +34,15 @@ const EmojiReactions = (props) => {
     (groupA, groupB) => compareAsc(groupA.smallestId, groupB.smallestId)
   )
 
+  const userId = props.loggedUser.userId
+  const readOnly = props.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id
+
   return (
     <div className='EmojiReactions'>
       {
         reactionListsByCreation.map(({ reactionList }) => {
           const userReaction = reactionList.find(
-            reaction => reaction.author.user_id === props.loggedUserId
+            reaction => reaction.author.user_id === userId
           )
 
           // INFO - RJ - 2021-03-17
@@ -53,18 +57,19 @@ const EmojiReactions = (props) => {
               onRemoveReaction={() => props.onRemoveReaction(userReactionId)}
               onAddReaction={() => props.onAddReaction(value)}
               reactionList={reactionList}
+              readOnly={readOnly}
               userReactionId={userReactionId}
             />
           )
         })
       }
-      <EmojiPickerButton onAddReaction={props.onAddReaction} />
+      {!readOnly && <EmojiPickerButton onAddReaction={props.onAddReaction} />}
     </div>
   )
 }
 
 EmojiReactions.propTypes = {
-  loggedUserId: PropTypes.number.isRequired,
+  loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
   reactionList: PropTypes.array.isRequired,
