@@ -383,7 +383,7 @@ api.key = %(basic_setup.api_key)s
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
 ; website.description =
-; website.welcome_page = %(frontend.dist_folder_path)/branding/simple-welcome.html
+; website.welcome_page = simple-welcome.html
 
 ; simple branding:
 ; - welcome-text.html
