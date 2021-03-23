@@ -426,5 +426,5 @@
   "Simple edition": "Edição simples",
   "Advanced edition": "Edição avançada",
   "Publish": "Publicar",
-  "Publication of {{author}} at {{date}}": "Publicação de {{author}} em {{date}}"
+  "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}"
 }
