@@ -293,7 +293,7 @@ export class Publications extends React.Component {
   handleClickValidateAnyway = async () => {
     const { props, state } = this
     const workspaceId = props.match.params.idws
-    const publicationName = props.t('Publication of {{author}} at {{date}}', {
+    const publicationName = props.t('Publication of {{author}} on {{date}}', {
       author: props.user.publicName,
       date: formatAbsoluteDate(new Date(), props.user.lang),
       interpolation: { escapeValue: false }
