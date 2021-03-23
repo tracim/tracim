@@ -40,6 +40,10 @@ function addAdminEmoji (contentType, contentId) {
 }
 
 describe('Reactions', function () {
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -134,7 +138,12 @@ describe('Reactions', function () {
     const container = '.feedItemFooter__right'
     it('should allow creating and deleting reactions', () => {
       cy.loginAs('users')
-      cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+      cy.visitPage({
+        pageName: PAGES.RECENT_ACTIVITIES,
+        params: { workspaceId },
+        waitForTlm: true
+      })
+
       cy.contains(container + ' .EmojiReactionButton__button__value', '😀')
       cy.contains(container + ' .EmojiReactionButton__button__count', '1')
 
