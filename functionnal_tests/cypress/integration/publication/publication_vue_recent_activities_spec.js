@@ -28,6 +28,7 @@ describe('In recent activities', () => {
     cy.contains('.feedItemHeader', threadLabel)
       .find('.feedItemHeader__icon')
       .should('have.class', 'fa-comments')
-      .should('have.css', 'color', 'rgb(66, 139, 202)')
+      // INFO - GB - 20210323 - see file backend/color-test.json for thread color
+      .should('have.css', 'color', 'rgb(173, 76, 249)')
   })
 })
