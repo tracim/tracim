@@ -26,15 +26,16 @@
       &__advancedEdition
         margin-inline-end auto
         font-size fontSizeSmall
-        @media (max-width: max-sm)
-          display none
-      &:last-child
+      > :last-child
         margin-inline-start auto
-  & .pageContentGeneric
     height calc(100% - 85px)
     display flex
     flex-direction column
     padding 10px
 
-    @media (max-width: max-xs)
+@media (max-width: max-xs)
+  .publications
+    &__publishArea__buttons__advancedEdition
+      display none
+    .pageContentGeneric
       padding 5px 0
