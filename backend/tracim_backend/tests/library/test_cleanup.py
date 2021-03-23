@@ -272,7 +272,7 @@ class TestCleanupLib(object):
             do_save=True,
             do_notify=False,
         )
-        content_api.set_favorite(folder, do_save=True)
+        content_api.add_favorite(folder, do_save=True)
         file_id = file_.content_id
         comment = content_api.create_comment(
             workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False

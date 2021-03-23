@@ -2103,7 +2103,7 @@ class ContentApi(object):
         except NoResultFound as exc:
             raise ContentNotFound("User {} did not author any content".format(user_id)) from exc
 
-    def get_all_user_favorites(
+    def get_user_favorite_contents(
         self,
         user_id: int,
         content_type: str = content_type_list.Any_SLUG,
@@ -2134,7 +2134,7 @@ class ContentApi(object):
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
-    def get_one_user_favorite_content(self, user_id: int, content_id: int):
+    def get_one_user_favorite_content(self, user_id: int, content_id: int) -> Content:
         try:
             return (
                 self.get_all_query()
@@ -2151,7 +2151,7 @@ class ContentApi(object):
                 )
             )
 
-    def set_favorite(self, content: Content, do_save: bool = True) -> FavoriteContent:
+    def add_favorite(self, content: Content, do_save: bool = True) -> FavoriteContent:
         try:
             # INFO - G.M - 2021-03-22 - If favorite already exist, accept without
             # recreating the favorite

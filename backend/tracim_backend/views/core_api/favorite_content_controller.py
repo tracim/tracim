@@ -66,7 +66,7 @@ class FavoriteContentController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(PaginatedContentDigestSchema())
-    def user_content_favorites(
+    def user_favorite_contents(
         self, context, request: TracimRequest, hapic_data=None
     ) -> PaginatedObject:
         """
@@ -77,7 +77,7 @@ class FavoriteContentController(Controller):
             session=request.dbsession,
             config=request.app_config,
         )
-        paged_contents = api.get_all_user_favorites(
+        paged_contents = api.get_user_favorite_contents(
             user_id=request.candidate_user.user_id, order_by_properties=[FavoriteContent.created],
         )
         contents = [api.get_content_in_context(content) for content in paged_contents]
@@ -88,7 +88,9 @@ class FavoriteContentController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(ContentIdBodySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_content_as_favorite(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def add_content_in_user_favorites(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         set content as user favorite
         """
@@ -98,13 +100,13 @@ class FavoriteContentController(Controller):
             config=request.app_config,
         )
         content = api.get_one(content_id=hapic_data.body.get("content_id"))
-        api.set_favorite(content, do_save=True)
+        api.add_favorite(content, do_save=True)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_FAVORITE_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def remove_content_from_favorite(
+    def remove_content_from_user_favorites(
         self, context, request: TracimRequest, hapic_data=None
     ) -> None:
         """
@@ -121,9 +123,9 @@ class FavoriteContentController(Controller):
     def bind(self, configurator: Configurator):
         # Get Favorites content
         configurator.add_route(
-            "user_content_favorites", "/user/{user_id}/favorite-contents", request_method="GET",
+            "user_favorite_contents", "/user/{user_id}/favorite-contents", request_method="GET",
         )
-        configurator.add_view(self.user_content_favorites, route_name="user_content_favorites")
+        configurator.add_view(self.user_favorite_contents, route_name="user_favorite_contents")
 
         configurator.add_route(
             "user_content_favorite",
@@ -134,16 +136,20 @@ class FavoriteContentController(Controller):
 
         # set content as favorite
         configurator.add_route(
-            "set_content_as_favorite", "/user/{user_id}/favorite-contents", request_method="POST",
+            "add_content_in_user_favorites",
+            "/user/{user_id}/favorite-contents",
+            request_method="POST",
         )
-        configurator.add_view(self.set_content_as_favorite, route_name="set_content_as_favorite")
+        configurator.add_view(
+            self.add_content_in_user_favorites, route_name="add_content_in_user_favorites"
+        )
 
         # remove content from favorites
         configurator.add_route(
-            "remove_content_from_favorite",
+            "remove_content_from_user_favorites",
             "/user/{user_id}/favorite-contents/{content_id}",
             request_method="DELETE",
         )
         configurator.add_view(
-            self.remove_content_from_favorite, route_name="remove_content_from_favorite"
+            self.remove_content_from_user_favorites, route_name="remove_content_from_user_favorites"
         )

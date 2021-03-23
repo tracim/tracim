@@ -5,9 +5,31 @@ import transaction
 
 from tracim_backend import ContentNotFound
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+
+
+def create_content(
+    content_api: ContentApi,
+    workspace: Workspace,
+    content_type=THREAD_TYPE,
+    label="Test Thread",
+    set_as_favorite: bool = False,
+):
+    content = content_api.create(
+        content_type_slug=content_type,
+        workspace=workspace,
+        parent=None,
+        label=label,
+        do_save=True,
+        do_notify=False,
+    )
+    if set_as_favorite:
+        content_api.add_favorite(content, do_save=True)
+    return content
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -25,17 +47,7 @@ class TestFavoriteContent(object):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
-        test_thread = content_api.create(
-            content_type_slug=content_type_list.Thread.slug,
-            workspace=test_workspace,
-            parent=None,
-            label="Test Thread",
-            do_save=False,
-            do_notify=False,
-        )
-        test_thread.description = "Thread description"
-        session.add(test_thread)
-        content_api.set_favorite(test_thread, do_save=True)
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
@@ -72,16 +84,7 @@ class TestFavoriteContent(object):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
-        test_thread = content_api.create(
-            content_type_slug=content_type_list.Thread.slug,
-            workspace=test_workspace,
-            parent=None,
-            label="Test Thread",
-            do_save=False,
-            do_notify=False,
-        )
-        test_thread.description = "Thread description"
-        session.add(test_thread)
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=False)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
@@ -102,32 +105,21 @@ class TestFavoriteContent(object):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
-        test_thread = content_api.create(
-            content_type_slug=content_type_list.Thread.slug,
-            workspace=test_workspace,
-            parent=None,
-            label="Test Thread",
-            do_save=True,
-            do_notify=False,
-        )
-        content_api.create(
-            content_type_slug=HTML_DOCUMENTS_TYPE,
-            workspace=test_workspace,
-            parent=None,
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
+        create_content(
+            content_api,
+            test_workspace,
+            set_as_favorite=False,
+            content_type=HTML_DOCUMENTS_TYPE,
             label="Test Note",
-            do_save=True,
-            do_notify=False,
         )
-        test_html_content2 = content_api.create(
-            content_type_slug=HTML_DOCUMENTS_TYPE,
-            workspace=test_workspace,
-            parent=None,
+        create_content(
+            content_api,
+            test_workspace,
+            set_as_favorite=True,
+            content_type=HTML_DOCUMENTS_TYPE,
             label="Test Note2",
-            do_save=True,
-            do_notify=False,
         )
-        content_api.set_favorite(test_thread, do_save=True)
-        content_api.set_favorite(test_html_content2, do_save=True)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
@@ -151,14 +143,7 @@ class TestFavoriteContent(object):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
-        test_thread = content_api.create(
-            content_type_slug=content_type_list.Thread.slug,
-            workspace=test_workspace,
-            parent=None,
-            label="Test Thread",
-            do_save=True,
-            do_notify=False,
-        )
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=False)
         transaction.commit()
         with pytest.raises(ContentNotFound):
             content_api.get_one_user_favorite_content(
@@ -186,15 +171,7 @@ class TestFavoriteContent(object):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
-        test_thread = content_api.create(
-            content_type_slug=content_type_list.Thread.slug,
-            workspace=test_workspace,
-            parent=None,
-            label="Test Thread",
-            do_save=True,
-            do_notify=False,
-        )
-        content_api.set_favorite(test_thread, do_save=True)
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         assert content_api.get_one_user_favorite_content(
             user_id=riyad_user.user_id, content_id=test_thread.content_id
