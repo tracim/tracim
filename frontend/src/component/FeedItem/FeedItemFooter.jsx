@@ -21,7 +21,7 @@ export class FeedItemFooter extends React.Component {
 
   render () {
     const { props } = this
-    const { content }  = props
+    const { content } = props
     const { workspaceId } = content
     return (
       <div className='feedItemFooter'>
