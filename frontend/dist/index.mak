@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <meta name="description" content="${website_description}" />
+    <!--<meta name="description" content="website_description" /> -->
     <title>${website_title}</title>
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}" nonce="${csp_nonce}">
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}" nonce="${csp_nonce}">
@@ -14,6 +14,9 @@
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
+
+    <!-- TODO: make this optional? -->
+    <link rel="stylesheet" type="text/css" href="/assets/branding/welcome.css?token=${cache_token}" nonce="${csp_nonce}">
 
     <style nonce="${csp_nonce}">
       <%
@@ -88,7 +91,8 @@
   </head>
 
   <body>
-    <div id="welcome"><%include file={welcome_filename} /></div>
+    <!-- TODO: make this optional?, and read the file path from the config -->
+    <div id="welcome"><%include file="/assets/branding/simple-welcome.html" /></div>
     <div id="content"></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>

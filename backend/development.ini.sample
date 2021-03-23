@@ -382,14 +382,16 @@ api.key = %(basic_setup.api_key)s
 ## title of website, used in email
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
-website.description = Hello this is my beautiful description
-website.branding_dir = %(here)s/branding
+; website.description =
+; website.welcome_page = %(frontend.dist_folder_path)/branding/simple-welcome.html
 
-; in branding:
-; - welcome.html
-; - welcome-bg.jpg
 ; simple branding:
 ; - welcome-text.html
+; - welcome.jpg
+
+; advanced branding:
+; - create a full html page (inline styles?)
+; - set its path with website.welcome_page
 
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
