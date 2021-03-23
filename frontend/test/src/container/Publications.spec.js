@@ -164,4 +164,17 @@ describe('<Publications />', () => {
       expect(wrapper.state('newComment')).to.equal('a')
     })
   })
+
+  describe('handleCancelSave()', () => {
+    it('should set showInvalidMentionPopupInComment state to false', () => {
+      wrapper.setState({ showInvalidMentionPopupInComment: false })
+      PublicationsInstance.handleCancelSave()
+      expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
+    })
+    it('should set showInvalidMentionPopupInComment state to false', () => {
+      wrapper.setState({ showInvalidMentionPopupInComment: true })
+      PublicationsInstance.handleCancelSave()
+      expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
+    })
+  })
 })
