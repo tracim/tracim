@@ -21,6 +21,8 @@ export class FeedItemFooter extends React.Component {
 
   render () {
     const { props } = this
+    const { content }  = props
+    const { workspaceId } = content
     return (
       <div className='feedItemFooter'>
         <div className='feedItemFooter__right'>
@@ -30,12 +32,12 @@ export class FeedItemFooter extends React.Component {
               ...props.user,
               userRoleIdInWorkspace: findUserRoleIdInWorkspace(
                 props.user.userId,
-                props.currentWorkspace.memberList,
+                (props.workspaceList.find(workspace => workspace.id === workspaceId) || {}).memberList || [],
                 ROLE_LIST
               )
             }}
-            contentId={props.content.id}
-            workspaceId={props.content.workspaceId}
+            contentId={content.id}
+            workspaceId={workspaceId}
           />
           <div className='feedItemFooter__comments'>
             {props.commentList.length}
@@ -53,7 +55,7 @@ export class FeedItemFooter extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace }) => ({ user, currentWorkspace })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(withRouter(translate()(FeedItemFooter)))
 
 FeedItemFooter.propTypes = {
