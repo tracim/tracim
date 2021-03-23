@@ -9,6 +9,7 @@
     display flex
     flex-direction column
     margin-top auto
+
     & textarea
       width 100%
       order 2
@@ -25,6 +26,10 @@
       &__advancedEdition
         margin-inline-end auto
         font-size fontSizeSmall
+        @media (max-width: max-sm)
+          display none
+      &:last-child
+        margin-inline-start auto
   & .pageContentGeneric
     height calc(100% - 85px)
     display flex
