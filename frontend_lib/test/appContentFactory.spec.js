@@ -60,8 +60,10 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
+        'appContentRemoveCommentAsFile',
         'appContentChangeStatus',
         'addCommentToTimeline',
         'appContentArchive',
@@ -317,7 +319,7 @@ describe('appContentFactory.js', () => {
     })
   })
 
-  describe('function appContentSaveNewComment', () => {
+  describe('function saveCommentAsText', () => {
     describe('on comment save success', async () => {
       let response
       const newComment = 'Edited comment'
@@ -337,11 +339,14 @@ describe('appContentFactory.js', () => {
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
-
+        const loggedUser = {
+          username: 'foo',
+          lang: 'en'
+        }
         const isCommentWysiwyg = true
         mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
-        response = await wrapper.instance().appContentSaveNewComment(
-          fakeContent, isCommentWysiwyg, newComment, [], fakeSetState, appContentSlug, 'foo'
+        response = await wrapper.instance().saveCommentAsText(
+          fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
         )
       })
 
@@ -350,10 +355,6 @@ describe('appContentFactory.js', () => {
         fakeTinymceSetContent.resetHistory()
         global.localStorage.removeItem.resetHistory()
         global.GLOBAL_dispatchEvent.resetHistory()
-      })
-
-      it('should call the function checkApiUrl', () => {
-        expect(fakeCheckApiUrl.called).to.equal(true)
       })
 
       it('should reset the tinymce comment field since we set param isCommentWysiwyg to true', () => {
@@ -372,6 +373,31 @@ describe('appContentFactory.js', () => {
           .to.have.property('apiResponse')
           .and.have.property('body')
       })
+    })
+  })
+
+  describe('function appContentSaveNewComment', () => {
+    const newComment = 'Edited comment'
+
+    before(() => {
+      wrapper.instance().checkApiUrl = fakeCheckApiUrl
+      const loggedUser = {
+        username: 'foo',
+        lang: 'en'
+      }
+      const fileChildContentList = []
+      const isCommentWysiwyg = true
+      wrapper.instance().appContentSaveNewComment(
+        fakeContent, isCommentWysiwyg, newComment, fileChildContentList, fakeSetState, appContentSlug, loggedUser, 'foo'
+      )
+    })
+
+    after(() => {
+      fakeCheckApiUrl.resetHistory()
+    })
+
+    it('should call the function checkApiUrl', () => {
+      expect(fakeCheckApiUrl.called).to.equal(true)
     })
   })
 
@@ -501,6 +527,7 @@ describe('appContentFactory.js', () => {
       lang: 'en'
     }
     const commentList = fixtureCommentList
+    const fileChildContentList = []
     const revisionList = fixtureRevisionList.map((revision, i) => ({
       ...revision,
       // INFO - CH - 2019-01-14 - ensure that the first revision after creation has all the comments from commentList
@@ -509,7 +536,9 @@ describe('appContentFactory.js', () => {
     let commentAndRevisionMergedList = []
 
     before(() => {
-      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(commentList, revisionList, loggedUser)
+      commentAndRevisionMergedList = wrapper.instance().buildTimelineFromCommentAndRevision(
+        commentList, revisionList, fileChildContentList, loggedUser
+      )
     })
 
     it('should have merged all the comments and revision at depth 0', () => {
