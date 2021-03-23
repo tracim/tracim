@@ -91,8 +91,8 @@
   </head>
 
   <body>
-    <!-- TODO: make this optional?, and read the file path from the config -->
-    <div id="welcome"><%include file="/assets/branding/simple-welcome.html" /></div>
+    <!-- TODO: make this optional?, and read the file name from the config -->
+    <div id="welcome"><%include file="assets/branding/simple-welcome.html" /></div>
     <div id="content"></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
