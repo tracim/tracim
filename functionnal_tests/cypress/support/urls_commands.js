@@ -14,6 +14,7 @@ const PAGES = {
   ACCOUNT: 'account',
   JOIN_WORKSPACE: 'join-workspace',
   RECENT_ACTIVITIES: 'recent-activities',
+  PUBLICATION: 'publication',
   PROFILE: 'profile',
   WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities'
 }
@@ -35,6 +36,7 @@ const URLS = {
   [PAGES.ACCOUNT]: () => '/ui/account',
   [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace',
   [PAGES.RECENT_ACTIVITIES]: () => '/ui/recent-activities',
+  [PAGES.PUBLICATION]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/publications`,
   [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`
 }
 

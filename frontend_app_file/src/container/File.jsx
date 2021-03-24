@@ -1085,7 +1085,6 @@ export class File extends React.Component {
               onChangeStatus={this.handleChangeStatus}
               onClickArchive={this.handleClickArchive}
               onClickDelete={this.handleClickDelete}
-              mobileVersion={onlineEditionAction}
             />
           </div>
         </PopinFixedOption>

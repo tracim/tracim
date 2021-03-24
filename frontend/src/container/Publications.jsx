@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
-import { v4 as uuidv4 } from 'uuid'
 import {
+  formatAbsoluteDate,
   addClassToMentionsOfUser,
   appContentFactory,
   BREADCRUMBS_TYPE,
@@ -31,7 +31,8 @@ import {
   CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace,
-  handleClickCopyLink
+  handleClickCopyLink,
+  publicationColor
 } from '../util/helper.js'
 import {
   getPublicationList,
@@ -293,11 +294,15 @@ export class Publications extends React.Component {
   handleClickValidateAnyway = async () => {
     const { props, state } = this
     const workspaceId = props.match.params.idws
-    const randomNumber = uuidv4()
+    const publicationName = props.t('Publication of {{author}} on {{date}}', {
+      author: props.user.publicName,
+      date: formatAbsoluteDate(new Date(), props.user.lang),
+      interpolation: { escapeValue: false }
+    })
 
     const fetchPostThreadPublication = await props.dispatch(postThreadPublication(
       workspaceId,
-      `thread_${randomNumber}`
+      publicationName
     ))
 
     switch (fetchPostThreadPublication.status) {
@@ -354,7 +359,6 @@ export class Publications extends React.Component {
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-    const publicationColor = '#661F98'
 
     return (
       <div className='publications'>
