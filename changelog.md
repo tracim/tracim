@@ -1,37 +1,41 @@
-# 3.6.0 / 2021-03-xx
+# 3.6.0 / 2021-03-23
 
 ### New Features
 
-- Translation of Note and comment directly in Tracim with Systran software
 - Advanced search available when search with Elasticsearch
+- Translation of Note and Comment directly in Tracim with Systran software (need a Systran account)
 
 ### Fixed Issues
 
-- Frontend: [#4218](https://github.com/tracim/tracim/issues/4218),
+- Frontend: [#3543](https://github.com/tracim/tracim/issues/3543),
+[#3575](https://github.com/tracim/tracim/issues/3575),
 [#4177](https://github.com/tracim/tracim/issues/4177),
-[#3575](https://github.com/tracim/tracim/issues/3575)
-- UX: [#3791](https://github.com/tracim/tracim/issues/3791),
-[#3553](https://github.com/tracim/tracim/issues/3553)
-- ElasticSearch: [#4147](https://github.com/tracim/tracim/issues/4147),
-[#4149](https://github.com/tracim/tracim/issues/4149),
-[#4146](https://github.com/tracim/tracim/issues/4146)
+[#4218](https://github.com/tracim/tracim/issues/4218)
+- UX: [#3553](https://github.com/tracim/tracim/issues/3553),
+[#3557](https://github.com/tracim/tracim/issues/3557),
+[#3791](https://github.com/tracim/tracim/issues/3791)
+- ElasticSearch: [#4146](https://github.com/tracim/tracim/issues/4146),
+[#4147](https://github.com/tracim/tracim/issues/4147),
+[#4149](https://github.com/tracim/tracim/issues/4149)
 - Agenda: [#3553](https://github.com/tracim/tracim/issues/3553)
 - Backend: [#2114](https://github.com/tracim/tracim/issues/2114)
 
 ### Breaking Changes
+
+- :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information  (issue #4133). We advise you to run this step after each upgrade of Tracim.
+If you use docker image, the migration is done automatically when new image is started.
+- ElasticSearch: Refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command for this (issue #2660).
 
 #### Backend configuration file (development.ini)
 
 - On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
   - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias__prefix`
 You need to delete, create and populate again your ElasticSearch index.
-- **Some chnage in api =>** https://github.com/tracim/tracim/issues/4133
 
 ### Other Changes
 
-- ElasticSearch: Refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command for this (issue #2660)
 - Sec: removing visibility of user email in Userschema used by the TLM
-- Translation service: new parameters available in the development.ini file to activate and configure this [translation-feature](backend/doc/setting.md#translation-feature)
+- Translation service: new parameters available in the development.ini file to activate this feature and see the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue #4093).
 
 
 # 3.5.0 / 2021-02-11
