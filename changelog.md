@@ -3,7 +3,7 @@
 ### New Features
 
 - Advanced search available with Elasticsearch
-- Translation of Note and Comment directly in Tracim using Systran software (require a Systran account)
+- Translation of Note and Comment directly in Tracim using the Systran service (requires a Systran account)
 
 ### Fixed Issues
 
@@ -24,12 +24,13 @@
 
 - :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information  (issue #4133). We advise you to run this step after each upgrade of Tracim.
 If you use docker image, the migration is done automatically when new image is started.
-- ElasticSearch: refactor of the indexing logic. It is necessary to drop the existing index, create it again and populate index to use ElasticSearch, use the CLI command. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) for more information (issue #2660).
+- ElasticSearch: refactor of the indexing logic.
+- The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias__prefix`
+  - It is necessary to drop the existing index, create it again and populate it to use ElasticSearch, use the CLI command for that. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) or see *Updating index of ElasticSearch* section of the [docker documentation](tools_docker/README.md) for more information.
 
 #### Backend configuration file (development.ini)
 
-- On existing Tracim installations using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
-  - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias__prefix`
+- On existing Tracim installations, also if using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 
 ### Other Changes
 
