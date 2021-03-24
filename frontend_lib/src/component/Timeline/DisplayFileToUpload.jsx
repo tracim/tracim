@@ -75,7 +75,7 @@ export class DisplayFileToUpload extends React.Component {
                         <Icon
                           icon='fas fa-fw fa-exclamation-triangle'
                           customClass='DisplayFileToUpload__popover__item__iconFile inError'
-                          title=''
+                          title={isFileInError ? file.errorMessage : ''}
                         />
                       )
                       : (
@@ -89,7 +89,7 @@ export class DisplayFileToUpload extends React.Component {
 
                     <div
                       className='DisplayFileToUpload__popover__item__text'
-                      title={file.file.name}
+                      title={isFileInError ? file.errorMessage : file.file.name}
                     >
                       {file.file.name}
                     </div>
