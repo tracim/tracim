@@ -1,15 +1,15 @@
 """add favorite contents table
 
-Revision ID: 572c98a0c5b0
+Revision ID: 208eda5a6a80
 Revises: bf040d1a4922
-Create Date: 2021-03-22 11:11:05.196195
+Create Date: 2021-03-24 16:55:51.130190
 
 """
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "572c98a0c5b0"
+revision = "208eda5a6a80"
 down_revision = "bf040d1a4922"
 
 
@@ -19,6 +19,8 @@ def upgrade():
         "favorite_contents",
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("content_id", sa.Integer(), nullable=False),
+        sa.Column("original_label", sa.Unicode(length=1024), nullable=False),
+        sa.Column("original_type", sa.Unicode(length=32), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["content_id"],
