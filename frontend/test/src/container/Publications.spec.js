@@ -10,7 +10,8 @@ import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   mockGetContentComments200,
-  mockGetPublicationList200
+  mockGetPublicationList200,
+  mockPostThreadPublication204
 } from '../../apiMock.js'
 import {
   ADD,
@@ -94,6 +95,7 @@ describe('<Publications />', () => {
 
   mockGetPublicationList200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, [])
   mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, props.publicationList[0].id, [])
+  mockPostThreadPublication204(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
 
   describe('handleContentCreatedOrRestored()', () => {
     it('should call appendPublication()', () => {
@@ -166,15 +168,24 @@ describe('<Publications />', () => {
   })
 
   describe('handleCancelSave()', () => {
-    it('should set showInvalidMentionPopupInComment state to false', () => {
+    it('should set showInvalidMentionPopupInComment state to false if it is false', () => {
       wrapper.setState({ showInvalidMentionPopupInComment: false })
       PublicationsInstance.handleCancelSave()
       expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
     })
-    it('should set showInvalidMentionPopupInComment state to false', () => {
+
+    it('should set showInvalidMentionPopupInComment state to false if it is true', () => {
       wrapper.setState({ showInvalidMentionPopupInComment: true })
       PublicationsInstance.handleCancelSave()
       expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
+    })
+  })
+
+  describe('handleClickValidateAnyway()', () => {
+    it('should call appendPublication()', (done) => {
+      PublicationsInstance.handleClickValidateAnyway().then(() => {
+        expect(appendPublicationCallBack.called).to.equal(true)
+      }).then(done, done)
     })
   })
 })
