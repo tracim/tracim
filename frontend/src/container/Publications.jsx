@@ -31,7 +31,8 @@ import {
   CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace,
-  handleClickCopyLink
+  handleClickCopyLink,
+  publicationColor
 } from '../util/helper.js'
 import {
   getPublicationList,
@@ -357,7 +358,6 @@ export class Publications extends React.Component {
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-    const publicationColor = '#661F98'
 
     return (
       <div className='publications'>

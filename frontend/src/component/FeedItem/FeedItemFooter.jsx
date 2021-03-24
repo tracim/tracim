@@ -3,8 +3,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
-
-import { IconButton, PAGE, ROLE_LIST, EmojiReactions } from 'tracim_frontend_lib'
+import { PAGE, ROLE_LIST, EmojiReactions } from 'tracim_frontend_lib'
 import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 
 require('./FeedItemFooter.styl')
@@ -39,16 +38,6 @@ export class FeedItemFooter extends React.Component {
             contentId={content.id}
             workspaceId={workspaceId}
           />
-          <div className='feedItemFooter__comments'>
-            {props.commentList.length}
-            <IconButton
-              icon='far fa-comment'
-              text={props.t('Comment')}
-              intent='link'
-              onClick={this.handleCommentClicked}
-              dataCy='feedItemFooter__comment'
-            />
-          </div>
         </div>
       </div>
     )
@@ -59,6 +48,5 @@ const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(withRouter(translate()(FeedItemFooter)))
 
 FeedItemFooter.propTypes = {
-  content: PropTypes.object.isRequired,
-  commentList: PropTypes.array.isRequired
+  content: PropTypes.object.isRequired
 }
