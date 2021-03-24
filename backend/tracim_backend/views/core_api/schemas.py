@@ -1584,6 +1584,19 @@ class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(ContentDigestSchema, many=True)
 
 
+class FavoriteContentSchema(marshmallow.Schema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content = marshmallow.fields.Nested(ContentDigestSchema, allow_none=True)
+    original_label = StrippedString(example="Intervention Report 12")
+    original_type = StrippedString(example="html-document", validate=all_content_types_validator)
+
+
+class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(FavoriteContentSchema, many=True)
+
+
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     read_by_user = marshmallow.fields.Bool(example=False, default=False)

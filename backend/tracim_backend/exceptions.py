@@ -303,6 +303,10 @@ class ContentNotFound(TracimException):
     error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
+class FavoriteContentNotFound(TracimException):
+    error_code = ErrorCode.FAVORITE_CONTENT_NOT_FOUND
+
+
 class ContentTypeNotAllowed(TracimException):
     error_code = ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 

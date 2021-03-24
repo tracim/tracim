@@ -3,10 +3,10 @@ from http import HTTPStatus
 import pytest
 import transaction
 
-from tracim_backend import ContentNotFound
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.error import ErrorCode
+from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -52,9 +52,11 @@ class TestFavoriteContent(object):
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
             "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
-            status=HTTPStatus.FOUND,
+            status=HTTPStatus.OK,
         )
-        assert res.headers["Location"]
+        favorite_content = res.json_body
+        assert favorite_content["original_label"] == "Test Thread"
+        assert favorite_content["content"]["label"] == "Test Thread"
 
     def test_api__get_favorite_content_redirect__err__content_not_exist(
         self,
@@ -70,7 +72,7 @@ class TestFavoriteContent(object):
             "/api/user/{}/favorite-contents/1010".format(riyad_user.user_id,),
             status=HTTPStatus.BAD_REQUEST,
         )
-        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
 
     def test_api__get_favorite_content_redirect__err__content_not__favorite(
         self,
@@ -91,7 +93,7 @@ class TestFavoriteContent(object):
             "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.BAD_REQUEST,
         )
-        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+        assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
 
     def test_api__get_favorites_contents_list__ok__nominal_case(
         self,
@@ -128,8 +130,10 @@ class TestFavoriteContent(object):
         )
         favorite_contents = res.json_body["items"]
         assert len(favorite_contents) == 2
-        assert favorite_contents[0]["label"] == "Test Thread"
-        assert favorite_contents[1]["label"] == "Test Note2"
+        assert favorite_contents[0]["original_label"] == "Test Thread"
+        assert favorite_contents[0]["content"]["label"] == "Test Thread"
+        assert favorite_contents[1]["original_label"] == "Test Note2"
+        assert favorite_contents[1]["content"]["label"] == "Test Note2"
 
     def test_api__set_content_as_favorites__ok__nominal_case(
         self,
@@ -145,7 +149,7 @@ class TestFavoriteContent(object):
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=False)
         transaction.commit()
-        with pytest.raises(ContentNotFound):
+        with pytest.raises(FavoriteContentNotFound):
             content_api.get_one_user_favorite_content(
                 user_id=riyad_user.user_id, content_id=test_thread.content_id
             )
@@ -181,7 +185,7 @@ class TestFavoriteContent(object):
             "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.NO_CONTENT,
         )
-        with pytest.raises(ContentNotFound):
+        with pytest.raises(FavoriteContentNotFound):
             content_api.get_one_user_favorite_content(
                 user_id=riyad_user.user_id, content_id=test_thread.content_id
             )
