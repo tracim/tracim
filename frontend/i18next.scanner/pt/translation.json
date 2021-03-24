@@ -425,5 +425,6 @@
   "Validate anyway": "Validar de qualquer forma",
   "Simple edition": "Edição simples",
   "Advanced edition": "Edição avançada",
-  "Publish": "Publicar"
+  "Publish": "Publicar",
+  "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}"
 }
