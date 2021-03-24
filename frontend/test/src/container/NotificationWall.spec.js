@@ -51,7 +51,8 @@ describe('<NotificationWall />', () => {
     notificationPage: {
       list: [{
         id: 1,
-        type: ''
+        type: '',
+        created: '2020-03-04T00:03:04Z'
       }]
     },
     t: tradKey => tradKey,

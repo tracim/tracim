@@ -39,7 +39,9 @@ import { SEARCH_TYPE } from '../../../src/util/helper.js'
 describe('reducer searchResult.js', () => {
   describe('actions', () => {
     const initialState = {
-      appliedFilters: {},
+      appliedFilters: {
+        searchFieldList: []
+      },
       newestAuthoredContentRange: {},
       createdRange: {},
       currentPage: 1,
@@ -172,7 +174,7 @@ describe('reducer searchResult.js', () => {
     describe(`${SET}/${APPLIED_FILTER(SEARCH_TYPE.SIMPLE)}`, () => {
       const rez = searchResult(SEARCH_TYPE.SIMPLE)(initialState, setAppliedFilter('key', 'value', SEARCH_TYPE.SIMPLE))
       it('should return a content object with the appliedFilters property set as an object with the given key and value', () => {
-        expect(rez).to.deep.equal({ ...initialState, appliedFilters: { key: 'value' } })
+        expect(rez).to.deep.equal({ ...initialState, appliedFilters: { searchFieldList: [], key: 'value' } })
       })
     })
 

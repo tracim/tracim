@@ -1339,7 +1339,11 @@ class ContentInContext(object):
             logger.warning(
                 self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-        return None
+        # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
+        # avoid broken search (both simple and elasticsearch)
+        # when broken content exist (content without valid depot file)
+        # see #4267 for better solution.
+        return 0
 
     @property
     def has_pdf_preview(self) -> bool:

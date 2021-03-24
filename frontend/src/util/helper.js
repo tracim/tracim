@@ -37,7 +37,7 @@ export const ADVANCED_SEARCH_TYPE = {
 }
 
 export const ADVANCED_SEARCH_FILTER = {
-  SEARCH_FIELD: 'searchField',
+  SEARCH_FIELD: 'searchFieldList',
   NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
   CREATED_RANGE: 'createdRange',
   MODIFIED_RANGE: 'modifiedRange',
@@ -217,10 +217,16 @@ export const toggleFavicon = (hasNewNotification) => {
 }
 
 export const parseSearchUrl = (parsedQuery) => {
-  const searchObject = {}
+  const searchObject = {
+    // INFO - CH - 20210318 - adding this default value because the search page use both this object and the one
+    // from redux. And it needs this property
+    appliedFilters: {
+      searchFieldList: []
+    }
+  }
 
   searchObject.contentTypes = parsedQuery.t
-  searchObject.searchString = parsedQuery.q
+  searchObject.searchString = parsedQuery.q || ''
   searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
   searchObject.currentPage = parseInt(parsedQuery.p)
   searchObject.showArchived = !!(parseInt(parsedQuery.arc))

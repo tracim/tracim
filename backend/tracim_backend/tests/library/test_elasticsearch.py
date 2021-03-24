@@ -229,6 +229,46 @@ class TestElasticSearchContentIndexer:
         assert not job.is_failed
         assert index_content_mock.call_count == 1
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
+    def test_unit__sync_index_contents__err__indexing_error(
+        self,
+        test_context_without_plugins: TracimContext,
+        content_indexer_with_api_mock: ContentIndexerWithApiMock,
+    ) -> None:
+        content = html_document()
+        (indexer, index_content_mock, _) = content_indexer_with_api_mock
+        index_content_mock.side_effect = Exception("indexing error")
+        indexed_error_count = indexer.sync_index_contents([content], test_context_without_plugins)
+        assert indexed_error_count == 1
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
+    )
+    def test_unit__sync_index_contents__err__async_indexing_error(
+        self,
+        session,
+        test_context_without_plugins: TracimContext,
+        content_indexer_with_api_mock: ContentIndexerWithApiMock,
+    ) -> None:
+        content = html_document()
+        (indexer, index_content_mock, _) = content_indexer_with_api_mock
+        index_content_mock.side_effect = Exception("indexing error")
+        test_context_without_plugins.dbsession.add(content)
+        test_context_without_plugins.dbsession.flush()
+        indexer.index_contents([content], test_context_without_plugins)
+        transaction.commit()
+        queue = get_rq_queue2(
+            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        )
+        assert not queue.is_empty()
+        job = queue.jobs[0]
+        worker = DatabaseWorker([queue], connection=queue.connection)
+        worker.work(burst=True, app_config=test_context_without_plugins.app_config)
+        assert queue.is_empty()
+        assert job.is_failed
+
 
 class TestElasticSearchUserIndexer:
     @pytest.mark.parametrize(

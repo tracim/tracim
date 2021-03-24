@@ -58,3 +58,10 @@ export const searchResult = {
     }
   ]
 }
+
+export const emptySearchResult = {
+  currentPage: 1,
+  numberResultsByPage: 10,
+  searchString: 'void',
+  resultList: []
+}

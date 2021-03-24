@@ -10,10 +10,10 @@ export default function FilenameWithExtension (props) {
 
   return (
     <div
-      className='FilenameWithExtension'
+      className={classnames('FilenameWithExtension', props.customClass)}
       title={file.label}
     >
-      <span className={classnames('FilenameWithExtension__label', props.customClass)}>{file.label}</span>
+      <span className='FilenameWithExtension__label'>{file.label}</span>
       {(isFile && (
         <Badge text={file.fileExtension || file.file_extension} customClass='badgeBackgroundColor' />
       ))}

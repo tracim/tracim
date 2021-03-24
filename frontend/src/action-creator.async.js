@@ -6,6 +6,7 @@ import {
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -1102,6 +1103,28 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
   })
 }
 
+const getUTCMidnight = (dateString) => parseISO(`${dateString}T00:00:00Z`)
+
+const getDateRangeParameters = (range, rangeParameterPrefix) => {
+  const rangeParameterList = []
+  if (range.from) {
+    const fromDate = getUTCMidnight(range.from)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const fromDateString = fromDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_from=${fromDateString}`)
+  }
+  if (range.to) {
+    const toDate = getUTCMidnight(range.to)
+    toDate.setDate(toDate.getDate() + 1)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const toDateString = toDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_to=${toDateString}`)
+  }
+  return rangeParameterList
+}
+
 export const getAdvancedSearchResult = (
   searchString,
   contentTypes,
@@ -1117,25 +1140,19 @@ export const getAdvancedSearchResult = (
   newestAuthoredContentRange,
   searchFacets
 ) => dispatch => {
-  const queryParameterList = []
+  let queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
   else queryParameterList.push('search_string=*')
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
-  if (pageSize) queryParameterList.push(`size=${searchString ? pageSize : 0}`)
+  if (Number.isInteger(pageSize)) queryParameterList.push(`size=${pageSize}`)
   if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
   if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
   if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
     if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
     if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
-    if (createdRange) {
-      if (createdRange.from) queryParameterList.push(`created_from=${createdRange.from}`)
-      if (createdRange.to) queryParameterList.push(`created_to=${createdRange.to}`)
-    }
-    if (modifiedRange) {
-      if (modifiedRange.from) queryParameterList.push(`modified_from=${modifiedRange.from}`)
-      if (modifiedRange.to) queryParameterList.push(`modified_to=${modifiedRange.to}`)
-    }
+    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
+    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
     if (searchFacets) {
       if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
       if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
@@ -1147,8 +1164,7 @@ export const getAdvancedSearchResult = (
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {
     if (searchFacets && searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
     if (newestAuthoredContentRange) {
-      if (newestAuthoredContentRange.from) queryParameterList.push(`newest_authored_content_date_from=${newestAuthoredContentRange.from}`)
-      if (newestAuthoredContentRange.to) queryParameterList.push(`newest_authored_content_date_to=${newestAuthoredContentRange.to}`)
+      queryParameterList = queryParameterList.concat(getDateRangeParameters(newestAuthoredContentRange, 'newest_authored_content_date'))
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
