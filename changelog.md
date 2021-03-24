@@ -2,8 +2,8 @@
 
 ### New Features
 
-- Advanced search available when search with Elasticsearch
-- Translation of Note and Comment directly in Tracim with Systran software (need a Systran account)
+- Advanced search available with Elasticsearch
+- Translation of Note and Comment directly in Tracim using Systran software (require a Systran account)
 
 ### Fixed Issues
 
@@ -24,18 +24,17 @@
 
 - :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information  (issue #4133). We advise you to run this step after each upgrade of Tracim.
 If you use docker image, the migration is done automatically when new image is started.
-- ElasticSearch: Refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command for this (issue #2660).
+- ElasticSearch: refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) for more information (issue #2660).
 
 #### Backend configuration file (development.ini)
 
-- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+- On existing Tracim installations using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
   - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias__prefix`
-You need to delete, create and populate again your ElasticSearch index.
 
 ### Other Changes
 
-- Sec: removing visibility of user email in Userschema used by the TLM
-- Translation service: new parameters available in the development.ini file to activate this feature and see the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue #4093).
+- Security: email addresses of users are no longer returned by API when it is not strictly necessary.
+- Translation service: new parameters available in the development.ini file to activate this feature. See the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue #4093).
 
 
 # 3.5.0 / 2021-02-11
@@ -65,7 +64,7 @@ You need to delete, create and populate again your ElasticSearch index.
 ### Breaking Changes
 
 - Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
-- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
+- On existing Tracim installations using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
   - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
   - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
   - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`
