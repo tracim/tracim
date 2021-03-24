@@ -43,6 +43,7 @@ import {
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
   getContentComment,
+  getFileChildContent,
   getFileContent,
   getFileRevision,
   PAGE,
@@ -83,6 +84,7 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
@@ -122,6 +124,7 @@ export class File extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
@@ -332,12 +335,17 @@ export class File extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
-    const [resComment, resRevision] = await Promise.all([
+    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 
-    if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
+    if (
+      resComment.apiResponse.status !== 200 &&
+      resCommentAsFile.apiResponse.status !== 200 &&
+      resRevision.apiResponse.status !== 200
+    ) {
       this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
       console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
       return
@@ -345,6 +353,7 @@ export class File extends React.Component {
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(
       resComment.body,
+      resCommentAsFile.body.items,
       resRevision.body,
       state.loggedUser,
       getDefaultTranslationState(state.config.system.config)
@@ -435,6 +444,14 @@ export class File extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
@@ -468,6 +485,7 @@ export class File extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -827,10 +845,13 @@ export class File extends React.Component {
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
           newComment={state.newComment}
+          newCommentAsFileList={state.newCommentAsFileList}
           disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
           availableStatusList={state.config.availableStatuses}
           wysiwyg={state.timelineWysiwyg}
           onChangeNewComment={this.handleChangeNewComment}
+          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
           onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
@@ -846,8 +867,8 @@ export class File extends React.Component {
           workspaceId={state.content.workspace_id}
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,
-            this.state.content.workspace_id,
-            this.state.loggedUser.lang,
+            state.content.workspace_id,
+            state.loggedUser.lang,
             this.setState.bind(this)
           )}
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}

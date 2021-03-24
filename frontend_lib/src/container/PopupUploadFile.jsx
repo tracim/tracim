@@ -95,6 +95,18 @@ class PopupUploadFile extends React.Component {
   handleValidate = async () => {
     const { state, props } = this
 
+    // INFO - CH - 20210315 - this allows to handle the upload outside of this component
+    if (props.onValidateOverride !== undefined) {
+      props.onValidateOverride(state.fileUploadList)
+      return
+    }
+
+    if (!props.uploadUrl) {
+      console.error("Error in PopupUploadFile, props uploadUrl isn't set.")
+      sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
+      return
+    }
+
     this.setState({ uploadStarted: true })
     const fileUploadDoneList = await Promise.all(state.fileUploadList.map(this.uploadFile))
     const successfulFileUploadList = fileUploadDoneList.filter(fileUpload => !isFileUploadInErrorState(fileUpload))
@@ -201,7 +213,7 @@ class PopupUploadFile extends React.Component {
 
 PopupUploadFile.propTypes = {
   label: PropTypes.string.isRequired,
-  uploadUrl: PropTypes.string.isRequired,
+  uploadUrl: PropTypes.string,
   faIcon: PropTypes.string,
   httpMethod: PropTypes.string,
   color: PropTypes.string.isRequired,
@@ -214,10 +226,12 @@ PopupUploadFile.propTypes = {
   maximumFileSize: PropTypes.number,
   uploadErrorMessageList: PropTypes.array,
   defaultUploadErrorMessage: PropTypes.string,
-  validateLabel: PropTypes.string
+  validateLabel: PropTypes.string,
+  onValidateOverride: PropTypes.func
 }
 
 PopupUploadFile.defaultProps = {
+  uploadUrl: '',
   additionalFormData: {},
   multipleFiles: false,
   faIcon: 'fas fa-upload',
@@ -226,7 +240,8 @@ PopupUploadFile.defaultProps = {
   onSuccess: () => {},
   onFailure: () => {},
   onClose: () => {},
-  uploadErrorMessageList: []
+  uploadErrorMessageList: [],
+  onValidateOverride: undefined
 }
 
 export default translate()(TracimComponent(PopupUploadFile))

@@ -1362,7 +1362,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.12.5":
   version: 7.13.10
   resolution: "@babel/runtime@npm:7.13.10"
   dependencies:
@@ -1371,7 +1371,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.10.2
   resolution: "@babel/runtime@npm:7.10.2"
   dependencies:
@@ -11184,20 +11184,19 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"reactstrap@npm:^8.0.0":
-  version: 8.4.1
-  resolution: "reactstrap@npm:8.4.1"
+"reactstrap@npm:^8.9.0":
+  version: 8.9.0
+  resolution: "reactstrap@npm:8.9.0"
   dependencies:
-    "@babel/runtime": ^7.2.0
+    "@babel/runtime": ^7.12.5
     classnames: ^2.2.3
     prop-types: ^15.5.8
-    react-lifecycles-compat: ^3.0.4
     react-popper: ^1.3.6
     react-transition-group: ^2.3.1
   peerDependencies:
-    react: ^16.3.0
-    react-dom: ^16.3.0
-  checksum: fc082c2db16fa1af54d3706054ff54ca9de506cb54ab88156aed9ca98fdf14303c241be90ffbe20bebe74893e310718a8436239abeddf9100a46c49f9e6e68cd
+    react: ">=16.3.0"
+    react-dom: ">=16.3.0"
+  checksum: 50345ab9291eab2748c7aa9c13dccead653341049aa6d5dff0d34a20b39ee97edc4ec759b8b1468f2cfc91272b96bdedeb0b7443dddfc19ea09aa8d698390070
   languageName: node
   linkType: hard
 
@@ -11705,11 +11704,11 @@ fsevents@^1.2.7:
 
 "resolve@patch:resolve@^1.10.0#builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#builtin<compat/resolve>, resolve@patch:resolve@^1.11.0#builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#builtin<compat/resolve>, resolve@patch:resolve@^1.17.0#builtin<compat/resolve>":
   version: 1.19.0
-  resolution: "resolve@patch:resolve@npm%3A1.19.0#builtin<compat/resolve>::version=1.19.0&hash=e7677c"
+  resolution: "resolve@patch:resolve@npm%3A1.19.0#builtin<compat/resolve>::version=1.19.0&hash=3388aa"
   dependencies:
     is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 346993290e1579ba21ce88047ecfbdf72741233e53fe7934dad3225ece79bc09e2e0045178b92c47c821ad28a263a2e342874a895da33f01f6a1fa20dd0cf6e3
+  checksum: 983e1f00a147b20c9bd6c12216fad49d2d0b83a280a203a0261b68f48621d699c5131f9626044af91254da6d2e8309c7e5559c5886faeeae7c6c47507c855410
   languageName: node
   linkType: hard
 
@@ -13272,7 +13271,7 @@ fsevents@^1.2.7:
     react-redux: 5.0.6
     react-router-dom: ^5.2.0
     react-select: ^3.0.4
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     redux: 3.7.2
     redux-logger: ^3.0.6
     redux-mock-store: ^1.5.3
@@ -13602,7 +13601,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0
@@ -13771,7 +13770,7 @@ fsevents@^1.2.7:
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13992,7 +13991,7 @@ fsevents@^1.2.7:
     react-i18next: 7.4.0
     react-onclickoutside: ^6.9.0
     react-router-dom: ^5.2.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -14029,7 +14028,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0

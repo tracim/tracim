@@ -209,7 +209,9 @@ export class CommentTextArea extends React.Component {
             style={props.disableAutocompletePosition ? {} : style}
             apiUrl={props.apiUrl}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            onClickAutoCompleteItem={(m) => props.wysiwyg ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this)) : this.handleClickAutoCompleteItem(m)}
+            onClickAutoCompleteItem={(m) => props.wysiwyg
+              ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
+              : this.handleClickAutoCompleteItem(m)}
             delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
           />
         )}

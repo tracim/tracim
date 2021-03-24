@@ -172,5 +172,13 @@
   "Medium-Light Skin Tone": "Medium-Light Skin Tone",
   "Medium Skin Tone": "Medium Skin Tone",
   "Medium-Dark Skin Tone": "Medium-Dark Skin Tone",
-  "Dark Skin Tone": "Dark Skin Tone"
+  "Dark Skin Tone": "Dark Skin Tone",
+  "Upload a file": "Upload a file",
+  "See files": "See files",
+  "{{numberOfFile}} files added": "{{numberOfFile}} files added",
+  "Remove file": "Remove file",
+  "A content with the same name already exists": "A content with the same name already exists",
+  "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
+  "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files"
 }

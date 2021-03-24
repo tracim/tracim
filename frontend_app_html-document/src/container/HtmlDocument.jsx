@@ -39,6 +39,7 @@ import {
   setLocalStorageItem,
   removeLocalStorageItem,
   getContentComment,
+  getFileChildContent,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
@@ -80,6 +81,7 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -112,6 +114,8 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -377,16 +381,19 @@ export class HtmlDocument extends React.Component {
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
-    const [resHtmlDocument, resComment, resRevision] = await Promise.all([
+    const [resHtmlDocument, resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
       handleFetchResult(await fetchResultComment),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(
       resComment.body,
+      resCommentAsFile.body.items,
       resRevision.body,
       state.loggedUser,
       getDefaultTranslationState(state.config.system.config)
@@ -590,6 +597,14 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
@@ -601,6 +616,7 @@ export class HtmlDocument extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -932,11 +948,14 @@ export class HtmlDocument extends React.Component {
                   loggedUser={state.loggedUser}
                   timelineData={state.timeline}
                   newComment={state.newComment}
+                  newCommentAsFileList={state.newCommentAsFileList}
                   apiUrl={state.config.apiUrl}
                   disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
                   availableStatusList={state.config.availableStatuses}
                   wysiwyg={state.timelineWysiwyg}
                   onChangeNewComment={this.handleChangeNewComment}
+                  onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                  onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                   onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
@@ -951,8 +970,8 @@ export class HtmlDocument extends React.Component {
                   workspaceId={state.content.workspace_id}
                   onClickTranslateComment={comment => props.handleTranslateComment(
                     comment,
-                    this.state.content.workspace_id,
-                    this.state.loggedUser.lang,
+                    state.content.workspace_id,
+                    state.loggedUser.lang,
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}

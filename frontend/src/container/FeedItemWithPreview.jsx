@@ -96,6 +96,7 @@ export class FeedItemWithPreview extends React.Component {
         },
         state.timelineWysiwyg,
         state.newComment,
+        [], // FIXME - CH - 20210322 - handle this in https://github.com/tracim/tracim/issues/4255
         this.setState.bind(this),
         props.content.slug,
         props.user.username,
@@ -146,6 +147,7 @@ export class FeedItemWithPreview extends React.Component {
             invalidMentionList={state.invalidMentionList}
             loggedUser={props.user}
             newComment={state.newComment}
+            newCommentAsFileList={[]} // FIXME - CH - 20210322 - handle this in https://github.com/tracim/tracim/issues/4255
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickSend}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
