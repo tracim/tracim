@@ -149,6 +149,10 @@ export class Dashboard extends React.Component {
         }
         this.setHeadTitle()
         break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage(props.t('Unknown space')))
+        break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
