@@ -21,11 +21,8 @@ import {
 import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
-  getMyselfWorkspaceRecentActivityList,
-  getMyselfWorkspaceReadStatusList,
   getMyselfKnownMember,
   postWorkspaceMember,
-  putMyselfWorkspaceRead,
   deleteWorkspaceMember,
   putMyselfWorkspaceDoNotify,
   getLoggedUserCalendar
@@ -34,9 +31,6 @@ import {
   newFlashMessage,
   setWorkspaceDetail,
   setWorkspaceMemberList,
-  setWorkspaceRecentActivityList,
-  appendWorkspaceRecentActivityList,
-  setWorkspaceReadStatusList,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
   setBreadcrumbs,
@@ -49,11 +43,11 @@ import {
 } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
-import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
+import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
@@ -109,7 +103,6 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadRecentActivity()
     this.buildBreadcrumbs()
   }
 
@@ -136,7 +129,6 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadRecentActivity()
     this.buildBreadcrumbs()
   }
 
@@ -156,10 +148,6 @@ export class Dashboard extends React.Component {
           this.loadCalendarDetail()
         }
         this.setHeadTitle()
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
@@ -188,25 +176,6 @@ export class Dashboard extends React.Component {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
-    }
-  }
-
-  loadRecentActivity = async () => {
-    const { props } = this
-
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(props.match.params.idws))
-    const fetchWorkspaceReadStatusList = await props.dispatch(getMyselfWorkspaceReadStatusList(props.match.params.idws))
-
-    switch (fetchWorkspaceRecentActivityList.status) {
-      case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
-    }
-
-    switch (fetchWorkspaceReadStatusList.status) {
-      case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
 
@@ -244,27 +213,6 @@ export class Dashboard extends React.Component {
   handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
-
-  handleClickMarkRecentActivityAsRead = async () => {
-    const { props } = this
-    const fetchUserWorkspaceAllRead = await props.dispatch(putMyselfWorkspaceRead(props.curWs.id))
-    switch (fetchUserWorkspaceAllRead.status) {
-      case 204: this.loadRecentActivity(); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while setting "mark all as read"')}`, 'warning')); break
-    }
-  }
-
-  handleClickSeeMore = async () => {
-    const { props, state } = this
-
-    const lastRecentActivityId = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
-
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl, lastRecentActivityId))
-    switch (fetchWorkspaceRecentActivityList.status) {
-      case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
-    }
-  }
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
@@ -576,17 +524,7 @@ export class Dashboard extends React.Component {
               </div>
 
               <div className='dashboard__workspaceInfo'>
-                <RecentActivity
-                  customClass='dashboard__activity'
-                  workspaceId={props.curWs.id}
-                  roleIdForLoggedUser={userRoleIdInWorkspace}
-                  recentActivityList={props.curWs.recentActivityList}
-                  readByUserList={props.curWs.contentReadStatusList}
-                  contentTypeList={props.contentType}
-                  onClickMarkAllAsRead={this.handleClickMarkRecentActivityAsRead}
-                  onClickSeeMore={this.handleClickSeeMore}
-                  t={props.t}
-                />
+                {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
 
                 <MemberList
                   customClass='dashboard__memberlist'

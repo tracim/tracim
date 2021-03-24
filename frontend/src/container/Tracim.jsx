@@ -78,7 +78,6 @@ import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalRecentActivities from './PersonalRecentActivities.jsx'
-import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 
@@ -499,8 +498,8 @@ export class Tracim extends React.Component {
 
                 <Route
                   path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
-                  render={(routerProps) => (
-                    <WorkspaceRecentActivities workspaceId={routerProps.match.params.idws} />
+                  render={({ match }) => (
+                    <Redirect to={PAGE.WORKSPACE.DASHBOARD(match.params.idws)} />
                   )}
                 />
 
