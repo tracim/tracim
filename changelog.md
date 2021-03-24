@@ -24,7 +24,7 @@
 
 - :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information  (issue #4133). We advise you to run this step after each upgrade of Tracim.
 If you use docker image, the migration is done automatically when new image is started.
-- ElasticSearch: refactor of the indexing logic. It is necessary to drop the existing index and to create it again to use ElasticSearch, use the CLI command. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) for more information (issue #2660).
+- ElasticSearch: refactor of the indexing logic. It is necessary to drop the existing index, create it again and populate index to use ElasticSearch, use the CLI command. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) for more information (issue #2660).
 
 #### Backend configuration file (development.ini)
 
