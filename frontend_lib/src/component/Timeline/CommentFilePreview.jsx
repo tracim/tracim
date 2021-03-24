@@ -73,7 +73,7 @@ export const CommentFilePreview = props => {
           <div className={classnames(`${props.customClass}__footer`, 'comment__footer')}>
             <EmojiReactions
               apiUrl={props.apiUrl}
-              loggedUserId={props.loggedUser.userId}
+              loggedUser={props.loggedUser}
               contentId={props.apiContent.content_id}
               workspaceId={props.apiContent.workspace_id}
             />
