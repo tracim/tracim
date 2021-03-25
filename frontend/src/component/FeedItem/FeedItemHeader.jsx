@@ -11,7 +11,8 @@ import {
   IconButton,
   PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  FilenameWithExtension
 } from 'tracim_frontend_lib'
 import TimedEvent from '../TimedEvent.jsx'
 import { publicationColor } from '../../util/helper.js'
@@ -71,7 +72,10 @@ export class FeedItemHeader extends React.Component {
               ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId)
               : PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
           >
-            <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
+            {(contentType === CONTENT_TYPE.FILE
+              ? <FilenameWithExtension file={props.content} customClass='content__name' />
+              : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
+            )}
           </Link>
           {props.breadcrumbsList && (
             <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />

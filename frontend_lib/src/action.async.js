@@ -1,4 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
+import { CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
 
 export const baseFetch = (method, url, body) =>
   fetch(url, {
@@ -27,8 +27,10 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
 export const getContentComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
 
-export const getFileChildContent = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file`)
+export const getFileChildContent = (apiUrl, workspaceId, contentId) => {
+  const queryParam = `parent_ids=${contentId}&content_type=file&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}`
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
+}
 
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features

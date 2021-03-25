@@ -202,9 +202,9 @@ export class Timeline extends React.Component {
               <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
                 <div>
                   <AddFileToUploadButton
-                    apiUrl={props.apiUrl}
                     workspaceId={props.workspaceId}
                     color={props.customColor}
+                    disabled={props.disableComment}
                     onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
                   />
                 </div>
@@ -254,7 +254,7 @@ Timeline.propTypes = {
   disableComment: PropTypes.bool,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
-  id: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object,
   onInitWysiwyg: PropTypes.func,
