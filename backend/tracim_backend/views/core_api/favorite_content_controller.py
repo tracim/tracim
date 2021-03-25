@@ -46,6 +46,8 @@ class FavoriteContentController(Controller):
             current_user=request.candidate_user,
             session=request.dbsession,
             config=request.app_config,
+            show_deleted=True,
+            show_archived=True,
         )
         favorite = api.get_one_user_favorite_content(
             user_id=request.candidate_user.user_id, content_id=hapic_data.path.content_id
@@ -66,6 +68,8 @@ class FavoriteContentController(Controller):
             current_user=request.candidate_user,
             session=request.dbsession,
             config=request.app_config,
+            show_deleted=True,
+            show_archived=True,
         )
         return api.get_user_favorite_contents(
             user_id=request.candidate_user.user_id, order_by_properties=[FavoriteContent.created],
@@ -86,6 +90,8 @@ class FavoriteContentController(Controller):
             current_user=request.candidate_user,
             session=request.dbsession,
             config=request.app_config,
+            show_deleted=True,
+            show_archived=True,
         )
         content = api.get_one(content_id=hapic_data.body.get("content_id"))
         api.add_favorite(content, do_save=True)
@@ -104,6 +110,8 @@ class FavoriteContentController(Controller):
             current_user=request.candidate_user,
             session=request.dbsession,
             config=request.app_config,
+            show_deleted=True,
+            show_archived=True,
         )
         content = api.get_one(content_id=request.current_content.content_id)
         api.remove_favorite(content, do_save=True)
