@@ -12,7 +12,7 @@ function groupReactionsByValue (reactionList) {
     const group = (
       reactionListsByValueObject[reaction.value] || (
         reactionListsByValueObject[reaction.value] = {
-          oldest: reaction.created,
+          oldest: parseISO(reaction.created),
           reactionList: []
         }
       )
@@ -31,7 +31,7 @@ function groupReactionsByValue (reactionList) {
 
 const EmojiReactions = (props) => {
   const reactionListsByCreation = groupReactionsByValue(props.reactionList).sort(
-    (groupA, groupB) => compareAsc(groupA.smallestId, groupB.smallestId)
+    (groupA, groupB) => compareAsc(groupA.created, groupB.created)
   )
 
   const userId = props.loggedUser.userId
