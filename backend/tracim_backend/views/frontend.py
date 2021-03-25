@@ -128,6 +128,8 @@ class FrontendController(Controller):
                 "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
+                "website_description": app_config.WEBSITE__DESCRIPTION,
+                "website__welcome_page": app_config.WEBSITE__WELCOME_PAGE,
                 "custom_toolbox_files": self.custom_toolbox_files,
                 "cache_token": self.cache_token,
                 "excluded_notifications": app_config.WEB__NOTIFICATIONS__EXCLUDED,

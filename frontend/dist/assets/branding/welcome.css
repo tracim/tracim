@@ -1,0 +1,12 @@
+.tracimBrandingWelcomePage__main {
+  background-image: url('welcome-simple-bg.jpg');
+  background-size: contain;
+  width: 100%;
+  height: auto;
+  padding: 20px;
+}
+
+.tracimBrandingWelcomePage__text {
+  width: 66%;
+  padding: 20px;
+}

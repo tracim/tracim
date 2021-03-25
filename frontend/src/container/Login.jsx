@@ -53,12 +53,23 @@ import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
 
+const WELCOME_ELEMENT_ID = 'welcome'
+
 class Login extends React.Component {
   constructor (props) {
     super(props)
+
+    // NOTE - SG - 2021-03-23 - the welcome DOM element is defined
+    // statically in the loaded HTML page so that its content can be parsed by
+    // search engines' robots.
+    // A copy of its html is made in order to display it in this component (see render()).
+    // Then the original element is hidden as it is not used.
+    const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
-      inputRememberMe: false
+      inputRememberMe: false,
+      welcomeHtml: welcomeElement.innerHTML
     }
+    welcomeElement.hidden = true
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -289,65 +300,68 @@ class Login extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <section className='loginpage'>
-        <Card customClass='loginpage__card'>
-          <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
-            {props.t('Connection')}
-          </CardHeader>
+      <div className='loginpage'>
+        <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
+        <section className='loginpage__main'>
+          <Card customClass='loginpage__main__card'>
+            <CardHeader customClass='loginpage__main__card__header primaryColorBgLighten'>
+              {props.t('Connection')}
+            </CardHeader>
 
-          <CardBody formClass='loginpage__card__form'>
-            <form onSubmit={this.handleClickSubmit} noValidate>
-              <InputGroupText
-                parentClassName='loginpage__card__form__groupelogin'
-                customClass='mb-3 mt-4'
-                icon='fa-user'
-                type='text'
-                placeHolder={props.t('Email address or username')}
-                invalidMsg={props.t('Invalid email or username')}
-                maxLength={512}
-                name='login'
-              />
+            <CardBody formClass='loginpage__main__card__form'>
+              <form onSubmit={this.handleClickSubmit} noValidate>
+                <InputGroupText
+                  parentClassName='loginpage__main__card__form__groupelogin'
+                  customClass='mb-3 mt-4'
+                  icon='fa-user'
+                  type='text'
+                  placeHolder={props.t('Email address or username')}
+                  invalidMsg={props.t('Invalid email or username')}
+                  maxLength={512}
+                  name='login'
+                />
 
-              <InputGroupText
-                parentClassName='loginpage__card__form__groupepw'
-                customClass=''
-                icon='fa-lock'
-                type='password'
-                placeHolder={props.t('Password')}
-                invalidMsg={props.t('Invalid password')}
-                maxLength={512}
-                name='password'
-              />
+                <InputGroupText
+                  parentClassName='loginpage__main__card__form__groupepw'
+                  customClass=''
+                  icon='fa-lock'
+                  type='password'
+                  placeHolder={props.t('Password')}
+                  invalidMsg={props.t('Invalid password')}
+                  maxLength={512}
+                  name='password'
+                />
 
-              <div className='row mt-4 mb-4'>
-                <div className='col-12 col-sm-6'>
-                  <div
-                    className='loginpage__card__form__pwforgot'
-                    onClick={this.handleClickForgotPassword}
-                  >
-                    {props.t('Forgotten password?')}
+                <div className='row mt-4 mb-4'>
+                  <div className='col-12 col-sm-6'>
+                    <div
+                      className='loginpage__main__card__form__pwforgot'
+                      onClick={this.handleClickForgotPassword}
+                    >
+                      {props.t('Forgotten password?')}
+                    </div>
+                  </div>
+
+                  <div className='col-12 col-sm-6 d-flex align-items-end'>
+                    <Button
+                      htmlType='submit'
+                      bootstrapType=''
+                      customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__main__card__form__btnsubmit ml-auto'
+                      label={props.t('Connection')}
+                    />
                   </div>
                 </div>
+              </form>
+            </CardBody>
+          </Card>
 
-                <div className='col-12 col-sm-6 d-flex align-items-end'>
-                  <Button
-                    htmlType='submit'
-                    bootstrapType=''
-                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
-                    label={props.t('Connection')}
-                  />
-                </div>
-              </div>
-            </form>
-          </CardBody>
-        </Card>
-
-        <FooterLogin />
-      </section>
+          <FooterLogin />
+        </section>
+      </div>
     )
   }
 }

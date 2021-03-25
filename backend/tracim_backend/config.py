@@ -390,6 +390,10 @@ class CFG(object):
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
+            "website.welcome_page", "welcome-simple.html"
+        )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
             "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",

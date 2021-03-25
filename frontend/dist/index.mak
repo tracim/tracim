@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <!--<meta name="description" content="website_description" /> -->
+    % if website_description:
+    <meta name="description" content="${website_description}" />
+    % endif
     <title>${website_title}</title>
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}" nonce="${csp_nonce}">
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}" nonce="${csp_nonce}">
@@ -14,8 +16,6 @@
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
-
-    <!-- TODO: make this optional? -->
     <link rel="stylesheet" type="text/css" href="/assets/branding/welcome.css?token=${cache_token}" nonce="${csp_nonce}">
 
     <style nonce="${csp_nonce}">
@@ -91,9 +91,11 @@
   </head>
 
   <body>
-    <!-- TODO: make this optional?, and read the file name from the config -->
-    <div id="welcome"><%include file="assets/branding/simple-welcome.html" /></div>
     <div id="content"></div>
+    <!-- NOTE - SG - 2021-03-23 - changing the id of this div must be propagated to the login page component.
+         Currently it is Login.jsx.
+      -->
+    <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>
