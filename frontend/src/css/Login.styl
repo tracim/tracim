@@ -1,11 +1,33 @@
 .loginpage
   display flex
   flex-direction row
+  width: 100%
   &__welcome
     width 60%
   &__main
-    &__card
-      &__form
-        &__pwforgot
-          cursor pointer
-          font-size 13px
+    width 40%
+    background-color lightGrey
+    display flex
+    flex-direction column
+    &__wrapper
+      display flex
+      flex-direction column
+      width: 80%
+      margin-block-start 40px
+      margin-inline-start 40px
+      margin-inline-end auto
+    &__form
+      width 100%
+      margin-block-start 20%
+      display flex
+      flex-direction column
+      &__forgot_password
+        cursor pointer
+        font-size 13px
+
+    & > footer
+      margin-inline-start auto
+      margin-inline-end auto
+      margin-block-start auto
+      margin-block-end 10px
+      text-align center
