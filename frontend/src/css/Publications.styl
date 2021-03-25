@@ -9,6 +9,7 @@
     display flex
     flex-direction column
     margin-top auto
+
     & textarea
       width 100%
       order 2
@@ -23,6 +24,8 @@
       justify-content space-between
       margin-top 10px
       order 3
+      > :last-child
+        margin-inline-start auto
       &__submit .iconbutton__icon
         margin-right 8px
       &__left
@@ -37,3 +40,11 @@
     height calc(100% - 85px)
     display flex
     flex-direction column
+    padding 10px
+
+@media (max-width: max-xs)
+  .publications
+    &__publishArea__buttons__advancedEdition
+      display none
+    .pageContentGeneric
+      padding 5px 0
