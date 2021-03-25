@@ -319,7 +319,6 @@
   "You joined the space {{space}}": "Você juntou-se ao espaço {{space}}",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "O seu pedido de acesso ao {{space}} será processado por um gestor do espaço. O resultado será mostrado no muro de notificação.",
   "Request accepted": "Pedido aceito",
-  "Comment": "Comentar",
   "commented": "comentou",
   "created": "criou",
   "modified": "modificou",
@@ -426,5 +425,8 @@
   "Simple edition": "Edição simples",
   "Advanced edition": "Edição avançada",
   "Publish": "Publicar",
-  "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}"
+  "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}",
+  "Error loading publication comments": "Erro ao carregar comentários da publicação",
+  "Publication": "Publicação",
+  "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros"
 }
