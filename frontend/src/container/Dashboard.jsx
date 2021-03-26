@@ -8,6 +8,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageContent,
+  IconButton,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
@@ -471,7 +472,7 @@ export class Dashboard extends React.Component {
 
             <PageContent>
               <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__detail'>
+                <div className='dashboard__workspace__content'>
                   <div
                     className='dashboard__workspace__detail__title primaryColorFont'
                     data-cy='dashboardWorkspaceLabel'
@@ -496,21 +497,12 @@ export class Dashboard extends React.Component {
                       )
                     )}
                     <div className='dashboard__workspace__detail__buttons'>
-                      <Link
-                        className='dashboard__workspace__detail__buttons__link'
-                        to={PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)}
-                      >
-                        <i className='fas fa-fw fa-th' />
-                        {props.t('Explore contents')}
-                      </Link>
                       {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
-                        <Link
-                          className='dashboard__workspace__detail__buttons__link'
+                        <IconButton
+                          icon='fas fa-fw fa-cog'
+                          text={props.t('Space settings')}
                           onClick={this.handleClickOpenAdvancedDashboard}
-                        >
-                          <i className='fas fa-fw fa-cog' />
-                          {props.t('Space settings')}
-                        </Link>
+                        />
                       )}
                     </div>
                   </div>
@@ -518,17 +510,6 @@ export class Dashboard extends React.Component {
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
-                  {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
-                    <button
-                      type='button'
-                      className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                      onClick={this.handleClickOpenAdvancedDashboard}
-                    >
-                      <i className='fas fa-fw fa-cog' />
-                      {props.t('Open advanced Dashboard')}
-                    </button>
-                  )}
-
                   <UserStatus
                     user={props.user}
                     curWs={props.curWs}

@@ -14,14 +14,13 @@
     align-items flex-start
     &__detail
       margin-right 20px
-      width calc(70% - 20px) //20px => margin-right
-      &__right
-        &__button
-          font-size fontSizeSmall
-          margin-left auto
-          display block
-          & .fas
-            margin-right 8px
+      background offWhite
+      border 1px solid grey
+      border-radius 5px
+      &__buttons
+        text-align end
+        button
+          margin 10px
       &__title
         margin 0 30px 20px 30px
         font-size 70px
@@ -29,8 +28,7 @@
         display flex
         justify-content space-between
       &__description
-        margin-left 30px
-        font-size 18px
+        margin 10px
         &__missing
           color mediumDarkGrey
           font-style italic
