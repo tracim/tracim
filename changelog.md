@@ -1,3 +1,50 @@
+# 3.6.1 / 2021-03-26
+
+### Fixed Issues
+
+- Documentation: [#4355](https://github.com/tracim/tracim/issues/4355)
+
+
+# 3.6.0 / 2021-03-24
+
+### New Features
+
+- Advanced search available with Elasticsearch
+- Translation of Note and Comment directly in Tracim using the Systran service (requires a Systran account)
+
+### Fixed Issues
+
+- Frontend: [#3543](https://github.com/tracim/tracim/issues/3543),
+[#3575](https://github.com/tracim/tracim/issues/3575),
+[#4177](https://github.com/tracim/tracim/issues/4177),
+[#4218](https://github.com/tracim/tracim/issues/4218)
+- UX: [#3553](https://github.com/tracim/tracim/issues/3553),
+[#3557](https://github.com/tracim/tracim/issues/3557),
+[#3791](https://github.com/tracim/tracim/issues/3791)
+- ElasticSearch: [#4146](https://github.com/tracim/tracim/issues/4146),
+[#4147](https://github.com/tracim/tracim/issues/4147),
+[#4149](https://github.com/tracim/tracim/issues/4149)
+- Agenda: [#3553](https://github.com/tracim/tracim/issues/3553)
+- Backend: [#2114](https://github.com/tracim/tracim/issues/2114)
+
+### Breaking Changes
+
+- :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
+If you use docker image, the migration is done automatically when new image is started.
+- ElasticSearch: refactor of the indexing logic.
+- The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias_prefix` (issue [#4147](https://github.com/tracim/tracim/issues/4147)).
+  - It is necessary to drop the existing index, create it again and populate it to use ElasticSearch, use the CLI command for that. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) or see *Updating index of ElasticSearch* section of the [docker documentation](tools_docker/README.md) for more information.
+
+#### Backend configuration file (development.ini)
+
+- On existing Tracim installations, also if using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+
+### Other Changes
+
+- Security: email addresses of users are no longer returned by API when it is not strictly necessary.
+- Translation service: new parameters available in the development.ini file to activate this feature. See the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue [#4093](https://github.com/tracim/tracim/issues/4093)).
+
+
 # 3.5.0 / 2021-02-11
 
 ### New Features
@@ -25,7 +72,7 @@
 ### Breaking Changes
 
 - Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
-- On existing Tracim installations using the docker image: It is necessary to update your development.ini (use this file [development.ini.sample](.backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
+- On existing Tracim installations using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
   - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
   - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
   - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`

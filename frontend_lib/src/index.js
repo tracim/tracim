@@ -34,6 +34,7 @@ import {
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername,
@@ -103,6 +104,9 @@ import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+
+import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
+import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
 
 import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
@@ -245,6 +249,8 @@ export {
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
   CommentTextArea,
+  AddFileToUploadButton,
+  DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
   getContentPath,
@@ -324,6 +330,7 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   RefreshWarningMessage,
   sortTimelineByDate,

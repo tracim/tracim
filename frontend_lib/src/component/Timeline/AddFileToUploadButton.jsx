@@ -36,6 +36,7 @@ export class AddFileToUploadButton extends React.Component {
           onClick={this.handleDisplayPopupUpload}
           color={props.color}
           icon='fas fa-paperclip'
+          disabled={props.disabled}
         />
 
         {state.showUploadPopup && (
@@ -47,7 +48,7 @@ export class AddFileToUploadButton extends React.Component {
             faIcon='fas fa-paperclip'
             onClose={this.handleClosePopup}
             onSuccess={this.handleClosePopup}
-            multipleFiles
+            multipleFiles={props.multipleFiles}
             onValidateOverride={this.handleValidatePopupOverride}
           />
         )}
@@ -59,13 +60,16 @@ export class AddFileToUploadButton extends React.Component {
 export default translate()(AddFileToUploadButton)
 
 AddFileToUploadButton.propTypes = {
-  apiUrl: PropTypes.string.isRequired,
-  workspaceId: PropTypes.string.isRequired,
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   color: PropTypes.string,
+  multipleFiles: PropTypes.bool,
+  disabled: PropTypes.bool,
   onValidateCommentFileToUpload: PropTypes.func
 }
 
 AddFileToUploadButton.defaultProps = {
   color: '#ffa500',
+  multipleFiles: true,
+  disabled: false,
   onValidateCommentFileToUpload: () => {}
 }

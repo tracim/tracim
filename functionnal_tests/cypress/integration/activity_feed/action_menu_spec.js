@@ -30,14 +30,14 @@ describe('At the space recent activities page', () => {
 
   describe('the action menu', () => {
     it('should show a flash message if user click at Copy content link', () => {
-      cy.contains('[data-cy=feedItemHeader__label]', fileTitle)
+      cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
       cy.get('.feedItemHeader__actionMenu').click()
       cy.contains('.feedItemHeader__actionMenu__item', 'Copy content link').click()
       cy.contains('.flashmessage__container__content__text__paragraph', 'The link has been copied to clipboard')
     })
 
     it(`should redirect to content's app if user click at Open content`, () => {
-      cy.contains('[data-cy=feedItemHeader__label]', fileTitle)
+      cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
       cy.get('.feedItemHeader__actionMenu').click()
       cy.contains('.dropdownMenuItem', 'Open content').click()
       cy.contains('.wsContentGeneric__header__title', fileTitle)

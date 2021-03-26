@@ -150,7 +150,7 @@ class Preview extends React.Component {
         return
       }
     } else {
-      previewComponent = this.getJPEGPreview()
+      previewComponent = this.getJPEGPreviewComponent()
     }
 
     this.setState({

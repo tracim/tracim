@@ -4,16 +4,14 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   formatAbsoluteDate,
-  addClassToMentionsOfUser,
   appContentFactory,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CommentTextArea,
   ConfirmPopup,
   CUSTOM_EVENT,
-  displayDistanceDate,
   getContentComment,
-  getOrCreateSessionClientToken,
+  getFileChildContent,
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
@@ -25,7 +23,11 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  TRANSLATION_STATE
+  TRANSLATION_STATE,
+  isFileUploadInErrorState,
+  CONTENT_TYPE,
+  AddFileToUploadButton,
+  DisplayFileToUpload
 } from 'tracim_frontend_lib'
 import {
   CONTENT_NAMESPACE,
@@ -38,11 +40,11 @@ import {
   getPublicationList,
   getWorkspaceDetail,
   getWorkspaceMemberList,
-  postThreadPublication
+  postThreadPublication,
+  postPublicationFile
 } from '../action-creator.async.js'
 import {
-  addCommentListToPublication,
-  appendCommentToPublication,
+  setCommentListToPublication,
   appendPublication,
   newFlashMessage,
   removePublication,
@@ -71,9 +73,12 @@ export class Publications extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommented }
     ])
 
     // NOTE - SG - 2021-03-25 - This will be set to the DOM element
@@ -82,6 +87,7 @@ export class Publications extends React.Component {
     this.state = {
       invalidMentionList: [],
       newComment: '',
+      newCommentAsFileList: [],
       publicationWysiwyg: false,
       showInvalidMentionPopupInComment: false,
       showReorderButton: false
@@ -143,7 +149,7 @@ export class Publications extends React.Component {
 
   handleContentCreatedOrRestored = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
-    if (data.fields.client_token === getOrCreateSessionClientToken()) return
+    if (data.fields.content.parent_id !== null) return
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
@@ -160,20 +166,16 @@ export class Publications extends React.Component {
     if (!parentPublication) return
 
     if (!parentPublication.commentList) {
-      this.getCommentList({ content_id: parentPublication.id })
+      this.getCommentList(parentPublication.id, parentPublication.type)
       return
     }
 
-    const newComment = {
-      ...data.fields.content,
-      timelineType: data.fields.content.content_type,
-      created_raw: data.fields.content.created,
-      created: displayDistanceDate(data.fields.content.created, props.user.lang),
-      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, props.user.username),
-      translatedRawContent: null,
-      translationState: TRANSLATION_STATE.DISABLED
-    }
-    props.dispatch(appendCommentToPublication(newComment))
+    const hasBeenRead = true
+    const newTimeline = props.addCommentToTimeline(
+      data.fields.content, parentPublication.commentList, props.user, hasBeenRead, TRANSLATION_STATE.DISABLED
+    )
+
+    props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
     props.dispatch(updatePublication({
       ...parentPublication,
       modified: data.fields.content.created
@@ -211,7 +213,12 @@ export class Publications extends React.Component {
         props.history.push(PAGE.HOME)
         props.dispatch(newFlashMessage(props.t('Unknown space')))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
+      default:
+        props.dispatch(newFlashMessage(
+          `${props.t('An error has happened while getting')} ${props.t('space detail')}`,
+          'warning'
+        ))
+        break
     }
   }
 
@@ -268,7 +275,7 @@ export class Publications extends React.Component {
     const fetchGetPublicationList = await props.dispatch(getPublicationList(workspaceId))
     switch (fetchGetPublicationList.status) {
       case 200: {
-        fetchGetPublicationList.json.items.forEach(publication => this.getCommentList(publication))
+        fetchGetPublicationList.json.items.forEach(publication => this.getCommentList(publication.content_id, publication.content_type))
         props.dispatch(setPublicationList(fetchGetPublicationList.json.items))
         break
       }
@@ -276,69 +283,136 @@ export class Publications extends React.Component {
     }
   }
 
-  getCommentList = async (publication) => {
+  getCommentList = async (publicationId, publicationContentType) => {
     const { props } = this
     const workspaceId = props.match.params.idws
-    const fetchGetContentComment = await handleFetchResult(await getContentComment(FETCH_CONFIG.apiUrl, workspaceId, publication.content_id))
-    switch (fetchGetContentComment.apiResponse.status) {
-      case 200: {
-        const commentList = fetchGetContentComment.body.map(c => ({
-          ...c,
-          timelineType: c.content_type,
-          created_raw: c.created,
-          created: displayDistanceDate(c.created, props.user.lang),
-          raw_content: addClassToMentionsOfUser(c.raw_content, props.user.username),
-          translatedRawContent: null,
-          translationState: TRANSLATION_STATE.DISABLED
-        }))
-        // INFO - G.B. - 2021-03-19 - We remove the first element because it's already shown in the preview
-        props.dispatch(addCommentListToPublication(publication.content_id, commentList.slice(1)))
-        break
-      }
-      default: props.dispatch(newFlashMessage(`${props.t('Error')}`, 'warning')); break
+
+    const [resComment, resCommentAsFile] = await Promise.all([
+      handleFetchResult(await getContentComment(FETCH_CONFIG.apiUrl, workspaceId, publicationId)),
+      handleFetchResult(await getFileChildContent(FETCH_CONFIG.apiUrl, workspaceId, publicationId))
+    ])
+
+    if (resComment.apiResponse.status !== 200 || resCommentAsFile.apiResponse.status !== 200) {
+      props.dispatch(newFlashMessage(`${props.t('Error loading publication comments')}`, 'warning'))
+      return
     }
+
+    const commentList = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resCommentAsFile.body.items,
+      [], // INFO - CH - 20210324 - this is supposed to be the revision list which we don't have for publications
+      props.user,
+      TRANSLATION_STATE.DISABLED
+    )
+
+    // INFO - G.B. - 2021-03-19 - For threads, we remove the first element because it's already shown in the preview
+    const finalCommentList = publicationContentType === CONTENT_TYPE.FILE ? commentList : commentList.slice(1)
+
+    props.dispatch(setCommentListToPublication(publicationId, finalCommentList))
   }
 
   handleChangeNewPublication = e => this.setState({ newComment: e.target.value })
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.PUBLICATION, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
-  handleClickValidateAnyway = async () => {
-    const { props, state } = this
-    const workspaceId = props.match.params.idws
-    const publicationName = props.t('Publication of {{author}} on {{date}}', {
+  buildPublicationName = (authorName, userLang) => {
+    const { props } = this
+
+    return props.t('Publication of {{author}} on {{date}}', {
       author: props.user.publicName,
-      date: formatAbsoluteDate(new Date(), props.user.lang),
+      date: formatAbsoluteDate(new Date(), userLang).replaceAll('/', '-'),
       interpolation: { escapeValue: false }
     })
+  }
 
-    const fetchPostThreadPublication = await props.dispatch(postThreadPublication(
-      workspaceId,
-      publicationName
-    ))
+  saveThreadPublication = async () => {
+    const { props, state } = this
 
-    switch (fetchPostThreadPublication.status) {
-      case 200: {
-        try {
-          props.appContentSaveNewComment(
-            fetchPostThreadPublication.json,
-            state.publicationWysiwyg,
-            state.newComment,
-            [], // FIXME - CH - 20210322 - handle this in https://github.com/tracim/tracim/issues/4255
-            this.setState.bind(this),
-            '',
-            props.user.username,
-            'Publication'
-          )
-        } catch (e) {
-          this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-        }
-        props.dispatch(appendPublication(fetchPostThreadPublication.json))
-        break
+    const workspaceId = props.match.params.idws
+    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
+
+    const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
+
+    if (fetchPostPublication.status !== 200) {
+      props.dispatch(newFlashMessage(`${props.t('Error while saving new publication')}`, 'warning'))
+      return
+    }
+
+    try {
+      props.appContentSaveNewComment(
+        fetchPostPublication.json,
+        state.publicationWysiwyg,
+        state.newComment,
+        [],
+        this.setState.bind(this),
+        '',
+        props.user.username,
+        'Publication'
+      )
+    } catch (e) {
+      props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
+    }
+  }
+
+  processSaveFilePublication = async () => {
+    const { props, state } = this
+
+    const workspaceId = props.match.params.idws
+    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
+
+    if (state.newCommentAsFileList.length !== 1) return
+
+    const fileToUpload = state.newCommentAsFileList[0]
+    const fetchPostPublicationFile = await props.dispatch(postPublicationFile(workspaceId, fileToUpload, publicationName))
+
+    const isUploadInError = isFileUploadInErrorState(fetchPostPublicationFile)
+    if (isUploadInError) {
+      props.dispatch(newFlashMessage(fetchPostPublicationFile.errorMessage, 'warning'))
+      this.setState({ newCommentAsFileList: [fetchPostPublicationFile] })
+      return
+    }
+
+    if (state.newComment !== '') {
+      try {
+        props.appContentSaveNewComment(
+          fetchPostPublicationFile.responseJson,
+          state.publicationWysiwyg,
+          state.newComment,
+          [],
+          this.setState.bind(this),
+          fetchPostPublicationFile.responseJson.slug,
+          props.user.username,
+          fetchPostPublicationFile.responseJson.content_id
+        )
+      } catch (e) {
+        props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
       }
-      default:
-        props.dispatch(newFlashMessage(`${props.t('Error while saving new publication')}`, 'warning'))
-        break
+    }
+
+    if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
+    this.setState({
+      newComment: '',
+      newCommentAsFileList: []
+    })
+  }
+
+  handleClickValidateAnyway = async () => {
+    const { state } = this
+
+    if (state.newComment !== '' && state.newCommentAsFileList.length === 0) {
+      this.saveThreadPublication()
+    }
+
+    if (state.newCommentAsFileList.length > 0) {
+      this.processSaveFilePublication()
     }
   }
 
@@ -447,23 +521,47 @@ export class Publications extends React.Component {
               />
 
               <div className='publications__publishArea__buttons'>
-                <IconButton
-                  customClass='publications__publishArea__buttons__advancedEdition'
-                  intent='link'
-                  mode='light'
-                  onClick={this.handleToggleWysiwyg}
-                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                />
+                <div className='publications__publishArea__buttons__left'>
+                  <IconButton
+                    customClass='publications__publishArea__buttons__left__advancedEdition'
+                    intent='link'
+                    mode='light'
+                    onClick={this.handleToggleWysiwyg}
+                    text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
+                  />
 
-                <IconButton
-                  color={publicationColor}
-                  disabled={state.newComment === ''}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickPublish}
-                  text={<span>{props.t('Publish')}&nbsp;<i className='far fa-paper-plane' /></span>}
-                  title={props.t('Publish')}
-                />
+                  <div>
+                    <DisplayFileToUpload
+                      fileList={state.newCommentAsFileList}
+                      onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                      color={publicationColor}
+                    />
+                  </div>
+                </div>
+
+                <div className='publications__publishArea__buttons__right'>
+                  <div>
+                    <AddFileToUploadButton
+                      workspaceId={props.currentWorkspace.id}
+                      color={publicationColor}
+                      disabled={state.newCommentAsFileList.length > 0}
+                      multipleFiles={false}
+                      onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                    />
+                  </div>
+
+                  <IconButton
+                    customClass='publications__publishArea__buttons__submit'
+                    color={publicationColor}
+                    disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
+                    intent='primary'
+                    mode='light'
+                    onClick={this.handleClickPublish}
+                    icon='far fa-paper-plane'
+                    text={props.t('Publish')}
+                    title={props.t('Publish')}
+                  />
+                </div>
               </div>
             </div>
           )}

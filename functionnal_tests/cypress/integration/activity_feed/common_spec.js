@@ -110,7 +110,7 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=feedItemHeader__label]').click()
+        cy.get('[data-cy=FilenameWithExtension__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
