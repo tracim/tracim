@@ -315,7 +315,6 @@
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.",
   "Unknown space": "Unknown space",
   "Request accepted": "Request accepted",
-  "Comment": "Comment",
   "commented": "commented",
   "created": "created",
   "modified": "modified",
@@ -426,5 +425,8 @@
   "Simple edition": "Simple edition",
   "Advanced edition": "Advanced edition",
   "Publish": "Publish",
-  "Publication of {{author}} on {{date}}": "Publication of {{author}} on {{date}}"
+  "Publication of {{author}} on {{date}}": "Publication of {{author}} on {{date}}",
+  "Error loading publication comments": "Error loading publication comments",
+  "Publication": "Publication",
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files"
 }

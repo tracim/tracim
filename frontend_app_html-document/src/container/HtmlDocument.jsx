@@ -46,7 +46,8 @@ import {
   permissiveNumberEqual,
   getTranslationApiErrorMessage,
   TRANSLATION_STATE,
-  getDefaultTranslationState
+  getDefaultTranslationState,
+  CONTENT_NAMESPACE
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -598,7 +599,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.CONTENT, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {

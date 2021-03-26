@@ -62,13 +62,14 @@ import {
   USER_PUBLIC_PROFILE
 } from './action-creator.sync.js'
 import {
-  CONTENT_TYPE,
   ErrorFlashMessageTemplateHtml,
   updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
-  TLM_ENTITY_TYPE
+  TLM_ENTITY_TYPE,
+  CONTENT_TYPE,
+  uploadFile
 } from 'tracim_frontend_lib'
 
 /*
@@ -1224,4 +1225,31 @@ export const postThreadPublication = (workspaceId, newContentName) => dispatch =
     actionName: PUBLICATION_THREAD,
     dispatch
   })
+}
+
+export const postPublicationFile = (workspaceId, content, label) => async dispatch => {
+  const errorMessageList = [
+    { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
+    { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
+    { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
+    { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+  ]
+  const result = await uploadFile(
+    content,
+    `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/files`,
+    {
+      additionalFormData: {
+        // FIXME - CH - 20210325 - the parent_id should be the same as the parent_id in postPublication()
+        // see https://github.com/tracim/tracim/issues/1180 and https://github.com/tracim/tracim/issues/3937
+        parent_id: 0,
+        label: label,
+        content_namespace: CONTENT_NAMESPACE.PUBLICATION
+      },
+      httpMethod: 'POST',
+      progressEventHandler: () => {},
+      errorMessageList: errorMessageList,
+      defaultErrorMessage: i18n.t('Error while uploading file')
+    }
+  )
+  return result
 }
