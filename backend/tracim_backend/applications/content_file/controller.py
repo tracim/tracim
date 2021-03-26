@@ -40,7 +40,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import FileContentModifySchema
+from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
@@ -132,7 +132,6 @@ class FileController(Controller):
                 new_mimetype=_file.type,
                 new_content=_file.file,
             )
-        api.execute_created_content_actions(content)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -178,7 +177,6 @@ class FileController(Controller):
             )
 
         api.save(content)
-        api.execute_update_content_actions(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -564,13 +562,13 @@ class FileController(Controller):
     @check_right(is_contributor)
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(FileContentModifySchema())
+    @hapic.input_body(ContentModifySchema())
     @hapic.output_body(FileContentSchema())
     def update_file_info(
         self, context, request: TracimRequest, hapic_data=None
     ) -> ContentInContext:
         """
-        update thread
+        update file
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
@@ -585,10 +583,10 @@ class FileController(Controller):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
-                new_content=hapic_data.body.raw_content,
+                new_raw_content=hapic_data.body.raw_content,
+                new_description=hapic_data.body.description,
             )
             api.save(content)
-            api.execute_update_content_actions(content)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -642,7 +640,6 @@ class FileController(Controller):
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
-            api.execute_update_content_actions(content)
         return
 
     def bind(self, configurator: Configurator) -> None:

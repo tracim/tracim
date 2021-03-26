@@ -1,8 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { distanceInWords, isAfter } from 'date-fns'
+import { formatDistance, isAfter } from 'date-fns'
 import color from 'color'
+import dateFnsFr from 'date-fns/locale/fr'
+import dateFnsEn from 'date-fns/locale/en-US'
+import dateFnsPt from 'date-fns/locale/pt'
+
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -47,10 +51,10 @@ export const PAGE = {
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
 
-const dateFnsLocale = {
-  fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en'),
-  pt: require('date-fns/locale/pt')
+export const DATE_FNS_LOCALE = {
+  fr: dateFnsFr,
+  en: dateFnsEn,
+  pt: dateFnsPt
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -99,7 +103,14 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
+export const displayDistanceDate = (dateToDisplay, lang) => {
+  if (!dateToDisplay) return ''
+  return formatDistance(
+    new Date(dateToDisplay),
+    new Date(),
+    { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
+  )
+}
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
@@ -112,47 +123,57 @@ export const BREADCRUMBS_TYPE = {
 export const revisionTypeList = [{
   id: 'archiving',
   faIcon: 'fas fa-archive',
-  label: i18n.t('Item archived')
+  tradKey: i18n.t('Item archived'),
+  label: 'Item archived'
 }, {
   id: 'content-comment',
   faIcon: 'far fa-comment',
-  label: i18n.t('Comment')
+  tradKey: i18n.t('Comment'),
+  label: 'Comment'
 }, {
   id: 'creation',
   faIcon: 'fas fa-magic',
-  label: i18n.t('Item created')
+  tradKey: i18n.t('Item created'),
+  label: 'Item created'
 }, {
   id: 'deletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item deleted')
+  tradKey: i18n.t('Item deleted'),
+  label: 'Item deleted'
 }, {
   id: 'edition',
-  faIcon: 'fas fa-edit',
-  label: i18n.t('New revision')
+  faIcon: 'fas fa-history',
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'revision',
   faIcon: 'fas fa-history',
-  label: i18n.t('New revision')
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'status-update',
   faIcon: 'fas fa-random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
+  label: (statusLabel) => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
   faIcon: 'far fa-file-archive',
-  label: i18n.t('Item unarchived')
+  tradKey: i18n.t('Item unarchived'),
+  label: 'Item unarchived'
 }, {
   id: 'undeletion',
   faIcon: 'far fa-trash-alt',
-  label: i18n.t('Item restored')
+  tradKey: i18n.t('Item restored'),
+  label: 'Item restored'
 }, {
   id: 'move',
-  faIcon: 'fas arrows-alt',
-  label: i18n.t('Item moved')
+  faIcon: 'fas fa-arrows-alt',
+  tradKey: i18n.t('Item moved'),
+  label: 'Item moved'
 }, {
   id: 'copy',
   faIcon: 'far fa-copy',
-  label: i18n.t('Item copied')
+  tradKey: i18n.t('Item copied'),
+  label: 'Item copied'
 }]
 
 const WORKSPACE_MANAGER = {
@@ -278,6 +299,7 @@ const ON_REQUEST = {
 }
 const CONFIDENTIAL = {
   id: 4,
+  hexcolor: '#B61616',
   slug: 'confidential',
   faIcon: 'fas fa-user-secret',
   tradKey: [
@@ -501,7 +523,7 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision',
+      timelineType: TIMELINE_TYPE.REVISION,
       hasBeenRead: isTokenClient
     }
   ]
@@ -680,14 +702,16 @@ export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
+  const workspaceId = content.workspace_id || content.workspaceId
+  const contentId = content.content_id || content.contentId
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+    await getContentPath(apiUrl, workspaceId, contentId)
   )
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
       return fetchGetContentPath.body.items.map(crumb => ({
-        link: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+        link: PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true

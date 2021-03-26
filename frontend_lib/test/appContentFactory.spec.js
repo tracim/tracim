@@ -69,7 +69,9 @@ describe('appContentFactory.js', () => {
         'appContentRestoreArchive',
         'appContentRestoreDelete',
         'buildTimelineFromCommentAndRevision',
-        'searchForMentionInQuery'
+        'searchForMentionInQuery',
+        'handleTranslateComment',
+        'handleRestoreComment'
       )
     })
   })

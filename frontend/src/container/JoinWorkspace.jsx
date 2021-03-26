@@ -39,8 +39,12 @@ export class JoinWorkspace extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
     this.handleAllAppChangeLanguage()
     await this.loadWorkspaceSubscriptions()
+    if (props.history.location.state && props.history.location.state.fromSearch) {
+      this.setState({ filter: props.spaceSearch.searchString })
+    }
   }
 
   async loadWorkspaceSubscriptions () {
@@ -177,7 +181,7 @@ export class JoinWorkspace extends React.Component {
             <PageTitle
               parentClass={className}
               title={props.t('Join a space')}
-              icon='users'
+              icon='fas fa-users'
               breadcrumbsList={props.breadcrumbs}
             />
 
@@ -187,6 +191,7 @@ export class JoinWorkspace extends React.Component {
                 onChange={e => this.handleWorkspaceFilter(e.target.value)}
                 placeholder={props.t('Filter spaces')}
                 icon='search'
+                value={this.state.filter}
               />
               <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
                 <div className={`${className}__content__workspaceList__item`}>
@@ -219,5 +224,11 @@ export class JoinWorkspace extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, accessibleWorkspaceList, workspaceSubscriptionList }) => ({ breadcrumbs, user, accessibleWorkspaceList, workspaceSubscriptionList })
+const mapStateToProps = ({ accessibleWorkspaceList, breadcrumbs, spaceSearch, user, workspaceSubscriptionList }) => ({
+  accessibleWorkspaceList,
+  breadcrumbs,
+  spaceSearch,
+  user,
+  workspaceSubscriptionList
+})
 export default connect(mapStateToProps)(translate()(TracimComponent(JoinWorkspace)))

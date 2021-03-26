@@ -14,23 +14,24 @@ import {
   PAGE,
   TracimComponent
 } from 'tracim_frontend_lib'
-import ContentItemSearch from '../component/ContentItemSearch.jsx'
+import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
   setCurrentNumberPage,
-  appendSearchResultsList,
-  setSearchResultsList,
+  appendSearchResultList,
+  setSearchResultList,
   setNumberResultsByPage,
-  setSearchedKeywords,
+  setSearchString,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
-import { getSearchedKeywords } from '../action-creator.async.js'
+import { getSimpleSearchResult } from '../action-creator.async.js'
+import { parseSearchUrl, SEARCH_TYPE } from '../util/helper.js'
 
 const qs = require('query-string')
 
-export class SearchResult extends React.Component {
+export class SimpleSearch extends React.Component {
   constructor (props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
@@ -50,21 +51,6 @@ export class SearchResult extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  parseUrl () {
-    const parsed = qs.parse(this.props.location.search)
-    const searchObject = {}
-
-    searchObject.contentTypes = parsed.t
-    searchObject.searchedKeywords = parsed.q
-    searchObject.numberResultsByPage = parseInt(parsed.nr)
-    searchObject.currentPage = parseInt(parsed.p)
-    searchObject.showArchived = !!(parseInt(parsed.arc))
-    searchObject.showDeleted = !!(parseInt(parsed.del))
-    searchObject.showActive = !!(parseInt(parsed.act))
-
-    return searchObject
-  }
-
   componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
@@ -72,13 +58,20 @@ export class SearchResult extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const prevSearchedKeywords = qs.parse(prevProps.location.search).q
-    const currentSearchedKeywords = this.parseUrl().searchedKeywords
+    const { props } = this
+    const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
+    const currentSearch = parseSearchUrl(qs.parse(props.location.search))
 
-    if (prevSearchedKeywords !== currentSearchedKeywords) {
+    if (
+      prevSearch.searchString !== currentSearch.searchString ||
+      prevSearch.currentPage !== currentSearch.currentPage
+    ) {
       this.loadSearchUrl()
     }
-    if (prevProps.system.config.instance_name !== this.props.system.config.instance_name || prevSearchedKeywords !== currentSearchedKeywords) {
+    if (
+      prevProps.system.config.instance_name !== props.system.config.instance_name ||
+      prevSearch.searchString !== currentSearch.searchString
+    ) {
       this.setHeadTitle()
     }
   }
@@ -86,7 +79,7 @@ export class SearchResult extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [`${props.t('Search results')} : ${this.parseUrl().searchedKeywords}`]
+      [`${props.t('Search results')} : ${parseSearchUrl(qs.parse(props.location.search)).searchString}`]
     )
 
     props.dispatch(setHeadTitle(headTitle))
@@ -94,26 +87,36 @@ export class SearchResult extends React.Component {
 
   loadSearchUrl = async () => {
     const { props } = this
-    const searchObject = this.parseUrl()
+    const searchObject = parseSearchUrl(qs.parse(props.location.search))
     const FIRST_PAGE = 1
+    // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
+    const hasFirstPage = !(props.simpleSearch.resultList.length < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
 
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
+    const fetchGetSimpleSearchResult = await props.dispatch(getSimpleSearchResult(
       searchObject.contentTypes,
-      searchObject.searchedKeywords,
-      FIRST_PAGE,
-      (searchObject.numberResultsByPage * searchObject.currentPage),
+      searchObject.searchString,
+      hasFirstPage
+        ? searchObject.currentPage
+        : FIRST_PAGE,
+      hasFirstPage
+        ? searchObject.numberResultsByPage
+        : searchObject.numberResultsByPage * searchObject.currentPage,
       searchObject.showArchived,
       searchObject.showDeleted,
       searchObject.showActive
     ))
 
-    switch (fetchGetSearchedKeywords.status) {
+    switch (fetchGetSimpleSearchResult.status) {
       case 200:
-        props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
-        props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        props.dispatch(setCurrentNumberPage(searchObject.currentPage))
+        props.dispatch(setSearchString(searchObject.searchString))
+        props.dispatch(setCurrentNumberPage(searchObject.currentPage, SEARCH_TYPE.SIMPLE))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
-        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
+        if (searchObject.currentPage === FIRST_PAGE || !hasFirstPage) {
+          props.dispatch(setSearchResultList(fetchGetSimpleSearchResult.json.contents, SEARCH_TYPE.SIMPLE))
+        } else {
+          props.dispatch(appendSearchResultList(fetchGetSimpleSearchResult.json.contents, SEARCH_TYPE.SIMPLE))
+        }
+        this.setState({ totalHits: fetchGetSimpleSearchResult.json.total_hits })
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -121,13 +124,7 @@ export class SearchResult extends React.Component {
     }
   }
 
-  getPath = (parentsList) => {
-    let parentPath = ''
-    if (parentsList.length > 0) {
-      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label} / ${acc}`, '')
-    }
-    return parentPath
-  }
+  getPath = (path) => path.map(c => c.label).join(' / ')
 
   getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
@@ -145,47 +142,27 @@ export class SearchResult extends React.Component {
 
   handleClickSeeMore = async () => {
     const { props } = this
-    const NEXT_PAGE = props.searchResult.currentNumberPage + 1
-    const searchObject = this.parseUrl()
-
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      searchObject.contentTypes,
-      props.searchResult.searchedKeywords,
-      NEXT_PAGE,
-      props.searchResult.numberResultsByPage,
-      searchObject.showArchived,
-      searchObject.showDeleted,
-      searchObject.showActive
-    ))
-
-    switch (fetchGetSearchedKeywords.status) {
-      case 200:
-        props.dispatch(setCurrentNumberPage(NEXT_PAGE))
-        props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
-        props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true }))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
-        break
-    }
+    const nextPage = props.simpleSearch.currentPage + 1
+    props.history.push(
+      `${PAGE.SEARCH_RESULT}?${qs.stringify({ ...qs.parse(props.location.search), p: nextPage }, { encode: true })}`
+    )
   }
 
   setSubtitle () {
     const { props } = this
-    const { searchResult } = props
+    const { simpleSearch } = props
 
-    const numberResults = searchResult.resultsList.length
+    const numberResults = simpleSearch.resultList.length
     const text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
-    const subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
+    const subtitle = `${numberResults} ${text} "${simpleSearch.searchString}"`
 
     return subtitle
   }
 
   getSubtitle () {
     let subtitle = ''
-    const currentNumberSearchResults = this.props.searchResult.resultsList.length
+    const currentNumberSearchResults = this.props.simpleSearch.resultList.length
     if (currentNumberSearchResults > 0) {
       subtitle = this.setSubtitle()
     }
@@ -196,7 +173,7 @@ export class SearchResult extends React.Component {
   hasMoreResults () {
     const { props } = this
     const currentNumberSearchResults = this.state.totalHits
-    return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
+    return currentNumberSearchResults >= (props.simpleSearch.numberResultsByPage * props.simpleSearch.currentPage)
   }
 
   buildBreadcrumbs = () => {
@@ -212,7 +189,7 @@ export class SearchResult extends React.Component {
 
   render () {
     const { props } = this
-    const currentNumberSearchResults = props.searchResult.resultsList.length
+    const currentNumberSearchResults = props.simpleSearch.resultList.length
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -238,21 +215,21 @@ export class SearchResult extends React.Component {
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
+                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchString}"`}
                   </div>
                 )}
 
-                {props.searchResult.resultsList.map((searchItem, index) => (
+                {props.simpleSearch.resultList.map((searchItem, index) => (
                   <ListItemWrapper
                     label={searchItem.label}
                     read
-                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                    isLast={index === props.searchResult.resultsList.length - 1}
+                    contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
+                    isLast={index === props.simpleSearch.resultList.length - 1}
                     key={searchItem.contentId}
                   >
                     <ContentItemSearch
                       label={searchItem.label}
-                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
+                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
                       lastModificationAuthor={searchItem.lastModifier}
                       lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                       lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
@@ -275,7 +252,7 @@ export class SearchResult extends React.Component {
                       text={props.t('See more')}
                     />
                   )
-                  : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
+                  : currentNumberSearchResults > props.simpleSearch.numberResultsByPage &&
                     props.t('No more results')
                 )}
               </div>
@@ -287,5 +264,5 @@ export class SearchResult extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, searchResult, contentType, system, user }) => ({ breadcrumbs, searchResult, contentType, system, user })
-export default connect(mapStateToProps)(translate()(TracimComponent(SearchResult)))
+const mapStateToProps = ({ breadcrumbs, simpleSearch, contentType, system, user }) => ({ breadcrumbs, simpleSearch, contentType, system, user })
+export default connect(mapStateToProps)(translate()(TracimComponent(SimpleSearch)))

@@ -1,10 +1,12 @@
 import React from 'react'
 import {
+  ADVANCED_SEARCH_TYPE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -19,7 +21,7 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   NOTIFICATION_NOT_READ_COUNT,
-  SEARCHED_KEYWORDS,
+  SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
   USER,
@@ -805,9 +807,9 @@ export const getUserCalendar = userId => dispatch => {
   })
 }
 
-export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
+export const getSimpleSearchResult = (contentTypes, searchString, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -815,7 +817,7 @@ export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, 
       },
       method: 'GET'
     },
-    actionName: SEARCHED_KEYWORDS,
+    actionName: SEARCHED_STRING,
     dispatch
   })
 }
@@ -1097,6 +1099,89 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
       })
     },
     actionName: USER_PUBLIC_PROFILE,
+    dispatch
+  })
+}
+
+const getUTCMidnight = (dateString) => parseISO(`${dateString}T00:00:00Z`)
+
+const getDateRangeParameters = (range, rangeParameterPrefix) => {
+  const rangeParameterList = []
+  if (range.from) {
+    const fromDate = getUTCMidnight(range.from)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const fromDateString = fromDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_from=${fromDateString}`)
+  }
+  if (range.to) {
+    const toDate = getUTCMidnight(range.to)
+    toDate.setDate(toDate.getDate() + 1)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const toDateString = toDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_to=${toDateString}`)
+  }
+  return rangeParameterList
+}
+
+export const getAdvancedSearchResult = (
+  searchString,
+  contentTypes,
+  pageNumber,
+  pageSize,
+  showArchived,
+  showDeleted,
+  showActive,
+  searchType,
+  searchFieldList,
+  createdRange,
+  modifiedRange,
+  newestAuthoredContentRange,
+  searchFacets
+) => dispatch => {
+  let queryParameterList = []
+  if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
+  else queryParameterList.push('search_string=*')
+  if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
+  if (Number.isInteger(pageSize)) queryParameterList.push(`size=${pageSize}`)
+  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+  if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
+  if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
+  if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+    if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
+    if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
+    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
+    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
+    if (searchFacets) {
+      if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
+      if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
+      if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
+      if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
+      if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+    }
+  }
+  if (searchType === ADVANCED_SEARCH_TYPE.USER) {
+    if (searchFacets && searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
+    if (newestAuthoredContentRange) {
+      queryParameterList = queryParameterList.concat(getDateRangeParameters(newestAuthoredContentRange, 'newest_authored_content_date'))
+    }
+  }
+  if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+    if (searchFacets && searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
+    if (searchFacets && searchFacets.owners) queryParameterList.push(`owner_ids=${searchFacets.owners}`)
+  }
+
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?${queryParameterList.join('&')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: SEARCHED_STRING,
     dispatch
   })
 }

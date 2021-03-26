@@ -62,6 +62,7 @@
     },
     "personal_page": {
       "title": " ",
+      "format": "html",
       "type": "string"
     },
     "tasks": {

@@ -35,7 +35,8 @@ import {
   unLoggedAllowedPageList,
   getUserProfile,
   toggleFavicon,
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  SEARCH_TYPE
 } from '../util/helper.js'
 import {
   getAppList,
@@ -69,7 +70,8 @@ import {
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
-import SearchResult from './SearchResult.jsx'
+import AdvancedSearch from './AdvancedSearch.jsx'
+import SimpleSearch from './SimpleSearch.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
 import { serializeUserProps } from '../reducer/user.js'
@@ -523,7 +525,12 @@ export class Tracim extends React.Component {
 
           <Route path='/wip/:cp' component={WIPcomponent} /> {/* for testing purpose only */}
 
-          <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
+          <Route
+            path={PAGE.SEARCH_RESULT}
+            component={props.system.config.search_engine === SEARCH_TYPE.ADVANCED
+              ? AdvancedSearch
+              : SimpleSearch}
+          />
 
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />

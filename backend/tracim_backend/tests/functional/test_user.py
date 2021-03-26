@@ -27,6 +27,7 @@ from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import create_png_test_image
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -3340,10 +3341,10 @@ class TestUserEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == res
+        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
         assert last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == author
+        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
 
     @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
     def test_api__create_user__with_only_username(

@@ -606,3 +606,11 @@ class ReservedUsernameError(TracimException):
 
 class UserFollowAlreadyDefined(TracimException):
     error_code = ErrorCode.USER_FOLLOW_ALREADY_DEFINED
+
+
+class AdvancedSearchNotEnabled(TracimException):
+    error_code = ErrorCode.ADVANCED_SEARCH_NOT_ENABLED
+
+
+class IndexingError(TracimException):
+    pass

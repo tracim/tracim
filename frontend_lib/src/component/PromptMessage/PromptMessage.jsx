@@ -36,12 +36,12 @@ const PromptMessage = props => (
 export default PromptMessage
 
 PromptMessage.propTypes = {
-  msg: PropTypes.string,
+  msg: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   btnType: PropTypes.oneOf([
     'button', 'link'
   ]),
   icon: PropTypes.string,
-  btnLabel: PropTypes.string,
+  btnLabel: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   onClickBtn: PropTypes.func,
   tooltip: PropTypes.string
 }

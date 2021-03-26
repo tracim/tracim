@@ -11,7 +11,7 @@ import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import {
   ROLE,
-  Badge,
+  FilenameWithExtension,
   ListItemWrapper,
   ComposedIcon
 } from 'tracim_frontend_lib'
@@ -79,13 +79,7 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-
-            <div className='content__name' title={props.label}>
-              {props.label}
-              {props.contentType.slug === 'file' && (
-                <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
-              )}
-            </div>
+            <FilenameWithExtension file={props} customClass='content__name' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (

@@ -62,6 +62,7 @@ class ConfigModel(object):
         email_notification_activated: bool,
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
+        translation_service__enabled: bool,
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
         content_length_file_size_limit: int,
@@ -69,6 +70,7 @@ class ConfigModel(object):
         workspaces_number_per_user_limit: int,
         instance_name: str,
         email_required: bool,
+        search_engine: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -80,6 +82,8 @@ class ConfigModel(object):
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
         self.instance_name = instance_name
         self.email_required = email_required
+        self.search_engine = search_engine
+        self.translation_service__enabled = translation_service__enabled
 
 
 class ErrorCodeModel(object):
@@ -418,6 +422,19 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
+class CommentPathFilename(object):
+    """
+    Paths params with workspace id and content_id and comment_id model
+    and filename, useful to get preview/translation of a comment.
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, comment_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.comment_id = comment_id
+        self.filename = filename
+
+
 class KnownMembersQuery(object):
     """
     Autocomplete query model
@@ -616,14 +633,20 @@ class SetContentStatus(object):
         self.status = status
 
 
-class TextBasedContentUpdate(object):
+class ContentUpdate(object):
     """
-    TextBasedContent update model
+    Content update model
     """
 
-    def __init__(self, label: str, raw_content: str) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
+        self.description = description
 
 
 class BasePaginatedQuery(object):
@@ -634,6 +657,15 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
+
+
+class TranslationQuery:
+    def __init__(
+        self, source_language_code: str, target_language_code: str, force_download: int = 0,
+    ):
+        self.source_language_code = source_language_code
+        self.target_language_code = target_language_code
+        self.force_download = force_download
 
 
 class LiveMessageQuery(BasePaginatedQuery):
@@ -690,10 +722,17 @@ class FolderContentUpdate(object):
     Folder Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, sub_content_types: List[str]) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        sub_content_types: Optional[List[str]] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
+        self.description = description
 
 
 class Agenda(object):
@@ -1185,6 +1224,10 @@ class ContentInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.content.raw_content
+
+    @property
+    def description(self) -> str:
         return self.content.description
 
     @property
@@ -1285,7 +1328,7 @@ class ContentInContext(object):
         :return: size of content if available, None if unavailable
         """
         if not self.content.depot_file:
-            return None
+            return len(self.raw_content)
         try:
             return self.content.depot_file.file.content_length
         except IOError:
@@ -1296,7 +1339,11 @@ class ContentInContext(object):
             logger.warning(
                 self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-        return None
+        # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
+        # avoid broken search (both simple and elasticsearch)
+        # when broken content exist (content without valid depot file)
+        # see #4267 for better solution.
+        return 0
 
     @property
     def has_pdf_preview(self) -> bool:
@@ -1371,6 +1418,15 @@ class ContentInContext(object):
 
         api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
         return len(api.get_content_shares(self.content))
+
+    @property
+    def content_path(self) -> List["ContentInContext"]:
+        return [
+            ContentInContext(
+                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
+            )
+            for component in self.content.content_path
+        ]
 
 
 class RevisionInContext(object):
@@ -1460,6 +1516,10 @@ class RevisionInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @property
+    def description(self) -> str:
         return self.revision.description
 
     @property

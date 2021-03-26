@@ -83,7 +83,8 @@ export class Account extends React.Component {
         agendaUrl: '',
         username: '',
         isUsernameValid: true,
-        usernameInvalidMsg: ''
+        usernameInvalidMsg: '',
+        email: ''
       },
       subComponentMenu: builtSubComponentMenu
     }
@@ -93,27 +94,16 @@ export class Account extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModifiedOrCreated },
+      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserModifiedOrCreated }
     ])
   }
 
   // TLM Handler
-  handleUserModified = data => {
+  handleUserModifiedOrCreated = async (data) => {
     const { state } = this
     if (Number(state.userToEditId) !== data.fields.user.user_id) return
-    if (state.userToEdit.publicName !== data.fields.user.public_name) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, publicName: data.fields.user.public_name } }))
-      return
-    }
-    if (state.userToEdit.username !== data.fields.user.username) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, username: data.fields.user.username } }))
-      return
-    }
-    if (state.userToEdit.email !== data.fields.user.email) {
-      this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: data.fields.user.email } }))
-      return
-    }
-    if (state.userToEdit.profile !== data.fields.user.profile) this.setState(prev => ({ userToEdit: { ...prev.userToEdit, profile: data.fields.user.profile } }))
+    await this.getUserDetail()
   }
 
   // Custom Event Handler
@@ -176,7 +166,6 @@ export class Account extends React.Component {
         this.setState(prev => ({
           userToEdit: {
             ...prev.userToEdit,
-            allowedSpace: fetchGetUser.json.allowed_space,
             ...serialize(fetchGetUser.json, serializeUserProps)
           },
           subComponentMenu: prev.subComponentMenu

@@ -1,28 +1,94 @@
 from datetime import datetime
 import typing
 
+from dateutil.parser import parse
 from elasticsearch import Elasticsearch
+from elasticsearch import NotFoundError
 from elasticsearch.client import IngestClient
+from elasticsearch_dsl import Document
 from elasticsearch_dsl import Index
 from elasticsearch_dsl import Search
+from elasticsearch_dsl.response.aggs import Bucket
+import pluggy
+from sqlalchemy import inspect
+from sqlalchemy.event import listen
 from sqlalchemy.orm import Session
 
+# from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import IndexingError
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rq import RqQueueName
+from tracim_backend.lib.rq import get_rq_queue2
+from tracim_backend.lib.rq.worker import worker_context
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
+from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import FacetCount
+from tracim_backend.lib.search.elasticsearch_search.models import UserSearchResponse
+from tracim_backend.lib.search.elasticsearch_search.models import WorkspaceSearchResponse
+from tracim_backend.lib.search.models import ContentSearchField
 from tracim_backend.lib.search.models import ContentSearchResponse
-from tracim_backend.lib.search.models import EmptyContentSearchResponse
+from tracim_backend.lib.search.models import UserSearchField
+from tracim_backend.lib.search.models import WorkspaceSearchField
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import UserInContext
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
+from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
+
+FILE_PIPELINE_ID = "attachment"
+FILE_PIPELINE_SOURCE_FIELD = "b64_file"
+FILE_PIPELINE_DESTINATION_FIELD = "file_data"
+FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
+
+DEFAULT_CONTENT_SEARCH_FIELDS = list(ContentSearchField)
+DEFAULT_USER_SEARCH_FIELDS = list(UserSearchField)
+DEFAULT_WORKSPACE_SEARCH_FIELDS = list(WorkspaceSearchField)
+
+T = typing.TypeVar("T")
+
+
+def name_starts_with_any_prefix(name: str, name_prefixes: typing.Iterable[str]) -> bool:
+    return any(name.startswith(n) for n in name_prefixes)
+
+
+class IndexParameters:
+    def __init__(
+        self,
+        alias: str,
+        document_class: typing.Type[Document],
+        index_name_template: str,
+        indexer: object,
+    ) -> None:
+        self.alias = alias
+        self.document_class = document_class
+        self.index_name_template = index_name_template
+        self.indexer = indexer
 
 
 class ESSearchApi(SearchApi):
     """
-    Search using ElasticSearch :
+    Search using ElasticSearch:
     - need indexing content first
     - allow pagination and filtering by content_type, deleted, archived
     - support ranking
@@ -33,7 +99,7 @@ class ESSearchApi(SearchApi):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
-        # TODO - G.M - 2019-05-31 - we do support only "one elasticsearch server case here in config,
+        # TODO - G.M - 2019-05-31 - we support only one elasticsearch server case here in config,
         # check how to support more complex case.
         self.es = Elasticsearch(
             hosts=[
@@ -45,65 +111,83 @@ class ESSearchApi(SearchApi):
                 )
             ]
         )
-        self.index_document_pattern = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE.format(
-            date="*", index_alias=config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
-        )
-        self.index_document_pattern_template = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE
-        self.index_document_alias = config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
+        self.IndexedUser = create_indexed_user_class(config)
 
-    def create_index(self) -> None:
-        """
-        Create the index template in elasticsearch specifying the mappings and any
-        settings to be used. This can be run at any time, ideally at every new code
-        deploy
-        """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-
-        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
+    def create_indices(self) -> None:
+        # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
-        logger.info(self, "Create index settings ...")
+        logger.info(self, "Creating ES indices...")
         if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             self._create_ingest_pipeline()
-        # create an index template
-        index_template = IndexedContent._index.as_template(
-            self.index_document_alias, self.index_document_pattern
+
+        indices_parameters = self._get_indices_parameters()
+        for parameters in indices_parameters:
+            self.create_template(parameters)
+            # NOTE - 2021-03-17 - S.G. - Testing the existence of the index through its
+            # alias name as the indice names have the datetime of creation included.
+            current_index = Index(parameters.alias)
+            if not current_index.exists(using=self.es):
+                index_name = self._get_index_name(parameters)
+                self.es.indices.create(index=index_name)
+                self.set_alias(parameters, index_name)
+
+        logger.info(self, "ES indices are ready")
+
+    def create_template(self, parameters: IndexParameters) -> None:
+        """Create an index template based on the given model."""
+        index_template = parameters.document_class._index.as_template(
+            parameters.alias, self._get_index_pattern(parameters)
         )
         # upload the template into elasticsearch
         # potentially overriding the one already there
         index_template.save(using=self.es)
 
-        # create the first index if it doesn't exist
-        current_index = Index(self.index_document_alias)
-        if not current_index.exists(using=self.es):
-            self.migrate_index(move_data=False)
+    def set_alias(self, parameters: IndexParameters, index_name: str) -> None:
+        """Ensure that the alias of the given parameters does point to the given index."""
+        self.es.indices.update_aliases(
+            body={
+                "actions": [
+                    {
+                        "remove": {
+                            "alias": parameters.alias,
+                            "index": self._get_index_pattern(parameters),
+                        }
+                    },
+                    {"add": {"alias": parameters.alias, "index": index_name}},
+                ]
+            }
+        )
 
-        logger.info(self, "ES index is ready")
-
-    def refresh_index(self) -> None:
+    def refresh_indices(self) -> None:
         """
-        refresh index to obtain up to odate information instead of relying on
-        periodically refresh, usefull for automated tests
+        refresh indices to obtain up to date information instead of relying on
+        periodical refresh, useful for automated tests.
         see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
         """
+        for parameters in self._get_indices_parameters():
+            self.es.indices.refresh(parameters.alias)
 
-        self.es.indices.refresh(self.index_document_alias)
-
-    def delete_index(self) -> None:
+    def delete_indices(self) -> None:
 
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
-        logger.info(self, "delete index with pattern {}".format(self.index_document_pattern))
-        self.es.indices.delete(self.index_document_pattern, allow_no_indices=True)
-        self.es.indices.delete_template(self.index_document_alias)
+        for parameters in self._get_indices_parameters():
+            index_pattern = self._get_index_pattern(parameters)
+            logger.info(self, "deleting indices whose name matches {}".format(index_pattern))
+            self.es.indices.delete(index_pattern, allow_no_indices=True)
+            self.es.indices.delete(parameters.alias, ignore_unavailable=True)
+            try:
+                self.es.indices.delete_template(parameters.alias)
+            except NotFoundError:
+                # Ignore error when no matching alias exists
+                pass
 
-    def migrate_index(self, move_data=True, update_alias=True) -> None:
+    def migrate_indices(self) -> None:
         """
-        Upgrade function that creates a new index for the data. Optionally it also can
-        (and by default will) reindex previous copy of the data into the new index
-        (specify ``move_data=False`` to skip this step) and update the alias to
-        point to the latest index (set ``update_alias=False`` to skip).
+        Upgrade function that creates new indices for the data and re-index
+        the previous copy of the data into the new indices.
+
         Note that while this function is running the application can still perform
         any and all searches without any loss of functionality. It should, however,
         not perform any writes at this time as those might be lost.
@@ -111,156 +195,197 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
-        next_index = self.index_document_pattern_template.replace(
-            "{index_alias}", self.index_document_alias
-        ).replace("{date}", datetime.now().strftime("%Y%m%d%H%M%S%f"))
+        for parameters in self._get_indices_parameters():
+            new_index_name = self._get_index_name(parameters)
 
-        logger.info(self, 'create new index "{}"'.format(next_index))
-        # create new index, it will use the settings from the template
-        self.es.indices.create(index=next_index)
+            logger.info(self, 'Creating new index "{}"'.format(new_index_name))
+            # create new index, it will use the settings from the template
+            self.es.indices.create(index=new_index_name)
 
-        if move_data:
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(self.index_document_alias, next_index)
+                self, 'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name)
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={
-                    "source": {"index": self.index_document_alias},
-                    "dest": {"index": next_index},
-                },
+                body={"source": {"index": parameters.alias}, "dest": {"index": new_index_name}},
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
-            self.es.indices.refresh(index=next_index)
+            self.es.indices.refresh(index=new_index_name)
 
-        if update_alias:
             logger.info(
                 self,
-                'set alias "{}" to point on index "{}"'.format(
-                    self.index_document_alias, next_index
+                'Setting alias "{}" to point on index "{}"'.format(
+                    parameters.alias, new_index_name
                 ),
             )
-            # repoint the alias to point to the newly created index
-            self.es.indices.update_aliases(
-                body={
-                    "actions": [
-                        {
-                            "remove": {
-                                "alias": self.index_document_alias,
-                                "index": self.index_document_pattern,
-                            }
-                        },
-                        {"add": {"alias": self.index_document_alias, "index": next_index}},
-                    ]
-                }
-            )
+            # move the alias to point to the newly created index
+            self.set_alias(parameters, new_index_name)
 
-    def index_content(self, content: ContentInContext) -> None:
+    def index_content(self, content: Content) -> None:
         """
         Index/update a content into elastic_search engine
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
-        from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
-
-        if content.content_type == content_type_list.Comment.slug:
-            content = content.parent
-            # INFO - G.M - 2019-05-20 - we currently do not support comment without parent
-            assert content
-        logger.info(self, "Indexing content {}".format(content.content_id))
-        author = DigestUser(user_id=content.author.user_id, public_name=content.author.public_name)
+        content_in_context = ContentInContext(content, config=self._config, dbsession=self._session)
+        logger.info(self, "Indexing content {}".format(content_in_context.content_id))
+        author = DigestUser(
+            user_id=content_in_context.author.user_id,
+            public_name=content_in_context.author.public_name,
+            has_avatar=content_in_context.author.has_avatar,
+            has_cover=content_in_context.author.has_cover,
+        )
         last_modifier = DigestUser(
-            user_id=content.last_modifier.user_id, public_name=content.last_modifier.public_name
+            user_id=content_in_context.last_modifier.user_id,
+            public_name=content_in_context.last_modifier.public_name,
+            has_avatar=content_in_context.last_modifier.has_avatar,
+            has_cover=content_in_context.last_modifier.has_cover,
         )
         workspace = DigestWorkspace(
-            workspace_id=content.workspace.workspace_id, label=content.workspace.label
+            workspace_id=content_in_context.workspace.workspace_id,
+            label=content_in_context.workspace.label,
         )
-        parents = []
-        parent = None
-        if content.parent:
-            parent = DigestContent(
-                content_id=content.parent.content_id,
-                parent_id=content.parent.parent_id,
-                label=content.parent.label,
-                slug=content.parent.slug,
-                content_type=content.parent.content_type,
+        path = [
+            DigestContent(
+                content_id=component.content_id,
+                label=component.label,
+                slug=component.slug,
+                content_type=component.content_type,
             )
-            for parent_ in content.parents:
-                digest_parent = DigestContent(
-                    content_id=parent_.content_id,
-                    parent_id=parent_.parent_id,
-                    label=parent_.label,
-                    slug=parent_.slug,
-                    content_type=parent_.content_type,
-                )
-                parents.append(digest_parent)
-        comments = []
-        for comment in content.comments:
-            digest_comment = DigestComments(
+            for component in content_in_context.content_path
+        ]
+        comments = [
+            DigestComments(
                 content_id=comment.content_id,
                 parent_id=comment.parent_id,
                 content_type=comment.content_type,
                 raw_content=comment.raw_content,
             )
-            comments.append(digest_comment)
+            for comment in content_in_context.comments
+        ]
         indexed_content = IndexedContent(
-            content_id=content.content_id,
-            label=content.label,
-            slug=content.slug,
-            status=content.status,
-            workspace_id=content.workspace_id,
+            content_namespace=content_in_context.content_namespace,
+            content_id=content_in_context.content_id,
+            current_revision_id=content_in_context.current_revision_id,
+            current_revision_type=content_in_context.current_revision_type,
+            slug=content_in_context.slug,
+            parent_id=content_in_context.parent_id,
+            workspace_id=content_in_context.workspace_id,
             workspace=workspace,
-            parent_id=content.parent_id or None,
-            parent=parent,
-            parents=parents or None,
+            label=content_in_context.label,
+            content_type=content_in_context.content_type,
+            sub_content_types=content_in_context.sub_content_types,
+            status=content_in_context.status,
+            is_archived=content_in_context.is_archived,
+            is_deleted=content_in_context.is_deleted,
+            is_editable=content_in_context.is_editable,
+            is_active=content_in_context.is_active,
+            show_in_ui=content_in_context.show_in_ui,
+            file_extension=content_in_context.file_extension,
+            filename=content_in_context.filename,
+            modified=content_in_context.modified,
+            created=content_in_context.created,
+            active_shares=content_in_context.actives_shares,
+            description=content_in_context.description,
+            path=path,
+            comments=comments,
+            comment_count=len(comments),
             author=author,
-            comments=comments or None,
             last_modifier=last_modifier,
-            content_type=content.content_type,
-            sub_content_types=content.sub_content_types,
-            is_deleted=content.is_deleted,
-            deleted_through_parent_id=content.deleted_through_parent_id,
-            is_archived=content.is_archived,
-            archived_through_parent_id=content.archived_through_parent_id,
-            is_editable=content.is_editable,
-            is_active=content.is_active,
-            show_in_ui=content.show_in_ui,
-            file_extension=content.file_extension,
-            filename=content.filename,
-            modified=content.modified,
-            created=content.created,
-            raw_content=content.raw_content,
-            current_revision_id=content.current_revision_id,
+            archived_through_parent_id=content_in_context.archived_through_parent_id,
+            deleted_through_parent_id=content_in_context.deleted_through_parent_id,
+            raw_content=content_in_context.raw_content,
+            content_size=content_in_context.size,
         )
-        indexed_content.meta.id = content.content_id
-        if self._can_index_content(content):
-            file_ = content.get_b64_file()
-            if file_:
-                indexed_content.b64_file = file_
-                indexed_content.save(
-                    using=self.es,
-                    pipeline="attachment",
-                    index=self.index_document_alias,
-                    request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
-                )
-                return
-            logger.debug(
-                self,
-                'Skip binary content file of content "{}": no binary content'.format(
-                    content.content_id
-                ),
-            )
+        indexed_content.meta.id = content_in_context.content_id
+        content_index_alias = self._get_index_parameters(IndexedContent).alias
+        pipeline_id = None  # type: typing.Optional[str]
+        if self._should_index_depot_file(content_in_context):
+            indexed_content.b64_file = content_in_context.get_b64_file()
+            pipeline_id = FILE_PIPELINE_ID
         indexed_content.save(
             using=self.es,
-            index=self.index_document_alias,
+            pipeline=pipeline_id,
+            index=content_index_alias,
             request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
         )
 
-    def _can_index_content(self, content: ContentInContext) -> bool:
+    def index_contents(self, contents: typing.Iterable[Content]) -> None:
+        """Index the given contents."""
+        for content in contents:
+            self.index_content(content)
+
+    def index_user(self, user: User) -> None:
+        """Index the given user in the appropriate index."""
+        user_in_context = UserInContext(user, dbsession=self._session, config=self._config)
+
+        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
+        workspace_ids = rapi.get_user_workspaces_ids(user.user_id)
+        capi = ContentApi(config=self._config, session=self._session, current_user=None)
+        try:
+            newest_authored_content_date = capi.get_newest_authored_content(
+                user_in_context.user_id
+            ).created
+        except ContentNotFound:
+            newest_authored_content_date = None
+
+        indexed_user = self.IndexedUser(
+            user_id=user_in_context.user_id,
+            public_name=user_in_context.public_name,
+            username=user_in_context.username,
+            is_deleted=user_in_context.is_deleted,
+            is_active=user_in_context.is_active,
+            has_avatar=user_in_context.has_avatar,
+            has_cover=user_in_context.has_cover,
+            workspace_ids=workspace_ids,
+            custom_properties=user.custom_properties.fields,
+            newest_authored_content_date=newest_authored_content_date,
+        )
+        indexed_user.meta.id = user.user_id
+        user_index_alias = self._get_index_parameters(self.IndexedUser).alias
+        indexed_user.save(
+            using=self.es,
+            index=user_index_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
+
+    def delete_user(self, user: User) -> None:
+        """Delete the given user from the corresponding ES index."""
+        user_index_alias = self._get_index_parameters(self.IndexedUser).alias
+        self.es.delete(user_index_alias, user.user_id)
+
+    def index_workspace(self, workspace: Workspace) -> None:
+        """Index the given worspace in the appropriate ES index."""
+        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
+        capi = ContentApi(config=self._config, session=self._session, current_user=None)
+        member_ids = rapi.get_workspace_member_ids(workspace.workspace_id)
+        indexed_workspace = IndexedWorkspace(
+            access_type=workspace.access_type.value,
+            workspace_id=workspace.workspace_id,
+            label=workspace.label,
+            description=workspace.description,
+            owner_id=workspace.owner_id,
+            member_ids=member_ids,
+            member_count=len(member_ids),
+            content_count=capi.get_all_query(workspace=workspace).count(),
+        )
+        indexed_workspace.meta.id = workspace.workspace_id
+        workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
+        indexed_workspace.save(
+            using=self.es,
+            index=workspace_index_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
+
+    def delete_workspace(self, workspace: Workspace) -> None:
+        """Delete the given workspace from the corresponding ES index."""
+        workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
+        self.es.delete(workspace_index_alias, workspace.workspace_id)
+
+    def register_plugins(self, plugin_manager: pluggy.PluginManager) -> None:
+        for parameters in self._get_indices_parameters():
+            plugin_manager.register(parameters.indexer)
+
+    def _should_index_depot_file(self, content: ContentInContext) -> bool:
         if not self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             logger.debug(
                 self,
@@ -327,96 +452,762 @@ class ESSearchApi(SearchApi):
 
         return True
 
+    @classmethod
+    def create_es_datetime_range(
+        cls, range_from: typing.Optional[datetime], range_to: typing.Optional[datetime]
+    ) -> typing.Dict[str, str]:
+        range_ = {}
+
+        if range_from:
+            range_.update({"gte": range_from.isoformat()})
+
+        if range_to:
+            range_.update({"lte": range_to.isoformat()})
+
+        return range_
+
     def search_content(
-        self,
-        search_string: str,
-        size: typing.Optional[int],
-        page_nb: typing.Optional[int],
-        content_types: typing.Optional[typing.List[str]] = None,
-        show_deleted: bool = False,
-        show_archived: bool = False,
-        show_active: bool = True,
+        self, search_parameters: AdvancedContentSearchQuery
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 
-        if not search_string:
-            return EmptyContentSearchResponse()
+        if not search_parameters.search_string:
+            return ContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
-        # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
-        # syntax to match complex case,
-        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+        es_search_fields = []
+        search_fields = search_parameters.search_fields or DEFAULT_CONTENT_SEARCH_FIELDS
+
+        # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
+        # change score according to this boost. label is the most important, content is
+        # important too, content of comment is less important. filename and file_extension is
+        # only useful to allow matching "png" or "nameofmycontent.png".
+
+        if ContentSearchField.LABEL in search_fields:
+            # TODO - G.M - 2021-02-08 -  we may want to split exact and not exact search to allow
+            # doing exact search efficiently.
+            es_search_fields.extend(
+                [
+                    "label.{}^8".format(EXACT_FIELD),
+                    "label^5",
+                    "filename.{}".format(EXACT_FIELD),
+                    "filename",
+                    "file_extension",
+                ]
+            )
+
+        if ContentSearchField.RAW_CONTENT in search_fields:
+            es_search_fields.extend(
+                [
+                    "raw_content.{}^3".format(EXACT_FIELD),
+                    "raw_content^3",
+                    "{}.content^3".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.title^4".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.author".format(FILE_PIPELINE_DESTINATION_FIELD),
+                    "{}.keywords".format(FILE_PIPELINE_DESTINATION_FIELD),
+                ]
+            )
+
+            for lang in FILE_PIPELINE_LANGS:
+                es_search_fields.append(
+                    "{}.content_{}^3".format(FILE_PIPELINE_DESTINATION_FIELD, lang)
+                )
+
+        if ContentSearchField.COMMENTS in search_fields:
+            es_search_fields.extend(
+                ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
+            )
+
+        if ContentSearchField.DESCRIPTION in search_fields:
+            es_search_fields.append("description^3")
+
         search = Search(
-            using=self.es, doc_type=IndexedContent, index=self.index_document_alias
+            using=self.es,
+            doc_type=IndexedContent,
+            index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string",
-            query=search_string,
-            # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
-            # change score according to this boost. label is the most important, content is
-            # important too, content of comment is less important. filename and file_extension is
-            # only useful to allow matching "png" or "nameofmycontent.png".
-            fields=[
-                "label.exact^8",
-                "label^5",
-                "filename.exact",
-                "filename",
-                "file_extension",
-                "raw_content.exact^3",
-                "raw_content^3",
-                "comments.raw_content.exact",
-                "comments.raw_content",
-                "file_data.content^3",
-                "file_data.title^4",
-                "file_data.author",
-                "file_data.keywords",
-            ],
+            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
         )
+
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
+        if not search_parameters.show_active:
+            search = search.exclude("term", is_active=True)
+
+        if not search_parameters.show_deleted:
+            search = search.exclude("term", is_deleted=True)
+            search = search.filter("term", deleted_through_parent_id=0)
+
+        if not search_parameters.show_archived:
+            search = search.exclude("term", is_archived=True)
+            search = search.filter("term", archived_through_parent_id=0)
+
+        search = search.response_class(ESContentSearchResponse)
+        # INFO - G.M - 2019-05-21 - remove some unneeded fields from results.
+        # As they are useful only for searching.
+        search = search.source(
+            exclude=[
+                "raw_content",
+                FILE_PIPELINE_DESTINATION_FIELD,
+                "{}.*".format(FILE_PIPELINE_DESTINATION_FIELD),
+                "deleted_through_parent_id",
+                "archived_through_parent_id",
+                "is_active",
+                "description",
+            ]
+        )
+
+        if search_parameters.page_nb:
+            search = search.extra(
+                from_=self.offset_from_pagination(
+                    search_parameters.size, search_parameters.page_nb
+                ),
+                size=search_parameters.size,
+            )
+
+        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
+        # return all workspaces content, empty list mean return nothing.
+        if filtered_workspace_ids is not None:
+            search = search.filter("terms", workspace_id=filtered_workspace_ids)
+
+        if search_parameters.content_types:
+            search = search.filter("terms", content_type=search_parameters.content_types)
+
+        if search_parameters.workspace_names:
+            search = search.filter(
+                "terms", workspace__label__exact=search_parameters.workspace_names
+            )
+
+        if search_parameters.author__public_names:
+            search = search.filter(
+                "terms", author__public_name__exact=search_parameters.author__public_names
+            )
+
+        if search_parameters.last_modifier__public_names:
+            search = search.filter(
+                "terms",
+                last_modifier__public_name__exact=search_parameters.last_modifier__public_names,
+            )
+
+        if search_parameters.file_extensions:
+            search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
+
+        if search_parameters.statuses:
+            search = search.filter("terms", status=search_parameters.statuses)
+
+        created_range = self.create_es_datetime_range(
+            search_parameters.created_from, search_parameters.created_to
+        )
+
+        if created_range:
+            search = search.filter("range", created=created_range)
+
+        modified_range = self.create_es_datetime_range(
+            search_parameters.modified_from, search_parameters.modified_to
+        )
+
+        if modified_range:
+            search = search.filter("range", modified=modified_range)
+
+        search.aggs.bucket("content_types", "terms", field="content_type")
+        search.aggs.bucket(
+            "workspace_names", "terms", field="workspace.label.{}".format(EXACT_FIELD)
+        )
+        search.aggs.bucket(
+            "author__public_names", "terms", field="author.public_name.{}".format(EXACT_FIELD)
+        )
+        search.aggs.bucket(
+            "last_modifier__public_names",
+            "terms",
+            field="last_modifier.public_name.{}".format(EXACT_FIELD),
+        )
+        search.aggs.bucket(
+            "file_extensions", "terms", field="file_extension.{}".format(EXACT_FIELD)
+        )
+        search.aggs.bucket("statuses", "terms", field="status")
+        search.aggs.metric("created_from", "min", field="created")
+        search.aggs.metric("created_to", "max", field="created")
+        search.aggs.metric("modified_from", "min", field="modified")
+        search.aggs.metric("modified_to", "max", field="modified")
+
+        res = search.execute()
+        return res
+
+    def search_user(
+        self,
+        search_string: str,
+        search_fields: typing.List[UserSearchField] = DEFAULT_USER_SEARCH_FIELDS,
+        workspace_ids: typing.Optional[typing.List[int]] = None,
+        newest_authored_content_date_from: typing.Optional[datetime] = None,
+        newest_authored_content_date_to: typing.Optional[datetime] = None,
+        show_deleted: bool = False,
+        show_active: bool = True,
+        page_nb: int = 1,
+        size: int = 10,
+    ) -> UserSearchResponse:
+        search = Search(
+            using=self.es,
+            doc_type=self.IndexedUser,
+            index=self._get_index_parameters(self.IndexedUser).alias,
+        )
+        fields = [
+            "public_name.{}^5".format(EXACT_FIELD),
+            "username.{}^5".format(EXACT_FIELD),
+            "public_name^3",
+            "username^3",
+            "custom_properties.*",
+        ]
+
+        search_fields = search_fields or DEFAULT_USER_SEARCH_FIELDS
+        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
+        search = search.query("simple_query_string", query=search_string, fields=fields)
+        known_user_ids = UserApi(
+            current_user=None, session=self._session, config=self._config
+        ).get_known_user_ids(self._user.user_id)
+        search = search.filter("terms", user_id=known_user_ids)
         if not show_active:
             search = search.exclude("term", is_active=True)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-            search = search.filter("term", deleted_through_parent_id=0)
-        if not show_archived:
-            search = search.exclude("term", is_archived=True)
-            search = search.filter("term", archived_through_parent_id=0)
-        search = search.response_class(ESContentSearchResponse)
-        # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
-        # result, because we do not need them and for performance reasons.
-        search = search.source(exclude=["raw_content", "*.raw_content", "file_data.*", "file"])
-        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
-        # return all workspaces content, empty list mean return nothing.
-        if size:
-            search = search.extra(size=size)
+        if workspace_ids:
+            search = search.filter("terms", workspace_ids=workspace_ids)
+        newest_authored_content_date_range = self.create_es_datetime_range(
+            newest_authored_content_date_from, newest_authored_content_date_to
+        )
+        if newest_authored_content_date_range:
+            search = search.filter(
+                "range", newest_authored_content_date=newest_authored_content_date_range
+            )
+
         if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
-        if filtered_workspace_ids is not None:
-            search = search.filter("terms", workspace_id=filtered_workspace_ids)
-        if content_types:
-            search = search.filter("terms", content_type=content_types)
-        res = search.execute()
-        return res
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
+
+        search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
+        search.aggs.metric(
+            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
+        )
+        search.aggs.metric(
+            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
+        )
+        response = search.execute()
+        known_workspaces = self._get_workspaces_known_to_user()
+        facets = {
+            "workspaces": self._create_filtered_facets(
+                "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
+            )
+        }
+        try:
+            newest_authored_content_date_from = parse(
+                response.aggregations.newest_authored_content_date_from["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_from = None
+        try:
+            newest_authored_content_date_to = parse(
+                response.aggregations.newest_authored_content_date_to["value_as_string"]
+            )
+        except KeyError:
+            newest_authored_content_date_to = None
+        return UserSearchResponse(
+            hits=response["hits"],
+            facets=facets,
+            newest_authored_content_date_from=newest_authored_content_date_from,
+            newest_authored_content_date_to=newest_authored_content_date_to,
+        )
+
+    def search_workspace(
+        self,
+        search_string: str,
+        search_fields: typing.Optional[
+            typing.List[WorkspaceSearchField]
+        ] = DEFAULT_WORKSPACE_SEARCH_FIELDS,
+        member_ids: typing.Optional[typing.List[int]] = None,
+        owner_ids: typing.Optional[typing.List[int]] = None,
+        show_deleted: bool = False,
+        page_nb: int = 1,
+        size: int = 10,
+    ) -> WorkspaceSearchResponse:
+        search = Search(
+            using=self.es,
+            doc_type=IndexedWorkspace,
+            index=self._get_index_parameters(IndexedWorkspace).alias,
+        )
+
+        fields = [
+            "label.{}^5".format(EXACT_FIELD),
+            "label^3",
+            "description^3",
+        ]
+        search_fields = search_fields or DEFAULT_WORKSPACE_SEARCH_FIELDS
+        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
+
+        known_workspace_ids = [ws.workspace_id for ws in self._get_workspaces_known_to_user()]
+        search = search.query("simple_query_string", query=search_string, fields=fields)
+        search = search.filter("terms", workspace_id=known_workspace_ids)
+        if member_ids:
+            search = search.filter("terms", member_ids=member_ids)
+        if owner_ids:
+            search = search.filter("terms", owner_id=owner_ids)
+        if not show_deleted:
+            search = search.exclude("term", is_deleted=True)
+        if page_nb:
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
+        search.aggs.bucket("member_ids", "terms", field="member_ids")
+        search.aggs.bucket("owner_ids", "terms", field="owner_id")
+        response = search.execute()
+        known_users = UserApi(
+            current_user=None, session=self._session, config=self._config
+        ).get_all_known_users(self._user.user_id)
+        facets = {
+            "members": self._create_filtered_facets(
+                "user_id", response.aggregations.member_ids.buckets, known_users
+            ),
+            "owners": self._create_filtered_facets(
+                "user_id", response.aggregations.owner_ids.buckets, known_users
+            ),
+        }
+
+        return WorkspaceSearchResponse(response["hits"], facets)
+
+    @staticmethod
+    def _create_filtered_facets(
+        attr_name: str, buckets: typing.List[Bucket], items: typing.List[T]
+    ) -> typing.List[FacetCount]:
+        """Filter the given ES aggregation buckets and create facets from the result.
+
+        Only keep buckets whose key equals an item's attr_name.
+        """
+        facets = []
+        for bucket in buckets:
+            try:
+                item = next(i for i in items if getattr(i, attr_name) == bucket.key)
+                facets.append(FacetCount(value=item, count=bucket.doc_count))
+            except StopIteration:
+                pass
+        return facets
+
+    @staticmethod
+    def _get_index_name(parameters: IndexParameters) -> str:
+        return parameters.index_name_template.format(
+            date=datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+        )
+
+    @staticmethod
+    def _get_index_pattern(parameters: IndexParameters) -> str:
+        return parameters.index_name_template.format(date="*")
+
+    def _get_indices_parameters(self) -> typing.List[IndexParameters]:
+        prefix = self._config.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX
+        template = self._config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE
+
+        return [
+            IndexParameters(
+                alias=prefix + "-content",
+                index_name_template=template.format(index_alias=prefix + "-content", date="{date}"),
+                document_class=IndexedContent,
+                indexer=ESContentIndexer(),
+            ),
+            IndexParameters(
+                alias=prefix + "-user",
+                index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
+                document_class=self.IndexedUser,
+                indexer=ESUserIndexer(),
+            ),
+            IndexParameters(
+                alias=prefix + "-workspace",
+                index_name_template=template.format(
+                    index_alias=prefix + "-workspace", date="{date}"
+                ),
+                document_class=IndexedWorkspace,
+                indexer=ESWorkspaceIndexer(),
+            ),
+        ]
+
+    def _get_index_parameters(self, document_class: typing.Type[Document]) -> IndexParameters:
+        return next(
+            parameters
+            for parameters in self._get_indices_parameters()
+            if parameters.document_class == document_class
+        )
+
+    @classmethod
+    def test_lang(cls, lang):
+        return "ctx.{source}.language == '{lang}'".format(
+            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
+        )
 
     def _create_ingest_pipeline(self) -> None:
         """
         Create ingest pipeline to allow extract file content and use them for search.
         """
         p = IngestClient(self.es)
-        # TODO - G.M - 2019-05-31 - check if possible to set specific analyzer for
-        # attachment content parameters. Goal :
-        # allow ngram or lang specific indexing for "in file search"
-        p.put_pipeline(
-            id="attachment",
-            body={
-                "description": "Extract attachment information",
-                "processors": [
-                    {"attachment": {"field": "b64_file", "target_field": "file_data"}},
-                    {"remove": {"field": "b64_file"}},
-                ],
+
+        processors = [
+            {
+                "attachment": {
+                    "field": FILE_PIPELINE_SOURCE_FIELD,
+                    "target_field": FILE_PIPELINE_DESTINATION_FIELD,
+                }
             },
+            {"remove": {"field": FILE_PIPELINE_SOURCE_FIELD}},
+        ]
+
+        for lang in FILE_PIPELINE_LANGS:
+            processors.append(
+                {
+                    "set": {
+                        "if": self.test_lang(lang),
+                        "field": "{source}.content_{lang}".format(
+                            source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
+                        ),
+                        "value": "{{" + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD) + "}}",
+                    }
+                }
+            )
+
+        processors.append(
+            {
+                "remove": {
+                    "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
+                    "field": "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD),
+                }
+            }
         )
+
+        p.put_pipeline(
+            id=FILE_PIPELINE_ID,
+            body={"description": "Extract attachment information", "processors": processors},
+        )
+
+    def _get_workspaces_known_to_user(self) -> typing.List[Workspace]:
+        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        return wapi.get_all_accessible_by_user(self._user) + wapi.get_all_for_user(self._user)
+
+
+class ESContentIndexer:
+    """Listen for events from database and trigger re-indexing of contents when needed."""
+
+    # content types which won't be indexed directly. Instead their main content will be indexed
+    # when they are created/modified.
+    EXCLUDED_CONTENT_TYPES = (content_type_list.Comment.slug,)
+
+    @hookimpl
+    def on_content_created(self, content: Content, context: TracimContext) -> None:
+        """Index the given content"""
+        content = self._get_main_content(content)
+        try:
+            self.index_contents([content], context)
+        except IndexingError:
+            logger.exception(
+                self, "Exception while indexing created content {}".format(content.content_id)
+            )
+
+    @hookimpl
+    def on_content_modified(self, content: Content, context: TracimContext) -> None:
+        """Index the given content and its children.
+
+        Children are indexed only if the content has changes influencing their index."""
+        content = self._get_main_content(content)
+        try:
+            self.index_contents([content], context)
+            if self._should_reindex_children(content.current_revision):
+                self.index_contents(content.recursive_children, context)
+        except Exception:
+            logger.exception(
+                self, "Exception while indexing modified content {}".format(content.content_id)
+            )
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        """Index the contents of the given workspace
+
+        Contents are indexed only if the workspace has changes influencing their index."""
+        if not self._should_reindex_children(workspace):
+            return
+        content_api = ContentApi(
+            session=context.dbsession,
+            current_user=None,
+            config=context.app_config,
+            show_deleted=True,
+            show_archived=True,
+        )
+        try:
+            self.index_contents(content_api.get_all_query(workspace=workspace), context)
+        except IndexingError:
+            logger.exception(
+                self,
+                "Exception while indexing modified contents of workspace {}".format(
+                    workspace.workspace_id
+                ),
+            )
+
+    @hookimpl
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
+        """Index contents whose author/last_modifier is the given user.
+
+        'author' is the author/owner of a content's first revision.
+        """
+        if not inspect(user).attrs.display_name.history.has_changes():
+            return
+        content_api = ContentApi(
+            session=context.dbsession,
+            current_user=None,
+            config=context.app_config,
+            show_deleted=True,
+            show_archived=True,
+        )
+        try:
+            self.index_contents(content_api.get_all_query(user=user), context)
+        except IndexingError:
+            logger.exception(
+                self,
+                "Exception while indexing contents authored/modified by user {}".format(
+                    user.user_id
+                ),
+            )
+
+    def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            content_ids = [
+                content.content_id for content in self._filter_excluded_content_types(contents)
+            ]
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_contents_from_ids, content_ids)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            indexing_error_count = self.sync_index_contents(contents, context)
+            if indexing_error_count:
+                raise IndexingError()
+
+    def sync_index_contents(self, contents: typing.List[Content], context: TracimContext) -> int:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        indexing_error_count = 0
+        for content in self._filter_excluded_content_types(contents):
+            try:
+                search_api.index_content(content)
+            except Exception:
+                logger.exception(
+                    self, "Exception while indexing content {}".format(content.content_id)
+                )
+                indexing_error_count += 1
+        return indexing_error_count
+
+    def _index_contents_from_ids(self, content_ids: typing.List[int]) -> None:
+        """Index contents whose ids are given.
+        Is exclusively made to be used inside a RQ DatabaseWorker()
+        """
+        with worker_context() as context:
+            capi = ContentApi(
+                session=context.dbsession, current_user=None, config=context.app_config
+            )
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            indexing_error_count = 0
+            for content_id in content_ids:
+                try:
+                    search_api.index_content(capi.get_one(content_id))
+                except Exception:
+                    indexing_error_count += 1
+                    logger.exception(self, "Exception while indexing content {}".format(content_id))
+            if indexing_error_count:
+                raise IndexingError(
+                    "Got error(s) while indexing content ids {}".format(content_ids)
+                )
+
+    @classmethod
+    def _get_main_content(cls, content: Content) -> Content:
+        """Find the first ancestor which has a type to be indexed."""
+        while content and content.type in cls.EXCLUDED_CONTENT_TYPES:
+            content = content.parent
+        assert content, "Got a sub-content without main content!"
+        return content
+
+    @classmethod
+    def _should_reindex_children(cls, obj: typing.Union[ContentRevisionRO, Workspace]) -> bool:
+        """Changes on a content/workspace only have effect on their children if:
+        - their 'label' has changed
+        - their 'is_deleted' state has changed
+        - (for contents) their 'is_archived' state has changed
+        """
+        attribute_state = inspect(obj).attrs
+        return (
+            attribute_state.label.history.has_changes()
+            or attribute_state.is_deleted.history.has_changes()
+            or (isinstance(obj, Content) and attribute_state.is_archived.history.has_changes())
+        )
+
+    @classmethod
+    def _filter_excluded_content_types(
+        cls, contents: typing.Iterable[Content]
+    ) -> typing.Generator[Content, None, None]:
+        """Generate the contents which should be indexed directly."""
+        for content in contents:
+            if content.type not in cls.EXCLUDED_CONTENT_TYPES:
+                yield content
+
+
+class ESUserIndexer:
+    """Listen for events from database and trigger re-indexing of users when needed."""
+
+    @hookimpl
+    def on_user_created(self, user: User, context: TracimContext) -> None:
+        self.index_user(user, context)
+
+    @hookimpl
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
+        self.index_user(user, context)
+
+    @hookimpl
+    def on_user_deleted(self, user: User, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.delete_user(user)
+        except Exception:
+            logger.exception(self, "Exception while deleting indexed user {}".format(user.user_id))
+
+    @hookimpl
+    def on_content_created(self, content: Content, context: TracimContext) -> None:
+        self.index_user(content.current_revision.owner, context)
+
+    @hookimpl
+    def on_content_modified(self, content: Content, context: TracimContext) -> None:
+        self.index_user(content.current_revision.owner, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self.index_user(role.user, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_modified(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self.index_user(role.user, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        self.index_user(role.user, context)
+
+    def index_user(self, user: User, context: TracimContext) -> None:
+        """Index the given user in the corresponding ES index.
+        Two execution modes: sync or async depending on jobs.processing_mode.
+        """
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            user_id = user.user_id
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_user_from_id, user_id)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            try:
+                search_api.index_user(user)
+            except Exception:
+                logger.exception(self, "Exception while indexing user {}".format(user.user_id))
+
+    def _index_user_from_id(self, user_id: int) -> None:
+        """Index user whose id is given.
+        Is exclusively made to be used inside a RQ DatabaseWorker().
+        """
+        with worker_context() as context:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            user_api = UserApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            search_api.index_user(user_api.get_one(user_id))
+
+
+class ESWorkspaceIndexer:
+    """Listen for events from database and trigger re-indexing of workspaces when needed."""
+
+    @hookimpl
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+        self.index_workspace(workspace, context)
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        self.index_workspace(workspace, context)
+
+    @hookimpl
+    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        try:
+            search_api.delete_workspace(workspace)
+        except Exception:
+            msg = "Exception while deleting indexed workspace {}".format(workspace.workspace_id)
+            logger.exception(self, msg)
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self.index_workspace(role.workspace, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_modified(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self.index_workspace(role.workspace, context)
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self.index_workspace(role.workspace, context)
+
+    def index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
+        """Index the given workpace in the corresponding ES index.
+
+        Two execution modes: sync or async depending on jobs.processing_mode.
+        """
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            workspace_id = workspace.workspace_id
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_workspace_from_id, workspace_id)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            try:
+                search_api.index_workspace(workspace)
+            except Exception:
+                msg = "Exception while indexing workspace {}".format(workspace.workspace_id)
+                logger.exception(self, msg)
+
+    def _index_workspace_from_id(self, workspace_id: int) -> None:
+        """Index workspace whose id is given.
+        Is exclusively made to be used inside a RQ DatabaseWorker().
+        """
+        with worker_context() as context:
+            search_api = ESSearchApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            )
+            workspace_api = WorkspaceApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            search_api.index_workspace(workspace_api.get_one(workspace_id))

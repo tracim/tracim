@@ -25,6 +25,78 @@ export const FETCH_CONFIG = {
   apiUrl: configEnv.apiUrl
 }
 
+export const SEARCH_TYPE = {
+  SIMPLE: 'simple',
+  ADVANCED: 'elasticsearch'
+}
+
+export const ADVANCED_SEARCH_TYPE = {
+  CONTENT: 'content',
+  USER: 'user',
+  SPACE: 'workspace'
+}
+
+export const ADVANCED_SEARCH_FILTER = {
+  SEARCH_FIELD: 'searchFieldList',
+  NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
+  CREATED_RANGE: 'createdRange',
+  MODIFIED_RANGE: 'modifiedRange',
+  SEARCH_FACETS: 'searchFacets'
+}
+
+export const DATE_FILTER_ELEMENT = {
+  AFTER: 'after',
+  BEFORE: 'before'
+}
+
+// INFO - G.B. - 2021-03-01 - All the translations in the object below has as their only purpose
+// to be able to generate translation keys through i18n.scanner
+
+export const SEARCH_USER_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  }
+}
+
+export const SEARCH_CONTENT_FACETS = {
+  SPACE: {
+    slug: 'workspace_names'
+  },
+  STATUS: {
+    slug: 'statuses',
+    items: [
+      i18n.t('open'),
+      i18n.t('closed-deprecated'),
+      i18n.t('closed-unvalidated'),
+      i18n.t('closed-validated')
+    ]
+  },
+  TYPE: {
+    slug: 'content_types',
+    items: [
+      i18n.t('folder_search'),
+      i18n.t('html-document_search'),
+      i18n.t('thread_search'),
+      i18n.t('file_search')
+    ]
+  },
+  EXTENSION: {
+    slug: 'file_extensions'
+  },
+  AUTHOR: {
+    slug: 'author__public_names'
+  }
+}
+
+export const SEARCH_SPACE_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  },
+  AUTHOR: {
+    slug: 'owners'
+  }
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }
@@ -142,4 +214,25 @@ export const toggleFavicon = (hasNewNotification) => {
       favicon.href = canvas.toDataURL('image/png')
     }
   })
+}
+
+export const parseSearchUrl = (parsedQuery) => {
+  const searchObject = {
+    // INFO - CH - 20210318 - adding this default value because the search page use both this object and the one
+    // from redux. And it needs this property
+    appliedFilters: {
+      searchFieldList: []
+    }
+  }
+
+  searchObject.contentTypes = parsedQuery.t
+  searchObject.searchString = parsedQuery.q || ''
+  searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
+  searchObject.currentPage = parseInt(parsedQuery.p)
+  searchObject.showArchived = !!(parseInt(parsedQuery.arc))
+  searchObject.showDeleted = !!(parseInt(parsedQuery.del))
+  searchObject.showActive = !!(parseInt(parsedQuery.act))
+  searchObject.searchType = parsedQuery.s
+
+  return searchObject
 }

@@ -389,7 +389,6 @@ class ContentOnlyContainer(WebdavContainer):
                 label=folder_label,
                 parent=self.content,
             )
-            self.content_api.execute_created_content_actions(folder)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
@@ -714,7 +713,6 @@ class FolderResource(DAVCollection):
         try:
             with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self.content_api.delete(self.content)
-                self.content_api.execute_update_content_actions(self.content)
                 self.content_api.save(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
@@ -792,7 +790,6 @@ class FolderResource(DAVCollection):
                         new_workspace=destination_workspace,
                         must_stay_in_same_workspace=False,
                     )
-                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
@@ -982,7 +979,6 @@ class FileResource(DAVNonCollection):
                         must_stay_in_same_workspace=False,
                         new_workspace=destination_workspace,
                     )
-                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
 
@@ -1033,14 +1029,13 @@ class FileResource(DAVNonCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            new_content = self.content_api.copy(
+            self.content_api.copy(
                 item=self.content,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
             )
-            self.content_api.execute_created_content_actions(new_content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
         transaction.commit()
@@ -1053,7 +1048,6 @@ class FileResource(DAVNonCollection):
         try:
             with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self.content_api.delete(self.content)
-                self.content_api.execute_update_content_actions(self.content)
                 self.content_api.save(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc

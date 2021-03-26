@@ -25,7 +25,7 @@ import {
   displayDistanceDate,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  Badge,
+  FilenameWithExtension,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -47,10 +47,11 @@ import {
   getFileContent,
   getFileRevision,
   PAGE,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -196,7 +197,7 @@ export class File extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -343,7 +344,12 @@ export class File extends React.Component {
       return
     }
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -402,7 +408,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const fetchResultSaveFile = await handleFetchResult(
-      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
+      await putFileDescription(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: {
@@ -418,10 +424,10 @@ export class File extends React.Component {
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+          default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
     }
   }
 
@@ -814,7 +820,7 @@ export class File extends React.Component {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
-      children: (
+      children: state.config.apiUrl ? (
         <Timeline
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
@@ -838,8 +844,15 @@ export class File extends React.Component {
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
+          onClickTranslateComment={comment => props.handleTranslateComment(
+            comment,
+            this.state.content.workspace_id,
+            this.state.loggedUser.lang,
+            this.setState.bind(this)
+          )}
+          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
         />
-      )
+      ) : null
     }
     const propertiesObject = {
       id: 'properties',
@@ -856,7 +869,7 @@ export class File extends React.Component {
           creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-          description={state.content.raw_content}
+          description={state.content.description}
           displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
@@ -972,7 +985,7 @@ export class File extends React.Component {
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
-          componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
+          componentTitle={<FilenameWithExtension file={state.content} />}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

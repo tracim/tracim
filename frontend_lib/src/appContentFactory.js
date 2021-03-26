@@ -6,7 +6,8 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate
+  sortTimelineByDate,
+  TIMELINE_TYPE
 } from './helper.js'
 
 import {
@@ -22,6 +23,12 @@ import {
   getInvalidMentionList,
   getMatchingGroupMentionList
 } from './mention.js'
+
+import {
+  getTranslationApiErrorMessage,
+  TRANSLATION_STATE
+} from './translation.js'
+
 import {
   putEditContent,
   postNewComment,
@@ -30,7 +37,8 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownMember
+  getMyselfKnownMember,
+  getCommentTranslated
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -339,12 +347,15 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
-      const resCommentWithProperDate = commentList.map(c => ({
+    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED) => {
+      const timelineCommentList = commentList.map(c => ({
         ...c,
+        timelineType: TIMELINE_TYPE.COMMENT,
         created_raw: c.created,
         created: displayDistanceDate(c.created, loggedUser.lang),
-        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
+        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username),
+        translatedRawContent: null,
+        translationState: initialCommentTranslationState
       }))
 
       return revisionList
@@ -352,15 +363,20 @@ export function appContentFactory (WrappedComponent) {
           ...revision,
           created_raw: revision.created,
           created: displayDistanceDate(revision.created, loggedUser.lang),
-          timelineType: 'revision',
-          commentList: revision.comment_ids.map(ci => ({
-            timelineType: 'comment',
-            ...resCommentWithProperDate.find(c => c.content_id === ci)
-          })),
+          timelineType: TIMELINE_TYPE.REVISION,
+          commentList: revision.comment_ids.map(commentId => (
+            timelineCommentList.find(comment => comment.content_id === commentId)
+          )),
           number: i + 1,
           hasBeenRead: true
         }))
         .flatMap(revision => [revision, ...revision.commentList])
+    }
+
+    replaceComment = (comment, timeline) => {
+      return timeline.map(
+        item => item.timelineType === TIMELINE_TYPE.COMMENT && item.content_id === comment.content_id ? comment : item
+      )
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
@@ -375,7 +391,7 @@ export function appContentFactory (WrappedComponent) {
       return mentionList
     }
 
-    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
       return sortTimelineByDate([
         ...timeline,
         {
@@ -384,9 +400,66 @@ export function appContentFactory (WrappedComponent) {
           created_raw: comment.created,
           created: displayDistanceDate(comment.created, loggedUser.lang),
           timelineType: comment.content_type,
-          hasBeenRead: hasBeenRead
+          hasBeenRead: hasBeenRead,
+          translatedRawContent: null,
+          translationState: initialCommentTranslationState
         }
       ])
+    }
+
+    onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.PENDING },
+            previousState.timeline
+          )
+        }
+      })
+      const response = await getCommentTranslated(
+        this.apiUrl,
+        workspaceId,
+        comment.parent_id,
+        comment.content_id,
+        lang
+      )
+      const errorMessage = getTranslationApiErrorMessage(response)
+      if (errorMessage) {
+        this.sendGlobalFlashMessage(errorMessage, 'warning')
+        setState(previousState => {
+          return {
+            timeline: this.replaceComment(
+              { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+              previousState.timeline
+            )
+          }
+        })
+        return
+      }
+      const translatedRawContent = await response.text()
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            {
+              ...comment,
+              translatedRawContent,
+              translationState: TRANSLATION_STATE.TRANSLATED
+            },
+            previousState.timeline
+          )
+        }
+      })
+    }
+
+    onHandleRestoreComment = (comment, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+            previousState.timeline
+          )
+        }
+      })
     }
 
     render () {
@@ -411,6 +484,8 @@ export function appContentFactory (WrappedComponent) {
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           searchForMentionInQuery={this.searchForMentionInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
+          handleTranslateComment={this.onHandleTranslateComment}
+          handleRestoreComment={this.onHandleRestoreComment}
         />
       )
     }

@@ -33,6 +33,7 @@
     "radium": "^0.25.2",
     "react": "^16.13.1",
     "react-animate-height": "^2.0.15",
+    "react-day-picker": "^7.4.8",
     "react-device-detect": "^1.7.5",
     "react-dnd": "7.4.5",
     "react-dnd-html5-backend": "7.4.4",

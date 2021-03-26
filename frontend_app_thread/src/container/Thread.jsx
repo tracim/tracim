@@ -28,7 +28,8 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -145,7 +146,7 @@ export class Thread extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id !== state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -257,7 +258,12 @@ export class Thread extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -373,7 +379,7 @@ export class Thread extends React.Component {
   }
 
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -429,37 +435,47 @@ export class Thread extends React.Component {
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
-          <Timeline
-            customClass={`${state.config.slug}__contentpage`}
-            customColor={state.config.hexcolor}
-            loggedUser={state.loggedUser}
-            apiUrl={state.config.apiUrl}
-            timelineData={state.timeline}
-            newComment={state.newComment}
-            disableComment={!state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            allowClickOnRevision={false}
-            onClickRevisionBtn={() => {}}
-            shouldScrollToBottom
-            isArchived={state.content.is_archived}
-            onClickRestoreArchived={this.handleClickRestoreArchive}
-            isDeleted={state.content.is_deleted}
-            onClickRestoreDeleted={this.handleClickRestoreDelete}
-            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-            deprecatedStatus={state.config.availableStatuses[3]}
-            showTitle={false}
-            invalidMentionList={state.invalidMentionList}
-            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitWysiwyg}
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            searchForMentionInQuery={this.searchForMentionInQuery}
-          />
+          {state.config.apiUrl ? (
+            <Timeline
+              customClass={`${state.config.slug}__contentpage`}
+              customColor={state.config.hexcolor}
+              loggedUser={state.loggedUser}
+              apiUrl={state.config.apiUrl}
+              timelineData={state.timeline}
+              newComment={state.newComment}
+              disableComment={!state.content.is_editable}
+              availableStatusList={state.config.availableStatuses}
+              wysiwyg={state.timelineWysiwyg}
+              onChangeNewComment={this.handleChangeNewComment}
+              onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              allowClickOnRevision={false}
+              onClickRevisionBtn={() => {}}
+              shouldScrollToBottom
+              isArchived={state.content.is_archived}
+              onClickRestoreArchived={this.handleClickRestoreArchive}
+              isDeleted={state.content.is_deleted}
+              onClickRestoreDeleted={this.handleClickRestoreDelete}
+              isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+              deprecatedStatus={state.config.availableStatuses[3]}
+              showTitle={false}
+              invalidMentionList={state.invalidMentionList}
+              isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+              onClickCancelSave={this.handleCancelSave}
+              onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+              onInitWysiwyg={this.handleInitWysiwyg}
+              showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+              searchForMentionInQuery={this.searchForMentionInQuery}
+              onClickTranslateComment={comment => props.handleTranslateComment(
+                comment,
+                state.content.workspace_id,
+                state.loggedUser.lang,
+                this.setState.bind(this)
+              )}
+              onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+
+            />
+          ) : null}
         </PopinFixedContent>
       </PopinFixed>
     )

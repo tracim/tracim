@@ -13,8 +13,11 @@
     border 1px solid darkGrey
     background-color offWhite
     display flex
+    flex-direction column
     &__content
-      width calc(100% - 44px) // 44px is the avatar size
+      display flex
+      &__text
+        width calc(100% - 44px) // 44px is the avatar size
     &__author
       margin-left 20px
     &__date

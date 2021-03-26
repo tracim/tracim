@@ -40,6 +40,7 @@ from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import worker_context
@@ -67,13 +68,10 @@ from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
-
-RQ_QUEUE_NAME = "event"
 
 JsonDict = Dict[str, Any]
 
@@ -81,14 +79,14 @@ JsonDict = Dict[str, Any]
 class EventApi:
     """Api to query event & messages"""
 
-    user_schema = UserSchema()
+    user_schema = UserDigestSchema()
     workspace_schema = WorkspaceSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        HTML_DOCUMENTS_TYPE: ContentSchema(),
         FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: TextBasedContentSchema(),
-        THREAD_TYPE: TextBasedContentSchema(),
+        FOLDER_TYPE: ContentSchema(),
+        THREAD_TYPE: ContentSchema(),
     }
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
@@ -861,10 +859,12 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        queue = get_rq_queue(redis_connection, RqQueueName.EVENT)
         logger.debug(
             self,
-            "publish event(id={}) asynchronously to RQ queue {}".format(event_id, RQ_QUEUE_NAME),
+            "publish event(id={}) asynchronously to RQ queue {}".format(
+                event_id, RqQueueName.EVENT
+            ),
         )
         queue.enqueue(self._publish_messages_for_event, event_id)
 

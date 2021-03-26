@@ -44,11 +44,6 @@ describe('Searching keywords', () => {
       cy.get('.searchResult__title').should('be.visible')
     })
 
-    it('Should be disabled if the input is empty', () => {
-      cy.get(searchInput).clear()
-      cy.get(searchButton).should('be.disabled')
-    })
-
     it('Should display the same word in the search input', () => {
       cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 
@@ -83,7 +78,7 @@ describe('Searching keywords', () => {
 
     before(function () {
       cy.loginAs('users')
-      cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
+      cy.visitPage({ pageName: PAGES.SEARCH, params: { searchString: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
     })
 
     describe('the subtitle', () => {

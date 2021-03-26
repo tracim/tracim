@@ -45,7 +45,6 @@ from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
@@ -582,64 +581,11 @@ class ContentApi(object):
             do_save=False,
             label="",
         )
-        item.description = content
+        item.raw_content = content
         item.revision_type = ActionDescription.COMMENT
         if do_save:
             self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
         return item
-
-    def execute_created_content_actions(self, content: Content) -> None:
-        """
-        WARNING! This method will be deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method do post-create user actions
-        """
-        try:
-            content_in_context = ContentInContext(
-                content, config=self._config, dbsession=self._session
-            )
-            search_api = SearchFactory.get_search_lib(
-                current_user=self._user, config=self._config, session=self._session
-            )
-            search_api.index_content(content_in_context)
-        except Exception:
-            logger.exception(self, "Something goes wrong during indexing of new content")
-
-    def execute_update_content_actions(self, content: Content) -> None:
-        """
-        WARNING! This method will be deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method do post-create user actions
-        """
-
-        try:
-            content_in_context = ContentInContext(
-                content, config=self._config, dbsession=self._session
-            )
-            search_api = SearchFactory.get_search_lib(
-                current_user=self._user, config=self._config, session=self._session
-            )
-            search_api.index_content(content_in_context)
-            # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
-            # see https://github.com/tracim/tracim/issues/1833
-            if content.last_revision.revision_type in (
-                ActionDescription.DELETION,
-                ActionDescription.ARCHIVING,
-                ActionDescription.UNARCHIVING,
-                ActionDescription.UNDELETION,
-            ):
-                for child_content in content.get_children(recursively=True):
-                    child_in_context = ContentInContext(
-                        child_content, config=self._config, dbsession=self._session
-                    )
-                    search_api.index_content(child_in_context)
-
-        except Exception:
-            logger.exception(self, "Something goes wrong during indexing of content")
 
     def get_one_from_revision(
         self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
@@ -670,7 +616,7 @@ class ContentApi(object):
     def get_one(
         self,
         content_id: int,
-        content_type: str,
+        content_type: str = content_type_list.Any_SLUG,
         workspace: Workspace = None,
         parent: Content = None,
         ignore_content_state_filter: bool = False,
@@ -896,16 +842,17 @@ class ContentApi(object):
             force_download=force_download,
         )
 
-    def _get_all_query(
+    def get_all_query(
         self,
-        parent_ids: typing.List[int] = None,
+        parent_ids: typing.Optional[typing.List[int]] = None,
         content_type_slug: str = content_type_list.Any_SLUG,
-        workspace: Workspace = None,
-        label: str = None,
+        workspace: typing.Optional[Workspace] = None,
+        label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
         ] = None,
-        complete_path_to_id: int = None,
+        complete_path_to_id: typing.Optional[int] = None,
+        user: typing.Optional[User] = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -923,7 +870,7 @@ class ContentApi(object):
         assert not parent_ids or isinstance(parent_ids, list)
         assert content_type_slug is not None
         assert not complete_path_to_id or isinstance(complete_path_to_id, int)
-        resultset = self._base_query(workspace)
+        query = self._base_query(workspace)
 
         # INFO - G.M - 2018-11-12 - Get list of all ancestror
         #  of content, workspace root included
@@ -948,10 +895,10 @@ class ContentApi(object):
             all_slug_aliases = [content_type_object.slug]
             if content_type_object.slug_aliases:
                 all_slug_aliases.extend(content_type_object.slug_aliases)
-            resultset = resultset.filter(Content.type.in_(all_slug_aliases))
+            query = query.filter(Content.type.in_(all_slug_aliases))
 
         if parent_ids is False:
-            resultset = resultset.filter(Content.parent_id == None)  # noqa: E711
+            query = query.filter(Content.parent_id == None)  # noqa: E711
 
         if parent_ids:
             # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
@@ -964,20 +911,28 @@ class ContentApi(object):
                 else:
                     allowed_parent_ids.append(parent_id)
             if allow_root:
-                resultset = resultset.filter(
+                query = query.filter(
                     or_(
                         Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
                     )  # noqa: E711
                 )
             else:
-                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))
+                query = query.filter(Content.parent_id.in_(allowed_parent_ids))
         if label:
-            resultset = resultset.filter(Content.label.ilike("%{}%".format(label)))
+            query = query.filter(Content.label.ilike("%{}%".format(label)))
+        if user:
+            author_id_query = (
+                self._session.query(ContentRevisionRO.owner_id)
+                .filter(ContentRevisionRO.content_id == Content.id)
+                .order_by(ContentRevisionRO.revision_id)
+                .limit(1)
+            )
+            query = query.filter(or_(Content.owner == user, user.user_id == author_id_query))
 
         for _property in order_by_properties:
-            resultset = resultset.order_by(_property)
+            query = query.order_by(_property)
 
-        return resultset
+        return query
 
     def get_all(
         self,
@@ -1002,8 +957,7 @@ class ContentApi(object):
         QueryableAttribute object)
         :return: List of contents
         """
-        order_by_properties = order_by_properties or []  # FDV
-        return self._get_all_query(
+        return self.get_all_query(
             parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id
         ).all()
 
@@ -1084,7 +1038,7 @@ class ContentApi(object):
         """
 
         resultset = (
-            self._get_all_query(workspace=workspace)
+            self.get_all_query(workspace=workspace)
             .outerjoin(
                 RevisionReadStatus,
                 and_(
@@ -1594,14 +1548,16 @@ class ContentApi(object):
         item: Content,
         allowed_content_type_slug_list: typing.List[str],
         new_label: str,
-        new_content: str = None,
+        new_description: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
     ):
         """
         Update a container content like folder
         :param item: content
         :param item: content
         :param new_label: new label of content
-        :param new_content: new raw text content/description of content
+        :param new_description: description of content
+        :param new_raw_content: raw content of this content
         :param allowed_content_type_slug_list: list of allowed subcontent type
          of content.
         :return:
@@ -1611,18 +1567,30 @@ class ContentApi(object):
             content_has_changed = True
         except SameValueError:
             content_has_changed = False
-        item = self.update_content(item, new_label, new_content, force_update=content_has_changed)
+        item = self.update_content(
+            item,
+            new_label,
+            new_description=new_description,
+            new_raw_content=new_raw_content,
+            force_update=content_has_changed,
+        )
 
         return item
 
     def update_content(
-        self, item: Content, new_label: str, new_content: str = None, force_update=False
+        self,
+        item: Content,
+        new_label: typing.Optional[str] = None,
+        new_raw_content: typing.Optional[str] = None,
+        new_description: typing.Optional[str] = None,
+        force_update=False,
     ) -> Content:
         """
         Update a content
         :param item: content
         :param new_label: new label of content
-        :param new_content: new raw text content/description of content
+        :param new_raw_content: new raw text content of content
+        :param new_description: new description of content
         :param force_update: don't raise SameValueError if value does not change
         :return: updated content
         """
@@ -1630,16 +1598,24 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
             )
+
+        if new_label is None:
+            new_label = item.label
+        if new_raw_content is None:
+            new_raw_content = item.raw_content
+        if new_description is None:
+            new_description = item.description
         if not force_update:
-            if item.label == new_label and item.description == new_content:
+            if (
+                item.label == new_label
+                and item.raw_content == new_raw_content
+                and item.description == new_description
+            ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
                 raise SameValueError("The content did not changed")
-        if not new_label:
-            raise EmptyLabelNotAllowed()
 
-        label = new_label or item.label
-        filename = self._prepare_filename(label, item.file_extension)
+        filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
         if filename:
             self._is_filename_available_or_raise(
@@ -1656,12 +1632,12 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
+
         if self._user:
             item.owner = self._user
         item.label = new_label
-        item.description = (
-            new_content if new_content else item.description
-        )  # TODO: convert urls into links
+        item.raw_content = new_raw_content
+        item.description = new_description
         item.revision_type = ActionDescription.EDITION
         return item
 
@@ -1870,7 +1846,7 @@ class ContentApi(object):
 
         # INFO - G.M - 2020-03-27 - Get all content of workspace
         resultset = (
-            self._get_all_query(workspace=workspace)
+            self.get_all_query(workspace=workspace)
             .outerjoin(
                 RevisionReadStatus,
                 and_(
@@ -2095,3 +2071,15 @@ class ContentApi(object):
         query = self._session.query(revision_count, workspace_count)
         infos = query.filter(ContentRevisionRO.owner_id == user_id).one()
         return AuthoredContentRevisionsInfos(infos[0], infos[1])
+
+    def get_newest_authored_content(self, user_id: int) -> Content:
+        query = (
+            self._base_query()
+            .filter(ContentRevisionRO.owner_id == user_id)
+            .order_by(ContentRevisionRO.created.desc())
+            .limit(1)
+        )
+        try:
+            return query.one()
+        except NoResultFound as exc:
+            raise ContentNotFound("User {} did not author any content".format(user_id)) from exc

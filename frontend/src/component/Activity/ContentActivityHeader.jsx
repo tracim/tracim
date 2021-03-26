@@ -20,6 +20,7 @@ require('./ContentActivityHeader.styl')
 export class ContentActivityHeader extends React.Component {
   getDisplayOperation (message) {
     const { props } = this
+
     if (message.fields.content.current_revision_type === 'status-update') return props.t('status modified')
     const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
     if (TLM_ET.MENTION === entityType) return props.t('mention made')
@@ -65,6 +66,7 @@ export class ContentActivityHeader extends React.Component {
           </Link>
           <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
+
         <TimedEvent
           customClass='contentActivityHeader__right'
           operation={this.getDisplayOperation(newestMessage)}
@@ -78,6 +80,7 @@ export class ContentActivityHeader extends React.Component {
           onEventClicked={props.onEventClicked}
           dataCy='contentActivityTimedEvent'
         />
+
         <DropdownMenu
           buttonCustomClass='contentActivityHeader__actionMenu'
           buttonIcon='fas fa-ellipsis-v'

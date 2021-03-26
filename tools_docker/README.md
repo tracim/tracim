@@ -128,7 +128,7 @@ Exemple to use Tracim with ElasticSearch: (you need to start elasticsearch first
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
                -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
                -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
-               -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
+               -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX=test_tracim \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
@@ -138,7 +138,7 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
                -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
                -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
-               -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
+               -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX=test_tracim \
                -e TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST=True \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim

@@ -121,7 +121,7 @@ describe('Searching keywords', () => {
     describe('that match two documents', () => {
       beforeEach(function () {
         cy.loginAs('users')
-        cy.visitPage({ pageName: PAGES.SEARCH, params: { searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
+        cy.visitPage({ pageName: PAGES.SEARCH, params: { searchString: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes } })
       })
 
       it('Should display two results', () => {

@@ -55,7 +55,8 @@ import {
   lightenColor,
   PAGE,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  DATE_FNS_LOCALE
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -129,10 +130,11 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.jsx'
 
-import IconButton from './component/Button/IconButton.jsx'
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
+import IconButton from './component/Button/IconButton.jsx'
 import GenericButton from './component/Button/GenericButton.jsx'
+import TranslateButton from './component/Button/TranslateButton.jsx'
 
 import PromptMessage from './component/PromptMessage/PromptMessage.jsx'
 
@@ -187,11 +189,12 @@ import {
   getWorkspaceContentList,
   putFileIsDeleted,
   getFileRevision,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   getContentComment,
   getContent,
-  getWorkspaceContent
+  getWorkspaceContent,
+  getCommentTranslated
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -220,6 +223,14 @@ export {
   setLocalStorageItem,
   removeLocalStorageItem
 } from './localStorage.js'
+
+export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+
+export {
+  TRANSLATION_STATE,
+  getTranslationApiErrorMessage,
+  getDefaultTranslationState
+} from './translation.js'
 
 export {
   appContentFactory,
@@ -346,7 +357,7 @@ export {
   getWorkspaceContentList,
   putFileIsDeleted,
   getFileRevision,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   getContentComment,
   addClassToMentionsOfUser,
@@ -375,5 +386,8 @@ export {
   isFileUploadInErrorState,
   getAvatarBaseUrl,
   ProfileNavigation,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  TranslateButton,
+  getCommentTranslated,
+  DATE_FNS_LOCALE
 }

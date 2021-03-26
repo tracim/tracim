@@ -255,7 +255,7 @@ class User(DeclarativeBase):
 
         return UserRoleInWorkspace.NOT_APPLICABLE
 
-    def get_active_roles(self) -> ["UserRoleInWorkspace"]:
+    def get_active_roles(self) -> typing.List["UserRoleInWorkspace"]:
         """
         :return: list of roles of the user for all not-deleted workspaces
         """

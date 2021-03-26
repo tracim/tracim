@@ -1,8 +1,10 @@
 # coding=utf-8
+from enum import Enum
 import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.fields import Field
 from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
@@ -33,6 +35,7 @@ from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.app_models.validator import workspace_access_type_validator
 from tracim_backend.app_models.validator import workspace_subscription_state_validator
+from tracim_backend.lib.translate.translator import AUTODETECT_LANG
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
@@ -40,9 +43,11 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
+from tracim_backend.models.context_models import CommentPathFilename
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
@@ -66,7 +71,7 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
-from tracim_backend.models.context_models import TextBasedContentUpdate
+from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -99,9 +104,90 @@ FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 class StrippedString(String):
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
-        if value:
-            value = value.strip()
         return value.strip()
+
+
+class StringList(marshmallow.fields.List):
+    """
+    This Field validates a list of elements the given field validates.
+    The Field is deserialized into a Python list.
+    The Field is serialized into a string with the Field's separated with the given separator.
+    """
+
+    def __init__(self, cls: typing.Type[Field], separator: str = ",", **kwargs: dict) -> None:
+        super().__init__(cls, **kwargs)
+        self._separator = separator
+
+    def _deserialize(self, value: str, *args: typing.Any, **kwargs: typing.Any):
+        value = value.strip()
+        if value:
+            return super()._deserialize(value.split(self._separator), *args, **kwargs)
+
+        return super()._deserialize([], *args, **kwargs)
+
+    def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
+        return self._separator.join(super()._serialize(*args, **kwargs))
+
+
+class EnumField(marshmallow.fields.Field):
+    """
+    This Field validates elements found in an Enum.
+    The serialized value of this Field is the value of an enum field of the given Enum.
+    The deserialized value of this Field an enum field.
+    """
+
+    def __init__(self, enum_cls: typing.Type[Enum], **kwargs):
+        super().__init__(**kwargs)
+        self._enum = enum_cls
+
+    def _deserialize(self, value: typing.Any, *arg: typing.Any, **kwargs: typing.Any) -> Enum:
+        try:
+            return self._enum(value)
+        except ValueError:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field. Allowed values: {}".format(
+                    value, [val.value for val in self._enum.__members__.values()]
+                )
+            )
+
+    def _serialize(self, value: Enum, *arg: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        if value not in self._enum:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid value for this field".format(value)
+            )
+
+        return value.value
+
+
+class RestrictedStringField(marshmallow.fields.String):
+    """
+    This Field validates elements found in a Python list.
+    The serialized value and the deserialized value are elements of this list.
+    Serialization and deserialization fail for values that do not belong to this list.
+    """
+
+    def __init__(self, allowed_strings: typing.Container[str], **kwargs):
+        super().__init__(**kwargs)
+        self._allowed_strings = allowed_strings
+
+    def _deserialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value in self._allowed_strings:
+            return value
+
+        self.error(value)
+
+    def _serialize(self, value: str, *arg: typing.Any, **kwargs: typing.Any) -> str:
+        if value not in self._allowed_strings:
+            self.error(value)
+
+        return value
+
+    def error(self, value: str) -> "typing.NoReturn":
+        raise marshmallow.ValidationError(
+            "'{}' is not a valid value for this field. Allowed values: {}".format(
+                value, self._allowed_strings
+            )
+        )
 
 
 class EventTypeListField(StrippedString):
@@ -200,10 +286,10 @@ class UserDigestSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     has_avatar = marshmallow.fields.Bool(
-        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint",
+        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint"
     )
     has_cover = marshmallow.fields.Bool(
-        description="Does the user have a cover? cover need to be obtain with /cover endpoint",
+        description="Does the user have a cover? cover need to be obtain with /cover endpoint"
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
@@ -304,7 +390,7 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True, example={"param1": "value1"}, description="custom_properties schema",
+        required=True, example={"param1": "value1"}, description="custom_properties schema"
     )
 
 
@@ -716,6 +802,12 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentPath(**data)
+
+
+class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return CommentPathFilename(**data)
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
@@ -1175,7 +1267,7 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties", required=True, allow_none=False,
+        description="ui schema used for user custom properties", required=True, allow_none=False
     )
 
 
@@ -1427,14 +1519,15 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-
-
-class ContentSchema(ContentDigestSchema):
+class UserInfoContentAbstractSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class TextBasedDataAbstractSchema(marshmallow.Schema):
+class ContentSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
+    description = StrippedString(
+        required=True, description="raw text or html description of the content"
+    )
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
@@ -1442,7 +1535,6 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
-    raw_content = StrippedString(description="raw text or html description of the file")
     page_nb = marshmallow.fields.Int(
         description="number of pages, return null value if unaivalable", example=1, allow_none=True
     )
@@ -1460,10 +1552,6 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     has_jpeg_preview = marshmallow.fields.Bool(
         description="true if a jpeg preview is available or false", example=True
     )
-
-
-class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
-    pass
 
 
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
@@ -1487,10 +1575,13 @@ class RevisionSchema(ContentDigestSchema):
         format=DATETIME_FORMAT, description="Content creation date"
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
-
-
-class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
-    pass
+    description = StrippedString(
+        required=True, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
 
 
 class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
@@ -1511,6 +1602,7 @@ class CommentSchema(marshmallow.Schema):
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    description = StrippedString(example="This is a description")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
@@ -1531,35 +1623,38 @@ class SetCommentSchema(marshmallow.Schema):
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True,
+        required=False,
         example="contract for client XXX",
         description="New title of the content",
         validate=not_empty_string_validator,
     )
+    description = StrippedString(
+        required=False, description="raw text or html description of the content"
+    )
+    raw_content = StrippedString(
+        required=False,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
 
 
-class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
-        return TextBasedContentUpdate(**data)
+        return ContentUpdate(**data)
 
 
-class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
+class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
         description="list of content types allowed as sub contents. "
         "This field is required for folder contents, "
         "set it to empty list in other cases",
-        required=True,
+        required=False,
     )
 
     @post_load
     def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return FolderContentUpdate(**data)
-
-
-class FileContentModifySchema(TextBasedContentModifySchema):
-    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):
@@ -1580,6 +1675,7 @@ class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
     webdav_enabled = marshmallow.fields.Bool()
+    translation_service__enabled = marshmallow.fields.Bool()
     webdav_url = marshmallow.fields.String()
     collaborative_document_edition = marshmallow.fields.Nested(
         CollaborativeDocumentEditionConfigSchema(), allow_none=True
@@ -1589,6 +1685,7 @@ class ConfigSchema(marshmallow.Schema):
     workspaces_number_per_user_limit = marshmallow.fields.Integer()
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
+    search_engine = marshmallow.fields.String()
 
 
 class EventSchema(marshmallow.Schema):
@@ -1633,6 +1730,26 @@ class LiveMessageSchemaPage(BasePaginatedSchemaPage):
 
 class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
+
+
+class TranslationQuerySchema(FileQuerySchema):
+    source_language_code = marshmallow.fields.String(
+        description="source language of translation, by default set to auto",
+        example="fr",
+        missing=AUTODETECT_LANG,
+        default=AUTODETECT_LANG,
+        allow_none=False,
+    )
+    target_language_code = marshmallow.fields.String(
+        description="destination language of translation",
+        example="en",
+        required=True,
+        allow_none=False,
+    )
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> TranslationQuery:
+        return TranslationQuery(**data)
 
 
 class BasePaginatedQuerySchema(marshmallow.Schema):

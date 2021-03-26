@@ -131,5 +131,12 @@
   "Error while uploading file": "Erreur pendant le téléversement du fichier",
   "Error while uploading file(s)": "Erreur pendant le téléversement des fichiers",
   "Please wait until the upload ends": "Veuillez patienter jusqu'à la fin du téléversement",
-  "Avatar of {{publicName}}": "Avatar de {{publicName}}"
+  "Avatar of {{publicName}}": "Avatar de {{publicName}}",
+  "Close": "Fermer",
+  "Restore the original language": "Rétablir la langue d'origine",
+  "Show translation": "Voir la traduction",
+  "Translation pending…": "Traduction en cours…",
+  "Translation is not available": "La traduction est indisponible",
+  "Unknown error": "Erreur inconnue",
+  "Error while translating the document: {{details}}": "Erreur pendant la traduction du document : {{details}}"
 }

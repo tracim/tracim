@@ -264,12 +264,14 @@ class TestConfigEndpoint(object):
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
         assert res.json_body["webdav_enabled"] is False
+        assert res.json_body["translation_service__enabled"] is False
         assert res.json_body["webdav_url"] == "https://localhost:3030/webdav"
         assert res.json_body["collaborative_document_edition"] is None
         assert res.json_body["content_length_file_size_limit"] == 0
         assert res.json_body["workspace_size_limit"] == 0
         assert res.json_body["workspaces_number_per_user_limit"] == 0
         assert res.json_body["email_required"] is True
+        assert res.json_body["search_engine"] == "simple"
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self, web_testapp):
@@ -345,7 +347,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
         assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["First", "Second", "Third"],
             "enum": ["first", "second", "third"],
@@ -371,8 +373,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema.get("properties")
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
-        assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["Premier", "Second", "Troisième"],
             "enum": ["first", "second", "third"],

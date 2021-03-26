@@ -20,6 +20,7 @@ from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -146,7 +147,7 @@ class TestUserSubscriptionEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.created"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
@@ -271,7 +272,7 @@ class TestUserSubscriptionEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.modified"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
@@ -298,7 +299,7 @@ class TestUserSubscriptionEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.modified"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200

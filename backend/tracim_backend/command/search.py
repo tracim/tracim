@@ -5,36 +5,73 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.command import AppContextCommand
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESContentIndexer
+from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESUserIndexer
+from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESWorkspaceIndexer
 from tracim_backend.lib.search.search_factory import SearchFactory
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 
 
 class IndexingCommand(AppContextCommand):
-    def _index_one_content(self, content_id: int) -> None:
+    def _index_one_content(self, content_id: int, context: TracimContext) -> None:
         print('Indexing content "{}"'.format(content_id))
-        content_api = ContentApi(current_user=None, session=self._session, config=self._app_config)
+        if context.app_config.SEARCH__ENGINE == "simple":
+            return
+        content_api = ContentApi(
+            current_user=None, session=context.dbsession, config=context.app_config
+        )
         content = content_api.get_one(
             content_id=content_id, content_type=content_type_list.Any_SLUG
         )
-        content_in_context = ContentInContext(
-            content, dbsession=self._session, config=self._app_config
-        )
-        self.search_api.index_content(content_in_context)
+        ESContentIndexer().index_contents([content], context)
         print('content "{}" correctly indexed.'.format(content_id))
 
-    def _index_all_contents(self) -> None:
-        print("Indexing all content")
-        index_contents_result = self.search_api.index_all_content()
-        nb_index_errors = index_contents_result.get_nb_index_errors()
-        nb_contents_to_index = index_contents_result.get_nb_contents_to_index()
-        if nb_index_errors == 0:
-            print("All {} content where indexed".format(nb_contents_to_index))
-        else:
-            print(
-                "Warning ! {}/{} contents cannot be indexed properly.".format(
-                    nb_index_errors, nb_contents_to_index
-                )
+    def _index_all_contents(self, context: TracimContext) -> None:
+        print("Indexing all contents")
+        if context.app_config.SEARCH__ENGINE == "simple":
+            return
+        content_api = ContentApi(
+            current_user=None, session=context.dbsession, config=context.app_config
+        )
+        contents = content_api.get_all()
+        indexing_error_count = ESContentIndexer().sync_index_contents(contents, context)
+        print(
+            "{} content(s) were indexed, got {} error(s), relaunch the command with '-d' to see the errors".format(
+                len(contents) - indexing_error_count, indexing_error_count
             )
+        )
+
+    def _index_all_users(self, context: TracimContext) -> None:
+        print("Indexing all users")
+        if context.app_config.SEARCH__ENGINE == "simple":
+            return
+        user_api = UserApi(current_user=None, session=context.dbsession, config=context.app_config)
+        indexed_user_count = 0
+        for user in user_api.get_all():
+            ESUserIndexer().index_user(user, context)
+            indexed_user_count += 1
+        print("{} user(s) were indexed".format(indexed_user_count))
+
+    def _index_all_workspaces(self, context: TracimContext) -> None:
+        print("Indexing all workspaces")
+        if context.app_config.SEARCH__ENGINE == "simple":
+            return
+        indexed_workspace_count = 0
+        workspace_api = WorkspaceApi(
+            current_user=None, session=context.dbsession, config=context.app_config
+        )
+        for workspace in workspace_api.get_all():
+            ESWorkspaceIndexer().index_workspace(workspace, context)
+            indexed_workspace_count += 1
+        print("{} space(s) were indexed".format(indexed_workspace_count))
+
+    def _index_all(self, context: TracimContext) -> None:
+        self._index_all_users(context)
+        self._index_all_workspaces(context)
+        self._index_all_contents(context)
 
 
 class SearchIndexInitCommand(IndexingCommand):
@@ -61,10 +98,10 @@ class SearchIndexInitCommand(IndexingCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.create_index()
-        print("Index template was created")
+        self.search_api.create_indices()
+        print("Index templates were created")
         if parsed_args.index_all:
-            self._index_all_contents()
+            self._index_all(app_context["request"])
 
 
 class SearchIndexUpgradeCommand(AppContextCommand):
@@ -79,7 +116,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.migrate_index()
+        self.search_api.migrate_indices()
 
 
 class SearchIndexIndexCommand(IndexingCommand):
@@ -91,7 +128,7 @@ class SearchIndexIndexCommand(IndexingCommand):
         parser.add_argument(
             "--content_id",
             help="select a specific content_id to index, "
-            "if not provided will index all content of tracim",
+            "if not provided will index all existing contents/users/spaces",
             dest="content_id",
             required=False,
             default=None,
@@ -104,22 +141,17 @@ class SearchIndexIndexCommand(IndexingCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
+        # INFO - G.M - 2021-03-04 - Force jobs processing mode to sync for command line based
+        # indexing, async mode doesn't work here and doesn't make much sense
+        logger.debug(self, "index tracim synchronously")
+        self._app_config.JOBS__PROCESSING_MODE = self._app_config.CST.SYNC
         self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
         if parsed_args.content_id:
-            content_api = ContentApi(
-                current_user=None, session=self._session, config=self._app_config
-            )
-            content = content_api.get_one(
-                content_id=parsed_args.content_id, content_type=content_type_list.Any_SLUG
-            )
-            content_in_context = ContentInContext(
-                content, dbsession=self._session, config=self._app_config
-            )
-            self.search_api.index_content(content_in_context)
+            self._index_one_content(parsed_args.content_id, app_context["request"])
         else:
-            self._index_all_contents()
+            self._index_all(app_context["request"])
 
 
 class SearchIndexDeleteCommand(AppContextCommand):
@@ -133,5 +165,5 @@ class SearchIndexDeleteCommand(AppContextCommand):
             current_user=None, session=self._session, config=self._app_config
         )
         print("delete index")
-        self.search_api.delete_index()
-        print("Index where deleted")
+        self.search_api.delete_indices()
+        print("Indices were deleted")

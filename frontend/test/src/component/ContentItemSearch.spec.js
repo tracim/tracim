@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../../src/component/ContentItemSearch.jsx'
+import { ContentItemSearch as ContentItemSearchWithoutHOC } from '../../../src/component/Search/ContentItemSearch.jsx'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 
 describe('<ContentItemSearch />', () => {
@@ -29,10 +29,6 @@ describe('<ContentItemSearch />', () => {
       expect(wrapper.find('div.content__path')).to.text().equal(props.path)
     )
 
-    it(`should display the label: ${props.label}`, () =>
-      expect(wrapper.find('div.content__name')).to.text().contains(props.label)
-    )
-
     it(`should display the lastModificationTime: ${props.lastModificationTime}`, () =>
       expect(wrapper.find('div.content__lastModification')).to.text().contains(props.lastModificationTime)
     )
@@ -55,10 +51,6 @@ describe('<ContentItemSearch />', () => {
 
     it(`the div .content__type should have the title: ${props.contentType.label}`, () =>
       expect(wrapper.find('div.content__type').prop('title')).to.equal(props.contentType.label)
-    )
-
-    it(`the div .content__name should have the title: ${props.label}`, () =>
-      expect(wrapper.find('div.content__name').prop('title')).to.equal(props.label)
     )
 
     it(`the div .content__path should have the title: ${props.path}`, () =>

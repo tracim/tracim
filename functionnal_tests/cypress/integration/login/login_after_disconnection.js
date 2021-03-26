@@ -26,7 +26,7 @@ describe('Login after a disconnection ', function () {
       .click()
   })
 
-  it('should able to add user', function () {
+  it('should allow adding a user', function () {
     cy.getTag({ selectorName: s.HEADER })
       .get('[data-cy=adminlink__dropdown__btn]')
       .should('be.visible')
