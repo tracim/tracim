@@ -74,7 +74,8 @@ export class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false
+      displayWebdavBtn: false,
+      newRequestsNumber: 0
     }
 
     props.registerCustomEventHandlerList([
@@ -104,6 +105,7 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
+    this.loadNewResquestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -130,6 +132,7 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
+    this.loadNewResquestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -181,6 +184,18 @@ export class Dashboard extends React.Component {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+    }
+  }
+
+  loadNewResquestNumber = async () => {
+    const { props } = this
+
+    // TODO NOT UPDATE
+    // const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
+    switch (fetchWorkspaceMemberList.status) {
+      case 200: this.setState({ newRequestsNumber: 0 }); break
+      case 400: break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('new requests')}`, 'warning')); break
     }
   }
 
