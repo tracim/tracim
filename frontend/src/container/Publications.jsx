@@ -385,7 +385,11 @@ export class Publications extends React.Component {
       }
     }
 
-    this.setState({ newCommentAsFileList: [] })
+    if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
+    this.setState({
+      newComment: '',
+      newCommentAsFileList: []
+    })
   }
 
   handleClickValidateAnyway = async () => {
