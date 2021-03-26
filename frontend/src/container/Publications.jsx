@@ -12,7 +12,6 @@ import {
   CUSTOM_EVENT,
   getContentComment,
   getFileChildContent,
-  getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
@@ -74,6 +73,8 @@ export class Publications extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
@@ -140,7 +141,7 @@ export class Publications extends React.Component {
 
   handleContentCreatedOrRestored = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
-    if (data.fields.client_token === getOrCreateSessionClientToken()) return
+    if (data.fields.content.parent_id !== null) return
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
@@ -347,7 +348,6 @@ export class Publications extends React.Component {
     } catch (e) {
       props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
     }
-    props.dispatch(appendPublication(fetchPostPublication.json))
   }
 
   processSaveFilePublication = async () => {
@@ -386,7 +386,6 @@ export class Publications extends React.Component {
     }
 
     this.setState({ newCommentAsFileList: [] })
-    props.dispatch(appendPublication(fetchPostPublicationFile.responseJson))
   }
 
   handleClickValidateAnyway = async () => {
