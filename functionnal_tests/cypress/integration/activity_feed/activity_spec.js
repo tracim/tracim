@@ -31,7 +31,7 @@ describe('At the space recent activities page', () => {
 
   describe('at last change of one activity of any type', () => {
     it("should redirect to user's profile if click at author name", () => {
-      cy.contains('[data-cy=feedItemHeader__label]', fileTitle)
+      cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
       cy.get('.timedEvent__author').first().click()
       cy.url().should('include', URLS[PAGES.PROFILE]({ userId: user.user_id }))
     })
