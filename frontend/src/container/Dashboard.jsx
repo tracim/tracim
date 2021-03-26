@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -458,6 +458,8 @@ export class Dashboard extends React.Component {
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
+    const description = convertBackslashNToBr(props.curWs.description)
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -477,12 +479,42 @@ export class Dashboard extends React.Component {
                     {props.curWs.label}
                   </div>
 
-                  <div
-                    className='dashboard__workspace__detail__description'
-                    dangerouslySetInnerHTML={{ __html: convertBackslashNToBr(props.curWs.description) }}
-                  />
-                  {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
+                  <h3>{props.t('About this space')}</h3>
 
+                  <div className='dashboard__workspace__detail'>
+                    {(description.trim()
+                      ? (
+                        <div
+                          className='dashboard__workspace__detail__description'
+                          dangerouslySetInnerHTML={{ __html: description }}
+                        />
+                      )
+                      : (
+                        <div className='dashboard__workspace__detail__description__missing'>
+                          {props.t("This space doesn't have a description yet.")}
+                        </div>
+                      )
+                    )}
+                    <div className='dashboard__workspace__detail__buttons'>
+                      <Link
+                        className='dashboard__workspace__detail__buttons__link'
+                        to={PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)}
+                      >
+                        <i className='fas fa-fw fa-th' />
+                        {props.t('Explore contents')}
+                      </Link>
+                      {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
+                        <Link
+                          className='dashboard__workspace__detail__buttons__link'
+                          onClick={this.handleClickOpenAdvancedDashboard}
+                        >
+                          <i className='fas fa-fw fa-cog' />
+                          {props.t('Space settings')}
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                  {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>

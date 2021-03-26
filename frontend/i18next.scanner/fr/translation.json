@@ -425,6 +425,9 @@
   "Validate anyway": "Valider quand même",
   "Simple edition": "Édition simple",
   "Advanced edition": "Édition avancée",
+  "About this space": "À propos de cet espace",
+  "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
+  "Space settings": "Space setting",
   "Publish": "Publier",
   "Publication of {{author}} on {{date}}": "Publication de {{author}} le {{date}}"
 }
