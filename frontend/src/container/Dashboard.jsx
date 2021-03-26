@@ -472,12 +472,12 @@ export class Dashboard extends React.Component {
             <PageContent>
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__detail'>
-                  <div
+                  {/* <div
                     className='dashboard__workspace__detail__title primaryColorFont'
                     data-cy='dashboardWorkspaceLabel'
                   >
                     {props.curWs.label}
-                  </div>
+                  </div> */}
 
                   <h3>{props.t('About this space')}</h3>
 
