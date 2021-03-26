@@ -11,7 +11,9 @@ export class ScrollToBottomWrapper extends React.Component {
   componentDidMount () {
     this.containerScrollHeight = this.container.scrollHeight
     if (window.innerWidth < 1200) return
-    this.containerBottom.scrollIntoView({ behavior: 'instant' })
+    if (this.props.shouldScrollToBottom) {
+      this.containerBottom.scrollIntoView({ behavior: 'instant' })
+    }
   }
 
   componentDidUpdate (prevProps) {

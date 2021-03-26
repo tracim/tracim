@@ -76,6 +76,9 @@ export class Publications extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented }
     ])
 
+    // NOTE - SG - 2021-03-25 - This will be set to the DOM element
+    // of the current publication coming from the URL (if any)
+    this.currentPublicationRef = null
     this.state = {
       invalidMentionList: [],
       newComment: '',
@@ -105,6 +108,11 @@ export class Publications extends React.Component {
       globalThis.tinymce.remove(`#${wysiwygId}`)
     }
     if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
+    if (this.currentPublicationRef && this.currentPublicationRef.current) {
+      this.currentPublicationRef.current.scrollIntoView({ behavior: 'instant' })
+      // Remove the ref as it has fulfilled its role
+      this.currentPublicationRef = null
+    }
   }
 
   componentWillUnmount () {
@@ -224,6 +232,10 @@ export class Publications extends React.Component {
   buildBreadcrumbs = () => {
     const { props } = this
     const workspaceId = props.match.params.idws
+    const publicationId = props.match.params.idcts
+    const myLink = publicationId
+      ? PAGE.WORKSPACE.PUBLICATION(workspaceId, publicationId)
+      : PAGE.WORKSPACE.PUBLICATIONS(workspaceId)
     const breadcrumbsList = [
       {
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
@@ -232,7 +244,7 @@ export class Publications extends React.Component {
         isALink: true
       },
       {
-        link: PAGE.WORKSPACE.PUBLICATION(workspaceId),
+        link: myLink,
         type: BREADCRUMBS_TYPE.CORE,
         label: props.t('Publications'),
         isALink: false
@@ -359,7 +371,8 @@ export class Publications extends React.Component {
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-
+    const currentPublicationId = Number(props.match.params.idcts || 0)
+    this.currentPublicationRef = currentPublicationId ? React.createRef() : null
     return (
       <div className='publications'>
         <TabBar
@@ -370,7 +383,7 @@ export class Publications extends React.Component {
         <ScrollToBottomWrapper
           itemList={props.publicationList}
           customClass='pageContentGeneric'
-          shouldScrollToBottom
+          shouldScrollToBottom={currentPublicationId === 0}
         >
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
@@ -378,6 +391,7 @@ export class Publications extends React.Component {
               content={publication}
               customColor={publicationColor}
               key={`publication_${publication.id}`}
+              ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
               memberList={props.currentWorkspace.memberList}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
               showTimeline

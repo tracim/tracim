@@ -117,7 +117,7 @@ export class FeedItemWithPreview extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='feedItem'>
+      <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           breadcrumbsList={props.breadcrumbsList}
           content={props.content}
@@ -167,7 +167,12 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 }
-export default translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
+
+const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
+const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
+  return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
+})
+export default FeedItemWithPreviewWithRef
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,

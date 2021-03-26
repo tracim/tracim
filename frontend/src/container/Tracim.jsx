@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import {
-  Route, withRouter, Redirect
+  Route, withRouter, Redirect, Switch
 } from 'react-router-dom'
 import Dashboard from './Dashboard.jsx'
 import Sidebar from './Sidebar.jsx'
@@ -488,14 +488,24 @@ export class Tracim extends React.Component {
                   )}
                 />
 
-                <Route
-                  path={PAGE.WORKSPACE.PUBLICATION(':idws')}
-                  render={() => (
-                    <div className='tracim__content fullWidthFullHeight'>
-                      <Publications />
-                    </div>
-                  )}
-                />
+                <Switch>
+                  <Route
+                    path={PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts')}
+                    render={() => (
+                      <div className='tracim__content fullWidthFullHeight'>
+                        <Publications />
+                      </div>
+                    )}
+                  />
+                  <Route
+                    path={PAGE.WORKSPACE.PUBLICATIONS(':idws')}
+                    render={() => (
+                      <div className='tracim__content fullWidthFullHeight'>
+                        <Publications />
+                      </div>
+                    )}
+                  />
+                </Switch>
 
                 <Route
                   path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
