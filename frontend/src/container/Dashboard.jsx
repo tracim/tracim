@@ -481,26 +481,8 @@ export class Dashboard extends React.Component {
                     className='dashboard__workspace__detail__description'
                     dangerouslySetInnerHTML={{ __html: convertBackslashNToBr(props.curWs.description) }}
                   />
+                  {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
 
-                  <div className='dashboard__calltoaction'>
-                    {contentTypeButtonList.map(app => {
-                      return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
-                        <ContentTypeBtn
-                          customClass='dashboard__calltoaction__button'
-                          hexcolor={app.hexcolor}
-                          label={app.label}
-                          faIcon={app.faIcon}
-                          // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
-                          // The creation label comes from api but since there is no translation in backend
-                          // every files has a 'externalTranslationList' array just to generate the translation key in the json files through i18n.scanner
-                          creationLabel={props.t(app.creationLabel)}
-                          onClickBtn={() => props.history.push(app.route)}
-                          appSlug={app.slug}
-                          key={app.slug}
-                        />
-                      )
-                    })}
-                  </div>
                 </div>
 
                 <div className='dashboard__workspace__detail__right'>
@@ -524,59 +506,76 @@ export class Dashboard extends React.Component {
                     onClickRemoveNotify={this.handleClickRemoveNotification}
                     t={props.t}
                   />
+                  <div className='dashboard__calltoaction'>
+                    {contentTypeButtonList.map(app => {
+                      return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
+                        <ContentTypeBtn
+                          customClass='dashboard__calltoaction__button'
+                          hexcolor={app.hexcolor}
+                          label={app.label}
+                          faIcon={app.faIcon}
+                          // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
+                          // The creation label comes from api but since there is no translation in backend
+                          // every files has a 'externalTranslationList' array just to generate the translation key in the json files through i18n.scanner
+                          creationLabel={props.t(app.creationLabel)}
+                          onClickBtn={() => props.history.push(app.route)}
+                          appSlug={app.slug}
+                          key={app.slug}
+                        />
+                      )
+                    })}
+                  </div>
+                  <div className='dashboard__workspaceInfo'>
+
+                    <MemberList
+                      customClass='dashboard__memberlist'
+                      loggedUser={props.user}
+                      apiUrl={FETCH_CONFIG.apiUrl}
+                      memberList={props.curWs.memberList}
+                      roleList={ROLE_LIST}
+                      searchedKnownMemberList={state.searchedKnownMemberList}
+                      autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                      publicName={state.newMember.publicName}
+                      isEmail={state.newMember.isEmail}
+                      onChangePersonalData={this.handleChangePersonalData}
+                      onClickKnownMember={this.handleClickKnownMember}
+                      // createAccount={state.newMember.createAccount}
+                      // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
+                      role={state.newMember.role}
+                      onChangeRole={this.handleChangeNewMemberRole}
+                      onClickValidateNewMember={this.handleClickValidateNewMember}
+                      displayNewMemberForm={state.displayNewMemberForm}
+                      onClickAddMemberBtn={this.handleClickAddMemberBtn}
+                      onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
+                      onClickRemoveMember={this.handleClickRemoveMember}
+                      userRoleIdInWorkspace={userRoleIdInWorkspace}
+                      canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
+                      emailNotifActivated={props.system.config.email_notification_activated}
+                      autoCompleteClicked={state.autoCompleteClicked}
+                      onClickAutoComplete={this.handleClickAutoComplete}
+                      t={props.t}
+                    />
+                  </div>
+
+                  {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
+                    <AgendaInfo
+                      customClass='dashboard__section'
+                      introText={props.t('Use this link to integrate this agenda to your')}
+                      caldavText={props.t('CalDAV compatible software')}
+                      agendaUrl={props.curWs.agendaUrl}
+                    />
+                  )}
+
+                  {props.system.config.webdav_enabled && (
+                    <WebdavInfo
+                      customClass='dashboard__section'
+                      introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                      webdavText={props.t('(protocole WebDAV)')}
+                      webdavUrl={props.system.config.webdav_url}
+                    />
+                  )}
                 </div>
               </div>
-
-              <div className='dashboard__workspaceInfo'>
-                {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
-
-                <MemberList
-                  customClass='dashboard__memberlist'
-                  loggedUser={props.user}
-                  apiUrl={FETCH_CONFIG.apiUrl}
-                  memberList={props.curWs.memberList}
-                  roleList={ROLE_LIST}
-                  searchedKnownMemberList={state.searchedKnownMemberList}
-                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  publicName={state.newMember.publicName}
-                  isEmail={state.newMember.isEmail}
-                  onChangePersonalData={this.handleChangePersonalData}
-                  onClickKnownMember={this.handleClickKnownMember}
-                  // createAccount={state.newMember.createAccount}
-                  // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
-                  role={state.newMember.role}
-                  onChangeRole={this.handleChangeNewMemberRole}
-                  onClickValidateNewMember={this.handleClickValidateNewMember}
-                  displayNewMemberForm={state.displayNewMemberForm}
-                  onClickAddMemberBtn={this.handleClickAddMemberBtn}
-                  onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
-                  onClickRemoveMember={this.handleClickRemoveMember}
-                  userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
-                  emailNotifActivated={props.system.config.email_notification_activated}
-                  autoCompleteClicked={state.autoCompleteClicked}
-                  onClickAutoComplete={this.handleClickAutoComplete}
-                  t={props.t}
-                />
-              </div>
-
-              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
-                <AgendaInfo
-                  customClass='dashboard__section'
-                  introText={props.t('Use this link to integrate this agenda to your')}
-                  caldavText={props.t('CalDAV compatible software')}
-                  agendaUrl={props.curWs.agendaUrl}
-                />
-              )}
-
-              {props.system.config.webdav_enabled && (
-                <WebdavInfo
-                  customClass='dashboard__section'
-                  introText={props.t('Use this link to integrate Tracim in your file explorer')}
-                  webdavText={props.t('(protocole WebDAV)')}
-                  webdavUrl={props.system.config.webdav_url}
-                />
-              )}
             </PageContent>
           </PageWrapper>
         </div>
