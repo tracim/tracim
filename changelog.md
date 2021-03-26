@@ -1,4 +1,11 @@
-# 3.6.0 / 2021-03-23
+# 3.6.1 / 2021-03-26
+
+### Fixed Issues
+
+- Documentation: [#4355](https://github.com/tracim/tracim/issues/4355)
+
+
+# 3.6.0 / 2021-03-24
 
 ### New Features
 
