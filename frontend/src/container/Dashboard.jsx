@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -480,7 +480,7 @@ export class Dashboard extends React.Component {
                     {props.curWs.label}
                   </div>
 
-                  <h3>{props.t('About this space')}</h3>
+                  <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
 
                   <div className='dashboard__workspace__detail'>
                     {(description.trim()

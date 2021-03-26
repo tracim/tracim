@@ -10,17 +10,21 @@
         margin 0
   &__workspace
     display flex
-    flex-wrap wrap
-    align-items flex-start
+    justify-content space-around
+    &__subtitle
+      font-size fontSizeMedium
+      font-weight bold
+    &__content
+      width 70%
     &__detail
-      margin-right 20px
       background offWhite
       border 1px solid grey
       border-radius 5px
+      padding 10px
+      margin 10px 10px 10px 0px
       &__buttons
         text-align end
-        button
-          margin 10px
+        margin-top 10px
       &__title
         margin 0 30px 20px 30px
         font-size 70px
@@ -28,7 +32,8 @@
         display flex
         justify-content space-between
       &__description
-        margin 10px
+        overflow hidden
+        text-overflow ellipsis
         &__missing
           color mediumDarkGrey
           font-style italic
@@ -37,6 +42,7 @@
       background-color offWhite
       border 1px solid grey
       border-radius 5px
+      padding 10px
   &__calltoaction
     display flex
     flex-wrap wrap
