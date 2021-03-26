@@ -1,12 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .dashboard
-  .pageContentGeneric
-    margin 0
-    min-height 100%
-    padding 0
-
-.dashboard
   width 100%
   min-height 100%
   &__header
@@ -22,8 +16,6 @@
       margin-right 20px
       width calc(70% - 20px) //20px => margin-right
       &__right
-        width 27%
-        margin-top 30px
         &__button
           font-size fontSizeSmall
           margin-left auto
@@ -39,6 +31,9 @@
       &__description
         margin-left 30px
         font-size 18px
+    &__rightMenu
+      width 30%
+
   &__calltoaction
     display flex
     flex-wrap wrap
