@@ -1,5 +1,5 @@
 import React from 'react'
-import { ROLE_LIST } from 'tracim_frontend_lib'
+import { Icon, ROLE_LIST } from 'tracim_frontend_lib'
 
 require('./UserStatus.styl')
 
@@ -8,20 +8,18 @@ export const UserStatus = props => {
   const myRole = ROLE_LIST.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (
-    <div className='userstatus notched primaryColorBorder'>
-      <div className='userstatus__username'>
-        {props.user.publicName}
-      </div>
-
+    <div className='userstatus'>
       <div className='userstatus__role'>
-        <div className='userstatus__role__icon'>
-          <i className={`fa-fw ${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
-        </div>
+        {props.t('Your role:')}
+        <Icon
+          color={myRole.hexcolor}
+          customClass='userstatus__role__icon'
+          icon={`fa-fw ${myRole.faIcon}`}
+          title={props.t('Your role in the space')}
+        />
 
         <div
           className='userstatus__role__text'
-          title={props.t('Your role in the space')}
-          style={{ color: myRole.hexcolor }}
         >
           {props.t(myRole.label)}
         </div>
@@ -45,6 +43,12 @@ export const UserStatus = props => {
               : props.t('Click here to subscribe')
             )}
           </div>
+        </div>
+      )}
+
+      {props.displayRequestsInformation && (
+        <div>
+          test
         </div>
       )}
     </div>
