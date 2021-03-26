@@ -68,7 +68,7 @@ export class FeedItemHeader extends React.Component {
         <div className='feedItemHeader__title'>
           <Link
             to={props.isPublication
-              ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId)
+              ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId, contentId)
               : PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
           >
             <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>

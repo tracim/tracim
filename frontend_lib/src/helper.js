@@ -29,7 +29,8 @@ export const PAGE = {
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
     RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
-    PUBLICATION: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
+    PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
