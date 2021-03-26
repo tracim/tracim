@@ -85,8 +85,7 @@ export class CommentFilePreview extends React.Component {
                     ? (
                       <>
                         <Icon icon='fas fa-fw fa-paperclip' title='' />
-                        {' '}
-                        {filename}
+                        {` ${filename}`}
                       </>
                     )
                     : (
