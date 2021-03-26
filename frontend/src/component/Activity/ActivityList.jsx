@@ -94,7 +94,7 @@ const ActivityList = (props) => {
       ? componentConstructor(
         activity,
         activity.entityType === TLM_ET.CONTENT ? buildActivityBreadcrumbsList(activity) : [],
-        () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
+        () => props.onCopyLinkClicked(activity.content),
         () => props.onEventClicked(activity)
       )
       : <span>{props.t('Unknown activity type')}</span>
