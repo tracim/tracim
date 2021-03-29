@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
-import Preview from '../component/FeedItem/Preview.jsx'
+import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
 import { FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
@@ -140,9 +140,10 @@ export class FeedItemWithPreview extends React.Component {
           onClickCopyLink={props.onClickCopyLink}
           onEventClicked={props.onEventClicked}
           workspaceId={props.workspaceId}
+          titleLink={props.titleLink}
         />
         <div className='feedItem__content'>
-          <Preview content={props.content} />
+          <Preview content={props.content} linkType={props.previewLinkType} link={props.previewLink} />
           <FeedItemFooter content={props.content} />
         </div>
         {props.showTimeline && (
@@ -182,6 +183,7 @@ const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
 })
 export default FeedItemWithPreviewWithRef
+export { LINK_TYPE }
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
@@ -201,7 +203,10 @@ FeedItemWithPreview.propTypes = {
   onEventClicked: PropTypes.func,
   reactionList: PropTypes.array,
   showTimeline: PropTypes.bool,
-  user: PropTypes.object
+  user: PropTypes.object,
+  titleLink: PropTypes.string,
+  previewLink: PropTypes.string,
+  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -218,5 +223,8 @@ FeedItemWithPreview.defaultProps = {
   modifiedDate: '',
   reactionList: [],
   showTimeline: false,
-  user: {}
+  user: {},
+  previewLinkType: LINK_TYPE.OPEN_IN_APP,
+  titleLink: null,
+  previewLink: null
 }

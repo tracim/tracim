@@ -335,7 +335,7 @@
   "No preview available": "Prévisualisation indisponible",
   "Preview loading...": "Chargement de la prévisualisation...",
   "Unknown entity type": "Type d'entité inconnu",
-  "Open content": "Ouvrir le contenu",
+  "Open as content": "Ouvrir en tant que contenu",
   "The link has been copied to clipboard": "Le lien a été copié dans le presse-papiers",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>Le role de {{userPublicName}}</0></0> a été changé en <2>{{role}}</2>",
@@ -428,5 +428,6 @@
   "Publication of {{author}} on {{date}}": "Publication de {{author}} le {{date}}",
   "Error loading publication comments": "Erreur lors du chargement des commentaires",
   "Publication": "Publication",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
+  "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "Attach files": "Joindre des fichiers"
 }

@@ -12,6 +12,7 @@ import {
   CUSTOM_EVENT,
   getContentComment,
   getFileChildContent,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
@@ -27,7 +28,8 @@ import {
   isFileUploadInErrorState,
   CONTENT_TYPE,
   AddFileToUploadButton,
-  DisplayFileToUpload
+  DisplayFileToUpload,
+  getFileDownloadUrl
 } from 'tracim_frontend_lib'
 import {
   CONTENT_NAMESPACE,
@@ -58,7 +60,7 @@ import {
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
-import FeedItemWithPreview from './FeedItemWithPreview.jsx'
+import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
 const wysiwygId = 'wysiwygTimelineCommentPublication'
 
@@ -85,6 +87,7 @@ export class Publications extends React.Component {
     // of the current publication coming from the URL (if any)
     this.currentPublicationRef = null
     this.state = {
+      isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       newComment: '',
       newCommentAsFileList: [],
@@ -150,6 +153,7 @@ export class Publications extends React.Component {
   handleContentCreatedOrRestored = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     if (data.fields.content.parent_id !== null) return
+    this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
@@ -328,7 +332,7 @@ export class Publications extends React.Component {
 
     return props.t('Publication of {{author}} on {{date}}', {
       author: props.user.publicName,
-      date: formatAbsoluteDate(new Date(), userLang).replaceAll('/', '-'),
+      date: formatAbsoluteDate(new Date(), userLang),
       interpolation: { escapeValue: false }
     })
   }
@@ -442,6 +446,17 @@ export class Publications extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.props.match.params.idws)
   }
 
+  getPreviewLinkParameters = (publication) => {
+    const previewLinkType = publication.type === CONTENT_TYPE.FILE
+      ? LINK_TYPE.DOWNLOAD
+      : LINK_TYPE.OPEN_IN_APP
+
+    const previewLink = publication.type === CONTENT_TYPE.FILE
+      ? getFileDownloadUrl(FETCH_CONFIG.apiUrl, publication.workspaceId, publication.id, publication.fileName)
+      : PAGE.WORKSPACE.CONTENT(publication.workspaceId, publication.type, publication.id)
+    return { previewLinkType, previewLink }
+  }
+
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
@@ -455,8 +470,9 @@ export class Publications extends React.Component {
         />
 
         <ScrollToBottomWrapper
-          itemList={props.publicationList}
           customClass='pageContentGeneric'
+          isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
+          itemList={props.publicationList}
           shouldScrollToBottom={currentPublicationId === 0}
         >
           {props.publicationList.map(publication =>
@@ -476,6 +492,7 @@ export class Publications extends React.Component {
                 userRoleIdInWorkspace: userRoleIdInWorkspace
               }}
               workspaceId={Number(publication.workspaceId)}
+              {...this.getPreviewLinkParameters(publication)}
             />
           )}
 

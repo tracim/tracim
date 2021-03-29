@@ -54,7 +54,6 @@ import {
   WORKSPACE_MEMBER_REMOVE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
-  WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
@@ -450,21 +449,6 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceRead = workspaceId => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/read`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'PUT'
-    },
-    actionName: USER_KNOWN_MEMBER_LIST,
-    dispatch
-  })
-}
-
 export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
@@ -611,21 +595,6 @@ export const getContentPathList = (workspaceId, contentId, folderIdList) => disp
       method: 'GET'
     },
     actionName: WORKSPACE_CONTENT_PATH,
-    dispatch
-  })
-}
-
-export const getMyselfWorkspaceRecentActivityList = (workspaceId, beforeId = null) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: WORKSPACE_RECENT_ACTIVITY,
     dispatch
   })
 }
@@ -1233,7 +1202,7 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
     { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
     { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
-    { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+    { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
   ]
   const result = await uploadFile(
     content,

@@ -1,7 +1,6 @@
 import { uniqBy } from 'lodash'
 import {
   APPEND,
-  COMMENT,
   COMMENT_LIST,
   PUBLICATION,
   REMOVE,
@@ -59,16 +58,6 @@ export default function publicationList (state = defaultPublicationList, action)
         ? { ...publication, commentList: action.commentList }
         : publication
       ))
-
-    case `${APPEND}/${PUBLICATION}/${COMMENT}`: {
-      return uniqByContentId(state.map(publication => {
-        if (action.comment.parent_id === publication.id) {
-          const newCommentList = publication.commentList || []
-          newCommentList.push(action.comment)
-          return { ...publication, commentList: newCommentList }
-        } else return publication
-      }))
-    }
 
     default:
       return state

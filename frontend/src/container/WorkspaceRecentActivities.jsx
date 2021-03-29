@@ -25,7 +25,6 @@ import {
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
-import TabBar from '../component/TabBar/TabBar.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
 require('../css/RecentActivities.styl')
@@ -118,10 +117,10 @@ export class WorkspaceRecentActivities extends React.Component {
 
     return (
       <div className='workspaceRecentActivities'>
-        <TabBar
-          currentSpace={props.currentWorkspace}
-          breadcrumbs={props.breadcrumbs}
-        />
+        <div className='workspaceRecentActivities__header subTitle'>
+          {props.t('Recent activities')}
+        </div>
+
         <ActivityList
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
@@ -146,7 +145,7 @@ WorkspaceRecentActivities.propTypes = {
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.string.isRequired
+  workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {

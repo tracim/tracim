@@ -459,7 +459,15 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
 }
 
-export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+export const splitFilenameExtension = filename => {
+  const match = filename.match(/^([\s\S]*?)((?:\.tar)?(?:\.[^.]+))$/)
+  return {
+    basename: match ? match[1] : filename,
+    extension: match ? match[2] : ''
+  }
+}
+
+export const removeExtensionOfFilename = filename => splitFilenameExtension(filename).basename
 
 export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
 
@@ -770,3 +778,5 @@ export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_d
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
+
+export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`

@@ -118,11 +118,6 @@ export const updateWorkspaceMember = (user, workspaceId, member) => ({
 })
 export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
 
-export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
-export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
-export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
@@ -254,4 +249,3 @@ export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLIC
 export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })
 export const updatePublication = (publication) => ({ type: `${UPDATE}/${PUBLICATION}`, publication })
 export const setCommentListToPublication = (publicationId, commentList) => ({ type: `${SET}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })
-export const appendCommentToPublication = (comment) => ({ type: `${APPEND}/${PUBLICATION}/${COMMENT}`, comment })

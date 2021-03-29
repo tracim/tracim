@@ -30,6 +30,7 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
@@ -58,7 +59,8 @@ import {
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -269,6 +271,7 @@ export {
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   removeAtInUsername,
   computeProgressionPercentage,
@@ -407,5 +410,6 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 }
