@@ -12,6 +12,7 @@ import {
   CUSTOM_EVENT,
   getContentComment,
   getFileChildContent,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
@@ -85,6 +86,7 @@ export class Publications extends React.Component {
     // of the current publication coming from the URL (if any)
     this.currentPublicationRef = null
     this.state = {
+      isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       newComment: '',
       newCommentAsFileList: [],
@@ -150,6 +152,7 @@ export class Publications extends React.Component {
   handleContentCreatedOrRestored = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     if (data.fields.content.parent_id !== null) return
+    this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
@@ -455,8 +458,9 @@ export class Publications extends React.Component {
         />
 
         <ScrollToBottomWrapper
-          itemList={props.publicationList}
           customClass='pageContentGeneric'
+          isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
+          itemList={props.publicationList}
           shouldScrollToBottom={currentPublicationId === 0}
         >
           {props.publicationList.map(publication =>
