@@ -90,21 +90,15 @@ export class CommentFilePreview extends React.Component {
                   href={fileDownloadUrl}
                   download
                 >
-                  {(this.state.fallbackPreview
-                    ? (
-                      <>
-                        <Icon icon='fas fa-fw fa-paperclip' title='' />
-                        {` ${filename}`}
-                      </>
-                    )
-                    : (
-                      <img
-                        className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
-                        src={previewUrl}
-                        alt={filename}
-                        onError={this.handleError}
-                      />
-                    )
+                  <Icon icon='fas fa-fw fa-paperclip' title='' />
+                  {` ${filename}`}
+                  {(!this.state.fallbackPreview &&
+                    <img
+                      className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
+                      src={previewUrl}
+                      alt={filename}
+                      onError={this.handleError}
+                    />
                   )}
                 </a>
               </div>
