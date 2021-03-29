@@ -31,7 +31,7 @@ const PREVIEW_WIDTHS = [
 
 const MAX_PREVIEW_HEIGHT = 300
 
-class Preview extends React.Component {
+export class Preview extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
