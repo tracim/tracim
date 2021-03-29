@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { formatAbsoluteDate, splitFilenameExtension } from '../../helper.js'
 import PopupUploadFile from '../../container/PopupUploadFile.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
@@ -10,6 +11,12 @@ export class AddFileToUploadButton extends React.Component {
     this.state = {
       showUploadPopup: false
     }
+  }
+
+  filenameWithDate (filename) {
+    const { basename, extension } = splitFilenameExtension(filename)
+    const date = formatAbsoluteDate(new Date(), this.props.i18n.language)
+    return `${basename} (${date})${extension}`
   }
 
   handleDisplayPopupUpload = e => {
@@ -23,7 +30,21 @@ export class AddFileToUploadButton extends React.Component {
 
   handleValidatePopupOverride = fileToUploadList => {
     this.handleClosePopup()
-    this.props.onValidateCommentFileToUpload(fileToUploadList)
+    this.props.onValidateCommentFileToUpload(
+      fileToUploadList.map(fileToUpload => {
+        const { file } = fileToUpload
+        return {
+          ...fileToUpload,
+          file: new File(
+            [file],
+            this.filenameWithDate(file.name), {
+              type: file.type,
+              lastModified: file.lastModified
+            }
+          )
+        }
+      })
+    )
   }
 
   render () {

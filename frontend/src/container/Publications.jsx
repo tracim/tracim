@@ -331,7 +331,7 @@ export class Publications extends React.Component {
 
     return props.t('Publication of {{author}} on {{date}}', {
       author: props.user.publicName,
-      date: formatAbsoluteDate(new Date(), userLang).replaceAll('/', '-'),
+      date: formatAbsoluteDate(new Date(), userLang),
       interpolation: { escapeValue: false }
     })
   }

@@ -145,7 +145,7 @@ WorkspaceRecentActivities.propTypes = {
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.string.isRequired
+  workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {
