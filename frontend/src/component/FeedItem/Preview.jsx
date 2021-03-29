@@ -276,8 +276,6 @@ export class Preview extends React.Component {
         return (
           <a
             href={props.link}
-            target='_blank'
-            rel='noopener noreferrer'
             download
           >
             {this.getPreviewComponent()}

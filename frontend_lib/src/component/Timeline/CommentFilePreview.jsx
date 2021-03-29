@@ -88,8 +88,6 @@ export class CommentFilePreview extends React.Component {
                   className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
                   title={title}
                   href={fileDownloadUrl}
-                  target='_blank'
-                  rel='noopener noreferrer'
                   download
                 >
                   {(this.state.fallbackPreview
