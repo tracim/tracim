@@ -7,7 +7,8 @@ import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
   formatAbsoluteDate,
-  removeExtensionOfFilename
+  removeExtensionOfFilename,
+  getFileDownloadUrl
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 
@@ -32,13 +33,13 @@ export class CommentFilePreview extends React.Component {
     const createdFormatted = formatAbsoluteDate(props.apiContent.created_raw, props.loggedUser.lang)
     const fromMe = props.loggedUser.userId === apiAuthor.user_id
 
-    const { filename } = props.apiContent
+    const { filename, workspace_id, content_id, revision_id } = props.apiContent
 
     const previewUrl = buildFilePreviewUrl(
       props.apiUrl,
-      props.apiContent.workspace_id,
-      props.apiContent.content_id,
-      props.apiContent.revision_id,
+      workspace_id,
+      content_id,
+      revision_id,
       removeExtensionOfFilename(filename),
       1, // page
       380, // width
@@ -46,6 +47,12 @@ export class CommentFilePreview extends React.Component {
     )
 
     const title = props.t('Attached file: {{filename}}', { filename })
+    const fileDownloadUrl = getFileDownloadUrl(
+      props.apiUrl,
+      workspace_id,
+      content_id,
+      filename
+    )
 
     return (
       <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -77,9 +84,11 @@ export class CommentFilePreview extends React.Component {
                   {props.apiContent.created}
                 </div>
 
-                <div
+                <a
                   className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
                   title={title}
+                  href={fileDownloadUrl}
+                  download
                 >
                   {(this.state.fallbackPreview
                     ? (
@@ -97,7 +106,7 @@ export class CommentFilePreview extends React.Component {
                       />
                     )
                   )}
-                </div>
+                </a>
               </div>
             </div>
 
