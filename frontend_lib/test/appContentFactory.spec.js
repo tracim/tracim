@@ -344,7 +344,7 @@ describe('appContentFactory.js', () => {
           lang: 'en'
         }
         const isCommentWysiwyg = true
-        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
+        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment, fakeContent.content_namespace)
         response = await wrapper.instance().saveCommentAsText(
           fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
         )
