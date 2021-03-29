@@ -55,6 +55,7 @@ import {
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
+  WORKSPACE_SUBSCRIPTION,
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
   CUSTOM_PROPERTIES_SCHEMA,
@@ -971,6 +972,21 @@ export const getWorkspaceSubscriptions = userId => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE_SUBSCRIPTION_LIST,
+    dispatch
+  })
+}
+
+export const getSubscriptions = workspaceId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_SUBSCRIPTION,
     dispatch
   })
 }

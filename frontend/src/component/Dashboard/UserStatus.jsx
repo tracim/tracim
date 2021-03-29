@@ -48,12 +48,12 @@ export const UserStatus = props => {
             <Icon
               icon='fa-fw fas fa-sign-in-alt'
               title={props.t('{{newRequests}} new requests', {
-                newRequests: 6 // props.newRequestsNumber
+                newRequests: props.newRequestsNumber
               })}
             />
             <div>
               {props.t('{{newRequests}} new requests', {
-                newRequests: 6 // props.newRequestsNumber
+                newRequests: props.newRequestsNumber
               })}
             </div>
           </div>

@@ -23,6 +23,7 @@ import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
   getMyselfKnownMember,
+  getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
   putMyselfWorkspaceDoNotify,
@@ -84,7 +85,9 @@ export class Dashboard extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleNewRequest },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleRequestModified }
     ])
   }
 
@@ -190,13 +193,28 @@ export class Dashboard extends React.Component {
   loadNewResquestNumber = async () => {
     const { props } = this
 
-    // TODO NOT UPDATE
-    // const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: this.setState({ newRequestsNumber: 0 }); break
+    const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
+    switch (fetchGetWorkspaceSubscriptions.status) {
+      case 200: {
+        const filteredRequestList = fetchGetWorkspaceSubscriptions.json.filter(request => request.state === 'pending')
+        this.setState({ newRequestsNumber: filteredRequestList.length })
+        break
+      }
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('new requests')}`, 'warning')); break
     }
+  }
+
+  handleNewRequest = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id ) return
+    this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
+  }
+
+  handleRequestModified = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id ) return
+    data.fields.subscription.state ===  'pending'
+      ? this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
+      : this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber - 1 }))
   }
 
   setHeadTitle = () => {
@@ -529,6 +547,7 @@ export class Dashboard extends React.Component {
                     user={props.user}
                     curWs={props.curWs}
                     displayNotifBtn={props.system.config.email_notification_activated}
+                    newRequestsNumber={state.newRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
                     onClickAddNotify={this.handleClickAddNotification}
                     onClickRemoveNotify={this.handleClickRemoveNotification}
