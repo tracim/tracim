@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import PopupUploadFile from '../../container/PopupUploadFile.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import { t } from 'i18next/dist/commonjs'
 
 export class AddFileToUploadButton extends React.Component {
   constructor (props) {
@@ -36,6 +37,7 @@ export class AddFileToUploadButton extends React.Component {
           onClick={this.handleDisplayPopupUpload}
           color={props.color}
           icon='fas fa-paperclip'
+          title={props.t('Attach files')}
           disabled={props.disabled}
         />
 
