@@ -59,7 +59,8 @@ import {
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -409,5 +410,6 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 }
