@@ -118,12 +118,12 @@ export class FeedItemHeader extends React.Component {
 
           <Link
             className='feedItemHeader__actionMenu__item'
-            title={props.t('Open content')}
+            title={props.t('Open as content')}
             to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
             key={`open-${contentId}`}
           >
             <i className={`fa-fw ${app.faIcon}`} />
-            {props.t('Open content')}
+            {props.t('Open as content')}
           </Link>
         </DropdownMenu>
       </div>

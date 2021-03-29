@@ -331,7 +331,7 @@
   "No preview available": "No preview available",
   "Preview loading...": "Preview loading...",
   "Unknown entity type": "Unknown entity type",
-  "Open content": "Open content",
+  "Open as content": "Open as content",
   "The link has been copied to clipboard": "The link has been copied to clipboard",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>",

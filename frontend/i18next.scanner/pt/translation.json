@@ -335,7 +335,7 @@
   "No preview available": "Pré-visualização indisponível",
   "Preview loading...": "Pré-visualização carregando...",
   "Unknown entity type": "Tipo de entidade desconhecida",
-  "Open content": "Abrir conteúdo",
+  "Open as content": "Abrir como conteúdo",
   "The link has been copied to clipboard": "A ligaçao foi copiada para a área de transferência",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> juntou-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "O papel de <0><0>{{userPublicName}}</0></0> foi alterado para <2>{{role}}</2>",
