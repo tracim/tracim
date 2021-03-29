@@ -51,8 +51,7 @@ import {
   putMyselfFileRead,
   putUserConfiguration,
   permissiveNumberEqual,
-  getDefaultTranslationState,
-  CONTENT_NAMESPACE
+  getDefaultTranslationState
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -448,7 +447,7 @@ export class File extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.CONTENT, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
