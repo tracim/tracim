@@ -428,6 +428,6 @@
   "Publication of {{author}} on {{date}}": "Publication de {{author}} le {{date}}",
   "Error loading publication comments": "Erreur lors du chargement des commentaires",
   "Publication": "Publication",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Attach files": "Joindre des fichiers"
 }
