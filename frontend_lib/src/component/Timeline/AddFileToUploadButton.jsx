@@ -57,6 +57,7 @@ export class AddFileToUploadButton extends React.Component {
           onClick={this.handleDisplayPopupUpload}
           color={props.color}
           icon='fas fa-paperclip'
+          title={props.t('Attach files')}
           disabled={props.disabled}
         />
 
