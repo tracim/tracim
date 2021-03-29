@@ -286,8 +286,7 @@ export class Preview extends React.Component {
   }
 
   render () {
-    const { props, state } = this
-    const { content } = props
+    const { state } = this
     return (
       <div
         className={classnames(

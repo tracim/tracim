@@ -33,7 +33,7 @@ export class CommentFilePreview extends React.Component {
     const createdFormatted = formatAbsoluteDate(props.apiContent.created_raw, props.loggedUser.lang)
     const fromMe = props.loggedUser.userId === apiAuthor.user_id
 
-    const { filename, workspace_id, content_id, revision_id } = props.apiContent
+    const { filename, workspace_id, content_id, revision_id } = props.apiContent // eslint-disable-line
 
     const previewUrl = buildFilePreviewUrl(
       props.apiUrl,
