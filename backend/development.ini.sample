@@ -383,7 +383,8 @@ api.key = %(basic_setup.api_key)s
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
 ; website.description =
-; website.welcome_page = simple-welcome.html
+; website.welcome_page = welcome-simple.html
+; website.welcome_page_style = welcome-simple.css
 
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.

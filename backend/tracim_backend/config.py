@@ -394,6 +394,9 @@ class CFG(object):
         self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
             "website.welcome_page", "welcome-simple.html"
         )
+        self.WEBSITE__WELCOME_PAGE_STYLE = self.get_raw_config(
+            "website.welcome_page_style", "welcome-simple.css"
+        )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
             "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
