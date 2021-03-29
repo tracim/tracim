@@ -288,8 +288,6 @@ export class Preview extends React.Component {
   render () {
     const { props, state } = this
     const { content } = props
-    console.assert(props.linkType === LINK_TYPE.OPEN_IN_APP || content.contentType === CONTENT_TYPE.FILE)
-
     return (
       <div
         className={classnames(
