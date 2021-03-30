@@ -298,7 +298,7 @@ class Login extends React.Component {
           <div className='loginpage__main__wrapper'>
             <h1 className='loginpage__main__title'>{props.t('Sign in')}</h1>
             <form onSubmit={this.handleClickSubmit} noValidate className='loginpage__main__form'>
-              <div className=''>{props.t('Login:')}</div>
+              <div>{props.t('Login:')}</div>
               <InputGroupText
                 parentClassName='loginpage__main__form__groupelogin'
                 icon='fa-user'
@@ -308,7 +308,7 @@ class Login extends React.Component {
                 maxLength={512}
                 name='login'
               />
-              <div className=''>{props.t('Password:')}</div>
+              <div>{props.t('Password:')}</div>
               <InputGroupText
                 parentClassName='loginpage__main__form__groupepw'
                 customClass=''

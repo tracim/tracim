@@ -429,7 +429,7 @@
   "Error loading publication comments": "Erro ao carregar comentários da publicação",
   "Publication": "Publicação",
   "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
-  "Sign in": "__NOT_TRANSLATED__",
-  "Login:": "__NOT_TRANSLATED__",
-  "Password:": "__NOT_TRANSLATED__"
+  "Sign in": "Iniciar sessão",
+  "Login:": "Identificador:",
+  "Password:": "Palavra-passe:"
 }
