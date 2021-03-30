@@ -12,17 +12,25 @@
         margin 0
   &__workspace
     display flex
-    flex-wrap wrap
-    align-items flex-start
+    justify-content space-around
+    &__subtitle
+      font-size fontSizeMedium
+      font-weight bold
+      margin-left 10px
+    &__content
+      width 70%
+      & .activityList
+        max-width 100%
     &__detail
-      margin-right 20px
       background offWhite
       border 1px solid grey
       border-radius 5px
+      padding 10px
+      margin 10px 30px 10px 0px
       &__buttons
         text-align end
-        button
-          margin 10px
+        margin-top 10px
+        font-size fontSizeSmall
       &__title
         margin 0 30px 20px 30px
         font-size 70px
@@ -30,7 +38,8 @@
         display flex
         justify-content space-between
       &__description
-        margin 10px
+        overflow hidden
+        text-overflow ellipsis
         &__missing
           color mediumDarkGrey
           font-style italic
@@ -39,21 +48,16 @@
       background-color offWhite
       border 1px solid grey
       border-radius 5px
-  &__calltoaction
-    display flex
-    flex-wrap wrap
-    margin 40px 30px
-    &__button
-      &:active
-        box-shadow inset 0px 0px 5px 2px #656565
-      &__text
-        color white
+      padding 10px
+      &__contents
         display flex
         flex-direction column
-        &__icon
-          font-size 40px
-        &__title
-          font-size 16px
+      & .iconbutton
+        margin-top 10px
+        width 240px
+        text-align start
+        margin-left auto
+        margin-right auto
   &__workspaceInfo
     display flex
     flex-wrap wrap
@@ -61,68 +65,26 @@
     min-height 100%
     justify-content space-around
     .subTitle
-      text-align center
       margin-bottom 10px
-  &__section
-    padding 30px
+.workspaceRecentActivities__header
+  font-size fontSizeMedium
+  font-weight bold
+  margin-top 10px
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .dashboard__workspace__rightMenu
     width 25%
 
-@media (min-width: min-md) and (max-width: max-md)
-  .dashboard
-    &__workspace
-      width 100%
-      &__detail
-        order 2
-        width 100%
-        &__right
-          &__button
-            margin-top 20px
-      &__rightMenu
-        margin 40px auto
-        width 50%
-        display flex
-        flex-direction column-reverse
-    .memberlist
-      margin-left 0
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .dashboard
-    &__workspace
-      width 100%
-      &__detail
-        order 2
-        width 100%
-        &__right
-          &__button
-            display none
-      &__rightMenu
-          margin 30px auto
-          width auto
+@media (max-width: max-md)
+  .dashboard__section
+    padding 0px
+    margin-top 10px
 
 @media (max-width: max-xs)
   .dashboard .pageContentGeneric
     margin 10px 0 0 0
 
   .dashboard
-    &__workspace
-      width 100%
-      &__detail
-        order 2
-        width 100%
-        &__title
-          font-size 45px
-          word-break break-word
-        &__right
-          &__button
-            display none
-      &__rightMenu
-        margin 20px auto
-        width auto
-    &__workspace-wrapper
-      margin 0 15px
     .memberlist
       &__list__item__delete
         display none

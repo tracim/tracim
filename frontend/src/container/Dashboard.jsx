@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -23,6 +23,7 @@ import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
   getMyselfKnownMember,
+  getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
   putMyselfWorkspaceDoNotify,
@@ -74,7 +75,8 @@ export class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false
+      displayWebdavBtn: false,
+      newRequestsNumber: 0
     }
 
     props.registerCustomEventHandlerList([
@@ -83,7 +85,9 @@ export class Dashboard extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleNewRequest },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleRequestModified }
     ])
   }
 
@@ -104,6 +108,7 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
+    this.loadNewResquestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -130,6 +135,7 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
+    this.loadNewResquestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -182,6 +188,33 @@ export class Dashboard extends React.Component {
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
     }
+  }
+
+  loadNewResquestNumber = async () => {
+    const { props } = this
+
+    const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
+    switch (fetchGetWorkspaceSubscriptions.status) {
+      case 200: {
+        const filteredRequestList = fetchGetWorkspaceSubscriptions.json.filter(request => request.state === 'pending')
+        this.setState({ newRequestsNumber: filteredRequestList.length })
+        break
+      }
+      case 400: break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('new requests')}`, 'warning')); break
+    }
+  }
+
+  handleNewRequest = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
+    this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
+  }
+
+  handleRequestModified = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
+    data.fields.subscription.state === 'pending'
+      ? this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
+      : this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber - 1 }))
   }
 
   setHeadTitle = () => {
@@ -474,7 +507,7 @@ export class Dashboard extends React.Component {
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__content'>
 
-                  <h3>{props.t('About this space')}</h3>
+                  <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
 
                   <div className='dashboard__workspace__detail'>
                     {(description.trim()
@@ -508,6 +541,8 @@ export class Dashboard extends React.Component {
                     user={props.user}
                     curWs={props.curWs}
                     displayNotifBtn={props.system.config.email_notification_activated}
+                    displayRequestsInformation={userRoleIdInWorkspace >= ROLE.workspaceManager.id}
+                    newRequestsNumber={state.newRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
                     onClickAddNotify={this.handleClickAddNotification}
                     onClickRemoveNotify={this.handleClickRemoveNotification}

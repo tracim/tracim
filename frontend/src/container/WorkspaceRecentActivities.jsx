@@ -117,7 +117,7 @@ export class WorkspaceRecentActivities extends React.Component {
 
     return (
       <div className='workspaceRecentActivities'>
-        <div className='workspaceRecentActivities__header subTitle'>
+        <div className='workspaceRecentActivities__header'>
           {props.t('Recent activities')}
         </div>
 
