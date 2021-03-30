@@ -17,13 +17,13 @@ export const UserStatus = props => {
           icon={`fa-fw ${myRole.faIcon}`}
           title={props.t('Your role in the space')}
         />
-        <div className='userstatus__role__text'>
+        <div className='userstatus__role__text' title={props.t('Your role in the space')}>
           {props.t(myRole.label)}
         </div>
       </div>
 
       <div className='userstatus__informations'>
-        {true && ( // props.displayNotifBtn && (
+        {props.displayNotifBtn && (
           <div
             className='userstatus__informations__notification primaryColorFontHover'
             title={props.t('You can change your notification status by clicking here')}
@@ -43,7 +43,7 @@ export const UserStatus = props => {
           </div>
         )}
 
-        {true && ( // props.displayRequestsInformation && (
+        {props.displayRequestsInformation && (
           <div className='userstatus__informations__requests'>
             <Icon
               icon='fa-fw fas fa-sign-in-alt'

@@ -541,6 +541,7 @@ export class Dashboard extends React.Component {
                     user={props.user}
                     curWs={props.curWs}
                     displayNotifBtn={props.system.config.email_notification_activated}
+                    displayRequestsInformation={userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                     newRequestsNumber={state.newRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
                     onClickAddNotify={this.handleClickAddNotification}
