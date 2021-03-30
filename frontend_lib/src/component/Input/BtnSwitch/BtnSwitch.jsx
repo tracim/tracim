@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 export const BtnSwitch = props =>
   <div
-    className={classnames('btnswitch', { disabled: props.disabled })}
+    className={classnames('btnswitch', { disabled: props.disabled, smallSize: props.smallSize })}
     title={props.checked ? props.activeLabel : props.inactiveLabel}
   >
     <label
@@ -42,7 +42,8 @@ BtnSwitch.propTypes = {
   onChange: PropTypes.func,
   activeLabel: PropTypes.string,
   inactiveLabel: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  smallSize: PropTypes.bool
 }
 
 BtnSwitch.defaultProps = {
@@ -50,5 +51,6 @@ BtnSwitch.defaultProps = {
   onChange: () => {},
   activeLabel: '',
   inactiveLabel: '',
-  disabled: false
+  disabled: false,
+  smallSize: false
 }

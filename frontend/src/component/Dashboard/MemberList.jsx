@@ -22,7 +22,7 @@ export class MemberList extends React.Component {
     return (
       <div className='memberlist' data-cy='memberlist'>
 
-        <div className='memberlist__header subTitle'>
+        <div className='memberlist__header'>
           {props.t('Member List')}
         </div>
 
