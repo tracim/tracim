@@ -1,5 +1,8 @@
 <div class="tracimBrandingWelcomePage__main">
-  <div class="tracimBrandingWelcomePage__text primaryColorBg">
-    <%include file="welcome-simple-text.html" />
+  <div>
+    <div class="tracimBrandingWelcomePage__background primaryColorBg" />
+    <div class="tracimBrandingWelcomePage__text">
+      <%include file="welcome-simple-text.html" />
+    </div>
   </div>
 </div>
