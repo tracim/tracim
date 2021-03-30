@@ -49,6 +49,7 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_SESSION__DATA_DIR
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+    - for sample_file in frontend/dist/assets/branding/*.sample; do cp "${sample_file}" "${sample_file%.*}"; done
     - ls -R /tmp/test
     # INFO - S.G - 2020-12-30 - needed to avoid an error with "docker login"
     # as the default docker credential helper requires a X11 display which is not present in Travis
@@ -77,7 +78,6 @@ _install_full_tracim: &_install_full_tracim
     # setup backend for running
     - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
-    - for sample_file in ../frontend/dist/assets/branding/*.sample; do base=$(basename "${sample_file}"); cp "${sample_file}" "${sample_file%.*}"; done
     - cp development.ini.sample development.ini
     - tracimcli db init -d
     - alembic -c development.ini stamp head
