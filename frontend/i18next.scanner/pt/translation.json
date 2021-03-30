@@ -64,8 +64,6 @@
   "An error has happened while getting": "Ocorreu um erro ao obter",
   "space detail": "detalhes do espaço",
   "member list": "lista de membros",
-  "recent activity list": "lista de atividades recentes",
-  "read status list": "lista de status de leitura",
   "An error has happened while setting \"mark all as read\"": " Ocorreu um erro ao definir \"marcar tudo como lido\"",
   "known members list": "lista de membros conhecidos",
   "Please set a name, an email or a username": "Defina um nome, um e-mail ou um identificador",
@@ -106,9 +104,7 @@
   "Implement Tracim in your explorer": "Implemente o Tracim no seu navegador",
   "Space calendar": "Calendário do espaço",
   "Each space has its own calendar.": "Cada espaço tem seu próprio calendário.",
-  "Recent activity": "Atividade recente",
   "Mark all as read": "Marcar tudo como lido",
-  "No recent activity": "Nenhuma atividade recente",
   "See more": "Ver mais",
   "Your role in the space": "Sua função no espaço",
   "You can change your notification status by clicking here": "Pode mudar seu status de notificação clicando aquí",
@@ -336,6 +332,7 @@
   "Preview loading...": "Pré-visualização carregando...",
   "Unknown entity type": "Tipo de entidade desconhecida",
   "Open as content": "Abrir como conteúdo",
+  "Open_action": "Abrir",
   "The link has been copied to clipboard": "A ligaçao foi copiada para a área de transferência",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> juntou-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "O papel de <0><0>{{userPublicName}}</0></0> foi alterado para <2>{{role}}</2>",
@@ -429,5 +426,6 @@
   "Error loading publication comments": "Erro ao carregar comentários da publicação",
   "Publication": "Publicação",
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
-  "Attach files": "Anexar ficheiros"
+  "Download {{filename}}": "Download {{filename}}",
+  "Show in publications": "Mostrar em publicações"
 }

@@ -65,13 +65,15 @@ export class FeedItemHeader extends React.Component {
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
     )
 
+    const icon = (props.isPublication && contentType === CONTENT_TYPE.THREAD) ? 'fas fa-stream' : app.faIcon
+
     return (
       <div className='feedItemHeader'>
         <Icon
           customClass='feedItemHeader__icon'
           color={props.isPublication ? publicationColor : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
-          icon={`fa-fw ${app.faIcon}`}
+          icon={`fa-fw ${icon}`}
         />
         <div className='feedItemHeader__title'>
           {props.titleLink
@@ -140,7 +142,7 @@ FeedItemHeader.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool,
+  isPublication: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,

@@ -177,9 +177,10 @@
   "See files": "Ver ficheiros",
   "{{numberOfFile}} files added": "{{numberOfFile}} ficheiros adicionados",
   "Remove file": "Remover ficheiro",
-  "Attached file: {{filename}}": "Ficheiro em anexo: {{filename}}",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "The file is larger than the maximum file size allowed": "O ficheiro é maior que o tamanho máximo permitido",
   "Error, the space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
-  "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros"
+  "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
+  "Attach files": "Anexar ficheiros",
+  "Download {{filename}}": "Dowload {{filename}}"
 }

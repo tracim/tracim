@@ -8,6 +8,7 @@ import { CONTENT_NAMESPACE, FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
   CUSTOM_EVENT,
+  CONTENT_TYPE,
   handleInvalidMentionInComment,
   Timeline,
   TracimComponent
@@ -125,6 +126,16 @@ export class FeedItemWithPreview extends React.Component {
   render () {
     const { props, state } = this
 
+    const title = (
+      props.inRecentActivities
+        ? (
+          props.isPublication
+            ? props.t('Show in publications')
+            : props.t('Open_action')
+        )
+        : props.t('Download {{filename}}', { filename: props.content.fileName })
+    )
+
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
@@ -142,8 +153,13 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        <div className='feedItem__content'>
-          <Preview content={props.content} linkType={props.previewLinkType} link={props.previewLink} />
+        <div className='feedItem__content' title={title}>
+          <Preview
+            fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
+            content={props.content}
+            linkType={props.previewLinkType}
+            link={props.previewLink}
+          />
           <FeedItemFooter content={props.content} />
         </div>
         {props.showTimeline && (
@@ -193,7 +209,8 @@ FeedItemWithPreview.propTypes = {
   commentList: PropTypes.array,
   customColor: PropTypes.string,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool,
+  isPublication: PropTypes.bool.isRequired,
+  inRecentActivities: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
@@ -214,7 +231,6 @@ FeedItemWithPreview.defaultProps = {
   commentList: [],
   customColor: '',
   eventList: [],
-  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',

@@ -52,7 +52,6 @@
   "Calendar": "Calendrier",
   "Access your personal calendar": "Accéder à votre calendrier personnel",
   "Dashboard": "Tableau de bord",
-  "Recent activity": "Activité récente",
   "Mark all as read": "Tout marquer comme lu",
   "See more": "Voir plus",
   "Member List": "Liste des membres",
@@ -64,8 +63,6 @@
   "Connection": "Connexion",
   "Forgotten password?": "Mot de passe oublié ?",
   "member list": "Liste des membres",
-  "recent activity list": "Liste des activités récentes",
-  "read status list": "Lire la liste des statuts",
   "known members list": "Liste des membres connus",
   "Please set a name, an email or a username": "Veuillez saisir le nom, l'email ou l'identifiant",
   "Please set a role": "Choisissez un rôle s'il vous plaît",
@@ -98,7 +95,6 @@
   "Error while loading read status list": "Erreur lors du chargement de l'activité récente",
   "Create": "Créer ",
   "Validate": "Valider",
-  "No recent activity": "Aucune activité récente",
   "Users": "Utilisateurs",
   "Wrong old password": "Ancien mot de passe incorrect",
   "New passwords are different": "Les nouveaux mots de passe sont différents",
@@ -336,6 +332,7 @@
   "Preview loading...": "Chargement de la prévisualisation...",
   "Unknown entity type": "Type d'entité inconnu",
   "Open as content": "Ouvrir en tant que contenu",
+  "Open_action": "Ouvrir",
   "The link has been copied to clipboard": "Le lien a été copié dans le presse-papiers",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>Le role de {{userPublicName}}</0></0> a été changé en <2>{{role}}</2>",
@@ -429,5 +426,6 @@
   "Error loading publication comments": "Erreur lors du chargement des commentaires",
   "Publication": "Publication",
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
-  "Attach files": "Joindre des fichiers"
+  "Download {{filename}}": "Télécharger {{filename}}",
+  "Show in publications": "Afficher dans les publications"
 }

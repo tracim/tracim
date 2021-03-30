@@ -484,6 +484,8 @@ export class Publications extends React.Component {
               ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
               memberList={props.currentWorkspace.memberList}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
+              isPublication
+              inRecentActivities={false}
               showTimeline
               user={{
                 userId: props.user.userId,

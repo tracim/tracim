@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
-import Icon from '../Icon/Icon.jsx'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
@@ -11,6 +10,7 @@ import {
   getFileDownloadUrl
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
+import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 
 export class CommentFilePreview extends React.Component {
   constructor (props) {
@@ -46,7 +46,7 @@ export class CommentFilePreview extends React.Component {
       380 // height
     )
 
-    const title = props.t('Attached file: {{filename}}', { filename })
+    const title = props.t('Download {{filename}}', { filename })
     const fileDownloadUrl = getFileDownloadUrl(
       props.apiUrl,
       workspace_id,
@@ -90,8 +90,7 @@ export class CommentFilePreview extends React.Component {
                   href={fileDownloadUrl}
                   download
                 >
-                  <Icon icon='fas fa-fw fa-paperclip' title='' />
-                  {` ${filename}`}
+                  <AttachedFile fileName={filename} />
                   {(!this.state.fallbackPreview &&
                     <img
                       className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
