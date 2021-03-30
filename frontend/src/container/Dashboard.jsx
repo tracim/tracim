@@ -206,13 +206,13 @@ export class Dashboard extends React.Component {
   }
 
   handleNewRequest = (data) => {
-    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id ) return
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
     this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
   }
 
   handleRequestModified = (data) => {
-    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id ) return
-    data.fields.subscription.state ===  'pending'
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
+    data.fields.subscription.state === 'pending'
       ? this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber + 1 }))
       : this.setState(prev => ({ newRequestsNumber: prev.newRequestsNumber - 1 }))
   }

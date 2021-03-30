@@ -4,14 +4,17 @@
   & .switch
     width 30px
     height 17px
-  & .slider
+  & .slider.round
+    border-radius 17px
     &:before
-    height 13px
-    width 13px
-    left 2px
-    bottom 2px
-    &.round
-      border-radius 17px
+      height 13px
+      width 13px
+      left 2px
+      bottom 2px
+  & input:checked + .slider:before
+    -webkit-transform translateX(13px)
+    -ms-transform translateX(13px)
+    transform translateX(13px)
 
 .btnswitch
   display flex
