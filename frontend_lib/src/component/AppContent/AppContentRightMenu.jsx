@@ -37,7 +37,7 @@ const AppContentRightMenu = (props) => (
 
 AppContentRightMenu.propTypes = {
   onChangeStatus: PropTypes.func.isRequired,
-  onClickArchive: PropTypes.func.isRequired,
+  onClickArchive: PropTypes.func,
   onClickDelete: PropTypes.func.isRequired,
   availableStatuses: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
@@ -47,7 +47,8 @@ AppContentRightMenu.propTypes = {
 }
 
 AppContentRightMenu.defaultProps = {
-  mode: undefined
+  mode: undefined,
+  onClickArchive: undefined // see https://github.com/tracim/tracim/issues/2347
 }
 
 export default AppContentRightMenu
