@@ -19,9 +19,10 @@ export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle
     ...propertiesToAddToBody
   })
 
-export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    raw_content: newComment
+    raw_content: newComment,
+    content_namespace: namespace
   })
 
 export const getContentComment = (apiUrl, workspaceId, contentId) =>

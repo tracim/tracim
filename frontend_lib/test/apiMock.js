@@ -16,10 +16,11 @@ const mockPutContent200 = (apiUrl, workspaceId, contentId, appSlug, newLabel, ne
     })
 }
 
-const mockPostContentComment200 = (apiUrl, workspaceId, contentId, newComment) => {
+const mockPostContentComment200 = (apiUrl, workspaceId, contentId, newComment, contentNamespace) => {
   return nock(apiUrl)
     .post(`/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-      raw_content: newComment
+      raw_content: newComment,
+      content_namespace: contentNamespace
     })
     .reply(200, {
       author: author,

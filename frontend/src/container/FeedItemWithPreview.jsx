@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
-import { CONTENT_NAMESPACE, FETCH_CONFIG } from '../util/helper.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
   CUSTOM_EVENT,
@@ -75,7 +75,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.PUBLICATION, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
