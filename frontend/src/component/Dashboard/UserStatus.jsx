@@ -43,17 +43,17 @@ export const UserStatus = props => {
           </div>
         )}
 
-        {props.displayRequestsInformation && (
+        {props.displaySubscriptionRequestsInformation && (
           <div className='userstatus__informations__requests'>
             <Icon
               icon='fa-fw fas fa-sign-in-alt'
               title={props.t('{{newRequests}} new requests', {
-                newRequests: props.newRequestsNumber
+                newRequests: props.newSubscriptionRequestsNumber
               })}
             />
             <div>
               {props.t('{{newRequests}} new requests', {
-                newRequests: props.newRequestsNumber
+                newRequests: props.newSubscriptionRequestsNumber
               })}
             </div>
           </div>
