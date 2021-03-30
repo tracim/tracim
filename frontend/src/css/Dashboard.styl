@@ -49,10 +49,15 @@
       border 1px solid grey
       border-radius 5px
       padding 10px
+      &__contents
+        display flex
+        flex-direction column
       & .iconbutton
         margin-top 10px
         width 240px
         text-align start
+        margin-left auto
+        margin-right auto
   &__workspaceInfo
     display flex
     flex-wrap wrap
@@ -61,6 +66,10 @@
     justify-content space-around
     .subTitle
       margin-bottom 10px
+.workspaceRecentActivities__header
+  font-size fontSizeMedium
+  font-weight bold
+  margin-top 10px
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .dashboard__workspace__rightMenu

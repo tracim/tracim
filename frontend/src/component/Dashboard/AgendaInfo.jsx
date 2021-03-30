@@ -6,7 +6,7 @@ require('./AgendaInfo.styl')
 
 export const AgendaInfo = props => (
   <div className={`agendaInfo ${props.customClass}`}>
-    <div className='agendaInfo__header subTitle'>
+    <div className='agendaInfo__header'>
       {props.t('Agenda')}
     </div>
 
