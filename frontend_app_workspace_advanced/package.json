@@ -74,6 +74,7 @@
       "btoa",
       "wysiwyg",
       "tinymce",
+      "globalThis",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
