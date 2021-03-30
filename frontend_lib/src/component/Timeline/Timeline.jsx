@@ -105,6 +105,8 @@ export class Timeline extends React.Component {
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
+                    onClickEditComment={() => props.onClickEditComment(content)}
+                    onClickDeleteComment={() => { props.onClickDeleteComment(content) }}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -276,6 +278,8 @@ Timeline.propTypes = {
   searchForMentionInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickTranslateComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
   onClickRestoreComment: PropTypes.func
 }
 

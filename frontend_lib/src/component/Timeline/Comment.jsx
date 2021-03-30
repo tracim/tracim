@@ -1,11 +1,13 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -48,6 +50,25 @@ const Comment = props => {
                 <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
               </div>
             </div>
+
+            <DropdownMenu
+              buttonCustomClass='comment__body__content__actions'
+              buttonIcon='fas fa-ellipsis-v'
+              buttonTooltip={props.t('Actions')}
+            >
+              <button
+                className='transparentButton'
+                onClick={props.onClickEditComment}
+              >
+                {props.t('Edit')}
+              </button>
+              <button
+                className='transparentButton'
+                onClick={props.onClickDeleteComment}
+              >
+                {props.t('Delete')}
+              </button>
+            </DropdownMenu>
           </div>
           <div
             className={classnames(`${props.customClass}__footer`, 'comment__footer')}
@@ -71,7 +92,7 @@ const Comment = props => {
   )
 }
 
-export default Comment
+export default translate()(Comment)
 
 Comment.propTypes = {
   customClass: PropTypes.string,
@@ -84,6 +105,8 @@ Comment.propTypes = {
   createdDistance: PropTypes.string,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
   onClickTranslate: PropTypes.func,
   onClickRestore: PropTypes.func
 }

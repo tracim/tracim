@@ -24,7 +24,10 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
     raw_content: newComment
   })
 
-export const getContentComment = (apiUrl, workspaceId, contentId) =>
+export const deleteComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
+  export const getContentComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
 
 export const getFileChildContent = (apiUrl, workspaceId, contentId) => {

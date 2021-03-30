@@ -786,6 +786,19 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
+  hanldeClickEditComment = (comment) => {
+    console.log('edit comment', comment)
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
   handleTranslateDocument = async () => {
     const { state } = this
     this.setState({ translationState: TRANSLATION_STATE.PENDING })
@@ -976,6 +989,8 @@ export class HtmlDocument extends React.Component {
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                  onClickEditComment={comment => this.hanldeClickEditComment(comment)}
+                  onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
                 />
               ) : null
             }]}

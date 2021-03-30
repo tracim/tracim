@@ -31,6 +31,7 @@ import {
 } from './translation.js'
 
 import {
+  deleteComment,
   putEditContent,
   postNewComment,
   putEditStatus,
@@ -148,6 +149,19 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentDeleteComment = async (workspaceId, contentId, commentId) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(
+        await deleteComment(this.apiUrl, workspaceId, contentId, commentId)
+      )
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
       return response
     }
 
@@ -540,6 +554,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentAddCommentAsFile={this.appContentAddCommentAsFile}
+          appContentDeleteComment={this.appContentDeleteComment}
           appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
