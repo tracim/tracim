@@ -99,7 +99,7 @@ fi
 # Create welcome page files if they do not exist
 mkdir -p /etc/tracim/branding
 for sample_file in /tracim/frontend/dist/assets/branding/*.sample; do
-    base=$(basename "$file")
+    base=$(basename "$sample_file")
     file="${base%.*}"
     if [ ! -f "/etc/tracim/branding/$file" ]; then
         cp "$sample_file" "/etc/tracim/branding/$file"
