@@ -10,8 +10,8 @@ describe('navigate :: workspace > create_new > thread', function () {
   })
   it('dashboard > button', function () {
     cy.get('.dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments').click()
+    cy.get('.dashboard__workspace__rightMenu__contents .fa-comments').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents .fa-comments').click()
     var titre1 = 'thread1'
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__header').should('be.visible')
