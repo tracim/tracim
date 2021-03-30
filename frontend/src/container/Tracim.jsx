@@ -488,7 +488,7 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.PUBLICATION(':idws')}
+                  path={[PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts'), PAGE.WORKSPACE.PUBLICATIONS(':idws')]}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Publications />
@@ -499,6 +499,8 @@ export class Tracim extends React.Component {
                 <Route
                   path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
                   render={({ match }) => (
+                    // NOTE - RJ - 2021-03-29 - This redirection is there to avoid breaking old links to recent activities
+                    // We may want to remove this redirection in the future. We will need to fix the related Cypress tests
                     <Redirect to={PAGE.WORKSPACE.DASHBOARD(match.params.idws)} />
                   )}
                 />

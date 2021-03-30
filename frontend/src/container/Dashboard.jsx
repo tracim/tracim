@@ -135,7 +135,10 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
+<<<<<<< HEAD
     this.loadNewResquestNumber()
+=======
+>>>>>>> dd0379a3248ca559c36e9f6ad5a8ed2b26aa7655
     this.buildBreadcrumbs()
   }
 

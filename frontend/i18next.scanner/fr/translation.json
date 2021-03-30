@@ -328,7 +328,8 @@
   "No preview available": "Prévisualisation indisponible",
   "Preview loading...": "Chargement de la prévisualisation...",
   "Unknown entity type": "Type d'entité inconnu",
-  "Open content": "Ouvrir le contenu",
+  "Open as content": "Ouvrir en tant que contenu",
+  "Open_action": "Ouvrir",
   "The link has been copied to clipboard": "Le lien a été copié dans le presse-papiers",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>Le role de {{userPublicName}}</0></0> a été changé en <2>{{role}}</2>",
@@ -419,7 +420,7 @@
   "Advanced edition": "Édition avancée",
   "About this space": "À propos de cet espace",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
-  "Space settings": "Space setting",
+  "Space settings": "Paramètres de l'espace",
   "Publish": "Publier",
   "Publication of {{author}} on {{date}}": "Publication de {{author}} le {{date}}",
   "new requests": "nouvelles demandes",
@@ -427,5 +428,7 @@
   "Your role:": "Votre rôle :",
   "{{newRequests}} new requests": "{{newRequests}} nouvelles demandes",
   "Error loading publication comments": "Erreur lors du chargement des commentaires",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
+  "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "Download {{filename}}": "Télécharger {{filename}}",
+  "Show in publications": "Afficher dans les publications"
 }
