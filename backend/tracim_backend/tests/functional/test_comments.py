@@ -4,6 +4,7 @@ import pytest
 import responses
 import transaction
 
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.revision_protection import new_revision
@@ -519,6 +520,69 @@ class TestCommentsEndpoint(object):
         assert response.json_body
         assert "code" in response.json_body
         assert response.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+
+def create_doc_and_comment(workspace_api, content_api_note, content_api_comment):
+    workspace = workspace_api.create_workspace("test")
+    test_html_document = content_api_note.create(
+        content_type_slug=HTML_DOCUMENTS_TYPE,
+        workspace=workspace,
+        label="just a content",
+        do_save=True,
+        do_notify=False,
+    )
+    comment = content_api_comment.create_comment(
+        workspace=workspace,
+        parent=test_html_document,
+        content="First version",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return (workspace, test_html_document, comment)
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test"}], indirect=True,
+)
+class TestEditComment(object):
+    def test_api__edit_comment__ok__nominal_case(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ):
+        """
+        Edit comment content
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=200,
+        )
+        assert res_put.json_body["raw_content"] == new_content
+
+        new_res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert new_res_get.json_body == res_put.json_body
 
 
 @pytest.mark.usefixtures("base_fixture")
