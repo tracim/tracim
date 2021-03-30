@@ -17,7 +17,7 @@ These parameters can also be changed with environment variables as described in 
 
 ### Simple customization
 
-Copy `frontend/dist/assets/branding/welcome-simple-text.html.sample` to `frontend/dist/assets/branding/welcome-simple-text.html` then write your HTML text in it and write your background image to `frontend/dist/assets/branding/welcome-simple-bg.jpg`.
+Copy [frontend/dist/assets/branding/welcome-simple-text.html.sample](../../frontend/dist/assets/branding/welcome-simple-text.html.sample) to `frontend/dist/assets/branding/welcome-simple-text.html` then write your HTML text in it and write your background image to `frontend/dist/assets/branding/welcome-simple-bg.jpg`.
 
 In the offical docker image the `branding` directory is available in `/etc/tracim/branding`.
 
@@ -36,3 +36,9 @@ This parameter can also be changed with an environment variable as described in 
 
 In case you use CSS styling, we recommend to use the `tracimBrandingWelcomePage` class name prefix to avoid collisions with Tracim's own class names.
 You can use `welcome-simple.html` and `welcome.css` as a starting point.
+
+### Structure of the welcome page files
+
+Tracim loads the HTML from `website.welcome_page` in its index HTML page. The CSS file `website.welcome_page_style` is loaded as an external CSS link.
+
+The default `welcome-simple.html` file loads the HTML from `welcome-simple-text.html` and renders it it a rectangle whose background is `welcome-simple-bg.jpg`.

@@ -77,6 +77,7 @@ _install_full_tracim: &_install_full_tracim
     # setup backend for running
     - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
+    - for sample_file in ../frontend/dist/assets/branding/*.sample; do base=$(basename "${sample_file}"); cp "${sample_file}" "${sample_file%.*}"; done
     - cp development.ini.sample development.ini
     - tracimcli db init -d
     - alembic -c development.ini stamp head
