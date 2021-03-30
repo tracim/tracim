@@ -9,7 +9,7 @@ website.title = My Tracim instance
 website.description = For storing files and collaborating with people.
 ```
 
-The title is displayed in the browser's page and is also used by search engines to display their results. The description is used by search engines to display their results.
+The title is displayed in the browser's page. The title and the description are used by search engines to display their results.
 
 These parameters can also be changed with environment variables as described in [setting.md](setting.md).
 
