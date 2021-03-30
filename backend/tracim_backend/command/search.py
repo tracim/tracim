@@ -37,8 +37,12 @@ class IndexingCommand(AppContextCommand):
             current_user=None, session=context.dbsession, config=context.app_config
         )
         contents = content_api.get_all()
-        ESContentIndexer().index_contents(contents, context)
-        print("{} content(s) were indexed".format(len(contents)))
+        indexing_error_count = ESContentIndexer().sync_index_contents(contents, context)
+        print(
+            "{} content(s) were indexed, got {} error(s), relaunch the command with '-d' to see the errors".format(
+                len(contents) - indexing_error_count, indexing_error_count
+            )
+        )
 
     def _index_all_users(self, context: TracimContext) -> None:
         print("Indexing all users")

@@ -423,7 +423,9 @@
   "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}",
   "new requests": "novos pedidos",
   "This space doesn't have a description yet.": "Este espaço ainda não tem uma descrição.",
-  "Publication": "Publicação",
   "Your role:": "A sua função:",
-  "{{newRequests}} new requests": "{{newRequests}} novos pedidos"
+  "{{newRequests}} new requests": "{{newRequests}} novos pedidos",
+  "Error loading publication comments": "Erro ao carregar comentários da publicação",
+  "Publication": "Publicação",
+  "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros"
 }

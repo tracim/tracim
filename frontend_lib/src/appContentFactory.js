@@ -163,12 +163,14 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentAddCommentAsFile = (fileToUploadList, setState) => {
+    appContentAddCommentAsFile = (fileToUploadList, namespace, setState) => {
       if (!fileToUploadList.length) return
       setState(prev => {
-        const fileToUploadListWithoutDuplicate = fileToUploadList.filter(fileToAdd =>
-          !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
-        )
+        const fileToUploadListWithoutDuplicate = fileToUploadList
+          .filter(fileToAdd =>
+            !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
+          )
+          .map(fileToAdd => ({ ...fileToAdd, namespace: namespace }))
         return {
           newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
         }
@@ -249,7 +251,10 @@ export function appContentFactory (WrappedComponent) {
         newCommentAsFile,
         `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
         {
-          additionalFormData: { parent_id: content.content_id },
+          additionalFormData: {
+            parent_id: content.content_id,
+            content_namespace: newCommentAsFile.namespace
+          },
           httpMethod: 'POST',
           progressEventHandler: () => {},
           errorMessageList: errorMessageList,

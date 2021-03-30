@@ -131,14 +131,14 @@ export class AdvancedSearch extends React.Component {
       !searchObject.searchString
     )
 
-    let pageNumber = FIRST_PAGE
+    let pageNumber = searchObject.currentPage
     let pageSize = searchObject.numberResultsByPage
     if (onlyGetFacet) {
       // NOTE - S.G. - 2021-03-09 - setting pageSize to 0 allows to get the search facets
       // without any results.
       pageSize = 0
     } else if (!hasFirstPage) {
-      pageNumber = searchObject.currentPage
+      pageNumber = FIRST_PAGE
       pageSize = searchObject.numberResultsByPage * searchObject.currentPage
     }
 
@@ -209,7 +209,8 @@ export class AdvancedSearch extends React.Component {
 
     this.getSearchResult(
       { ...currentSearch, searchType: state.searchType },
-      currentSearch.resultList.length,
+      0, // INFO - CH - 20210319 - Force to 0 to force hasFirstPage (from getSearchResult()) to be evaluated to false to
+      // load previous pages in case we already clicked on "see more" button
       newAppliedSearchFieldList,
       currentSearch.appliedFilters
     )
@@ -274,7 +275,8 @@ export class AdvancedSearch extends React.Component {
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
     this.getSearchResult(
       { ...currentSearch, searchType: state.searchType },
-      currentSearch.resultList.length,
+      0, // INFO - CH - 20210319 - Force to 0 to force hasFirstPage (from getSearchResult()) to be evaluated to false to
+      // load previous pages in case we already clicked on "see more" button
       currentSearch.appliedFilters.searchFieldList,
       {
         ...currentSearch.appliedFilters,
@@ -284,18 +286,17 @@ export class AdvancedSearch extends React.Component {
   }
 
   getAllSearchResult = (searchObject) => {
-    const appliedFilters = searchObject.appliedFilters || {}
     for (const searchType of Object.values(ADVANCED_SEARCH_TYPE)) {
       const searchTypeObject = this.getSearchObject(searchType)
       this.getSearchResult(
         {
           ...searchObject,
-          currentPage: FIRST_PAGE,
+          currentPage: searchObject.searchType === searchType ? searchObject.currentPage : FIRST_PAGE,
           searchType: searchType
         },
         searchTypeObject && searchTypeObject.resultList ? searchTypeObject.resultList.length : 0,
-        searchTypeObject.searchType === searchObject.searchType ? appliedFilters.searchFieldList : [],
-        searchTypeObject.searchType === searchObject.searchType ? appliedFilters : {}
+        searchObject.searchType === searchType ? searchTypeObject.appliedFilters.searchFieldList : [],
+        searchObject.searchType === searchType ? searchTypeObject.appliedFilters : {}
       )
     }
   }

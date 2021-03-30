@@ -630,3 +630,7 @@ class UserFollowAlreadyDefined(TracimException):
 
 class AdvancedSearchNotEnabled(TracimException):
     error_code = ErrorCode.ADVANCED_SEARCH_NOT_ENABLED
+
+
+class IndexingError(TracimException):
+    pass

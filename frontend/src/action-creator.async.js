@@ -62,13 +62,14 @@ import {
   USER_PUBLIC_PROFILE
 } from './action-creator.sync.js'
 import {
-  CONTENT_TYPE,
   ErrorFlashMessageTemplateHtml,
   updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
-  TLM_ENTITY_TYPE
+  TLM_ENTITY_TYPE,
+  CONTENT_TYPE,
+  uploadFile
 } from 'tracim_frontend_lib'
 
 /*
@@ -1094,14 +1095,14 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
 
 const getUTCMidnight = (dateString) => parseISO(`${dateString}T00:00:00Z`)
 
-const getDateRangeParameters = (range) => {
+const getDateRangeParameters = (range, rangeParameterPrefix) => {
   const rangeParameterList = []
   if (range.from) {
     const fromDate = getUTCMidnight(range.from)
     // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
     // does not handle them, but keep the UTC zone as it is mandatory.
     const fromDateString = fromDate.toISOString().split('.')[0] + 'Z'
-    rangeParameterList.push(`created_from=${fromDateString}`)
+    rangeParameterList.push(`${rangeParameterPrefix}_from=${fromDateString}`)
   }
   if (range.to) {
     const toDate = getUTCMidnight(range.to)
@@ -1109,7 +1110,7 @@ const getDateRangeParameters = (range) => {
     // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
     // does not handle them, but keep the UTC zone as it is mandatory.
     const toDateString = toDate.toISOString().split('.')[0] + 'Z'
-    rangeParameterList.push(`created_to=${toDateString}`)
+    rangeParameterList.push(`${rangeParameterPrefix}_to=${toDateString}`)
   }
   return rangeParameterList
 }
@@ -1140,8 +1141,8 @@ export const getAdvancedSearchResult = (
   if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
     if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
     if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
-    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange))
-    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange))
+    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
+    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
     if (searchFacets) {
       if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
       if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
@@ -1153,8 +1154,7 @@ export const getAdvancedSearchResult = (
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {
     if (searchFacets && searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
     if (newestAuthoredContentRange) {
-      if (newestAuthoredContentRange.from) queryParameterList.push(`newest_authored_content_date_from=${newestAuthoredContentRange.from}`)
-      if (newestAuthoredContentRange.to) queryParameterList.push(`newest_authored_content_date_to=${newestAuthoredContentRange.to}`)
+      queryParameterList = queryParameterList.concat(getDateRangeParameters(newestAuthoredContentRange, 'newest_authored_content_date'))
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
@@ -1210,4 +1210,31 @@ export const postThreadPublication = (workspaceId, newContentName) => dispatch =
     actionName: PUBLICATION_THREAD,
     dispatch
   })
+}
+
+export const postPublicationFile = (workspaceId, content, label) => async dispatch => {
+  const errorMessageList = [
+    { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
+    { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
+    { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
+    { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+  ]
+  const result = await uploadFile(
+    content,
+    `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/files`,
+    {
+      additionalFormData: {
+        // FIXME - CH - 20210325 - the parent_id should be the same as the parent_id in postPublication()
+        // see https://github.com/tracim/tracim/issues/1180 and https://github.com/tracim/tracim/issues/3937
+        parent_id: 0,
+        label: label,
+        content_namespace: CONTENT_NAMESPACE.PUBLICATION
+      },
+      httpMethod: 'POST',
+      progressEventHandler: () => {},
+      errorMessageList: errorMessageList,
+      defaultErrorMessage: i18n.t('Error while uploading file')
+    }
+  )
+  return result
 }

@@ -248,5 +248,5 @@ export const updatePublicationList = () => ({ type: `${UPDATE}/${WORKSPACE_PUBLI
 export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLICATION}`, publicationId })
 export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })
 export const updatePublication = (publication) => ({ type: `${UPDATE}/${PUBLICATION}`, publication })
-export const addCommentListToPublication = (publicationId, commentList) => ({ type: `${ADD}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })
+export const setCommentListToPublication = (publicationId, commentList) => ({ type: `${SET}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })
 export const appendCommentToPublication = (comment) => ({ type: `${APPEND}/${PUBLICATION}/${COMMENT}`, comment })

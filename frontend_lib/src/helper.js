@@ -486,6 +486,14 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
+// see https://github.com/tracim/tracim/issues/4340
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
+}
+
 export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
   COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,

@@ -425,5 +425,7 @@
   "new requests": "new requests",
   "Publication": "Publication",
   "Your role:": "Your role:",
-  "{{newRequests}} new requests": "{{newRequests}} new requests"
+  "{{newRequests}} new requests": "{{newRequests}} new requests",
+  "Error loading publication comments": "Error loading publication comments",
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files"
 }

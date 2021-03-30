@@ -62,7 +62,9 @@ export const serializeSearchItemProps = {
 }
 
 const defaultResult = {
-  appliedFilters: {},
+  appliedFilters: {
+    searchFieldList: []
+  },
   createdRange: {},
   newestAuthoredContentRange: {},
   currentPage: 1,
@@ -154,7 +156,7 @@ function searchResult (searchType = SEARCH_TYPE.SIMPLE, state = defaultResult, a
       return { ...state, appliedFilters: { ...state.appliedFilters, [action.key]: action.value } }
 
     case `${RESET}/${APPLIED_FILTER(searchType)}`:
-      return { ...state, appliedFilters: { } }
+      return { ...state, appliedFilters: defaultResult.appliedFilters }
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:
       newResultList = state.resultList.map(item =>

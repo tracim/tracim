@@ -28,7 +28,8 @@ import {
   getContentComment,
   getFileChildContent,
   permissiveNumberEqual,
-  getDefaultTranslationState
+  getDefaultTranslationState,
+  CONTENT_NAMESPACE
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -303,7 +304,7 @@ export class Thread extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.CONTENT, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {

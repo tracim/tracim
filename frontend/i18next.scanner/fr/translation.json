@@ -425,5 +425,7 @@
   "new requests": "nouvelles demandes",
   "Publication": "Publication",
   "Your role:": "Votre rôle :",
-  "{{newRequests}} new requests": "{{newRequests}} nouvelles demandes"
+  "{{newRequests}} new requests": "{{newRequests}} nouvelles demandes",
+  "Error loading publication comments": "Erreur lors du chargement des commentaires",
+  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
 }

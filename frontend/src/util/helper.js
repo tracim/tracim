@@ -220,7 +220,13 @@ export const toggleFavicon = (hasNewNotification) => {
 }
 
 export const parseSearchUrl = (parsedQuery) => {
-  const searchObject = {}
+  const searchObject = {
+    // INFO - CH - 20210318 - adding this default value because the search page use both this object and the one
+    // from redux. And it needs this property
+    appliedFilters: {
+      searchFieldList: []
+    }
+  }
 
   searchObject.contentTypes = parsedQuery.t
   searchObject.searchString = parsedQuery.q || ''

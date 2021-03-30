@@ -21,13 +21,22 @@
       order 1
     &__buttons
       display flex
+      justify-content space-between
       margin-top 10px
       order 3
-      &__advancedEdition
-        margin-inline-end auto
-        font-size fontSizeSmall
       > :last-child
         margin-inline-start auto
+      &__submit .iconbutton__icon
+        margin-inline-end 8px
+      &__left
+        &__advancedEdition
+          margin-inline-end auto
+          font-size fontSizeSmall
+      &__right
+        display flex
+        & .AddFileToCommentButton
+          padding 3px 6px
+  & .pageContentGeneric
     height calc(100% - 85px)
     display flex
     flex-direction column

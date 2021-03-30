@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview from '../component/FeedItem/Preview.jsx'
-import { FETCH_CONFIG } from '../util/helper.js'
+import { CONTENT_NAMESPACE, FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
   CUSTOM_EVENT,
@@ -25,6 +25,7 @@ export class FeedItemWithPreview extends React.Component {
     this.state = {
       invalidMentionList: [],
       newComment: '',
+      newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false
     }
@@ -72,6 +73,14 @@ export class FeedItemWithPreview extends React.Component {
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.PUBLICATION, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   handleClickSend = () => {
     const { props, state } = this
 
@@ -96,9 +105,9 @@ export class FeedItemWithPreview extends React.Component {
         },
         state.timelineWysiwyg,
         state.newComment,
-        [], // FIXME - CH - 20210322 - handle this in https://github.com/tracim/tracim/issues/4255
+        state.newCommentAsFileList,
         this.setState.bind(this),
-        props.content.slug,
+        props.content.type,
         props.user.username,
         props.content.id
       )
@@ -134,9 +143,7 @@ export class FeedItemWithPreview extends React.Component {
         />
         <div className='feedItem__content'>
           <Preview content={props.content} />
-          <FeedItemFooter
-            content={props.content}
-          />
+          <FeedItemFooter content={props.content} />
         </div>
         {props.showTimeline && (
           <Timeline
@@ -147,8 +154,10 @@ export class FeedItemWithPreview extends React.Component {
             invalidMentionList={state.invalidMentionList}
             loggedUser={props.user}
             newComment={state.newComment}
-            newCommentAsFileList={[]} // FIXME - CH - 20210322 - handle this in https://github.com/tracim/tracim/issues/4255
+            newCommentAsFileList={state.newCommentAsFileList}
             onChangeNewComment={this.handleChangeNewComment}
+            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickSend}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onInitWysiwyg={this.handleInitWysiwyg}
