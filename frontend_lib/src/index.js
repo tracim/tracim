@@ -236,6 +236,7 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 

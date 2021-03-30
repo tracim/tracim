@@ -177,9 +177,10 @@
   "See files": "See files",
   "{{numberOfFile}} files added": "{{numberOfFile}} files added",
   "Remove file": "Remove file",
-  "Attached file: {{filename}}": "Attached file: {{filename}}",
   "A content with the same name already exists": "A content with the same name already exists",
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
-  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files"
+  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
+  "Attach files": "Attach files",
+  "Download {{filename}}": "Download {{filename}}"
 }

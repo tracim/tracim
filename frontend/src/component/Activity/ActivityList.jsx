@@ -35,6 +35,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
       ? (
         <ContentWithoutPreviewActivity
           activity={activity}
+          isPublication={isPublication}
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
@@ -52,6 +53,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
           isPublication={isPublication}
+          inRecentActivities
           key={activity.id}
           lastModifier={activity.newestMessage.fields.author}
           lastModificationType={coreEventType}

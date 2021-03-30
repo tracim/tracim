@@ -6,6 +6,7 @@ import {
   removeExtensionOfFilename,
   removeInteractiveContentFromHTML,
   HTMLContent,
+  AttachedFile,
   CONTENT_TYPE,
   SCREEN_SIZE
 } from 'tracim_frontend_lib'
@@ -125,7 +126,6 @@ export class Preview extends React.Component {
       <div className='feedItem__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
-          title={content.label}
           src={previewURL(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
           srcSet={PREVIEW_WIDTHS.map(src).join(',')}
           sizes={
@@ -209,7 +209,11 @@ export class Preview extends React.Component {
   }
 
   getUnavailablePreviewComponent () {
-    return this.noPreviewComponent(this.props.t('No preview available'))
+    return (
+      this.props.fallbackToAttachedFile
+        ? <AttachedFile fileName={this.props.content.fileName} />
+        : this.noPreviewComponent(this.props.t('No preview available'))
+    )
   }
 
   noPreviewComponent (details) {
@@ -222,9 +226,9 @@ export class Preview extends React.Component {
   }
 
   getHTMLPreviewComponent () {
-    if (!this.state.previewHtmlCode) {
-      const { props } = this
+    const { props } = this
 
+    if (!this.state.previewHtmlCode) {
       return this.noPreviewComponent(
         props.content.type === CONTENT_TYPE.THREAD
           ? props.t('Empty thread')
@@ -305,12 +309,14 @@ export class Preview extends React.Component {
 }
 
 Preview.propTypes = {
+  fallbackToAttachedFile: PropTypes.boolean,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
   linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
 }
 
 Preview.defaultProps = {
+  fallbackToAttachedFile: false,
   linkType: LINK_TYPE.OPEN_IN_APP
 }
 
