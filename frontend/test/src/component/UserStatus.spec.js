@@ -30,10 +30,6 @@ describe('<UserStatus />', () => {
   const wrapper = shallow(<UserStatusWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
-    it(`should display the user public name: ${props.user.publicName}`, () =>
-      expect(wrapper.find('div.userstatus__username')).to.text().equal(props.user.publicName)
-    )
-
     it(`should display his role icon: ${testRole.faIcon}`, () =>
       expect(wrapper.find('div.userstatus__role__icon').children('i').prop('className'))
         .include(testRole.faIcon)
@@ -43,24 +39,20 @@ describe('<UserStatus />', () => {
       expect(wrapper.find('div.userstatus__role__text')).to.text().equal(testRole.label)
     )
 
-    it(`role label should have the color: ${testRole.hexcolor}`, () =>
-      expect(wrapper.find('div.userstatus__role__text').prop('style').color).to.equal(testRole.hexcolor)
-    )
-
     it(`role icon should have the color: ${testRole.hexcolor}`, () =>
       expect(wrapper.find('div.userstatus__role__icon').children('i').prop('style').color).to.equal(testRole.hexcolor)
     )
 
     it('should not display the notification button when displayNotifBtn is false', () => {
       wrapper.setProps({ displayNotifBtn: false })
-      expect(wrapper.find('div.userstatus__notification').length).to.equal(0)
+      expect(wrapper.find('div.userstatus__informations__notification').length).to.equal(0)
       wrapper.setProps({ displayNotifBtn: props.displayNotifBtn })
     })
   })
 
   describe('handlers', () => {
     it('onClickRemoveNotifyCallBack should be call when the notification button is clicked and doNotify is true', () => {
-      wrapper.find('div.userstatus__notification').simulate('click')
+      wrapper.find('div.userstatus__informations__notification').simulate('click')
       expect(onClickRemoveNotifyCallBack.called).to.equal(true)
       expect(onClickAddNotifyCallBack.called).to.equal(false)
       onClickRemoveNotifyCallBack.resetHistory()
@@ -75,7 +67,7 @@ describe('<UserStatus />', () => {
           }]
         }
       })
-      wrapper.find('div.userstatus__notification').simulate('click')
+      wrapper.find('div.userstatus__informations__notification').simulate('click')
       expect(onClickRemoveNotifyCallBack.called).to.equal(false)
       expect(onClickAddNotifyCallBack.called).to.equal(true)
       wrapper.setProps({ curWs: props.curWs })

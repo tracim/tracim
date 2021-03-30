@@ -29,12 +29,14 @@ const IconButton = props => {
       title={props.title || props.text}
       data-cy={props.dataCy}
     >
-      {props.icon && <i 
-        className={`fa-fw ${props.icon} iconbutton__icon`} 
-        style={{
-          color: props.iconColor
-        }}
-      />}
+      {props.icon && (
+        <i
+          className={`fa-fw ${props.icon} iconbutton__icon`}
+          style={{
+            color: props.iconColor
+          }}
+        />
+      )}
       {props.text && <span className={props.icon ? 'iconbutton__text_with_icon' : 'iconbutton__text'}>{props.text}</span>}
     </button>
   )
@@ -58,7 +60,7 @@ IconButton.propTypes = {
 IconButton.defaultProps = {
   text: undefined,
   icon: undefined,
-  iconColor: '#252525',
+  iconColor: undefined,
   onClick: undefined,
   disabled: false,
   title: undefined,
