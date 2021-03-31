@@ -146,13 +146,15 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         tracim_setting_for_beaker_session
     )
     configurator.set_session_factory(session_factory)
+
+    # TODO - G.M - 2021-03-31 Make beaker cache configurable like sessions
+    #  through tracim config, see https://github.com/tracim/tracim/issues/4386
     cached_region_settings = {
+        "cache.enabled": "True",
         "cache.regions": "url_preview",
         "cache.type": "memory",
-        "cache.url_preview.expire": "60",
+        "cache.url_preview.expire": "1800",  # = 30 min
     }
-    tracim_setting_for_beaker_cache = sliced_dict(settings, beginning_key_string="cache.")
-    cached_region_settings.update(tracim_setting_for_beaker_cache)
     pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
 
     # Add AuthPolicy
