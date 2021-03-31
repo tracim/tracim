@@ -78,6 +78,7 @@ export class Publications extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommented }
     ])
 
@@ -124,6 +125,28 @@ export class Publications extends React.Component {
     }
     this.buildBreadcrumbs()
     this.setHeadTitle()
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props } = this
+    const lastPublicationId = props.publicationList[props.publicationList.length - 1]
+      ? props.publicationList[props.publicationList.length - 1].id
+      : undefined
+    const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
+
+    if (!parentPublication) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      parentPublication.commentList || []
+    )
+    props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
+    props.dispatch(updatePublication({
+      ...parentPublication,
+      modified: data.created
+    }))
+
+    if (parentPublication.id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
   handleClickPublish = () => {
@@ -315,7 +338,7 @@ export class Publications extends React.Component {
     const { props } = this
 
     return props.t('Publication of {{author}} on {{date}}', {
-      author: props.user.publicName,
+      author: authorName,
       date: formatAbsoluteDate(new Date(), userLang).replaceAll('/', '-'),
       interpolation: { escapeValue: false }
     })

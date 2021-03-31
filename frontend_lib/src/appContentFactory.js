@@ -486,6 +486,10 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate([...timeline, commentForTimeline])
     }
 
+    removeCommentFromTimeline = (commentId, timeline) => {
+      return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
+    }
+
     onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
       setState(previousState => {
         return {
@@ -568,6 +572,7 @@ export function appContentFactory (WrappedComponent) {
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
+          removeCommentFromTimeline={this.removeCommentFromTimeline}
         />
       )
     }

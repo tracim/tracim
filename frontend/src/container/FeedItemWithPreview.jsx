@@ -85,8 +85,13 @@ export class FeedItemWithPreview extends React.Component {
     console.log('edit comment', comment)
   }
 
-  handleClickDeleteComment = (comment) => {
-    console.log('delete comment', comment)
+  handleClickDeleteComment = async (comment) => {
+    const { props } = this
+    props.appContentDeleteComment(
+      props.content.workspaceId,
+      comment.parent_id,
+      comment.content_id
+    )
   }
 
   handleClickSend = () => {
