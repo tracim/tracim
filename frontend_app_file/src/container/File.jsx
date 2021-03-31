@@ -522,7 +522,13 @@ export class File extends React.Component {
   }
 
   handleClickEditComment = (comment) => {
-    console.log('edit comment', comment)
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
   }
 
   handleClickDeleteComment = async (comment) => {

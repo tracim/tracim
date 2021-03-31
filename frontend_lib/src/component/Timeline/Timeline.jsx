@@ -33,7 +33,8 @@ export class Timeline extends React.Component {
     this.state = {
       showEditCommentPopup: false,
       showDeleteCommentPopup: false,
-      commentToDelete: null
+      commentToDelete: null,
+      newComment: {}
     }
   }
 
@@ -55,6 +56,16 @@ export class Timeline extends React.Component {
       showDeleteCommentPopup: false,
       commentToDelete: null
     })
+  }
+
+  handleClickEditComment = (comment) => {
+    this.setState({ showEditCommentPopup: true, newComment: comment })
+  }
+
+  handleClickValidateEditComment = () => {
+    const { props, state } = this
+    this.setState({ showEditCommentPopup: false })
+    props.onClickEditComment(state.newComment)
   }
 
   render () {
@@ -128,7 +139,7 @@ export class Timeline extends React.Component {
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
-                    onClickEditComment={() => props.onClickEditComment(content)}
+                    onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                   />
                 )
@@ -181,9 +192,15 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {this.state.showEditCommentPopup && (
+        {state.showEditCommentPopup && (
           <EditCommentPopup
-            onClick={props.onClickEditComment}
+            apiUrl={props.apiUrl}
+            comment={state.newComment.raw_content}
+            customColor={props.customColor}
+            loggedUserLanguage={props.loggedUser.lang}
+            onClickValidate={this.handleClickValidateEditComment}
+            onClickClose={() => this.setState({ showEditCommentPopup: false })}
+            workspaceId={props.workspaceId}
           />
         )}
 

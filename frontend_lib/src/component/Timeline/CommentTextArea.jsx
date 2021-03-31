@@ -34,6 +34,13 @@ export class CommentTextArea extends React.Component {
     }
   }
 
+  componentDidMount () {
+    const { props } = this
+    if (props.wysiwyg) {
+      globalThis.wysiwyg(`#${props.id}`, props.lang, props.onChangeNewComment)
+    }
+  }
+
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
       this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
@@ -60,6 +67,7 @@ export class CommentTextArea extends React.Component {
   }
 
   getMentionCandidate = newComment => {
+    console.log('here')
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {

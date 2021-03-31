@@ -62,6 +62,7 @@ const Comment = props => {
                 onClick={props.onClickEditComment}
                 key='editComment'
               >
+                <Icon icon='fas fa-pencil-alt' title={props.t('Edit comment')} />
                 {props.t('Edit')}
               </button>
 
@@ -71,7 +72,7 @@ const Comment = props => {
                 key='deleteComment'
                 title={props.t('Delete comment')}
               >
-                <Icon icon={'far fa-fw fa-trash-alt'} title={props.t('Delete comment')} />
+                <Icon icon='far fa-fw fa-trash-alt' title={props.t('Delete comment')} />
                 {props.t('Delete')}
               </button>
             </DropdownMenu>
