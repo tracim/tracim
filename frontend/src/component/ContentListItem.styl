@@ -1,0 +1,117 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.contentListItem
+  display flex
+  justify-content space-between
+  color fontColor
+  height 65px
+  align-items center
+  &:hover
+    color fontColor
+  &__link
+    z-index 1
+    position absolute
+    // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
+    // 35px = fontSizeTitle + margin
+    width calc(100% - 35px)
+    height 100%
+  & > .favoriteButton
+    font-size fontSizeTitle
+    margin-inline-end 10px
+  &__typeAndTitle
+    display none
+  &__type
+    &__content
+      font-size fontSizeTitle
+      display flex
+      flex-direction column
+      align-items center
+      width 90px
+      place-content center
+      & > span
+        font-size fontSizeSmall
+    &__header
+      margin 15px 25px
+      text-align center
+      align-self center
+  &__name_path
+    flex 2
+    text-overflow ellipsis
+    overflow hidden
+    width 0
+    white-space nowrap
+  &__title
+    padding 0 5px
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    color fontColor
+    align-self center
+    flex 2
+    width 0
+  &__modification
+    align-self center
+    flex 1
+    &.timedEvent
+      margin-left 15px
+      margin-right 10px
+      overflow hidden
+  &__information
+    color fontColor
+    align-self center
+    margin-inline-end 5px
+    width 160px
+    display flex
+    align-items center
+    &__comments
+      display inline-block
+      min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
+      padding-right 10px
+    & > *
+      font-size fontSizeSmall
+    & > i
+      margin-inline-end 5px
+      margin-inline-start 2px
+
+@media (max-width: max-lg)
+  .contentListItem
+    &__type
+      &__header
+        margin 15px 10px
+      &__content
+        width 50px
+        & > span
+          display none
+    &__modification
+      overflow hidden
+      text-overflow ellipsis
+    &__name_path
+      padding-inline-start 10px
+  .timedEvent.contentListItem__modification
+    & .timedEvent__operation
+      display none
+
+@media (max-width: max-md)
+  .contentListItem
+    &__information
+      display none
+
+@media (max-width: max-sm)
+  .contentListItem
+    & .contentListItem
+      &__type__content
+        width 50px
+      &__title
+        padding 0 5px
+    &__modification
+      display none
+    &__typeAndTitle
+      display unset
+      padding 15px 5px
+      flex 2
+  .content__header
+    & .contentListItem
+      &__title
+        display none
+  .advancedSearch__content .content .breadcrumbs
+      display none

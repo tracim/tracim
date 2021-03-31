@@ -46,7 +46,7 @@ FavoriteButton.propTypes = {
 }
 
 FavoriteButton.defaultProps = {
-  customClass: null,
+  customClass: 'favoriteButton',
   dataCy: 'favoriteButton'
 }
 
