@@ -284,6 +284,14 @@ export class WorkspaceContent extends React.Component {
         )
     )
 
+  galleryButton = () => {
+    const { props } = this
+
+    // on click, render gallery
+    // définir la route
+
+  }
+
     const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
@@ -725,6 +733,10 @@ export class WorkspaceContent extends React.Component {
             />
 
             <PageContent parentClass='workspace__content'>
+              <ContentTypeBtn
+                onClick={this.galleryButton}
+              />
+
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
                   folderId={null} // null because it is workspace root content
