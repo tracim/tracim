@@ -15,7 +15,7 @@ function getDomain (url) {
   // Returns the original URL if the regular expression does not match it.
   // This function might have its place in helper.js.
 
-  const match = url.match(/^[a-z]+:\/\/([^\/:]+)(?::[0-9]+)?(?:\/(?:[\s\S]+)?)?$/i)
+  const match = url.match(/^[a-z]+:\/\/([^/:]+)(?::[0-9]+)?(?:\/(?:[\s\S]+)?)?$/i)
   return (match && match[1]) || url
 }
 
@@ -83,6 +83,7 @@ export default class LinkPreview extends React.Component {
       <a
         href={url}
         target='_blank'
+        rel='noopener noreferrer'
         className={classnames('linkPreview', { bigPreviewImage: !description })}
       >
         {(image && (
