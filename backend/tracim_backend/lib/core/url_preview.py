@@ -14,8 +14,10 @@ class URLPreview:
 
 class URLPreviewLib(object):
     def __init__(self, config: CFG,) -> None:
-        pass
+        self.app_config = config
 
     def get_preview(self, url: str) -> URLPreview:
-        title, description, image = web_preview(url)
+        title, description, image = web_preview(
+            url, timeout=self.app_config.URL_PREVIEW__FETCH_TIMEOUT
+        )
         return URLPreview(title=title, description=description, image=image)

@@ -499,6 +499,10 @@ class CFG(object):
             "frontend.custom_toolbox_folder_path", None
         )
 
+        self.URL_PREVIEW__FETCH_TIMEOUT = int(
+            self.get_raw_config("url_preview.fetch_timeout", "30")
+        )
+
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
@@ -999,6 +1003,13 @@ class CFG(object):
 
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
+
+        if self.URL_PREVIEW__FETCH_TIMEOUT < 1:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
+                    "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(

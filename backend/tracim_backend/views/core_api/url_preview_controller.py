@@ -1,4 +1,7 @@
+from http import HTTPStatus
+
 from pyramid.config import Configurator
+from webpreview import WebpreviewException
 
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.url_preview import URLPreview
@@ -16,6 +19,7 @@ SWAGGER_TAG_URL_PREVIEW_ENDPOINTS = "URL Preview"
 class URLPreviewController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_URL_PREVIEW_ENDPOINTS])
     @check_right(is_user)
+    @hapic.handle_exception(WebpreviewException, HTTPStatus.BAD_GATEWAY)
     @hapic.input_query(UrlQuerySchema())
     @hapic.output_body(UrlPreviewSchema())
     def url_preview(self, context, request: TracimRequest, hapic_data=None) -> URLPreview:
