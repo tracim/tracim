@@ -430,6 +430,6 @@
   "Publication": "Publication",
   "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Sign in": "Se connecter",
-  "Login:": "Identifiant",
-  "Password:": "Mot de passe"
+  "Login:": "Identifiant :",
+  "Password:": "Mot de passe :"
 }

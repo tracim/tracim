@@ -385,7 +385,8 @@ website.title = %(basic_setup.website_title)s
 ## description of website, used by search engines to display their results
 ; website.description =
 ## Custom welcome page displayed during login
-## Please read the documentation in doc/branding.md
+## The path of those files is relative to frontend/dist/assets/branding/
+## Please read the documentation in doc/branding.md for further information
 ; website.welcome_page = welcome-simple.html
 ; website.welcome_page_style = welcome-simple.css
 
