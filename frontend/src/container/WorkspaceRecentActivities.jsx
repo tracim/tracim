@@ -5,7 +5,6 @@ import { translate } from 'react-i18next'
 
 import {
   TracimComponent,
-  CUSTOM_EVENT,
   PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'

@@ -12,7 +12,6 @@ describe('content :: workspace > dashboard', function () {
     cy.get('.activityList__item')
     cy.get('.memberlist').scrollIntoView()
     cy.get('.memberlist .memberlist__list').should('be.visible')
-    cy.get('.memberlist .memberlist__header.subTitle').should('be.visible')
     cy.get('.memberlist .memberlist__wrapper').should('be.visible')
     cy.get('.memberlist .memberlist__list.withAddBtn').should('be.visible')
     cy.get('.memberlist .memberlist__btnadd').should('be.visible')

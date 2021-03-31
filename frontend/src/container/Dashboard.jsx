@@ -556,7 +556,6 @@ export class Dashboard extends React.Component {
                     {contentTypeButtonList.map(app => {
                       return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
-                          customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}
                           label={app.label}
                           faIcon={app.faIcon}

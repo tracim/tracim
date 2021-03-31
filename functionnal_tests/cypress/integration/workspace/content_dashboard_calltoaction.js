@@ -19,17 +19,13 @@ describe('content :: workspace > dashboard', function () {
 
   it('dashboard__workspace > calltoaction', function () {
     cy.get('.dashboard__workspace__rightMenu__contents').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(1)').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(1) .dashboard__workspace__rightMenu__contents__button__text__icon').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(1) .dashboard__workspace__rightMenu__contents__button__text__title').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(2)').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(2) .dashboard__workspace__rightMenu__contents__button__text__icon').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(2) .dashboard__workspace__rightMenu__contents__button__text__title').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(3)').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(3) .dashboard__workspace__rightMenu__contents__button__text__icon').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents > div:nth-child(3) .dashboard__workspace__rightMenu__contents__button__text__title').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents__button i.fa-comments').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents__button i.fa-paperclip').should('be.visible')
-    cy.get('.dashboard__workspace__rightMenu__contents__button i.fa-file-alt').should('be.visible')
+    for (var i = 1; i <= 6; i++) {
+      cy.get(`.dashboard__workspace__rightMenu__contents button:nth-child(${i})[title]`).should('be.visible')
+      cy.get(`.dashboard__workspace__rightMenu__contents button:nth-child(${i}) .iconbutton__text_with_icon`).should('be.visible')
+      cy.get(`.dashboard__workspace__rightMenu__contents button:nth-child(${i}) .iconbutton__icon`).should('be.visible')
+    }
+    cy.get('.dashboard__workspace__rightMenu__contents button .iconbutton__icon.far.fa-comments').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents button .iconbutton__icon.fas.fa-paperclip').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents button .iconbutton__icon.far.fa-file-alt').should('be.visible')
   })
 })
