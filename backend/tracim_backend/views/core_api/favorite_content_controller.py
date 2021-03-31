@@ -120,13 +120,13 @@ class FavoriteContentController(Controller):
     def bind(self, configurator: Configurator):
         # Get Favorites content
         configurator.add_route(
-            "user_favorite_contents", "/user/{user_id}/favorite-contents", request_method="GET",
+            "user_favorite_contents", "/users/{user_id}/favorite-contents", request_method="GET",
         )
         configurator.add_view(self.user_favorite_contents, route_name="user_favorite_contents")
 
         configurator.add_route(
             "user_content_favorite",
-            "/user/{user_id}/favorite-contents/{content_id}",
+            "/users/{user_id}/favorite-contents/{content_id}",
             request_method="GET",
         )
         configurator.add_view(self.user_content_favorite, route_name="user_content_favorite")
@@ -134,7 +134,7 @@ class FavoriteContentController(Controller):
         # set content as favorite
         configurator.add_route(
             "add_content_in_user_favorites",
-            "/user/{user_id}/favorite-contents",
+            "/users/{user_id}/favorite-contents",
             request_method="POST",
         )
         configurator.add_view(
@@ -144,7 +144,7 @@ class FavoriteContentController(Controller):
         # remove content from favorites
         configurator.add_route(
             "remove_content_from_user_favorites",
-            "/user/{user_id}/favorite-contents/{content_id}",
+            "/users/{user_id}/favorite-contents/{content_id}",
             request_method="DELETE",
         )
         configurator.add_view(

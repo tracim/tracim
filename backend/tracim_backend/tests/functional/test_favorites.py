@@ -52,7 +52,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -78,7 +78,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -107,7 +107,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -125,7 +125,7 @@ class TestFavoriteContent(object):
     ):
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents/1010".format(riyad_user.user_id,),
+            "/api/users/{}/favorite-contents/1010".format(riyad_user.user_id,),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
@@ -146,7 +146,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
@@ -199,7 +199,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/user/{}/favorite-contents".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.OK,
         )
         favorite_contents = res.json_body["items"]
@@ -234,7 +234,7 @@ class TestFavoriteContent(object):
             )
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.post_json(
-            "/api/user/{}/favorite-contents".format(riyad_user.user_id),
+            "/api/users/{}/favorite-contents".format(riyad_user.user_id),
             params={"content_id": test_thread.content_id},
             status=HTTPStatus.OK,
         )
@@ -264,7 +264,7 @@ class TestFavoriteContent(object):
         )
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         web_testapp.delete(
-            "/api/user/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
             status=HTTPStatus.NO_CONTENT,
         )
         with pytest.raises(FavoriteContentNotFound):
