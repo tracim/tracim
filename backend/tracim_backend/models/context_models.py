@@ -1874,7 +1874,7 @@ class FavoriteContentInContext:
         return self._favorite_content.content_id
 
     @property
-    def content(self) -> Content:
+    def content(self) -> ContentInContext:
         # INFO - G.M - 2021-03-24 - Overriding the content of the favorite content in order to
         # handle access limitation here.
         return self._content

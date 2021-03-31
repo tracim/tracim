@@ -58,6 +58,7 @@ class TestFavoriteContent(object):
         favorite_content = res.json_body
         assert favorite_content["original_label"] == "Test Thread"
         assert favorite_content["content"]["label"] == "Test Thread"
+        assert favorite_content["content"]["content_namespace"] == "content"
 
     def test_api__get_favorite_content__ok__deleted_content(
         self,
@@ -85,6 +86,7 @@ class TestFavoriteContent(object):
         assert favorite_content["original_label"] == "Test Thread"
         assert favorite_content["content"]["label"].startswith("Test Thread-deleted")
         assert favorite_content["content"]["is_deleted"] is True
+        assert favorite_content["content"]["content_namespace"] == "content"
 
     def test_api__get_favorite_content__ok__unaccessible_content(
         self,
@@ -207,12 +209,15 @@ class TestFavoriteContent(object):
         # accessible and active content
         assert favorite_contents[0]["original_label"] == "Test Thread"
         assert favorite_contents[0]["content"]["label"] == "Test Thread"
+        assert favorite_contents[0]["content"]["content_namespace"] == "content"
+
         # non-accessible content: should give none content
         assert favorite_contents[1]["original_label"] == "Test Note2"
         assert favorite_contents[1]["content"] is None
         # deleted content: should be accessible
         assert favorite_contents[2]["original_label"] == "Test Note3"
         assert favorite_contents[2]["content"]["label"].startswith("Test Note3-deleted")
+        assert favorite_contents[2]["content"]["content_namespace"] == "content"
 
     def test_api__set_content_as_favorites__ok__nominal_case(
         self,
@@ -241,6 +246,7 @@ class TestFavoriteContent(object):
         favorite_content = res.json_body
         assert favorite_content["original_label"] == "Test Thread"
         assert favorite_content["content"]["label"] == "Test Thread"
+        assert favorite_content["content"]["content_namespace"] == "content"
         assert content_api.get_one_user_favorite_content(
             user_id=riyad_user.user_id, content_id=test_thread.content_id
         )

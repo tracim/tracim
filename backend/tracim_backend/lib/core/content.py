@@ -2133,7 +2133,7 @@ class ContentApi(object):
         for favorite in paged_favorites:
             content = None
             if favorite.content_id in favorite_content_ids:
-                content = favorite.content
+                content = self.get_content_in_context(favorite.content)
             favorites.append(FavoriteContentInContext(favorite, content))
         return PaginatedObject(paged_favorites, favorites)
 
@@ -2177,7 +2177,7 @@ class ContentApi(object):
         self, favorite_content: FavoriteContent
     ) -> FavoriteContentInContext:
         try:
-            content = self.get_one(favorite_content.content_id)
+            content = self.get_content_in_context(self.get_one(favorite_content.content_id))
         except ContentNotFound:
             content = None
         return FavoriteContentInContext(favorite_content, content)
