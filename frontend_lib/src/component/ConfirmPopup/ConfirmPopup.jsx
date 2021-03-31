@@ -1,14 +1,16 @@
-// require('./ConfirmPopup.styl') // see https://github.com/tracim/tracim/issues/1156
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import { translate } from 'react-i18next'
+import IconButton from '../Button/IconButton.jsx'
+
+// require('./ConfirmPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const ConfirmPopup = (props) => (
   <CardPopup
     customClass='confirm_popup'
-    customHeaderClass='primaryColorBg'
+    customHeaderClass={props.customColor !== '' ? '' : 'primaryColorBg'}
+    customColor={props.customColor !== '' ? props.customColor : ''}
     onClose={props.onClose || props.onCancel}
   >
     <div className='confirm_popup__body'>
@@ -16,23 +18,32 @@ const ConfirmPopup = (props) => (
         {props.msg || props.t('Are you sure?')}
       </div>
       <div className='confirm_popup__body__btn'>
-        <button
+        <IconButton
+          customClass='confirm_popup__body__btn__item'
+          icon={props.cancelIcon}
+          text={props.cancelLabel || props.t('Cancel')}
+          title={props.cancelLabel || props.t('Cancel')}
           type='button'
-          className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
-          data-cy='confirm_popup__button_cancel'
+          intent='secondary'
+          mode='dark'
+          disabled={false}
           onClick={props.onCancel}
-        >
-          {props.cancelLabel || props.t('Cancel')}
-        </button>
-        <button
+          dataCy='confirm_popup__button_cancel'
+        />
+
+        <IconButton
+          customClass='confirm_popup__body__btn__item'
+          color={props.customColor ? props.customColor : undefined}
+          icon={props.confirmIcon}
+          text={props.confirmLabel || props.t('Confirm')}
+          title={props.confirmLabel || props.t('Confirm')}
           type='button'
-          className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
-          data-cy='confirm_popup__button_confirm'
+          intent='primary'
+          mode='light'
+          disabled={false}
           onClick={props.onConfirm}
-          autoFocus
-        >
-          {props.confirmLabel || props.t('Confirm')}
-        </button>
+          dataCy='confirm_popup__button_confirm'
+        />
       </div>
     </div>
   </CardPopup>
@@ -41,16 +52,22 @@ const ConfirmPopup = (props) => (
 ConfirmPopup.propTypes = {
   cancelLabel: PropTypes.string,
   confirmLabel: PropTypes.string,
+  cancelIcon: PropTypes.string,
+  confirmIcon: PropTypes.string,
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  msg: PropTypes.any
+  msg: PropTypes.any,
+  customColor: PropTypes.string
 }
 
 ConfirmPopup.defaultProps = {
   cancelLabel: '',
   confirmLabel: '',
-  msg: ''
+  cancelIcon: '',
+  confirmIcon: '',
+  msg: '',
+  customColor: ''
 }
 
 export default translate()(ConfirmPopup)

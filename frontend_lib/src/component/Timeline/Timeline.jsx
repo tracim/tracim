@@ -18,7 +18,6 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
-import DeleteCommentPopup from './DeleteCommentPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -156,6 +155,7 @@ export class Timeline extends React.Component {
                     apiUrl={props.apiUrl}
                     apiContent={content}
                     loggedUser={props.loggedUser}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     key={`commentAsFile_${content.content_id}`}
                   />
                 )
@@ -188,10 +188,13 @@ export class Timeline extends React.Component {
         )}
 
         {state.showDeleteCommentPopup && (
-          <DeleteCommentPopup
+          <ConfirmPopup
             customColor={props.customColor}
-            onClickCancel={this.handleToggleDeleteCommentPopup}
-            onClickValidate={this.handleClickValidateDeleteComment}
+            confirmLabel={props.t('Delete')}
+            confirmIcon='far fa-trash-alt'
+            cancelIcon='fas fa-times'
+            onConfirm={this.handleClickValidateDeleteComment}
+            onCancel={this.handleToggleDeleteCommentPopup}
           />
         )}
 

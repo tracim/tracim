@@ -8,7 +8,8 @@ import {
   displayDistanceDate,
   sortTimelineByDate,
   sendGlobalFlashMessage,
-  TIMELINE_TYPE
+  TIMELINE_TYPE,
+  CONTENT_TYPE
 } from './helper.js'
 
 import {
@@ -152,11 +153,15 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentDeleteComment = async (workspaceId, contentId, commentId) => {
+    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType) => {
       this.checkApiUrl()
-      const response = await handleFetchResult(
-        await deleteComment(this.apiUrl, workspaceId, contentId, commentId)
-      )
+      let response
+
+      if (contentType === CONTENT_TYPE.COMMENT) {
+        response = await handleFetchResult(await deleteComment(this.apiUrl, workspaceId, contentId, commentId))
+      } else {
+        response = await handleFetchResult(await putContentDeleted(this.apiUrl, workspaceId, commentId))
+      }
 
       if (response.status !== 204) {
         sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))

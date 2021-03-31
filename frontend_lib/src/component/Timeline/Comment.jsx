@@ -71,7 +71,7 @@ const Comment = props => {
                 key='deleteComment'
                 title={props.t('Delete comment')}
               >
-                <Icon icon={'far fa-fw fa-trash-alt'} title={props.t('Delete comment')} />
+                <Icon icon='far fa-fw fa-trash-alt' title={props.t('Delete comment')} />
                 {props.t('Delete')}
               </button>
             </DropdownMenu>
