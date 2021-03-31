@@ -193,6 +193,9 @@ export class Dashboard extends React.Component {
   loadNewResquestNumber = async () => {
     const { props } = this
 
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
+    if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
+
     const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
     switch (fetchGetWorkspaceSubscriptions.status) {
       case 200: {
