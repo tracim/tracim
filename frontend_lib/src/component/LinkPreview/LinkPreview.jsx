@@ -31,7 +31,7 @@ export default class LinkPreview extends React.Component {
   }
 
   getSelectedLink () {
-    const links = (
+    const linkList = (
       new DOMParser().parseFromString(
         this.props.findLinkInHTML,
         'text/html'
