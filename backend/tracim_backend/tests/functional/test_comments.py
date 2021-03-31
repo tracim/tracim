@@ -7,6 +7,7 @@ import transaction
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -583,6 +584,145 @@ class TestEditComment(object):
             status=200,
         )
         assert new_res_get.json_body == res_put.json_body
+
+    def test_api__edit_comment__err__empty_raw_content(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ):
+        """
+        Edit comment content and set empty content
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = ""
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=400,
+        )
+        assert res_put.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
+    def test_api__edit_comment__ok__workspace_manager(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit other user comment content as workspace manager
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=200,
+        )
+
+    def test_api__edit_comment__err__400__not_member(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit own comment content where user is not members of the workspace
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=400,
+        )
+        assert res_get.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": "Second revision"},
+            status=400,
+        )
+        assert res_put.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+
+    def test_api__edit_comment__err__403__simple_reader(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit user comment content where user is only simple reader
+        """
+        workspace_api = workspace_api_factory.get()
+        role_api = role_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        role_api.create_one(riyad_user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=403,
+        )
 
 
 @pytest.mark.usefixtures("base_fixture")
