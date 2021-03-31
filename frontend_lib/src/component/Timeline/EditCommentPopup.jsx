@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import { TracimComponent } from '../../tracimComponent.js'
@@ -104,3 +105,20 @@ export class EditCommentPopup extends React.Component {
   }
 }
 export default translate()(appContentFactory(TracimComponent(EditCommentPopup)))
+
+EditCommentPopup.propTypes = {
+  comment: PropTypes.string.isRequired,
+  onClickClose: PropTypes.func.isRequired,
+  onClickValidate: PropTypes.func.isRequired,
+  apiUrl: PropTypes.string,
+  customColor: PropTypes.string,
+  loggedUserLanguage: PropTypes.string,
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+}
+
+EditCommentPopup.defaultProps = {
+  apiUrl: '',
+  customColor: undefined,
+  loggedUserLanguage: 'en',
+  workspaceId: undefined
+}
