@@ -62,6 +62,7 @@ const Comment = props => {
                 onClick={props.onClickEditComment}
                 key='editComment'
               >
+                <Icon icon='fas fa-pencil-alt' title={props.t('Edit comment')} />
                 {props.t('Edit')}
               </button>
 

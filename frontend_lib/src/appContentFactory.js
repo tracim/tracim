@@ -34,6 +34,7 @@ import {
 import {
   deleteComment,
   putEditContent,
+  putNewComment,
   postNewComment,
   putEditStatus,
   putContentArchived,
@@ -170,14 +171,45 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentEditComment = async (workspaceId, contentId, commentId, newComment) => {
+    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
+
+      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
+      let knownMentions = await this.searchForMentionInQuery('', workspaceId)
+      knownMentions = knownMentions.map(member => `@${member.username}`)
+      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await putNewComment(this.apiUrl, workspaceId, contentId, commentId, newComment)
+        await putNewComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
       )
 
-      if (response.status !== 200) {
-        sendGlobalFlashMessage(i18n.t('Error while editing the comment'))
+      switch (response.apiResponse.status) {
+        case 200:
+          break
+        case 400:
+          switch (response.body.code) {
+            case 2067:
+              sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
+            case 2003:
+              sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
+              break
+            case 2044:
+              sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
+            default:
+              sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
+              break
+          }
+          break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response
@@ -504,6 +536,21 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate([...timeline, commentForTimeline])
     }
 
+    updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
+      const oldComment = timeline.find(timelineItem => timelineItem.content_id === comment.content_id)
+
+      if (!oldComment) {
+        sendGlobalFlashMessage(i18n.t('Error while saving the comment'), 'warning')
+        return timeline
+      }
+
+      const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
+        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        : timelineItem
+      )
+      return newTimeline
+    }
+
     removeCommentFromTimeline = (commentId, timeline) => {
       return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
     }
@@ -592,6 +639,7 @@ export function appContentFactory (WrappedComponent) {
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           removeCommentFromTimeline={this.removeCommentFromTimeline}
+          updateCommentOnTimeline={this.updateCommentOnTimeline}
         />
       )
     }
