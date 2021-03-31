@@ -236,6 +236,8 @@ export {
 
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
+export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 
 export {
   TRANSLATION_STATE,

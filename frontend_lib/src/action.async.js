@@ -133,3 +133,15 @@ export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, 
   const name = `comment-${commentId}.html`
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}/translated/${name}?target_language_code=${targetLanguageCode}`)
 }
+
+export const getFavoriteContentList = (apiUrl, userId) => {
+  return baseFetch('GET', `${apiUrl}/users/${userId}/favorite-contents`)
+}
+
+export const addContentToFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('POST', `${apiUrl}/users/${userId}/favorite-contents`, { content_id: contentId })
+}
+
+export const removeContentFromFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
+}

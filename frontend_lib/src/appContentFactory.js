@@ -39,7 +39,10 @@ import {
   putContentRestoreArchive,
   putContentRestoreDelete,
   getMyselfKnownMember,
-  getCommentTranslated
+  getCommentTranslated,
+  addContentToFavoriteList,
+  getFavoriteContentList,
+  removeContentFromFavoriteList
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -414,6 +417,81 @@ export function appContentFactory (WrappedComponent) {
       translationState: initialCommentTranslationState
     })
 
+    addContentToFavoriteList = async (content, loggedUser, setState) => {
+      const response = await addContentToFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      )
+      if (!response.ok) {
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.ADD_FLASH_MSG,
+          data: {
+            msg: i18n.t('Error while adding content to favorites'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
+        return
+      }
+      const newFavorite = await response.json()
+      setState(previousState => {
+        return {
+          favoriteList: [...previousState.favoriteList, newFavorite]
+        }
+      })
+    }
+
+    removeContentFromFavoriteList = async (content, loggedUser, setState) => {
+      const response = await removeContentFromFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      )
+      if (!response.ok) {
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.ADD_FLASH_MSG,
+          data: {
+            msg: i18n.t('Error while removing content from favorites'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
+        return
+      }
+      setState(previousState => {
+        return {
+          favoriteList: previousState.favoriteList.filter(
+            favorite => favorite.content_id !== content.content_id
+          )
+        }
+      })
+    }
+
+    loadFavoriteContentList = async (loggedUser, setState) => {
+      const response = await getFavoriteContentList(this.apiUrl, loggedUser.userId)
+      if (!response.ok) {
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.ADD_FLASH_MSG,
+          data: {
+            msg: i18n.t('Error while getting favorites'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
+        setState({ favoriteList: [] })
+        return
+      }
+      const favorites = await response.json()
+      setState({ favoriteList: favorites.items })
+    }
+
+    isContentInFavoriteList = (content, state) => {
+      return state.favoriteList && state.favoriteList.some(
+        favorite => favorite.content_id === content.content_id
+      )
+    }
+
     buildTimelineItemCommentAsFile = (content, loggedUser) => ({
       ...content,
       timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
@@ -553,6 +631,10 @@ export function appContentFactory (WrappedComponent) {
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
+          isContentInFavoriteList={this.isContentInFavoriteList}
+          addContentToFavoriteList={this.addContentToFavoriteList}
+          removeContentFromFavoriteList={this.removeContentFromFavoriteList}
+          loadFavoriteContentList={this.loadFavoriteContentList}
         />
       )
     }
