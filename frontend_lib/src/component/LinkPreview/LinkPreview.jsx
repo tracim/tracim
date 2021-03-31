@@ -75,21 +75,21 @@ export default class LinkPreview extends React.Component {
   }
 
   render () {
-    const { title, url, description, image } = this.state
+    const { state } = this
 
-    if (!url || !description) return null
+    if (!state.url || !state.description) return null
 
     return (
       <a
-        href={url}
+        href={state.url}
         target='_blank'
         rel='noopener noreferrer'
-        className={classnames('linkPreview', { bigPreviewImage: !description })}
+        className={classnames('linkPreview', { bigPreviewImage: !state.description })}
       >
-        {(image && (
+        {(state.image && (
           <img
             alt=''
-            src={image}
+            src={state.image}
             className='linkPreview__img'
             onError={this.handleImageError}
             onLoad={this.handleImageLoad}
@@ -98,13 +98,13 @@ export default class LinkPreview extends React.Component {
 
         <div className='linkPreview__content'>
           <div className='linkPreview__content__title'>
-            <strong>{title}</strong>
+            <strong>{state.title}</strong>
           </div>
           <div className='linkPreview__content__link'>
-            {getDomain(url)}
+            {getDomain(state.url)}
           </div>
           <div className='linkPreview__content__description'>
-            {description}
+            {state.description}
           </div>
         </div>
       </a>
