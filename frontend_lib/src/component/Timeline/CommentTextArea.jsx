@@ -67,7 +67,6 @@ export class CommentTextArea extends React.Component {
   }
 
   getMentionCandidate = newComment => {
-    console.log('here')
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {

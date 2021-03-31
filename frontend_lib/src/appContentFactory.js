@@ -531,6 +531,21 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate([...timeline, commentForTimeline])
     }
 
+    updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
+      const oldComment = timeline.find(timelineItem => timelineItem.content_id === comment.content_id)
+
+      if (!oldComment) {
+        sendGlobalFlashMessage(i18n.t('Error while saving the comment'), 'warning')
+        return timeline
+      }
+
+      const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
+        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        : timelineItem
+      )
+      return newTimeline
+    }
+
     removeCommentFromTimeline = (commentId, timeline) => {
       return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
     }
@@ -619,6 +634,7 @@ export function appContentFactory (WrappedComponent) {
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           removeCommentFromTimeline={this.removeCommentFromTimeline}
+          updateCommentOnTimeline={this.updateCommentOnTimeline}
         />
       )
     }
