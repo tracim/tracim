@@ -8,6 +8,7 @@ import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import Icon from '../Icon/Icon.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -63,11 +64,14 @@ const Comment = props => {
               >
                 {props.t('Edit')}
               </button>
+
               <button
                 className='transparentButton'
                 onClick={props.onClickDeleteComment}
                 key='deleteComment'
+                title={props.t('Delete comment')}
               >
+                <Icon icon={'far fa-fw fa-trash-alt'} title={props.t('Delete comment')} />
                 {props.t('Delete')}
               </button>
             </DropdownMenu>

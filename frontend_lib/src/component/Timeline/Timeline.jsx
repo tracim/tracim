@@ -18,6 +18,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
+import DeleteCommentPopup from './DeleteCommentPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -30,7 +31,9 @@ export class Timeline extends React.Component {
     ])
 
     this.state = {
-      showEditCommentPopup: false
+      showEditCommentPopup: false,
+      showDeleteCommentPopup: false,
+      commentToDelete: null
     }
   }
 
@@ -39,8 +42,23 @@ export class Timeline extends React.Component {
     i18n.changeLanguage(data)
   }
 
+  handleToggleDeleteCommentPopup = content => {
+    this.setState(prev => ({
+      showDeleteCommentPopup: !prev.showDeleteCommentPopup,
+      commentToDelete: prev.showDeleteCommentPopup ? null : content
+    }))
+  }
+
+  handleClickValidateDeleteComment = () => {
+    this.props.onClickDeleteComment(this.state.commentToDelete)
+    this.setState({
+      showDeleteCommentPopup: false,
+      commentToDelete: null
+    })
+  }
+
   render () {
-    const { props } = this
+    const { props, state } = this
 
     if (!Array.isArray(props.timelineData)) {
       console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
@@ -111,7 +129,7 @@ export class Timeline extends React.Component {
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
                     onClickEditComment={() => props.onClickEditComment(content)}
-                    onClickDeleteComment={() => props.onClickDeleteComment(content)}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -166,6 +184,14 @@ export class Timeline extends React.Component {
         {this.state.showEditCommentPopup && (
           <EditCommentPopup
             onClick={props.onClickEditComment}
+          />
+        )}
+
+        {state.showDeleteCommentPopup && (
+          <DeleteCommentPopup
+            customColor={props.customColor}
+            onClickCancel={this.handleToggleDeleteCommentPopup}
+            onClickValidate={this.handleClickValidateDeleteComment}
           />
         )}
 
@@ -327,5 +353,6 @@ Timeline.defaultProps = {
   searchForMentionInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },
+  onClickDeleteComment: () => {},
   onClickRestoreComment: content => { }
 }

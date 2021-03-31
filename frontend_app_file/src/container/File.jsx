@@ -901,7 +901,7 @@ export class File extends React.Component {
           )}
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
           onClickEditComment={comment => this.handleClickEditComment(comment)}
-          onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
+          onClickDeleteComment={this.handleClickDeleteComment}
         />
       ) : null
     }
