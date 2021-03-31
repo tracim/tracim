@@ -29,7 +29,10 @@ import {
   getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE
+  CONTENT_NAMESPACE,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -168,6 +171,7 @@ export class Thread extends React.Component {
   componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async updateTimelineAndContent () {
@@ -418,12 +422,25 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div>
-            {state.showRefreshWarning && (
-              <RefreshWarningMessage
-                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                onClickRefresh={this.handleClickRefresh}
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
               />
-            )}
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+            </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               onChangeStatus={this.handleChangeStatus}
