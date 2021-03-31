@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from beaker.cache import cache_region
 from pyramid.config import Configurator
 from webpreview import WebpreviewException
 
@@ -8,6 +9,7 @@ from tracim_backend.lib.core.url_preview import URLPreview
 from tracim_backend.lib.core.url_preview import URLPreviewLib
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import UrlPreviewSchema
@@ -27,7 +29,13 @@ class URLPreviewController(Controller):
         Get url Preview
         """
         url_preview_lib = URLPreviewLib(request.app_config)
-        return url_preview_lib.get_preview(url=hapic_data.query.url)
+
+        @cache_region("url_preview")
+        def get_cached_preview(url: str):
+            logger.debug(self, "getting url preview of {}".format(url))
+            return url_preview_lib.get_preview(url=url)
+
+        return get_cached_preview(hapic_data.query.url)
 
     def bind(self, configurator: Configurator) -> None:
         configurator.add_route(

@@ -137,14 +137,24 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
-    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
-    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
-    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
-    tracim_setting_for_beaker["session.httponly"] = app_config.SESSION__HTTPONLY
-    tracim_setting_for_beaker["session.secure"] = app_config.SESSION__SECURE
-    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
+    tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
+    tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
+    tracim_setting_for_beaker_session["session.secure"] = app_config.SESSION__SECURE
+    session_factory = pyramid_beaker.session_factory_from_settings(
+        tracim_setting_for_beaker_session
+    )
     configurator.set_session_factory(session_factory)
-    pyramid_beaker.set_cache_regions_from_settings(tracim_setting_for_beaker)
+    cached_region_settings = {
+        "cache.regions": "url_preview",
+        "cache.type": "memory",
+        "cache.url_preview.expire": "60",
+    }
+    tracim_setting_for_beaker_cache = sliced_dict(settings, beginning_key_string="cache.")
+    cached_region_settings.update(tracim_setting_for_beaker_cache)
+    pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
+
     # Add AuthPolicy
     configurator.include("pyramid_multiauth")
     policies = []
