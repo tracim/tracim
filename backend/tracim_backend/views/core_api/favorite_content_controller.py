@@ -79,10 +79,10 @@ class FavoriteContentController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(ContentIdBodySchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    @hapic.output_body(FavoriteContentSchema())
     def add_content_in_user_favorites(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    ) -> FavoriteContentInContext:
         """
         set content as user favorite
         """
@@ -94,7 +94,8 @@ class FavoriteContentController(Controller):
             show_archived=True,
         )
         content = api.get_one(content_id=hapic_data.body.get("content_id"))
-        api.add_favorite(content, do_save=True)
+        favorite = api.add_favorite(content, do_save=True)
+        return api.get_one_user_favorite_content_in_context(favorite)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_FAVORITE_ENDPOINTS])
     @check_right(has_personal_access)

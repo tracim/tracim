@@ -233,11 +233,14 @@ class TestFavoriteContent(object):
                 user_id=riyad_user.user_id, content_id=test_thread.content_id
             )
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
-        web_testapp.post_json(
+        res = web_testapp.post_json(
             "/api/user/{}/favorite-contents".format(riyad_user.user_id),
             params={"content_id": test_thread.content_id},
-            status=HTTPStatus.NO_CONTENT,
+            status=HTTPStatus.OK,
         )
+        favorite_content = res.json_body
+        assert favorite_content["original_label"] == "Test Thread"
+        assert favorite_content["content"]["label"] == "Test Thread"
         assert content_api.get_one_user_favorite_content(
             user_id=riyad_user.user_id, content_id=test_thread.content_id
         )
