@@ -17,6 +17,7 @@ import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
+import EditCommentPopup from './EditCommentPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -27,6 +28,10 @@ export class Timeline extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    this.state = {
+      showEditCommentPopup: false
+    }
   }
 
   handleAllAppChangeLanguage = data => {
@@ -106,7 +111,7 @@ export class Timeline extends React.Component {
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
                     onClickEditComment={() => props.onClickEditComment(content)}
-                    onClickDeleteComment={() => { props.onClickDeleteComment(content) }}
+                    onClickDeleteComment={() => props.onClickDeleteComment(content)}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -155,6 +160,12 @@ export class Timeline extends React.Component {
             }
             confirmLabel={props.t('Edit')}
             cancelLabel={props.t('Validate anyway')}
+          />
+        )}
+
+        {this.state.showEditCommentPopup && (
+          <EditCommentPopup
+            onClick={props.onClickEditComment}
           />
         )}
 

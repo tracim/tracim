@@ -787,7 +787,7 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
-  hanldeClickEditComment = (comment) => {
+  handleClickEditComment = (comment) => {
     console.log('edit comment', comment)
   }
 
@@ -1001,7 +1001,7 @@ export class HtmlDocument extends React.Component {
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-                  onClickEditComment={comment => this.hanldeClickEditComment(comment)}
+                  onClickEditComment={comment => this.handleClickEditComment(comment)}
                   onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
                 />
               ) : null

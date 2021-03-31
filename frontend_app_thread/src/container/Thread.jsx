@@ -375,7 +375,7 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  hanldeClickEditComment = (comment) => {
+  handleClickEditComment = (comment) => {
     console.log('edit comment', comment)
   }
 
@@ -507,7 +507,7 @@ export class Thread extends React.Component {
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-              onClickEditComment={comment => this.hanldeClickEditComment(comment)}
+              onClickEditComment={comment => this.handleClickEditComment(comment)}
               onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
             />
           ) : null}

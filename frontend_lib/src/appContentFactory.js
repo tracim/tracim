@@ -165,6 +165,19 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentEditComment = async (workspaceId, contentId, commentId, newComment) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(
+        await putNewComment(this.apiUrl, workspaceId, contentId, commentId, newComment)
+      )
+
+      if (response.status !== 200) {
+        sendGlobalFlashMessage(i18n.t('Error while editing the comment'))
+      }
+
+      return response
+    }
+
     appContentChangeComment = (e, content, setState, appSlug) => {
       const newComment = e.target.value
       setState({ newComment: newComment })
@@ -559,6 +572,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeComment={this.appContentChangeComment}
           appContentAddCommentAsFile={this.appContentAddCommentAsFile}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentEditComment={this.appContentEditComment}
           appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}

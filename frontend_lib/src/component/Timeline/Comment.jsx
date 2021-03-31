@@ -59,12 +59,14 @@ const Comment = props => {
               <button
                 className='transparentButton'
                 onClick={props.onClickEditComment}
+                key='editComment'
               >
                 {props.t('Edit')}
               </button>
               <button
                 className='transparentButton'
                 onClick={props.onClickDeleteComment}
+                key='deleteComment'
               >
                 {props.t('Delete')}
               </button>

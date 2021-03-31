@@ -521,7 +521,7 @@ export class File extends React.Component {
     props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
   }
 
-  hanldeClickEditComment = (comment) => {
+  handleClickEditComment = (comment) => {
     console.log('edit comment', comment)
   }
 
@@ -900,7 +900,7 @@ export class File extends React.Component {
             this.setState.bind(this)
           )}
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-          onClickEditComment={comment => this.hanldeClickEditComment(comment)}
+          onClickEditComment={comment => this.handleClickEditComment(comment)}
           onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
         />
       ) : null

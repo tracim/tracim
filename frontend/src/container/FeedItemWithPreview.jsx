@@ -81,7 +81,7 @@ export class FeedItemWithPreview extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  hanldeClickEditComment = (comment) => {
+  handleClickEditComment = (comment) => {
     console.log('edit comment', comment)
   }
 
@@ -183,7 +183,7 @@ export class FeedItemWithPreview extends React.Component {
             onClickSaveAnyway={this.handleClickValidateAnyway}
             searchForMentionInQuery={this.searchForMentionInQuery}
             workspaceId={props.workspaceId}
-            onClickEditComment={comment => this.hanldeClickEditComment(comment)}
+            onClickEditComment={comment => this.handleClickEditComment(comment)}
             onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
           />
         )}
