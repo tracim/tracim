@@ -38,7 +38,7 @@ export default class LinkPreview extends React.Component {
       ).body.querySelectorAll('a[href]')
     )
 
-    for (const link of links) {
+    for (const link of linkList) {
       const href = link.href
       if (href.startsWith('https://') && !href.startsWith('https://' + location.hostname)) {
         return href
