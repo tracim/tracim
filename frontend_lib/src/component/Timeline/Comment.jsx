@@ -8,7 +8,7 @@ import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
-import Icon from '../Icon/Icon.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -57,24 +57,25 @@ const Comment = props => {
               buttonIcon='fas fa-ellipsis-v'
               buttonTooltip={props.t('Actions')}
             >
-              <button
-                className='transparentButton'
-                onClick={props.onClickEditComment}
+              <IconButton
+                icon='fas fa-fw fa-pencil-alt'
+                intent='link'
                 key='editComment'
-              >
-                <Icon icon='fas fa-pencil-alt' title={props.t('Edit comment')} />
-                {props.t('Edit')}
-              </button>
+                mode='dark'
+                onClick={props.onClickEditComment}
+                text={props.t('Edit')}
+                title={props.t('Edit comment')}
+              />
 
-              <button
-                className='transparentButton'
-                onClick={props.onClickDeleteComment}
+              <IconButton
+                icon='far fa-fw fa-trash-alt'
+                intent='link'
                 key='deleteComment'
+                mode='dark'
+                onClick={props.onClickDeleteComment}
+                text={props.t('Delete')}
                 title={props.t('Delete comment')}
-              >
-                <Icon icon='far fa-fw fa-trash-alt' title={props.t('Delete comment')} />
-                {props.t('Delete')}
-              </button>
+              />
             </DropdownMenu>
           </div>
           <div
@@ -124,5 +125,7 @@ Comment.defaultProps = {
   createdFormated: '',
   createdDistance: '',
   fromMe: false,
-  translationState: TRANSLATION_STATE.DISABLED
+  translationState: TRANSLATION_STATE.DISABLED,
+  onClickEditComment: () => {},
+  onClickDeleteComment: () => {}
 }

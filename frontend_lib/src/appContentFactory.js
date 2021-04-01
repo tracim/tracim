@@ -34,7 +34,7 @@ import {
 import {
   deleteComment,
   putEditContent,
-  putNewComment,
+  putComment,
   postNewComment,
   putEditStatus,
   putContentArchived,
@@ -187,7 +187,7 @@ export function appContentFactory (WrappedComponent) {
       }
 
       const response = await handleFetchResult(
-        await putNewComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
       )
 
       switch (response.apiResponse.status) {

@@ -27,7 +27,7 @@ export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
 export const deleteComment = (apiUrl, workspaceId, contentId, commentId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
 
-export const putNewComment = (apiUrl, workspaceId, contentId, commentId, newComment) =>
+export const putComment = (apiUrl, workspaceId, contentId, commentId, newComment) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`, {
     raw_content: newComment
   })

@@ -177,8 +177,8 @@ export class FeedItemWithPreview extends React.Component {
             newCommentAsFileList={state.newCommentAsFileList}
             onChangeNewComment={this.handleChangeNewComment}
             onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
-            onClickEditComment={comment => this.handleClickEditComment(comment)}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickEditComment={this.handleClickEditComment}
             onClickValidateNewCommentBtn={this.handleClickSend}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onInitWysiwyg={this.handleInitWysiwyg}

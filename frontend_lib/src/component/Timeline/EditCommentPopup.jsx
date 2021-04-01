@@ -9,7 +9,7 @@ import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import CommentTextArea from './CommentTextArea.jsx'
 
-// require('./EditCommentPopup.styl')
+// require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const wysiwygId = 'wysiwygTimelineCommentEdit'
 const wysiwygIdSelector = `#${wysiwygId}`

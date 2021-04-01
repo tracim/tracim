@@ -1,19 +1,16 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
-  CONTENT_TYPE,
   formatAbsoluteDate,
-  PAGE,
   removeExtensionOfFilename
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
-import Icon from '../Icon/Icon.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 export const CommentFilePreview = props => {
   const styleSent = {
@@ -80,15 +77,15 @@ export const CommentFilePreview = props => {
               buttonIcon='fas fa-ellipsis-v'
               buttonTooltip={props.t('Actions')}
             >
-              <button
-                className='transparentButton'
-                onClick={props.onClickDeleteComment}
+              <IconButton
+                icon='far fa-fw fa-trash-alt'
+                intent='link'
                 key='deleteComment'
+                mode='dark'
+                onClick={props.onClickDeleteComment}
+                text={props.t('Delete')}
                 title={props.t('Delete comment')}
-              >
-                <Icon icon='far fa-fw fa-trash-alt' title={props.t('Delete comment')} />
-                {props.t('Delete')}
-              </button>
+              />
             </DropdownMenu>
           </div>
 

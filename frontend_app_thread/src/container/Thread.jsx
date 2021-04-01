@@ -527,8 +527,8 @@ export class Thread extends React.Component {
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-              onClickEditComment={comment => this.handleClickEditComment(comment)}
-              onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
+              onClickEditComment={this.handleClickEditComment}
+              onClickDeleteComment={this.handleClickDeleteComment}
             />
           ) : null}
         </PopinFixedContent>

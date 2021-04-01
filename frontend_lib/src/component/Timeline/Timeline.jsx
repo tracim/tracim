@@ -412,5 +412,6 @@ Timeline.defaultProps = {
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },
   onClickDeleteComment: () => {},
-  onClickRestoreComment: content => { }
+  onClickRestoreComment: content => { },
+  onClickEditComment: () => {}
 }
