@@ -1,3 +1,24 @@
+# 3.7.0 / 2021-04-xx
+
+### New Features
+
+- publications
+- reactions to contents using emojis
+
+### Fixed Issues
+
+### Breaking Changes
+
+- database migration needed for mysql/mariadb => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-797556041)
+- manual database migration for old instance running since Tracim v1 => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-801944438)
+
+### Other Changes
+
+- HTTP API chang => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-800124255)
+- modification of default value for `web.notifications.excluded` => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-801880866)
+
+
+
 # 3.6.1 / 2021-03-26
 
 ### Fixed Issues
