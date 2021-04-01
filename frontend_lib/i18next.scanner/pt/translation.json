@@ -181,9 +181,9 @@
   "The file is larger than the maximum file size allowed": "O ficheiro é maior que o tamanho máximo permitido",
   "Error, the space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
   "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
-  "Remove from favorites": "__NOT_TRANSLATED__",
-  "Add to favorites": "__NOT_TRANSLATED__",
-  "Error while adding content to favorites": "__NOT_TRANSLATED__",
-  "Error while removing content from favorites": "__NOT_TRANSLATED__",
-  "Error while getting favorites": "__NOT_TRANSLATED__"
+  "Remove from favorites": "Eliminar dos favoritos",
+  "Add to favorites": "Adicionar aos favoritos",
+  "Error while adding content to favorites": "Erro ao adicionar conteúdo aos favoritos",
+  "Error while removing content from favorites": "Erro ao eliminar conteúdo dos favoritos",
+  "Error while getting favorites": "Erro ao obter favoritos"
 }
