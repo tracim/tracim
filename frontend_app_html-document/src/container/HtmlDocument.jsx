@@ -848,7 +848,7 @@ export class HtmlDocument extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div> {/* this div in display flex, justify-content space-between */}
+          <div>
             <ToolBar>
               <FavoriteButton
                 favoriteState={props.isContentInFavoriteList(state.content, state)

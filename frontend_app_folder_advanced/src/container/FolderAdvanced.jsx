@@ -301,9 +301,11 @@ export class FolderAdvanced extends React.Component {
           <div className='folder_advanced__header'>
             <ToolBar>
               <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
+                favoriteState={(
+                  props.isContentInFavoriteList(state.content, state)
+                    ? FAVORITE_STATE.FAVORITE
+                    : FAVORITE_STATE.NOT_FAVORITE
+                )}
                 onClickAddToFavoriteList={() => props.addContentToFavoriteList(
                   state.content, state.loggedUser, this.setState.bind(this)
                 )}
