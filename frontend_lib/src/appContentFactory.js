@@ -424,14 +424,7 @@ export function appContentFactory (WrappedComponent) {
         content.content_id
       )
       if (!response.ok) {
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while adding content to favorites'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+        sendGlobalFlashMessage(i18n.t('Error while adding content to favorites'))
         return
       }
       const newFavorite = await response.json()
@@ -449,14 +442,7 @@ export function appContentFactory (WrappedComponent) {
         content.content_id
       )
       if (!response.ok) {
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while removing content from favorites'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+        sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
         return
       }
       setState(previousState => {
@@ -471,14 +457,7 @@ export function appContentFactory (WrappedComponent) {
     loadFavoriteContentList = async (loggedUser, setState) => {
       const response = await getFavoriteContentList(this.apiUrl, loggedUser.userId)
       if (!response.ok) {
-        GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.ADD_FLASH_MSG,
-          data: {
-            msg: i18n.t('Error while getting favorites'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+        sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
         setState({ favoriteList: [] })
         return
       }
