@@ -724,21 +724,21 @@ export class WorkspaceContent extends React.Component {
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
             />
-
             <PageContent parentClass='workspace__content'>
-              <IconButton
-                onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
-                text={props.t('Open the gallery')}
-                icon='fa-fw far fa-image'
-                hexcolor= {GLOBAL_primaryColor}
-              />
-              {userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <DropdownCreateButton
-                  folderId={null} // null because it is workspace root content
-                  onClickCreateContent={this.handleClickCreateContent}
-                  availableApp={createContentAvailableApp}
+              <div className='buttons'>
+                <IconButton
+                  onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                  text={props.t('Open the gallery')}
+                  icon='far fa-image'
                 />
-              )}
+                {userRoleIdInWorkspace >= ROLE.contributor.id && (
+                  <DropdownCreateButton
+                    folderId={null} // null because it is workspace root content
+                    onClickCreateContent={this.handleClickCreateContent}
+                    availableApp={createContentAvailableApp}
+                  />
+                )}
+              </div>
 
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />
