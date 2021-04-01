@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import classnames from 'classnames'
 
 import {
   Breadcrumbs,
@@ -65,7 +66,7 @@ const ContentListItem = (props) => {
       read
       contentType={props.contentTypeInfo}
       isLast={props.isLast}
-      customClass='contentListItem'
+      customClass={classnames('contentListItem', props.customClass)}
     >
       <ContentType
         contentTypeInfo={props.contentTypeInfo}
@@ -116,7 +117,13 @@ const ContentListItem = (props) => {
         )}
       </div>
       {props.children}
-      <Link to={contentAppUrl} className='contentListItem__link' />
+      <Link
+        to={contentAppUrl}
+        className={classnames(
+          'contentListItem__link',
+          { [`${props.customClass}__link`]: props.customClass }
+        )}
+      />
     </ListItemWrapper>
   )
 }
@@ -127,13 +134,15 @@ ContentListItem.propTypes = {
   userLang: PropTypes.string.isRequired,
   breadcrumbsList: PropTypes.arrayOf(PropTypes.string),
   commentsCount: PropTypes.number,
-  isLast: PropTypes.bool
+  isLast: PropTypes.bool,
+  customClass: PropTypes.string
 }
 
 ContentListItem.defaultProps = {
   breadcrumbsList: [],
   commentsCount: null,
-  isLast: false
+  isLast: false,
+  customClass: null
 }
 
 export default translate()(ContentListItem)

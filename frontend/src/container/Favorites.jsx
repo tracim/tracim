@@ -28,7 +28,7 @@ import {
 
 import {
   getFavoriteContentList,
-  removeContentFromFavoriteList
+  deleteContentFromFavoriteList
 } from '../action-creator.async.js'
 import {
   FETCH_CONFIG
@@ -189,10 +189,10 @@ export class Favorites extends React.Component {
 
   handleClickRemoveFromFavoriteList = async (favorite) => {
     const { props } = this
-    const removeFromFavoriteList = await props.dispatch(
-      removeContentFromFavoriteList(props.user.userId, favorite.contentId)
+    const deleteFromFavoriteList = await props.dispatch(
+      deleteContentFromFavoriteList(props.user.userId, favorite.contentId)
     )
-    if (!removeFromFavoriteList.ok) {
+    if (!deleteFromFavoriteList.ok) {
       props.dispatch(newFlashMessage(props.t('An error has happened while removing the favorite'), 'warning'))
       return
     }
@@ -214,13 +214,13 @@ export class Favorites extends React.Component {
   getFavoriteComponent = (favorite, index) => {
     // A favorite can point to an unavailable content (changed space access, deleted…)
     // In this case a special component is displayed for the favorite
-    const { props } = this
+    const { props, state } = this
     const favoriteButton = (
       <FavoriteButton
         favoriteState={FAVORITE_STATE.FAVORITE}
         onClickRemoveFromFavoriteList={() => this.handleClickRemoveFromFavoriteList(favorite)}
         onClickAddToFavoriteList={() => {}}
-        customClass='contentListItem__favoriteButton'
+        customClass='favorites__item__favoriteButton'
       />
     )
     const isLast = index === props.favoriteList.length - 1
@@ -237,7 +237,6 @@ export class Favorites extends React.Component {
         </UnavailableContent>
       )
     }
-    const { contentBreadcrumbsList, contentCommentsCountList } = this.state
     const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
     return (
       <ContentListItem
@@ -246,8 +245,9 @@ export class Favorites extends React.Component {
         userLang={props.user.lang}
         key={favorite.contentId}
         isLast={isLast}
-        breadcrumbsList={contentBreadcrumbsList[index]}
-        commentsCount={contentCommentsCountList[index]}
+        breadcrumbsList={state.contentBreadcrumbsList[index]}
+        commentsCount={state.contentCommentsCountList[index]}
+        customClass='favorites__item'
       >
         {favoriteButton}
       </ContentListItem>
@@ -258,7 +258,7 @@ export class Favorites extends React.Component {
     const { props } = this
     return (
       <div className='tracim__content-scrollview'>
-        <PageWrapper customClass='advancedSearch__wrapper'>
+        <PageWrapper customClass='favorites__wrapper'>
           <PageTitle
             title={props.t('Favorites')}
             icon='far fa-star'
@@ -270,12 +270,12 @@ export class Favorites extends React.Component {
                 <FavoritesHeader />
                 {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
               </PageContent>
-              )
+            )
             : (
               <span className='favorites__no_favorite'>
                 {props.t('You did not add any content as favorite yet.')}
               </span>
-              )}
+            )}
         </PageWrapper>
       </div>
     )

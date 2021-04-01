@@ -26,16 +26,6 @@
     text-align center
     width 90px
 
-.contentListItem
-  &__favoriteButton
-    font-size fontSizeTitle
-    text-align center
-    width 90px
-  &__link
-    // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
-    // 90px == favorite button column width
-    width calc(100% - 90px)
-
 .unavailableContent
   &__name_warning
     display flex
@@ -43,16 +33,26 @@
   &__warning
     font-size fontSizeSmall
 
-.favorites__no_favorite
-  margin-inline-start 40px
-  font-size fontSizeTitle
+.favorites
+  &__no_favorite
+    margin-inline-start 40px
+    font-size fontSizeTitle
+  &__item
+    &__favoriteButton
+      font-size fontSizeTitle
+      text-align center
+      width 90px
+    &__link
+      // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
+      // 90px == favorite button column width
+      width calc(100% - 90px)
 
 @media (max-width: max-lg)
   .favoritesHeader
     &__type
       width 50px
-  .contentListItem
-    &__link
+  .favorites
+    &__item__link
       // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
       // 50px == favorite button column width
       width calc(100% - 50px)

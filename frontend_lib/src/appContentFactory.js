@@ -40,9 +40,9 @@ import {
   putContentRestoreDelete,
   getMyselfKnownMember,
   getCommentTranslated,
-  addContentToFavoriteList,
+  postContentToFavoriteList,
   getFavoriteContentList,
-  removeContentFromFavoriteList
+  deleteContentFromFavoriteList
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -418,16 +418,16 @@ export function appContentFactory (WrappedComponent) {
     })
 
     addContentToFavoriteList = async (content, loggedUser, setState) => {
-      const response = await addContentToFavoriteList(
+      const response = await handleFetchResult(await postContentToFavoriteList(
         this.apiUrl,
         loggedUser.userId,
         content.content_id
-      )
+      ))
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while adding content to favorites'))
         return
       }
-      const newFavorite = await response.json()
+      const newFavorite = response.body
       setState(previousState => {
         return {
           favoriteList: [...previousState.favoriteList, newFavorite]
@@ -436,11 +436,11 @@ export function appContentFactory (WrappedComponent) {
     }
 
     removeContentFromFavoriteList = async (content, loggedUser, setState) => {
-      const response = await removeContentFromFavoriteList(
+      const response = await handleFetchResult(await deleteContentFromFavoriteList(
         this.apiUrl,
         loggedUser.userId,
         content.content_id
-      )
+      ))
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
         return
@@ -455,13 +455,13 @@ export function appContentFactory (WrappedComponent) {
     }
 
     loadFavoriteContentList = async (loggedUser, setState) => {
-      const response = await getFavoriteContentList(this.apiUrl, loggedUser.userId)
+      const response = await handleFetchResult(await getFavoriteContentList(this.apiUrl, loggedUser.userId))
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
         setState({ favoriteList: [] })
         return
       }
-      const favorites = await response.json()
+      const favorites = response.body
       setState({ favoriteList: favorites.items })
     }
 

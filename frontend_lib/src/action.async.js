@@ -138,10 +138,10 @@ export const getFavoriteContentList = (apiUrl, userId) => {
   return baseFetch('GET', `${apiUrl}/users/${userId}/favorite-contents`)
 }
 
-export const addContentToFavoriteList = (apiUrl, userId, contentId) => {
+export const postContentToFavoriteList = (apiUrl, userId, contentId) => {
   return baseFetch('POST', `${apiUrl}/users/${userId}/favorite-contents`, { content_id: contentId })
 }
 
-export const removeContentFromFavoriteList = (apiUrl, userId, contentId) => {
+export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
   return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
 }
