@@ -264,10 +264,18 @@ export class Favorites extends React.Component {
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
           />
-          <PageContent>
-            <FavoritesHeader />
-            {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-          </PageContent>
+          {props.favoriteList.length > 0
+            ? (
+              <PageContent>
+                <FavoritesHeader />
+                {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
+              </PageContent>
+              )
+            : (
+              <span className='favorites__no_favorite'>
+                {props.t('You did not add any content as favorite yet.')}
+              </span>
+              )}
         </PageWrapper>
       </div>
     )

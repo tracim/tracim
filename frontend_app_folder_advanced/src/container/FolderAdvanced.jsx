@@ -20,7 +20,10 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent
+  TracimComponent,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -128,6 +131,7 @@ export class FolderAdvanced extends React.Component {
 
   async componentDidMount () {
     await this.loadContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -295,13 +299,25 @@ export class FolderAdvanced extends React.Component {
 
         <PopinFixedOption>
           <div className='folder_advanced__header'>
-            {state.showRefreshWarning && (
-              <RefreshWarningMessage
-                tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                onClickRefresh={this.handleClickRefresh}
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
               />
-            )}
-
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+            </ToolBar>
             <div className='folder_advanced__header__deleteButton'>
               {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
