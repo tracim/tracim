@@ -71,6 +71,16 @@ function setup_config_file {
         loggood "color.json already exists"
     fi
 
+    if [ ! -f ../frontend/dist/assets/branding/welcome-simple.html ]; then
+        log "Creating default welcome page ..."
+        for sample_file in ../frontend/dist/assets/branding/*.sample; do
+            base=$(basename "${sample_file}")
+            cp "${sample_file}" "${sample_file%.*}" && loggood "Successfully copied ${base}" || logerror "Failed to copy ${base}"
+        done
+    else
+        loggood "welcome page already exists"
+    fi
+
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
         log "Removing folder 'sessions_data' in '$DEFAULTDIR/backend'"
         rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "Successfully removed the sessions_data folder" || logerror "Failed to remove the sessions_data folder"

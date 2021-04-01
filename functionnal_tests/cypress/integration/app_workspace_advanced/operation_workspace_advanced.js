@@ -28,18 +28,18 @@ describe('App Workspace Advanced', function () {
         .find('.dashboard__workspace__detail__right__button.btn')
         .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.workspace_advanced__description__text__textarea')
-        .clear()
-        .type(newDescription)
+      cy.waitForTinyMCELoaded().then(() => {
+        cy.clearTinyMCE().then(() => {
+          cy.typeInTinyMCE(newDescription).then(() => {
+            cy.get('.workspace_advanced__description__bottom__btn')
+              .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.workspace_advanced__description__bottom__btn')
-        .click()
-
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__description')
-        .contains(newDescription)
+            cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+              .find('.dashboard__workspace__detail__description')
+              .contains(newDescription)
+          })
+        })
+      })
     })
   })
 
