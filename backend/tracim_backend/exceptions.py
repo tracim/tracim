@@ -545,7 +545,11 @@ class UsernameAlreadyExists(TracimException):
 
 
 class UnavailablePreview(TracimException):
-    error_code = ErrorCode.UNAIVALABLE_PREVIEW
+    error_code = ErrorCode.UNAVAILABLE_FILE_PREVIEW
+
+
+class UnavailableURLPreview(TracimException):
+    error_code = ErrorCode.UNAVAILABLE_URL_PREVIEW
 
 
 class EmptyNotificationError(TracimException):

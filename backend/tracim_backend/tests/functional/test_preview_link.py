@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 import pytest
 import responses
 
+from tracim_backend.error import ErrorCode
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 # INFO - G.M - 30-03-2021 Opengraph protocol example,
@@ -97,11 +98,12 @@ class TestUrlPreview(object):
         assert res.json_body == endpoint_result
 
     @responses.activate
-    def test_api__url_preview__err_502__do_not_exist(
+    def test_api__url_preview__err_400__do_not_exist(
         self, web_testapp,
     ):
         params = {"url": "http://thisurldoesnotexist.invalid"}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=502,
+        res = web_testapp.get(
+            "/api/url-preview?{params}".format(params=urlencode(params)), status=400,
         )
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_URL_PREVIEW
