@@ -15,28 +15,28 @@ describe('Login page', function () {
   it('should allow login with email and logout', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .type(defaultAdmin.email)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .type(defaultAdmin.password)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .click()
 
     cy.get('.menuprofil__dropdown__name.btn')
@@ -50,28 +50,28 @@ describe('Login page', function () {
   it('should allow login with username and logout', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .type(defaultAdmin.username)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .type(defaultAdmin.password)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .click()
 
     cy.get('.menuprofil__dropdown__name.btn')
