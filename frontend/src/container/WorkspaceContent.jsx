@@ -29,7 +29,8 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   PAGE,
-  TracimComponent
+  TracimComponent,
+  IconButton
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -283,14 +284,6 @@ export class WorkspaceContent extends React.Component {
           folderIdInUrl.filter(id => id !== SHARE_FOLDER_ID)
         )
     )
-
-  galleryButton = () => {
-    const { props } = this
-
-    // on click, render gallery
-    // définir la route
-
-  }
 
     const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
@@ -733,10 +726,12 @@ export class WorkspaceContent extends React.Component {
             />
 
             <PageContent parentClass='workspace__content'>
-              <ContentTypeBtn
-                onClick={this.galleryButton}
+              <IconButton
+                onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                text={props.t('Open the gallery')}
+                icon='fa-fw far fa-image'
+                hexcolor= {GLOBAL_primaryColor}
               />
-
               {userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <DropdownCreateButton
                   folderId={null} // null because it is workspace root content
