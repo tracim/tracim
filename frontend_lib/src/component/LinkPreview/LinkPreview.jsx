@@ -6,19 +6,6 @@ import { handleFetchResult } from '../../helper.js'
 
 const MAX_DESCRIPTION_LENGTH = 0 // 0 means no limit
 
-function getDomain (url) {
-  // RJ - NOTE - 2021-03-30
-  // - getDomain("http://perdu.com") if given "perdu.com"
-  // - getDomain("https://example.org/index.html") = "example.org"
-  // - getDomain("https://example.org:443/index.html") = "example.org"
-  // - getDomain("https://example.org:443") = "example.org"
-  // Returns the original URL if the regular expression does not match it.
-  // This function might have its place in helper.js.
-
-  const match = url.match(/^[a-z]+:\/\/([^/:]+)(?::[0-9]+)?(?:\/(?:[\s\S]+)?)?$/i)
-  return (match && match[1]) || url
-}
-
 export default class LinkPreview extends React.Component {
   constructor (props) {
     super(props)
@@ -101,7 +88,7 @@ export default class LinkPreview extends React.Component {
             <strong>{state.title}</strong>
           </div>
           <div className='linkPreview__content__link'>
-            {getDomain(state.url)}
+            {new URL(state.url).hostname}
           </div>
           <div className='linkPreview__content__description'>
             {state.description}
