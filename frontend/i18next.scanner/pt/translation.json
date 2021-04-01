@@ -432,11 +432,11 @@
   "Sign in": "Iniciar sessão",
   "Login:": "Identificador :",
   "Password:": "Palavra-passe :",
-  "Favorite": "__NOT_TRANSLATED__",
-  "content is not available": "__NOT_TRANSLATED__",
-  "Favorites": "__NOT_TRANSLATED__",
-  "An error has happened while fetching favorites": "__NOT_TRANSLATED__",
-  "An error has happened while removing the favorite": "__NOT_TRANSLATED__",
-  "{{contentLabel}} has been removed from your favorites.": "__NOT_TRANSLATED__",
-  "You did not add any content as favorite yet.": "__NOT_TRANSLATED__"
+  "Favorite": "Favorito",
+  "content is not available": "o conteúdo não está disponível",
+  "Favorites": "Favoritos",
+  "An error has happened while fetching favorites": "Aconteceu um erro ao procurar os favoritos",
+  "An error has happened while removing the favorite": "Aconteceu um erro ao remover os favoritos",
+  "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} foi removido dos seus favoritos.",
+  "You did not add any content as favorite yet.": "Ainda não acrescentou nenhum conteúdo como favorito."
 }
