@@ -19,6 +19,7 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.reaction import Reaction
 
@@ -250,6 +251,19 @@ class CleanupLib(object):
 
     def delete_user_associated_data(self, user: User) -> None:
         """deleted all stuff about user except user itself, his workspaces and user content"""
+
+        # INFO - G.M - 2021-03-22 UserFavoriteContent
+        favorites_contents = self.session.query(FavoriteContent).filter(
+            FavoriteContent.user_id == user.user_id
+        )
+        for favorite_content in favorites_contents:
+            logger.info(
+                self,
+                "delete favorite_content {} from user {}".format(
+                    favorite_content.content_id, favorite_content.user_id
+                ),
+            )
+            self.safe_delete(favorite_content)
 
         # INFO - G.M - 2019-12-11 - user permission
         upload_permissions = self.session.query(UploadPermission).filter(

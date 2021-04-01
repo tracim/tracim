@@ -35,6 +35,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
@@ -57,6 +58,8 @@ from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import AuthoredContentRevisionsInfos
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import FavoriteContentInContext
+from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
@@ -67,6 +70,7 @@ from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -1323,6 +1327,7 @@ class ContentApi(object):
         This method does NOT copy some info related to content:
         - reactions on content or children (reaction table)
         - content share link (content_shares table element) on content or children content
+        - user content favorites (favorite_contents table)
 
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
@@ -2100,3 +2105,122 @@ class ContentApi(object):
             return query.one()
         except NoResultFound as exc:
             raise ContentNotFound("User {} did not author any content".format(user_id)) from exc
+
+    def get_user_favorite_contents(
+        self,
+        user_id: int,
+        order_by_properties: typing.Optional[
+            typing.List[typing.Union[str, QueryableAttribute]]
+        ] = None,
+    ) -> PaginatedObject:
+        """
+        Return all user favorite content using some filters
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: List of contents
+        """
+        favorite_content_ids_tuple = (
+            self._get_content_marked_as_favorite_query(user_id=user_id)
+            .with_entities(Content.id)
+            .all()
+        )
+        favorite_content_ids = [elem[0] for elem in favorite_content_ids_tuple]
+        paged_favorites = self._get_user_favorite_contents(
+            user_id=user_id, order_by_properties=[FavoriteContent.created],
+        )
+        favorites = []
+        for favorite in paged_favorites:
+            content = None
+            if favorite.content_id in favorite_content_ids:
+                content = self.get_content_in_context(favorite.content)
+            favorites.append(FavoriteContentInContext(favorite, content))
+        return PaginatedObject(paged_favorites, favorites)
+
+    def _get_content_marked_as_favorite_query(self, user_id: int):
+        query = (
+            self.get_all_query(
+                parent_ids=None,
+                content_type_slug=content_type_list.Any_SLUG,
+                workspace=None,
+                label=None,
+            )
+            .join(FavoriteContent, Content.id == FavoriteContent.content_id)
+            .filter(FavoriteContent.user_id == user_id)
+        )
+        return query
+
+    def _get_user_favorite_contents(
+        self,
+        user_id: int,
+        order_by_properties: typing.Optional[
+            typing.List[typing.Union[str, QueryableAttribute]]
+        ] = None,
+        page_token: typing.Optional[str] = None,
+        count: typing.Optional[int] = None,
+    ) -> Page:
+        """
+        Return all user favorite content using some filters
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: List of contents
+        """
+        query = self._session.query(FavoriteContent).filter(FavoriteContent.user_id == user_id)
+        for _property in order_by_properties:
+            query = query.order_by(_property)
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
+
+    def get_one_user_favorite_content_in_context(
+        self, favorite_content: FavoriteContent
+    ) -> FavoriteContentInContext:
+        try:
+            content = self.get_content_in_context(self.get_one(favorite_content.content_id))
+        except ContentNotFound:
+            content = None
+        return FavoriteContentInContext(favorite_content, content)
+
+    def get_one_user_favorite_content(self, user_id: int, content_id: int) -> FavoriteContent:
+        try:
+            return (
+                self._session.query(FavoriteContent)
+                .filter(
+                    FavoriteContent.user_id == user_id, FavoriteContent.content_id == content_id
+                )
+                .one()
+            )
+        except NoResultFound:
+            raise FavoriteContentNotFound(
+                "Favorite of content {content_id} and user {user_id} was not found .".format(
+                    content_id=content_id, user_id=user_id
+                )
+            )
+
+    def add_favorite(self, content: Content, do_save: bool = True) -> FavoriteContent:
+        try:
+            # INFO - G.M - 2021-03-22 - If favorite already exist, accept without
+            # recreating the favorite
+            favorite = self.get_one_user_favorite_content(
+                user_id=self._user.user_id, content_id=content.content_id
+            )
+        except FavoriteContentNotFound:
+            favorite = FavoriteContent(
+                user=self._user,
+                content=content,
+                original_type=content.type,
+                original_label=content.label,
+            )
+            self._session.add(favorite)
+            if do_save:
+                self._session.flush()
+        return favorite
+
+    def remove_favorite(self, content: Content, do_save: bool = True) -> None:
+        self._session.query(FavoriteContent).filter(
+            FavoriteContent.user_id == self._user.user_id,
+            FavoriteContent.content_id == content.content_id,
+        ).delete()
+        if do_save:
+            self._session.flush()

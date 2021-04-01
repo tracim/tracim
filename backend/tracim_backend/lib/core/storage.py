@@ -13,7 +13,7 @@ from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import PageOfPreviewNotFound
