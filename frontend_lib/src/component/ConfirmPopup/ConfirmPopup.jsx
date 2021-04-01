@@ -20,6 +20,7 @@ const ConfirmPopup = (props) => (
       <div className='confirm_popup__body__btn'>
         <IconButton
           customClass='confirm_popup__body__btn__item'
+          color={props.customColor ? props.customColor : undefined}
           icon={props.cancelIcon}
           text={props.cancelLabel || props.t('Cancel')}
           title={props.cancelLabel || props.t('Cancel')}

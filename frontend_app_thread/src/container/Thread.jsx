@@ -489,6 +489,7 @@ export class Thread extends React.Component {
               customClass={`${state.config.slug}__contentpage`}
               customColor={state.config.hexcolor}
               loggedUser={state.loggedUser}
+              memberList={state.config.workspace.memberList}
               apiUrl={state.config.apiUrl}
               timelineData={state.timeline}
               newComment={state.newComment}

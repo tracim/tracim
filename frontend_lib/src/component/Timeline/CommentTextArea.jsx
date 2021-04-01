@@ -37,14 +37,11 @@ export class CommentTextArea extends React.Component {
   componentDidMount () {
     const { props } = this
     if (props.wysiwyg) {
-      console.log('componentDidMount')
-      globalThis.wysiwyg(`#${props.id}`, props.lang, props.onChangeNewComment)
-      props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange) // needed ?
+      props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    console.log('componentDidUpdate')
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
       this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
@@ -55,7 +52,6 @@ export class CommentTextArea extends React.Component {
   }
 
   searchForMentionCandidate = async () => {
-    console.log('searchForMentionCandidate')
     const mentionCandidate = this.getMentionCandidate(this.props.newComment)
     if (mentionCandidate === undefined) {
       if (this.state.isAutoCompleteActivated) this.setState({ isAutoCompleteActivated: false })
@@ -71,7 +67,6 @@ export class CommentTextArea extends React.Component {
   }
 
   getMentionCandidate = newComment => {
-    console.log('getMentionCandidate')
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
@@ -84,7 +79,6 @@ export class CommentTextArea extends React.Component {
   }
 
   handleInputKeyDown = e => {
-    console.log('handleInputKeyDown')
     if (this.props.wysiwyg || !this.state.isAutoCompleteActivated) return
     const { state } = this
 
@@ -126,7 +120,6 @@ export class CommentTextArea extends React.Component {
   // See https://github.com/tracim/tracim/issues/3639
 
   handleClickAutoCompleteItem = (autoCompleteItem) => {
-    console.log('handleClickAutoCompleteItem')
     if (!autoCompleteItem.mention) {
       console.log('Error: this member does not have a username')
       return
@@ -162,7 +155,6 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceInput = (e, position) => {
-    console.log('handleTinyMceInput')
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
@@ -172,9 +164,7 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceKeyDown = event => {
-    console.log('handleTinyMceKeyDown')
     const { state } = this
-
     tinymceAutoCompleteHandleKeyDown(
       event,
       this.setState.bind(this),
@@ -186,9 +176,7 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceKeyUp = (event) => {
-    console.log('handleTinyMceKeyUp')
     const { state } = this
-
     tinymceAutoCompleteHandleKeyUp(
       event,
       this.setState.bind(this),
@@ -198,7 +186,6 @@ export class CommentTextArea extends React.Component {
   }
 
   handleTinyMceSelectionChange = (e, position) => {
-    console.log('handleTinyMceSelectionChange')
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
       this.props.searchForMentionInQuery,

@@ -991,6 +991,7 @@ export class HtmlDocument extends React.Component {
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
+                  memberList={state.config.workspace.memberList}
                   timelineData={state.timeline}
                   newComment={state.newComment}
                   newCommentAsFileList={state.newCommentAsFileList}

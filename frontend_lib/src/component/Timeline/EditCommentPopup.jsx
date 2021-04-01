@@ -17,14 +17,13 @@ const wysiwygIdSelector = `#${wysiwygId}`
 export class EditCommentPopup extends React.Component {
   constructor (props) {
     super(props)
+    props.setApiUrl(props.apiUrl)
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
     this.state = {
-      invalidMentionList: [],
-      newComment: props.comment || '',
-      showInvalidMentionPopupInComment: false // props
+      newComment: props.comment || ''
     }
   }
 
@@ -74,7 +73,7 @@ export class EditCommentPopup extends React.Component {
           newComment={state.newComment}
           onChangeNewComment={this.handleChangeNewComment}
           onInitWysiwyg={this.handleInitWysiwyg}
-          searchForMentionInQuery={this.searchForMentionInQuery} // TODO mentions not working
+          searchForMentionInQuery={this.searchForMentionInQuery}
           lang={props.loggedUserLanguage}
           wysiwyg
         />

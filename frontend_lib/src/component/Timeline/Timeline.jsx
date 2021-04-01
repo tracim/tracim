@@ -8,6 +8,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
+import { handleInvalidMentionInComment } from '../../mention.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -30,10 +31,12 @@ export class Timeline extends React.Component {
     ])
 
     this.state = {
-      showEditCommentPopup: false,
-      showDeleteCommentPopup: false,
       commentToDelete: null,
-      newComment: {}
+      invalidMentionList: [],
+      newComment: {},
+      showDeleteCommentPopup: false,
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
     }
   }
 
@@ -61,14 +64,47 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = () => {
+  handleClickValidateEditComment = async () => {
     const { props, state } = this
-    this.setState({ showEditCommentPopup: false })
+
+    if (!handleInvalidMentionInComment(
+      props.memberList,
+      true,
+      state.newComment.raw_content,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayEditComment()
+    }
+  }
+
+  handleClickValidateAnywayEditComment = () => {
+    const { props, state } = this
+    this.setState({
+      invalidMentionList: [],
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
+    })
     props.onClickEditComment(state.newComment)
+  }
+
+  handleCloseInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickCancelSave()
+      : this.setState({ showInvalidMentionPopupInComment: false })
+  }
+
+  handleValidateInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickSaveAnyway()
+      : this.handleClickValidateAnywayEditComment()
   }
 
   render () {
     const { props, state } = this
+    const invalidMentionList = props.invalidMentionList.length ? props.invalidMentionList : state.invalidMentionList
+    const showInvalidMentionPopup = props.showInvalidMentionPopup || state.showInvalidMentionPopupInComment
 
     if (!Array.isArray(props.timelineData)) {
       console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
@@ -174,16 +210,16 @@ export class Timeline extends React.Component {
           })}
         </ScrollToBottomWrapper>
 
-        {props.showInvalidMentionPopup && (
+        {showInvalidMentionPopup && (
           <ConfirmPopup
-            onConfirm={props.onClickCancelSave}
-            onClose={props.onClickCancelSave}
-            onCancel={props.onClickSaveAnyway}
+            onConfirm={this.handleCloseInvalidMentionPopup}
+            onClose={this.handleCloseInvalidMentionPopup}
+            onCancel={this.handleValidateInvalidMentionPopup}
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
                 <div className='timeline__texteditor__mentions'>
-                  {props.invalidMentionList.join(', ')}
+                  {invalidMentionList.join(', ')}
                 </div>
               </>
             }
@@ -316,6 +352,7 @@ Timeline.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object,
+  memberList: PropTypes.array,
   onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
@@ -350,6 +387,7 @@ Timeline.defaultProps = {
   customColor: '',
   id: '',
   isDeprecated: false,
+  memberList: [],
   loggedUser: {
     userId: '',
     name: '',

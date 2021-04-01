@@ -1,11 +1,14 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
+  CONTENT_TYPE,
   formatAbsoluteDate,
+  PAGE,
   removeExtensionOfFilename
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
@@ -77,14 +80,6 @@ export const CommentFilePreview = props => {
               buttonIcon='fas fa-ellipsis-v'
               buttonTooltip={props.t('Actions')}
             >
-              <button
-                className='transparentButton'
-                onClick={props.onClickEditComment}
-                key='editComment'
-              >
-                {props.t('Edit')}
-              </button>
-
               <button
                 className='transparentButton'
                 onClick={props.onClickDeleteComment}

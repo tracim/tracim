@@ -172,14 +172,17 @@ export class FeedItemWithPreview extends React.Component {
             id={props.content.id}
             invalidMentionList={state.invalidMentionList}
             loggedUser={props.user}
+            memberList={props.memberList}
             newComment={state.newComment}
             newCommentAsFileList={state.newCommentAsFileList}
             onChangeNewComment={this.handleChangeNewComment}
             onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+            onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
+            onClickEditComment={comment => this.handleClickEditComment(comment)}
             onClickValidateNewCommentBtn={this.handleClickSend}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onInitWysiwyg={this.handleInitWysiwyg}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             shouldScrollToBottom={false}
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             showTitle={false}
@@ -189,8 +192,6 @@ export class FeedItemWithPreview extends React.Component {
             onClickSaveAnyway={this.handleClickValidateAnyway}
             searchForMentionInQuery={this.searchForMentionInQuery}
             workspaceId={props.workspaceId}
-            onClickEditComment={comment => this.handleClickEditComment(comment)}
-            onClickDeleteComment={comment => this.handleClickDeleteComment(comment)}
           />
         )}
       </div>

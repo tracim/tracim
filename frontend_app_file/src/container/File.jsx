@@ -901,6 +901,7 @@ export class File extends React.Component {
           apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
+          memberList={state.config.workspace.memberList}
           newComment={state.newComment}
           newCommentAsFileList={state.newCommentAsFileList}
           disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
