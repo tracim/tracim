@@ -13,7 +13,7 @@ const serializeFavoriteProps = {
   content_id: 'contentId',
   user_id: 'userId',
   original_label: 'originalLabel',
-  original_ee: 'originalEe'
+  original_type: 'originalType'
 }
 
 const serializeFavorite = (apiFavorite) => {

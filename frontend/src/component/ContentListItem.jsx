@@ -67,7 +67,7 @@ const ContentListItem = (props) => {
       customClass='contentListItem'
     >
       <div
-        className='contentListItem__type__content'
+        className='contentListItem__type'
         style={{ color: props.contentTypeInfo.hexcolor }}
       >
         <Icon

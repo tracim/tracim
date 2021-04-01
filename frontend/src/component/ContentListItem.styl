@@ -1,5 +1,8 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
+// NOTE - S.G. - 2021-04-01 - The positioning properties (flex/sizes) of the "columns"
+// should be kept in sync with Favorites.styl
+// Or a better solution (flex-grid?) be implemented.
 .contentListItem
   display flex
   justify-content space-between
@@ -11,55 +14,29 @@
   &__link
     z-index 1
     position absolute
-    // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
-    // 35px = fontSizeTitle + margin
-    width calc(100% - 35px)
+    width 100%
     height 100%
-  & > .favoriteButton
-    font-size fontSizeTitle
-    margin-inline-end 10px
-  &__typeAndTitle
-    display none
   &__type
-    &__content
-      font-size fontSizeTitle
-      display flex
-      flex-direction column
-      align-items center
-      width 90px
-      place-content center
-      & > span
-        font-size fontSizeSmall
-    &__header
-      margin 15px 25px
-      text-align center
-      align-self center
+    font-size fontSizeTitle
+    display flex
+    flex-direction column
+    align-items center
+    width 90px
+    place-content center
+    & > span
+      font-size fontSizeSmall
   &__name_path
     flex 2
     text-overflow ellipsis
     overflow hidden
-    width 0
     white-space nowrap
-  &__title
-    padding 0 5px
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
-    color fontColor
-    align-self center
-    flex 2
-    width 0
   &__modification
-    align-self center
     flex 1
     &.timedEvent
-      margin-left 15px
-      margin-right 10px
       overflow hidden
   &__information
+    flex 1
     color fontColor
-    align-self center
-    margin-inline-end 5px
     width 160px
     display flex
     align-items center

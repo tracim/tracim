@@ -10,7 +10,8 @@ import {
   PageTitle,
   PageWrapper,
   TracimComponent,
-  FavoriteButton
+  FavoriteButton,
+  FAVORITE_STATE
 } from 'tracim_frontend_lib'
 
 import {
@@ -27,6 +28,30 @@ import {
 } from '../action-creator.async.js'
 
 import ContentListItem from '../component/ContentListItem.jsx'
+
+require('../css/Favorites.styl')
+
+const FavoritesHeader = translate()((props) => {
+  return (
+    <div className='favoritesHeader content__header'>
+      <div className='favoritesHeader__type'>
+        {props.t('Type')}
+      </div>
+      <div className='favoritesHeader__title'>
+        {props.t('Title and path')}
+      </div>
+      <div className='favoritesHeader__modification'>
+        {props.t('Last Modification')}
+      </div>
+      <div className='favoritesHeader__information'>
+        {props.t('Information_plural')}
+      </div>
+      <div className='favoritesHeader__favoriteButton'>
+        {props.t('Favorite')}
+      </div>
+    </div>
+  )
+})
 
 export class Favorites extends React.Component {
   constructor (props) {
@@ -89,7 +114,7 @@ export class Favorites extends React.Component {
     }
     props.dispatch(removeFavorite(favorite))
     props.dispatch(newFlashMessage(props.t(
-      'The content {{contentLabel}} has been removed from your favorites.',
+      '{{contentLabel}} has been removed from your favorites.',
       { contentLabel: this.getAvailableLabel(favorite) }
     ), 'info'))
   }
@@ -112,19 +137,22 @@ export class Favorites extends React.Component {
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
           />
-
-          <PageContent parentClass=''>
-            {props.favoriteList.map(favorite => (
+          <PageContent>
+            <FavoritesHeader />
+            {props.favoriteList.map((favorite, index) => (
               <ContentListItem
                 content={favorite.content}
                 contentTypeInfo={props.contentType.find(info => info.slug === favorite.content.type)}
                 userLang={props.user.lang}
                 key={favorite.contentId}
+                isLast={index === props.favoriteList.length - 1}
               >
                 <FavoriteButton
-                  favoriteState='favorite'
+                  // By definition a favorite is in the favorite list :-)
+                  favoriteState={FAVORITE_STATE.FAVORITE}
                   onClickRemoveFromFavoriteList={() => this.handleClickRemoveFromFavoriteList(favorite)}
                   onClickAddToFavoriteList={() => {}}
+                  customClass='contentListItem__favoriteButton'
                 />
               </ContentListItem>
             ))}
