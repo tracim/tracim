@@ -17,14 +17,7 @@
     width 100%
     height 100%
   &__type
-    font-size fontSizeTitle
-    display flex
-    flex-direction column
-    align-items center
     width 90px
-    place-content center
-    & > span
-      font-size fontSizeSmall
   &__name_path
     flex 2
     text-overflow ellipsis
@@ -37,12 +30,9 @@
   &__information
     flex 1
     color fontColor
-    width 160px
     display flex
-    align-items center
     &__comments
       display inline-block
-      min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
       padding-right 10px
     & > *
       font-size fontSizeSmall
@@ -53,17 +43,10 @@
 @media (max-width: max-lg)
   .contentListItem
     &__type
-      &__header
-        margin 15px 10px
-      &__content
-        width 50px
-        & > span
-          display none
+      width 50px
     &__modification
       overflow hidden
       text-overflow ellipsis
-    &__name_path
-      padding-inline-start 10px
   .timedEvent.contentListItem__modification
     & .timedEvent__operation
       display none
@@ -75,20 +58,8 @@
 
 @media (max-width: max-sm)
   .contentListItem
-    & .contentListItem
-      &__type__content
-        width 50px
-      &__title
-        padding 0 5px
-    &__modification
-      display none
-    &__typeAndTitle
-      display unset
-      padding 15px 5px
-      flex 2
-  .content__header
-    & .contentListItem
-      &__title
+    &__name_path
+      & > .breadcrumbs
         display none
-  .advancedSearch__content .content .breadcrumbs
+    &__modification
       display none

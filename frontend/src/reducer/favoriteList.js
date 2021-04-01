@@ -19,11 +19,13 @@ const serializeFavoriteProps = {
 const serializeFavorite = (apiFavorite) => {
   return {
     ...serialize(apiFavorite, serializeFavoriteProps),
-    content: {
-      ...serialize(apiFavorite.content, serializeContentProps),
-      author: serialize(apiFavorite.content.author, serializeUserProps),
-      lastModifier: serialize(apiFavorite.content.last_modifier, serializeUserProps)
-    }
+    content: apiFavorite.content
+      ? {
+          ...serialize(apiFavorite.content, serializeContentProps),
+          author: serialize(apiFavorite.content.author, serializeUserProps),
+          lastModifier: serialize(apiFavorite.content.last_modifier, serializeUserProps)
+        }
+      : null
   }
 }
 

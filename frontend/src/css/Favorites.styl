@@ -15,6 +15,9 @@
     text-align center
   &__title
     flex 2
+  &__title-max-sm
+    flex 2
+    display none
   &__modification
     flex 1
   &__information
@@ -32,3 +35,34 @@
     // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
     // 90px == favorite button column width
     width calc(100% - 90px)
+
+.unavailableContent
+  &__name_warning
+    display flex
+    flex-direction column
+  &__warning
+    font-size fontSizeSmall
+
+@media (max-width: max-lg)
+  .favoritesHeader
+    &__type
+      width 50px
+  .contentListItem
+    &__link
+      // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
+      // 50px == favorite button column width
+      width calc(100% - 50px)
+
+@media (max-width: max-md)
+  .favoritesHeader
+    &__information
+      display none
+
+@media (max-width: max-sm)
+  .favoritesHeader
+    &__modification
+      display none
+    &__title
+      display none
+    &__title-max-sm
+      display unset

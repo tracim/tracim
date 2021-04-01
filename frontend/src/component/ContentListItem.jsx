@@ -11,6 +11,7 @@ import {
   FilenameWithExtension,
   PAGE
 } from 'tracim_frontend_lib'
+import ContentType from './ContentType.jsx'
 import TimedEvent from './TimedEvent.jsx'
 
 require('./ContentListItem.styl')
@@ -51,8 +52,8 @@ const ContentListItem = (props) => {
     props.contentTypeInfo.slug,
     content.id
   )
-  const commentCountTitle = props.commentCount !== null
-    ? numberCommentsTitle(props.commentCount, props.t)
+  const commentCountTitle = Number.isInteger(props.commentsCount)
+    ? numberCommentsTitle(props.commentsCount, props.t)
     : null
 
   const statusInfo = props.contentTypeInfo.availableStatuses.find(
@@ -66,22 +67,15 @@ const ContentListItem = (props) => {
       isLast={props.isLast}
       customClass='contentListItem'
     >
-      <div
-        className='contentListItem__type'
-        style={{ color: props.contentTypeInfo.hexcolor }}
-      >
-        <Icon
-          icon={`fa-fw ${props.contentTypeInfo.faIcon}`}
-          title={props.t(props.contentTypeInfo.label)}
-          color={props.contentTypeInfo.hexcolor}
-        />
-        <span>{props.t(props.contentTypeInfo.label)}</span>
-      </div>
+      <ContentType
+        contentTypeInfo={props.contentTypeInfo}
+        customClass='contentListItem__type'
+      />
 
       <div className='contentListItem__name_path'>
         <FilenameWithExtension file={content} />
         <Breadcrumbs
-          breadcrumbsList={props.contentPath}
+          breadcrumbsList={props.breadcrumbsList}
           keepLastBreadcrumbAsLink
         />
       </div>
@@ -96,14 +90,14 @@ const ContentListItem = (props) => {
 
       <div className='contentListItem__information'>
         {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
-          <div>
+          <>
             {commentCountTitle && (
               <span className='contentListItem__information__comments'>
                 <Icon
                   icon='fa-fw far fa-comment'
                   title={commentCountTitle}
                 />
-                <span title={commentCountTitle}>{props.commentCount}</span>
+                <span title={commentCountTitle}>{props.commentsCount}</span>
               </span>
             )}
             <span className='contentListItem__information__status'>
@@ -118,7 +112,7 @@ const ContentListItem = (props) => {
                 {props.t(statusInfo.label)}
               </span>
             </span>
-          </div>
+          </>
         )}
       </div>
       {props.children}
@@ -131,14 +125,14 @@ ContentListItem.propTypes = {
   content: PropTypes.object.isRequired,
   contentTypeInfo: PropTypes.object.isRequired,
   userLang: PropTypes.string.isRequired,
-  contentPath: PropTypes.arrayOf(PropTypes.object),
-  commentCount: PropTypes.number,
+  breadcrumbsList: PropTypes.arrayOf(PropTypes.string),
+  commentsCount: PropTypes.number,
   isLast: PropTypes.bool
 }
 
 ContentListItem.defaultProps = {
-  contentPath: [],
-  commentCount: null,
+  breadcrumbsList: [],
+  commentsCount: null,
   isLast: false
 }
 
