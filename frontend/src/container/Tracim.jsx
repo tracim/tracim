@@ -36,7 +36,8 @@ import {
   getUserProfile,
   toggleFavicon,
   FETCH_CONFIG,
-  SEARCH_TYPE
+  SEARCH_TYPE,
+  WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import {
   getAppList,
@@ -88,7 +89,6 @@ const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 export class Tracim extends React.Component {
   constructor (props) {
     super(props)
-
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,

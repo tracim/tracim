@@ -95,7 +95,7 @@
     <!-- NOTE - SG - 2021-03-23 - changing the id of this div must be propagated to the login page component.
          Currently it is Login.jsx.
       -->
-    <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
+    <div id="welcome" hidden><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>

@@ -434,9 +434,11 @@
   "Password:": "Mot de passe :",
   "Favorite": "Favori",
   "content is not available": "le contenu n'est pas disponible",
-  "Favorites": "Favorites",
+  "Favorites": "Favoris",
   "An error has happened while fetching favorites": "Une erreur est survenue pendant la récupération des favoris",
   "An error has happened while removing the favorite": "Une erreur est survenue pendant la suppression du favori",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} a été supprimé de vos favoris.",
-  "You did not add any content as favorite yet.": "Vous n'avez pas ajouté de contenu dans les favoris."
+  "You did not add any content as favorite yet.": "Vous n'avez pas ajouté de contenu dans les favoris.",
+  "moved": "déplacé",
+  "copied": "copié"
 }

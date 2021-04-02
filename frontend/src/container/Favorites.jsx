@@ -248,6 +248,7 @@ export class Favorites extends React.Component {
         breadcrumbsList={state.contentBreadcrumbsList[index]}
         commentsCount={state.contentCommentsCountList[index]}
         customClass='favorites__item'
+        dataCy='favorites__item'
       >
         {favoriteButton}
       </ContentListItem>

@@ -438,5 +438,7 @@
   "An error has happened while fetching favorites": "An error has happened while fetching favorites",
   "An error has happened while removing the favorite": "An error has happened while removing the favorite",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} has been removed from your favorites.",
-  "You did not add any content as favorite yet.": "You did not add any content as favorite yet."
+  "You did not add any content as favorite yet.": "You did not add any content as favorite yet.",
+  "moved": "moved",
+  "copied": "copied"
 }

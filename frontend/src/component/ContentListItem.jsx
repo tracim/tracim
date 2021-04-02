@@ -14,31 +14,9 @@ import {
 } from 'tracim_frontend_lib'
 import ContentType from './ContentType.jsx'
 import TimedEvent from './TimedEvent.jsx'
+import { getRevisionTypeLabel } from '../util/helper.js'
 
 require('./ContentListItem.styl')
-
-const getRevisionTypeLabel = (revisionType, t) => {
-  switch (revisionType) {
-    case 'revision':
-      return t('modified')
-    case 'creation':
-      return t('created')
-    case 'edition':
-      return t('modified')
-    case 'undeletion':
-      return t('undeleted')
-    case 'mention':
-      return t('mention made')
-    case 'content-comment':
-      return t('commented')
-    case 'status-update':
-      return t('status modified')
-    case 'unknown':
-      return t('unknown')
-  }
-
-  return revisionType
-}
 
 const numberCommentsTitle = (numberComments, t) => {
   if (numberComments === 0) return t('0 comments')
@@ -67,6 +45,7 @@ const ContentListItem = (props) => {
       contentType={props.contentTypeInfo}
       isLast={props.isLast}
       customClass={classnames('contentListItem', props.customClass)}
+      dataCy={props.dataCy}
     >
       <ContentType
         contentTypeInfo={props.contentTypeInfo}
@@ -135,14 +114,16 @@ ContentListItem.propTypes = {
   breadcrumbsList: PropTypes.arrayOf(PropTypes.string),
   commentsCount: PropTypes.number,
   isLast: PropTypes.bool,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 ContentListItem.defaultProps = {
   breadcrumbsList: [],
   commentsCount: null,
   isLast: false,
-  customClass: null
+  customClass: null,
+  dataCy: null
 }
 
 export default translate()(ContentListItem)

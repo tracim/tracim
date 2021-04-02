@@ -45,12 +45,10 @@ import {
   putUserLang,
   getAccessibleWorkspaces
 } from '../action-creator.async.js'
-import { COOKIE_FRONTEND } from '../util/helper.js'
+import { COOKIE_FRONTEND, WELCOME_ELEMENT_ID } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
-
-const WELCOME_ELEMENT_ID = 'welcome'
 
 class Login extends React.Component {
   constructor (props) {
@@ -60,8 +58,10 @@ class Login extends React.Component {
     // statically in the loaded HTML page so that its content can be parsed by
     // search engines' robots.
     // A copy of its html is made in order to display it in this component (see render()).
-    // Then the original element is hidden as it is not used.
+    // Then the original element is also hidden in Tracim.jsx as it is not used visually and this component
+    // is not rendered when the user is already logged in.
     const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
+    welcomeElement.hidden = false
     this.state = {
       inputRememberMe: false,
       welcomeHtml: welcomeElement.innerHTML
