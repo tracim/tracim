@@ -10,7 +10,6 @@ import {
   appContentFactory,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  CONTENT_TYPE,
   handleInvalidMentionInComment,
   PAGE,
   Timeline,
