@@ -100,7 +100,8 @@ export class Favorites extends React.Component {
 
     this.state = {
       contentCommentsCountList: [],
-      contentBreadcrumbsList: []
+      contentBreadcrumbsList: [],
+      hasLoadedFavoriteList: false
     }
 
     props.registerCustomEventHandlerList([
@@ -181,7 +182,7 @@ export class Favorites extends React.Component {
     })
     const contentBreadcrumbsList = await Promise.all(contentBreadcrumbsFetchList)
 
-    this.setState({ contentCommentsCountList, contentBreadcrumbsList })
+    this.setState({ contentCommentsCountList, contentBreadcrumbsList, hasLoadedFavoriteList: true })
     props.dispatch(setFavoriteList(favoriteList))
   }
 
@@ -256,7 +257,11 @@ export class Favorites extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
+    // NOTE - S.G. - 2021-04-02 - added as if a favorite list is present then one
+    // favorite content is made unavailable, the list is not sync-ed and shouldn't be used
+    // until it has been re-loaded by this component.
+    if (!state.hasLoadedFavoriteList) return null
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
