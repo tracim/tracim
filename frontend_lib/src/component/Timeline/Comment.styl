@@ -18,9 +18,19 @@
       flex 1
       display flex
       &__text
+        width calc(100% - 44px) // 44px is the avatar size
         margin-top 10px
       &__textAndPreview
         margin-left 20px
+      &__actions
+        padding 0
+        color grey
+        &::after
+          display none
+        &:hover
+          color fontColor
+    &__author
+      margin-left 20px
     &__date
       font-size 12px
     p img

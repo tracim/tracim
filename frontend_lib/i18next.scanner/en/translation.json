@@ -181,9 +181,13 @@
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
   "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
-  "Remove from favorites": "Remove from favorites",
-  "Add to favorites": "Add to favorites",
-  "Error while adding content to favorites": "Error while adding content to favorites",
-  "Error while removing content from favorites": "Error while removing content from favorites",
-  "Error while getting favorites": "Error while getting favorites"
+  "Remove from favorites": "Remove from favourites",
+  "Add to favorites": "Add to favourites",
+  "Error while adding content to favorites": "Error while adding content to favourites",
+  "Error while removing content from favorites": "Error while removing content from favourites",
+  "Error while getting favorites": "Error while getting favourites",
+  "Actions": "Actions",
+  "Edit comment": "Edit comment",
+  "Delete comment": "Delete comment",
+  "Error while deleting the comment": "Error while deleting the comment"
 }

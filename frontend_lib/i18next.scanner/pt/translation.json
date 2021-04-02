@@ -185,5 +185,9 @@
   "Add to favorites": "Adicionar aos favoritos",
   "Error while adding content to favorites": "Erro ao adicionar conteúdo aos favoritos",
   "Error while removing content from favorites": "Erro ao eliminar conteúdo dos favoritos",
-  "Error while getting favorites": "Erro ao obter favoritos"
+  "Error while getting favorites": "Erro ao obter favoritos",
+  "Actions": "Ações",
+  "Edit comment": "Editar o comentário",
+  "Delete comment": "Eliminar o comentário",
+  "Error while deleting the comment": "Erro ao eliminar o comentário"
 }

@@ -1,11 +1,14 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
 import PropTypes from 'prop-types'
 import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 
 const Comment = props => {
@@ -52,6 +55,32 @@ const Comment = props => {
               </div>
               <LinkPreview apiUrl={props.apiUrl} findLinkInHTML={props.text} />
             </div>
+
+            <DropdownMenu
+              buttonCustomClass='comment__body__content__actions'
+              buttonIcon='fas fa-ellipsis-v'
+              buttonTooltip={props.t('Actions')}
+            >
+              <IconButton
+                icon='fas fa-fw fa-pencil-alt'
+                intent='link'
+                key='editComment'
+                mode='dark'
+                onClick={props.onClickEditComment}
+                text={props.t('Edit')}
+                title={props.t('Edit comment')}
+              />
+
+              <IconButton
+                icon='far fa-fw fa-trash-alt'
+                intent='link'
+                key='deleteComment'
+                mode='dark'
+                onClick={props.onClickDeleteComment}
+                text={props.t('Delete')}
+                title={props.t('Delete comment')}
+              />
+            </DropdownMenu>
           </div>
           <div
             className={classnames(`${props.customClass}__footer`, 'comment__footer')}
@@ -75,7 +104,7 @@ const Comment = props => {
   )
 }
 
-export default Comment
+export default translate()(Comment)
 
 Comment.propTypes = {
   customClass: PropTypes.string,
@@ -88,6 +117,8 @@ Comment.propTypes = {
   createdDistance: PropTypes.string,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
   onClickTranslate: PropTypes.func,
   onClickRestore: PropTypes.func
 }
@@ -98,5 +129,7 @@ Comment.defaultProps = {
   createdFormated: '',
   createdDistance: '',
   fromMe: false,
-  translationState: TRANSLATION_STATE.DISABLED
+  translationState: TRANSLATION_STATE.DISABLED,
+  onClickEditComment: () => {},
+  onClickDeleteComment: () => {}
 }

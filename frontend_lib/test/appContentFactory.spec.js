@@ -60,6 +60,8 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentDeleteComment',
+        'appContentEditComment',
         'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
@@ -77,7 +79,9 @@ describe('appContentFactory.js', () => {
         'addContentToFavoriteList',
         'isContentInFavoriteList',
         'loadFavoriteContentList',
-        'removeContentFromFavoriteList'
+        'removeContentFromFavoriteList',
+        'removeCommentFromTimeline',
+        'updateCommentOnTimeline'
       )
     })
   })

@@ -185,5 +185,9 @@
   "Add to favorites": "Ajouter aux favoris",
   "Error while adding content to favorites": "Error pendant l'ajout du contenu aux favoris",
   "Error while removing content from favorites": "Erreur pendant le retrait du contenu des favoris",
-  "Error while getting favorites": "Erreur pendant la récupération des favoris"
+  "Error while getting favorites": "Erreur pendant la récupération des favoris",
+  "Actions": "Actions",
+  "Edit comment": "Modifier le commentaire",
+  "Delete comment": "Supprimer le commentaire",
+  "Error while deleting the comment": "Erreur pendant la suppression du commentaire"
 }

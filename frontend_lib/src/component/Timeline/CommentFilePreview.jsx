@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
@@ -8,6 +9,8 @@ import {
   removeExtensionOfFilename
 } from '../../helper.js'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 export const CommentFilePreview = props => {
   const styleSent = {
@@ -68,6 +71,22 @@ export const CommentFilePreview = props => {
                 />
               </div>
             </div>
+
+            <DropdownMenu
+              buttonCustomClass='comment__body__content__actions'
+              buttonIcon='fas fa-ellipsis-v'
+              buttonTooltip={props.t('Actions')}
+            >
+              <IconButton
+                icon='far fa-fw fa-trash-alt'
+                intent='link'
+                key='deleteComment'
+                mode='dark'
+                onClick={props.onClickDeleteComment}
+                text={props.t('Delete')}
+                title={props.t('Delete comment')}
+              />
+            </DropdownMenu>
           </div>
 
           <div className={classnames(`${props.customClass}__footer`, 'comment__footer')}>
@@ -84,7 +103,7 @@ export const CommentFilePreview = props => {
   )
 }
 
-export default CommentFilePreview
+export default translate()(CommentFilePreview)
 
 CommentFilePreview.propTypes = {
   customClass: PropTypes.string,

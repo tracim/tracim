@@ -1,4 +1,5 @@
 .confirm_popup
+  z-index 21
   .cardPopup__container
     width 400px
   &__body
@@ -8,5 +9,5 @@
     &__btn
       display flex
       justify-content flex-end
-      .btn:first-child
+      &__item:not(:last-child)
         margin-right 15px
