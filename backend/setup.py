@@ -76,6 +76,7 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
+    "webpreview",
 ]
 
 tests_require = [

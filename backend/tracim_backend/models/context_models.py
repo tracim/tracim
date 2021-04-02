@@ -7,6 +7,7 @@ from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
+from urllib.parse import unquote
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -712,6 +713,11 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
+
+
+class UrlQuery:
+    def __init__(self, url: str):
+        self.url = unquote(url)
 
 
 class TranslationQuery:
