@@ -6,8 +6,10 @@ import {
   appContentFactory,
   addAllResourceI18n,
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
+  PAGE,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -326,7 +328,7 @@ export class Thread extends React.Component {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
-      state.config.workspace.memberList,
+      state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
       state.newComment,
       this.setState.bind(this)
@@ -398,6 +400,15 @@ export class Thread extends React.Component {
       comment.parent_id,
       comment.content_id
     )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
   }
 
   handleContentCommentModified = (data) => {
@@ -506,7 +517,7 @@ export class Thread extends React.Component {
               customClass={`${state.config.slug}__contentpage`}
               customColor={state.config.hexcolor}
               loggedUser={state.loggedUser}
-              memberList={state.config.workspace.memberList}
+              memberList={state.config.workspace && state.config.workspace.memberList}
               apiUrl={state.config.apiUrl}
               timelineData={state.timeline}
               newComment={state.newComment}
@@ -546,6 +557,7 @@ export class Thread extends React.Component {
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
               onClickEditComment={this.handleClickEditComment}
               onClickDeleteComment={this.handleClickDeleteComment}
+              onClickOpenFileComment={this.handleClickOpenFileComment}
             />
           ) : null}
         </PopinFixedContent>

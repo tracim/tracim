@@ -9,6 +9,7 @@ import {
   appContentFactory,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   getCurrentContentVersionNumber,
   getInvalidMentionList,
@@ -16,6 +17,7 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   NewVersionBtn,
+  PAGE,
   PopinFixed,
   PopinFixedContent,
   PopinFixedHeader,
@@ -811,6 +813,15 @@ export class HtmlDocument extends React.Component {
     )
   }
 
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
   handleContentCommentModified = (data) => {
     const { props, state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
@@ -1037,6 +1048,7 @@ export class HtmlDocument extends React.Component {
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
                   onClickEditComment={this.handleClickEditComment}
                   onClickDeleteComment={this.handleClickDeleteComment}
+                  onClickOpenFileComment={this.handleClickOpenFileComment}
                 />
               ) : null
             }]}

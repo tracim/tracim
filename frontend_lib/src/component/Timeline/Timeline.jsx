@@ -204,6 +204,7 @@ export class Timeline extends React.Component {
                     loggedUser={props.loggedUser}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     key={`commentAsFile_${content.content_id}`}
+                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
             }
@@ -374,6 +375,7 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func,
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
   onClickRestoreComment: PropTypes.func
 }
 
@@ -413,5 +415,6 @@ Timeline.defaultProps = {
   onClickTranslateComment: content => { },
   onClickDeleteComment: () => {},
   onClickRestoreComment: content => { },
-  onClickEditComment: () => {}
+  onClickEditComment: () => {},
+  onClickOpenFileComment: () => {}
 }
