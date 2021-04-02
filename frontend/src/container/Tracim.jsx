@@ -97,6 +97,13 @@ export class Tracim extends React.Component {
 
     this.liveMessageManager = new LiveMessageManager()
 
+    // NOTE - S.G. - Unconditionally hide the original welcome element
+    // so that it does not interfere with Tracim render.
+    // It is not done statically in index.mak because search engine robots have a tendency to
+    // ignore hidden elements…
+    const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
+    welcomeElement.hidden = true
+
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
       { name: CUSTOM_EVENT.ADD_FLASH_MSG, handler: this.handleAddFlashMessage },

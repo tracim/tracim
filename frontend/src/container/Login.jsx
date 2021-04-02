@@ -58,6 +58,7 @@ class Login extends React.Component {
     // statically in the loaded HTML page so that its content can be parsed by
     // search engines' robots.
     // A copy of its html is made in order to display it in this component (see render()).
+    // The original welcome element is hidden unconditionally in Tracim.jsx
     const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
       inputRememberMe: false,
