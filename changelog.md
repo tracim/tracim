@@ -2,7 +2,7 @@
 
 ### New Features
 
-- You can create your own publications to share informations with other member without creating a specific content (like a blog page)
+- You can create your own publications to share information with other members without creating a specific content (like a blog page)
 - You can add reactions to contents using emojis like usable in social networking platform
 - The activity feed of a space is now visible in the dashboard and replaces the recent activity view.
 
