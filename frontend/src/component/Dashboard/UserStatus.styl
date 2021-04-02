@@ -1,44 +1,24 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .userstatus
-  position relative
-  top 70px
-  border-radius 5px
-  padding 40px
-  background-color offWhite
-  text-align center
-  font-size fontSizeMedium
   &__role
     display flex
     align-items center
-    padding 25px 0 15px 0
+    justify-content center
+    margin-bottom 10px
+    &__icon
+      margin 0 5px
     &__text
-      margin-left 15px
-      text-align left
-  &__notification
+      font-weight bold
+  &__informations
     display flex
-    align-items center
-    padding 20px 0 10px 0
-    cursor pointer
-    &__text
-      margin-left 15px
-      text-align left
-
-@media (min-width: min-md) and (max-width: max-md)
-  .userstatus
-    top 0
-    &__wrapper
-      top 0
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .userstatus
-    top 0
-    &__wrapper
-      top 0
-
-@media (max-width: max-xs)
-  .userstatus
-    top 0
-    padding 20px 30px
-    &__wrapper
-      top 0
+    text-align center
+    font-size fontSizeSmall
+    width 100%
+    &__notification
+      margin auto
+      cursor pointer
+      & .btnswitch
+        justify-content center
+    &__requests
+      margin auto

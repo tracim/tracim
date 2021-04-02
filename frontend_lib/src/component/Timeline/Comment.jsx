@@ -9,6 +9,7 @@ import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -33,23 +34,26 @@ const Comment = props => {
               user={props.author}
               apiUrl={props.apiUrl}
             />
-            <div className='comment__body__content__text'>
-              <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-                {props.author.public_name}
-              </div>
+            <div className='comment__body__content__textAndPreview'>
+              <div className='comment__body__content__text'>
+                <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
+                  {props.author.public_name}
+                </div>
 
-              <div
-                className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
-                title={props.createdFormated}
-              >
-                {props.createdDistance}
-              </div>
+                <div
+                  className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
+                  title={props.createdFormated}
+                >
+                  {props.createdDistance}
+                </div>
 
-              <div
-                className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
-              >
-                <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
+                <div
+                  className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
+                >
+                  <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>{props.text}</HTMLContent>
+                </div>
               </div>
+              <LinkPreview apiUrl={props.apiUrl} findLinkInHTML={props.text} />
             </div>
 
             <DropdownMenu

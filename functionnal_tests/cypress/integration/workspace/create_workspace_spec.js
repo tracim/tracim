@@ -29,8 +29,7 @@ describe('Workspace', () => {
 
     cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: 1 } })
       .get('.dashboard')
-      .get('[data-cy="dashboardWorkspaceLabel"]')
-      .contains(spaceTitle)
+      .contains('.pageTitleGeneric__title__label', spaceTitle)
 
     cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
       .should('exist')

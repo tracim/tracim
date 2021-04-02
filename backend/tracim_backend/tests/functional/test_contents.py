@@ -3117,7 +3117,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3195,7 +3195,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3646,7 +3646,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3725,7 +3725,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -4179,7 +4179,7 @@ class TestThreads(object):
         res = web_testapp.get(
             "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=400
         )
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
         """

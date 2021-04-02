@@ -96,6 +96,19 @@ if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
     ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
 fi
 
+# Create welcome page files if they do not exist
+mkdir -p /etc/tracim/branding
+for sample_file in /tracim/frontend/dist/assets/branding/*.sample; do
+    base=$(basename "$sample_file")
+    file="${base%.*}"
+    if [ ! -f "/etc/tracim/branding/$file" ]; then
+        cp "$sample_file" "/etc/tracim/branding/$file"
+    fi
+    if [ ! -L "/tracim/frontend/dist/assets/branding/$file" ]; then
+        ln -s "/etc/tracim/branding/$file" "/tracim/frontend/dist/assets/branding/$file"
+    fi
+done
+
 # Create folder for plugins (backend) and custom_toolbox (frontend)
 if [ ! -d /etc/tracim/plugins ]; then
     mkdir /etc/tracim/plugins -p

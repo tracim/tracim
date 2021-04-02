@@ -15,9 +15,13 @@
     display flex
     flex-direction column
     &__content
+      flex 1
       display flex
       &__text
         width calc(100% - 44px) // 44px is the avatar size
+        margin-top 10px
+      &__textAndPreview
+        margin-left 20px
       &__actions
         padding 0
         color grey
@@ -28,11 +32,7 @@
     &__author
       margin-left 20px
     &__date
-      margin-left 20px
       font-size 12px
-    &__text
-      margin-left 20px
-      margin-top 10px
     p img
       max-width 100%
       height auto

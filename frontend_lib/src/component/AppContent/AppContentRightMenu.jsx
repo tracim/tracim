@@ -48,7 +48,7 @@ AppContentRightMenu.propTypes = {
 
 AppContentRightMenu.defaultProps = {
   mode: undefined,
-  onClickArchive: () => {}
+  onClickArchive: undefined // see https://github.com/tracim/tracim/issues/2347
 }
 
 export default AppContentRightMenu

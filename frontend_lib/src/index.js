@@ -236,6 +236,7 @@ export {
 
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 
 export {
   TRANSLATION_STATE,

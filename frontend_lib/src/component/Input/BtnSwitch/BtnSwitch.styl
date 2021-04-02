@@ -1,5 +1,19 @@
 @import '../../../css/Variable.styl'
 
+.smallSize
+  & .switch
+    width 30px
+    height 17px
+  & .slider.round
+    border-radius 17px
+    &:before
+      height 13px
+      width 13px
+      left 2px
+      bottom 2px
+  & input:checked + .slider:before
+    transform translateX(13px)
+
 .btnswitch
   display flex
   align-items center
@@ -56,4 +70,3 @@ input:checked + .slider:before
 
 .slider.round:before
   border-radius: 50%
-
