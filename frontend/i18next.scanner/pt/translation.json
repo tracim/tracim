@@ -430,5 +430,14 @@
   "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Sign in": "Iniciar sessão",
   "Login:": "Identificador :",
-  "Password:": "Palavra-passe :"
+  "Password:": "Palavra-passe :",
+  "Favorite": "Favorito",
+  "content is not available": "o conteúdo não está disponível",
+  "Favorites": "Favoritos",
+  "An error has happened while fetching favorites": "Aconteceu um erro ao procurar os favoritos",
+  "An error has happened while removing the favorite": "Aconteceu um erro ao remover os favoritos",
+  "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} foi removido dos seus favoritos.",
+  "You did not add any content as favorite yet.": "Ainda não acrescentou nenhum conteúdo como favorito.",
+  "moved": "movido",
+  "copied": "copiado"
 }

@@ -59,7 +59,9 @@ import {
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
   CUSTOM_PROPERTIES_SCHEMA,
-  USER_PUBLIC_PROFILE
+  USER_PUBLIC_PROFILE,
+  FAVORITE_LIST,
+  FAVORITE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -1237,4 +1239,50 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     }
   )
   return result
+}
+
+export const getFavoriteContentList = (userId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: FAVORITE_LIST,
+    dispatch
+  })
+}
+
+export const postContentToFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: { content_id: contentId }
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const deleteContentFromFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents/${contentId}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'DELETE'
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
 }

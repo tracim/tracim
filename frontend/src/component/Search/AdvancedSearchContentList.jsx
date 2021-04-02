@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   Breadcrumbs,
@@ -10,32 +11,9 @@ import {
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
 import TimedEvent from '../TimedEvent.jsx'
-import PropTypes from 'prop-types'
+import { getRevisionTypeLabel } from '../../util/helper.js'
 
 require('./AdvancedSearchContentList.styl')
-
-const getRevisionTypeLabel = (revisionType, t) => {
-  switch (revisionType) {
-    case 'revision':
-      return t('modified')
-    case 'creation':
-      return t('created')
-    case 'edition':
-      return t('modified')
-    case 'undeletion':
-      return t('undeleted')
-    case 'mention':
-      return t('mention made')
-    case 'content-comment':
-      return t('commented')
-    case 'status-update':
-      return t('status modified')
-    case 'unknown':
-      return t('unknown')
-  }
-
-  return revisionType
-}
 
 export const AdvancedSearchContentList = props => {
   const resultList = props.contentSearch.resultList.map((searchItem) => {

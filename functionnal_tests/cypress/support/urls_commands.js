@@ -16,7 +16,8 @@ const PAGES = {
   RECENT_ACTIVITIES: 'recent-activities',
   PUBLICATION: 'publication',
   PROFILE: 'profile',
-  WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities'
+  WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities',
+  FAVORITES: 'favorites'
 }
 
 const URLS = {
@@ -37,7 +38,8 @@ const URLS = {
   [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace',
   [PAGES.RECENT_ACTIVITIES]: () => '/ui/recent-activities',
   [PAGES.PUBLICATION]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/publications`,
-  [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`
+  [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`,
+  [PAGES.FAVORITES]: () => 'ui/favorites'
 }
 
 /**

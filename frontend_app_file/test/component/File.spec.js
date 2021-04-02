@@ -27,7 +27,9 @@ describe('<File />', () => {
     registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
-    t: key => key
+    t: key => key,
+    isContentInFavoriteList: () => false,
+    loadFavoriteContentList: () => {}
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()

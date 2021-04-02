@@ -42,7 +42,10 @@ import {
   putContentRestoreArchive,
   putContentRestoreDelete,
   getMyselfKnownMember,
-  getCommentTranslated
+  getCommentTranslated,
+  postContentToFavoriteList,
+  getFavoriteContentList,
+  deleteContentFromFavoriteList
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
@@ -478,6 +481,60 @@ export function appContentFactory (WrappedComponent) {
       translationState: initialCommentTranslationState
     })
 
+    addContentToFavoriteList = async (content, loggedUser, setState) => {
+      const response = await handleFetchResult(await postContentToFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      ))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while adding content to favorites'))
+        return
+      }
+      const newFavorite = response.body
+      setState(previousState => {
+        return {
+          favoriteList: [...previousState.favoriteList, newFavorite]
+        }
+      })
+    }
+
+    removeContentFromFavoriteList = async (content, loggedUser, setState) => {
+      const response = await handleFetchResult(await deleteContentFromFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      ))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
+        return
+      }
+      setState(previousState => {
+        return {
+          favoriteList: previousState.favoriteList.filter(
+            favorite => favorite.content_id !== content.content_id
+          )
+        }
+      })
+    }
+
+    loadFavoriteContentList = async (loggedUser, setState) => {
+      const response = await handleFetchResult(await getFavoriteContentList(this.apiUrl, loggedUser.userId))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
+        setState({ favoriteList: [] })
+        return
+      }
+      const favorites = response.body
+      setState({ favoriteList: favorites.items })
+    }
+
+    isContentInFavoriteList = (content, state) => {
+      return state.favoriteList && state.favoriteList.some(
+        favorite => favorite.content_id === content.content_id
+      )
+    }
+
     buildTimelineItemCommentAsFile = (content, loggedUser) => ({
       ...content,
       timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
@@ -638,6 +695,10 @@ export function appContentFactory (WrappedComponent) {
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
+          isContentInFavoriteList={this.isContentInFavoriteList}
+          addContentToFavoriteList={this.addContentToFavoriteList}
+          removeContentFromFavoriteList={this.removeContentFromFavoriteList}
+          loadFavoriteContentList={this.loadFavoriteContentList}
           removeCommentFromTimeline={this.removeCommentFromTimeline}
           updateCommentOnTimeline={this.updateCommentOnTimeline}
         />

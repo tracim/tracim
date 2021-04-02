@@ -430,5 +430,14 @@
   "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
   "Sign in": "Sign in",
   "Login:": "Login:",
-  "Password:": "Password:"
+  "Password:": "Password:",
+  "Favorite": "Favourite",
+  "content is not available": "content is not available",
+  "Favorites": "Favourites",
+  "An error has happened while fetching favorites": "An error has happened while fetching favourites",
+  "An error has happened while removing the favorite": "An error has happened while removing the favourite",
+  "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} has been removed from your favourites.",
+  "You did not add any content as favorite yet.": "You did not add any content as favourite yet.",
+  "moved": "moved",
+  "copied": "copied"
 }

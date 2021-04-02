@@ -47,7 +47,10 @@ import {
   getTranslationApiErrorMessage,
   TRANSLATION_STATE,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE
+  CONTENT_NAMESPACE,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -231,8 +234,8 @@ export class HtmlDocument extends React.Component {
 
   async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
-
     await this.loadContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -889,8 +892,19 @@ export class HtmlDocument extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div> {/* this div in display flex, justify-content space-between */}
-            <div className='d-flex'>
+          <div>
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+              />
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
@@ -918,7 +932,7 @@ export class HtmlDocument extends React.Component {
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
-            </div>
+            </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               content={state.content}

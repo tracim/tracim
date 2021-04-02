@@ -76,6 +76,10 @@ describe('appContentFactory.js', () => {
         'searchForMentionInQuery',
         'handleTranslateComment',
         'handleRestoreComment',
+        'addContentToFavoriteList',
+        'isContentInFavoriteList',
+        'loadFavoriteContentList',
+        'removeContentFromFavoriteList',
         'removeCommentFromTimeline',
         'updateCommentOnTimeline'
       )

@@ -91,7 +91,7 @@ export class Sidebar extends React.Component {
     )
   }
 
-  getSidebarItem = (label, to) => {
+  getSidebarItem = (label, icon, to) => {
     return (
       <Link
         className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
@@ -107,7 +107,7 @@ export class Sidebar extends React.Component {
           title={label}
         >
           <Icon
-            icon='far fa-fw fa-newspaper'
+            icon={icon}
             title={label}
             color='white'
           />
@@ -186,7 +186,8 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
-                {this.getSidebarItem(props.t('Recent activities'), PAGE.RECENT_ACTIVITIES)}
+                {this.getSidebarItem(props.t('Recent activities'), 'far fa-fw fa-newspaper', PAGE.RECENT_ACTIVITIES)}
+                {this.getSidebarItem(props.t('Favorites'), 'far fa-fw fa-star', PAGE.FAVORITES)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
