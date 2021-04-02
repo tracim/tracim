@@ -41,6 +41,7 @@ import {
 import appFactory from '../util/appFactory.js'
 import {
   FETCH_CONFIG,
+  publicationColor,
   findUserRoleIdInWorkspace
 } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
@@ -438,7 +439,13 @@ export class Dashboard extends React.Component {
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
-    const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
+    const contentTypeButtonList = [{
+      slug: 'publications',
+      creationLabel: props.t('Publish some information'),
+      route: PAGE.WORKSPACE.PUBLICATION(props.curWs.id),
+      hexcolor: publicationColor,
+      faIcon: 'fas fa-stream'
+    }].concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
@@ -485,6 +492,7 @@ export class Dashboard extends React.Component {
           }
         })
       : []
+    )
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
