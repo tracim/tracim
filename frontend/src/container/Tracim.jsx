@@ -101,7 +101,7 @@ export class Tracim extends React.Component {
     // It is not done statically in index.mak because search engine robots have a tendency to
     // ignore hidden elements…
     const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
-    welcomeElement.hidden = true
+    if (welcomeElement) welcomeElement.hidden = true
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
