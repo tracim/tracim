@@ -7,6 +7,7 @@ describe('<Comment />', () => {
   const props = {
     customClass: 'randomCustomClass',
     author: { public_name: 'randomAuthor' },
+    loggedUser: { public_name: 'randomUser' },
     text: 'randomText',
     createdFormated: 'randomCreatedFormated',
     createdDistance: 'randomCreatedDistance',
@@ -14,6 +15,8 @@ describe('<Comment />', () => {
     workspaceId: 42,
     onClickTranslate: () => {},
     onClickRestore: () => {},
+    onClickEditComment: () => {},
+    onClickDeleteComment: () => {},
     fromMe: true
   }
 

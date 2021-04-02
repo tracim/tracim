@@ -390,6 +390,13 @@ class CFG(object):
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
+            "website.welcome_page", "welcome-simple.html"
+        )
+        self.WEBSITE__WELCOME_PAGE_STYLE = self.get_raw_config(
+            "website.welcome_page_style", "welcome-simple.css"
+        )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
             "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
@@ -497,6 +504,10 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+        self.URL_PREVIEW__FETCH_TIMEOUT = int(
+            self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
     def __load_uploaded_files_config(self) -> None:
@@ -999,6 +1010,13 @@ class CFG(object):
 
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
+
+        if self.URL_PREVIEW__FETCH_TIMEOUT < 1:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
+                    "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(

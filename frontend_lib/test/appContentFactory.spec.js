@@ -60,6 +60,8 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentDeleteComment',
+        'appContentEditComment',
         'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
@@ -73,7 +75,9 @@ describe('appContentFactory.js', () => {
         'buildTimelineFromCommentAndRevision',
         'searchForMentionInQuery',
         'handleTranslateComment',
-        'handleRestoreComment'
+        'handleRestoreComment',
+        'removeCommentFromTimeline',
+        'updateCommentOnTimeline'
       )
     })
   })

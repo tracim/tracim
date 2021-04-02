@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-require('./HTMLContent.styl')
+// require('./HTMLContent.styl')
 
 const HTMLContent = (props) => (
   <article

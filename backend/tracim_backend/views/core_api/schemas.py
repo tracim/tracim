@@ -44,6 +44,7 @@ from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
+from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -75,6 +76,7 @@ from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TranslationQuery
+from tracim_backend.models.context_models import UrlQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -709,6 +711,15 @@ class ContentIdPathSchema(marshmallow.Schema):
     )
 
 
+class ContentIdBodySchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        required=True,
+        description="id of a valid content",
+        validate=strictly_positive_int_validator,
+    )
+
+
 class RevisionIdPathSchema(marshmallow.Schema):
     revision_id = marshmallow.fields.Int(example=6, required=True)
 
@@ -804,6 +815,12 @@ class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndUserPath(**data)
+
+
+class UserContentIdPathSchema(UserIdPathSchema, ContentIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentAndUserPath(**data)
 
 
 class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
@@ -1568,6 +1585,19 @@ class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(ContentDigestSchema, many=True)
 
 
+class FavoriteContentSchema(marshmallow.Schema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content = marshmallow.fields.Nested(ContentDigestSchema, allow_none=True)
+    original_label = StrippedString(example="Intervention Report 12")
+    original_type = StrippedString(example="html-document", validate=all_content_types_validator)
+
+
+class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(FavoriteContentSchema, many=True)
+
+
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
@@ -1792,6 +1822,20 @@ class LiveMessageSchemaPage(BasePaginatedSchemaPage):
 
 class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
+
+
+class UrlQuerySchema(marshmallow.Schema):
+    url = marshmallow.fields.URL()
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> UrlQuery:
+        return UrlQuery(**data)
+
+
+class UrlPreviewSchema(marshmallow.Schema):
+    title = StrippedString(allow_none=True)
+    description = StrippedString(allow_none=True)
+    image = marshmallow.fields.URL(allow_none=True)
 
 
 class TranslationQuerySchema(FileQuerySchema):

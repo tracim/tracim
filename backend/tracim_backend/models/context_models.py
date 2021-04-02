@@ -7,6 +7,7 @@ from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
+from urllib.parse import unquote
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -38,6 +39,7 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -384,6 +386,16 @@ class WorkspaceAndUserPath(object):
         self.user_id = user_id
 
 
+class ContentAndUserPath(object):
+    """
+    Paths params with content id and user_id
+    """
+
+    def __init__(self, content_id: int, user_id: int) -> None:
+        self.content_id = content_id
+        self.user_id = user_id
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
@@ -701,6 +713,11 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
+
+
+class UrlQuery:
+    def __init__(self, url: str):
+        self.url = unquote(url)
 
 
 class TranslationQuery:
@@ -1843,3 +1860,35 @@ class AuthoredContentRevisionsInfos:
     def __init__(self, revisions_count: int, revisions_space_count: int) -> None:
         self.count = revisions_count
         self.space_count = revisions_space_count
+
+
+class FavoriteContentInContext:
+    """
+    Favorite Content objet for api, permitting to override content with the correct filter
+    """
+
+    def __init__(self, favorite_content: FavoriteContent, content: Content):
+        self._favorite_content = favorite_content
+        self._content = content
+
+    @property
+    def user_id(self) -> int:
+        return self._favorite_content.user_id
+
+    @property
+    def content_id(self) -> int:
+        return self._favorite_content.content_id
+
+    @property
+    def content(self) -> ContentInContext:
+        # INFO - G.M - 2021-03-24 - Overriding the content of the favorite content in order to
+        # handle access limitation here.
+        return self._content
+
+    @property
+    def original_label(self) -> str:
+        return self._favorite_content.original_label
+
+    @property
+    def original_type(self) -> str:
+        return self._favorite_content.original_type
