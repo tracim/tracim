@@ -1,13 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Redirect } from 'react-router-dom'
+import { withRouter, Redirect, Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import * as Cookies from 'js-cookie'
-import Card from '../component/common/Card/Card.jsx'
-import CardHeader from '../component/common/Card/CardHeader.jsx'
-import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
@@ -53,12 +50,23 @@ import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
 
+const WELCOME_ELEMENT_ID = 'welcome'
+
 class Login extends React.Component {
   constructor (props) {
     super(props)
+
+    // NOTE - SG - 2021-03-23 - the welcome DOM element is defined
+    // statically in the loaded HTML page so that its content can be parsed by
+    // search engines' robots.
+    // A copy of its html is made in order to display it in this component (see render()).
+    // Then the original element is hidden as it is not used.
+    const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
-      inputRememberMe: false
+      inputRememberMe: false,
+      welcomeHtml: welcomeElement.innerHTML
     }
+    welcomeElement.hidden = true
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
@@ -279,31 +287,20 @@ class Login extends React.Component {
     }
   }
 
-  handleClickForgotPassword = () => {
-    const { props } = this
-    props.history.push(
-      props.system.config.email_notification_activated
-        ? PAGE.FORGOT_PASSWORD
-        : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF
-    )
-  }
-
   render () {
-    const { props } = this
+    const { props, state } = this
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <section className='loginpage'>
-        <Card customClass='loginpage__card'>
-          <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
-            {props.t('Connection')}
-          </CardHeader>
-
-          <CardBody formClass='loginpage__card__form'>
-            <form onSubmit={this.handleClickSubmit} noValidate>
+      <div className='loginpage'>
+        <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
+        <section className='loginpage__main'>
+          <div className='loginpage__main__wrapper'>
+            <h1 className='loginpage__main__title'>{props.t('Sign in')}</h1>
+            <form onSubmit={this.handleClickSubmit} noValidate className='loginpage__main__form'>
+              <div>{props.t('Login:')}</div>
               <InputGroupText
-                parentClassName='loginpage__card__form__groupelogin'
-                customClass='mb-3 mt-4'
+                parentClassName='loginpage__main__form__groupelogin'
                 icon='fa-user'
                 type='text'
                 placeHolder={props.t('Email address or username')}
@@ -311,9 +308,9 @@ class Login extends React.Component {
                 maxLength={512}
                 name='login'
               />
-
+              <div>{props.t('Password:')}</div>
               <InputGroupText
-                parentClassName='loginpage__card__form__groupepw'
+                parentClassName='loginpage__main__form__groupepw'
                 customClass=''
                 icon='fa-lock'
                 type='password'
@@ -323,31 +320,26 @@ class Login extends React.Component {
                 name='password'
               />
 
-              <div className='row mt-4 mb-4'>
-                <div className='col-12 col-sm-6'>
-                  <div
-                    className='loginpage__card__form__pwforgot'
-                    onClick={this.handleClickForgotPassword}
-                  >
-                    {props.t('Forgotten password?')}
-                  </div>
-                </div>
+              <Link
+                className='loginpage__main__form__forgot_password'
+                to={props.system.config.email_notification_activated
+                  ? PAGE.FORGOT_PASSWORD
+                  : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
+              >
+                {props.t('Forgotten password?')}
+              </Link>
 
-                <div className='col-12 col-sm-6 d-flex align-items-end'>
-                  <Button
-                    htmlType='submit'
-                    bootstrapType=''
-                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
-                    label={props.t('Connection')}
-                  />
-                </div>
-              </div>
+              <Button
+                htmlType='submit'
+                bootstrapType=''
+                customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__main__form__btnsubmit ml-auto'
+                label={props.t('Connection')}
+              />
             </form>
-          </CardBody>
-        </Card>
-
-        <FooterLogin />
-      </section>
+          </div>
+          <FooterLogin />
+        </section>
+      </div>
     )
   }
 }

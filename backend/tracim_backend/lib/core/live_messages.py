@@ -7,7 +7,7 @@ from gripcontrol import HttpStreamFormat
 
 # TODO - G.M - 2020-05-14 - Use default event "message" for TLM to be usable with
 # "onmessage" EventSource Object in javascript.
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.models.event import Message
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
 

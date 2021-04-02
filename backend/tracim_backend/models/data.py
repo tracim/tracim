@@ -413,7 +413,6 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
     owner = relationship("User", remote_side=[User.user_id])
 
-    label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
@@ -424,7 +423,10 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
+    # INFO - G.M - same type are used for FavoriteContent.
+    label = Column(Unicode(1024), unique=False, nullable=False)
     type = Column(Unicode(32), unique=False, nullable=False)
+
     status = Column(
         Unicode(32),
         unique=False,

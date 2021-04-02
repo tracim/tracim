@@ -426,5 +426,9 @@
   "new requests": "new requests",
   "Publication": "Publication",
   "Your role:": "Your role:",
-  "{{newRequests}} new requests": "{{newRequests}} new requests"
+  "{{newRequests}} new requests": "{{newRequests}} new requests",
+  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
+  "Sign in": "Sign in",
+  "Login:": "Login:",
+  "Password:": "Password:"
 }
