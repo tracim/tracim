@@ -40,6 +40,13 @@ export class FeedItemHeader extends React.Component {
     return props.t('unknown')
   }
 
+  getTitleComponent (contentType, contentLabel) {
+    const { props } = this
+    return contentType === CONTENT_TYPE.FILE
+      ? <FilenameWithExtension file={props.content} customClass='content__name' />
+      : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
+  }
+
   render () {
     const { props } = this
     const contentId = props.content.id
@@ -58,25 +65,20 @@ export class FeedItemHeader extends React.Component {
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
     )
 
+    const icon = (props.isPublication && contentType === CONTENT_TYPE.THREAD) ? 'fas fa-stream' : app.faIcon
+
     return (
       <div className='feedItemHeader'>
         <Icon
           customClass='feedItemHeader__icon'
           color={props.isPublication ? publicationColor : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
-          icon={props.isPublication ? 'fa-fw fas fa-stream' : `fa-fw ${app.faIcon}`}
+          icon={`fa-fw ${icon}`}
         />
         <div className='feedItemHeader__title'>
-          <Link
-            to={props.isPublication
-              ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId)
-              : PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-          >
-            {(contentType === CONTENT_TYPE.FILE
-              ? <FilenameWithExtension file={props.content} customClass='content__name' />
-              : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
-            )}
-          </Link>
+          {props.titleLink
+            ? <Link to={props.titleLink}>{this.getTitleComponent(contentType, contentLabel)}</Link>
+            : <span>{this.getTitleComponent(contentType, contentLabel)}</span>}
           {props.breadcrumbsList && (
             <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
           )}
@@ -118,12 +120,12 @@ export class FeedItemHeader extends React.Component {
 
           <Link
             className='feedItemHeader__actionMenu__item'
-            title={props.t('Open content')}
+            title={props.t('Open as content')}
             to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
             key={`open-${contentId}`}
           >
             <i className={`fa-fw ${app.faIcon}`} />
-            {props.t('Open content')}
+            {props.t('Open as content')}
           </Link>
         </DropdownMenu>
       </div>
@@ -140,13 +142,14 @@ FeedItemHeader.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool,
+  isPublication: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
   modifiedDate: PropTypes.string,
-  onEventClicked: PropTypes.func
+  onEventClicked: PropTypes.func,
+  titleLink: PropTypes.string
 }
 
 FeedItemHeader.defaultProps = {
@@ -157,5 +160,6 @@ FeedItemHeader.defaultProps = {
   lastModificationSubEntityType: '',
   lastModificationType: '',
   lastModifier: {},
-  modifiedDate: ''
+  modifiedDate: '',
+  titleLink: null
 }

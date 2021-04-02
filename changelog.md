@@ -1,3 +1,27 @@
+# 3.7.0 / 2021-04-02
+
+### New Features
+
+- You can create your own publications to share information with other members without creating a specific content (like a blog page).
+- You can add reactions to contents using emojis like you can find on social networking platforms or instant messaging tools.
+- The activity feed of a space is now visible in the dashboard and replaces the recent activity view.
+
+### Fixed Issues
+
+- Frontend: [#4341](https://github.com/tracim/tracim/issues/4341)
+
+### Breaking Changes
+
+- Database: databases that were created using Tracim v1 need to be updated manually, [more information here](https://github.com/tracim/tracim/issues/4282#issuecomment-801944438) (issue [#4266](https://github.com/tracim/tracim/issues/4266)).
+
+### Other Changes
+
+- This new version requires a special migration for mysql/mariadb (due to the reaction feature): [tracimcli command line](https://github.com/tracim/tracim/blob/2a6aae281046e7a10bf4c5b24dfc60f81214c709/backend/doc/cli.md#migrate-mysqlmariadb-database-to-utf8mb4-added-for-tracim-37) (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+- API: this API`/api/workspaces/<workspace_id>/contents` now returns an object containing the contents in "items" instead of a direct list and also contains pagination information when the count/page_token parameters are used (issue [#4264](https://github.com/tracim/tracim/issues/4264)).
+- Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed to a simpler syntax for `user` and adds filtering for the new notification type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+  - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+
+
 # 3.6.1 / 2021-03-26
 
 ### Fixed Issues

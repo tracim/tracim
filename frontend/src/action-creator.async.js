@@ -1033,7 +1033,8 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
 export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
+  const filename = encodeURIComponent(label.replace(/\//g, '_'))
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${filename}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
@@ -1219,7 +1220,7 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
     { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
     { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
-    { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+    { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
   ]
   const result = await uploadFile(
     content,

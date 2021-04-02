@@ -108,7 +108,7 @@ class PopupCreateFile extends React.Component {
       { status: 400, code: 3002, message: props.t('A content with the same name already exists') },
       { status: 400, code: 6002, message: props.t('The file is larger than the maximum file size allowed') },
       { status: 400, code: 6003, message: props.t('Error, the space exceed its maximum size') },
-      { status: 400, code: 6004, message: props.t('You have reach your storage limit, you cannot add new files') }
+      { status: 400, code: 6004, message: props.t('You have reached your storage limit, you cannot add new files') }
     ]
     const defaultErrorMessage = props.t('Error while creating file')
     const additionalFormData = {

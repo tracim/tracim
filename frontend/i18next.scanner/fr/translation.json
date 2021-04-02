@@ -329,7 +329,8 @@
   "No preview available": "Prévisualisation indisponible",
   "Preview loading...": "Chargement de la prévisualisation...",
   "Unknown entity type": "Type d'entité inconnu",
-  "Open content": "Ouvrir le contenu",
+  "Open as content": "Ouvrir en tant que contenu",
+  "Open_action": "Ouvrir",
   "The link has been copied to clipboard": "Le lien a été copié dans le presse-papiers",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>Le role de {{userPublicName}}</0></0> a été changé en <2>{{role}}</2>",
@@ -427,7 +428,6 @@
   "Publication": "Publication",
   "Your role:": "Votre rôle :",
   "{{newRequests}} new requests": "{{newRequests}} nouvelles demandes",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Sign in": "Se connecter",
   "Login:": "Identifiant :",
   "Password:": "Mot de passe :",
@@ -439,5 +439,8 @@
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} a été supprimé de vos favoris.",
   "You did not add any content as favorite yet.": "Vous n'avez pas ajouté de contenu dans les favoris.",
   "moved": "déplacé",
-  "copied": "copié"
+  "copied": "copié",
+  "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "Download {{filename}}": "Télécharger {{filename}}",
+  "Show in publications": "Afficher dans les publications"
 }

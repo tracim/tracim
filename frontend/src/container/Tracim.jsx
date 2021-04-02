@@ -505,7 +505,7 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.PUBLICATION(':idws')}
+                  path={[PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts'), PAGE.WORKSPACE.PUBLICATIONS(':idws')]}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Publications />

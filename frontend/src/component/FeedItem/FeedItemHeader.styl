@@ -13,10 +13,11 @@
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
-  &__label
     color fontColor
-    &:hover
-      text-decoration underline fontColor
+    & > a
+      color inherit
+      &:hover
+        text-decoration underline fontColor
 
   &__right
     margin-left 10px

@@ -12,6 +12,7 @@ import {
   CUSTOM_EVENT,
   getContentComment,
   getFileChildContent,
+  getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
@@ -27,7 +28,8 @@ import {
   isFileUploadInErrorState,
   CONTENT_TYPE,
   AddFileToUploadButton,
-  DisplayFileToUpload
+  DisplayFileToUpload,
+  getFileDownloadUrl
 } from 'tracim_frontend_lib'
 import {
   CONTENT_NAMESPACE,
@@ -58,7 +60,7 @@ import {
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
-import FeedItemWithPreview from './FeedItemWithPreview.jsx'
+import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
 const wysiwygId = 'wysiwygTimelineCommentPublication'
 
@@ -84,7 +86,11 @@ export class Publications extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommented }
     ])
 
+    // NOTE - SG - 2021-03-25 - This will be set to the DOM element
+    // of the current publication coming from the URL (if any)
+    this.currentPublicationRef = null
     this.state = {
+      isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       newComment: '',
       newCommentAsFileList: [],
@@ -114,6 +120,11 @@ export class Publications extends React.Component {
       globalThis.tinymce.remove(`#${wysiwygId}`)
     }
     if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
+    if (this.currentPublicationRef && this.currentPublicationRef.current) {
+      this.currentPublicationRef.current.scrollIntoView({ behavior: 'instant' })
+      // Remove the ref as it has fulfilled its role
+      this.currentPublicationRef = null
+    }
   }
 
   componentWillUnmount () {
@@ -172,6 +183,7 @@ export class Publications extends React.Component {
   handleContentCreatedOrRestored = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     if (data.fields.content.parent_id !== null) return
+    this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
   }
 
@@ -261,6 +273,10 @@ export class Publications extends React.Component {
   buildBreadcrumbs = () => {
     const { props } = this
     const workspaceId = props.match.params.idws
+    const publicationId = props.match.params.idcts
+    const myLink = publicationId
+      ? PAGE.WORKSPACE.PUBLICATION(workspaceId, publicationId)
+      : PAGE.WORKSPACE.PUBLICATIONS(workspaceId)
     const breadcrumbsList = [
       {
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
@@ -269,7 +285,7 @@ export class Publications extends React.Component {
         isALink: true
       },
       {
-        link: PAGE.WORKSPACE.PUBLICATION(workspaceId),
+        link: myLink,
         type: BREADCRUMBS_TYPE.CORE,
         label: props.t('Publications'),
         isALink: false
@@ -332,7 +348,7 @@ export class Publications extends React.Component {
   handleChangeNewPublication = e => this.setState({ newComment: e.target.value })
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.PUBLICATION, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
@@ -345,8 +361,8 @@ export class Publications extends React.Component {
     const { props } = this
 
     return props.t('Publication of {{author}} on {{date}}', {
-      author: authorName,
-      date: formatAbsoluteDate(new Date(), userLang).replaceAll('/', '-'),
+      author: props.user.publicName,
+      date: formatAbsoluteDate(new Date(), userLang),
       interpolation: { escapeValue: false }
     })
   }
@@ -460,10 +476,22 @@ export class Publications extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.props.match.params.idws)
   }
 
+  getPreviewLinkParameters = (publication) => {
+    const previewLinkType = publication.type === CONTENT_TYPE.FILE
+      ? LINK_TYPE.DOWNLOAD
+      : LINK_TYPE.OPEN_IN_APP
+
+    const previewLink = publication.type === CONTENT_TYPE.FILE
+      ? getFileDownloadUrl(FETCH_CONFIG.apiUrl, publication.workspaceId, publication.id, publication.fileName)
+      : PAGE.WORKSPACE.CONTENT(publication.workspaceId, publication.type, publication.id)
+    return { previewLinkType, previewLink }
+  }
+
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-
+    const currentPublicationId = Number(props.match.params.idcts || 0)
+    this.currentPublicationRef = currentPublicationId ? React.createRef() : null
     return (
       <div className='publications'>
         <TabBar
@@ -472,9 +500,10 @@ export class Publications extends React.Component {
         />
 
         <ScrollToBottomWrapper
-          itemList={props.publicationList}
           customClass='pageContentGeneric'
-          shouldScrollToBottom
+          isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
+          itemList={props.publicationList}
+          shouldScrollToBottom={currentPublicationId === 0}
         >
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
@@ -482,8 +511,11 @@ export class Publications extends React.Component {
               content={publication}
               customColor={publicationColor}
               key={`publication_${publication.id}`}
+              ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
               memberList={props.currentWorkspace.memberList}
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
+              isPublication
+              inRecentActivities={false}
               showTimeline
               user={{
                 userId: props.user.userId,
@@ -492,6 +524,7 @@ export class Publications extends React.Component {
                 userRoleIdInWorkspace: userRoleIdInWorkspace
               }}
               workspaceId={Number(publication.workspaceId)}
+              {...this.getPreviewLinkParameters(publication)}
             />
           )}
 

@@ -325,7 +325,8 @@
   "No preview available": "No preview available",
   "Preview loading...": "Preview loading...",
   "Unknown entity type": "Unknown entity type",
-  "Open content": "Open content",
+  "Open as content": "Open as content",
+  "Open_action": "Open",
   "The link has been copied to clipboard": "The link has been copied to clipboard",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>",
@@ -427,7 +428,6 @@
   "Publication": "Publication",
   "Your role:": "Your role:",
   "{{newRequests}} new requests": "{{newRequests}} new requests",
-  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
   "Sign in": "Sign in",
   "Login:": "Login:",
   "Password:": "Password:",
@@ -439,5 +439,8 @@
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} has been removed from your favourites.",
   "You did not add any content as favorite yet.": "You did not add any content as favourite yet.",
   "moved": "moved",
-  "copied": "copied"
+  "copied": "copied",
+  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
+  "Download {{filename}}": "Download {{filename}}",
+  "Show in publications": "Show in publications"
 }
