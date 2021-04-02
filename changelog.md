@@ -1,22 +1,25 @@
-# 3.7.0 / 2021-04-xx
+# 3.7.0 / 2021-04-02
 
 ### New Features
 
-- publications
-- reactions to contents using emojis
+- You can create your own publications to share informations with other member without creating a specific content (like a blog page)
+- You can add reactions to contents using emojis like usable in social networking platform
+- The activity feed of space is now visible in dashboad and replace recent activity view
 
 ### Fixed Issues
 
+- Frontend: [#4341](https://github.com/tracim/tracim/issues/4341)
+
 ### Breaking Changes
 
-- database migration needed for mysql/mariadb => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-797556041)
-- manual database migration for old instance running since Tracim v1 => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-801944438)
+- Database: databases that were created using Tracim v1 need to be updated manually, [more information here](https://github.com/tracim/tracim/issues/4282#issuecomment-801944438) (issue [#4266](https://github.com/tracim/tracim/issues/4266))
 
 ### Other Changes
 
-- HTTP API chang => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-800124255)
-- modification of default value for `web.notifications.excluded` => add better information here (https://github.com/tracim/tracim/issues/4282#issuecomment-801880866)
-
+- Reaction feature add big change to mysql/mariadb support: database migration needed for mysql/mariadb with [this tracimcli command line](https://github.com/tracim/tracim/blob/2a6aae281046e7a10bf4c5b24dfc60f81214c709/backend/doc/cli.md#migrate-mysqlmariadb-database-to-utf8mb4-added-for-tracim-37) (issue [#4272](https://github.com/tracim/tracim/issues/4272))
+- API: this API`/api/workspaces/<workspace_id>/contents` now returns an object containing the contents in "items" instead of a direct list and also contains pagination information when the count/page_token parameters are used (issue [#4264](https://github.com/tracim/tracim/issues/4264))
+- Modification of default value used in development.ini: default value for `web.notifications.excluded`as changed to a reduced synonym for user and add filtering for new type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272))
+  - On existing Tracim installations, also if using the docker image: you can update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 
 
 # 3.6.1 / 2021-03-26
