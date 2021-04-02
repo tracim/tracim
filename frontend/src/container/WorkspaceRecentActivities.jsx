@@ -68,7 +68,7 @@ export class WorkspaceRecentActivities extends React.Component {
 
     return (
       <div className='workspaceRecentActivities'>
-        <div className='workspaceRecentActivities__header'>
+        <div className='workspaceRecentActivities__header subTitle'>
           {props.t('Recent activities')}
         </div>
 
@@ -96,7 +96,7 @@ WorkspaceRecentActivities.propTypes = {
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.number.isRequired
+  workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {

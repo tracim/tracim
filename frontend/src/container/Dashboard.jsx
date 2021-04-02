@@ -109,7 +109,7 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadNewResquestNumber()
+    this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -136,7 +136,7 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadNewResquestNumber()
+    this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -191,7 +191,7 @@ export class Dashboard extends React.Component {
     }
   }
 
-  loadNewResquestNumber = async () => {
+  loadNewRequestNumber = async () => {
     const { props } = this
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)

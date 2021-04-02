@@ -230,14 +230,13 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentAddCommentAsFile = (fileToUploadList, namespace, setState) => {
+    appContentAddCommentAsFile = (fileToUploadList, setState) => {
       if (!fileToUploadList.length) return
       setState(prev => {
         const fileToUploadListWithoutDuplicate = fileToUploadList
           .filter(fileToAdd =>
             !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
           )
-          .map(fileToAdd => ({ ...fileToAdd, namespace: namespace }))
         return {
           newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
         }
@@ -271,7 +270,7 @@ export function appContentFactory (WrappedComponent) {
       }
 
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention, content.content_namespace)
       )
 
       switch (response.apiResponse.status) {
@@ -312,15 +311,16 @@ export function appContentFactory (WrappedComponent) {
         { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
         { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
         { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
-        { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+        { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
       ]
+      const parentNamespace = content.contentNamespace ? content.contentNamespace : content.content_namespace
       return uploadFile(
         newCommentAsFile,
         `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
         {
           additionalFormData: {
             parent_id: content.content_id,
-            content_namespace: newCommentAsFile.namespace
+            content_namespace: parentNamespace
           },
           httpMethod: 'POST',
           progressEventHandler: () => {},

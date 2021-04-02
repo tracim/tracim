@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
-import Preview from '../component/FeedItem/Preview.jsx'
-import { CONTENT_NAMESPACE, FETCH_CONFIG } from '../util/helper.js'
+import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
   CUSTOM_EVENT,
+  CONTENT_TYPE,
   handleInvalidMentionInComment,
   Timeline,
   TracimComponent
@@ -74,7 +75,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.PUBLICATION, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
@@ -144,8 +145,18 @@ export class FeedItemWithPreview extends React.Component {
   render () {
     const { props, state } = this
 
+    const title = (
+      props.inRecentActivities
+        ? (
+          props.isPublication
+            ? props.t('Show in publications')
+            : props.t('Open_action')
+        )
+        : props.t('Download {{filename}}', { filename: props.content.fileName })
+    )
+
     return (
-      <div className='feedItem'>
+      <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           breadcrumbsList={props.breadcrumbsList}
           content={props.content}
@@ -159,9 +170,15 @@ export class FeedItemWithPreview extends React.Component {
           onClickCopyLink={props.onClickCopyLink}
           onEventClicked={props.onEventClicked}
           workspaceId={props.workspaceId}
+          titleLink={props.titleLink}
         />
-        <div className='feedItem__content'>
-          <Preview content={props.content} />
+        <div className='feedItem__content' title={title}>
+          <Preview
+            fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
+            content={props.content}
+            linkType={props.previewLinkType}
+            link={props.previewLink}
+          />
           <FeedItemFooter content={props.content} />
         </div>
         {props.showTimeline && (
@@ -198,7 +215,13 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 }
-export default translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
+
+const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
+const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
+  return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
+})
+export default FeedItemWithPreviewWithRef
+export { LINK_TYPE }
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
@@ -208,7 +231,8 @@ FeedItemWithPreview.propTypes = {
   commentList: PropTypes.array,
   customColor: PropTypes.string,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool,
+  isPublication: PropTypes.bool.isRequired,
+  inRecentActivities: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
@@ -218,7 +242,10 @@ FeedItemWithPreview.propTypes = {
   onEventClicked: PropTypes.func,
   reactionList: PropTypes.array,
   showTimeline: PropTypes.bool,
-  user: PropTypes.object
+  user: PropTypes.object,
+  titleLink: PropTypes.string,
+  previewLink: PropTypes.string,
+  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -226,7 +253,6 @@ FeedItemWithPreview.defaultProps = {
   commentList: [],
   customColor: '',
   eventList: [],
-  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',
@@ -235,5 +261,8 @@ FeedItemWithPreview.defaultProps = {
   modifiedDate: '',
   reactionList: [],
   showTimeline: false,
-  user: {}
+  user: {},
+  previewLinkType: LINK_TYPE.OPEN_IN_APP,
+  titleLink: null,
+  previewLink: null
 }
