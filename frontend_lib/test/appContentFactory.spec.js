@@ -73,7 +73,11 @@ describe('appContentFactory.js', () => {
         'buildTimelineFromCommentAndRevision',
         'searchForMentionInQuery',
         'handleTranslateComment',
-        'handleRestoreComment'
+        'handleRestoreComment',
+        'addContentToFavoriteList',
+        'isContentInFavoriteList',
+        'loadFavoriteContentList',
+        'removeContentFromFavoriteList'
       )
     })
   })

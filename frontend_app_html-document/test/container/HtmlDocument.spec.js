@@ -26,7 +26,8 @@ describe('<HtmlDocument />', () => {
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
     setApiUrl: () => { },
-    t: key => key
+    t: key => key,
+    isContentInFavoriteList: () => false
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
