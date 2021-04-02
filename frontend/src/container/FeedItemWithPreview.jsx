@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
@@ -7,8 +8,10 @@ import Preview from '../component/FeedItem/Preview.jsx'
 import { CONTENT_NAMESPACE, FETCH_CONFIG } from '../util/helper.js'
 import {
   appContentFactory,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   handleInvalidMentionInComment,
+  PAGE,
   Timeline,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -100,6 +103,15 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
+  handleClickOpenFileComment = (comment) => {
+    const { props } = this
+    props.history.push(PAGE.WORKSPACE.CONTENT(
+      props.content.workspaceId,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
   handleClickSend = () => {
     const { props, state } = this
 
@@ -189,6 +201,7 @@ export class FeedItemWithPreview extends React.Component {
             timelineData={props.commentList}
             wysiwyg={state.timelineWysiwyg}
             onClickCancelSave={this.handleCancelSave}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickSaveAnyway={this.handleClickValidateAnyway}
             searchForMentionInQuery={this.searchForMentionInQuery}
             workspaceId={props.workspaceId}
@@ -198,7 +211,7 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 }
-export default translate()(appContentFactory(TracimComponent(FeedItemWithPreview)))
+export default translate()(appContentFactory(withRouter(TracimComponent(FeedItemWithPreview))))
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,

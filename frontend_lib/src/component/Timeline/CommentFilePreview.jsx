@@ -77,6 +77,19 @@ export const CommentFilePreview = props => {
               buttonIcon='fas fa-ellipsis-v'
               buttonTooltip={props.t('Actions')}
             >
+              {/*
+                FIXME - G.B. - 2021-04-02 - Ideally it would be good to use Link here, but since this
+                component is called by apps that do not have a router, we have an error case.
+              */}
+              <IconButton
+                icon='fas fa-paperclip'
+                intent='link'
+                key='openFileComment'
+                mode='dark'
+                onClick={props.onClickOpenFileComment}
+                text={props.t('Open as content')}
+              />
+
               <IconButton
                 icon='far fa-fw fa-trash-alt'
                 intent='link'
@@ -110,7 +123,9 @@ CommentFilePreview.propTypes = {
   customColor: PropTypes.string,
   apiUrl: PropTypes.string,
   apiContent: PropTypes.object,
-  loggedUser: PropTypes.object
+  loggedUser: PropTypes.object,
+  onClickDeleteComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func
 }
 
 CommentFilePreview.defaultProps = {
@@ -132,5 +147,7 @@ CommentFilePreview.defaultProps = {
   loggedUser: {
     lang: '',
     userId: ''
-  }
+  },
+  onClickDeleteComment: () => {},
+  onClickOpenFileComment: () => {}
 }

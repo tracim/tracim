@@ -37,17 +37,18 @@ const AppContentRightMenu = (props) => (
 
 AppContentRightMenu.propTypes = {
   onChangeStatus: PropTypes.func.isRequired,
-  onClickArchive: PropTypes.func.isRequired,
   onClickDelete: PropTypes.func.isRequired,
   availableStatuses: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   loggedUser: PropTypes.object.isRequired,
-  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE))
+  mode: PropTypes.oneOf(Object.values(APP_FEATURE_MODE)),
+  onClickArchive: PropTypes.func
 }
 
 AppContentRightMenu.defaultProps = {
-  mode: undefined
+  mode: undefined,
+  onClickArchive: () => {}
 }
 
 export default AppContentRightMenu

@@ -4,6 +4,7 @@ import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -552,6 +553,15 @@ export class File extends React.Component {
     )
   }
 
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
   handleContentCommentModified = (data) => {
     const { props, state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
@@ -821,7 +831,7 @@ export class File extends React.Component {
         break
       case 400:
         this.sendGlobalFlashMessage(props.t('Error in the URL'))
-        props.history.push(PAGE.LOGIN)
+        state.config.history.push(PAGE.LOGIN)
         break
       default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
     }
@@ -932,6 +942,7 @@ export class File extends React.Component {
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
           onClickEditComment={this.handleClickEditComment}
           onClickDeleteComment={this.handleClickDeleteComment}
+          onClickOpenFileComment={this.handleClickOpenFileComment}
         />
       ) : null
     }

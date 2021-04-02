@@ -6,8 +6,10 @@ import {
   appContentFactory,
   addAllResourceI18n,
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
+  PAGE,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -396,6 +398,15 @@ export class Thread extends React.Component {
     )
   }
 
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
   handleContentCommentModified = (data) => {
     const { props, state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
@@ -529,6 +540,7 @@ export class Thread extends React.Component {
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
               onClickEditComment={this.handleClickEditComment}
               onClickDeleteComment={this.handleClickDeleteComment}
+              onClickOpenFileComment={this.handleClickOpenFileComment}
             />
           ) : null}
         </PopinFixedContent>
