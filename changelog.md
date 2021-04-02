@@ -19,7 +19,7 @@
 - This new version requires a special migration for mysql/mariadb (due to the reaction feature): [tracimcli command line](https://github.com/tracim/tracim/blob/2a6aae281046e7a10bf4c5b24dfc60f81214c709/backend/doc/cli.md#migrate-mysqlmariadb-database-to-utf8mb4-added-for-tracim-37) (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
 - API: this API`/api/workspaces/<workspace_id>/contents` now returns an object containing the contents in "items" instead of a direct list and also contains pagination information when the count/page_token parameters are used (issue [#4264](https://github.com/tracim/tracim/issues/4264))
 - Modification of default value used in development.ini: default value for `web.notifications.excluded`as changed to a reduced synonym for user and add filtering for new type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272))
-  - On existing Tracim installations, also if using the docker image: you can update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+  - On existing Tracim installations, also if using the docker image: you may want to update your development.ini configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 
 
 # 3.6.1 / 2021-03-26
