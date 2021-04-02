@@ -143,7 +143,6 @@ else
     run_docker_services "$sleep"
     if tracimcli db init; then
         echo "Tagging database schema"
-        alembic -c development.ini stamp head
     else
         echo "Upgrading database schema"
         alembic -c development.ini upgrade head
