@@ -2,14 +2,13 @@ import { uniqBy } from 'lodash'
 import {
   SET,
   ADD,
-  APPEND,
   REMOVE,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_RECENT_ACTIVITY_LIST,
-  WORKSPACE_MEMBER, UPDATE,
+  WORKSPACE_MEMBER,
+  UPDATE,
   USER,
   USER_WORKSPACE_DO_NOTIFY,
   FOLDER_READ,
@@ -123,21 +122,6 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         memberList: state.memberList.filter(m => m.id !== action.memberId)
-      }
-
-    case `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
-      return {
-        ...state,
-        recentActivityList: action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
-      }
-
-    case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
-      return {
-        ...state,
-        recentActivityList: [
-          ...state.recentActivityList,
-          ...action.workspaceRecentActivityList.map(ra => serialize(ra, serializeContentProps))
-        ]
       }
 
     case `${ADD}/${WORKSPACE_CONTENT}`:

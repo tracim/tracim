@@ -105,6 +105,9 @@ export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
 export const getFileRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
 
+export const getUrlPreview = (apiUrl, url) =>
+  baseFetch('GET', `${apiUrl}/url-preview?url=${encodeURIComponent(url)}`)
+
 export const putFileDescription = (apiUrl, workspaceId, contentId, label, newDescription) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     label: label,

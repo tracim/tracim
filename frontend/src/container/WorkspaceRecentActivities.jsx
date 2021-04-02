@@ -5,9 +5,6 @@ import { translate } from 'react-i18next'
 
 import {
   TracimComponent,
-  BREADCRUMBS_TYPE,
-  buildHeadTitle,
-  CUSTOM_EVENT,
   PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
@@ -16,8 +13,6 @@ import { getWorkspaceDetail } from '../action-creator.async.js'
 import {
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
-  setBreadcrumbs,
-  setHeadTitle,
   newFlashMessage,
   setWorkspaceDetail,
   resetWorkspaceActivity,
@@ -25,7 +20,6 @@ import {
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
-import TabBar from '../component/TabBar/TabBar.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
 require('../css/RecentActivities.styl')
@@ -34,29 +28,17 @@ export class WorkspaceRecentActivities extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
-    props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
-    ])
   }
 
   componentDidMount () {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
     this.loadWorkspaceDetail()
-    this.setHeadTitle()
-    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.workspaceId === this.props.workspaceId) return
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
     this.loadWorkspaceDetail()
-    this.setHeadTitle()
-    this.buildBreadcrumbs()
-  }
-
-  handleAllAppChangeLanguage = () => {
-    this.buildBreadcrumbs()
-    this.setHeadTitle()
   }
 
   handleTlm = (data) => {
@@ -72,8 +54,6 @@ export class WorkspaceRecentActivities extends React.Component {
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -83,45 +63,15 @@ export class WorkspaceRecentActivities extends React.Component {
     }
   }
 
-  buildBreadcrumbs = () => {
-    const { props } = this
-
-    const breadcrumbsList = [
-      {
-        link: PAGE.WORKSPACE.DASHBOARD(props.workspaceId),
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.currentWorkspace.label,
-        isALink: true
-      },
-      {
-        link: PAGE.WORKSPACE.RECENT_ACTIVITIES(props.workspaceId),
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Recent activities'),
-        isALink: false
-      }
-    ]
-
-    props.dispatch(setBreadcrumbs(breadcrumbsList))
-  }
-
-  setHeadTitle = () => {
-    const { props } = this
-
-    const headTitle = buildHeadTitle(
-      [props.t('Recent activities'), props.currentWorkspace.label]
-    )
-    props.dispatch(setHeadTitle(headTitle))
-  }
-
   render () {
     const { props } = this
 
     return (
       <div className='workspaceRecentActivities'>
-        <TabBar
-          currentSpace={props.currentWorkspace}
-          breadcrumbs={props.breadcrumbs}
-        />
+        <div className='workspaceRecentActivities__header'>
+          {props.t('Recent activities')}
+        </div>
+
         <ActivityList
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
@@ -146,7 +96,7 @@ WorkspaceRecentActivities.propTypes = {
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.string.isRequired
+  workspaceId: PropTypes.number.isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {

@@ -28,6 +28,7 @@ describe('content :: workspace > dashboard', function () {
     cy.get('.pageTitleGeneric').should('be.visible')
     cy.get('.tabBar').should('be.visible')
     cy.get('.dashboard .pageContentGeneric').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu').should('be.visible')
   })
 
   it('dashboard__header__title', function () {
@@ -35,9 +36,7 @@ describe('content :: workspace > dashboard', function () {
   })
 
   it('dashboard__workspace > dashboard__workspace__detail', function () {
-    cy.get('.pageContentGeneric .dashboard__workspace__detail__title').should('be.visible')
     cy.get('.pageContentGeneric .dashboard__workspace__detail__description').should('be.visible')
-    cy.get('.dashboard__workspace__detail__right').should('be.visible')
-    cy.get('.dashboard__workspace__detail__right__button').should('have.attr', 'type', 'button').should('be.visible')
+    cy.get('.dashboard__workspace__detail__buttons .iconbutton').should('have.attr', 'type', 'button').should('be.visible')
   })
 })
