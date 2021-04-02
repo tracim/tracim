@@ -81,6 +81,25 @@ export class FeedItemWithPreview extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
+  handleClickEditComment = (comment) => {
+    const { props } = this
+    props.appContentEditComment(
+      props.content.workspaceId,
+      comment.parent_id,
+      comment.content_id,
+      props.user.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { props } = this
+    props.appContentDeleteComment(
+      props.content.workspaceId,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
   handleClickSend = () => {
     const { props, state } = this
 
@@ -153,14 +172,17 @@ export class FeedItemWithPreview extends React.Component {
             id={props.content.id}
             invalidMentionList={state.invalidMentionList}
             loggedUser={props.user}
+            memberList={props.memberList}
             newComment={state.newComment}
             newCommentAsFileList={state.newCommentAsFileList}
             onChangeNewComment={this.handleChangeNewComment}
             onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickEditComment={this.handleClickEditComment}
             onClickValidateNewCommentBtn={this.handleClickSend}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onInitWysiwyg={this.handleInitWysiwyg}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             shouldScrollToBottom={false}
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             showTitle={false}

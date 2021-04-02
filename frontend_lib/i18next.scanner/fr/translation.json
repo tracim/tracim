@@ -180,5 +180,9 @@
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
   "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
-  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
+  "You have reach your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
+  "Actions": "Actions",
+  "Edit comment": "Modifier le commentaire",
+  "Delete comment": "Supprimer le commentaire",
+  "Error while deleting the comment": "Erreur pendant la suppression du commentaire"
 }

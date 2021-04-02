@@ -101,7 +101,8 @@
       "FormData",
       "XMLHttpRequest",
       "Image",
-      "FileReader"
+      "FileReader",
+      "wysiwyg"
     ],
     "parser": "babel-eslint",
     "ignore": []

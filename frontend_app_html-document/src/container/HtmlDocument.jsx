@@ -115,8 +115,11 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
       // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -786,6 +789,47 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
   handleTranslateDocument = async () => {
     const { state } = this
     this.setState({ translationState: TRANSLATION_STATE.PENDING })
@@ -947,6 +991,7 @@ export class HtmlDocument extends React.Component {
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
+                  memberList={state.config.workspace.memberList}
                   timelineData={state.timeline}
                   newComment={state.newComment}
                   newCommentAsFileList={state.newCommentAsFileList}
@@ -976,6 +1021,8 @@ export class HtmlDocument extends React.Component {
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                  onClickEditComment={this.handleClickEditComment}
+                  onClickDeleteComment={this.handleClickDeleteComment}
                 />
               ) : null
             }]}

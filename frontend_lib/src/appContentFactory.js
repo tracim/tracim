@@ -8,7 +8,8 @@ import {
   displayDistanceDate,
   sortTimelineByDate,
   sendGlobalFlashMessage,
-  TIMELINE_TYPE
+  TIMELINE_TYPE,
+  CONTENT_TYPE
 } from './helper.js'
 
 import {
@@ -31,7 +32,9 @@ import {
 } from './translation.js'
 
 import {
+  deleteComment,
   putEditContent,
+  putComment,
   postNewComment,
   putEditStatus,
   putContentArchived,
@@ -148,6 +151,67 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType) => {
+      this.checkApiUrl()
+      let response
+
+      if (contentType === CONTENT_TYPE.COMMENT) {
+        response = await handleFetchResult(await deleteComment(this.apiUrl, workspaceId, contentId, commentId))
+      } else {
+        response = await handleFetchResult(await putContentDeleted(this.apiUrl, workspaceId, commentId))
+      }
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
+      return response
+    }
+
+    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
+      this.checkApiUrl()
+
+      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
+      let knownMentions = await this.searchForMentionInQuery('', workspaceId)
+      knownMentions = knownMentions.map(member => `@${member.username}`)
+      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
+      const response = await handleFetchResult(
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
+      )
+
+      switch (response.apiResponse.status) {
+        case 200:
+          break
+        case 400:
+          switch (response.body.code) {
+            case 2067:
+              sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
+            case 2003:
+              sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
+              break
+            case 2044:
+              sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
+            default:
+              sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
+              break
+          }
+          break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
+      }
+
       return response
     }
 
@@ -472,6 +536,25 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate([...timeline, commentForTimeline])
     }
 
+    updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
+      const oldComment = timeline.find(timelineItem => timelineItem.content_id === comment.content_id)
+
+      if (!oldComment) {
+        sendGlobalFlashMessage(i18n.t('Error while saving the comment'), 'warning')
+        return timeline
+      }
+
+      const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
+        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        : timelineItem
+      )
+      return newTimeline
+    }
+
+    removeCommentFromTimeline = (commentId, timeline) => {
+      return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
+    }
+
     onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
       setState(previousState => {
         return {
@@ -540,6 +623,8 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentAddCommentAsFile={this.appContentAddCommentAsFile}
+          appContentDeleteComment={this.appContentDeleteComment}
+          appContentEditComment={this.appContentEditComment}
           appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
@@ -553,6 +638,8 @@ export function appContentFactory (WrappedComponent) {
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
+          removeCommentFromTimeline={this.removeCommentFromTimeline}
+          updateCommentOnTimeline={this.updateCommentOnTimeline}
         />
       )
     }
