@@ -78,8 +78,9 @@ export const CommentFilePreview = props => {
               buttonTooltip={props.t('Actions')}
             >
               {/*
-                FIXME - G.B. - 2021-04-02 - Ideally it would be good to use Link here, but since this
-                component is called by apps that do not have a router, we have an error case.
+                FIXME - G.B. - 2021-04-02 - Ideally it would be good to use Link here instead IconButton, but
+                since the Timeline component is called by apps that do not have a router, we have an error case.
+                See https://github.com/tracim/tracim/issues/4406
               */}
               <IconButton
                 icon='fas fa-paperclip'
