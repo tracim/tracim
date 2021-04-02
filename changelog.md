@@ -4,7 +4,7 @@
 
 - You can create your own publications to share informations with other member without creating a specific content (like a blog page)
 - You can add reactions to contents using emojis like usable in social networking platform
-- The activity feed of space is now visible in dashboad and replace recent activity view
+- The activity feed of a space is now visible in the dashboard and replaces the recent activity view.
 
 ### Fixed Issues
 
