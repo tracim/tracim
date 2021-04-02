@@ -23,6 +23,6 @@ describe('Sidebar', function () {
     cy.get('li').contains('Dashboard').should('have.attr', 'href', `/ui/workspaces/${workspaceId}/dashboard`)
     cy.get('[data-cy="sidebar_subdropdown-dashboard"]').should('be.visible').click()
     cy.url().should('include', `/workspaces/${workspaceId}/dashboard`)
-    cy.contains('.dashboard__workspace__detail__title', workspaceLabel)
+    cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
   })
 })

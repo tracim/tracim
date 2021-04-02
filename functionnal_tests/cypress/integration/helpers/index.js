@@ -19,8 +19,8 @@ export function create_file (cy) {
 export function create_thread (cy) {
   cy.visit('/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-comments').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-comments').click()
+  cy.get('.dashboard__workspace__rightMenu__contents .fa-comments').should('be.visible')
+  cy.get('.dashboard__workspace__rightMenu__contents .fa-comments').click()
   var titre1 = 'createthread'
   cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
   cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
@@ -39,8 +39,8 @@ export function create_thread (cy) {
 export function create_htmldocument (cy) {
   cy.visit('/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-file-alt').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-file-alt').click()
+  cy.get('.dashboard__workspace__rightMenu__contents .fa-file-alt').should('be.visible')
+  cy.get('.dashboard__workspace__rightMenu__contents .fa-file-alt').click()
   var titre1 = 'createhtml-document'
   cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
   cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')

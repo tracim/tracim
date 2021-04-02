@@ -2,7 +2,6 @@ const SELECTORS = {
   CONTENT_FRAME: 'contentFrame',
   CONTENT_IN_LIST: 'contentInList',
   FOLDER_IN_LIST: 'folderInList',
-  RECENT_ACTIVITY_IN_LIST: 'recentactivity',
   WORKSPACE_MENU: 'workspaceMenu',
   CONTENT_IN_SEARCH: 'contentInSearch',
   WORKSPACE_DASHBOARD: 'workspaceDashboard',
@@ -18,7 +17,6 @@ const SELECTORS = {
 const TAGS = {
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
   [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__fileandfolder > .content${read ? '.read' : ''}`,
-  [SELECTORS.RECENT_ACTIVITY_IN_LIST]: () => '.recentactivity__list__item',
   [SELECTORS.CONTENT_IN_SEARCH]: () => '.FilenameWithExtension',
   [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,

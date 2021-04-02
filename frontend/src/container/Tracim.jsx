@@ -78,7 +78,6 @@ import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalRecentActivities from './PersonalRecentActivities.jsx'
-import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 
@@ -499,8 +498,10 @@ export class Tracim extends React.Component {
 
                 <Route
                   path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
-                  render={(routerProps) => (
-                    <WorkspaceRecentActivities workspaceId={routerProps.match.params.idws} />
+                  render={({ match }) => (
+                    // NOTE - RJ - 2021-03-29 - This redirection is there to avoid breaking old links to recent activities
+                    // We may want to remove this redirection in the future. We will need to fix the related Cypress tests
+                    <Redirect to={PAGE.WORKSPACE.DASHBOARD(match.params.idws)} />
                   )}
                 />
 
