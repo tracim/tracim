@@ -73,7 +73,7 @@ class DeleteUserCommand(AppContextCommand):
         parser.add_argument(
             "-r",
             "--delete-all-user-revisions",
-            help="delete all user revisions. Warning ! This may put the database into an inconsistent state",
+            help="delete all user revisions and reactions. Warning ! This may put the database into an inconsistent state",
             dest="delete_revisions",
             default=False,
             action="store_true",
@@ -101,7 +101,7 @@ class DeleteUserCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
 
-        delete_user_revision = parsed_args.force or parsed_args.delete_revisions
+        delete_user_revision_and_reaction = parsed_args.force or parsed_args.delete_revisions
         delete_owned_sharespaces = (
             parsed_args.force or parsed_args.best_effort or parsed_args.delete_sharespaces
         )
@@ -115,8 +115,10 @@ class DeleteUserCommand(AppContextCommand):
         if parsed_args.best_effort:
             print("(!) Running in best-effort mode")
 
-        if delete_user_revision:
-            print("/!\\ Delete all user revisions, database created may be broken /!\\.")
+        if delete_user_revision_and_reaction:
+            print(
+                "/!\\ Delete all user revision and reactions, database created may be broken /!\\."
+            )
         if delete_owned_sharespaces:
             print("(!) User owned sharespaces will be deleted too.")
         if anonymize_if_required:
@@ -154,7 +156,7 @@ class DeleteUserCommand(AppContextCommand):
                 )
                 deleted_user_ids_result = self._delete_user_database_info(
                     user,
-                    force_delete_all_user_revisions=delete_user_revision,
+                    force_delete_all_user_revisions_and_reactions=delete_user_revision_and_reaction,
                     anonymize_if_required=anonymize_if_required,
                     delete_owned_workspaces=delete_owned_sharespaces,
                     anonymized_user_display_name=parsed_args.anonymize_name,
@@ -224,6 +226,11 @@ class DeleteUserCommand(AppContextCommand):
             user, owned_workspace_will_be_deleted=owned_workspaces_will_be_deleted
         )
 
+        if should_anonymize.blocking_reactions:
+            print(
+                '{} reactions of user "{}" in sharespaces found, deleting them, can cause inconsistent'
+                " database.".format(len(should_anonymize.blocking_reactions), user.user_id)
+            )
         if should_anonymize.blocking_revisions:
             print(
                 '{} revision of user "{}" in sharespaces found, deleting them, can cause inconsistent'
@@ -236,6 +243,7 @@ class DeleteUserCommand(AppContextCommand):
                     len(should_anonymize.blocking_workspaces), user.user_id
                 )
             )
+
         return should_anonymize
 
     def _delete_user_database_info(
@@ -243,7 +251,7 @@ class DeleteUserCommand(AppContextCommand):
         user: User,
         cleanup_lib: CleanupLib,
         delete_owned_workspaces: bool = False,
-        force_delete_all_user_revisions: bool = False,
+        force_delete_all_user_revisions_and_reactions: bool = False,
         anonymize_if_required: bool = False,
         anonymized_user_display_name: typing.Optional[str] = None,
     ):
@@ -255,7 +263,7 @@ class DeleteUserCommand(AppContextCommand):
             user, owned_workspaces_will_be_deleted=delete_owned_workspaces, cleanup_lib=cleanup_lib
         )
         force_delete_all_associated_data = (
-            force_delete_all_user_revisions and delete_owned_workspaces
+            force_delete_all_user_revisions_and_reactions and delete_owned_workspaces
         )
 
         revision_conflict_for_deleting_user = (
@@ -264,20 +272,29 @@ class DeleteUserCommand(AppContextCommand):
         workspace_conflict_for_deleting_user = (
             should_anonymize.blocking_workspaces and not delete_owned_workspaces
         )
+        reaction_conflict_for_deleting_user = (
+            should_anonymize.blocking_reactions and not force_delete_all_associated_data
+        )
         if (
-            revision_conflict_for_deleting_user or workspace_conflict_for_deleting_user
+            revision_conflict_for_deleting_user
+            or workspace_conflict_for_deleting_user
+            or reaction_conflict_for_deleting_user
         ) and not anonymize_if_required:
             raise UserCannotBeDeleted(
-                'user "{}" has revisions or workspaces left, cannot delete it'.format(user.user_id)
+                'user "{}" has revisions,reactions, or workspaces left, cannot delete it'.format(
+                    user.user_id
+                )
             )
 
         if delete_owned_workspaces:
             deleted_workspace_ids = cleanup_lib.delete_user_owned_workspace(user)
             print('owned workspace for user "{}" deleted'.format(user.user_id))
 
-        if force_delete_all_user_revisions:
+        if force_delete_all_user_revisions_and_reactions:
             cleanup_lib.delete_user_revisions(user)
             print('all user "{}" revisions deleted'.format(user.user_id))
+            cleanup_lib.delete_user_reactions(user)
+            print('all user "{}" reactions deleted'.format(user.user_id))
 
         if should_anonymize.need_anonymization and not force_delete_all_associated_data:
             # NOTE S.G. 2020-10-14 - Need to load the user config now as loading it after
@@ -302,8 +319,13 @@ class DeleteUserCommand(AppContextCommand):
             user_config = user.config
             user_custom_properties = user.custom_properties
             cleanup_lib.delete_user_associated_data(user)
-            cleanup_lib.safe_delete(user_config)
-            cleanup_lib.safe_delete(user_custom_properties)
+
+            # INFO - G.M 2021-03-15 - Check None case to avoid error when deleting
+            # a previously anonymized user
+            if user_config is not None:
+                cleanup_lib.safe_delete(user_config)
+            if user_custom_properties is not None:
+                cleanup_lib.safe_delete(user_custom_properties)
             cleanup_lib.safe_delete(user)
             print('user "{}" deleted'.format(user.user_id))
 

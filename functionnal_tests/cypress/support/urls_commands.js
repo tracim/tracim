@@ -13,9 +13,10 @@ const PAGES = {
   CONTENT_OPEN: 'contentOpen',
   ACCOUNT: 'account',
   JOIN_WORKSPACE: 'join-workspace',
-  ACTIVITY_FEED: 'activity-feed',
+  RECENT_ACTIVITIES: 'recent-activities',
+  PUBLICATION: 'publication',
   PROFILE: 'profile',
-  WORKSPACE_ACTIVITY_FEED: 'workspaceActivityFeed'
+  WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities'
 }
 
 const URLS = {
@@ -24,7 +25,7 @@ const URLS = {
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.CONTENT_OPEN]: ({ workspaceId, contentType, contentId }) => `/ui/workspaces/${workspaceId}/contents/${contentType}/${contentId}`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
-  [PAGES.WORKSPACE_ACTIVITY_FEED]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/activity-feed/`,
+  [PAGES.WORKSPACE_RECENT_ACTIVITIES]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/recent-activities/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
   [PAGES.SEARCH]: ({ searchString, pageNumber, numberByPage, actived, deleted, archived, contentTypes }) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchString}&t=${contentTypes}`,
@@ -34,7 +35,8 @@ const URLS = {
   [PAGES.GALLERY]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/gallery` + (folderId ? `?folder_ids=${folderId}` : '/'),
   [PAGES.ACCOUNT]: () => '/ui/account',
   [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace',
-  [PAGES.ACTIVITY_FEED]: () => '/ui/activity-feed',
+  [PAGES.RECENT_ACTIVITIES]: () => '/ui/recent-activities',
+  [PAGES.PUBLICATION]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/publications`,
   [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`
 }
 

@@ -1,0 +1,44 @@
+@import '../../css/Variable.styl'
+
+.DisplayFileToUpload
+  // color mediumDarkGrey
+  width max-content
+  &:hover
+    color fontColor
+    .DisplayFileToUpload__message__text
+      text-decoration underline
+  &__message
+    display flex
+    align-items center
+    padding-inline-start 8px
+    cursor pointer
+    font-size fontSizeSmall
+    & > &__iconFile, & > &__text
+      margin-inline-end 5px
+    & > &__iconFile, & > &__listIcon
+      font-size 16px
+    &__listIcon
+      color mediumDarkGrey
+  &__popover__item
+    display flex
+    align-items center
+    padding-top 8px
+    padding-bottom 8px
+    padding-inline 12px
+    &:not(:last-child)
+      border-bottom 1px solid grey
+    & > &__iconFile, & > &__text
+      margin-inline-end 5px
+    &__iconFile.inError
+      color errorRed
+    &__text
+      flex-grow 1
+      overflow hidden
+      white-space nowrap
+      text-overflow ellipsis
+    &__deleteBtn
+      cursor pointer
+
+.popoverFileToUploadList
+  & .popover-body
+    padding 0

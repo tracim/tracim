@@ -345,6 +345,25 @@ export class NotificationWall extends React.Component {
       }
     }
 
+    if (entityType === TLM_ENTITY.REACTION) {
+      i18nOpts.reaction = notification.reaction.value
+
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          icon: 'far fa-smile+fas fa-plus',
+          title: props.t('Reaction created'),
+          text: props.t('{{author}} reacted to {{content}} with {{reaction}}', i18nOpts),
+          url: contentUrl
+        }
+        case TLM_EVENT.DELETED: return {
+          icon: 'far fa-smile+fas fa-times',
+          title: props.t('Reaction deleted'),
+          text: props.t('{{author}} removed their reaction {{reaction}} to {{content}}', i18nOpts),
+          url: contentUrl
+        }
+      }
+    }
+
     return {
       icon: 'fas fa-bell',
       text: `${escapedAuthor} ${notification.type}`,

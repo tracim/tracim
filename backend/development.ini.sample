@@ -116,9 +116,9 @@ basic_setup.session_secret = change_this_value_please!
 # example:
 # workspace.allowed_access_types = confidential
 
-# When a user joins a space, messages from events that happened before are added to the user's activity feed.
+# When a user joins a space, messages from events that happened before are added to the user's recent activities.
 # This setting limits the messages of events that are created to avoid cluttering the database and too much processing when a user joins a space.
-# 0 will completely disable the feature, leading to empty space activity feed when joining a space.
+# 0 will completely disable the feature, leading to empty space recent activities when joining a space.
 # -1 means no limit.
 workspace.join.max_messages_history_count = -1
 
@@ -439,7 +439,9 @@ website.base_url = %(basic_setup.website_base_url)s
 # EVENT_TYPE   = created | modified | deleted | undeleted
 # CONTENT_TYPE = html-document | file | thread | folder | comment
 # To include all notifications, use web.notifications.excluded = ""
-; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified
+# To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
+# will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
+; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*
 
 ####
 # JOB EXECUTION

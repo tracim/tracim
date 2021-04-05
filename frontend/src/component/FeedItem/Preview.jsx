@@ -6,8 +6,8 @@ import {
   removeExtensionOfFilename,
   removeInteractiveContentFromHTML,
   HTMLContent,
+  AttachedFile,
   CONTENT_TYPE,
-  PAGE,
   SCREEN_SIZE
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG } from '../../util/helper.js'
@@ -31,7 +31,13 @@ const PREVIEW_WIDTHS = [
 
 const MAX_PREVIEW_HEIGHT = 300
 
-class Preview extends React.Component {
+const LINK_TYPE = {
+  NONE: 'none',
+  DOWNLOAD: 'download',
+  OPEN_IN_APP: 'open_in_app'
+}
+
+export class Preview extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -43,7 +49,7 @@ class Preview extends React.Component {
   }
 
   isHtmlPreview () {
-    const type = this.props.content.content_type
+    const type = this.props.content.type
     return type === CONTENT_TYPE.HTML_DOCUMENT || type === CONTENT_TYPE.THREAD
   }
 
@@ -60,14 +66,14 @@ class Preview extends React.Component {
   }
 
   async getHTMLPreviewCode (content) {
-    if (content.content_type === CONTENT_TYPE.HTML_DOCUMENT) {
-      return content.raw_content
+    if (content.type === CONTENT_TYPE.HTML_DOCUMENT) {
+      return content.rawContent
     }
 
     const fetchResultGetHTMLPreview = await getHTMLPreview(
-      content.workspace_id,
-      content.content_type,
-      content.content_id,
+      content.workspaceId,
+      content.type,
+      content.id,
       content.label
     )
 
@@ -91,21 +97,22 @@ class Preview extends React.Component {
     }
 
     this.setState({
-      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode)
+      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode),
+      previewUnavailable: htmlCode === null
     })
   }
 
   getJPEGPreviewComponent (previewUrl) {
     const { content } = this.props
-    const filenameNoExtension = removeExtensionOfFilename(content.filename)
+    const filenameNoExtension = removeExtensionOfFilename(content.fileName)
     const FIRST_PAGE = 1
 
     const previewURL = (width) => (
       jpgPreviewUrl(
         FETCH_CONFIG.apiUrl,
-        content.workspace_id,
-        content.content_id,
-        content.current_revision_id,
+        content.workspaceId,
+        content.id,
+        content.currentRevisionId,
         filenameNoExtension,
         FIRST_PAGE,
         width,
@@ -116,10 +123,9 @@ class Preview extends React.Component {
     const src = ([mediaQuery, width]) => `${previewURL(width)} ${width}w`
 
     return (
-      <div className='activityFeed__preview__image'>
+      <div className='feedItem__preview__image'>
         <img
           alt={this.props.t('Preview of {{content}}', { content: content.label })}
-          title={content.label}
           src={previewURL(PREVIEW_WIDTHS[0][1])} // fall back on the smallest image size
           srcSet={PREVIEW_WIDTHS.map(src).join(',')}
           sizes={
@@ -149,7 +155,7 @@ class Preview extends React.Component {
         return
       }
     } else {
-      previewComponent = this.getJPEGPreview()
+      previewComponent = this.getJPEGPreviewComponent()
     }
 
     this.setState({
@@ -163,17 +169,23 @@ class Preview extends React.Component {
     this.testPreviewOverflow()
   }
 
+  isContentDifferent = (oldContent, newContent) => (
+    newContent.commentList !== oldContent.commentList ||
+    newContent.currentRevisionId !== oldContent.currentRevisionId
+  )
+
   componentDidUpdate (prevProps) {
-    if (prevProps.content === this.props.content) {
+    const { props } = this
+    if (prevProps.content === props.content) {
       this.testPreviewOverflow()
-    } else if (prevProps.content.current_revision_id !== this.props.content.current_revision_id) {
+    } else if (this.isContentDifferent(prevProps.content, props.content)) {
       this.updatePreview()
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return (
-      nextProps.content.current_revision_id !== this.props.content.current_revision_id ||
+      this.isContentDifferent(this.props.content, nextProps.content) ||
       Object.entries(nextState).some(([key, val]) => val !== this.state[key])
     )
   }
@@ -197,7 +209,11 @@ class Preview extends React.Component {
   }
 
   getUnavailablePreviewComponent () {
-    return this.noPreviewComponent(this.props.t('No preview available'))
+    return (
+      this.props.fallbackToAttachedFile
+        ? <AttachedFile fileName={this.props.content.fileName} />
+        : this.noPreviewComponent(this.props.t('No preview available'))
+    )
   }
 
   noPreviewComponent (details) {
@@ -210,18 +226,18 @@ class Preview extends React.Component {
   }
 
   getHTMLPreviewComponent () {
-    if (!this.state.previewHtmlCode) {
-      const { props } = this
+    const { props } = this
 
+    if (!this.state.previewHtmlCode) {
       return this.noPreviewComponent(
-        props.content.content_type === CONTENT_TYPE.THREAD
+        props.content.type === CONTENT_TYPE.THREAD
           ? props.t('Empty thread')
           : props.t('Empty note')
       )
     }
 
     return (
-      <div className='activityFeed__preview__html'>
+      <div className='feedItem__preview__html'>
         <HTMLContent>{this.state.previewHtmlCode}</HTMLContent>
       </div>
     )
@@ -229,53 +245,80 @@ class Preview extends React.Component {
 
   getPreviewComponent () {
     const { props, state } = this
+    let component = null
     if (state.previewLoading) {
-      return <>{props.t('Preview loading...')}</>
+      component = <>{props.t('Preview loading...')}</>
     }
 
     if (state.previewUnavailable) {
-      return this.getUnavailablePreviewComponent()
-    }
-
-    if (this.isHtmlPreview()) {
+      component = this.getUnavailablePreviewComponent()
+    } else if (this.isHtmlPreview()) {
       if (state.previewHtmlCode === null) {
-        return this.getUnavailablePreviewComponent()
+        component = this.getUnavailablePreviewComponent()
+      } else {
+        component = this.getHTMLPreviewComponent()
       }
-
-      return this.getHTMLPreviewComponent()
+    } else {
+      component = this.getJPEGPreviewComponent()
     }
+    return (
+      <>
+        {component}
+        {state.previewOverflow && <div className='feedItem__preview__overflowOverlay' />}
+      </>
+    )
+  }
 
-    return this.getJPEGPreviewComponent()
+  getPreviewWithLink () {
+    const { props } = this
+    switch (props.linkType) {
+      case LINK_TYPE.NONE:
+        return this.getPreviewComponent()
+      case LINK_TYPE.OPEN_IN_APP:
+        return <Link to={props.link}>{this.getPreviewComponent()}</Link>
+      case LINK_TYPE.DOWNLOAD:
+        return (
+          <a
+            href={props.link}
+            download
+          >
+            {this.getPreviewComponent()}
+          </a>
+        )
+    }
+    return null
   }
 
   render () {
-    const { props, state } = this
-    const { content } = props
-
+    const { state } = this
     return (
       <div
         className={classnames(
-          'activityFeed__preview', {
-            activityFeed__preview__overflow: state.previewOverflow,
-            activityFeed__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
-            activityFeed__preview__loading: state.previewLoading
+          'feedItem__preview', {
+            feedItem__preview__overflow: state.previewOverflow,
+            feedItem__preview__unavailable: state.previewUnavailable || (this.isHtmlPreview() && state.previewHtmlCode === ''),
+            feedItem__preview__loading: state.previewLoading
           }
         )}
         ref={(ref) => this.receivePreviewRef(ref)}
       >
-        <Link to={PAGE.WORKSPACE.CONTENT(content.workspace_id, content.content_type, content.content_id)}>
-          {this.getPreviewComponent()}
-          {state.previewOverflow && (
-            <div className='activityFeed__preview__overflowOverlay' />
-          )}
-        </Link>
+        {this.getPreviewWithLink()}
       </div>
     )
   }
 }
 
 Preview.propTypes = {
-  content: PropTypes.object.isRequired
+  fallbackToAttachedFile: PropTypes.boolean,
+  content: PropTypes.object.isRequired,
+  link: PropTypes.string.isRequired,
+  linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
+}
+
+Preview.defaultProps = {
+  fallbackToAttachedFile: false,
+  linkType: LINK_TYPE.OPEN_IN_APP
 }
 
 export default translate()(Preview)
+export { LINK_TYPE }

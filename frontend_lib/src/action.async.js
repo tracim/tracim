@@ -1,4 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
+import { CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
 
 export const baseFetch = (method, url, body) =>
   fetch(url, {
@@ -19,13 +19,19 @@ export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle
     ...propertiesToAddToBody
   })
 
-export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    raw_content: newComment
+    raw_content: newComment,
+    content_namespace: namespace
   })
 
 export const getContentComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
+
+export const getFileChildContent = (apiUrl, workspaceId, contentId) => {
+  const queryParam = `parent_ids=${contentId}&content_type=file&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}`
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
+}
 
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
@@ -111,6 +117,15 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
+
+export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
+
+export const postContentReaction = (apiUrl, workspaceId, contentId, value) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`, { value })
+
+export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
 
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)

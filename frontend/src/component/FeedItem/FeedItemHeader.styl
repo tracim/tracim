@@ -1,6 +1,6 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-.contentActivityHeader
+.feedItemHeader
   display flex
   flex-direction row
   justify-content space-between
@@ -13,10 +13,11 @@
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
-  &__label
     color fontColor
-    &:hover
-      text-decoration underline fontColor
+    & > a
+      color inherit
+      &:hover
+        text-decoration underline fontColor
 
   &__right
     margin-left 10px
@@ -40,7 +41,7 @@
     left 0
 
 @media (max-width max-sm)
-  .contentActivityHeader
+  .feedItemHeader
     & .breadcrumbs
       display none
     &__actionMenu

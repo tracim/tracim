@@ -3,7 +3,7 @@
 
 __metadata:
   version: 4
-  cacheKey: 4
+  cacheKey: 5
 
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.1":
   version: 7.10.1
@@ -1362,7 +1362,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.12.5":
+  version: 7.13.10
+  resolution: "@babel/runtime@npm:7.13.10"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 22014226b96a8c8e8d4e8bcdb011f317d1b32881aef424a669dc6ceaee14993d3609172967853cbf9c25c724c25145d45885b6c9df56ba241c12820776607f1f
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.10.2
   resolution: "@babel/runtime@npm:7.10.2"
   dependencies:
@@ -4810,6 +4819,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"emoji-mart@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "emoji-mart@npm:3.0.1"
+  dependencies:
+    "@babel/runtime": ^7.0.0
+    prop-types: ^15.6.0
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0-0 || ^16.0.0 || ^17.0.0
+  checksum: 82239f4f25ec728bc6cb3f32949fdde6b6c6364ff5bd2b04785afa81a5c8b8c624ba2b37ed6d0ee31215db231e60cc86adf19f6441f38db98d538b50cca1976b
+  languageName: node
+  linkType: hard
+
 "emoji-regex@npm:^7.0.1":
   version: 7.0.3
   resolution: "emoji-regex@npm:7.0.3"
@@ -6126,7 +6147,7 @@ fsevents@^1.2.7:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  checksum: f36f09403fbdff434b1cf4baa03d58b69e6ba5e84070bfd5cf48ef1ade8de364e01f2fcb1dafea8897732c211983cd2a593488b59b62b64ae9df4ffc5ab3685b
+  checksum: 508a7e7e1e365236a7a0478392827145ba05c0181b1928b73b20c1a5212d15f6529735db897d617d7b0b051248c5720160f74c113bd727fc02de4f6cf885e1ff
   languageName: node
   linkType: hard
 
@@ -6135,7 +6156,7 @@ fsevents@^1.2.7:
   resolution: "fsevents@patch:fsevents@npm%3A2.1.3#builtin<compat/fsevents>::version=2.1.3&hash=495457"
   dependencies:
     node-gyp: latest
-  checksum: b2c7c3576498b568fcc9e932d6ad10774abffb4668450de2d0afb64531f3aef35016bef0880a74f71b0fee99925301430634698d59c68781c337ba6e28ec038c
+  checksum: 0005677b72f38a129a3cbe8c3794bdc83081a2bec53dfc03b085c2e5e4ca7a33a861a779d623313652df89746d97f79d24e4fef3b101c11c39ce1ea8a9690e18
   languageName: node
   linkType: hard
 
@@ -11163,20 +11184,19 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"reactstrap@npm:^8.0.0":
-  version: 8.4.1
-  resolution: "reactstrap@npm:8.4.1"
+"reactstrap@npm:^8.9.0":
+  version: 8.9.0
+  resolution: "reactstrap@npm:8.9.0"
   dependencies:
-    "@babel/runtime": ^7.2.0
+    "@babel/runtime": ^7.12.5
     classnames: ^2.2.3
     prop-types: ^15.5.8
-    react-lifecycles-compat: ^3.0.4
     react-popper: ^1.3.6
     react-transition-group: ^2.3.1
   peerDependencies:
-    react: ^16.3.0
-    react-dom: ^16.3.0
-  checksum: fc082c2db16fa1af54d3706054ff54ca9de506cb54ab88156aed9ca98fdf14303c241be90ffbe20bebe74893e310718a8436239abeddf9100a46c49f9e6e68cd
+    react: ">=16.3.0"
+    react-dom: ">=16.3.0"
+  checksum: 50345ab9291eab2748c7aa9c13dccead653341049aa6d5dff0d34a20b39ee97edc4ec759b8b1468f2cfc91272b96bdedeb0b7443dddfc19ea09aa8d698390070
   languageName: node
   linkType: hard
 
@@ -11688,7 +11708,7 @@ fsevents@^1.2.7:
   dependencies:
     is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 983e1f00a147b20c9bd6c12216fad49d2d0b83a280a203a0261b68f48621d699c5131f9626044af91254da6d2e8309c7e5559c5886faeeae7c6c47507c855410
+  checksum: 188d5167e8578a9af8d194faf382b8f3526aad5145391c24ecdc6246c6fc82c10fc66d6352267f8e93c5977c503d61803169c91b9e2ee36dd2de759915c9b673
   languageName: node
   linkType: hard
 
@@ -13251,7 +13271,7 @@ fsevents@^1.2.7:
     react-redux: 5.0.6
     react-router-dom: ^5.2.0
     react-select: ^3.0.4
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     redux: 3.7.2
     redux-logger: ^3.0.6
     redux-mock-store: ^1.5.3
@@ -13581,7 +13601,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0
@@ -13750,7 +13770,7 @@ fsevents@^1.2.7:
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13946,6 +13966,7 @@ fsevents@^1.2.7:
     core-js: ^3.6.4
     css-loader: ^3.5.1
     date-fns: ^2.19.0
+    emoji-mart: ^3.0.1
     enzyme: ^3.10.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
@@ -13968,8 +13989,9 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-dropzone: ^7.0.1
     react-i18next: 7.4.0
+    react-onclickoutside: ^6.9.0
     react-router-dom: ^5.2.0
-    reactstrap: ^8.0.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -14006,6 +14028,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
+    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0

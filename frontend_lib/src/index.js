@@ -30,10 +30,12 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername,
@@ -53,10 +55,12 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -101,6 +105,12 @@ import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
+import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+
+import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
+import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
+
+import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
@@ -192,6 +202,7 @@ import {
   putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getFileChildContent,
   getContent,
   getWorkspaceContent,
   getCommentTranslated
@@ -211,6 +222,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
+export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
 
@@ -224,7 +236,9 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 
 export {
   TRANSLATION_STATE,
@@ -237,11 +251,15 @@ export {
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
+  CommentTextArea,
+  AddFileToUploadButton,
+  DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
+  ScrollToBottomWrapper,
   sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,
@@ -254,6 +272,7 @@ export {
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   removeAtInUsername,
   computeProgressionPercentage,
@@ -315,6 +334,7 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   RefreshWarningMessage,
   sortTimelineByDate,
@@ -360,6 +380,7 @@ export {
   putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getFileChildContent,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,
@@ -370,6 +391,7 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   TextInput,
@@ -389,5 +411,6 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 }

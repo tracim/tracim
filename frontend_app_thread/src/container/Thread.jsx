@@ -13,9 +13,7 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   Timeline,
-  SelectStatus,
-  ArchiveDeleteContent,
-  ROLE,
+  AppContentRightMenu,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -28,6 +26,7 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
+  getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState
 } from 'tracim_frontend_lib'
@@ -52,6 +51,7 @@ export class Thread extends React.Component {
       content: param.content,
       timeline: [],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -84,6 +84,8 @@ export class Thread extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
+      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleCommentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -251,15 +253,18 @@ export class Thread extends React.Component {
     const { props, state } = this
 
     const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
-    const [resComment, resRevision] = await Promise.all([
+    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultThreadComment),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 
     const revisionWithComment = props.buildTimelineFromCommentAndRevision(
       resComment.body,
+      resCommentAsFile.body.items,
       resRevision.body,
       state.loggedUser,
       getDefaultTranslationState(state.config.system.config)
@@ -297,6 +302,14 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
@@ -321,6 +334,7 @@ export class Thread extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -409,26 +423,16 @@ export class Thread extends React.Component {
                 onClickRefresh={this.handleClickRefresh}
               />
             )}
-
-            <div className='thread__rightMenu'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              onChangeStatus={this.handleChangeStatus}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
@@ -443,10 +447,13 @@ export class Thread extends React.Component {
               apiUrl={state.config.apiUrl}
               timelineData={state.timeline}
               newComment={state.newComment}
+              newCommentAsFileList={state.newCommentAsFileList}
               disableComment={!state.content.is_editable}
               availableStatusList={state.config.availableStatuses}
               wysiwyg={state.timelineWysiwyg}
               onChangeNewComment={this.handleChangeNewComment}
+              onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+              onValidateCommentFileToUpload={this.handleAddCommentAsFile}
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               allowClickOnRevision={false}
@@ -464,6 +471,7 @@ export class Thread extends React.Component {
               onClickCancelSave={this.handleCancelSave}
               onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
               onInitWysiwyg={this.handleInitWysiwyg}
+              workspaceId={state.content.workspace_id}
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
               searchForMentionInQuery={this.searchForMentionInQuery}
               onClickTranslateComment={comment => props.handleTranslateComment(
@@ -473,7 +481,6 @@ export class Thread extends React.Component {
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-
             />
           ) : null}
         </PopinFixedContent>

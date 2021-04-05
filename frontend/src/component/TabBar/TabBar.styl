@@ -6,8 +6,8 @@ tabWidth = 185 //185px
   display flex
   background-color offWhite
   & .pageTitleGeneric
-    width "calc(100% - %s)" % (3*tabWidth)px
-  // INFO - GB - 2020-12-09 - The style below means that from 4 items the label "Home"
+    flex 1
+  // INFO - GB - 2020-12-09 - The style below means that for 4 items the label "Home"
   // will be hidden in the breadcrumbs
   & .breadcrumbs__item
     &:first-child
@@ -45,7 +45,7 @@ tabWidth = 185 //185px
   tabWidth = 50
   .tab
     width (tabWidth)px
-    & .fas
+    & .fas, .far
       margin 0
     &__label
       display none

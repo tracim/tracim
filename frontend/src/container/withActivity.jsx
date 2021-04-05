@@ -1,13 +1,16 @@
 import React from 'react'
 
-import { NUMBER_RESULTS_BY_PAGE, PAGE } from 'tracim_frontend_lib'
+import { CONTENT_TYPE, NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
 
 import {
   mergeWithActivityList,
   addMessageToActivityList,
   sortActivityList
 } from '../util/activity.js'
-import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  handleClickCopyLink
+} from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
@@ -17,7 +20,7 @@ const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
 
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
- * activity feeds.
+ * recent activities.
  * @param {React.Component} WrappedComponent component you want to wrap with this HOC
  * @param {function} setActivityList a redux action that will set the activity.list prop when dispatched.
  * @param {function} setActivityNextPage a redux action that will set the
@@ -52,18 +55,18 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     handleClickCopyLink = content => {
       const { props } = this
-      // INFO - GB - 2020-11-20 - Algorithm based on
-      // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
-      const tmp = document.createElement('textarea')
-      document.body.appendChild(tmp)
-      tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
-        props.workspaceId,
-        content.content_type,
-        content.content_id
-      )}`
-      tmp.select()
-      document.execCommand('copy')
-      document.body.removeChild(tmp)
+      handleClickCopyLink(content.content_type === CONTENT_TYPE.COMMENT
+        ? {
+          id: content.parent_id,
+          workspaceId: props.workspaceId,
+          type: content.parent_content_type
+        }
+        : {
+          id: content.content_id,
+          workspaceId: content.workspace_id,
+          type: content.content_type
+        }
+      )
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }
 
@@ -73,7 +76,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         props.user.userId,
         {
           notificationsPerPage: ACTIVITY_HISTORY_COUNT,
-          activityFeedEvents: true,
+          recentActivitiesEvents: true,
           relatedContentId: activity.content.content_id,
           workspaceId: activity.content.workspace_id,
           includeNotSent: true
@@ -112,7 +115,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * /api/users/<user_id>/messages
      * @param {Number} minActivityCount minimum activity count to load
      * @param {boolean} resetList if true the current activity list will be cleared before load
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace activity feed)
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
       const { props } = this
@@ -133,7 +136,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           {
             nextPageToken: nextPageToken,
             notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
-            activityFeedEvents: true,
+            recentActivitiesEvents: true,
             workspaceId: workspaceId,
             includeNotSent: true
           }

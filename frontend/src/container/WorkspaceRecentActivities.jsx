@@ -25,12 +25,11 @@ import {
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
-import TabBar from '../component/TabBar/TabBar.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
-require('../css/ActivityFeed.styl')
+require('../css/RecentActivities.styl')
 
-export class WorkspaceActivityFeed extends React.Component {
+export class WorkspaceRecentActivities extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
@@ -94,9 +93,9 @@ export class WorkspaceActivityFeed extends React.Component {
         isALink: true
       },
       {
-        link: PAGE.WORKSPACE.ACTIVITY_FEED(props.workspaceId),
+        link: PAGE.WORKSPACE.RECENT_ACTIVITIES(props.workspaceId),
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Activity feed'),
+        label: props.t('Recent activities'),
         isALink: false
       }
     ]
@@ -108,7 +107,7 @@ export class WorkspaceActivityFeed extends React.Component {
     const { props } = this
 
     const headTitle = buildHeadTitle(
-      [props.t('Activity feed'), props.currentWorkspace.label]
+      [props.t('Recent activities'), props.currentWorkspace.label]
     )
     props.dispatch(setHeadTitle(headTitle))
   }
@@ -117,11 +116,11 @@ export class WorkspaceActivityFeed extends React.Component {
     const { props } = this
 
     return (
-      <div className='workspaceActivityFeed'>
-        <TabBar
-          currentSpace={props.currentWorkspace}
-          breadcrumbs={props.breadcrumbs}
-        />
+      <div className='workspaceRecentActivities'>
+        <div className='workspaceRecentActivities__header subTitle'>
+          {props.t('Recent activities')}
+        </div>
+
         <ActivityList
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
@@ -141,19 +140,19 @@ export class WorkspaceActivityFeed extends React.Component {
   }
 }
 
-WorkspaceActivityFeed.propTypes = {
+WorkspaceRecentActivities.propTypes = {
   loadActivities: PropTypes.func.isRequired,
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.string.isRequired
+  workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
 const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {
   return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs }
 }
 const component = withActivity(
-  TracimComponent(WorkspaceActivityFeed),
+  TracimComponent(WorkspaceRecentActivities),
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
   resetWorkspaceActivity,

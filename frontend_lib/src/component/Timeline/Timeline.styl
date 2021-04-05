@@ -24,7 +24,6 @@
     flex 1 1 auto
     margin-bottom 0
     padding 5px
-    border-bottom 1px solid grey
     list-style none
     overflow-y auto
     &__item
@@ -73,6 +72,7 @@
       align-items flex-start
       justify-content flex-end
       margin-top 10px
+      height 42px
     &__advancedtext
       width 100%
       margin-right 15px
@@ -81,16 +81,17 @@
         border none
         background-color transparent
         color mediumDarkGrey
-        text-decoration underline
         cursor pointer
         font-size fontSizeSmall
         &:hover
           color darkGrey
+          text-decoration underline
         &:disabled
           cursor not-allowed
           &:hover
             color mediumDarkGrey
     &__submit
+      display flex
       &__btn
         display inline-block
         cursor pointer

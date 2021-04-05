@@ -13,10 +13,13 @@ const CardPopup = props => {
       <div className='cardPopup__container'>
         <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{ backgroundColor: props.customColor }} />
 
-        {props.hideCloseBtn === false &&
-          <div className='cardPopup__close' onClick={props.onClose}>
-            <i className='fas fa-times' />
-          </div>}
+        {props.hideCloseBtn === false && (
+          <div className='cardPopup__close'>
+            <button className='transparentButton' onClick={props.onClose}>
+              <i className='fas fa-times' />
+            </button>
+          </div>
+        )}
 
         <div className='cardPopup__body'>
           {props.children}

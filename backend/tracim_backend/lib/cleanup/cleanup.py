@@ -20,6 +20,7 @@ from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.reaction import Reaction
 
 ANONYMIZED_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
 
@@ -29,13 +30,19 @@ class UserNeedAnonymization(object):
         self,
         blocking_revisions: typing.List[ContentRevisionRO],
         blocking_workspaces: typing.List[Workspace],
+        blocking_reactions: typing.List[Reaction],
     ) -> None:
         self.blocking_revisions = blocking_revisions
         self.blocking_workspaces = blocking_workspaces
+        self.blocking_reactions = blocking_reactions
 
     @property
     def need_anonymization(self):
-        return self.blocking_workspaces != [] or self.blocking_revisions != []
+        return (
+            self.blocking_workspaces != []
+            or self.blocking_revisions != []
+            or self.blocking_reactions != []
+        )
 
 
 class CleanupLib(object):
@@ -337,6 +344,26 @@ class CleanupLib(object):
                 self.delete_content(revision.node)
         return deleted_revision_ids
 
+    def delete_user_reactions(self, user: User) -> typing.List[int]:
+        """
+        Delete all user reactions
+        :param user: tracim user
+        :return: reaction id for all reaction deleted
+        """
+
+        deleted_reactions_ids = []  # typing.List[int]
+        reactions = self.session.query(Reaction).filter(Reaction.author_id == user.user_id)
+        for reaction in reactions:
+            deleted_reactions_ids.append(reaction.reaction_id)
+            logger.info(
+                self,
+                "delete reaction {} of content {}".format(
+                    reaction.reaction_id, reaction.content_id
+                ),
+            )
+            self.safe_delete(reaction)
+        return deleted_reactions_ids
+
     def delete_full_user(self, user: User) -> int:
         """
         Full deletion of user in database (including all his revisions)
@@ -380,19 +407,35 @@ class CleanupLib(object):
             user, include_owned=True, include_with_role=False
         )
 
-        query = self.session.query(ContentRevisionRO)
+        revision_query = self.session.query(ContentRevisionRO)
+        reaction_query = self.session.query(Reaction)
         if owned_workspace_will_be_deleted:
-            query = query.filter(
+            revision_query = revision_query.filter(
                 ~ContentRevisionRO.workspace_id.in_(
                     [workspace.workspace_id for workspace in user_owned_workspaces_to_filter]
+                )
+            )
+            reaction_query = (
+                reaction_query.join(Content)
+                .join(
+                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                )
+                .filter(
+                    ~ContentRevisionRO.workspace_id.in_(
+                        [workspace.workspace_id for workspace in user_owned_workspaces_to_filter]
+                    )
                 )
             )
             user_blocking_workspaces = []
         else:
             user_blocking_workspaces = user_owned_workspaces_to_filter
 
-        query = query.filter(ContentRevisionRO.owner_id == user.user_id)
-        user_blocking_revisions = query.all()
+        revision_query = revision_query.filter(ContentRevisionRO.owner_id == user.user_id)
+        reaction_query = reaction_query.filter(Reaction.author_id == user.user_id)
+        user_blocking_revisions = revision_query.all()
+        user_blocking_reactions = reaction_query.all()
         return UserNeedAnonymization(
-            blocking_workspaces=user_blocking_workspaces, blocking_revisions=user_blocking_revisions
+            blocking_workspaces=user_blocking_workspaces,
+            blocking_revisions=user_blocking_revisions,
+            blocking_reactions=user_blocking_reactions,
         )

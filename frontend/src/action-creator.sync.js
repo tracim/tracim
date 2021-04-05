@@ -118,11 +118,6 @@ export const updateWorkspaceMember = (user, workspaceId, member) => ({
 })
 export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
 
-export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
-export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
-export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
@@ -242,3 +237,15 @@ export const setUserActivityNextPage = (hasNextPage, nextPageToken) => ({
 })
 export const resetUserActivity = () => ({ type: `${RESET}/${USER_ACTIVITY}` })
 export const setUserActivityEventList = (activityId, messageList) => ({ type: `${SET}/${USER_ACTIVITY}/${EVENT_LIST}`, activityId, messageList })
+
+export const PUBLICATION = 'Publication'
+export const WORKSPACE_PUBLICATION_LIST = `${WORKSPACE}/${PUBLICATION}List`
+export const PUBLICATION_THREAD = `${PUBLICATION}/Thread`
+export const COMMENT = 'Comment'
+export const COMMENT_LIST = `${COMMENT}List`
+export const setPublicationList = (publicationList) => ({ type: `${SET}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
+export const updatePublicationList = () => ({ type: `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}` })
+export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLICATION}`, publicationId })
+export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })
+export const updatePublication = (publication) => ({ type: `${UPDATE}/${PUBLICATION}`, publication })
+export const setCommentListToPublication = (publicationId, commentList) => ({ type: `${SET}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })

@@ -104,7 +104,7 @@ export class MemberActivity extends React.Component {
     ]
 
     return (
-      <div className='memberActivity'>
+      <div className='memberActivity feedItem'>
         <Avatar
           size={AVATAR_SIZE.SMALL}
           user={newestMessage.fields.user}

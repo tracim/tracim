@@ -66,6 +66,10 @@ class RoleAlreadyExistError(TracimError):
     error_code = ErrorCode.USER_ROLE_ALREADY_EXIST
 
 
+class ReactionAlreadyExistError(TracimError):
+    error_code = ErrorCode.REACTION_ALREADY_EXISTS
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -166,6 +170,10 @@ class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
 
 
+class ReactionNotFound(NotFound):
+    error_code = ErrorCode.REACTION_NOT_FOUND
+
+
 class UploadPermissionNotFound(NotFound):
     error_code = ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
@@ -263,6 +271,10 @@ class ContentNotFoundInTracimRequest(TracimException):
     error_code = ErrorCode.CONTENT_NOT_IN_TRACIM_REQUEST
 
 
+class ReactionNotFoundInTracimRequest(TracimException):
+    error_code = ErrorCode.REACTION_NOT_IN_TRACIM_REQUEST
+
+
 class InvalidId(TracimException):
     pass
 
@@ -273,6 +285,10 @@ class InvalidContentId(InvalidId):
 
 class InvalidCommentId(InvalidId):
     error_code = ErrorCode.COMMENT_INVALID_ID
+
+
+class InvalidReactionId(InvalidId):
+    error_code = ErrorCode.REACTION_INVALID_ID
 
 
 class InvalidWorkspaceId(InvalidId):
@@ -416,6 +432,10 @@ class UserCantChangeIsOwnProfile(TracimException):
 
 
 class UserIsNotContentOwner(TracimException):
+    pass
+
+
+class UserIsNotReactionAuthor(TracimException):
     pass
 
 

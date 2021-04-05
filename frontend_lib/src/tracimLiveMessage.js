@@ -4,6 +4,7 @@ import { CONTENT_TYPE } from './helper.js'
 const USER = 'user'
 const CONTENT = 'content'
 const MENTION = 'mention'
+const REACTION = 'reaction'
 const SHAREDSPACE = 'workspace'
 const SHAREDSPACE_MEMBER = 'workspace_member'
 const SHAREDSPACE_SUBSCRIPTION = 'workspace_subscription'
@@ -20,6 +21,7 @@ export const TLM_ENTITY_TYPE = {
   USER,
   CONTENT,
   MENTION,
+  REACTION,
   SHAREDSPACE,
   SHAREDSPACE_MEMBER,
   SHAREDSPACE_SUBSCRIPTION

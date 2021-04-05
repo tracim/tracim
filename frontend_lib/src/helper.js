@@ -28,7 +28,9 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
-    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
+    RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
+    PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -46,7 +48,7 @@ export const PAGE = {
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
-  ACTIVITY_FEED: '/ui/activity-feed',
+  RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
 }
@@ -61,7 +63,8 @@ export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
     apiResponse: fetchResult,
-    body: resultJson
+    body: resultJson,
+    ok: fetchResult.ok
   }))
 }
 
@@ -456,7 +459,15 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
 }
 
-export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+export const splitFilenameExtension = filename => {
+  const match = filename.match(/^([\s\S]*?)((?:\.tar)?(?:\.[^.]+))$/)
+  return {
+    basename: match ? match[1] : filename,
+    extension: match ? match[2] : ''
+  }
+}
+
+export const removeExtensionOfFilename = filename => splitFilenameExtension(filename).basename
 
 export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
 
@@ -484,13 +495,27 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
+// see https://github.com/tracim/tracim/issues/4340
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
+}
+
 export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
+  COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
 }
 
 export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
+  return timeline.sort((a, b) => {
+    // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
+    // may very happen. So we sort on content_id in that case. This isn't ideal
+    if (a.created_raw === b.created_raw) return parseInt(a.content_id) - parseInt(b.content_id)
+    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
+  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
@@ -669,6 +694,25 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const humanAndList = (list) => {
+  // INFO - RJ - 2021-17-03
+  // This function return a localized string that looks like:
+  //  - 'elem1' (one element in list)
+  //  - 'elem1 and elem2' (two elements)
+  //  - 'elem1, elem2 and elem3' (three elements and more)
+  //  - 'elem1, elem2, elem3 and elem4'
+
+  switch (list.length) {
+    case 0: return ''
+    case 1: return list[0]
+    default: {
+      const allButLast = list.slice(0, list.length - 1).join(', ')
+      const last = list[list.length - 1]
+      return `${allButLast} ${i18n.t('and')} ${last}`
+    }
+  }
+}
+
 export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
   // RJ - 2020-11-05 - INFO
   //
@@ -722,6 +766,17 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
+export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+  type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  data: {
+    msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
+    type: type || 'warning',
+    delay: delay
+  }
+})
+
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
+
+export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`

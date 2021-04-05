@@ -43,7 +43,7 @@
     "react-redux": "5.0.6",
     "react-router-dom": "^5.2.0",
     "react-select": "^3.0.4",
-    "reactstrap": "^8.0.0",
+    "reactstrap": "^8.9.0",
     "redux": "3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
