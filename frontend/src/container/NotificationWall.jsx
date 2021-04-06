@@ -131,7 +131,6 @@ export class NotificationWall extends React.Component {
       switch (eventType) {
         case TLM_EVENT.CREATED: {
           if (contentType === TLM_SUB.COMMENT) {
-            console.log("NOTIFICATIONCOMMENT", notification)
             return {
               icon: 'far fa-comments',
               title: props.t('Comment_noun'),
