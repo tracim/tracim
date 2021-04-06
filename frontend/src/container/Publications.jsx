@@ -479,7 +479,7 @@ export class Publications extends React.Component {
   getPreviewLinkParameters = (publication) => {
     const previewLinkType = publication.type === CONTENT_TYPE.FILE
       ? LINK_TYPE.DOWNLOAD
-      : LINK_TYPE.OPEN_IN_APP
+      : LINK_TYPE.NONE
 
     const previewLink = publication.type === CONTENT_TYPE.FILE
       ? getFileDownloadUrl(FETCH_CONFIG.apiUrl, publication.workspaceId, publication.id, publication.fileName)
