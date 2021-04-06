@@ -730,6 +730,7 @@ export class WorkspaceContent extends React.Component {
                   onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
                   text={props.t('Open the gallery')}
                   icon='far fa-image'
+                  dataCy='IconButton_gallery'
                 />
                 {userRoleIdInWorkspace >= ROLE.contributor.id && (
                   <DropdownCreateButton
