@@ -178,7 +178,8 @@ export class ReduxTlmDispatcher extends React.Component {
         content: {
           ...data.fields.content,
           parent_label: response.json.label,
-          parent_content_type: response.json.content_type
+          parent_content_type: response.json.content_type,
+          parent_content_namespace: response.json.content_namespace
         }
       }
     }

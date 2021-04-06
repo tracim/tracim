@@ -15,7 +15,10 @@ import {
   readNotificationList,
   setNextPage
 } from '../action-creator.sync.js'
-import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  CONTENT_NAMESPACE
+} from '../util/helper.js'
 import {
   AVATAR_SIZE,
   CONTENT_TYPE,
@@ -110,23 +113,40 @@ export class NotificationWall extends React.Component {
       interpolation: { escapeValue: false }
     }
 
-    const contentUrl = notification.content ? PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id) : ''
+    const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
+
+    const contentUrl = (
+      notification.content
+        ? (
+          isPublication
+            ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.id)
+            : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id)
+        )
+        : ''
+    )
 
     if (entityType === TLM_ENTITY.CONTENT) {
+      const publicationIcon = isPublication ? 'fas fa-stream+' : ''
+
       switch (eventType) {
         case TLM_EVENT.CREATED: {
           if (contentType === TLM_SUB.COMMENT) {
+            console.log("NOTIFICATIONCOMMENT", notification)
             return {
               icon: 'far fa-comments',
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
-              url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+              url: (
+                notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
+                  ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
+                  : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+              )
             }
           }
 
           return {
-            icon: 'fas fa-magic',
-            title: props.t('New content'),
+            icon: publicationIcon + 'fas fa-magic',
+            title: isPublication ? props.t('New publication') : props.t('New content'),
             text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -134,7 +154,7 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
-              icon: 'fas fa-random',
+              icon: publicationIcon + 'fas fa-random',
               title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
               url: contentUrl
@@ -142,24 +162,24 @@ export class NotificationWall extends React.Component {
           }
 
           return {
-            icon: 'fas fa-history',
-            title: props.t('Content updated'),
+            icon: publicationIcon + 'fas fa-history',
+            title: isPublication ? props.t('Publication updated') : props.t('Content updated'),
             text: props.t('{{author}} updated {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
-            icon: 'fas fa-magic',
-            title: props.t('Content deleted'),
+            icon: publicationIcon + 'fas fa-times',
+            title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
-            icon: 'fas fa-magic',
-            title: props.t('Content restored'),
+            icon: publicationIcon + 'fas fa-undo',
+            title: isPublication ? props.t('Publication restored') : props.t('Content restored'),
             text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }

@@ -38,6 +38,7 @@ export const serializeContentProps = {
   actives_shares: 'activedShares',
   created: 'created',
   parent_content_type: 'parentContentType',
+  parent_content_namespace: 'parentContentNamespace',
   parent_label: 'parentLabel',
   current_revision_type: 'currentRevisionType'
 }
