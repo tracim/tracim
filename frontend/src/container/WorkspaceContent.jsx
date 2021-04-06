@@ -725,7 +725,7 @@ export class WorkspaceContent extends React.Component {
               breadcrumbs={breadcrumbs}
             />
             <PageContent parentClass='workspace__content'>
-              <div className='buttons'>
+              <div className='workspace__content__buttons'>
                 <IconButton
                   onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
                   text={props.t('Open the gallery')}
