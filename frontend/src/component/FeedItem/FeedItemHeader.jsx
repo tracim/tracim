@@ -53,7 +53,7 @@ export class FeedItemHeader extends React.Component {
     const contentLabel = props.content.label
     const contentType = props.content.type
     const showLastModification = (
-      props.success &&
+      props.available &&
       props.lastModificationType &&
       props.lastModificationEntityType &&
       props.lastModificationSubEntityType &&
@@ -106,13 +106,13 @@ export class FeedItemHeader extends React.Component {
           />
         )}
 
-        {!props.success && (
-          <span className='feedItemHeader__notAvailable'>
+        {!props.available && (
+          <span className='feedItemHeader__unavailable'>
             {props.t('This content is not available')}
           </span>
         )}
 
-        {props.success && (
+        {props.available && (
           <DropdownMenu
             buttonCustomClass='feedItemHeader__actionMenu'
             buttonIcon='fas fa-ellipsis-v'
@@ -146,7 +146,7 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  success: PropTypes.bool.isRequired,
+  available: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,

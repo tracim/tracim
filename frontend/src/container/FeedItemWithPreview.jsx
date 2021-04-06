@@ -170,7 +170,7 @@ export class FeedItemWithPreview extends React.Component {
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           breadcrumbsList={props.breadcrumbsList}
-          success={props.success}
+          available={props.available}
           content={props.content}
           isPublication={props.isPublication}
           eventList={props.eventList}
@@ -184,7 +184,7 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        {props.success && (
+        {props.available && (
           <>
             <div className='feedItem__content' title={title}>
               <Preview
@@ -242,7 +242,7 @@ export { LINK_TYPE }
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
-  success: PropTypes.bool.isRequired,
+  available: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,

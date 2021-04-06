@@ -49,7 +49,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
       : (
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
-          success={activity.success}
+          available={activity.available}
           commentList={activity.commentList}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
@@ -85,7 +85,7 @@ const ActivityList = (props) => {
       isALink: true
     }
 
-    if (activity.success && activity.contentPath.length > 0) {
+    if (activity.available && activity.contentPath.length > 0) {
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({

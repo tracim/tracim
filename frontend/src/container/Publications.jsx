@@ -507,7 +507,7 @@ export class Publications extends React.Component {
         >
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
-              success
+              available
               commentList={publication.commentList}
               content={publication}
               customColor={publicationColor}

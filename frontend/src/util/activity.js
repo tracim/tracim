@@ -24,7 +24,7 @@ const createSingleMessageActivity = (activityParams, messageList) => {
     eventList: [],
     commentList: [],
     newestMessage: message,
-    success: true
+    available: true
   }
 }
 
@@ -68,7 +68,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     newestMessage: first,
     content: content,
     contentPath: contentPath,
-    success: !!contentPath
+    available: !!contentPath
   }
 }
 
