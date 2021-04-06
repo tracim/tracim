@@ -89,7 +89,7 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def get_all_slugs_values(self) -> typing.List[str]:
-        """ Get alls slugs"""
+        """ Get all slugs"""
         return [item.slug for item in self._content_status]
 
     def get_all(self) -> typing.List[ContentStatus]:
@@ -253,7 +253,7 @@ class ContentTypeList(object):
 
     def query_allowed_types_slugs(self) -> typing.List[str]:
         """
-        Return alls allowed types slug : content_type slug + all alias, any
+        Return all allowed types slug : content_type slug + all alias, any
         and special content_type like comment. Do not return event.
         Usefull allowed value to perform query to database.
         """

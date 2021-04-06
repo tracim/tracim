@@ -23,7 +23,7 @@ class TestCommentsEndpoint(object):
 
     def test_api__get_contents_comments__ok_200__nominal_case(self, web_testapp) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
@@ -32,6 +32,7 @@ class TestCommentsEndpoint(object):
         assert comment["content_id"] == 18
         assert comment["parent_id"] == 7
         assert comment["parent_content_type"] == "thread"
+        assert comment["parent_content_namespace"] == "content"
         assert comment["parent_label"] == "Best Cakes?"
         assert (
             comment["raw_content"]
@@ -109,6 +110,7 @@ class TestCommentsEndpoint(object):
         assert comment["content_id"] == comment_created.content_id
         assert comment["parent_id"] == comment_created.parent_id
         assert comment["parent_content_type"] == "html-document"
+        assert comment["parent_content_namespace"] == "content"
         assert comment["parent_label"] == "test_page"
         assert comment["raw_content"] == raw_content
         assert comment["author"]
@@ -181,7 +183,7 @@ class TestCommentsEndpoint(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
 
         workspace_api = workspace_api_factory.get()
@@ -217,7 +219,7 @@ class TestCommentsEndpoint(object):
 
     def test_api__post_content_comment__err_400__empty_raw_content(self, web_testapp) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": ""}

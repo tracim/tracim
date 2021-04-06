@@ -116,7 +116,7 @@ class TestTimezonesEndpoint(object):
 
     def test_api__get_timezones__ok_200__nominal_case(self, web_testapp):
         """
-        Get alls timezones list with a registered user.
+        Get all timezones list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/timezones", status=200)
