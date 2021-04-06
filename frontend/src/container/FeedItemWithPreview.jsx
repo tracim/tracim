@@ -170,6 +170,7 @@ export class FeedItemWithPreview extends React.Component {
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           breadcrumbsList={props.breadcrumbsList}
+          success={props.success}
           content={props.content}
           isPublication={props.isPublication}
           eventList={props.eventList}
@@ -183,45 +184,49 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        <div className='feedItem__content' title={title}>
-          <Preview
-            fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
-            content={props.content}
-            linkType={props.previewLinkType}
-            link={props.previewLink}
-          />
-          <FeedItemFooter content={props.content} />
-        </div>
-        {props.showTimeline && (
-          <Timeline
-            apiUrl={FETCH_CONFIG.apiUrl}
-            customClass='feedItem__timeline'
-            customColor={props.customColor}
-            id={props.content.id}
-            invalidMentionList={state.invalidMentionList}
-            loggedUser={props.user}
-            memberList={props.memberList}
-            newComment={state.newComment}
-            newCommentAsFileList={state.newCommentAsFileList}
-            onChangeNewComment={this.handleChangeNewComment}
-            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onClickDeleteComment={this.handleClickDeleteComment}
-            onClickEditComment={this.handleClickEditComment}
-            onClickValidateNewCommentBtn={this.handleClickSend}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onInitWysiwyg={this.handleInitWysiwyg}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-            shouldScrollToBottom={false}
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            showTitle={false}
-            timelineData={props.commentList}
-            wysiwyg={state.timelineWysiwyg}
-            onClickCancelSave={this.handleCancelSave}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
-            onClickSaveAnyway={this.handleClickValidateAnyway}
-            searchForMentionInQuery={this.searchForMentionInQuery}
-            workspaceId={props.workspaceId}
-          />
+        {props.success && (
+          <>
+            <div className='feedItem__content' title={title}>
+              <Preview
+                fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
+                content={props.content}
+                linkType={props.previewLinkType}
+                link={props.previewLink}
+              />
+              <FeedItemFooter content={props.content} />
+            </div>
+            {props.showTimeline && (
+              <Timeline
+                apiUrl={FETCH_CONFIG.apiUrl}
+                customClass='feedItem__timeline'
+                customColor={props.customColor}
+                id={props.content.id}
+                invalidMentionList={state.invalidMentionList}
+                loggedUser={props.user}
+                memberList={props.memberList}
+                newComment={state.newComment}
+                newCommentAsFileList={state.newCommentAsFileList}
+                onChangeNewComment={this.handleChangeNewComment}
+                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickEditComment={this.handleClickEditComment}
+                onClickValidateNewCommentBtn={this.handleClickSend}
+                onClickWysiwygBtn={this.handleToggleWysiwyg}
+                onInitWysiwyg={this.handleInitWysiwyg}
+                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                shouldScrollToBottom={false}
+                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                showTitle={false}
+                timelineData={props.commentList}
+                wysiwyg={state.timelineWysiwyg}
+                onClickCancelSave={this.handleCancelSave}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                onClickSaveAnyway={this.handleClickValidateAnyway}
+                searchForMentionInQuery={this.searchForMentionInQuery}
+                workspaceId={props.workspaceId}
+              />
+            )}
+          </>
         )}
       </div>
     )
@@ -237,6 +242,7 @@ export { LINK_TYPE }
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
+  success: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,

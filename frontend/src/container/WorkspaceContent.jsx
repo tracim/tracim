@@ -513,7 +513,7 @@ export class WorkspaceContent extends React.Component {
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     if (fetchMoveContent.status !== 200) {
-      switch (fetchMoveContent.json.code) {
+      switch ((fetchMoveContent.json || {}).code) {
         case 3002:
           props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
           break

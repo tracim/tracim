@@ -53,6 +53,7 @@ export class FeedItemHeader extends React.Component {
     const contentLabel = props.content.label
     const contentType = props.content.type
     const showLastModification = (
+      props.success &&
       props.lastModificationType &&
       props.lastModificationEntityType &&
       props.lastModificationSubEntityType &&
@@ -105,29 +106,36 @@ export class FeedItemHeader extends React.Component {
           />
         )}
 
-        <DropdownMenu
-          buttonCustomClass='feedItemHeader__actionMenu'
-          buttonIcon='fas fa-ellipsis-v'
-          buttonTooltip={props.t('Actions')}
-        >
-          <IconButton
-            customClass='feedItemHeader__actionMenu__item'
-            icon='fas fa-link'
-            onClick={props.onClickCopyLink}
-            text={props.t('Copy content link')}
-            key={`link-${contentId}`}
-          />
+        {!props.success && (
+          <span className='feedItemHeader__notAvailable'>
+            {props.t('This content is not available')}
+          </span>
+        )}
 
-          <Link
-            className='feedItemHeader__actionMenu__item'
-            title={props.t('Open as content')}
-            to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-            key={`open-${contentId}`}
+        {props.success && (
+          <DropdownMenu
+            buttonCustomClass='feedItemHeader__actionMenu'
+            buttonIcon='fas fa-ellipsis-v'
+            buttonTooltip={props.t('Actions')}
           >
-            <i className={`fa-fw ${app.faIcon}`} />
-            {props.t('Open as content')}
-          </Link>
-        </DropdownMenu>
+            <IconButton
+              customClass='feedItemHeader__actionMenu__item'
+              icon='fas fa-link'
+              onClick={props.onClickCopyLink}
+              text={props.t('Copy content link')}
+              key={`link-${contentId}`}
+            />
+            <Link
+              className='feedItemHeader__actionMenu__item'
+              title={props.t('Open content')}
+              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+              key={`open-${contentId}`}
+            >
+              <i className={`fa-fw ${app.faIcon}`} />
+              {props.t('Open as content')}
+            </Link>
+          </DropdownMenu>
+        )}
       </div>
     )
   }
@@ -138,6 +146,7 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
+  success: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   breadcrumbsList: PropTypes.array,
