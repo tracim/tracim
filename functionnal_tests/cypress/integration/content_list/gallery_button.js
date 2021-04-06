@@ -18,7 +18,7 @@ describe('In the content list page', () => {
     cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
   })
 
-  it('should have a specific icon and color for gallery button', () => {
+  it('should have a specific icon for gallery button', () => {
     cy.contains('[data-cy=IconButton_gallery]', galleryButton)
       .find('.iconbutton__icon')
       .should('have.class', 'fa-image')
