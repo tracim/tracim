@@ -183,12 +183,13 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        <div className='feedItem__content' title={title}>
+        <div className='feedItem__content'>
           <Preview
             fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
             content={props.content}
             linkType={props.previewLinkType}
             link={props.previewLink}
+            title={title}
           />
           <FeedItemFooter content={props.content} />
         </div>
