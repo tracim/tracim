@@ -176,7 +176,6 @@ export function appContentFactory (WrappedComponent) {
 
     appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
-
       const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
       let knownMentions = await this.searchForMentionInQuery('', workspaceId)
       knownMentions = knownMentions.map(member => `@${member.username}`)

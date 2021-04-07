@@ -106,6 +106,7 @@ import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
@@ -259,6 +260,7 @@ export {
   DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
+  EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,

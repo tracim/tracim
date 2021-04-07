@@ -64,13 +64,12 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = async () => {
-    const { props, state } = this
-
+  handleClickValidateEditComment = async (comment) => {
+    const { props } = this
     if (!handleInvalidMentionInComment(
       props.memberList,
       true,
-      state.newComment.raw_content,
+      comment,
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayEditComment()

@@ -170,6 +170,7 @@ export class Preview extends React.Component {
   }
 
   isContentDifferent = (oldContent, newContent) => (
+    newContent.firstComment !== oldContent.firstComment ||
     newContent.commentList !== oldContent.commentList ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )
@@ -309,7 +310,7 @@ export class Preview extends React.Component {
 }
 
 Preview.propTypes = {
-  fallbackToAttachedFile: PropTypes.boolean,
+  fallbackToAttachedFile: PropTypes.bool,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
   linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
