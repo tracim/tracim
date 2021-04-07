@@ -56,12 +56,12 @@ const Comment = props => {
               <LinkPreview apiUrl={props.apiUrl} findLinkInHTML={props.text} />
             </div>
 
-            <DropdownMenu
-              buttonCustomClass='comment__body__content__actions'
-              buttonIcon='fas fa-ellipsis-v'
-              buttonTooltip={props.t('Actions')}
-            >
-              {props.allowCommentEdition && (
+            {props.allowCommentActions && (
+              <DropdownMenu
+                buttonCustomClass='comment__body__content__actions'
+                buttonIcon='fas fa-ellipsis-v'
+                buttonTooltip={props.t('Actions')}
+              >
                 <IconButton
                   icon='fas fa-fw fa-pencil-alt'
                   intent='link'
@@ -71,18 +71,18 @@ const Comment = props => {
                   text={props.t('Edit')}
                   title={props.t('Edit comment')}
                 />
-              )}
 
-              <IconButton
-                icon='far fa-fw fa-trash-alt'
-                intent='link'
-                key='deleteComment'
-                mode='dark'
-                onClick={props.onClickDeleteComment}
-                text={props.t('Delete')}
-                title={props.t('Delete comment')}
-              />
-            </DropdownMenu>
+                <IconButton
+                  icon='far fa-fw fa-trash-alt'
+                  intent='link'
+                  key='deleteComment'
+                  mode='dark'
+                  onClick={props.onClickDeleteComment}
+                  text={props.t('Delete')}
+                  title={props.t('Delete comment')}
+                />
+              </DropdownMenu>
+            )}
           </div>
           <div
             className={classnames(`${props.customClass}__footer`, 'comment__footer')}
@@ -113,7 +113,7 @@ Comment.propTypes = {
   loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  allowCommentEdition: PropTypes.bool,
+  allowCommentActions: PropTypes.bool,
   customClass: PropTypes.string,
   text: PropTypes.string,
   createdFormated: PropTypes.string,
@@ -127,7 +127,7 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
-  allowCommentEdition: false,
+  allowCommentActions: false,
   customClass: '',
   text: '',
   createdFormated: '',

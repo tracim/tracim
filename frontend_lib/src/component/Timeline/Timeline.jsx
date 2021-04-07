@@ -100,7 +100,7 @@ export class Timeline extends React.Component {
       : this.handleClickValidateAnywayEditComment()
   }
 
-  isCommentEditionAllowed = (commentAuthorId) => {
+  areCommentActionsAllowed = (commentAuthorId) => {
     const { props } = this
     return props.loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
       props.loggedUser.userId === commentAuthorId
@@ -164,7 +164,7 @@ export class Timeline extends React.Component {
               case TIMELINE_TYPE.COMMENT:
                 return (
                   <Comment
-                    allowCommentEdition={this.isCommentEditionAllowed(content.author.user_id)}
+                    allowCommentActions={this.areCommentActionsAllowed(content.author.user_id)}
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
