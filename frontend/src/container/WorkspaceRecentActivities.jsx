@@ -5,16 +5,12 @@ import { translate } from 'react-i18next'
 
 import {
   TracimComponent,
-  PAGE,
   permissiveNumberEqual
 } from 'tracim_frontend_lib'
 
-import { getWorkspaceDetail } from '../action-creator.async.js'
 import {
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
-  newFlashMessage,
-  setWorkspaceDetail,
   resetWorkspaceActivity,
   setWorkspaceActivityEventList
 } from '../action-creator.sync.js'
@@ -32,35 +28,22 @@ export class WorkspaceRecentActivities extends React.Component {
 
   componentDidMount () {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
-    this.loadWorkspaceDetail()
+  }
+
+  componentWillUnmount () {
+    this.props.cancelCurrentLoadActivities()
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.workspaceId === this.props.workspaceId) return
+    this.props.cancelCurrentLoadActivities()
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
-    this.loadWorkspaceDetail()
   }
 
   handleTlm = (data) => {
     if (!data.fields.workspace ||
       !permissiveNumberEqual(data.fields.workspace.workspace_id, this.props.workspaceId)) return
     this.props.handleTlm(data)
-  }
-
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
-    }
   }
 
   render () {
