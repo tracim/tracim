@@ -23,7 +23,7 @@ const createSingleMessageActivity = (activityParams, messageList) => {
     ...activityParams,
     eventList: [],
     commentList: [],
-    newestMessage: message,
+    newestMessage: message
   }
 }
 

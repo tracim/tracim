@@ -87,7 +87,6 @@ describe('In activity.js module', () => {
     entityType: TLM_ET.CONTENT,
     eventList: [],
     commentList: [],
-    contentAvailable: true,
     newestMessage: messageList[1],
     content: fileContent
   }
