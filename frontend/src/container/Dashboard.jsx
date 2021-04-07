@@ -110,7 +110,6 @@ export class Dashboard extends React.Component {
     const { props } = this
 
     if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
-
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
