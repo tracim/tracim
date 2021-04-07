@@ -19,7 +19,6 @@ from tracim_backend.lib.utils.utils import validate_page_token
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
@@ -112,7 +111,6 @@ user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
 user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
 page_token_validator = validate_page_token
 user_config_validator = validate_simple_dict
-all_content_namespaces_validator = OneOf(choices=list(ContentNamespaces))
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])

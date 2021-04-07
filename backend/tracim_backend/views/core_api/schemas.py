@@ -13,7 +13,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
 from tracim_backend.app_models.validator import action_description_validator
-from tracim_backend.app_models.validator import all_content_namespaces_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
@@ -1693,7 +1692,9 @@ class CommentSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
-    parent_content_namespace = String(example="content", validate=all_content_namespaces_validator)
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")
