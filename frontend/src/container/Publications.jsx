@@ -487,11 +487,26 @@ export class Publications extends React.Component {
     return { previewLinkType, previewLink }
   }
 
+  // displayPublicationsEmptyMessage = (isPublicationListEmpty) => {
+  //   const { props } = this
+
+  //   const emptyPublicationListMessage = !isPublicationListEmpty
+  //     ? return // rien
+  //     : props.t('Cet espace n\'a pas encore de publications, créez la première publication en utilisant la zone en bas de la page.')
+
+  //   return (
+  //     <div className='publication__list__empty'>
+  //       {emptyPublicationListMessage}
+  //     </div>
+  //   )
+  // }
+
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
     this.currentPublicationRef = currentPublicationId ? React.createRef() : null
+    const isPublicationListEmpty = props.publicationList.length === 0 // ???? la fonction publicationList
     return (
       <div className='publications'>
         <TabBar
@@ -558,6 +573,8 @@ export class Publications extends React.Component {
 
           {userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='publications__publishArea'>
+
+
               <CommentTextArea
                 apiUrl={FETCH_CONFIG.apiUrl}
                 id={wysiwygId}
