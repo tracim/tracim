@@ -17,6 +17,7 @@ import { serialize } from 'tracim_frontend_lib'
 import { CONTENT_NAMESPACE } from '../util/helper'
 
 export const serializeContentProps = {
+  author: 'author',
   content_id: 'id',
   content_namespace: 'contentNamespace',
   current_revision_id: 'currentRevisionId',

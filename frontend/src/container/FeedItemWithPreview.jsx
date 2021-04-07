@@ -169,6 +169,7 @@ export class FeedItemWithPreview extends React.Component {
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
+          allowEdition={props.allowEdition}
           breadcrumbsList={props.breadcrumbsList}
           content={props.content}
           isPublication={props.isPublication}
@@ -180,6 +181,7 @@ export class FeedItemWithPreview extends React.Component {
           modifiedDate={props.modifiedDate}
           onClickCopyLink={props.onClickCopyLink}
           onEventClicked={props.onEventClicked}
+          onClickEdit={props.onClickEdit}
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
@@ -240,12 +242,13 @@ FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  isPublication: PropTypes.bool.isRequired,
+  inRecentActivities: PropTypes.bool.isRequired,
+  allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   commentList: PropTypes.array,
   customColor: PropTypes.string,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool.isRequired,
-  inRecentActivities: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
@@ -253,6 +256,7 @@ FeedItemWithPreview.propTypes = {
   memberList: PropTypes.array,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
+  onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
   showTimeline: PropTypes.bool,
   user: PropTypes.object,
@@ -262,6 +266,7 @@ FeedItemWithPreview.propTypes = {
 }
 
 FeedItemWithPreview.defaultProps = {
+  allowEdition: false,
   breadcrumbsList: [],
   commentList: [],
   customColor: '',
@@ -272,6 +277,7 @@ FeedItemWithPreview.defaultProps = {
   lastModifier: {},
   memberList: [],
   modifiedDate: '',
+  onClickEdit: () => {},
   reactionList: [],
   showTimeline: false,
   user: {},
