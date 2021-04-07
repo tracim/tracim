@@ -61,15 +61,17 @@ const Comment = props => {
               buttonIcon='fas fa-ellipsis-v'
               buttonTooltip={props.t('Actions')}
             >
-              <IconButton
-                icon='fas fa-fw fa-pencil-alt'
-                intent='link'
-                key='editComment'
-                mode='dark'
-                onClick={props.onClickEditComment}
-                text={props.t('Edit')}
-                title={props.t('Edit comment')}
-              />
+              {props.allowCommentEdition && (
+                <IconButton
+                  icon='fas fa-fw fa-pencil-alt'
+                  intent='link'
+                  key='editComment'
+                  mode='dark'
+                  onClick={props.onClickEditComment}
+                  text={props.t('Edit')}
+                  title={props.t('Edit comment')}
+                />
+              )}
 
               <IconButton
                 icon='far fa-fw fa-trash-alt'
@@ -107,11 +109,12 @@ const Comment = props => {
 export default translate()(Comment)
 
 Comment.propTypes = {
-  customClass: PropTypes.string,
   author: PropTypes.object.isRequired,
   loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  allowCommentEdition: PropTypes.bool,
+  customClass: PropTypes.string,
   text: PropTypes.string,
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,
@@ -124,6 +127,7 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
+  allowCommentEdition: false,
   customClass: '',
   text: '',
   createdFormated: '',
