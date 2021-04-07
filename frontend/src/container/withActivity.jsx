@@ -18,6 +18,20 @@ const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 const ACTIVITY_HISTORY_COUNT = 5
 const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
 
+const makeCancelable = (promise) => {
+  let isCanceled = false
+  const wrappedPromise =
+    new Promise((resolve, reject) => {
+      promise
+        .then((val) => (isCanceled ? reject(new Error('Cancelled')) : resolve(val)))
+        .catch((error) => (reject(isCanceled ? new Error('Cancelled') : error)))
+    })
+  return {
+    promise: wrappedPromise,
+    cancel: () => { isCanceled = true }
+  }
+}
+
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
  * recent activities.
@@ -36,6 +50,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         showRefresh: false
       }
       this.changingActivityList = false
+      this.loadActivitiesPromise = null
     }
 
     /**
@@ -111,13 +126,34 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     }
 
     /**
+       Wrap loadActivitiesImpl() so that the dispatch in redux can be cancelled.
+     */
+    loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
+      const { props } = this
+
+      this.loadActivitiesPromise = makeCancelable(
+        this.loadActivitiesImpl(
+          minActivityCount,
+          resetList,
+          workspaceId
+        )
+      )
+      try {
+        const activitiesParams = await this.loadActivitiesPromise.promise
+        props.dispatch(setActivityList(activitiesParams.list))
+        props.dispatch(setActivityNextPage(activitiesParams.hasNextPage, activitiesParams.nextPageToken))
+      } catch {}
+      this.loadActivitiesPromise = null
+    }
+
+    /**
      * Load at minimum the given count of activities by getting messages through
      * /api/users/<user_id>/messages
      * @param {Number} minActivityCount minimum activity count to load
      * @param {boolean} resetList if true the current activity list will be cleared before load
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
-    loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
+    loadActivitiesImpl = async (minActivityCount, resetList = false, workspaceId = null) => {
       const { props } = this
       let activityList = props.activity.list
       let hasNextPage = props.activity.hasNextPage
@@ -149,9 +185,17 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }
-      props.dispatch(setActivityList(activityList))
-      props.dispatch(setActivityNextPage(hasNextPage, nextPageToken))
       this.changingActivityList = false
+      return {
+        list: activityList,
+        hasNextPage,
+        nextPageToken
+      }
+    }
+
+    cancelCurrentLoadActivities = () => {
+      if (!this.loadActivitiesPromise) return
+      this.loadActivitiesPromise.cancel()
     }
 
     render () {
@@ -163,6 +207,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           onCopyLinkClicked={this.handleClickCopyLink}
           onEventClicked={this.handleEventClick}
           showRefresh={this.state.showRefresh}
+          cancelCurrentLoadActivities={this.cancelCurrentLoadActivities}
           {...this.props}
         />
       )
