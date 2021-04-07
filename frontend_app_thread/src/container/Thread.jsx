@@ -31,7 +31,6 @@ import {
   getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE,
   FavoriteButton,
   FAVORITE_STATE,
   ToolBar
