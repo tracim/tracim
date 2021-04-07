@@ -157,7 +157,7 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType) => {
+    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType = CONTENT_TYPE.COMMENT) => {
       this.checkApiUrl()
       let response
 
