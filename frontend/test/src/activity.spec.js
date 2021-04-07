@@ -82,10 +82,12 @@ describe('In activity.js module', () => {
 
   const contentActivity = {
     id: 'content-42',
+    contentAvailable: true,
     contentPath: [],
     entityType: TLM_ET.CONTENT,
     eventList: [],
     commentList: [],
+    contentAvailable: true,
     newestMessage: messageList[1],
     content: fileContent
   }
@@ -116,9 +118,11 @@ describe('In activity.js module', () => {
         content: commentContent,
         workspace: workspace
       })
+      const mockContentPath = mockGetContentPath200(apiUrl, commentContent.workspace_id, commentContent.content_id, [])
       const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
       const resultActivityList = await mergeWithActivityList([message], [], apiUrl)
       expect(mock.isDone()).to.equal(true)
+      expect(mockContentPath.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal([])
     })
   })
@@ -142,6 +146,7 @@ describe('In activity.js module', () => {
             ...contentActivity.eventList
           ],
           commentList: [],
+          contentAvailable: true,
           newestMessage: modifiedMessage
         }
       },
@@ -191,6 +196,7 @@ describe('In activity.js module', () => {
         commentList: [],
         newestMessage: message,
         content: otherFileContent,
+        contentAvailable: true,
         contentPath: []
       }
       const resultActivityList = await addMessageToActivityList(
@@ -209,9 +215,11 @@ describe('In activity.js module', () => {
         content: commentContent,
         workspace: workspace
       })
+      const mockContentPath = mockGetContentPath200(apiUrl, commentContent.workspace_id, commentContent.content_id, [])
       const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
       const resultActivityList = await addMessageToActivityList(message, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
+      expect(mockContentPath.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal([])
     })
   })

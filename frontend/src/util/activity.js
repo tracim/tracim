@@ -24,7 +24,6 @@ const createSingleMessageActivity = (activityParams, messageList) => {
     eventList: [],
     commentList: [],
     newestMessage: message,
-    contentAvailable: true
   }
 }
 
@@ -59,7 +58,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     } else return null
   }
 
-  const commentList = contentPath ? getCommentList(content, apiUrl) : []
+  const commentList = contentPath ? await getCommentList(content, apiUrl) : []
 
   return {
     ...activityParams,
