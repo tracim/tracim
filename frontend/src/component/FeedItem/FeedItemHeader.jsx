@@ -9,7 +9,6 @@ import {
   DropdownMenu,
   Icon,
   IconButton,
-  PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilenameWithExtension
