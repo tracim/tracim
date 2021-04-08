@@ -2,9 +2,12 @@
 
 .publications
   height 100%
+  display flex
+  flex-direction column
   overflow auto
   & .feedItem
-    margin-bottom 30px
+    margin-block-start 15px
+    margin-block-end 15px
   &__reorder
     margin auto auto 10px
   &__publishArea
@@ -38,11 +41,6 @@
         display flex
         & .AddFileToCommentButton
           padding 3px 6px
-  & .pageContentGeneric
-    height calc(100% - 85px)
-    display flex
-    flex-direction column
-    padding 10px
 
 @media (max-width: max-xs)
   .publications

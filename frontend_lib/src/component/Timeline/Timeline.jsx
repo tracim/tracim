@@ -156,7 +156,6 @@ export class Timeline extends React.Component {
         <ScrollToBottomWrapper
           customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
           shouldScrollToBottom={props.shouldScrollToBottom}
-          itemList={props.timelineData}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
           {props.timelineData.map(content => {
