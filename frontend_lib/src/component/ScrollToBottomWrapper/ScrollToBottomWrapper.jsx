@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 /*
  * DOC - SG - 2021-04-08
  * This component keeps the scroll position of its root element at the bottom as long as
- * it hasn't been scrolled externally.
+ * it hasn't been scrolled manually away from the bottom.
  *
- * It properly handles the resizing of direct children.
+ * It properly handles children changing size (height).
  * You can disable its behavior with shouldScrollToBottom=false.
 
  * You can use isLastItemAddedFromCurrentToken=true to force a scroll to bottom
