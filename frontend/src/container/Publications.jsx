@@ -565,7 +565,6 @@ export class Publications extends React.Component {
 
           {userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='publications__publishArea'>
-
               <CommentTextArea
                 apiUrl={FETCH_CONFIG.apiUrl}
                 id={wysiwygId}
