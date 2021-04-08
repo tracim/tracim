@@ -66,6 +66,10 @@ export class Preview extends React.Component {
   }
 
   async getHTMLPreviewCode (content) {
+    if (Object.hasOwnProperty.call(content, 'translatedRawContent')) {
+      return content.translatedRawContent
+    }
+
     if (content.type === CONTENT_TYPE.HTML_DOCUMENT) {
       return content.rawContent
     }
@@ -172,6 +176,7 @@ export class Preview extends React.Component {
   isContentDifferent = (oldContent, newContent) => (
     newContent.firstComment !== oldContent.firstComment ||
     newContent.commentList !== oldContent.commentList ||
+    newContent.translatedRawContent !== oldContent.translatedRawContent ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )
 

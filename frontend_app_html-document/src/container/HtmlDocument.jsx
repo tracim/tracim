@@ -48,6 +48,7 @@ import {
   permissiveNumberEqual,
   getTranslationApiErrorMessage,
   TRANSLATION_STATE,
+  handleTranslateHtmlContent,
   getDefaultTranslationState,
   FavoriteButton,
   FAVORITE_STATE,
@@ -60,7 +61,6 @@ import {
   getHtmlDocRevision,
   putHtmlDocContent,
   putHtmlDocRead,
-  getHtmlDocTranslated
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -843,31 +843,24 @@ export class HtmlDocument extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  handleTranslateDocument = async () => {
+  handleTranslateDocument = () => {
     const { state } = this
-    this.setState({ translationState: TRANSLATION_STATE.PENDING })
-    const response = await getHtmlDocTranslated(
+    handleTranslateHtmlContent(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.loggedUser.lang
+      state.loggedUser.lang,
+      state.config.system.config,
+      ({translatedRawContent = state.translatedRawContent, translationState }) => {
+        this.setState({ translatedRawContent, translationState })
+      }
     )
-    const errorMessage = getTranslationApiErrorMessage(response)
-    if (errorMessage) {
-      this.sendGlobalFlashMessage(errorMessage)
-      this.setState(previousState => {
-        return { translationState: getDefaultTranslationState(previousState.config.system.config) }
-      })
-      return
-    }
-    const translatedRawContent = await response.text()
-    this.setState({ translatedRawContent, translationState: TRANSLATION_STATE.TRANSLATED })
   }
 
   handleRestoreDocument = () => {
-    this.setState(previousState => {
-      return { translationState: getDefaultTranslationState(previousState.config.system.config) }
+    this.setState({
+      translationState: getDefaultTranslationState(this.state.config.system.config)
     })
   }
 
