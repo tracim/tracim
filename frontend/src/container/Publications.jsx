@@ -506,9 +506,11 @@ export class Publications extends React.Component {
           itemList={props.publicationList}
           shouldScrollToBottom={currentPublicationId === 0}
         >
-          {isPublicationListEmpty
-            ? <div className='publications__empty'>{props.t('This space does not have any publications yet, create the first publication using the area at the bottom of the page.')}</div>
-            : null}
+          {isPublicationListEmpty && (
+            <div className='publications__empty'>
+              {props.t('This space does not have any publications yet, create the first publication using the area at the bottom of the page.')}
+            </div>
+          )}
 
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
