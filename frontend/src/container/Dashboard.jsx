@@ -441,7 +441,7 @@ export class Dashboard extends React.Component {
     const contentTypeButtonList = [{
       slug: 'publications',
       creationLabel: props.t('Publish some information'),
-      route: PAGE.WORKSPACE.PUBLICATION(props.curWs.id),
+      route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
       hexcolor: publicationColor,
       faIcon: 'fas fa-stream'
     }].concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded

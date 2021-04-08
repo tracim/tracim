@@ -231,6 +231,7 @@ class TestMentionBuilder:
         mention_event = context.pending_events[0]
         assert "content" in mention_event.fields
         assert mention_event.content["parent_content_type"] == "html-document"
+        assert mention_event.content["parent_content_namespace"] == "content"
 
     def test_unit_on_content_created__ok__no_mention(
         self, session_factory, app_config, one_content_without_mention: Content
