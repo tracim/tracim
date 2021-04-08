@@ -508,7 +508,7 @@ export class Publications extends React.Component {
         >
           {isPublicationListEmpty && (
             <div className='publications__empty'>
-              {props.t('This space does not have any publications yet, create the first publication using the area at the bottom of the page.')}
+              {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
             </div>
           )}
 
