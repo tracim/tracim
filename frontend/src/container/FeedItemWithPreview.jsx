@@ -156,15 +156,16 @@ export class FeedItemWithPreview extends React.Component {
   render () {
     const { props, state } = this
 
-    const title = (
-      props.inRecentActivities
-        ? (
-          props.isPublication
-            ? props.t('Show in publications')
-            : props.t('Open_action')
-        )
-        : props.t('Download {{filename}}', { filename: props.content.fileName })
-    )
+    let previewTitle = ''
+    if (props.inRecentActivities) {
+      previewTitle = props.isPublication
+        ? props.t('Show in publications')
+        : props.t('Open_action')
+    } else {
+      if (props.previewLinkType !== LINK_TYPE.NONE) {
+        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName })
+      }
+    }
 
     return (
       <div className='feedItem' ref={props.innerRef}>
@@ -188,13 +189,12 @@ export class FeedItemWithPreview extends React.Component {
         />
         {props.contentAvailable && (
           <>
-            <div className='feedItem__content' title={title}>
+            <div className='feedItem__content' title={previewTitle}>
               <Preview
                 fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
                 content={props.content}
                 linkType={props.previewLinkType}
                 link={props.previewLink}
-                title={title}
               />
               <FeedItemFooter content={props.content} />
             </div>

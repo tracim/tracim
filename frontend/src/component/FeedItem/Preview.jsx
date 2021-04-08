@@ -276,13 +276,12 @@ export class Preview extends React.Component {
       case LINK_TYPE.NONE:
         return this.getPreviewComponent()
       case LINK_TYPE.OPEN_IN_APP:
-        return <Link to={props.link} title={props.title}>{this.getPreviewComponent()}</Link>
+        return <Link to={props.link}>{this.getPreviewComponent()}</Link>
       case LINK_TYPE.DOWNLOAD:
         return (
           <a
             href={props.link}
             download
-            title={props.title}
           >
             {this.getPreviewComponent()}
           </a>
