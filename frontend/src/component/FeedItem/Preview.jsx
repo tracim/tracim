@@ -313,14 +313,12 @@ Preview.propTypes = {
   fallbackToAttachedFile: PropTypes.bool,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
-  linkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
-  title: PropTypes.string
+  linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
 }
 
 Preview.defaultProps = {
   fallbackToAttachedFile: false,
-  linkType: LINK_TYPE.OPEN_IN_APP,
-  title: ''
+  linkType: LINK_TYPE.OPEN_IN_APP
 }
 
 export default translate()(Preview)

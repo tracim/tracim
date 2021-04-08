@@ -206,7 +206,9 @@ export class NotificationWall extends React.Component {
 
     if (entityType === TLM_ENTITY.USER) {
       const details = {
-        url: (props.user.profile === PROFILE.administrator.slug) ? PAGE.ADMIN.USER_EDIT(notification.user.userId) : '',
+        url: (props.user.profile === PROFILE.administrator.slug)
+          ? PAGE.ADMIN.USER_EDIT(notification.user.userId)
+          : PAGE.PUBLIC_PROFILE(notification.user.userId),
         emptyUrlMsg: props.t("Only an administrator can see this user's account"),
         msgType: 'info'
       }
