@@ -23,6 +23,7 @@ export class ScrollToBottomWrapper extends React.Component {
   }
 
   componentWillUnmount () {
+    this.resizeObserver.disconnect()
     this.resizeObserver = null
   }
 
