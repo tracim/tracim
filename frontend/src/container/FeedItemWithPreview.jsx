@@ -44,7 +44,7 @@ export class FeedItemWithPreview extends React.Component {
 
   getInitialTranslationState (props) {
     return (
-      (props.content.type === CONTENT_TYPE.THREAD && props.commentList[0] || props.content.type === CONTENT_TYPE.HTML_DOCUMENT)
+      ((props.content.type === CONTENT_TYPE.THREAD && props.commentList[0]) || props.content.type === CONTENT_TYPE.HTML_DOCUMENT)
         ? getDefaultTranslationState(props.system.config)
         : TRANSLATION_STATE.DISABLED
     )
@@ -187,7 +187,7 @@ export class FeedItemWithPreview extends React.Component {
         props.commentList[0].content_id,
         props.i18n.language,
         props.system.config,
-        ({translatedRawContent = state.translatedRawContent, translationState }) => {
+        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
           this.setState({ translatedRawContent, contentTranslationState: translationState })
         }
       )
@@ -199,7 +199,7 @@ export class FeedItemWithPreview extends React.Component {
         props.content.currentRevisionId,
         props.i18n.language,
         props.system.config,
-        ({translatedRawContent = state.translatedRawContent, translationState }) => {
+        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
           this.setState({ translatedRawContent, contentTranslationState: translationState })
         }
       )
@@ -347,7 +347,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickSaveAnyway={this.handleClickValidateAnyway}
                 searchForMentionInQuery={this.searchForMentionInQuery}
                 workspaceId={props.workspaceId}
-                onClickTranslateComment={
+                onClickTranslateComment={(
                   comment => handleTranslateComment(
                     FETCH_CONFIG.apiUrl,
                     props.content.workspaceId,
@@ -357,7 +357,7 @@ export class FeedItemWithPreview extends React.Component {
                     props.system.config,
                     this.commentSetState.bind(this, comment.content_id)
                   )
-                }
+                )}
                 onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
               />
             )}
