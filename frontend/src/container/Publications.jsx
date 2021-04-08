@@ -487,26 +487,12 @@ export class Publications extends React.Component {
     return { previewLinkType, previewLink }
   }
 
-  // displayPublicationsEmptyMessage = (isPublicationListEmpty) => {
-  //   const { props } = this
-
-  //   const emptyPublicationListMessage = !isPublicationListEmpty
-  //     ? return // rien
-  //     : props.t('Cet espace n\'a pas encore de publications, créez la première publication en utilisant la zone en bas de la page.')
-
-  //   return (
-  //     <div className='publication__list__empty'>
-  //       {emptyPublicationListMessage}
-  //     </div>
-  //   )
-  // }
-
   render () {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
     this.currentPublicationRef = currentPublicationId ? React.createRef() : null
-    const isPublicationListEmpty = props.publicationList.length === 0 // ???? la fonction publicationList
+    const isPublicationListEmpty = props.publicationList.length === 0
     return (
       <div className='publications'>
         <TabBar
@@ -520,6 +506,10 @@ export class Publications extends React.Component {
           itemList={props.publicationList}
           shouldScrollToBottom={currentPublicationId === 0}
         >
+          {isPublicationListEmpty
+            ? <div className='publications__empty'>{props.t('This space does not have any publications yet, create the first publication using the area at the bottom of the page.')}</div>
+            : null}
+
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
               commentList={publication.commentList}
@@ -573,7 +563,6 @@ export class Publications extends React.Component {
 
           {userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='publications__publishArea'>
-
 
               <CommentTextArea
                 apiUrl={FETCH_CONFIG.apiUrl}

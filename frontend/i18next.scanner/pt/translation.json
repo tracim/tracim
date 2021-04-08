@@ -442,5 +442,6 @@
   "copied": "copiado",
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Download {{filename}}": "Download {{filename}}",
-  "Show in publications": "Mostrar em publicações"
+  "Show in publications": "Mostrar em publicações",
+  "This space does not have any publications yet, create the first publication using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma publicação, crie a primeira publicação utilizando a zona na parte de baixo da página."
 }
