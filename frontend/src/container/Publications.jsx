@@ -553,144 +553,140 @@ export class Publications extends React.Component {
     const currentPublicationId = Number(props.match.params.idcts || 0)
     this.currentPublicationRef = currentPublicationId ? React.createRef() : null
     return (
-      <div className='publications'>
+      <ScrollToBottomWrapper
+        customClass='publications'
+        isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
+        shouldScrollToBottom={currentPublicationId === 0}
+      >
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
         />
+        {props.publicationList.map(publication =>
+          <FeedItemWithPreview
+            contentAvailable
+            allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
+            commentList={publication.commentList}
+            content={publication}
+            customColor={publicationColor}
+            key={`publication_${publication.id}`}
+            ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
+            memberList={props.currentWorkspace.memberList}
+            onClickCopyLink={() => this.handleClickCopyLink(publication)}
+            isPublication
+            inRecentActivities={false}
+            onClickEdit={() => this.handleClickEdit(publication)}
+            showTimeline
+            user={{
+              userId: props.user.userId,
+              username: props.user.username,
+              name: props.user.publicName,
+              userRoleIdInWorkspace: userRoleIdInWorkspace
+            }}
+            workspaceId={Number(publication.workspaceId)}
+            {...this.getPreviewLinkParameters(publication)}
+          />
+        )}
 
-        <ScrollToBottomWrapper
-          customClass='pageContentGeneric'
-          isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
-          itemList={props.publicationList}
-          shouldScrollToBottom={currentPublicationId === 0}
-        >
-          {props.publicationList.map(publication =>
-            <FeedItemWithPreview
-              contentAvailable
-              allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
-              commentList={publication.commentList}
-              content={publication}
-              customColor={publicationColor}
-              key={`publication_${publication.id}`}
-              ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
-              memberList={props.currentWorkspace.memberList}
-              onClickCopyLink={() => this.handleClickCopyLink(publication)}
-              isPublication
-              inRecentActivities={false}
-              onClickEdit={() => this.handleClickEdit(publication)}
-              showTimeline
-              user={{
-                userId: props.user.userId,
-                username: props.user.username,
-                name: props.user.publicName,
-                userRoleIdInWorkspace: userRoleIdInWorkspace
-              }}
-              workspaceId={Number(publication.workspaceId)}
-              {...this.getPreviewLinkParameters(publication)}
-            />
-          )}
+        {state.showReorderButton && (
+          <IconButton
+            customClass='publications__reorder'
+            text={props.t('Reorder')}
+            icon='fas fa-redo-alt'
+            intent='link'
+            onClick={this.handleClickReorder}
+          />
+        )}
 
-          {state.showReorderButton && (
-            <IconButton
-              customClass='publications__reorder'
-              text={props.t('Reorder')}
-              icon='fas fa-redo-alt'
-              intent='link'
-              onClick={this.handleClickReorder}
-            />
-          )}
-
-          {state.showInvalidMentionPopupInComment && (
-            <ConfirmPopup
-              onConfirm={this.handleCancelSave}
-              onClose={this.handleCancelSave}
-              onCancel={this.handleClickValidateAnyway}
-              msg={
-                <>
-                  {props.t('Your text contains mentions that do not match any member of this space:')}
-                  <div className='timeline__texteditor__mentions'>
-                    {state.invalidMentionList.join(', ')}
-                  </div>
-                </>
-              }
-              confirmLabel={props.t('Edit')}
-              cancelLabel={props.t('Validate anyway')}
-            />
-          )}
-
-          {state.showEditPopup && (
-            <EditCommentPopup
-              apiUrl={FETCH_CONFIG.apiUrl}
-              comment={state.commentToEdit.raw_content}
-              customColor={publicationColor}
-              loggedUserLanguage={props.user.lang}
-              onClickValidate={this.handleClickValidateEdit}
-              onClickClose={() => this.setState({ showEditPopup: false })}
-              workspaceId={props.currentWorkspace.id}
-            />
-          )}
-
-          {userRoleIdInWorkspace >= ROLE.contributor.id && (
-            <div className='publications__publishArea'>
-              <CommentTextArea
-                apiUrl={FETCH_CONFIG.apiUrl}
-                id={wysiwygId}
-                newComment={state.newComment}
-                onChangeNewComment={this.handleChangeNewPublication}
-                onInitWysiwyg={this.handleInitPublicationWysiwyg}
-                searchForMentionInQuery={this.searchForMentionInQuery}
-                wysiwyg={state.publicationWysiwyg}
-                disableAutocompletePosition
-              />
-
-              <div className='publications__publishArea__buttons'>
-                <div className='publications__publishArea__buttons__left'>
-                  <IconButton
-                    customClass='publications__publishArea__buttons__left__advancedEdition'
-                    intent='link'
-                    mode='light'
-                    onClick={this.handleToggleWysiwyg}
-                    text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                  />
-
-                  <div>
-                    <DisplayFileToUpload
-                      fileList={state.newCommentAsFileList}
-                      onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                      color={publicationColor}
-                    />
-                  </div>
+        {state.showInvalidMentionPopupInComment && (
+          <ConfirmPopup
+            onConfirm={this.handleCancelSave}
+            onClose={this.handleCancelSave}
+            onCancel={this.handleClickValidateAnyway}
+            msg={
+              <>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+                <div className='timeline__texteditor__mentions'>
+                  {state.invalidMentionList.join(', ')}
                 </div>
+              </>
+            }
+            confirmLabel={props.t('Edit')}
+            cancelLabel={props.t('Validate anyway')}
+          />
+        )}
 
-                <div className='publications__publishArea__buttons__right'>
-                  <div>
-                    <AddFileToUploadButton
-                      workspaceId={props.currentWorkspace.id}
-                      color={publicationColor}
-                      disabled={state.newCommentAsFileList.length > 0}
-                      multipleFiles={false}
-                      onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-                    />
-                  </div>
+        {state.showEditPopup && (
+          <EditCommentPopup
+            apiUrl={FETCH_CONFIG.apiUrl}
+            comment={state.commentToEdit.raw_content}
+            customColor={publicationColor}
+            loggedUserLanguage={props.user.lang}
+            onClickValidate={this.handleClickValidateEdit}
+            onClickClose={() => this.setState({ showEditPopup: false })}
+            workspaceId={props.currentWorkspace.id}
+          />
+        )}
 
-                  <IconButton
-                    customClass='publications__publishArea__buttons__submit'
+        {userRoleIdInWorkspace >= ROLE.contributor.id && (
+          <div className='publications__publishArea'>
+            <CommentTextArea
+              apiUrl={FETCH_CONFIG.apiUrl}
+              id={wysiwygId}
+              newComment={state.newComment}
+              onChangeNewComment={this.handleChangeNewPublication}
+              onInitWysiwyg={this.handleInitPublicationWysiwyg}
+              searchForMentionInQuery={this.searchForMentionInQuery}
+              wysiwyg={state.publicationWysiwyg}
+              disableAutocompletePosition
+            />
+
+            <div className='publications__publishArea__buttons'>
+              <div className='publications__publishArea__buttons__left'>
+                <IconButton
+                  customClass='publications__publishArea__buttons__left__advancedEdition'
+                  intent='link'
+                  mode='light'
+                  onClick={this.handleToggleWysiwyg}
+                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
+                />
+
+                <div>
+                  <DisplayFileToUpload
+                    fileList={state.newCommentAsFileList}
+                    onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                     color={publicationColor}
-                    disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
-                    intent='primary'
-                    mode='light'
-                    onClick={this.handleClickPublish}
-                    icon='far fa-paper-plane'
-                    text={props.t('Publish')}
-                    title={props.t('Publish')}
                   />
                 </div>
               </div>
+
+              <div className='publications__publishArea__buttons__right'>
+                <div>
+                  <AddFileToUploadButton
+                    workspaceId={props.currentWorkspace.id}
+                    color={publicationColor}
+                    disabled={state.newCommentAsFileList.length > 0}
+                    multipleFiles={false}
+                    onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                  />
+                </div>
+
+                <IconButton
+                  customClass='publications__publishArea__buttons__submit'
+                  color={publicationColor}
+                  disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickPublish}
+                  icon='far fa-paper-plane'
+                  text={props.t('Publish')}
+                  title={props.t('Publish')}
+                />
+              </div>
             </div>
-          )}
-        </ScrollToBottomWrapper>
-      </div>
+          </div>
+        )}
+      </ScrollToBottomWrapper>
     )
   }
 }
