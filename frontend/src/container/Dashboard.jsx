@@ -17,7 +17,8 @@ import {
   PROFILE,
   buildHeadTitle,
   PAGE,
-  removeAtInUsername
+  removeAtInUsername,
+  SPACE_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -551,7 +552,10 @@ export class Dashboard extends React.Component {
                     user={props.user}
                     curWs={props.curWs}
                     displayNotifBtn={props.system.config.email_notification_activated}
-                    displaySubscriptionRequestsInformation={userRoleIdInWorkspace >= ROLE.workspaceManager.id}
+                    displaySubscriptionRequestsInformation={
+                      userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
+                      props.curWs.accessType === SPACE_TYPE.onRequest.slug
+                    }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
                     onClickAddNotify={this.handleClickAddNotification}
