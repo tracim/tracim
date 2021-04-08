@@ -118,6 +118,16 @@ export class FeedItemHeader extends React.Component {
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={props.t('Actions')}
           >
+            {props.allowEdition && (
+              <IconButton
+                customClass='feedItemHeader__actionMenu__item'
+                icon='fas fa-pencil-alt'
+                onClick={props.onClickEdit}
+                text={props.t('Edit')}
+                key={`edit-${contentId}`}
+              />
+            )}
+
             <IconButton
               customClass='feedItemHeader__actionMenu__item'
               icon='fas fa-link'
@@ -125,15 +135,6 @@ export class FeedItemHeader extends React.Component {
               text={props.t('Copy content link')}
               key={`link-${contentId}`}
             />
-            <Link
-              className='feedItemHeader__actionMenu__item'
-              title={props.t('Open content')}
-              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-              key={`open-${contentId}`}
-            >
-              <i className={`fa-fw ${app.faIcon}`} />
-              {props.t('Open as content')}
-            </Link>
           </DropdownMenu>
         )}
       </div>
@@ -149,19 +150,22 @@ FeedItemHeader.propTypes = {
   contentAvailable: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  isPublication: PropTypes.bool.isRequired,
+  allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool.isRequired,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
+  onClickEdit: PropTypes.func,
   titleLink: PropTypes.string
 }
 
 FeedItemHeader.defaultProps = {
+  allowEdition: false,
   breadcrumbsList: [],
   eventList: [],
   isPublication: false,
@@ -170,5 +174,6 @@ FeedItemHeader.defaultProps = {
   lastModificationType: '',
   lastModifier: {},
   modifiedDate: '',
+  onClickEdit: () => {},
   titleLink: null
 }

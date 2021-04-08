@@ -10,6 +10,7 @@ import {
   CommentTextArea,
   ConfirmPopup,
   CUSTOM_EVENT,
+  EditCommentPopup,
   getContentComment,
   getFileChildContent,
   getOrCreateSessionClientToken,
@@ -46,12 +47,13 @@ import {
   postPublicationFile
 } from '../action-creator.async.js'
 import {
-  setCommentListToPublication,
   appendPublication,
   newFlashMessage,
   removePublication,
   setBreadcrumbs,
+  setCommentListToPublication,
   setHeadTitle,
+  setFirstComment,
   setPublicationList,
   setWorkspaceDetail,
   setWorkspaceMemberList,
@@ -90,11 +92,13 @@ export class Publications extends React.Component {
     // of the current publication coming from the URL (if any)
     this.currentPublicationRef = null
     this.state = {
+      commentToEdit: {},
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       newComment: '',
       newCommentAsFileList: [],
       publicationWysiwyg: false,
+      showEditPopup: false,
       showInvalidMentionPopupInComment: false,
       showReorderButton: false
     }
@@ -145,6 +149,11 @@ export class Publications extends React.Component {
     const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
+
+    if (data.fields.content.content_id === parentPublication.firstComment.content_id) {
+      props.dispatch(updatePublication({ ...parentPublication, firstComment: data.fields.content }))
+      return
+    }
 
     const newTimeline = props.updateCommentOnTimeline(
       data.fields.content,
@@ -343,9 +352,47 @@ export class Publications extends React.Component {
     const finalCommentList = publicationContentType === CONTENT_TYPE.FILE ? commentList : commentList.slice(1)
 
     props.dispatch(setCommentListToPublication(publicationId, finalCommentList))
+    if (publicationContentType === CONTENT_TYPE.THREAD) {
+      props.dispatch(setFirstComment(publicationId, commentList[0]))
+    }
   }
 
   handleChangeNewPublication = e => this.setState({ newComment: e.target.value })
+
+  handleClickEdit = (publication) => {
+    this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
+  }
+
+  handleClickValidateEdit = async (comment) => {
+    const { props } = this
+    if (!handleInvalidMentionInComment(
+      props.currentWorkspace.memberList,
+      true,
+      comment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayEdit()
+    }
+  }
+
+  handleClickValidateAnywayEdit = () => {
+    this.setState({
+      invalidMentionList: [],
+      showEditPopup: false,
+      showInvalidMentionPopupInComment: false
+    })
+    this.handleEditPublication()
+  }
+
+  handleEditPublication = () => {
+    const { props, state } = this
+    props.appContentEditComment(
+      props.currentWorkspace.id,
+      state.commentToEdit.parent_id,
+      state.commentToEdit.content_id,
+      props.user.username
+    )
+  }
 
   handleAddCommentAsFile = fileToUploadList => {
     this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
@@ -361,7 +408,7 @@ export class Publications extends React.Component {
     const { props } = this
 
     return props.t('Publication of {{author}} on {{date}}', {
-      author: props.user.publicName,
+      author: authorName,
       date: formatAbsoluteDate(new Date(), userLang),
       interpolation: { escapeValue: false }
     })
@@ -441,6 +488,11 @@ export class Publications extends React.Component {
   handleClickValidateAnyway = async () => {
     const { state } = this
 
+    if (state.showEditPopup) {
+      this.handleClickValidateAnywayEdit()
+      return
+    }
+
     if (state.newComment !== '' && state.newCommentAsFileList.length === 0) {
       this.saveThreadPublication()
     }
@@ -479,12 +531,20 @@ export class Publications extends React.Component {
   getPreviewLinkParameters = (publication) => {
     const previewLinkType = publication.type === CONTENT_TYPE.FILE
       ? LINK_TYPE.DOWNLOAD
-      : LINK_TYPE.OPEN_IN_APP
+      : LINK_TYPE.NONE
 
     const previewLink = publication.type === CONTENT_TYPE.FILE
       ? getFileDownloadUrl(FETCH_CONFIG.apiUrl, publication.workspaceId, publication.id, publication.fileName)
       : PAGE.WORKSPACE.CONTENT(publication.workspaceId, publication.type, publication.id)
     return { previewLinkType, previewLink }
+  }
+
+  isEditionAllowed = (publication, userRoleIdInWorkspace) => {
+    return publication.type === CONTENT_TYPE.THREAD &&
+      (
+        userRoleIdInWorkspace === ROLE.workspaceManager.id ||
+        this.props.user.userId === publication.author.user_id
+      )
   }
 
   render () {
@@ -507,7 +567,8 @@ export class Publications extends React.Component {
         >
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
-              contentAvailable
+649ffbe5583ef99d47b5702d0b25c02e19bbfd79              contentAvailable
+              allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
               commentList={publication.commentList}
               content={publication}
               customColor={publicationColor}
@@ -517,6 +578,7 @@ export class Publications extends React.Component {
               onClickCopyLink={() => this.handleClickCopyLink(publication)}
               isPublication
               inRecentActivities={false}
+              onClickEdit={() => this.handleClickEdit(publication)}
               showTimeline
               user={{
                 userId: props.user.userId,
@@ -554,6 +616,18 @@ export class Publications extends React.Component {
               }
               confirmLabel={props.t('Edit')}
               cancelLabel={props.t('Validate anyway')}
+            />
+          )}
+
+          {state.showEditPopup && (
+            <EditCommentPopup
+              apiUrl={FETCH_CONFIG.apiUrl}
+              comment={state.commentToEdit.raw_content}
+              customColor={publicationColor}
+              loggedUserLanguage={props.user.lang}
+              onClickValidate={this.handleClickValidateEdit}
+              onClickClose={() => this.setState({ showEditPopup: false })}
+              workspaceId={props.currentWorkspace.id}
             />
           )}
 

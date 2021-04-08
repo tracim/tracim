@@ -64,13 +64,12 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = async () => {
-    const { props, state } = this
-
+  handleClickValidateEditComment = async (comment) => {
+    const { props } = this
     if (!handleInvalidMentionInComment(
       props.memberList,
       true,
-      state.newComment.raw_content,
+      comment,
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayEditComment()
@@ -99,6 +98,12 @@ export class Timeline extends React.Component {
     props.showInvalidMentionPopup
       ? props.onClickSaveAnyway()
       : this.handleClickValidateAnywayEditComment()
+  }
+
+  areCommentActionsAllowed = (commentAuthorId) => {
+    const { props } = this
+    return props.loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
+      props.loggedUser.userId === commentAuthorId
   }
 
   render () {
@@ -159,6 +164,7 @@ export class Timeline extends React.Component {
               case TIMELINE_TYPE.COMMENT:
                 return (
                   <Comment
+                    allowCommentActions={this.areCommentActionsAllowed(content.author.user_id)}
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}

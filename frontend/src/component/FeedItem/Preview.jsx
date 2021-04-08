@@ -170,6 +170,7 @@ export class Preview extends React.Component {
   }
 
   isContentDifferent = (oldContent, newContent) => (
+    newContent.firstComment !== oldContent.firstComment ||
     newContent.commentList !== oldContent.commentList ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )
@@ -275,12 +276,13 @@ export class Preview extends React.Component {
       case LINK_TYPE.NONE:
         return this.getPreviewComponent()
       case LINK_TYPE.OPEN_IN_APP:
-        return <Link to={props.link}>{this.getPreviewComponent()}</Link>
+        return <Link to={props.link} title={props.title}>{this.getPreviewComponent()}</Link>
       case LINK_TYPE.DOWNLOAD:
         return (
           <a
             href={props.link}
             download
+            title={props.title}
           >
             {this.getPreviewComponent()}
           </a>
@@ -312,12 +314,14 @@ Preview.propTypes = {
   fallbackToAttachedFile: PropTypes.bool,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
-  linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
+  linkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
+  title: PropTypes.string
 }
 
 Preview.defaultProps = {
   fallbackToAttachedFile: false,
-  linkType: LINK_TYPE.OPEN_IN_APP
+  linkType: LINK_TYPE.OPEN_IN_APP,
+  title: ''
 }
 
 export default translate()(Preview)

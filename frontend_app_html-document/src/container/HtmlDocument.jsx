@@ -49,7 +49,6 @@ import {
   getTranslationApiErrorMessage,
   TRANSLATION_STATE,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE,
   FavoriteButton,
   FAVORITE_STATE,
   ToolBar

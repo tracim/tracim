@@ -49,11 +49,14 @@ describe('Favorites', function () {
     })
 
     it('clicking on a favorite button should remove it from the page', () => {
+      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 2)
       cy.get('[data-cy=favoriteButton]').first().click()
+      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 1)
       cy.get('[data-cy=favorites__item]').first().should('contain', 'A file')
     })
 
     it('clicking on a favorite should open the content in app', () => {
+      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 1)
       cy.get('[data-cy=favorites__item]').first().click()
       cy.location('pathname')
         .should('equal', `/ui/workspaces/${workspaceId}/contents/file/${fileContentId}`)

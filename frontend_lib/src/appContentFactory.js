@@ -157,7 +157,7 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType) => {
+    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType = CONTENT_TYPE.COMMENT) => {
       this.checkApiUrl()
       let response
 
@@ -176,7 +176,6 @@ export function appContentFactory (WrappedComponent) {
 
     appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
-
       const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
       let knownMentions = await this.searchForMentionInQuery('', workspaceId)
       knownMentions = knownMentions.map(member => `@${member.username}`)
