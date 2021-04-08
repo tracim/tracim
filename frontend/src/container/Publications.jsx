@@ -567,6 +567,7 @@ export class Publications extends React.Component {
         >
           {props.publicationList.map(publication =>
             <FeedItemWithPreview
+649ffbe5583ef99d47b5702d0b25c02e19bbfd79              contentAvailable
               allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
               commentList={publication.commentList}
               content={publication}
