@@ -31,9 +31,11 @@
   "Are you sure you want to remove this member from the space?": "Tem a certeza de que quer remover este membro do espaço?",
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Copy content link": "Copiar ligação do conteúdo",
+  "Error loading publication comments": "Erro ao carregar comentários de publicação",
   "Member": "Membro",
   "Member of": "Membro de",
   "Last Intervention": "Última intervenção",
+  "This content is not available": "Este conteúdo não está disponível",
   "Unknown space type": "Tipo de espaço desconhecido",
   "Create a space": "Criar um espaço",
   "Dashboard": "Painel",
@@ -329,7 +331,6 @@
   "No preview available": "Pré-visualização indisponível",
   "Preview loading...": "Pré-visualização carregando...",
   "Unknown entity type": "Tipo de entidade desconhecida",
-  "Open as content": "Abrir como conteúdo",
   "Open_action": "Abrir",
   "The link has been copied to clipboard": "A ligaçao foi copiada para a área de transferência",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> juntou-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
@@ -399,6 +400,10 @@
   "Content updated": "Conteúdo actualizado",
   "Content deleted": "Conteúdo eliminado",
   "Content restored": "Conteúdo restaurado",
+  "New publication": "Nova publicação",
+  "Publication updated": "Publicação actualizada",
+  "Publication deleted": "Publicação eliminada",
+  "Publication restored": "Publicação restaurada",
   "Mention": "Menção",
   "Account created": "Nova conta",
   "Account updated": "Conta actualizada",
@@ -442,5 +447,6 @@
   "copied": "copiado",
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Download {{filename}}": "Download {{filename}}",
-  "Show in publications": "Mostrar em publicações"
+  "Show in publications": "Mostrar em publicações",
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma publicação, crie a primeira publicação utilizando a zona na parte de baixo da página."
 }

@@ -17,7 +17,8 @@ import {
   PROFILE,
   buildHeadTitle,
   PAGE,
-  removeAtInUsername
+  removeAtInUsername,
+  SPACE_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -441,7 +442,7 @@ export class Dashboard extends React.Component {
     const contentTypeButtonList = [{
       slug: 'publications',
       creationLabel: props.t('Publish some information'),
-      route: PAGE.WORKSPACE.PUBLICATION(props.curWs.id),
+      route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
       hexcolor: publicationColor,
       faIcon: 'fas fa-stream'
     }].concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
@@ -551,7 +552,10 @@ export class Dashboard extends React.Component {
                     user={props.user}
                     curWs={props.curWs}
                     displayNotifBtn={props.system.config.email_notification_activated}
-                    displaySubscriptionRequestsInformation={userRoleIdInWorkspace >= ROLE.workspaceManager.id}
+                    displaySubscriptionRequestsInformation={
+                      userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
+                      props.curWs.accessType === SPACE_TYPE.onRequest.slug
+                    }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
                     onClickAddNotify={this.handleClickAddNotification}

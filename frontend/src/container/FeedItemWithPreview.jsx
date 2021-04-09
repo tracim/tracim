@@ -156,21 +156,23 @@ export class FeedItemWithPreview extends React.Component {
   render () {
     const { props, state } = this
 
-    const title = (
-      props.inRecentActivities
-        ? (
-          props.isPublication
-            ? props.t('Show in publications')
-            : props.t('Open_action')
-        )
-        : props.t('Download {{filename}}', { filename: props.content.fileName })
-    )
+    let previewTitle = ''
+    if (props.inRecentActivities) {
+      previewTitle = props.isPublication
+        ? props.t('Show in publications')
+        : props.t('Open_action')
+    } else {
+      if (props.previewLinkType !== LINK_TYPE.NONE) {
+        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName })
+      }
+    }
 
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           allowEdition={props.allowEdition}
           breadcrumbsList={props.breadcrumbsList}
+          contentAvailable={props.contentAvailable}
           content={props.content}
           isPublication={props.isPublication}
           eventList={props.eventList}
@@ -185,46 +187,49 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        <div className='feedItem__content'>
-          <Preview
-            fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
-            content={props.content}
-            linkType={props.previewLinkType}
-            link={props.previewLink}
-            title={title}
-          />
-          <FeedItemFooter content={props.content} />
-        </div>
-        {props.showTimeline && (
-          <Timeline
-            apiUrl={FETCH_CONFIG.apiUrl}
-            customClass='feedItem__timeline'
-            customColor={props.customColor}
-            id={props.content.id}
-            invalidMentionList={state.invalidMentionList}
-            loggedUser={props.user}
-            memberList={props.memberList}
-            newComment={state.newComment}
-            newCommentAsFileList={state.newCommentAsFileList}
-            onChangeNewComment={this.handleChangeNewComment}
-            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onClickDeleteComment={this.handleClickDeleteComment}
-            onClickEditComment={this.handleClickEditComment}
-            onClickValidateNewCommentBtn={this.handleClickSend}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onInitWysiwyg={this.handleInitWysiwyg}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-            shouldScrollToBottom={false}
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            showTitle={false}
-            timelineData={props.commentList}
-            wysiwyg={state.timelineWysiwyg}
-            onClickCancelSave={this.handleCancelSave}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
-            onClickSaveAnyway={this.handleClickValidateAnyway}
-            searchForMentionInQuery={this.searchForMentionInQuery}
-            workspaceId={props.workspaceId}
-          />
+        {props.contentAvailable && (
+          <>
+            <div className='feedItem__content' title={previewTitle}>
+              <Preview
+                fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
+                content={props.content}
+                linkType={props.previewLinkType}
+                link={props.previewLink}
+              />
+              <FeedItemFooter content={props.content} />
+            </div>
+            {props.showTimeline && (
+              <Timeline
+                apiUrl={FETCH_CONFIG.apiUrl}
+                customClass='feedItem__timeline'
+                customColor={props.customColor}
+                id={props.content.id}
+                invalidMentionList={state.invalidMentionList}
+                loggedUser={props.user}
+                memberList={props.memberList}
+                newComment={state.newComment}
+                newCommentAsFileList={state.newCommentAsFileList}
+                onChangeNewComment={this.handleChangeNewComment}
+                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickEditComment={this.handleClickEditComment}
+                onClickValidateNewCommentBtn={this.handleClickSend}
+                onClickWysiwygBtn={this.handleToggleWysiwyg}
+                onInitWysiwyg={this.handleInitWysiwyg}
+                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                shouldScrollToBottom={false}
+                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                showTitle={false}
+                timelineData={props.commentList}
+                wysiwyg={state.timelineWysiwyg}
+                onClickCancelSave={this.handleCancelSave}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                onClickSaveAnyway={this.handleClickValidateAnyway}
+                searchForMentionInQuery={this.searchForMentionInQuery}
+                workspaceId={props.workspaceId}
+              />
+            )}
+          </>
         )}
       </div>
     )
@@ -240,6 +245,7 @@ export { LINK_TYPE }
 
 FeedItemWithPreview.propTypes = {
   content: PropTypes.object.isRequired,
+  contentAvailable: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   isPublication: PropTypes.bool.isRequired,

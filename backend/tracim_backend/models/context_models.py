@@ -1146,7 +1146,7 @@ class ContentInContext(object):
 
     @property
     def content_namespace(self) -> ContentNamespaces:
-        return self.content.content_namespace.value
+        return self.content.content_namespace
 
     @property
     def parent(self) -> Optional["ContentInContext"]:
@@ -1170,6 +1170,13 @@ class ContentInContext(object):
         p = self.parent
         if p:
             return p.content_type
+        return None
+
+    @property
+    def parent_content_namespace(self) -> Optional[ContentNamespaces]:
+        p = self.parent
+        if p:
+            return p.content_namespace
         return None
 
     @property

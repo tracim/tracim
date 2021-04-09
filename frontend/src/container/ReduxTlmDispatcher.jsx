@@ -96,7 +96,10 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
-    if (this.props.user.userId !== data.fields.author.user_id && !GLOBAL_excludedNotifications.some(type => data.event_type.startsWith(type))) {
+    if (
+      this.props.user.userId !== data.fields.author.user_id &&
+      !GLOBAL_excludedNotifications.some(type => data.event_type.startsWith(type))
+    ) {
       this.props.dispatch(addNotification(data))
     }
   }
@@ -178,7 +181,8 @@ export class ReduxTlmDispatcher extends React.Component {
         content: {
           ...data.fields.content,
           parent_label: response.json.label,
-          parent_content_type: response.json.content_type
+          parent_content_type: response.json.content_type,
+          parent_content_namespace: response.json.content_namespace
         }
       }
     }

@@ -103,7 +103,8 @@
       "Image",
       "FileReader",
       "wysiwyg",
-      "File"
+      "File",
+      "ResizeObserver"
     ],
     "parser": "babel-eslint",
     "ignore": []

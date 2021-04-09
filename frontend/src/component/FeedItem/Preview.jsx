@@ -276,13 +276,12 @@ export class Preview extends React.Component {
       case LINK_TYPE.NONE:
         return this.getPreviewComponent()
       case LINK_TYPE.OPEN_IN_APP:
-        return <Link to={props.link} title={props.title}>{this.getPreviewComponent()}</Link>
+        return <Link to={props.link}>{this.getPreviewComponent()}</Link>
       case LINK_TYPE.DOWNLOAD:
         return (
           <a
             href={props.link}
             download
-            title={props.title}
           >
             {this.getPreviewComponent()}
           </a>
@@ -314,14 +313,12 @@ Preview.propTypes = {
   fallbackToAttachedFile: PropTypes.bool,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
-  linkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
-  title: PropTypes.string
+  linkType: PropTypes.oneOf(Object.values(LINK_TYPE))
 }
 
 Preview.defaultProps = {
   fallbackToAttachedFile: false,
-  linkType: LINK_TYPE.OPEN_IN_APP,
-  title: ''
+  linkType: LINK_TYPE.OPEN_IN_APP
 }
 
 export default translate()(Preview)

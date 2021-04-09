@@ -27,12 +27,26 @@ const createSingleMessageActivity = (activityParams, messageList) => {
   }
 }
 
+const getCommentList = async (content, apiUrl) => {
+  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
+  return response.apiResponse.status === 200 ? response.body : []
+}
+
 // INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
   const first = messageList[0]
 
   let content = first.fields.content
+
+  const fetchGetContentPath = await handleFetchResult(
+    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+  )
+
+  const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : null
+
   if (content.content_type === TLM_ST.COMMENT) {
+    if (!contentPath) return null
+
     const response = await handleFetchResult(await getWorkspaceContent(
       apiUrl,
       first.fields.workspace.workspace_id,
@@ -44,13 +58,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     } else return null
   }
 
-  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  const commentList = response.apiResponse.status === 200 ? response.body : []
-
-  const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
-  )
-  const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : []
+  const commentList = contentPath ? await getCommentList(content, apiUrl) : []
 
   return {
     ...activityParams,
@@ -58,7 +66,8 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     commentList: commentList,
     newestMessage: first,
     content: content,
-    contentPath: contentPath
+    contentPath: contentPath,
+    contentAvailable: !!contentPath
   }
 }
 
