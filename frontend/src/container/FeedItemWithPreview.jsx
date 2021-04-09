@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
@@ -10,7 +11,11 @@ import {
   appContentFactory,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  TRANSLATION_STATE,
   handleInvalidMentionInComment,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
+  getDefaultTranslationState,
   PAGE,
   Timeline,
   TracimComponent
@@ -28,14 +33,33 @@ export class FeedItemWithPreview extends React.Component {
     this.state = {
       invalidMentionList: [],
       newComment: '',
+      translatedRawContent: '',
+      contentTranslationState: this.getInitialTranslationState(props),
+      translationStateByCommentId: {},
       newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false
     }
   }
 
+  getInitialTranslationState (props) {
+    return (
+      ((props.content.type === CONTENT_TYPE.THREAD && props.commentList[0]) || props.content.type === CONTENT_TYPE.HTML_DOCUMENT)
+        ? getDefaultTranslationState(props.system.config)
+        : TRANSLATION_STATE.DISABLED
+    )
+  }
+
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
+
+    if (state.contentTranslationState === TRANSLATION_STATE.DISABLED && getDefaultTranslationState(props.system.config) !== TRANSLATION_STATE.DISABLED) {
+      const contentTranslationState = this.getInitialTranslationState(props)
+      if (contentTranslationState !== state.contentTranslationState) {
+        this.setState({ contentTranslationState })
+      }
+    }
+
     if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
     }
@@ -58,7 +82,7 @@ export class FeedItemWithPreview extends React.Component {
   handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
       this.getWysiwygId(this.props.content.id),
-      this.props.user.lang,
+      this.props.i18n.language,
       this.handleChangeNewComment,
       handleTinyMceInput,
       handleTinyMceKeyDown,
@@ -153,6 +177,93 @@ export class FeedItemWithPreview extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.props.workspaceId)
   }
 
+  handleTranslate = () => {
+    const { state, props } = this
+    if (props.content.type === CONTENT_TYPE.THREAD) {
+      handleTranslateComment(
+        FETCH_CONFIG.apiUrl,
+        props.content.workspaceId,
+        props.content.id,
+        props.commentList[0].content_id,
+        props.i18n.language,
+        props.system.config,
+        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+          this.setState({ translatedRawContent, contentTranslationState: translationState })
+        }
+      )
+    } else {
+      handleTranslateHtmlContent(
+        FETCH_CONFIG.apiUrl,
+        props.content.workspaceId,
+        props.content.id,
+        props.content.currentRevisionId,
+        props.i18n.language,
+        props.system.config,
+        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+          this.setState({ translatedRawContent, contentTranslationState: translationState })
+        }
+      )
+    }
+  }
+
+  handleRestoreContentTranslation = () => {
+    this.setState({
+      contentTranslationState: getDefaultTranslationState(this.props.system.config)
+    })
+  }
+
+  handleRestoreCommentTranslation = (commentId) => {
+    const commentTranslationState = this.getCommentTranslationState(commentId)
+    this.setState(prev => ({
+      translationStateByCommentId: {
+        ...prev.translationStateByCommentId,
+        [commentId]: {
+          ...commentTranslationState,
+          translationState: getDefaultTranslationState(this.props.system.config)
+        }
+      }
+    }))
+  }
+
+  commentSetState = (commentId, { translatedRawContent, translationState }) => {
+    this.setState(prev => {
+      const commentTranslationState = this.getCommentTranslationState(commentId)
+      return {
+        translationStateByCommentId: {
+          ...prev.translationStateByCommentId,
+          [commentId]: {
+            ...commentTranslationState,
+            translatedRawContent: translatedRawContent || commentTranslationState.translatedRawContent,
+            translationState: translationState || commentTranslationState.translationState
+          }
+        }
+      }
+    })
+  }
+
+  getCommentTranslationState (commentId) {
+    const { props } = this
+    return this.state.translationStateByCommentId[commentId] || {
+      translationState: getDefaultTranslationState(props.system.config),
+      translatedRawContent: null
+    }
+  }
+
+  getTimelineData () {
+    const { props, state } = this
+    const defaultTranslationState = getDefaultTranslationState(props.system.config)
+    return props.commentList.map(
+      comment => {
+        const commentTranslationState = state.translationStateByCommentId[comment.content_id] || {}
+        return {
+          ...comment,
+          translationState: commentTranslationState.translationState || defaultTranslationState,
+          translatedRawContent: commentTranslationState.translatedRawContent
+        }
+      }
+    )
+  }
+
   render () {
     const { props, state } = this
 
@@ -192,11 +303,20 @@ export class FeedItemWithPreview extends React.Component {
             <div className='feedItem__content' title={previewTitle}>
               <Preview
                 fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
-                content={props.content}
+                content={
+                  state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
+                    ? { ...props.content, translatedRawContent: state.translatedRawContent }
+                    : props.content
+                }
                 linkType={props.previewLinkType}
                 link={props.previewLink}
               />
-              <FeedItemFooter content={props.content} />
+              <FeedItemFooter
+                onClickTranslate={this.handleTranslate}
+                onClickRestore={this.handleRestoreContentTranslation}
+                translationState={state.contentTranslationState}
+                content={props.content}
+              />
             </div>
             {props.showTimeline && (
               <Timeline
@@ -220,13 +340,25 @@ export class FeedItemWithPreview extends React.Component {
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 showTitle={false}
-                timelineData={props.commentList}
+                timelineData={this.getTimelineData()}
                 wysiwyg={state.timelineWysiwyg}
                 onClickCancelSave={this.handleCancelSave}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickSaveAnyway={this.handleClickValidateAnyway}
                 searchForMentionInQuery={this.searchForMentionInQuery}
                 workspaceId={props.workspaceId}
+                onClickTranslateComment={(
+                  comment => handleTranslateComment(
+                    FETCH_CONFIG.apiUrl,
+                    props.content.workspaceId,
+                    props.content.id,
+                    comment.content_id,
+                    props.i18n.language,
+                    props.system.config,
+                    () => this.commentSetState(comment.content_id)
+                  )
+                )}
+                onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
               />
             )}
           </>
@@ -236,7 +368,8 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(FeedItemWithPreview))))
+const mapStateToProps = ({ system }) => ({ system })
+const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
 })

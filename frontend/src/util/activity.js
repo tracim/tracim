@@ -39,7 +39,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   let content = first.fields.content
 
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+    await getContentPath(apiUrl, first.fields.workspace.workspace_id, content.content_id)
   )
 
   const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : null

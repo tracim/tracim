@@ -146,6 +146,12 @@ export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, 
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}/translated/${name}?target_language_code=${targetLanguageCode}`)
 }
 
+export const getHtmlDocTranslated = (apiUrl, workspaceId, contentId, revisionId, targetLanguageCode) => {
+  const name = `content-${contentId}-${targetLanguageCode}.html`
+  const url = `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions/${revisionId}/translated/${name}?target_language_code=${targetLanguageCode}`
+  return baseFetch('GET', url)
+}
+
 export const getFavoriteContentList = (apiUrl, userId) => {
   return baseFetch('GET', `${apiUrl}/users/${userId}/favorite-contents`)
 }

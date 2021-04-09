@@ -53,7 +53,8 @@ describe('In activity.js module', () => {
     }),
     createMessage(5, TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE, {
       author: foo,
-      content: fileContent
+      content: fileContent,
+      workspace: workspace
     }),
     createMessage(4, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_CET.CREATED, undefined, {
       author: bar,
@@ -63,12 +64,14 @@ describe('In activity.js module', () => {
     }),
     createMessage(3, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.FILE, {
       author: foo,
-      content: fileContent
+      content: fileContent,
+      workspace: workspace
     }),
     createMessage(2, TLM_ET.MENTION, TLM_CET.CREATED, undefined, {
       author: foo,
       mention: { recipient: 'all' },
-      content: fileContent
+      content: fileContent,
+      workspace: workspace
     })
   ]
 
@@ -181,12 +184,14 @@ describe('In activity.js module', () => {
     })
 
     it('should create a new activity if the message is not part of any activity', async () => {
-      const otherFileContent = { workspace_id: 54, content_id: 12 }
+      const otherFileContent = { workspace_id: workspace.workspace_id, content_id: 12 }
       const mock = mockGetContentComments200(apiUrl, otherFileContent.workspace_id, otherFileContent.content_id, [])
       const mockContentPath = mockGetContentPath200(apiUrl, otherFileContent.workspace_id, otherFileContent.content_id, [])
+
       const message = createMessage(7, TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.FILE, {
         author: foo,
-        content: otherFileContent
+        content: otherFileContent,
+        workspace: workspace
       })
       const expectedContentActivity = {
         id: 'content-12',

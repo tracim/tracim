@@ -206,6 +206,7 @@ import {
   getFileChildContent,
   getContent,
   getWorkspaceContent,
+  getHtmlDocTranslated,
   getCommentTranslated
 } from './action.async.js'
 
@@ -246,6 +247,8 @@ export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 
 export {
   TRANSLATION_STATE,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
   getTranslationApiErrorMessage,
   getDefaultTranslationState
 } from './translation.js'
@@ -416,6 +419,7 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
+  getHtmlDocTranslated,
   DATE_FNS_LOCALE,
   getFileDownloadUrl
 }
