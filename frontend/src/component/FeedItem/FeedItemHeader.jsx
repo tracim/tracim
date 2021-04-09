@@ -110,6 +110,16 @@ export class FeedItemHeader extends React.Component {
           buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
         >
+          <Link
+            className='feedItemHeader__actionMenu__item'
+            title={props.t('Open as content')}
+            to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+            key={`open-${contentId}`}
+          >
+            <i className={`fa-fw ${app.faIcon}`} />
+            {props.t('Open as content')}
+          </Link>
+
           {props.allowEdition && (
             <IconButton
               customClass='feedItemHeader__actionMenu__item'
@@ -127,16 +137,6 @@ export class FeedItemHeader extends React.Component {
             text={props.t('Copy content link')}
             key={`link-${contentId}`}
           />
-
-          <Link
-            className='feedItemHeader__actionMenu__item'
-            title={props.t('Open as content')}
-            to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-            key={`open-${contentId}`}
-          >
-            <i className={`fa-fw ${app.faIcon}`} />
-            {props.t('Open as content')}
-          </Link>
         </DropdownMenu>
       </div>
     )
