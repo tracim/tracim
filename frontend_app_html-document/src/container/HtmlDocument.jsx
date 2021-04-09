@@ -46,7 +46,6 @@ import {
   addClassToMentionsOfUser,
   putUserConfiguration,
   permissiveNumberEqual,
-  getTranslationApiErrorMessage,
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
@@ -60,7 +59,7 @@ import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead,
+  putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -852,7 +851,7 @@ export class HtmlDocument extends React.Component {
       state.content.current_revision_id,
       state.loggedUser.lang,
       state.config.system.config,
-      ({translatedRawContent = state.translatedRawContent, translationState }) => {
+      ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, translationState })
       }
     )
