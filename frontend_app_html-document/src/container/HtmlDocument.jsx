@@ -858,9 +858,9 @@ export class HtmlDocument extends React.Component {
   }
 
   handleRestoreDocument = () => {
-    this.setState({
-      translationState: getDefaultTranslationState(this.state.config.system.config)
-    })
+    this.setState(prev => ({
+      translationState: getDefaultTranslationState(prev.config.system.config)
+    }))
   }
 
   render () {
