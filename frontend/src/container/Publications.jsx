@@ -150,7 +150,7 @@ export class Publications extends React.Component {
 
     if (!parentPublication) return
 
-    if (data.fields.content.content_id === parentPublication.firstComment.content_id) {
+    if (parentPublication.firstComment && data.fields.content.content_id === parentPublication.firstComment.content_id) {
       props.dispatch(updatePublication({ ...parentPublication, firstComment: data.fields.content }))
       return
     }

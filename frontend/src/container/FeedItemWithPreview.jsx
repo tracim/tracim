@@ -42,7 +42,7 @@ export class FeedItemWithPreview extends React.Component {
     }
   }
 
-  getFirstComment() {
+  getFirstComment () {
     // NOTE - RJ - 2021-04-09 is commentList[0] either the first comment (in recent activities)
     // or the second comment (in publications), and then firstComment is the first comment
     return this.props.content.firstComment || this.props.commentList[0]
