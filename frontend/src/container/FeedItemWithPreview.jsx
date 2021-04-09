@@ -42,9 +42,15 @@ export class FeedItemWithPreview extends React.Component {
     }
   }
 
+  getFirstComment() {
+    // NOTE - RJ - 2021-04-09 is commentList[0] either the first comment (in recent activities)
+    // or the second comment (in publications), and then firstComment is the first comment
+    return this.props.content.firstComment || this.props.commentList[0]
+  }
+
   getInitialTranslationState (props) {
     return (
-      ((props.content.type === CONTENT_TYPE.THREAD && props.commentList[0]) || props.content.type === CONTENT_TYPE.HTML_DOCUMENT)
+      ((props.content.type === CONTENT_TYPE.THREAD && this.getFirstComment()) || props.content.type === CONTENT_TYPE.HTML_DOCUMENT)
         ? getDefaultTranslationState(props.system.config)
         : TRANSLATION_STATE.DISABLED
     )
@@ -184,7 +190,7 @@ export class FeedItemWithPreview extends React.Component {
         FETCH_CONFIG.apiUrl,
         props.content.workspaceId,
         props.content.id,
-        props.commentList[0].content_id,
+        this.getFirstComment().content_id,
         props.i18n.language,
         props.system.config,
         ({ translatedRawContent = state.translatedRawContent, translationState }) => {
@@ -355,7 +361,7 @@ export class FeedItemWithPreview extends React.Component {
                     comment.content_id,
                     props.i18n.language,
                     props.system.config,
-                    () => this.commentSetState(comment.content_id)
+                    (...args) => this.commentSetState(comment.content_id, ...args)
                   )
                 )}
                 onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
