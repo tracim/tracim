@@ -214,15 +214,15 @@ export class FeedItemWithPreview extends React.Component {
 
   handleRestoreCommentTranslation = (commentId) => {
     const commentTranslationState = this.getCommentTranslationState(commentId)
-    this.setState({
+    this.setState(prev => ({
       translationStateByCommentId: {
-        ...this.state.translationStateByCommentId,
+        ...prev.translationStateByCommentId,
         [commentId]: {
           ...commentTranslationState,
           translationState: getDefaultTranslationState(this.props.system.config)
         }
       }
-    })
+    }))
   }
 
   commentSetState = (commentId, { translatedRawContent, translationState }) => {
