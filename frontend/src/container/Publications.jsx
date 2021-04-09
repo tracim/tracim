@@ -190,8 +190,11 @@ export class Publications extends React.Component {
   }
 
   handleContentCreatedOrRestored = (data) => {
-    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
-    if (data.fields.content.parent_id !== null) return
+    if (
+      data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+      data.fields.content.parent_id !== null ||
+      data.fields.content.workspace_id !== this.props.currentWorkspace.id
+    ) return
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
   }
