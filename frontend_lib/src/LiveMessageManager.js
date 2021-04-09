@@ -34,6 +34,7 @@ export class LiveMessageManager {
     this.userId = null
     this.host = null
     this.lastEventId = 0
+    this.leftoverEventIdList = []
   }
 
   openLiveMessageConnection (userId, host) {
@@ -75,10 +76,10 @@ export class LiveMessageManager {
 
     this.closeEventSourceConnection()
 
-    let afterEventFilter = ''
-    if (this.lastEventId) {
-      afterEventFilter = `?after_event_id=${this.lastEventId}`
-    }
+    // INFO - SG - 2021-04-08 - restart from the last received event id
+    // or from the predecessor of the last leftover event id if there are leftovers
+    const afterId = this.leftoverEventIdList.length ? Math.min(...this.leftoverEventIdList) - 1 : this.lastEventId
+    const afterEventFilter = afterId ? `?after_event_id=${afterId}` : ''
 
     this.eventSource = new EventSource(
       `${url}/users/${this.userId}/live_messages${afterEventFilter}`,
@@ -216,13 +217,24 @@ export class LiveMessageManager {
   }
 
   dispatchLiveMessage (tlm) {
-    if (this.lastEventId >= tlm.event_id) {
+    const isLeftover = this.leftoverEventIdList.includes(tlm.event_id)
+    if (this.lastEventId >= tlm.event_id && !isLeftover) {
       console.log('INFO: prevented a live message to be dispatched a second time:', tlm)
       return
     }
 
-    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
+    if (isLeftover) {
+      this.leftoverEventIdList = this.leftoverEventIdList.filter(id => id !== tlm.event_id)
+    }
 
+    // NOTE - SG - 2021-04-08 - keep track of event ids we didn't receive yet
+    // So that we can dispatch them when they arrive (see above)
+    // The loop won't do anything if tlm.event_id === this.lastEventId + 1
+    if (this.lastEventId) {
+      for (let eventId = this.lastEventId + 1; eventId < tlm.event_id; ++eventId) {
+        this.leftoverEventIdList.push(eventId)
+      }
+    }
     this.lastEventId = Math.max(this.lastEventId, tlm.event_id)
 
     const customEvent = new CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
@@ -231,7 +243,7 @@ export class LiveMessageManager {
         data: tlm
       }
     })
-
+    console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
     document.dispatchEvent(customEvent)
   }
 
