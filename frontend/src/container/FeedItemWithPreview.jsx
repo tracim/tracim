@@ -129,7 +129,8 @@ export class FeedItemWithPreview extends React.Component {
     props.appContentDeleteComment(
       props.content.workspaceId,
       comment.parent_id,
-      comment.content_id
+      comment.content_id,
+      comment.content_type
     )
   }
 
