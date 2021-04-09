@@ -355,7 +355,7 @@ export class FeedItemWithPreview extends React.Component {
                     comment.content_id,
                     props.i18n.language,
                     props.system.config,
-                    this.commentSetState.bind(this, comment.content_id)
+                    () => this.commentSetState(comment.content_id)
                   )
                 )}
                 onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
