@@ -56,31 +56,33 @@ const Comment = props => {
               <LinkPreview apiUrl={props.apiUrl} findLinkInHTML={props.text} />
             </div>
 
-            <DropdownMenu
-              buttonCustomClass='comment__body__content__actions'
-              buttonIcon='fas fa-ellipsis-v'
-              buttonTooltip={props.t('Actions')}
-            >
-              <IconButton
-                icon='fas fa-fw fa-pencil-alt'
-                intent='link'
-                key='editComment'
-                mode='dark'
-                onClick={props.onClickEditComment}
-                text={props.t('Edit')}
-                title={props.t('Edit comment')}
-              />
+            {props.allowCommentActions && (
+              <DropdownMenu
+                buttonCustomClass='comment__body__content__actions'
+                buttonIcon='fas fa-ellipsis-v'
+                buttonTooltip={props.t('Actions')}
+              >
+                <IconButton
+                  icon='fas fa-fw fa-pencil-alt'
+                  intent='link'
+                  key='editComment'
+                  mode='dark'
+                  onClick={props.onClickEditComment}
+                  text={props.t('Edit')}
+                  title={props.t('Edit comment')}
+                />
 
-              <IconButton
-                icon='far fa-fw fa-trash-alt'
-                intent='link'
-                key='deleteComment'
-                mode='dark'
-                onClick={props.onClickDeleteComment}
-                text={props.t('Delete')}
-                title={props.t('Delete comment')}
-              />
-            </DropdownMenu>
+                <IconButton
+                  icon='far fa-fw fa-trash-alt'
+                  intent='link'
+                  key='deleteComment'
+                  mode='dark'
+                  onClick={props.onClickDeleteComment}
+                  text={props.t('Delete')}
+                  title={props.t('Delete comment')}
+                />
+              </DropdownMenu>
+            )}
           </div>
           <div
             className={classnames(`${props.customClass}__footer`, 'comment__footer')}
@@ -107,11 +109,12 @@ const Comment = props => {
 export default translate()(Comment)
 
 Comment.propTypes = {
-  customClass: PropTypes.string,
   author: PropTypes.object.isRequired,
   loggedUser: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  allowCommentActions: PropTypes.bool,
+  customClass: PropTypes.string,
   text: PropTypes.string,
   createdFormated: PropTypes.string,
   createdDistance: PropTypes.string,
@@ -124,6 +127,7 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
+  allowCommentActions: false,
   customClass: '',
   text: '',
   createdFormated: '',

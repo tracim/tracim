@@ -31,6 +31,7 @@ export const contentFromApi = {
   ],
   content_type: 'html-document',
   parent_content_type: '',
+  parent_content_namespace: '',
   parent_label: '',
   parent_id: null,
   label: 'Test content html',

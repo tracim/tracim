@@ -1,6 +1,7 @@
 import { uniqBy } from 'lodash'
 import {
   APPEND,
+  COMMENT,
   COMMENT_LIST,
   PUBLICATION,
   REMOVE,
@@ -35,14 +36,18 @@ export default function publicationList (state = defaultPublicationList, action)
     case `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}`:
       return uniqByContentId(sortByModifiedDate(state))
 
-    case `${UPDATE}/${PUBLICATION}`:
-      return uniqByContentId(state.map(publication => action.publication.content_id === publication.id
+    case `${UPDATE}/${PUBLICATION}`: {
+      const serializedPublication = action.publication.content_id
+        ? serialize(action.publication, serializeContentProps)
+        : action.publication
+      return uniqByContentId(state.map(publication => serializedPublication.id === publication.id
         ? {
-          ...serialize(action.publication, serializeContentProps),
+          ...serializedPublication,
           commentList: publication.commentList
         }
         : publication
       ))
+    }
 
     case `${REMOVE}/${PUBLICATION}`:
       return state.filter(publication => action.publicationId !== publication.id)
@@ -56,6 +61,12 @@ export default function publicationList (state = defaultPublicationList, action)
     case `${SET}/${PUBLICATION}/${COMMENT_LIST}`:
       return uniqByContentId(state.map(publication => action.publicationId === publication.id
         ? { ...publication, commentList: action.commentList }
+        : publication
+      ))
+
+    case `${SET}/${COMMENT}`:
+      return uniqByContentId(state.map(publication => action.publicationId === publication.id
+        ? { ...publication, firstComment: action.comment }
         : publication
       ))
 

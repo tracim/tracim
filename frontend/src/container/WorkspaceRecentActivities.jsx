@@ -5,7 +5,9 @@ import { translate } from 'react-i18next'
 
 import {
   TracimComponent,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 
 import {
@@ -41,9 +43,15 @@ export class WorkspaceRecentActivities extends React.Component {
   }
 
   handleTlm = (data) => {
+    const { props } = this
     if (!data.fields.workspace ||
-      !permissiveNumberEqual(data.fields.workspace.workspace_id, this.props.workspaceId)) return
-    this.props.handleTlm(data)
+      !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
+    if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
+      const member = props.currentWorkspace.memberList.find(user => user.id === data.fields.user.user_id)
+      if (!member || member.role === data.fields.member.role) return
+    }
+
+    props.handleTlm(data)
   }
 
   render () {

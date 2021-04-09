@@ -1531,7 +1531,7 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
-    content_namespace = marshmallow.fields.String(example="content")
+    content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
     current_revision_type = StrippedString(
@@ -1692,6 +1692,9 @@ class CommentSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")

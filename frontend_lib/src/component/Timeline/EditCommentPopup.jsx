@@ -94,7 +94,7 @@ export class EditCommentPopup extends React.Component {
             icon='far fa-paper-plane'
             intent='primary'
             mode='light'
-            onClick={props.onClickValidate}
+            onClick={() => props.onClickValidate(state.newComment)}
             text={props.t('Send')}
             type='button'
           />

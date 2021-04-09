@@ -38,7 +38,7 @@ class SystemController(Controller):
     @hapic.output_body(ApplicationSchema(many=True))
     def applications(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of alls applications installed in this tracim instance.
+        Get list of all applications installed in this tracim instance.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         app_api = ApplicationApi(app_list=app_list)
@@ -52,7 +52,7 @@ class SystemController(Controller):
     @hapic.output_body(ContentTypeSchema(many=True))
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of alls content types availables in this tracim instance.
+        Get list of all content types availables in this tracim instance.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         content_types_slugs = content_type_list.endpoint_allowed_types_slug()
