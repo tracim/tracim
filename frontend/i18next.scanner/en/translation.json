@@ -447,5 +447,6 @@
   "copied": "copied",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Download {{filename}}": "Download {{filename}}",
-  "Show in publications": "Show in publications"
+  "Show in publications": "Show in publications",
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page."
 }

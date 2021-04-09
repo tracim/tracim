@@ -552,6 +552,7 @@ export class Publications extends React.Component {
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
     this.currentPublicationRef = currentPublicationId ? React.createRef() : null
+    const isPublicationListEmpty = props.publicationList.length === 0
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -562,6 +563,13 @@ export class Publications extends React.Component {
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
         />
+
+        {isPublicationListEmpty && (
+          <div className='publications__empty'>
+            {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
+          </div>
+        )}
+
         {props.publicationList.map(publication =>
           <FeedItemWithPreview
             contentAvailable
