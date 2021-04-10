@@ -27,7 +27,7 @@ export const MentionAutoComplete = props => {
             <b className='autocomplete__item__mention'>@{m.mention}</b>&nbsp;-&nbsp;{props.t(m.detail)}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (
-            <div className='autocomplete__delimiter' key={`delimiter${id}`} />
+            <div className='autocomplete__delimiter' key={`delimiter${i}`} />
           )}
         </>
       ))}
