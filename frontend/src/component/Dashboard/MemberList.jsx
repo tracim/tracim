@@ -4,7 +4,9 @@ import classnames from 'classnames'
 import {
   NewMemberForm,
   Avatar,
-  ROLE
+  ROLE,
+  PAGE,
+  ProfileNavigation
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -85,12 +87,14 @@ export class MemberList extends React.Component {
 
                       <div className='memberlist__list__item__info'>
                         <div className='memberlist__list__item__info__firstColumn'>
-                          <div
-                            className='memberlist__list__item__info__firstColumn__name'
-                            title={m.publicName}
-                          >
-                            {m.publicName}
-                          </div>
+                          <ProfileNavigation user={m.publicName}>
+                            <span
+                              className='memberlist__list__item__info__firstColumn__name'
+                              to={PAGE.PUBLIC_PROFILE(m.userId)}
+                              title={m.publicName}
+                            >{m.publicName}
+                            </span>
+                          </ProfileNavigation>
 
                           {m.username && (
                             <div
