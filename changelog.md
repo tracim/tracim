@@ -2,7 +2,7 @@
 
 ### Fixed Issues
 
-- Frontend: fix for blinking dashboard in somes case
+- Frontend: fix for a problem where the dashboard blinks in some cases
 
 
 # 3.7.0 / 2021-04-02
