@@ -5,7 +5,6 @@ import {
   NewMemberForm,
   Avatar,
   ROLE,
-  PAGE,
   ProfileNavigation
 } from 'tracim_frontend_lib'
 
@@ -87,12 +86,17 @@ export class MemberList extends React.Component {
 
                       <div className='memberlist__list__item__info'>
                         <div className='memberlist__list__item__info__firstColumn'>
-                          <ProfileNavigation user={m.publicName}>
+                          <ProfileNavigation
+                            user={{
+                              userId: m.id,
+                              publicName: m.publicName
+                            }}
+                          >
                             <span
                               className='memberlist__list__item__info__firstColumn__name'
-                              to={PAGE.PUBLIC_PROFILE(m.userId)}
                               title={m.publicName}
-                            >{m.publicName}
+                            >
+                              {m.publicName}
                             </span>
                           </ProfileNavigation>
 

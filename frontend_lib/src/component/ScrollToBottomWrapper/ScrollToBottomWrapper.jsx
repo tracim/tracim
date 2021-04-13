@@ -38,7 +38,7 @@ export class ScrollToBottomWrapper extends React.Component {
     this.resizeObserver.disconnect()
   }
 
-  handleScroll = (event) => {
+  handleScroll = () => {
     // NOTE - SG - 2021-04-08 - the second test is used to ignore
     // scrollHeight changes not already handled by handleResizeChildren()
     // as it can be called **after** handleScroll() thanks to asynchronism.
@@ -94,6 +94,7 @@ export class ScrollToBottomWrapper extends React.Component {
           this.container = el
           if (el) {
             this.containerScrollHeight = el.scrollHeight
+            this.resizeObserver.disconnect()
             this.resizeObserver.observe(el.firstChild)
           }
         }}
