@@ -125,7 +125,6 @@ export class Publications extends React.Component {
     }
   }
 
-
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
     if (prevProps.match.params.idws !== props.match.params.idws) {
