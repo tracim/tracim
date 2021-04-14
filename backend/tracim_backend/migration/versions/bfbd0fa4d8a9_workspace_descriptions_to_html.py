@@ -47,7 +47,7 @@ class TemporaryWorkspaces(DeclarativeBase):
     description = sa.Column(sa.Text(), unique=False, nullable=False, default="")
 
 
-def nl2br(text: str):
+def newlines_to_html_br(text: str):
     return text.replace("\n", "<br />")
 
 
@@ -62,7 +62,7 @@ def upgrade():
         if text_content == description:
             # if this condition is reached, the description is not in HTML
             # Otherwise, we have nothing to do
-            converted_description = nl2br(html.escape(description, quote=False))
+            converted_description = newlines_to_html_br(html.escape(description, quote=False))
             workspace.description = converted_description
             session.add(workspace)
     session.commit()
