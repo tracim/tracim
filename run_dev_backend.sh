@@ -60,6 +60,15 @@ fi
 
 
 if [ "$mode" = "cypress" ]; then
+    if ! [ -f "$script_dir/functionnal_tests/cypress.json" ]; then
+        cat <<EOF
+It seems you haven't configured Cypress yet. Please run the following command before continuing.
+
+cd "$script_dir"; ./setup_functionnal_tests.sh
+EOF
+        exit 1
+    fi
+
     if [ -z "$cypress_arg" ]; then
         echo "cypress mode needs an argument, ('open' or 'run')"
         exit 1
