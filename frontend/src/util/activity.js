@@ -1,5 +1,6 @@
 import {
   TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
@@ -72,9 +73,10 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 }
 
 const getActivityParams = (message) => {
-  const [entityType, , subEntityType] = message.event_type.split('.')
+  const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
+      if (subEntityType === TLM_ST.COMMENT && coreEventType !== TLM_CET.CREATED) return null
       const id = (subEntityType === TLM_ST.COMMENT)
         ? message.fields.content.parent_id
         : message.fields.content.content_id
@@ -136,6 +138,7 @@ export const mergeWithActivityList = async (messageList, activityList, apiUrl) =
   const activityMap = groupMessageListByActivityId(messageList)
 
   for (const activity of activityList) {
+    console.log('aaaaaaaaaa', activity)
     if (activityMap.has(activity.id)) {
       activityMap.delete(activity.id)
     }
