@@ -23,8 +23,9 @@ from sqlalchemy.ext.declarative import declarative_base
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
+    # TODO - G.M - 28-03-2018 - [Database] Convert database to allow naming convention
     # for ck contraint.
-    # "ck": "ck_%(table_name)s_%(constraint_name)s",
+    # "ck": "ck_%(table_name)s_%(column_0_N_name)s",
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
