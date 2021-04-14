@@ -87,6 +87,24 @@
   .dashboard__section
     padding 0px
     margin-top 10px
+    overflow-wrap anywhere
+
+@media (max-width: max-sm)
+  .dashboard__workspace
+    flex-direction column
+    &__subtitle
+      font-size unset
+    &__content
+      width 100%
+      & .activityList
+        width 100%
+      & .workspaceRecentActivities__header
+        font-size unset
+        margin-inline-end auto
+        margin-bottom 10px
+    &__rightMenu
+      width 100%
+      margin 0
 
 @media (max-width: max-xs)
   .dashboard .pageContentGeneric
@@ -94,7 +112,18 @@
 
   .dashboard
     .memberlist
+      margin 10px 0
       &__list__item__delete
         display none
       &__btnadd
         display none
+    &__workspace__rightMenu__contents
+      flex-flow row wrap
+      & .iconbutton
+        width auto
+        margin-inline-end 10px
+        margin-inline-start 0px
+        &__icon
+          margin 0
+        &__text_with_icon
+          display none

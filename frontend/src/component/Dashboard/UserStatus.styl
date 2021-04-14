@@ -22,3 +22,24 @@
         justify-content center
     &__requests
       margin auto
+
+@media (max-width: max-md)
+  .userstatus
+    &__role
+      font-size fontSizeSmall
+
+@media (max-width: max-sm)
+  .userstatus
+    &__role
+      justify-content flex-start
+      margin-inline-start 10px
+      &__text
+        font-weight normal
+    &__informations
+      &__notification
+        display flex
+        margin-inline-start 10px
+        margin-top 0
+      &__requests
+        display none
+
