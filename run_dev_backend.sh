@@ -62,7 +62,7 @@ fi
 if [ "$mode" = "cypress" ]; then
     if ! [ -f "$script_dir/functionnal_tests/cypress.json" ]; then
         cat <<EOF
-It seems you haven't configured Cypress yet. The following command need to be run before continuing:
+It seems you haven't configured Cypress yet. The following command needs to be run before continuing:
 
 cd "$script_dir"; ./setup_functionnal_tests.sh
 
