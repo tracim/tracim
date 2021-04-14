@@ -66,6 +66,16 @@ import { uniqueId } from 'lodash'
       }
     }
 
+    const hiddenTinymceFileInput = document.createElement('input')
+    hiddenTinymceFileInput.id = 'hidden_tinymce_fileinput'
+    hiddenTinymceFileInput.type = 'file'
+    hiddenTinymceFileInput.style.display = 'none'
+    hiddenTinymceFileInput.addEventListener('change', () => {
+      base64EncodeAndTinyMceInsert(hiddenTinymceFileInput.files)
+    })
+
+    document.body.append(hiddenTinymceFileInput)
+
     globalThis.tinymce.init({
       selector: selector,
       language: getTinyMceLang(lang),
@@ -139,19 +149,7 @@ import { uniqueId } from 'lodash'
           icon: 'mce-ico mce-i-image',
           title: 'Image',
           onclick: function () {
-            const hiddenTinymceFileInput = $('#hidden_tinymce_fileinput')
-            if (hiddenTinymceFileInput.length > 0) hiddenTinymceFileInput.remove()
-
-            const fileTag = document.createElement('input')
-            fileTag.id = 'hidden_tinymce_fileinput'
-            fileTag.type = 'file'
-            fileTag.style.display = 'none'
-            $('body').append(fileTag)
-
-            hiddenTinymceFileInput.on('change', function () {
-              base64EncodeAndTinyMceInsert($(this)[0].files)
-            })
-
+            hiddenTinymceFileInput.value = ''
             hiddenTinymceFileInput.click()
           }
         })
