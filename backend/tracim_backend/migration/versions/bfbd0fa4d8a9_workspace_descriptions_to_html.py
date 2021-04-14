@@ -16,12 +16,34 @@ import html
 
 from alembic import op
 from bs4 import BeautifulSoup
+import sqlalchemy as sa
+from sqlalchemy import MetaData
+from sqlalchemy.ext.declarative import declarative_base
 
-from tracim_backend.models.meta import metadata
+NAMING_CONVENTION = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
+    # for ck contraint.
+    # "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+metadata = MetaData(naming_convention=NAMING_CONVENTION)
+DeclarativeBase = declarative_base(metadata=metadata)
 
 # revision identifiers, used by Alembic.
 revision = "bfbd0fa4d8a9"
 down_revision = "208eda5a6a80"
+
+
+class TemporaryWorkspaces(DeclarativeBase):
+    """ temporary sqlalchemy object to help migration"""
+
+    __tablename__ = "workspaces"
+
+    workspace_id = sa.Column(sa.Integer, primary_key=True)
+    description = sa.Column(sa.Text(), unique=False, nullable=False, default="")
 
 
 def nl2br(text: str):
@@ -30,22 +52,19 @@ def nl2br(text: str):
 
 def upgrade():
     connection = op.get_bind()
-    workspaces_table = metadata.tables["workspaces"]
-    workspaces = connection.execute(workspaces_table.select()).fetchall()
+    session = sa.orm.Session(bind=connection)
+    workspaces = session.query(TemporaryWorkspaces)
     for workspace in workspaces:
-        description = workspace["description"]
+        description = workspace.description
         parsed_description = BeautifulSoup(description, "html.parser")
         text_content = parsed_description.get_text()
         if text_content == description:
             # if this condition is reached, the description is not in HTML
             # Otherwise, we have nothing to do
             converted_description = nl2br(html.escape(description, quote=False))
-            query = (
-                workspaces_table.update()
-                .where(workspaces_table.c.workspace_id == workspace["workspace_id"])
-                .values(description=converted_description)
-            )
-            connection.execute(query)
+            workspace.description = converted_description
+            session.add(workspace)
+    session.commit()
 
 
 def downgrade():
