@@ -36,6 +36,11 @@ for (const pageTestCase of activityPages) {
         }
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
+
+      afterEach(function () {
+        cy.cancelXHR()
+      })
+
       it('should display a "See more" button when more than 15 activities exist', () => {
         cy.get('[data-cy=activityList__item]').should('have.length.gte', 15)
         cy.get('[data-cy=activityList__more]').click()
@@ -44,16 +49,23 @@ for (const pageTestCase of activityPages) {
     })
 
     describe('List', () => {
+      let firstContentId = null
       beforeEach(() => {
+        cy.createFile(fileImage, fileType, fileName2, workspaceId).then(content => {
+          firstContentId = content.content_id
+        })
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
 
+      afterEach(function () {
+        cy.cancelXHR()
+      })
+
       it('should have items', () => {
-        cy.get('[data-cy=activityList__item]').should('have.length', initialItemCount)
+        cy.get('[data-cy=activityList__item]').should('have.length', initialItemCount + 1)
       })
 
       it('should add an item in first position when a file is created', () => {
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
         cy.get('[data-cy=activityList__item]')
           .first()
@@ -61,44 +73,35 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should update an already existing item when a comment for its content is posted', () => {
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
-        cy.get('[data-cy=activityList__item]')
-          .first()
-          .should('contain.text', 'modified')
-        cy.postComment(workspaceId, 1, 'A comment')
+        cy.postComment(workspaceId, firstContentId, 'A comment')
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
           .should('contain.text', 'commented')
       })
 
       // FIXME - GB - 2020-12-29 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3392
       it.skip('should be reordered only when the "Refresh" button is pressed', () => {
-        let firstContentId = null
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
-          .then(content => {
-            firstContentId = content.content_id
-            cy.createFile(fileImage, fileType, fileName3, workspaceId).then(() => {
-              cy.get('[data-cy=activityList__item]')
-                .should('have.length', initialItemCount + 2)
-                .first()
-                .contains(fileName3WithoutExtention)
+        cy.createFile(fileImage, fileType, fileName3, workspaceId).then(() => {
+          cy.get('[data-cy=activityList__item]')
+            .should('have.length', initialItemCount + 2)
+            .first()
+            .contains(fileName3WithoutExtention)
 
-              cy.get('[data-cy=activityList__refresh]').should('not.exist')
+          cy.get('[data-cy=activityList__refresh]').should('not.exist')
 
-              cy.postComment(workspaceId, firstContentId, 'A comment').then(() => {
-                cy.get('[data-cy=activityList__item]')
-                  .first()
-                  .should('contain.text', fileName3WithoutExtention)
+          cy.postComment(workspaceId, firstContentId, 'A comment').then(() => {
+            cy.get('[data-cy=activityList__item]')
+              .first()
+              .should('contain.text', fileName3WithoutExtention)
 
-                cy.get('[data-cy=activityList__refresh]')
-                  .click()
+            cy.get('[data-cy=activityList__refresh]')
+              .click()
 
-                cy.get('[data-cy=activityList__item]')
-                  .first()
-                  .should('contain.text', fileName2WithoutExtention)
-              })
-            })
+            cy.get('[data-cy=activityList__item]')
+              .first()
+              .should('contain.text', fileName2WithoutExtention)
           })
+        })
       })
     })
 
@@ -107,6 +110,10 @@ for (const pageTestCase of activityPages) {
       beforeEach(() => {
         cy.createFile(fileImage, fileType, fileName2, workspaceId).then(content => { fileId = content.content_id })
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
+      })
+
+      afterEach(function () {
+        cy.cancelXHR()
       })
 
       it('should have a title link, clicking on it opens the content', () => {
@@ -134,6 +141,10 @@ for (const pageTestCase of activityPages) {
         cy.createHtmlDocument(contentName, workspaceId).then(doc => {
           contentId = doc.content_id
         })
+      })
+
+      afterEach(function () {
+        cy.cancelXHR()
       })
 
       it('should render a small note without the visual overflow', () => {
