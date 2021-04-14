@@ -38,7 +38,8 @@ import {
   putMemberRole,
   deleteMember,
   postWorkspaceMember,
-  getAppList
+  getAppList,
+  putPublicationEnabled
 } from '../action.async.js'
 import Radium from 'radium'
 import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
@@ -417,6 +418,29 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleTogglePublicationEnabled = async () => {
+    const { props, state } = this
+    const newPublicationEnabledValue = !state.content.publication_enabled
+
+    const fetchTogglePublicationEnabled = await handleFetchResult(await putPublicationEnabled(state.config.apiUrl, state.content, newPublicationEnabledValue))
+
+    switch (fetchTogglePublicationEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newPublicationEnabledValue ? props.t('Publication activated') : props.t('Publication deactivated'),
+          'info'
+        )
+        break
+      default:
+        this.sendGlobalFlashMessage(
+          newPublicationEnabledValue
+            ? props.t('Error while activating publication')
+            : props.t('Error while deactivating publication'),
+          'warning'
+        )
+    }
+  }
+
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
@@ -668,6 +692,8 @@ export class WorkspaceAdvanced extends React.Component {
             uploadEnabled={state.content.public_upload_enabled}
             appUploadAvailable={state.content.appUploadAvailable}
             onToggleUploadEnabled={this.handleToggleUploadEnabled}
+            publicationEnabled={state.content.publication_enabled}
+            onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
           />
         </PopinFixedRightPartContent>
       )

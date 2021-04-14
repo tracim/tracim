@@ -60,7 +60,8 @@ import {
   getAvatarBaseUrl,
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  capitalize
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -421,5 +422,6 @@ export {
   getCommentTranslated,
   getHtmlDocTranslated,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  capitalize
 }

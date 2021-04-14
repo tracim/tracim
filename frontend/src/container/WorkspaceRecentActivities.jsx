@@ -76,6 +76,7 @@ export class WorkspaceRecentActivities extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
+          workspaceList={props.workspaceList}
         />
       </div>
     )
@@ -90,8 +91,8 @@ WorkspaceRecentActivities.propTypes = {
   workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
-const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {
-  return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs }
+const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }) => {
+  return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }
 }
 const component = withActivity(
   TracimComponent(WorkspaceRecentActivities),

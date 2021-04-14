@@ -46,7 +46,8 @@ export const serializeWorkspace = ws => {
     description: ws.description,
     agendaEnabled: ws.agenda_enabled,
     downloadEnabled: ws.public_download_enabled,
-    uploadEnabled: ws.public_upload_enabled
+    uploadEnabled: ws.public_upload_enabled,
+    publicationEnabled: ws.publication_enabled
   }
 }
 
