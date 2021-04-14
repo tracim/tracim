@@ -138,7 +138,6 @@ export const mergeWithActivityList = async (messageList, activityList, apiUrl) =
   const activityMap = groupMessageListByActivityId(messageList)
 
   for (const activity of activityList) {
-    console.log('aaaaaaaaaa', activity)
     if (activityMap.has(activity.id)) {
       activityMap.delete(activity.id)
     }
