@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
-import { ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')
@@ -102,11 +102,19 @@ class WorkspaceListItem extends React.Component {
                 style={{
                   marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
                 }}
-              >
-                &#8735;
-              </div>
+              />
             )
           }
+
+          {props.hasChildren && (
+            <IconButton
+              customClass='transparentButton sidebar__content__navigation__item__hideChildren'
+              icon='fas fa-caret-down'
+              intent='link'
+              mode='light'
+              onClick={() => {}}
+            />
+          )}
 
           <div
             className='sidebar__content__navigation__item__name'

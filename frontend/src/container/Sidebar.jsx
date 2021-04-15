@@ -79,6 +79,7 @@ export class Sidebar extends React.Component {
         <WorkspaceListItem
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
+          hasChildren={space.children.length > 0}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
