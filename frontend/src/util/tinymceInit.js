@@ -149,6 +149,7 @@ import { uniqueId } from 'lodash'
           icon: 'mce-ico mce-i-image',
           title: 'Image',
           onclick: function () {
+            $editor.focus()
             hiddenTinymceFileInput.value = ''
             hiddenTinymceFileInput.click()
           }
@@ -164,6 +165,7 @@ import { uniqueId } from 'lodash'
           icon: 'mce-ico mce-i-fullscreen',
           title: 'Fullscreen',
           onclick: function () {
+            $editor.focus()
             const headerHeight = 61 // 61px is Tracim's header height
             var iframeElement = $editor.getWin()
 
