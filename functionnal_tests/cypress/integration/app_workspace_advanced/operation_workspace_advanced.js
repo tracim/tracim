@@ -212,8 +212,8 @@ describe('App Workspace Advanced', function () {
       {
         feature: 'publication',
         buttonSelector: '[data-cy=publication_enabled]',
-        deactivatedMessage: 'Publication deactivated',
-        activatedMessage: 'Publication activated'
+        deactivatedMessage: 'Publications deactivated',
+        activatedMessage: 'Publications activated'
       },
       {
         feature: 'agenda',

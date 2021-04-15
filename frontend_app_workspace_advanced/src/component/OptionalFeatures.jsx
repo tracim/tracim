@@ -43,8 +43,8 @@ const OptionalFeatures = props => {
         <BtnSwitch
           checked={props.publicationEnabled}
           onChange={props.onTogglePublicationEnabled}
-          activeLabel={props.t('Publication activated')}
-          inactiveLabel={props.t('Publication deactivated')}
+          activeLabel={props.t('Publications activated')}
+          inactiveLabel={props.t('Publications deactivated')}
         />
       </div>
     </div>
