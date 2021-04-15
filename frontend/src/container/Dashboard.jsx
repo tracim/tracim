@@ -437,7 +437,7 @@ export class Dashboard extends React.Component {
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
 
-    // INFO - GB - 2019-08-29 - these filters are made temporarly by the frontend, but may change to have all the intelligence in the backend
+    // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
     let contentTypeButtonList = []
     if (props.curWs.publicationEnabled) {

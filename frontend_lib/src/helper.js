@@ -781,9 +781,3 @@ export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/a
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
 
 export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
-
-/**
- * DOC - SG - 2021-04-15
- * Return the string with its first letter in uppercase.
- */
-export const capitalize = (string) => string[0].toUpperCase() + string.slice(1)
