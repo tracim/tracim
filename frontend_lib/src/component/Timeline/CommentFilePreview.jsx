@@ -9,6 +9,7 @@ import {
   removeExtensionOfFilename,
   getFileDownloadUrl
 } from '../../helper.js'
+import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
@@ -75,9 +76,19 @@ export class CommentFilePreview extends React.Component {
                 apiUrl={props.apiUrl}
               />
               <div className='comment__body__content__text'>
-                <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-                  {apiAuthor.public_name}
-                </div>
+                <ProfileNavigation
+                  user={{
+                    userId: apiAuthor.user_id,
+                    publicName: apiAuthor.public_name
+                  }}
+                >
+                  <span
+                    className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}
+                    title={apiAuthor.public_name}
+                  >
+                    {apiAuthor.public_name}
+                  </span>
+                </ProfileNavigation>
 
                 <div
                   className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
