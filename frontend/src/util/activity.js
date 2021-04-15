@@ -12,7 +12,7 @@ const createActivityEvent = (message) => {
   const [, eventType, subEntityType] = message.event_type.split('.')
   return {
     eventId: message.event_id,
-    eventType: subEntityType === TLM_ST.COMMENT ? 'commented' : eventType,
+    eventType: subEntityType === TLM_ST.COMMENT ? `comment ${eventType}` : eventType,
     author: message.fields.author,
     created: message.created
   }
