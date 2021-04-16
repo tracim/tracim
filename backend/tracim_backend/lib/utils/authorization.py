@@ -361,7 +361,7 @@ can_move_content = AndAuthorizationChecker(
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
-can_delete_comment = OrAuthorizationChecker(
+can_edit_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
 # reaction

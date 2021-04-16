@@ -30,6 +30,7 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
@@ -58,7 +59,8 @@ import {
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -104,6 +106,7 @@ import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
@@ -203,7 +206,9 @@ import {
   getFileChildContent,
   getContent,
   getWorkspaceContent,
-  getCommentTranslated
+  getHtmlDocTranslated,
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -234,11 +239,17 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
+export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
+export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 
 export {
   TRANSLATION_STATE,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
   getTranslationApiErrorMessage,
   getDefaultTranslationState
 } from './translation.js'
@@ -253,6 +264,7 @@ export {
   DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
+  EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
@@ -269,6 +281,7 @@ export {
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   removeAtInUsername,
   computeProgressionPercentage,
@@ -407,5 +420,8 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
-  DATE_FNS_LOCALE
+  getHtmlDocTranslated,
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl,
+  getGenericWorkspaceContent
 }

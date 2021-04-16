@@ -8,6 +8,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
+import { handleInvalidMentionInComment } from '../../mention.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -17,6 +18,7 @@ import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
+import EditCommentPopup from './EditCommentPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -27,6 +29,15 @@ export class Timeline extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    this.state = {
+      commentToDelete: null,
+      invalidMentionList: [],
+      newComment: {},
+      showDeleteCommentPopup: false,
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
+    }
   }
 
   handleAllAppChangeLanguage = data => {
@@ -34,8 +45,71 @@ export class Timeline extends React.Component {
     i18n.changeLanguage(data)
   }
 
-  render () {
+  handleToggleDeleteCommentPopup = content => {
+    this.setState(prev => ({
+      showDeleteCommentPopup: !prev.showDeleteCommentPopup,
+      commentToDelete: prev.showDeleteCommentPopup ? null : content
+    }))
+  }
+
+  handleClickValidateDeleteComment = () => {
+    this.props.onClickDeleteComment(this.state.commentToDelete)
+    this.setState({
+      showDeleteCommentPopup: false,
+      commentToDelete: null
+    })
+  }
+
+  handleClickEditComment = (comment) => {
+    this.setState({ showEditCommentPopup: true, newComment: comment })
+  }
+
+  handleClickValidateEditComment = async (comment) => {
     const { props } = this
+    if (!handleInvalidMentionInComment(
+      props.memberList,
+      true,
+      comment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayEditComment()
+    }
+  }
+
+  handleClickValidateAnywayEditComment = () => {
+    const { props, state } = this
+    this.setState({
+      invalidMentionList: [],
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
+    })
+    props.onClickEditComment(state.newComment)
+  }
+
+  handleCloseInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickCancelSave()
+      : this.setState({ showInvalidMentionPopupInComment: false })
+  }
+
+  handleValidateInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickSaveAnyway()
+      : this.handleClickValidateAnywayEditComment()
+  }
+
+  areCommentActionsAllowed = (commentAuthorId) => {
+    const { props } = this
+    return props.loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
+      props.loggedUser.userId === commentAuthorId
+  }
+
+  render () {
+    const { props, state } = this
+    const invalidMentionList = props.invalidMentionList.length ? props.invalidMentionList : state.invalidMentionList
+    const showInvalidMentionPopup = props.showInvalidMentionPopup || state.showInvalidMentionPopupInComment
 
     if (!Array.isArray(props.timelineData)) {
       console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
@@ -82,7 +156,6 @@ export class Timeline extends React.Component {
         <ScrollToBottomWrapper
           customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
           shouldScrollToBottom={props.shouldScrollToBottom}
-          itemList={props.timelineData}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
           {props.timelineData.map(content => {
@@ -90,6 +163,7 @@ export class Timeline extends React.Component {
               case TIMELINE_TYPE.COMMENT:
                 return (
                   <Comment
+                    allowCommentActions={this.areCommentActionsAllowed(content.author.user_id)}
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
@@ -105,6 +179,8 @@ export class Timeline extends React.Component {
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
+                    onClickEditComment={() => this.handleClickEditComment(content)}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -131,28 +207,53 @@ export class Timeline extends React.Component {
                     apiUrl={props.apiUrl}
                     apiContent={content}
                     loggedUser={props.loggedUser}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     key={`commentAsFile_${content.content_id}`}
+                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
             }
           })}
         </ScrollToBottomWrapper>
 
-        {props.showInvalidMentionPopup && (
+        {showInvalidMentionPopup && (
           <ConfirmPopup
-            onConfirm={props.onClickCancelSave}
-            onClose={props.onClickCancelSave}
-            onCancel={props.onClickSaveAnyway}
+            onConfirm={this.handleCloseInvalidMentionPopup}
+            onClose={this.handleCloseInvalidMentionPopup}
+            onCancel={this.handleValidateInvalidMentionPopup}
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
                 <div className='timeline__texteditor__mentions'>
-                  {props.invalidMentionList.join(', ')}
+                  {invalidMentionList.join(', ')}
                 </div>
               </>
             }
             confirmLabel={props.t('Edit')}
             cancelLabel={props.t('Validate anyway')}
+          />
+        )}
+
+        {state.showEditCommentPopup && (
+          <EditCommentPopup
+            apiUrl={props.apiUrl}
+            comment={state.newComment.raw_content}
+            customColor={props.customColor}
+            loggedUserLanguage={props.loggedUser.lang}
+            onClickValidate={this.handleClickValidateEditComment}
+            onClickClose={() => this.setState({ showEditCommentPopup: false })}
+            workspaceId={props.workspaceId}
+          />
+        )}
+
+        {state.showDeleteCommentPopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Delete')}
+            confirmIcon='far fa-trash-alt'
+            cancelIcon='fas fa-times'
+            onConfirm={this.handleClickValidateDeleteComment}
+            onCancel={this.handleToggleDeleteCommentPopup}
           />
         )}
 
@@ -257,6 +358,7 @@ Timeline.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object,
+  memberList: PropTypes.array,
   onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
@@ -276,6 +378,9 @@ Timeline.propTypes = {
   searchForMentionInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickTranslateComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
   onClickRestoreComment: PropTypes.func
 }
 
@@ -289,6 +394,7 @@ Timeline.defaultProps = {
   customColor: '',
   id: '',
   isDeprecated: false,
+  memberList: [],
   loggedUser: {
     userId: '',
     name: '',
@@ -312,5 +418,8 @@ Timeline.defaultProps = {
   searchForMentionInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },
-  onClickRestoreComment: content => { }
+  onClickDeleteComment: () => {},
+  onClickRestoreComment: content => { },
+  onClickEditComment: () => {},
+  onClickOpenFileComment: () => {}
 }

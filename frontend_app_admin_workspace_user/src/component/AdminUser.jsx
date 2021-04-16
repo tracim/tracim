@@ -107,7 +107,7 @@ export class AdminUser extends React.Component {
         <PageTitle
           parentClass='adminUser'
           title={props.t('User account management')}
-          icon='users'
+          icon='fas fa-users'
           breadcrumbsList={props.breadcrumbsList}
         />
 

@@ -76,6 +76,7 @@ from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TranslationQuery
+from tracim_backend.models.context_models import UrlQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -1530,7 +1531,7 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
-    content_namespace = marshmallow.fields.String(example="content")
+    content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
     current_revision_type = StrippedString(
@@ -1691,6 +1692,9 @@ class CommentSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")
@@ -1821,6 +1825,20 @@ class LiveMessageSchemaPage(BasePaginatedSchemaPage):
 
 class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
+
+
+class UrlQuerySchema(marshmallow.Schema):
+    url = marshmallow.fields.URL()
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> UrlQuery:
+        return UrlQuery(**data)
+
+
+class UrlPreviewSchema(marshmallow.Schema):
+    title = StrippedString(allow_none=True)
+    description = StrippedString(allow_none=True)
+    image = marshmallow.fields.URL(allow_none=True)
 
 
 class TranslationQuerySchema(FileQuerySchema):

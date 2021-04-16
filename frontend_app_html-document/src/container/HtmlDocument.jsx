@@ -9,6 +9,7 @@ import {
   appContentFactory,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   getCurrentContentVersionNumber,
   getInvalidMentionList,
@@ -16,6 +17,7 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   NewVersionBtn,
+  PAGE,
   PopinFixed,
   PopinFixedContent,
   PopinFixedHeader,
@@ -44,10 +46,12 @@ import {
   addClassToMentionsOfUser,
   putUserConfiguration,
   permissiveNumberEqual,
-  getTranslationApiErrorMessage,
   TRANSLATION_STATE,
+  handleTranslateHtmlContent,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -55,8 +59,7 @@ import {
   getHtmlDocContent,
   getHtmlDocRevision,
   putHtmlDocContent,
-  putHtmlDocRead,
-  getHtmlDocTranslated
+  putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -115,8 +118,11 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
       // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -228,8 +234,8 @@ export class HtmlDocument extends React.Component {
 
   async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
-
     await this.loadContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -599,7 +605,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.CONTENT, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
@@ -786,32 +792,75 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
-  handleTranslateDocument = async () => {
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
     const { state } = this
-    this.setState({ translationState: TRANSLATION_STATE.PENDING })
-    const response = await getHtmlDocTranslated(
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleTranslateDocument = () => {
+    const { state } = this
+    handleTranslateHtmlContent(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.loggedUser.lang
+      state.loggedUser.lang,
+      state.config.system.config,
+      ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+        this.setState({ translatedRawContent, translationState })
+      }
     )
-    const errorMessage = getTranslationApiErrorMessage(response)
-    if (errorMessage) {
-      this.sendGlobalFlashMessage(errorMessage)
-      this.setState(previousState => {
-        return { translationState: getDefaultTranslationState(previousState.config.system.config) }
-      })
-      return
-    }
-    const translatedRawContent = await response.text()
-    this.setState({ translatedRawContent, translationState: TRANSLATION_STATE.TRANSLATED })
   }
 
   handleRestoreDocument = () => {
-    this.setState(previousState => {
-      return { translationState: getDefaultTranslationState(previousState.config.system.config) }
-    })
+    this.setState(prev => ({
+      translationState: getDefaultTranslationState(prev.config.system.config)
+    }))
   }
 
   render () {
@@ -845,8 +894,19 @@ export class HtmlDocument extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div> {/* this div in display flex, justify-content space-between */}
-            <div className='d-flex'>
+          <div>
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+              />
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
@@ -874,7 +934,7 @@ export class HtmlDocument extends React.Component {
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
-            </div>
+            </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               content={state.content}
@@ -947,6 +1007,7 @@ export class HtmlDocument extends React.Component {
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
+                  memberList={state.config.workspace.memberList}
                   timelineData={state.timeline}
                   newComment={state.newComment}
                   newCommentAsFileList={state.newCommentAsFileList}
@@ -976,6 +1037,9 @@ export class HtmlDocument extends React.Component {
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                  onClickEditComment={this.handleClickEditComment}
+                  onClickDeleteComment={this.handleClickDeleteComment}
+                  onClickOpenFileComment={this.handleClickOpenFileComment}
                 />
               ) : null
             }]}

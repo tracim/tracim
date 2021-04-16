@@ -6,14 +6,16 @@ tabWidth = 185 //185px
   display flex
   background-color offWhite
   & .pageTitleGeneric
-    width "calc(100% - %s)" % (4*tabWidth)px
+    flex 1
+    &__title__label
+      font-weight bold
   // INFO - GB - 2020-12-09 - The style below means that for 4 items the label "Home"
   // will be hidden in the breadcrumbs
-  & .breadcrumbs__item
+  .breadcrumbs__item
     &:first-child
       overflow visible
       &:nth-last-child(n + 4)
-        & .breadcrumbs__item__home
+        .breadcrumbs__item__home
           display none
 
 .tab
@@ -31,11 +33,11 @@ tabWidth = 185 //185px
     border-top-style solid
     border-bottom 1px solid transparent
     background-color veryLightGrey
-  & .fas, & .far
+  .fas, .far
     margin-right 10px
   // INFO - GB - 2020-11-20 - The style below should be specific to tachometer-alt icon.
   // See https://github.com/tracim/tracim/issues/3863
-  & .fa-tachometer-alt
+  .fa-tachometer-alt
     margin-bottom 1px
   &:hover
     color fontColor
@@ -52,7 +54,7 @@ tabWidth = 185 //185px
   .tabBar
     .breadcrumbs
       display none
-    & .pageTitleGeneric
+    .pageTitleGeneric
       width "calc(100% - %s)" % (3*tabWidth)px
 
 @media (max-width: max-xs)

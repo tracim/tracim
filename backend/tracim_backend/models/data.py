@@ -405,7 +405,12 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
     __tablename__ = "content_revisions"
 
-    revision_id = Column(Integer, primary_key=True)
+    revision_id = Column(
+        Integer,
+        Sequence("seq__content_revisions__revision_id"),
+        autoincrement=True,
+        primary_key=True,
+    )
     # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
@@ -682,7 +687,7 @@ class Content(DeclarativeBase):
         -0
     )  # This flag allow to serialize a given revision if required by the user
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence("seq__content__id"), autoincrement=True, primary_key=True)
     cached_revision_id = Column(
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )

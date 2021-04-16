@@ -7,6 +7,7 @@ from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
+from urllib.parse import unquote
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -714,6 +715,11 @@ class BasePaginatedQuery(object):
         self.page_token = page_token
 
 
+class UrlQuery:
+    def __init__(self, url: str):
+        self.url = unquote(url)
+
+
 class TranslationQuery:
     def __init__(
         self, source_language_code: str, target_language_code: str, force_download: int = 0,
@@ -1140,7 +1146,7 @@ class ContentInContext(object):
 
     @property
     def content_namespace(self) -> ContentNamespaces:
-        return self.content.content_namespace.value
+        return self.content.content_namespace
 
     @property
     def parent(self) -> Optional["ContentInContext"]:
@@ -1164,6 +1170,13 @@ class ContentInContext(object):
         p = self.parent
         if p:
             return p.content_type
+        return None
+
+    @property
+    def parent_content_namespace(self) -> Optional[ContentNamespaces]:
+        p = self.parent
+        if p:
+            return p.content_namespace
         return None
 
     @property

@@ -5,7 +5,7 @@
   flex-direction column
   width calc(100% - 65px) // 65px is the width of the rightPart header
   height 100%
-  & a
+  & a:not(.linkPreview)
     color #007bff
     &:hover
       color #007bff
@@ -26,6 +26,7 @@
     padding 5px
     list-style none
     overflow-y auto
+    overflow-x visible
     &__item
       position relative
       margin 10px 0

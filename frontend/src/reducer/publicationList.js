@@ -36,14 +36,18 @@ export default function publicationList (state = defaultPublicationList, action)
     case `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}`:
       return uniqByContentId(sortByModifiedDate(state))
 
-    case `${UPDATE}/${PUBLICATION}`:
-      return uniqByContentId(state.map(publication => action.publication.content_id === publication.id
+    case `${UPDATE}/${PUBLICATION}`: {
+      const serializedPublication = action.publication.content_id
+        ? serialize(action.publication, serializeContentProps)
+        : action.publication
+      return uniqByContentId(state.map(publication => serializedPublication.id === publication.id
         ? {
-          ...serialize(action.publication, serializeContentProps),
+          ...serializedPublication,
           commentList: publication.commentList
         }
         : publication
       ))
+    }
 
     case `${REMOVE}/${PUBLICATION}`:
       return state.filter(publication => action.publicationId !== publication.id)
@@ -60,15 +64,11 @@ export default function publicationList (state = defaultPublicationList, action)
         : publication
       ))
 
-    case `${APPEND}/${PUBLICATION}/${COMMENT}`: {
-      return uniqByContentId(state.map(publication => {
-        if (action.comment.parent_id === publication.id) {
-          const newCommentList = publication.commentList || []
-          newCommentList.push(action.comment)
-          return { ...publication, commentList: newCommentList }
-        } else return publication
-      }))
-    }
+    case `${SET}/${COMMENT}`:
+      return uniqByContentId(state.map(publication => action.publicationId === publication.id
+        ? { ...publication, firstComment: action.comment }
+        : publication
+      ))
 
     default:
       return state

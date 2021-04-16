@@ -12,7 +12,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.translate.providers import TranslationLib
 from tracim_backend.lib.translate.translator import InvalidParametersForTranslationService
 from tracim_backend.lib.translate.translator import TranslationServiceException
-from tracim_backend.lib.utils.authorization import can_delete_comment
+from tracim_backend.lib.utils.authorization import can_edit_comment
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -146,7 +146,44 @@ class CommentController(Controller):
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
-    @check_right(can_delete_comment)
+    @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @check_right(can_edit_comment)
+    @hapic.input_path(CommentsPathSchema())
+    @hapic.input_body(SetCommentSchema())
+    @hapic.output_body(CommentSchema())
+    def edit_comment(self, context, request: TracimRequest, hapic_data=None):
+        """
+        edit existing comment
+        """
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
+        )
+        wapi = WorkspaceApi(
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
+        )
+        workspace = wapi.get_one(hapic_data.path.workspace_id)
+        parent = api.get_one(
+            hapic_data.path.content_id, content_type=content_type_list.Any_SLUG, workspace=workspace
+        )
+        comment = api.get_one(
+            hapic_data.path.comment_id,
+            content_type=content_type_list.Comment.slug,
+            workspace=workspace,
+            parent=parent,
+        )
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=comment):
+            api.update_content(
+                comment, new_raw_content=hapic_data.body.raw_content,
+            )
+        return api.get_content_in_context(comment)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
+    @check_right(can_edit_comment)
     @hapic.input_path(CommentsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_comment(self, context, request: TracimRequest, hapic_data=None):
@@ -216,3 +253,11 @@ class CommentController(Controller):
             request_method="DELETE",
         )
         configurator.add_view(self.delete_comment, route_name="delete_comment")
+
+        # edit comments
+        configurator.add_route(
+            "edit_comment",
+            "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}",
+            request_method="PUT",
+        )
+        configurator.add_view(self.edit_comment, route_name="edit_comment")

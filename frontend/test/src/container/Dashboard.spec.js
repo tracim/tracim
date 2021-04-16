@@ -44,7 +44,10 @@ describe('<Dashboard />', () => {
   }
 
   const mockStore = configureMockStore()
-  const store = mockStore({})
+  const store = mockStore({
+    workspaceActivity: { list: [], hasNextPage: false },
+    currentWorkspace: { label: 'test workspace' }
+  })
 
   const props = {
     // mock redux

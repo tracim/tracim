@@ -8,6 +8,7 @@ import typing
 from marshmallow import ValidationError
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Sequence
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import JSON
@@ -131,7 +132,9 @@ class Event(CreationDateMixin, DeclarativeBase):
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
 
-    event_id = Column(Integer, autoincrement=True, primary_key=True)
+    event_id = Column(
+        Integer, Sequence("seq__events__event_id"), autoincrement=True, primary_key=True
+    )
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
     entity_subtype = Column(String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)

@@ -1,12 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .dashboard
-  .pageContentGeneric
-    margin 0
-    min-height 100%
-    padding 0
-
-.dashboard
   width 100%
   min-height 100%
   &__header
@@ -16,20 +10,25 @@
         margin 0
   &__workspace
     display flex
-    flex-wrap wrap
-    align-items flex-start
+    justify-content space-around
+    &__subtitle
+      font-size fontSizeMedium
+      font-weight bold
+      margin-left 10px
+    &__content
+      width 70%
+      & .activityList
+        max-width 100%
     &__detail
-      margin-right 20px
-      width calc(70% - 20px) //20px => margin-right
-      &__right
-        width 27%
-        margin-top 30px
-        &__button
-          font-size fontSizeSmall
-          margin-left auto
-          display block
-          & .fas
-            margin-right 8px
+      background offWhite
+      border 1px solid grey
+      border-radius 5px
+      padding 10px
+      margin 10px 0px 10px 0px
+      &__buttons
+        text-align end
+        margin-top 10px
+        font-size fontSizeSmall
       &__title
         margin 0 30px 20px 30px
         font-size 70px
@@ -37,91 +36,93 @@
         display flex
         justify-content space-between
       &__description
-        margin-left 30px
-        font-size 18px
-  &__calltoaction
-    display flex
-    flex-wrap wrap
-    margin 40px 30px
-    &__button
-      &:active
-        box-shadow inset 0px 0px 5px 2px #656565
-      &__text
-        color white
+        overflow hidden
+        text-overflow ellipsis
+        &__missing
+          color mediumDarkGrey
+          font-style italic
+    &__rightMenu
+      width 30%
+      background-color offWhite
+      border 1px solid grey
+      border-radius 5px
+      padding 10px
+      margin-left 30px
+      &__contents
         display flex
         flex-direction column
-        &__icon
-          font-size 40px
-        &__title
-          font-size 16px
+      & .iconbutton
+        margin-top 10px
+        width 260px
+        text-align start
+        margin-left auto
+        margin-right auto
+        max-width 100%
+        text-overflow ellipsis
+        overflow hidden
   &__workspaceInfo
     display flex
     flex-wrap wrap
     padding 30px
     min-height 100%
+    justify-content space-around
+    .subTitle
+      margin-bottom 10px
+      text-align center
+      margin-bottom 10px
+
   &__section
-    padding 30px
+    padding 10px 0
+
+.workspaceRecentActivities__header
+  font-size fontSizeMedium
+  font-weight bold
+  margin-top 10px
 
 @media (min-width: min-lg) and (max-width: max-lg)
-  .dashboard__workspace__detail__right
-    width 28%
+  .dashboard__workspace__rightMenu
+    width 25%
 
-@media (min-width: min-md) and (max-width: max-md)
-  .dashboard
-    &__workspace
-      width 100%
-      &__detail
-        order 2
-        width 100%
-        &__right
-          margin 40px auto
-          width 50%
-          display flex
-          flex-direction column-reverse
-          &__button
-            margin-top 20px
-    .memberlist
-      margin-left 0
+@media (max-width: max-md)
+  .dashboard__section
+    padding 0px
+    margin-top 10px
+    overflow-wrap anywhere
 
-@media (min-width: min-sm) and (max-width: max-sm)
+@media (max-width: max-sm)
   .dashboard
+    & .pageContentGeneric
+      padding 10px
     &__workspace
-      &__detail
-        &__right
-          margin 30px auto
-          width auto
-          &__button
-            display none
-    &__workspace
-      width 100%
-      &__detail
-        order 2
+      flex-direction column
+      &__subtitle
+        font-size unset
+      &__content
         width 100%
+        & .activityList
+          width 100%
+        & .workspaceRecentActivities__header
+          font-size unset
+          margin 0px auto 10px 10px
+      &__rightMenu
+        width 100%
+        margin 0
 
 @media (max-width: max-xs)
-  .dashboard .pageContentGeneric
-    margin 10px 0 0 0
-
   .dashboard
-    &__workspace
-      &__detail
-        &__right
-          margin 20px auto
-          width auto
-          &__button
-            display none
-    &__workspace-wrapper
-      margin 0 15px
-    &__workspace
-      width 100%
-      &__detail
-        order 2
-        width 100%
-        &__title
-          font-size 45px
-          word-break break-word
     .memberlist
+      margin 10px 0
       &__list__item__delete
         display none
       &__btnadd
         display none
+    &__workspace__rightMenu__contents
+      flex-flow row wrap
+      & .iconbutton
+        width auto
+        margin-inline-end 10px
+        margin-inline-start 0px
+        &__icon
+          margin 0
+        &__text_with_icon
+          display none

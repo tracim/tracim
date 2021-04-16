@@ -25,7 +25,7 @@ describe('App Workspace Advanced', function () {
   describe("Changing the workspace's description", () => {
     it('Should update the description in the dashboard', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__right__button.btn')
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
       cy.waitForTinyMCELoaded().then(() => {
@@ -46,7 +46,7 @@ describe('App Workspace Advanced', function () {
   describe("Changing the space's default role", () => {
     it('Should show a flash message', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-      .find('.dashboard__workspace__detail__right__button.btn')
+      .find('.dashboard__workspace__detail__buttons .iconbutton')
       .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -86,7 +86,7 @@ describe('App Workspace Advanced', function () {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__right__button.btn')
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -120,7 +120,7 @@ describe('App Workspace Advanced', function () {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__right__button.btn')
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -154,7 +154,7 @@ describe('App Workspace Advanced', function () {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__right__button.btn')
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
@@ -189,7 +189,7 @@ describe('App Workspace Advanced', function () {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__right__button.btn')
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })

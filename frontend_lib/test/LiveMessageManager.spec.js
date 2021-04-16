@@ -259,6 +259,31 @@ describe('LiveMessageManager class', () => {
 
       manager.closeLiveMessageConnection()
     })
+
+    it('should dispatch a leftover message (not received in ascending order)', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+
+      for (const eventId of [42, 44, 43]) {
+        document.dispatchEvent.resetHistory()
+        manager.dispatchLiveMessage({ event_id: eventId })
+        expect(document.dispatchEvent.callCount).to.equal(1)
+      }
+      manager.closeLiveMessageConnection()
+    })
+  })
+
+  describe('the openEventSource method', () => {
+    it('should take leftover event ids into account', () => {
+      const manager = createManager(30000, 0)
+      manager.openLiveMessageConnection(userId, apiUrl)
+      manager.dispatchLiveMessage({ event_id: 42 })
+      manager.dispatchLiveMessage({ event_id: 44 })
+      manager.openEventSourceConnection()
+      expect(manager.eventSource.url).to.be.equal(
+        `${apiUrl}/users/${userId}/live_messages?after_event_id=42`
+      )
+    })
   })
 
   after(() => {

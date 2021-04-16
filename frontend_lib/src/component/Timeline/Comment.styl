@@ -10,25 +10,33 @@
   &__body
     border-radius 5px
     padding 15px 15px 15px 20px
-    border 1px solid darkGrey
+    border 1px solid grey
     background-color offWhite
     display flex
     flex-direction column
     &__content
+      flex 1
       display flex
       &__text
-        width calc(100% - 44px) // 44px is the avatar size
-    &__author
-      margin-left 20px
+        margin 10px 10px 10px 20px
+        width calc(100% - 50px) // 50px is the avatar size
+      &__textAndPreview
+        width calc(100% - 50px) // 50px is the avatar size
+      &__actions
+        padding 0
+        color grey
+        &::after
+          display none
+        &:hover
+          color fontColor
     &__date
-      margin-left 20px
       font-size 12px
     &__text
-      margin-left 20px
       margin-top 10px
-    p img
+    img
       max-width 100%
       height auto
+      box-shadow 0px 0px 10px mediumDarkGrey
   &__footer
     display flex
     justify-content space-between

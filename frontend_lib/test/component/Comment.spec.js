@@ -1,12 +1,15 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import Comment from '../../src/component/Timeline/Comment.jsx'
 
 describe('<Comment />', () => {
   const props = {
+    apiUrl: '',
     customClass: 'randomCustomClass',
+    customColor: '#252525',
     author: { public_name: 'randomAuthor' },
+    loggedUser: { public_name: 'randomUser' },
     text: 'randomText',
     createdFormated: 'randomCreatedFormated',
     createdDistance: 'randomCreatedDistance',
@@ -14,10 +17,13 @@ describe('<Comment />', () => {
     workspaceId: 42,
     onClickTranslate: () => {},
     onClickRestore: () => {},
-    fromMe: true
+    onClickEditComment: () => {},
+    onClickDeleteComment: () => {},
+    fromMe: true,
+    translationState: ''
   }
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <Comment {...props} />
   )
 

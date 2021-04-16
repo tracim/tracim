@@ -5,6 +5,9 @@
   display flex
   flex-direction column
   align-items center
+
+.personalRecentActivities
+  @extend .recentActivities
   width 100%
   overflow auto
   height "calc(100vh - %s)" % headerHeight
@@ -13,10 +16,5 @@
     margin-top 10px
     margin-bottom 10px
 
-.personalRecentActivities
-  @extend .recentActivities
-
 .workspaceRecentActivities
   @extend .recentActivities
-  & .tabBar
-    width 100%

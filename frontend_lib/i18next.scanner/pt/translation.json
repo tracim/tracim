@@ -1,6 +1,7 @@
 {
   "{{user}}'s profile": "Perfil de {{user}}",
   "all": "todos",
+  "Open as content": "Abrir como conteúdo",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",
   "Send": "Enviar",
@@ -180,5 +181,16 @@
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "The file is larger than the maximum file size allowed": "O ficheiro é maior que o tamanho máximo permitido",
   "Error, the space exceed its maximum size": "Erro, o espaço de partilha excede o tamanho máximo",
-  "You have reach your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros"
+  "Remove from favorites": "Eliminar dos favoritos",
+  "Add to favorites": "Adicionar aos favoritos",
+  "Error while adding content to favorites": "Erro ao adicionar conteúdo aos favoritos",
+  "Error while removing content from favorites": "Erro ao eliminar conteúdo dos favoritos",
+  "Error while getting favorites": "Erro ao obter favoritos",
+  "Actions": "Ações",
+  "Edit comment": "Editar o comentário",
+  "Delete comment": "Eliminar o comentário",
+  "Error while deleting the comment": "Erro ao eliminar o comentário",
+  "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
+  "Attach files": "Anexar ficheiros",
+  "Download {{filename}}": "Download {{filename}}"
 }
