@@ -100,7 +100,7 @@ class WorkspaceListItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__content__navigation__item__hideChildren'
+            customClass='transparentButton sidebar__content__navigation__item__foldChildren'
             icon={`fas fa-caret-${props.hideChildren ? 'right' : 'down'}`}
             title={props.hideChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
