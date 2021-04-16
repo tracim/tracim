@@ -80,7 +80,7 @@ export class Sidebar extends React.Component {
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
           hasChildren={space.children.length > 0}
-          hideChildren={state[`hideChildrenOf${space.id}`]}
+          foldChildren={state[`hideChildrenOf${space.id}`]}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
