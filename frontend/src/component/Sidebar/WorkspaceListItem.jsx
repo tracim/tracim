@@ -105,7 +105,7 @@ class WorkspaceListItem extends React.Component {
             title={props.hideChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
             mode='light'
-            onClick={props.onToggleHideChildren}
+            onClick={props.onToggleFoldChildren}
           />
         )}
 
