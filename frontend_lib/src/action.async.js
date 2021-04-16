@@ -163,3 +163,6 @@ export const postContentToFavoriteList = (apiUrl, userId, contentId) => {
 export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
   return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
 }
+
+export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)

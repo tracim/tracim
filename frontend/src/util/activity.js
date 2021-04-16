@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getWorkspaceContent,
+  getGenericWorkspaceContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -33,39 +33,44 @@ const getCommentList = async (content, apiUrl) => {
   return response.apiResponse.status === 200 ? response.body : []
 }
 
-// INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
+/**
+ * DOC - SG - 2021-04-16
+ * Create a content activity from a list of messages.
+ * Can return null if a the content is not accessible anymore: as messages are an history,
+ * the content can be inaccessible when calling this function.
+ * This function assumes that the list is ordered from newest to oldest.
+ */
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
-  const first = messageList[0]
+  const newestMessage = messageList[0]
 
-  let content = first.fields.content
-
-  const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, first.fields.workspace.workspace_id, content.content_id)
-  )
-
-  const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : null
+  let content = newestMessage.fields.content
 
   if (content.content_type === TLM_ST.COMMENT) {
-    if (!contentPath) return null
-
-    const response = await handleFetchResult(await getWorkspaceContent(
+    // INFO - SG - 2021-04-16
+    // We have to get the parent content as comments shall produce an activity
+    // for it and not for the comment.
+    const response = await handleFetchResult(await getGenericWorkspaceContent(
       apiUrl,
-      first.fields.workspace.workspace_id,
-      content.parent_content_type + 's',
+      newestMessage.fields.workspace.workspace_id,
       content.parent_id
     ))
-    if (response.apiResponse.status === 200) {
-      content = response.body
-    } else return null
+    if (!response.apiResponse.ok) return null
+    content = response.body
   }
 
-  const commentList = contentPath ? await getCommentList(content, apiUrl) : []
+  const fetchGetContentPath = await handleFetchResult(
+    await getContentPath(apiUrl, newestMessage.fields.workspace.workspace_id, content.content_id)
+  )
+  if (!fetchGetContentPath.apiResponse.ok) return null
+
+  const contentPath = fetchGetContentPath.body.items
+  const commentList = await getCommentList(content, apiUrl)
 
   return {
     ...activityParams,
     eventList: [],
     commentList: commentList,
-    newestMessage: first,
+    newestMessage: newestMessage,
     content: content,
     contentPath: contentPath,
     contentAvailable: !!contentPath
