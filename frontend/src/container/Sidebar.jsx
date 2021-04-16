@@ -80,17 +80,17 @@ export class Sidebar extends React.Component {
         <WorkspaceListItem
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
+          foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
-          foldChildren={state.foldedSpaceList.find(id => id === space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
           id={this.spaceItemId(space.id)}
-          onToggleHideChildren={() => this.handleToggleHideChildren(space.id)}
+          onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
         />
-        {!state[`hideChildrenOf${space.id}`] &&
+        {!state.foldedSpaceList.find(id => id === space.id) &&
           space.children.length !== 0 &&
           this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
