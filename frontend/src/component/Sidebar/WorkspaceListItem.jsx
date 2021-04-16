@@ -185,7 +185,7 @@ WorkspaceListItem.propTypes = {
 WorkspaceListItem.defaultProps = {
   allowedAppList: [],
   hasChildren: false,
-  hideChildren: false,
+  foldChildren: false,
   onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   level: 0,
