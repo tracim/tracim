@@ -189,6 +189,6 @@ WorkspaceListItem.defaultProps = {
   onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   level: 0,
-  onToggleHideChildren: () => {},
+  onToggleFoldChildren: () => {},
   userRoleIdInWorkspace: ROLE.reader.id
 }
