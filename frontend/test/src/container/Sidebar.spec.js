@@ -50,10 +50,16 @@ describe('<Sidebar />', () => {
     })
 
     describe('handleToggleFoldChildren', () => {
-      it('should toggle the state related to a specific id', () => {
-        wrapper.setState({ hideChildrenOf10: false })
-        wrapper.instance().handleToggleHideChildren(10)
-        expect(wrapper.state('hideChildrenOf10')).to.equal(true)
+      it('should add the id to the foldedSpaceList state if it is not on the list', () => {
+        wrapper.setState({ foldedSpaceList: [] })
+        wrapper.instance().handleToggleFoldChildren(10)
+        expect(wrapper.state('foldedSpaceList')).to.deep.equal([10])
+      })
+
+      it('should remove the id to the foldedSpaceList state if it is not on the list', () => {
+        wrapper.setState({ foldedSpaceList: [10, 5] })
+        wrapper.instance().handleToggleFoldChildren(10)
+        expect(wrapper.state('foldedSpaceList')).to.deep.equal([5])
       })
     })
   })
