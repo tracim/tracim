@@ -14,8 +14,17 @@ describe('Sidebar', function () {
     })
   })
 
-  it('should display the child space with a ∟ before its label', function () {
-    cy.get('[data-cy="sidebar__content__navigation__workspace__item_2"]').should('be.visible')
-    cy.contains('[data-cy="sidebar__content__navigation__workspace__item_2"]', '∟').should('be.visible')
+  it('should be albe to fold child space', function () {
+    cy.get('[data-cy="sidebar__content__navigation__workspace__item_2"]')
+      .should('be.visible')
+    cy.get('[data-cy="sidebar__content__navigation__workspace__item_1"]')
+      .should('be.visible')
+      .get('.fa-caret-down')
+      .should('be.visible')
+      .click()
+      .get('.fa-caret-right')
+      .should('be.visible')
+    cy.get('[data-cy="sidebar__content__navigation__workspace__item_2"]')
+      .should('not.be.visible')
   })
 })

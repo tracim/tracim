@@ -48,5 +48,13 @@ describe('<Sidebar />', () => {
         expect(wrapper.instance().displaySpace(0, [])).to.deep.equal([])
       })
     })
+
+    describe('handleToggleHideChildren', () => {
+      it('should toggle the state related to a specific id', () => {
+        wrapper.setState({ hideChildrenOf10: false })
+        wrapper.instance().handleToggleHideChildren(10)
+        expect(wrapper.state('hideChildrenOf10')).to.equal(true)
+      })
+    })
   })
 })

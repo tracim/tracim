@@ -112,7 +112,7 @@ class WorkspaceListItem extends React.Component {
         <Link
           className={classnames(
             'sidebar__content__navigation__item__wrapper',
-            { sidebar__content__navigation__item__notChildren: !props.hasChildren }
+            { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
           )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >

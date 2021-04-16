@@ -39,6 +39,7 @@ export class Sidebar extends React.Component {
     this.frameRef = React.createRef()
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+      foldedSpaceList: [],
       sidebarClose: isMobile
     }
 
@@ -80,7 +81,7 @@ export class Sidebar extends React.Component {
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
           hasChildren={space.children.length > 0}
-          foldChildren={state[`hideChildrenOf${space.id}`]}
+          foldChildren={state.foldedSpaceList.find(id => id === space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
@@ -97,7 +98,11 @@ export class Sidebar extends React.Component {
   }
 
   handleToggleFoldChildren = (id) => {
-    this.setState(prev => ({ [`hideChildrenOf${id}`]: !prev[`hideChildrenOf${id}`] }))
+    const { state } = this
+    if (state.foldedSpaceList.find(space => space === id)) {
+      const newFoldedSpaceList = state.foldedSpaceList.filter(space => space !== id)
+      this.setState({ foldedSpaceList: newFoldedSpaceList })
+    } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
   }
 
   getSidebarItem = (label, icon, to) => {
