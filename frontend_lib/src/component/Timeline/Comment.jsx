@@ -10,7 +10,7 @@ import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
-// import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
+import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 
 const Comment = props => {
   const styleSent = {
@@ -37,22 +37,19 @@ const Comment = props => {
             />
             <div className='comment__body__content__textAndPreview'>
               <div className='comment__body__content__text'>
-                <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-                  {props.author.public_name}
-                </div>
-                {/* <ProfileNavigation
+                <ProfileNavigation
                   user={{
-                    userId: apiAuthor.user_id,
-                    publicName: apiAuthor.public_name
+                    userId: props.author.user_id,
+                    publicName: props.author.public_name
                   }}
                 >
                   <span
                     className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}
-                    title={apiAuthor.public_name}
+                    title={props.author.public_name}
                   >
-                    {apiAuthor.public_name}
+                    {props.author.public_name}
                   </span>
-                </ProfileNavigation> */}
+                </ProfileNavigation>
                 <div
                   className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
                   title={props.createdFormated}

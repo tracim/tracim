@@ -82,12 +82,12 @@ export class CommentFilePreview extends React.Component {
                     publicName: apiAuthor.public_name
                   }}
                 >
-                  <span
+                  <div
                     className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}
                     title={apiAuthor.public_name}
                   >
                     {apiAuthor.public_name}
-                  </span>
+                  </div>
                 </ProfileNavigation>
 
                 <div
