@@ -1,6 +1,12 @@
 import React from 'react'
 
-import { CONTENT_TYPE, NUMBER_RESULTS_BY_PAGE } from 'tracim_frontend_lib'
+import {
+  CONTENT_TYPE,
+  NUMBER_RESULTS_BY_PAGE,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_SUB
+} from 'tracim_frontend_lib'
 
 import {
   mergeWithActivityList,
@@ -102,7 +108,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     updateActivityListFromTlm = async (data) => {
       const { props } = this
-
+      if (
+        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
+        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
+      ) return
       await this.waitForNoChange()
       this.changingActivityList = true
       const updatedActivityList = await addMessageToActivityList(data, props.activity.list, FETCH_CONFIG.apiUrl)

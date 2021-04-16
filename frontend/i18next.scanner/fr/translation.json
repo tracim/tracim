@@ -26,6 +26,9 @@
   "0 contents": "0 contenu",
   "0 members": "0 membre",
   "Account Settings": "Paramètres du compte",
+  "comment deleted": "commentaire supprimé",
+  "comment modified": "commentaire modifié",
+  "comment restored ": "commentaire restauré",
   "Empty note": "Note vide",
   "Empty thread": "Discussion vide",
   "Are you sure you want to remove this member from the space?": "Voulez-vous vraiment retirer ce membre de l'espace ?",
@@ -448,5 +451,6 @@
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Download {{filename}}": "Télécharger {{filename}}",
   "Show in publications": "Afficher dans les publications",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page."
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page.",
+  "Open as content": "Ouvrir en tant que contenu"
 }

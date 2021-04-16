@@ -25,8 +25,18 @@ export class FeedItemHeader extends React.Component {
 
     if (currentRevisionType === 'status-update') return props.t('status modified')
     if (TLM_ET.MENTION === lastModificationEntityType) return props.t('mention made')
-    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) return props.t('commented')
-
+    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) {
+      switch (lastModificationType) {
+        case TLM_CET.CREATED:
+          return props.t('commented')
+        case TLM_CET.MODIFIED:
+          return props.t('comment modified')
+        case TLM_CET.DELETED:
+          return props.t('comment deleted')
+        case TLM_CET.UNDELETED:
+          return props.t('comment restored ')
+      }
+    }
     switch (lastModificationType) {
       case TLM_CET.CREATED:
         return props.t('created')

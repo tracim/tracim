@@ -22,6 +22,9 @@
   "0 contents": "0 contents",
   "0 members": "0 members",
   "Account Settings": "Account Settings",
+  "comment deleted": "comment deleted",
+  "comment modified": "comment modified",
+  "comment restored ": "comment restored ",
   "Copy content link": "Copy content link",
   "Empty note": "Empty note",
   "Empty thread": "Empty thread",
@@ -448,5 +451,6 @@
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Download {{filename}}": "Download {{filename}}",
   "Show in publications": "Show in publications",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page."
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page.",
+  "Open as content": "Open as content"
 }
