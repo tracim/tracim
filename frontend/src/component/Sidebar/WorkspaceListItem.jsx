@@ -178,7 +178,7 @@ WorkspaceListItem.propTypes = {
   onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
   level: PropTypes.number,
-  onToggleHideChildren: PropTypes.func,
+  onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number
 }
 
