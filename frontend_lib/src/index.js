@@ -207,7 +207,8 @@ import {
   getContent,
   getWorkspaceContent,
   getHtmlDocTranslated,
-  getCommentTranslated
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -421,5 +422,6 @@ export {
   getCommentTranslated,
   getHtmlDocTranslated,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  getGenericWorkspaceContent
 }

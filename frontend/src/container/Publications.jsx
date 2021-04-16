@@ -90,9 +90,10 @@ export class Publications extends React.Component {
 
     // NOTE - SG - 2021-03-25 - This will be set to the DOM element
     // of the current publication coming from the URL (if any)
-    this.currentPublicationRef = null
+    this.currentPublicationRef = React.createRef()
     this.state = {
       commentToEdit: {},
+      newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       newComment: '',
@@ -110,6 +111,18 @@ export class Publications extends React.Component {
     this.buildBreadcrumbs()
     this.getPublicationList()
     if (this.props.currentWorkspace.memberList.length === 0) this.loadMemberList()
+    this.gotToCurrentPublication()
+  }
+
+  gotToCurrentPublication () {
+    if (!this.props.match.params.idcts) return
+
+    if (this.currentPublicationRef.current) {
+      this.setState({ newCurrentPublication: false })
+      this.currentPublicationRef.current.scrollIntoView({ behavior: 'instant' })
+    } else if (!this.state.newCurrentPublication) {
+      this.setState({ newCurrentPublication: true })
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -120,14 +133,15 @@ export class Publications extends React.Component {
       this.buildBreadcrumbs()
       this.getPublicationList()
     }
+
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
       globalThis.tinymce.remove(`#${wysiwygId}`)
     }
+
     if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
-    if (this.currentPublicationRef && this.currentPublicationRef.current) {
-      this.currentPublicationRef.current.scrollIntoView({ behavior: 'instant' })
-      // Remove the ref as it has fulfilled its role
-      this.currentPublicationRef = null
+
+    if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
+      this.gotToCurrentPublication()
     }
   }
 
@@ -190,8 +204,11 @@ export class Publications extends React.Component {
   }
 
   handleContentCreatedOrRestored = (data) => {
-    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
-    if (data.fields.content.parent_id !== null) return
+    if (
+      data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+      data.fields.content.parent_id !== null ||
+      data.fields.content.workspace_id !== this.props.currentWorkspace.id
+    ) return
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
   }
@@ -223,6 +240,10 @@ export class Publications extends React.Component {
       ...parentPublication,
       modified: data.fields.content.created
     }))
+
+    // RJ - NOTE - 2021-04-09 - We don't want to scroll for any arriving comment,
+    // even if it is ours
+    this.setState({ isLastItemAddedFromCurrentToken: false })
 
     if (parentPublication.id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
@@ -551,13 +572,12 @@ export class Publications extends React.Component {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
-    this.currentPublicationRef = currentPublicationId ? React.createRef() : null
     const isPublicationListEmpty = props.publicationList.length === 0
     return (
       <ScrollToBottomWrapper
         customClass='publications'
         isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
-        shouldScrollToBottom={currentPublicationId === 0}
+        shouldScrollToBottom={!state.newCurrentPublication}
       >
         <TabBar
           currentSpace={props.currentWorkspace}

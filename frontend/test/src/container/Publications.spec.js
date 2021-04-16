@@ -86,7 +86,8 @@ describe('<Publications />', () => {
       content: {
         content_id: 12,
         content_namespace: 'publication',
-        parent_id: null
+        parent_id: null,
+        workspace_id: firstWorkspace.id
       },
       client_token: ''
     }

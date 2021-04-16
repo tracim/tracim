@@ -9,7 +9,6 @@ import {
   PageWrapper,
   PageContent,
   IconButton,
-  convertBackslashNToBr,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ROLE,
@@ -503,7 +502,7 @@ export class Dashboard extends React.Component {
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
-    const description = convertBackslashNToBr(props.curWs.description)
+    const description = props.curWs.description.trim()
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -521,7 +520,7 @@ export class Dashboard extends React.Component {
                   <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
 
                   <div className='dashboard__workspace__detail'>
-                    {(description.trim()
+                    {(description
                       ? (
                         <div
                           className='dashboard__workspace__detail__description'

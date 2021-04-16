@@ -25,8 +25,18 @@ export class FeedItemHeader extends React.Component {
 
     if (currentRevisionType === 'status-update') return props.t('status modified')
     if (TLM_ET.MENTION === lastModificationEntityType) return props.t('mention made')
-    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) return props.t('commented')
-
+    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) {
+      switch (lastModificationType) {
+        case TLM_CET.CREATED:
+          return props.t('commented')
+        case TLM_CET.MODIFIED:
+          return props.t('comment modified')
+        case TLM_CET.DELETED:
+          return props.t('comment deleted')
+        case TLM_CET.UNDELETED:
+          return props.t('comment restored ')
+      }
+    }
     switch (lastModificationType) {
       case TLM_CET.CREATED:
         return props.t('created')
@@ -118,15 +128,13 @@ export class FeedItemHeader extends React.Component {
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={props.t('Actions')}
           >
-            <Link
-              className='feedItemHeader__actionMenu__item'
-              title={props.t('Open as content')}
-              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-              key={`open-${contentId}`}
-            >
-              <i className={`fa-fw ${app.faIcon}`} />
-              {props.t('Open as content')}
-            </Link>
+            <IconButton
+              customClass='feedItemHeader__actionMenu__item'
+              icon='fas fa-link'
+              onClick={props.onClickCopyLink}
+              text={props.t('Copy content link')}
+              key={`link-${contentId}`}
+            />
 
             {props.allowEdition && (
               <IconButton
@@ -138,13 +146,15 @@ export class FeedItemHeader extends React.Component {
               />
             )}
 
-            <IconButton
-              customClass='feedItemHeader__actionMenu__item'
-              icon='fas fa-link'
-              onClick={props.onClickCopyLink}
-              text={props.t('Copy content link')}
-              key={`link-${contentId}`}
-            />
+            <Link
+              className='feedItemHeader__actionMenu__item'
+              title={props.t('Open as content')}
+              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+              key={`open-${contentId}`}
+            >
+              <i className={`fa-fw ${app.faIcon}`} />
+              {props.t('Open as content')}
+            </Link>
           </DropdownMenu>
         )}
       </div>

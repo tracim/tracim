@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 import { ScrollToBottomWrapper } from '../../src/component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 import sinon from 'sinon'
 
-const newWrapper = (props = { shouldScrollToBottom: true }) => {
+const newWrapper = (props) => {
   return mount(
     <ScrollToBottomWrapper {...props}>
       <span>Hello</span>
@@ -17,44 +17,31 @@ describe('<ScrollToBottomWrapper />', () => {
   window.HTMLElement.prototype.scrollTo = scrollToCallBack
 
   describe('functions', () => {
-    describe('componentDidUpdate()', () => {
-      describe('when shouldScrollToBottom is set to true', () => {
-        const wrapper = newWrapper()
-        wrapper.instance().componentDidUpdate()
-        it('should observe its children', () => {
-          expect(wrapper.instance().resizeObserver.disconnect.called).to.equal(true)
-          expect(wrapper.instance().resizeObserver.observe.called).to.equal(true)
-        })
-      })
-
-      describe('when shouldScrollToBottom is set to false', () => {
-        const wrapper = newWrapper({ shouldScrollToBottom: false })
-        wrapper.instance().componentDidUpdate()
-        it('should not observe its children', () => {
-          expect(wrapper.instance().resizeObserver.disconnect.called).to.equal(true)
-          expect(wrapper.instance().resizeObserver.observe.called).to.equal(false)
-        })
-      })
-    })
     describe('handleResizeChildren', () => {
       const testCases = [
         {
           description: 'when the scroll is at the bottom',
           atBottom: true,
           scrollToCalled: true,
-          props: {}
+          props: { shouldScrollToBottom: true }
         },
         {
           description: 'when the scroll is not at the bottom',
           atBottom: false,
           scrollToCalled: false,
-          props: {}
+          props: { shouldScrollToBottom: true }
         },
         {
           description: 'isLastItemAddedFromCurrentToken when the scroll is not at the bottom',
           atBottom: false,
           scrollToCalled: true,
-          props: { isLastItemAddedFromCurrentToken: true }
+          props: { isLastItemAddedFromCurrentToken: true, shouldScrollToBottom: true }
+        },
+        {
+          description: 'shouldScrollToBottom is false',
+          atBottom: true,
+          scrollToCalled: false,
+          props: { shouldScrollToBottom: false }
         }
       ]
       for (const testCase of testCases) {

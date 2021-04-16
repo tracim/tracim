@@ -100,8 +100,11 @@ export class Preview extends React.Component {
       this.handleUnavailablePreview()
     }
 
+    const previewHtmlCode = this.props.linkType !== LINK_TYPE.NONE
+      ? removeInteractiveContentFromHTML(htmlCode)
+      : htmlCode
     this.setState({
-      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode),
+      previewHtmlCode,
       previewUnavailable: htmlCode === null
     })
   }
