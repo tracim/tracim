@@ -70,7 +70,7 @@ class WorkspaceListItem extends React.Component {
   render () {
     const { props, state } = this
     const INDENT_WIDTH = 20
-    const BASE_MARGIN = 10
+    const BASE_MARGIN = 15
 
     return (
       <li
@@ -87,33 +87,37 @@ class WorkspaceListItem extends React.Component {
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
       >
+        {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
+          // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
+          props.level > 0 && (
+            <div
+              style={{
+                marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
+              }}
+            />
+          )
+        }
+
+        {props.hasChildren && (
+          <IconButton
+            customClass='transparentButton sidebar__content__navigation__item__hideChildren'
+            icon={`fas fa-caret-${props.hideChildren ? 'right' : 'down'}`}
+            title={props.hideChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
+            intent='link'
+            mode='light'
+            onClick={props.onToggleHideChildren}
+          />
+        )}
+
         <Link
-          className='sidebar__content__navigation__item__wrapper'
+          className={classnames(
+            'sidebar__content__navigation__item__wrapper',
+            { sidebar__content__navigation__item__notChildren: !props.hasChildren }
+          )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
             <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
-          )}
-
-          {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
-            // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
-            props.level > 0 && (
-              <div
-                style={{
-                  marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
-                }}
-              />
-            )
-          }
-
-          {props.hasChildren && (
-            <IconButton
-              customClass='transparentButton sidebar__content__navigation__item__hideChildren'
-              icon='fas fa-caret-down'
-              intent='link'
-              mode='light'
-              onClick={() => {}}
-            />
           )}
 
           <div
@@ -169,16 +173,22 @@ WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
+  hasChildren: PropTypes.bool,
+  hideChildren: PropTypes.bool,
   onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
   level: PropTypes.number,
+  onToggleHideChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
   allowedAppList: [],
+  hasChildren: false,
+  hideChildren: false,
   onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   level: 0,
+  onToggleHideChildren: () => {},
   userRoleIdInWorkspace: ROLE.reader.id
 }

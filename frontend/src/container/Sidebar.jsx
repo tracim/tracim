@@ -80,16 +80,24 @@ export class Sidebar extends React.Component {
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
           hasChildren={space.children.length > 0}
+          hideChildren={state[`hideChildrenOf${space.id}`]}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
           id={this.spaceItemId(space.id)}
+          onToggleHideChildren={() => this.handleToggleHideChildren(space.id)}
         />
-        {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
+        {!state[`hideChildrenOf${space.id}`] &&
+          space.children.length !== 0 &&
+          this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
     )
+  }
+
+  handleToggleHideChildren = (id) => {
+    this.setState(prev => ({ [`hideChildrenOf${id}`]: !prev[`hideChildrenOf${id}`] }))
   }
 
   getSidebarItem = (label, icon, to) => {

@@ -677,7 +677,6 @@ export const createSpaceTree = spaceList => {
       newSpaceList.push(space)
     }
   }
-  console.log('newSpaceList', newSpaceList)
   return newSpaceList
 }
 

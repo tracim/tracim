@@ -85,16 +85,18 @@ sidebarColorDarken = darken(sidebarColor, 15%)
         height 100%
         &:hover
           background-color sidebarColorDarken
+        &__notChildren
+          padding-inline-start 20px
         &__hideChildren
           color offWhite
-          & .iconbutton
-            margin 0
           &:hover
-            color offWhtite
+            color offWhite
+          & .iconbutton__icon
+            margin 0
         &__menu
           color offWhite
           &:hover
-            color offWhtite
+            color offWhite
           &:focus
             outline none
           &::after
