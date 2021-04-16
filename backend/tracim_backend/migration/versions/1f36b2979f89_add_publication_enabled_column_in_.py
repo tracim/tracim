@@ -18,7 +18,10 @@ def upgrade():
     with op.batch_alter_table("workspaces") as batch_op:
         batch_op.add_column(
             sa.Column(
-                "publication_enabled", sa.Boolean(), server_default=sa.text("1"), nullable=False
+                "publication_enabled",
+                sa.Boolean(),
+                server_default=sa.sql.expression.literal(True),
+                nullable=False,
             ),
         )
     # ### end Alembic commands ###
