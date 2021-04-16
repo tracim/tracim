@@ -96,7 +96,7 @@ export class Sidebar extends React.Component {
     )
   }
 
-  handleToggleHideChildren = (id) => {
+  handleToggleFoldChildren = (id) => {
     this.setState(prev => ({ [`hideChildrenOf${id}`]: !prev[`hideChildrenOf${id}`] }))
   }
 
