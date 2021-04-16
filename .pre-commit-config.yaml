@@ -31,3 +31,7 @@ repos:
       hooks:
           - id: flake8
             files: 'backend'
+    - repo: https://github.com/standard/standard
+      rev: master
+      hooks:
+          - id: standard
