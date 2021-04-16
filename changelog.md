@@ -1,3 +1,10 @@
+# 3.7.1 / 2021-04-14
+
+### Fixed Issues
+
+- Frontend: fix for a problem where the dashboard blinks in some cases
+
+
 # 3.7.0 / 2021-04-02
 
 ### New Features
