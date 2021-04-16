@@ -32,9 +32,11 @@
   "Allowed characters: {{allowedCharactersUsername}}": "Carateres permitidos: {{allowedCharactersUsername}}",
   "Copy content link": "Copiar ligação do conteúdo",
   "Error loading publication comments": "Erro ao carregar comentários de publicação",
+  "Hide subspaces": "Ocultar subespaços",
   "Member": "Membro",
   "Member of": "Membro de",
   "Last Intervention": "Última intervenção",
+  "Show subspaces": "Mostrar subespaços",
   "This content is not available": "Este conteúdo não está disponível",
   "Unknown space type": "Tipo de espaço desconhecido",
   "Create a space": "Criar um espaço",
@@ -448,5 +450,6 @@
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Download {{filename}}": "Download {{filename}}",
   "Show in publications": "Mostrar em publicações",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma publicação, crie a primeira publicação utilizando a zona na parte de baixo da página."
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma publicação, crie a primeira publicação utilizando a zona na parte de baixo da página.",
+  "Open as content": "Abrir como conteúdo"
 }

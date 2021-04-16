@@ -26,9 +26,11 @@
   "Empty note": "Empty note",
   "Empty thread": "Empty thread",
   "Error loading publication comments": "Error loading publication comments",
+  "Hide subspaces": "Hide subspaces",
   "Member": "Member",
   "Member of": "Member of",
   "Last Intervention": "Last intervention",
+  "Show subspaces": "Show subspaces",
   "This content is not available": "This content is not available",
   "Unknown space type": "Unknown space type",
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
@@ -448,5 +450,6 @@
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Download {{filename}}": "Download {{filename}}",
   "Show in publications": "Show in publications",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page."
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page.",
+  "Open as content": "Open as content"
 }

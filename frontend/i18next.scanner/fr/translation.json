@@ -31,9 +31,11 @@
   "Are you sure you want to remove this member from the space?": "Voulez-vous vraiment retirer ce membre de l'espace ?",
   "Copy content link": "Copier le lien du contenu",
   "Error loading publication comments": "Erreur de chargement des commentaires de la publication",
+  "Hide subspaces": "Masquer sous-espaces",
   "Member": "Membre",
   "Member of": "Membre de",
   "Last Intervention": "Dernière intervention",
+  "Show subspaces": "Montrer sous-espaces",
   "This content is not available": "Ce contenu n'est pas disponible",
   "Unknown space type": "Type d'espace inconnu",
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",
@@ -448,5 +450,6 @@
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Download {{filename}}": "Télécharger {{filename}}",
   "Show in publications": "Afficher dans les publications",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page."
+  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page.",
+  "Open as content": "Ouvrir en tant que contenu"
 }
