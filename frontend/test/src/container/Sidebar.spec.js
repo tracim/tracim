@@ -49,7 +49,7 @@ describe('<Sidebar />', () => {
       })
     })
 
-    describe('handleToggleHideChildren', () => {
+    describe('handleToggleFoldChildren', () => {
       it('should toggle the state related to a specific id', () => {
         wrapper.setState({ hideChildrenOf10: false })
         wrapper.instance().handleToggleHideChildren(10)
