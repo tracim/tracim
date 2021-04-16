@@ -174,7 +174,7 @@ WorkspaceListItem.propTypes = {
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
   hasChildren: PropTypes.bool,
-  hideChildren: PropTypes.bool,
+  foldChildren: PropTypes.bool,
   onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
   level: PropTypes.number,
