@@ -243,6 +243,12 @@ const mockPostThreadPublication204 = (apiUrl, workspaceId) => {
     .reply(204)
 }
 
+const mockGenericGetContent400 = (apiUrl, workspaceId, contentId) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}`)
+    .reply(400, {})
+}
+
 export {
   mockGetFileChildContent200,
   mockGetPublicationList200,
@@ -277,5 +283,6 @@ export {
   mockGetContent200,
   mockGetFileContent400,
   mockGetContentPath200,
-  mockPostThreadPublication204
+  mockPostThreadPublication204,
+  mockGenericGetContent400
 }
