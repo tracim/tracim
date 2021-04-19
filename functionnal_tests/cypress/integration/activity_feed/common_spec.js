@@ -182,6 +182,12 @@ for (const pageTestCase of activityPages) {
             ‘It is easy’, It was saying. ‘The trick is that’
             And the Voice stopped speaking. The Light went away.
             I went back to the Holy Randomly Failing Tests.
+            After a few hours,
+            Just when I was about to give up,
+            I realized:
+            My test was just missing a few text lines.
+            So here I am,
+            Writing the final piece.
           </pre>`,
           'The Holy Tests'
         )
