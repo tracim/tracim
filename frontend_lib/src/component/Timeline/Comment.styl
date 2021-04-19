@@ -9,19 +9,17 @@
     margin-right auto
   &__body
     border-radius 5px
-    padding 15px 15px 15px 20px
+    padding 10px
     border 1px solid grey
+    flex-direction column
     background-color offWhite
     display flex
-    flex-direction column
     &__content
-      flex 1
       display flex
-      &__text
-        margin 10px 10px 10px 20px
-        width calc(100% - 50px) // 50px is the avatar size
+      .avatar-wrapper
+        margin-right 10px
       &__textAndPreview
-        width calc(100% - 50px) // 50px is the avatar size
+        flex 1
       &__actions
         padding 0
         color grey
@@ -29,14 +27,20 @@
           display none
         &:hover
           color fontColor
-    &__date
+    &__header
+      display flex
+      flex-direction row
+      margin-bottom 10px
       font-size 12px
-    &__text
-      margin-top 10px
+      &__meta
+        flex 1
+        &__author
+          overflow-wrap anywhere
     img
       max-width 100%
       height auto
       box-shadow 0px 0px 10px mediumDarkGrey
   &__footer
     display flex
+    margin-top 10px
     justify-content space-between

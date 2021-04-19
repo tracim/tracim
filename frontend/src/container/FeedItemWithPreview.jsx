@@ -17,6 +17,7 @@ import {
   handleTranslateHtmlContent,
   getDefaultTranslationState,
   PAGE,
+  Comment,
   Timeline,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -285,6 +286,8 @@ export class FeedItemWithPreview extends React.Component {
       }
     }
 
+    const firstComment = this.getFirstComment()
+
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
@@ -307,24 +310,50 @@ export class FeedItemWithPreview extends React.Component {
         />
         {props.contentAvailable && (
           <>
-            <div className='feedItem__content' title={previewTitle}>
-              <Preview
-                fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
-                content={
-                  state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
-                    ? { ...props.content, translatedRawContent: state.translatedRawContent }
-                    : props.content
-                }
-                linkType={props.previewLinkType}
-                link={props.previewLink}
-              />
-              <FeedItemFooter
-                onClickTranslate={this.handleTranslate}
-                onClickRestore={this.handleRestoreContentTranslation}
-                translationState={state.contentTranslationState}
-                content={props.content}
-              />
-            </div>
+            {(props.isPublication
+              ? (firstComment &&
+                  <Comment
+                    isPublication
+                    customClass='feedItem__publication'
+                    apiUrl={FETCH_CONFIG.apiUrl}
+                    contentId={Number(props.content.id)}
+                    workspaceId={Number(props.workspaceId)}
+                    author={firstComment.author}
+                    loggedUser={props.user}
+                    createdRaw={firstComment.created_raw}
+                    createdDistance={firstComment.created}
+                    text={
+                      state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
+                        ? state.translatedRawContent
+                        : firstComment.raw_content
+                    }
+                    fromMe={props.user.userId === firstComment.author.user_id}
+                    onClickTranslate={this.handleTranslate}
+                    onClickRestore={this.handleRestoreContentTranslation}
+                    translationState={state.contentTranslationState}
+                  />
+                )
+              : (
+                  <div className='feedItem__content' title={previewTitle}>
+                    <Preview
+                      fallbackToAttachedFile={props.isPublication && props.content.type === CONTENT_TYPE.FILE}
+                      content={
+                        state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
+                          ? { ...props.content, translatedRawContent: state.translatedRawContent }
+                          : props.content
+                      }
+                      linkType={props.previewLinkType}
+                      link={props.previewLink}
+                    />
+                    <FeedItemFooter
+                      onClickTranslate={this.handleTranslate}
+                      onClickRestore={this.handleRestoreContentTranslation}
+                      translationState={state.contentTranslationState}
+                      content={props.content}
+                    />
+                  </div>
+                )
+            )}
             {props.showTimeline && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}

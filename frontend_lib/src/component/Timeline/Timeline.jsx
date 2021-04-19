@@ -100,12 +100,6 @@ export class Timeline extends React.Component {
       : this.handleClickValidateAnywayEditComment()
   }
 
-  areCommentActionsAllowed = (commentAuthorId) => {
-    const { props } = this
-    return props.loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
-      props.loggedUser.userId === commentAuthorId
-  }
-
   render () {
     const { props, state } = this
     const invalidMentionList = props.invalidMentionList.length ? props.invalidMentionList : state.invalidMentionList
@@ -163,7 +157,7 @@ export class Timeline extends React.Component {
               case TIMELINE_TYPE.COMMENT:
                 return (
                   <Comment
-                    allowCommentActions={this.areCommentActionsAllowed(content.author.user_id)}
+                    isPublication={false}
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
@@ -171,7 +165,7 @@ export class Timeline extends React.Component {
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
-                    createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
+                    createdRaw={content.created_raw}
                     createdDistance={content.created}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}

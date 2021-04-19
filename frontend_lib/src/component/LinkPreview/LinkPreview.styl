@@ -20,9 +20,15 @@
       color blue
     &__description
       margin-top 5px
+
   &:hover
     text-decoration none
     color inherit
 
     .linkPreview__content__link
       text-decoration underline
+
+  &::after // RJ - NOTE - 2021-04-19 - this ensures the image does not overflows
+    content ""
+    display block
+    clear both
