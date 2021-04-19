@@ -118,6 +118,7 @@ class WorkspaceApi(object):
         public_upload_enabled: bool = True,
         access_type: WorkspaceAccessType = WorkspaceAccessType.CONFIDENTIAL,
         default_user_role: WorkspaceRoles = WorkspaceRoles.READER,
+        publication_enabled: bool = True,
         parent: Workspace = None,
         save_now: bool = False,
     ) -> Workspace:
@@ -141,6 +142,7 @@ class WorkspaceApi(object):
         workspace.access_type = access_type
         workspace.default_user_role = default_user_role
         workspace.parent = parent
+        workspace.publication_enabled = publication_enabled
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -168,6 +170,7 @@ class WorkspaceApi(object):
         public_upload_enabled: typing.Optional[bool] = None,
         public_download_enabled: typing.Optional[bool] = None,
         default_user_role: typing.Optional[WorkspaceRoles] = None,
+        publication_enabled: typing.Optional[bool] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -191,6 +194,8 @@ class WorkspaceApi(object):
             workspace.public_download_enabled = public_download_enabled
         if default_user_role:
             workspace.default_user_role = default_user_role
+        if publication_enabled is not None:
+            workspace.publication_enabled = publication_enabled
         workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)

@@ -642,3 +642,7 @@ class AdvancedSearchNotEnabled(TracimException):
 
 class IndexingError(TracimException):
     pass
+
+
+class WorkspaceFeatureDisabled(TracimException):
+    error_code = ErrorCode.WORKSPACE_FEATURE_DISABLED
