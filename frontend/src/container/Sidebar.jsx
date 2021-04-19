@@ -99,8 +99,8 @@ export class Sidebar extends React.Component {
 
   handleToggleFoldChildren = (id) => {
     const { state } = this
-    if (state.foldedSpaceList.find(space => space === id)) {
-      const newFoldedSpaceList = state.foldedSpaceList.filter(space => space !== id)
+    if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
+      const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
       this.setState({ foldedSpaceList: newFoldedSpaceList })
     } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
   }
