@@ -5,6 +5,7 @@ import 'regenerator-runtime/runtime'
 import FolderAdvanced from './container/FolderAdvanced.jsx'
 import PopupCreateFolder from './container/PopupCreateFolder.jsx'
 import { ROLE } from 'tracim_frontend_lib'
+import { Router } from 'react-router-dom'
 
 require('./css/index.styl')
 
@@ -19,7 +20,9 @@ const appInterface = {
     }
 
     return ReactDOM.render(
-      <FolderAdvanced data={data} />
+      <Router history={data.config.history}>
+        <FolderAdvanced data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },
