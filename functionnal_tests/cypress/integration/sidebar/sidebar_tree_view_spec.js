@@ -14,7 +14,7 @@ describe('Sidebar', function () {
     })
   })
 
-  it('should be albe to fold child space', function () {
+  it('should be able to fold child space', function () {
     cy.get('[data-cy="sidebar__content__navigation__workspace__item_2"]')
       .should('be.visible')
     cy.get('[data-cy="sidebar__content__navigation__workspace__item_1"]')
