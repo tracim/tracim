@@ -1,0 +1,64 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.advancedSearch
+  padding-inline-end 0px
+  padding-bottom 0px
+  overflow-x hidden
+  &__wrapper
+    height "calc(100vh - %s)" % (headerHeight + 69) // 69px is the PageTitle height
+  &__page
+    display flex
+    min-height calc(100% - 40px) // 40px is the search input height
+  & .search
+    margin-inline-end 30px
+    width 100%
+  &__input
+    display flex
+    &__type
+      display inline-flex
+      align-items center
+      & > *
+        cursor pointer
+      & > label
+        margin 0px 10px
+  &__content
+    flex 1
+    padding-inline-end 30px
+    width 100%
+    &__detail
+      display flex
+      margin-top 15px
+      margin-inline-start 25px
+      color lightDarkGrey
+      height 45px
+      align-items center
+      &__count
+        flex 1
+      &__filter
+        margin-inline-end 0px
+        margin-inline-start auto
+    &__empty
+      margin-top 50px
+      font-weight bold
+    &__btnSeeMore
+      text-align center
+      padding 25px
+
+@media (max-width: max-md)
+  .advancedSearch__openMenu
+    padding 0px
+    & > .advancedSearch__input
+      display none
+    & .advancedSearch__content
+      display none
+
+@media (max-width: max-sm)
+  .advancedSearch
+    &__content__detail__filter
+      & > .iconbutton__text
+        display none
+    &__input
+      flex-direction column-reverse
+      margin-inline-end 30px
+      &__type
+        margin-top 15px

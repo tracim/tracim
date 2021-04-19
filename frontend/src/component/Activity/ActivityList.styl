@@ -3,6 +3,7 @@
 feedWidth = 800px
 smallScreenFeedWidth = 400px
 spacingSize = 10px
+previewHeight = 400px
 
 .activityList
   background-color veryLightGrey
@@ -21,16 +22,25 @@ spacingSize = 10px
     width 100%
     flex-direction column
 
-  &__item
-    background-color offWhite
-    border 1px solid grey
-    border-radius 5px
-    padding spacingSize
-    margin-bottom spacingSize
-
   &__placeholder
     font-size fontSizeMedium
     text-align center
+
+  & .feedItem__preview
+    box-sizing content-box
+    overflow hidden
+    max-height previewHeight
+
+    &__overflowOverlay
+      background-image:
+        linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent),
+        radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1), transparent)
+      background-repeat no-repeat
+      background-position bottom
+      position absolute
+      bottom 40px
+      height 25%
+      width 100%
 
 @media (max-width: max-sm)
   .activityList

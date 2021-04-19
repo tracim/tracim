@@ -116,9 +116,9 @@ basic_setup.session_secret = change_this_value_please!
 # example:
 # workspace.allowed_access_types = confidential
 
-# When a user joins a space, messages from events that happened before are added to the user's activity feed.
+# When a user joins a space, messages from events that happened before are added to the user's recent activities.
 # This setting limits the messages of events that are created to avoid cluttering the database and too much processing when a user joins a space.
-# 0 will completely disable the feature, leading to empty space activity feed when joining a space.
+# 0 will completely disable the feature, leading to empty space recent activities when joining a space.
 # -1 means no limit.
 workspace.join.max_messages_history_count = -1
 
@@ -167,6 +167,11 @@ workspace.join.max_messages_history_count = -1
 # additional directives to tune the CSP header, they are added without any change to the header
 ; content_security_policy.additional_directives =
 
+###
+# URL PREVIEW
+###
+# timeout for fetching URL preview (in sec).
+; url_preview.fetch_timeout = 30
 
 ####
 # LIMITATION
@@ -364,12 +369,12 @@ api.key = %(basic_setup.api_key)s
 
 ## User custom properties: This features allows defining custom instance-global fields on users of this instance.
 # See the Tracim settings documentation (available in source code, see "user_custom_properties.md") for more
-# information about it. By default, Tracim doesn't use custom properties.
-; user.custom_properties.json_schema_file_path =
-; user.custom_properties.ui_schema_file_path =
-; user.custom_properties.translations_dir_path =
+# information about it.
+; user.custom_properties.json_schema_file_path = %(here)s/tracim_backend/templates/user_custom_properties/default/schema.json
+; user.custom_properties.ui_schema_file_path = %(here)s/tracim_backend/templates/user_custom_properties/default/ui.json
+; user.custom_properties.translations_dir_path = %(here)s/tracim_backend/templates/user_custom_properties/default/locale
 ## example with user.custom_properties.dir shortcut:
-# user.custom_properties.dir = %(here)s/examples/user_custom_properties/default
+# user.custom_properties.dir = %(here)s/tracim_backend/templates/user_custom_properties/default
 # user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
 # user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
 # user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
@@ -379,9 +384,17 @@ api.key = %(basic_setup.api_key)s
 ####
 
 ### Website config ###
-## title of website, used in email
+## title of website, used in email and is part of the title in browsers
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
+## description of website, used by search engines to display their results
+; website.description =
+## Custom welcome page displayed during login
+## The path of those files is relative to frontend/dist/assets/branding/
+## Please read the documentation in doc/branding.md for further information
+; website.welcome_page = welcome-simple.html
+; website.welcome_page_style = welcome-simple.css
+
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
 ; website.base_url = http://localhost:6543
@@ -439,7 +452,9 @@ website.base_url = %(basic_setup.website_base_url)s
 # EVENT_TYPE   = created | modified | deleted | undeleted
 # CONTENT_TYPE = html-document | file | thread | folder | comment
 # To include all notifications, use web.notifications.excluded = ""
-; web.notifications.excluded = user.created, user.modified, user.deleted, user.undeleted, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified
+# To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
+# will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
+; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*
 
 ####
 # JOB EXECUTION
@@ -708,13 +723,13 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # global elasticsearch timeout in seconds
 ; search.elasticsearch.request_timeout = 60
 
-# main index alias use to search/index content in elasticsearch
-; search.elasticsearch.index_alias =
+# prefix of the index aliases that will be used to store Tracim users, contents and workspaces for searching
+; search.elasticsearch.index_alias_prefix =
 # example:
-# search.elasticsearch.index_alias = tracim_contents
+# search.elasticsearch.index_alias_prefix = my-tracim
 
-# template_name for all index created currently only {index_alias} and {date} variable are usable.
-# be carefull this template is use to find all index to delete with tracimcli search delete command
+# template_name for all created indices. Currently only {index_alias} and {date} variable are usable.
+# be careful this template is used to find all indices to delete with tracimcli search delete command
 ; search.elasticsearch.index_pattern_template = {index_alias}-{date}
 
 # if you use ingest mode in elasticsearch, you can enable file content ingest
@@ -760,6 +775,34 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # template dir for collaborative document edition:
 ; collaborative_document_edition.file_template_dir = %(here)s/tracim_backend/templates/open_documents
 
+
+####
+# Translation service
+####
+
+
+# This feature provides comments and html-documents translation by using a third-party translation service
+
+; translation_service.enabled = False
+
+
+## Translation service timeout in seconds.
+# This timeout will be applied to each translation request.
+; translation_service.timeout = 0
+# example:
+# translation_service.timeout = 20
+
+## Translation provider, currently only "systran" is supported
+; translation_service.provider =
+# example:
+# translation_service.provider = systran
+
+## Systran translation config parameters
+; translation_service.systran.api_url =
+; translation_service.systran.api_key =
+# example:
+# translation_service.systran.api_url = https://api-translate.systran.net
+# translation_service.systran.api_key = your-systran-api-key
 
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
 

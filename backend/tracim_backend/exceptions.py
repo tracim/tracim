@@ -66,6 +66,10 @@ class RoleAlreadyExistError(TracimError):
     error_code = ErrorCode.USER_ROLE_ALREADY_EXIST
 
 
+class ReactionAlreadyExistError(TracimError):
+    error_code = ErrorCode.REACTION_ALREADY_EXISTS
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -166,6 +170,10 @@ class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
 
 
+class ReactionNotFound(NotFound):
+    error_code = ErrorCode.REACTION_NOT_FOUND
+
+
 class UploadPermissionNotFound(NotFound):
     error_code = ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
 
@@ -263,6 +271,10 @@ class ContentNotFoundInTracimRequest(TracimException):
     error_code = ErrorCode.CONTENT_NOT_IN_TRACIM_REQUEST
 
 
+class ReactionNotFoundInTracimRequest(TracimException):
+    error_code = ErrorCode.REACTION_NOT_IN_TRACIM_REQUEST
+
+
 class InvalidId(TracimException):
     pass
 
@@ -275,6 +287,10 @@ class InvalidCommentId(InvalidId):
     error_code = ErrorCode.COMMENT_INVALID_ID
 
 
+class InvalidReactionId(InvalidId):
+    error_code = ErrorCode.REACTION_INVALID_ID
+
+
 class InvalidWorkspaceId(InvalidId):
     error_code = ErrorCode.WORKSPACE_INVALID_ID
 
@@ -285,6 +301,10 @@ class InvalidUserId(InvalidId):
 
 class ContentNotFound(TracimException):
     error_code = ErrorCode.CONTENT_NOT_FOUND
+
+
+class FavoriteContentNotFound(TracimException):
+    error_code = ErrorCode.FAVORITE_CONTENT_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
@@ -419,6 +439,10 @@ class UserIsNotContentOwner(TracimException):
     pass
 
 
+class UserIsNotReactionAuthor(TracimException):
+    pass
+
+
 class UserGivenIsNotTheSameAsAuthenticated(TracimException):
     pass
 
@@ -521,7 +545,11 @@ class UsernameAlreadyExists(TracimException):
 
 
 class UnavailablePreview(TracimException):
-    error_code = ErrorCode.UNAIVALABLE_PREVIEW
+    error_code = ErrorCode.UNAVAILABLE_FILE_PREVIEW
+
+
+class UnavailableURLPreview(TracimException):
+    error_code = ErrorCode.UNAVAILABLE_URL_PREVIEW
 
 
 class EmptyNotificationError(TracimException):
@@ -606,3 +634,15 @@ class ReservedUsernameError(TracimException):
 
 class UserFollowAlreadyDefined(TracimException):
     error_code = ErrorCode.USER_FOLLOW_ALREADY_DEFINED
+
+
+class AdvancedSearchNotEnabled(TracimException):
+    error_code = ErrorCode.ADVANCED_SEARCH_NOT_ENABLED
+
+
+class IndexingError(TracimException):
+    pass
+
+
+class WorkspaceFeatureDisabled(TracimException):
+    error_code = ErrorCode.WORKSPACE_FEATURE_DISABLED

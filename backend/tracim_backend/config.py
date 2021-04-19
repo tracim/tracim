@@ -19,6 +19,8 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
+from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
@@ -334,6 +336,8 @@ class CFG(object):
         self._load_search_config()
         self.log_config_header("Content Security Policy parameters:")
         self._load_content_security_policy_config()
+        self.log_config_header("Translation Service config parameters:")
+        self._load_translation_service_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -344,6 +348,9 @@ class CFG(object):
         """
         "replace "%(here)s" by localisation of the config file.
         """
+        if "TRACIM_HERE_PATH" in os.environ:
+            return value.replace("%(here)s", os.environ["TRACIM_HERE_PATH"])
+
         return value.replace("%(here)s", self.settings["here"])
 
     def _load_global_config(self) -> None:
@@ -383,9 +390,16 @@ class CFG(object):
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
+            "website.welcome_page", "welcome-simple.html"
+        )
+        self.WEBSITE__WELCOME_PAGE_STYLE = self.get_raw_config(
+            "website.welcome_page_style", "welcome-simple.css"
+        )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user.created,user.modified,user.deleted,user.undeleted,workspace.modified,workspace.deleted,workspace.undeleted,workspace_member.modified,content.modified",
+            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
         )
 
         # base url of the frontend
@@ -422,14 +436,22 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
+
+        default_user_custom_properties_path = self.here_macro_replace(
+            "%(here)s/tracim_backend/templates/user_custom_properties/default/"
+        )
+
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.json_schema_file_path"
+            "user.custom_properties.json_schema_file_path",
+            default_user_custom_properties_path + "schema.json",
         )
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH = self.get_raw_config(
-            "user.custom_properties.ui_schema_file_path"
+            "user.custom_properties.ui_schema_file_path",
+            default_user_custom_properties_path + "ui.json",
         )
         self.USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH = self.get_raw_config(
-            "user.custom_properties.translations_dir_path"
+            "user.custom_properties.translations_dir_path",
+            default_user_custom_properties_path + "locale",
         )
 
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
@@ -482,6 +504,10 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+        self.URL_PREVIEW__FETCH_TIMEOUT = int(
+            self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
     def __load_uploaded_files_config(self) -> None:
@@ -747,22 +773,21 @@ class CFG(object):
 
     def _load_search_config(self):
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
-
-        DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
-        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS = self.get_raw_config(
-            "search.elasticsearch.index_alias"
+        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX = self.get_raw_config(
+            "search.elasticsearch.index_alias_prefix"
         )
+        default_index_documents_pattern_template = "{index_alias}-{date}"
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE,
+            "search.elasticsearch.index_pattern_template", default_index_documents_pattern_template,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
         )
         # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
-        ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
+        allowed_ingest_default_mimetype = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE,
+                "search.elasticsearch.ingest.mimetype_whitelist", allowed_ingest_default_mimetype,
             ),
             separator=",",
             cast_func=str,
@@ -808,6 +833,22 @@ class CFG(object):
             "{}.additional_directives".format(prefix), ""
         )
 
+    def _load_translation_service_config(self) -> None:
+        prefix = "translation_service"
+        self.TRANSLATION_SERVICE__ENABLED = asbool(
+            self.get_raw_config("{}.enabled".format(prefix), "False")
+        )
+        self.TRANSLATION_SERVICE__TIMEOUT = (
+            float(self.get_raw_config("{}.timeout".format(prefix), "0")) or None
+        )
+        self.TRANSLATION_SERVICE__PROVIDER = self.get_raw_config("{}.provider".format(prefix))
+        self.TRANSLATION_SERVICE__SYSTRAN__API_URL = self.get_raw_config(
+            "{}.systran.api_url".format(prefix)
+        )
+        self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
+            "{}.systran.api_key".format(prefix)
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -823,6 +864,7 @@ class CFG(object):
         self._check_search_config_validity()
         self._check_webdav_config_validity()
         self._check_content_security_policy_validity()
+        self._check_translation_service_validity()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -968,6 +1010,13 @@ class CFG(object):
 
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
+
+        if self.URL_PREVIEW__FETCH_TIMEOUT < 1:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
+                    "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
@@ -1180,8 +1229,8 @@ class CFG(object):
         # see https://github.com/tracim/tracim/issues/1835
         if self.SEARCH__ENGINE == "elasticsearch":
             self.check_mandatory_param(
-                "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
-                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
+                "SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX",
+                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX,
                 when_str="if elasticsearch search feature is enabled",
             )
 
@@ -1196,6 +1245,30 @@ class CFG(object):
                 self.CONTENT_SECURITY_POLICY__REPORT_URI,
                 when_str="if content_security_policy.report_only is enabled",
             )
+
+    def _check_translation_service_validity(self) -> None:
+        if self.TRANSLATION_SERVICE__ENABLED:
+            if self.TRANSLATION_SERVICE__PROVIDER not in TRANSLATION_SERVICE_CLASSES:
+                translation_service_list = ", ".join(
+                    ['"{}"'.format(slug) for slug in TRANSLATION_SERVICE_CLASSES.keys()]
+                )
+                raise ConfigurationError(
+                    'ERROR "{}" is an invalid value for TRANSLATION_SERVICE__PROVIDER,'
+                    "valids values are {}.".format(
+                        self.TRANSLATION_SERVICE__PROVIDER, translation_service_list
+                    )
+                )
+            if self.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.SYSTRAN:
+                self.check_mandatory_param(
+                    "TRANSLATION_SERVICE__SYSTRAN__API_URL",
+                    self.TRANSLATION_SERVICE__SYSTRAN__API_URL,
+                    when_str="if translation service with systran is activated",
+                )
+                self.check_mandatory_param(
+                    "TRANSLATION_SERVICE__SYSTRAN__API_KEY",
+                    self.TRANSLATION_SERVICE__SYSTRAN__API_KEY,
+                    when_str="if translation service with systran is activated",
+                )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):

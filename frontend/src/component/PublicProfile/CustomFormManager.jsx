@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { IconButton, Checkbox } from 'tracim_frontend_lib'
@@ -19,19 +18,20 @@ const DisplayTitle = props => {
   )
 }
 
+const DisplaySchemaPropertyLabel = translate()(props => (
+  (props.label && props.label.trim())
+    ? (
+      <span className='DisplaySchemaPropertyString__label'>
+        {props.t('{{label}}: ', { label: props.label, interpolation: { escapeValue: false } })}
+      </span>
+    )
+    : null
+))
+
 const DisplaySchemaPropertyString = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          // INFO - GB - 20210129 - We check the space to not put : in the case of a fake empty label
-          // See https://github.com/tracim/tracim/issues/4123
-          { noLabel: !props.label || props.label === ' ' }
-        )}
-      >
-        {props.label}
-      </span>
+      <DisplaySchemaPropertyLabel {...props} />
       <span
         className='DisplaySchemaPropertyString__value'
         dangerouslySetInnerHTML={{ __html: props.value }}
@@ -43,14 +43,7 @@ const DisplaySchemaPropertyString = props => {
 const DisplaySchemaPropertyBoolean = props => {
   return (
     <div className='DisplaySchemaPropertyString'>
-      <span
-        className={classnames(
-          'DisplaySchemaPropertyString__label',
-          { noLabel: !props.label }
-        )}
-      >
-        {props.label}
-      </span>
+      <DisplaySchemaPropertyLabel {...props} />
       <span className='DisplaySchemaPropertyString__value'>
         <Checkbox
           name={props.label}
@@ -107,6 +100,35 @@ const DisplaySchemaArray = props => {
   ]
 }
 
+const orderDataSchema = (dataSchemaObject, uiSchemaObject) => {
+  let uiOrderList = uiSchemaObject && uiSchemaObject['ui:order']
+
+  if (!uiOrderList) {
+    return Object.entries(dataSchemaObject)
+  }
+
+  if (!uiOrderList.includes('*')) {
+    uiOrderList = [...uiOrderList, '*']
+  }
+
+  const orderedDataSchema = []
+
+  for (const uiKey of uiOrderList) {
+    const schemaItem = dataSchemaObject[uiKey]
+    if (schemaItem) {
+      orderedDataSchema.push([uiKey, schemaItem])
+    } else if (uiKey === '*') {
+      for (const dataKey of Object.keys(dataSchemaObject)) {
+        if (!uiOrderList.includes(dataKey)) {
+          orderedDataSchema.push([dataKey, dataSchemaObject[dataKey]])
+        }
+      }
+    }
+  }
+
+  return orderedDataSchema
+}
+
 const DisplaySchemaObject = props => {
   if (!props.dataSchemaObject || !props.schemaObject) {
     console.error('Error in DisplaySchemaObject, null props', props)
@@ -122,19 +144,27 @@ const DisplaySchemaObject = props => {
     )
     : null
 
+  const orderedDataSchema = orderDataSchema(props.dataSchemaObject, props.uiSchemaObject)
+
   return [
     title,
     <div className='DisplaySchemaObject' key={`object_root_${props.nestedLevel}`}>
-      {Object.entries(props.dataSchemaObject).map(([key, value]) => {
+      {orderedDataSchema.map(([key, value]) => {
+        const schemaItemProperties = props.schemaObject.properties[key]
+        if (!schemaItemProperties) {
+          console.error(`Key ${key} is missing in the JSON schema object`)
+          return <div>Error loading field {key}</div>
+        }
+
         const valueType = typeof value
 
         if (Array.isArray(value)) {
           return (
             <DisplaySchemaArray
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               valueList={value}
               parentKey={key}
-              schemaObject={props.schemaObject.properties[key].items}
+              schemaObject={schemaItemProperties.items}
               key={`array_${key}`}
             />
           )
@@ -143,7 +173,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'object') {
           return (
             <DisplaySchemaObject
-              schemaObject={props.schemaObject.properties[key]}
+              schemaObject={schemaItemProperties}
               dataSchemaObject={value}
               nestedLevel={props.nestedLevel + 1}
               key={`object_${key}`}
@@ -154,7 +184,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'string') {
           return (
             <DisplaySchemaPropertyString
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               value={value}
               key={`property_string_${key}`}
             />
@@ -164,7 +194,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'boolean') {
           return (
             <DisplaySchemaPropertyBoolean
-              label={props.schemaObject.properties[key].title}
+              label={schemaItemProperties.title}
               value={value}
               key={`property_boolean_${key}_${value}`}
             />
@@ -182,6 +212,7 @@ const SchemaAsView = props => {
     <div className='SchemaAsView'>
       <DisplaySchemaObject
         schemaObject={props.schemaObject}
+        uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}
         nestedLevel={1}
       />
@@ -189,7 +220,7 @@ const SchemaAsView = props => {
       {props.displayEditButton && (
         <IconButton
           customClass={props.submitButtonClass}
-          icon='pencil-square-o'
+          icon='fas fa-edit'
           onClick={props.onClickToggleButton}
           text={props.validateLabel}
           dataCy='CustomFormManager__updateProfile__edit__button'
@@ -241,7 +272,7 @@ class SchemaAsForm extends React.Component {
       >
         <IconButton
           customClass={props.submitButtonClass}
-          icon='check'
+          icon='fas fa-check'
           type='submit'
           text={props.validateLabel}
           dataCy='CustomFormManager__updateProfile__validate__button'
@@ -287,6 +318,7 @@ export class CustomFormManager extends React.Component {
           ? (
             <SchemaAsView
               schemaObject={props.schemaObject}
+              uiSchemaObject={props.uiSchemaObject}
               dataSchemaObject={props.dataSchemaObject}
               validateLabel={props.t('Edit')}
               submitButtonClass={props.submitButtonClass}

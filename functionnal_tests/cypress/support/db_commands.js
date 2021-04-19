@@ -194,6 +194,19 @@ Cypress.Commands.add('createComment', (workspaceId, contentId, rawContent) => {
     .then(handleUndefinedResponse)
 })
 
+Cypress.Commands.add('createPublication', (title, workspaceId) => {
+  let url = `/api/workspaces/${workspaceId}/contents`
+  let data = {
+    parent_id: null,
+    content_type: 'thread',
+    content_namespace: 'publication',
+    label: title
+  }
+  cy
+    .request('POST', url, data)
+    .then(handleUndefinedResponse)
+})
+
 Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
   let url = `/api/workspaces/${workspaceId}/contents`
   let data = {
@@ -240,6 +253,22 @@ Cypress.Commands.add('postComment', (workspaceId, contentId, comment) => {
 
   return cy
     .request('POST', url, { raw_content: comment })
+    .then(handleUndefinedResponse)
+})
+
+Cypress.Commands.add('putComment', (workspaceId, contentId, commentId, comment) => {
+  const url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`
+
+  return cy
+    .request('PUT', url, { raw_content: comment })
+    .then(handleUndefinedResponse)
+})
+
+Cypress.Commands.add('deleteComment', (workspaceId, contentId, commentId, comment) => {
+  const url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`
+
+  return cy
+    .request('DELETE', url, { raw_content: comment })
     .then(handleUndefinedResponse)
 })
 

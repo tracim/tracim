@@ -70,7 +70,7 @@ describe('App Gallery', function () {
         params: { workspaceId }
       })
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('[data-cy=contentTypeBtn_gallery]')
+        .find('button[title="Open the gallery"]')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .should('be.visible')

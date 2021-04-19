@@ -1,0 +1,42 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.advancedSearchUser
+  height 65px
+  width 100%
+  display flex
+  align-items center
+  &__avatar
+    &__content
+      margin 0px 30px
+    &__header
+      margin 15px 20px
+  &__name
+    padding 0px 5px
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    color fontColor
+    align-self center
+    flex 3
+  &__information
+    color fontColor
+    align-self center
+    overflow hidden
+    text-overflow ellipsis
+    flex 1
+    margin-inline-end 25px
+    & > *
+      font-size fontSizeSmall
+
+@media (max-width: max-sm)
+  .advancedSearchUser
+    &__avatar
+      &__header
+        margin 15px 10px
+      &__content
+        margin 0px 10px
+
+@media (max-width: max-xs)
+  .advancedSearchUser
+    &__information
+      display none

@@ -14,16 +14,12 @@
 
 .DisplaySchemaPropertyString
   font-weight normal
+
   &__label
-    margin-right 10px
-    &::after
-      content ':'
-      margin-left 3px
-    &.noLabel
-      margin-right 0
-      &::after
-        content ''
-        margin-left 0
+    font-weight bold
+
+  &:not(:last-child)
+    margin-bottom 0.75ex
 
 .DisplaySchemaArray
   margin 0 0 14px 0

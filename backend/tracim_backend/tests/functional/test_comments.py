@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+
 import pytest
+import responses
 import transaction
 
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.error import ErrorCode
+from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -18,7 +23,7 @@ class TestCommentsEndpoint(object):
 
     def test_api__get_contents_comments__ok_200__nominal_case(self, web_testapp) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
@@ -27,6 +32,7 @@ class TestCommentsEndpoint(object):
         assert comment["content_id"] == 18
         assert comment["parent_id"] == 7
         assert comment["parent_content_type"] == "thread"
+        assert comment["parent_content_namespace"] == "content"
         assert comment["parent_label"] == "Best Cakes?"
         assert (
             comment["raw_content"]
@@ -67,6 +73,52 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
+    def test_api__get_one_comment__ok_200__nominal_case(
+        self, web_testapp, session, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one specific comment of a content
+        """
+        raw_content = "<b>just a comment label</b>"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        comment_created = content_api.create_comment(
+            workspace=workspace,
+            parent=test_html_document,
+            content=raw_content,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment_created.content_id
+            ),
+            status=200,
+        )
+        comment = res.json_body
+        assert comment["content_id"] == comment_created.content_id
+        assert comment["parent_id"] == comment_created.parent_id
+        assert comment["parent_content_type"] == "html-document"
+        assert comment["parent_content_namespace"] == "content"
+        assert comment["parent_label"] == "test_page"
+        assert comment["raw_content"] == raw_content
+        assert comment["author"]
+        assert comment["author"]["user_id"] == 1
+        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["public_name"] == "Global manager"
+        assert comment["author"]["username"] == "TheAdmin"
+
     def test_api__post_content_comment__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -94,7 +146,7 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -131,7 +183,7 @@ class TestCommentsEndpoint(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
 
         workspace_api = workspace_api_factory.get()
@@ -148,7 +200,7 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         content_api.set_status(test_thread, "closed-deprecated")
         transaction.commit()
@@ -167,7 +219,7 @@ class TestCommentsEndpoint(object):
 
     def test_api__post_content_comment__err_400__empty_raw_content(self, web_testapp) -> None:
         """
-        Get alls comments of a content
+        Get all comments of a content
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": ""}
@@ -471,3 +523,280 @@ class TestCommentsEndpoint(object):
         assert response.json_body
         assert "code" in response.json_body
         assert response.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+
+def create_doc_and_comment(workspace_api, content_api_note, content_api_comment):
+    workspace = workspace_api.create_workspace("test")
+    test_html_document = content_api_note.create(
+        content_type_slug=HTML_DOCUMENTS_TYPE,
+        workspace=workspace,
+        label="just a content",
+        do_save=True,
+        do_notify=False,
+    )
+    comment = content_api_comment.create_comment(
+        workspace=workspace,
+        parent=test_html_document,
+        content="First version",
+        do_save=True,
+        do_notify=False,
+    )
+    transaction.commit()
+    return (workspace, test_html_document, comment)
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test"}], indirect=True,
+)
+class TestEditComment(object):
+    def test_api__edit_comment__ok__nominal_case(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ):
+        """
+        Edit comment content
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=200,
+        )
+        assert res_put.json_body["raw_content"] == new_content
+
+        new_res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert new_res_get.json_body == res_put.json_body
+
+    def test_api__edit_comment__err__empty_raw_content(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ):
+        """
+        Edit comment content and set empty content
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = ""
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=400,
+        )
+        assert res_put.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
+
+    def test_api__edit_comment__ok__workspace_manager(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit other user comment content as workspace manager
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=200,
+        )
+
+    def test_api__edit_comment__err__400__not_member(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit own comment content where user is not members of the workspace
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=400,
+        )
+        assert res_get.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        res_put = web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": "Second revision"},
+            status=400,
+        )
+        assert res_put.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+
+    def test_api__edit_comment__err__403__simple_reader(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        riyad_user,
+        role_api_factory,
+    ):
+        """
+        Edit user comment content where user is only simple reader
+        """
+        workspace_api = workspace_api_factory.get()
+        role_api = role_api_factory.get()
+        content_api = content_api_factory.get(current_user=riyad_user)
+        workspace, test_html_document, comment = create_doc_and_comment(
+            workspace_api, content_api, content_api
+        )
+        role_api.create_one(riyad_user, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        res_get = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            status=200,
+        )
+        assert res_get.json_body["raw_content"] == "First version"
+        new_content = "Second version"
+        web_testapp.put_json(
+            "/api/workspaces/{}/contents/{}/comments/{}".format(
+                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+            ),
+            params={"raw_content": new_content},
+            status=403,
+        )
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+)
+class TestCommentTranslation(object):
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_comment_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get content translation of a comment
+        """
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        comment = content_api.create_comment(
+            workspace=workspace,
+            parent=test_html_document,
+            content=raw_content,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/contents/{}/comments/{}/translated/{}".format(
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
+                translation_filename,
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"

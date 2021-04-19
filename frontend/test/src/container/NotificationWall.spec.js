@@ -51,7 +51,8 @@ describe('<NotificationWall />', () => {
     notificationPage: {
       list: [{
         id: 1,
-        type: ''
+        type: '',
+        created: '2020-03-04T00:03:04Z'
       }]
     },
     t: tradKey => tradKey,
@@ -79,8 +80,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon: 'comments-o',
+            icon: 'far fa-comments',
             text: '{{author}} commented on {{content}} in {{space}}',
+            title: 'Comment_noun',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
           })
       })
@@ -91,8 +93,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'magic',
+            icon: 'fas fa-magic',
             text: '{{author}} created {{content}} in {{space}}',
+            title: 'New content',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -103,8 +106,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'history',
+            icon: 'fas fa-history',
             text: '{{author}} updated {{content}} in {{space}}',
+            title: 'Content updated',
             url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
           })
       })
@@ -116,8 +120,9 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'user-plus',
+            icon: 'fas fa-user-plus',
             text: '{{author}} added you to {{space}}',
+            title: 'New access',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`
           })
       })

@@ -6,7 +6,7 @@ const fileTitle = 'FileTitle'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
-describe('At the space activity feed page', () => {
+describe('At the space recent activities page', () => {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -21,7 +21,7 @@ describe('At the space activity feed page', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+    cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
   })
 
   afterEach(function () {
@@ -30,18 +30,10 @@ describe('At the space activity feed page', () => {
 
   describe('the action menu', () => {
     it('should show a flash message if user click at Copy content link', () => {
-      cy.contains('[data-cy=contentActivityHeader__label]', fileTitle)
-      cy.get('.contentActivityHeader__actionMenu').click()
-      cy.contains('.contentActivityHeader__actionMenu__item', 'Copy content link').click()
+      cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+      cy.get('.feedItemHeader__actionMenu').click()
+      cy.contains('.feedItemHeader__actionMenu__item', 'Copy content link').click()
       cy.contains('.flashmessage__container__content__text__paragraph', 'The link has been copied to clipboard')
-    })
-
-    it(`should redirect to content's app if user click at Open content`, () => {
-      cy.contains('[data-cy=contentActivityHeader__label]', fileTitle)
-      cy.get('.contentActivityHeader__actionMenu').click()
-      cy.contains('.dropdownMenuItem', 'Open content').click()
-      cy.contains('.wsContentGeneric__header__title', fileTitle)
-      cy.url().should('include', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
     })
   })
 })

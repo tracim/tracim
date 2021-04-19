@@ -8,12 +8,13 @@ describe('Login page', function () {
   })
 
   it('should have translations', () => {
-    cy.contains('.loginpage__card__form__btnsubmit', 'Connection')
+    cy.changeLanguage('en')
+    cy.contains('.loginpage__main__form__btnsubmit', 'Connection')
 
     cy.changeLanguage('fr')
-    cy.contains('.loginpage__card__form__btnsubmit', 'Connexion')
+    cy.contains('.loginpage__main__form__btnsubmit', 'Connexion')
 
     cy.changeLanguage('pt')
-    cy.contains('.loginpage__card__form__btnsubmit', 'Conexão')
+    cy.contains('.loginpage__main__form__btnsubmit', 'Conexão')
   })
 })

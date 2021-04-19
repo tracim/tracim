@@ -15,7 +15,10 @@ import {
   readNotificationList,
   setNextPage
 } from '../action-creator.sync.js'
-import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  CONTENT_NAMESPACE
+} from '../util/helper.js'
 import {
   AVATAR_SIZE,
   CONTENT_TYPE,
@@ -105,26 +108,44 @@ export class NotificationWall extends React.Component {
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}'class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+      content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
       space: `<span title="${escapedWorkspaceLabel}" class='documentTitle__highlight'>${escapedWorkspaceLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
-    const contentUrl = notification.content ? PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id) : ''
+    const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
+
+    const contentUrl = (
+      notification.content
+        ? (
+          isPublication
+            ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.id)
+            : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id)
+        )
+        : ''
+    )
 
     if (entityType === TLM_ENTITY.CONTENT) {
+      const publicationIcon = isPublication ? 'fas fa-stream+' : ''
+
       switch (eventType) {
         case TLM_EVENT.CREATED: {
           if (contentType === TLM_SUB.COMMENT) {
             return {
-              icon: 'comments-o',
+              icon: 'far fa-comments',
+              title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
-              url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+              url: (
+                notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
+                  ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
+                  : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+              )
             }
           }
 
           return {
-            icon: 'magic',
+            icon: publicationIcon + 'fas fa-magic',
+            title: isPublication ? props.t('New publication') : props.t('New content'),
             text: props.t('{{author}} created {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -132,28 +153,32 @@ export class NotificationWall extends React.Component {
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
-              icon: 'random',
+              icon: publicationIcon + 'fas fa-random',
+              title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}} in {{space}}', i18nOpts),
               url: contentUrl
             }
           }
 
           return {
-            icon: 'history',
+            icon: publicationIcon + 'fas fa-history',
+            title: isPublication ? props.t('Publication updated') : props.t('Content updated'),
             text: props.t('{{author}} updated {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
-            icon: 'magic',
+            icon: publicationIcon + 'fas fa-times',
+            title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}} from {{space}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
-            icon: 'magic',
+            icon: publicationIcon + 'fas fa-undo',
+            title: isPublication ? props.t('Publication restored') : props.t('Content restored'),
             text: props.t('{{author}} restored {{content}} in {{space}}', i18nOpts),
             url: contentUrl
           }
@@ -164,14 +189,16 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
       if (notification.content.type === CONTENT_TYPE.COMMENT) {
         return {
-          icon: 'comment-o',
+          icon: 'far fa-comment',
+          title: props.t('Mention'),
           text: props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts),
           url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
         }
       }
 
       return {
-        icon: 'at',
+        icon: 'fas fa-at',
+        title: props.t('Mention'),
         text: props.t('{{author}} mentioned you in {{content}} in {{space}}', i18nOpts),
         url: contentUrl
       }
@@ -179,7 +206,9 @@ export class NotificationWall extends React.Component {
 
     if (entityType === TLM_ENTITY.USER) {
       const details = {
-        url: (props.user.profile === PROFILE.administrator.slug) ? PAGE.ADMIN.USER_EDIT(notification.user.userId) : '',
+        url: (props.user.profile === PROFILE.administrator.slug)
+          ? PAGE.ADMIN.USER_EDIT(notification.user.userId)
+          : PAGE.PUBLIC_PROFILE(notification.user.userId),
         emptyUrlMsg: props.t("Only an administrator can see this user's account"),
         msgType: 'info'
       }
@@ -187,22 +216,26 @@ export class NotificationWall extends React.Component {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
           ...details,
-          icon: 'user-plus',
+          icon: 'fas fa-user-plus',
+          title: props.t('Account created'),
           text: props.t("{{author}} created {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.MODIFIED: return {
           ...details,
-          icon: 'user+history',
+          icon: 'fas fa-user+fas fa-history',
+          title: props.t('Account updated'),
           text: props.t("{{author}} modified {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.DELETED: return {
           ...details,
-          icon: 'user-times',
+          icon: 'fas fa-user-times',
+          title: props.t('Account deleted'),
           text: props.t("{{author}} deleted {{user}}'s account", i18nOpts)
         }
         case TLM_EVENT.UNDELETED: return {
           ...details,
-          icon: 'user+undo',
+          icon: 'fas fa-user+fas fa-undo',
+          title: props.t('Account restored'),
           text: props.t("{{author}} restored {{user}}'s account", i18nOpts)
         }
       }
@@ -224,20 +257,23 @@ export class NotificationWall extends React.Component {
             }
           }
           return {
-            icon: 'user-plus',
+            icon: 'fas fa-user-plus',
+            title: props.t('New access'),
             text: notificationText,
             url: dashboardUrl
           }
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'user-o+history',
+          icon: 'far fa-user+fas fa-history',
+          title: props.t('Status updated'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} modified your role in {{space}}', i18nOpts)
             : props.t("{{author}} modified {{user}}'s role in {{space}}", i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'user-times',
+          icon: 'fas fa-user-times',
+          title: props.t('Access removed'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} removed you from {{space}}', i18nOpts)
             : props.t('{{author}} removed {{user}} from {{space}}', i18nOpts),
@@ -249,22 +285,26 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'users+plus',
+          icon: 'fas fa-users+fas fa-plus',
+          title: props.t('New space'),
           text: props.t('{{author}} created the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'users+history',
+          icon: 'fas fa-users+fas fa-history',
+          title: props.t('Space updated'),
           text: props.t('{{author}} modified the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'users+times',
+          icon: 'fas fa-users+fas fa-times',
+          title: props.t('Space deleted'),
           text: props.t('{{author}} deleted the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
-          icon: 'users+undo',
+          icon: 'fas fa-users+fas fa-undo',
+          title: props.t('Space restored'),
           text: props.t('{{author}} restored the space {{space}}', i18nOpts),
           url: dashboardUrl
         }
@@ -287,6 +327,7 @@ export class NotificationWall extends React.Component {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
               icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+              title: props.t('Access removed'),
               text: props.t('{{author}} rejected your access to {{space}}', i18nOpts),
               url: subscriptionPageURL,
               emptyUrlMsg: defaultEmptyUrlMsg
@@ -297,6 +338,7 @@ export class NotificationWall extends React.Component {
         switch (eventType) {
           case TLM_EVENT.CREATED: return {
             icon: SUBSCRIPTION_TYPE.pending.faIcon,
+            title: props.t('Requested access'),
             text: props.t('{{author}} requested access to {{space}}', i18nOpts),
             url: dashboardUrl
           }
@@ -305,6 +347,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.rejected.faIcon,
+                title: props.t('Access removed'),
                 text: props.t('{{author}} rejected access to {{space}} for {{user}}', i18nOpts),
                 url: defaultEmptyUrlMsg
               }
@@ -313,6 +356,7 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
               return {
                 icon: SUBSCRIPTION_TYPE.pending.faIcon,
+                title: props.t('Requested access'),
                 text: props.t('{{author}} requested access to {{space}}', i18nOpts),
                 url: dashboardUrl
               }
@@ -322,8 +366,27 @@ export class NotificationWall extends React.Component {
       }
     }
 
+    if (entityType === TLM_ENTITY.REACTION) {
+      i18nOpts.reaction = notification.reaction.value
+
+      switch (eventType) {
+        case TLM_EVENT.CREATED: return {
+          icon: 'far fa-smile+fas fa-plus',
+          title: props.t('Reaction created'),
+          text: props.t('{{author}} reacted to {{content}} with {{reaction}}', i18nOpts),
+          url: contentUrl
+        }
+        case TLM_EVENT.DELETED: return {
+          icon: 'far fa-smile+fas fa-times',
+          title: props.t('Reaction deleted'),
+          text: props.t('{{author}} removed their reaction {{reaction}} to {{content}}', i18nOpts),
+          url: contentUrl
+        }
+      }
+    }
+
     return {
-      icon: 'bell',
+      icon: 'fas fa-bell',
       text: `${escapedAuthor} ${notification.type}`,
       url: contentUrl,
       emptyUrlMsg: defaultEmptyUrlMsg,
@@ -353,7 +416,7 @@ export class NotificationWall extends React.Component {
       <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
         <PopinFixedHeader
           customClass='notification'
-          faIcon='bell-o'
+          faIcon='far fa-bell'
           rawTitle={props.t('Notifications')}
           componentTitle={<div>{props.t('Notifications')}</div>}
           onClickCloseBtn={props.onCloseNotificationWall}
@@ -362,7 +425,7 @@ export class NotificationWall extends React.Component {
             customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickMarkAllAsRead}
             label={props.t('Mark all as read')}
-            faIcon='envelope-open-o'
+            faIcon='far fa-envelope-open'
             dataCy='markAllAsReadButton'
           />
         </PopinFixedHeader>
@@ -374,8 +437,8 @@ export class NotificationWall extends React.Component {
             const icons = notificationDetails.icon.split('+')
             const icon = (
               icons.length === 1
-                ? <i className={`fa fa-fw fa-${icons[0]}`} />
-                : <ComposedIcon mainIcon={icons[0]} smallIcon={icons[1]} />
+                ? <i title={notificationDetails.title} className={`fa-fw ${icons[0]}`} />
+                : <ComposedIcon titleIcon={notificationDetails.title} mainIcon={icons[0]} smallIcon={icons[1]} />
             )
 
             return (
@@ -411,7 +474,7 @@ export class NotificationWall extends React.Component {
                       }}
                     />
                   </div>
-                  {!notification.read && <i className='notification__list__item__circle fa fa-circle' />}
+                  {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
                 </Link>
               </ListItemWrapper>
             )
@@ -423,7 +486,7 @@ export class NotificationWall extends React.Component {
                 customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                 onClick={this.handleClickSeeMore}
                 label={props.t('See more')}
-                faIcon='chevron-down'
+                faIcon='fas fa-chevron-down'
               />
             </div>}
         </div>

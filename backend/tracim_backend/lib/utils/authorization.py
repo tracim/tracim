@@ -14,10 +14,12 @@ from tracim_backend.exceptions import AllUsersAreNotKnown
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import PageNotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.exceptions import UserIsNotReactionAuthor
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
@@ -227,6 +229,28 @@ class CommentOwnerChecker(AuthorizationChecker):
         )
 
 
+class ReactionAuthorChecker(AuthorizationChecker):
+    """
+    Check if current_user is author of current_reaction
+    """
+
+    def check(self, tracim_context: TracimContext) -> bool:
+
+        if tracim_context.current_reaction.author.user_id == tracim_context.current_user.user_id:
+            return True
+        raise UserIsNotReactionAuthor(
+            "user {} is not author of reaction {}".format(
+                tracim_context.current_user.user_id, tracim_context.current_reaction.reaction_id,
+            )
+        )
+
+
+class TranslationEnabled(AuthorizationChecker):
+    def check(self, tracim_context: TracimContext):
+        if not tracim_context.app_config.TRANSLATION_SERVICE__ENABLED:
+            raise PageNotFound()
+
+
 class OrAuthorizationChecker(AuthorizationChecker):
     """
     Check multiple auth_checker with a logical operator "or"
@@ -337,9 +361,15 @@ can_move_content = AndAuthorizationChecker(
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
-can_delete_comment = OrAuthorizationChecker(
+can_edit_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
+# reaction
+is_reaction_author = ReactionAuthorChecker()
+can_delete_reaction = OrAuthorizationChecker(
+    AndAuthorizationChecker(is_contributor, is_reaction_author), is_workspace_manager
+)
+is_translation_service_enabled = TranslationEnabled()
 
 ###
 # Authorization decorators for views

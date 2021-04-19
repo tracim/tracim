@@ -1,18 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
+import { CONTENT_NAMESPACE } from '../../util/helper.js'
 import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   IconButton,
   PAGE,
+  serialize,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
-
-import ContentWithPreviewActivity from './ContentWithPreviewActivity.jsx'
+import { serializeContentProps } from '../../reducer/workspaceContentList.js'
+import FeedItemWithPreview from '../../container/FeedItemWithPreview.jsx'
 import ContentWithoutPreviewActivity from './ContentWithoutPreviewActivity.jsx'
 import MemberActivity from './MemberActivity.jsx'
 
@@ -20,23 +21,51 @@ require('./ActivityList.styl')
 
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.CONTENT, (activity, breadcrumbsList, onCopyLinkClicked, onEventClicked) => {
-    return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
+    const [entityType, coreEventType, subEntityType] = activity.newestMessage.event_type.split('.')
+    const isPublication = activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    const openInAppLink = PAGE.WORKSPACE.CONTENT(activity.content.workspace_id, activity.content.content_type, activity.content.content_id)
+    const openAsPublicationLink = PAGE.WORKSPACE.PUBLICATION(activity.content.workspace_id, activity.content.content_id)
+    const titleLink = isPublication
+      ? openAsPublicationLink
+      : openInAppLink
+    const previewLink = isPublication
+      ? openAsPublicationLink
+      : openInAppLink
+    return activity.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
           activity={activity}
+          isPublication={isPublication}
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
           breadcrumbsList={breadcrumbsList}
+          lastModificationType={coreEventType}
+          lastModificationEntityType={entityType}
+          lastModificationSubEntityType={subEntityType}
+          content={serialize(activity.content, serializeContentProps)}
         />
       )
       : (
-        <ContentWithPreviewActivity
-          activity={activity}
+        <FeedItemWithPreview
+          breadcrumbsList={breadcrumbsList}
+          contentAvailable={activity.contentAvailable}
+          commentList={activity.commentList}
+          content={serialize(activity.content, serializeContentProps)}
+          eventList={activity.eventList}
+          isPublication={isPublication}
+          inRecentActivities
           key={activity.id}
+          lastModifier={activity.newestMessage.fields.author}
+          lastModificationType={coreEventType}
+          lastModificationEntityType={entityType}
+          lastModificationSubEntityType={subEntityType}
+          modifiedDate={activity.newestMessage.created}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
-          breadcrumbsList={breadcrumbsList}
+          workspaceId={activity.newestMessage.fields.workspace.workspace_id}
+          titleLink={titleLink}
+          previewLink={previewLink}
         />
       )
   }],
@@ -56,7 +85,7 @@ const ActivityList = (props) => {
       isALink: true
     }
 
-    if (activity.contentPath.length > 0) {
+    if (activity.contentAvailable && activity.contentPath.length > 0) {
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
@@ -79,11 +108,11 @@ const ActivityList = (props) => {
       ? componentConstructor(
         activity,
         activity.entityType === TLM_ET.CONTENT ? buildActivityBreadcrumbsList(activity) : [],
-        () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
+        () => props.onCopyLinkClicked(activity.content),
         () => props.onEventClicked(activity)
       )
       : <span>{props.t('Unknown activity type')}</span>
-    return <div className='activityList__item' data-cy='activityList__item' key={component.key}>{component}</div>
+    return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
   const isSubscriptionRequestOrRejection = (activity) => {
@@ -97,10 +126,18 @@ const ActivityList = (props) => {
       DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
   }
 
+  const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+    if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+        !activity.newestMessage.fields.workspace) return true
+    const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+    if (!currentWorkspace) return true
+    return currentWorkspace.publicationEnabled
+  }
+
   const activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
       (
-        activity.entityType === TLM_ET.CONTENT ||
+        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
         isSubscriptionRequestOrRejection(activity) ||
         isMemberCreatedOrModified(activity)
       )
@@ -111,23 +148,27 @@ const ActivityList = (props) => {
       {props.showRefresh && (
         <IconButton
           customClass='activityList__refresh'
-          text={props.t('Refresh')}
+          text={props.t('Reorder')}
+          icon='fas fa-redo-alt'
           intent='link'
           onClick={props.onRefreshClicked}
           dataCy='activityList__refresh'
         />
       )}
       <div className='activityList__list' data-cy='activityList__list'>
-        {props.activity.list.length > 0
-          ? props.activity.list
-            .filter(activityDisplayFilter)
-            .map(renderActivityComponent)
-          : <div className='activityList__placeholder'>{props.activity.hasNextPage ? props.t('Loading activity feed…') : props.t('No activity')}</div>}
+        {(props.activity.list.length > 0
+          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)
+          : (
+            <div className='activityList__placeholder'>
+              {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
+            </div>
+          )
+        )}
       </div>
       {props.activity.list.length > 0 && props.activity.hasNextPage && (
         <IconButton
           text={props.t('See more')}
-          icon='chevron-down'
+          icon='fas fa-chevron-down'
           onClick={props.onLoadMoreClicked}
           dataCy='activityList__more'
         />
@@ -142,7 +183,8 @@ ActivityList.propTypes = {
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  onEventClicked: PropTypes.func
+  onEventClicked: PropTypes.func,
+  workspaceList: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default translate()(ActivityList)

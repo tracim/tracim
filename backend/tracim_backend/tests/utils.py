@@ -26,9 +26,9 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.event import EventBuilder
 from tracim_backend.lib.core.event import EventPublisher
 from tracim_backend.lib.core.plugins import create_plugin_manager
+from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -238,13 +238,14 @@ class MailHogHelper(object):
 class ElasticSearchHelper(object):
     def __init__(self, app_config, session):
         self.elastic_search_api = ESSearchApi(config=app_config, current_user=None, session=session)
-        self.elastic_search_api.create_index()
+        self.delete_indices()
+        self.elastic_search_api.create_indices()
 
     def refresh_elasticsearch(self) -> None:
-        self.elastic_search_api.refresh_index()
+        self.elastic_search_api.refresh_indices()
 
-    def delete_index(self) -> None:
-        self.elastic_search_api.delete_index()
+    def delete_indices(self) -> None:
+        self.elastic_search_api.delete_indices()
 
 
 class RadicaleServerHelper(object):
@@ -300,19 +301,21 @@ class MessageHelper(object):
 
 class TracimTestContext(TracimContext):
     def __init__(
-        self, app_config: CFG, session_factory, user: typing.Optional[User] = None,
+        self,
+        app_config: CFG,
+        session_factory,
+        user: typing.Optional[User] = None,
+        init_plugins: bool = True,
     ) -> None:
         super().__init__()
         self._app_config = app_config
-        self._plugin_manager = create_plugin_manager()
-        event_builder = EventBuilder(app_config)
-        event_publisher = EventPublisher(app_config)
-        # mock event publishing to avoid requiring a working
-        # pushpin instance for every test
-        EventPublisher._publish_pending_events_of_context = mock.Mock()
-
-        self._plugin_manager.register(event_builder)
-        self._plugin_manager.register(event_publisher)
+        if init_plugins:
+            self._plugin_manager = init_plugin_manager(app_config)
+            # mock event publishing to avoid requiring a working
+            # pushpin instance for every test
+            EventPublisher._publish_pending_events_of_context = mock.Mock()
+        else:
+            self._plugin_manager = create_plugin_manager()
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
         self._dbsession.set_context(self)
         self._current_user = user

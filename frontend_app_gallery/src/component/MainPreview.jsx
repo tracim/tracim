@@ -99,14 +99,14 @@ export class MainPreview extends React.Component {
         <span className='carousel__item__preview__content'>
           {state.imageLoaded === IMG_LOAD_STATE.LOADING && (
             <div className='gallery__loader'>
-              <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+              <i className='fas fa-spinner fa-spin gallery__loader__icon' />
             </div>
           )}
           {(state.imageLoaded === IMG_LOAD_STATE.ERROR
             ? (
               <div className='carousel__item__preview__error'>
                 <div className='carousel__item__preview__error__message'>
-                  <i className='fa fa-fw fa-exclamation-triangle carousel__item__preview__error__icon' />
+                  <i className='fas fa-fw fa-exclamation-triangle carousel__item__preview__error__icon' />
                   <div>{props.t('No preview available')}</div>
                 </div>
               </div>

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "",
+  "description": "",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "tagline": {
+      "type": "string",
+      "title": "Tagline"
+    },
+
+    "location": {
+      "type": "string",
+      "title": "City/Country"
+    },
+
+    "hobbies": {
+      "title": "Hobbies",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "website": {
+      "type": "string",
+      "title": "Personal Website"
+    },
+
+    "birth_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Date of birth"
+    },
+
+    "phone": {
+      "type": "string",
+      "title": "Phone",
+      "minLength": 10
+    },
+
+    "languages": {
+      "title": "Languages",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "personal_page": {
+      "type": "string",
+      "format": "html",
+      "title": " "
+    }
+  }
+}

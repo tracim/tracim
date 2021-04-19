@@ -1,4 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
+import { CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
 
 export const baseFetch = (method, url, body) =>
   fetch(url, {
@@ -19,13 +19,27 @@ export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle
     ...propertiesToAddToBody
   })
 
-export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
+    raw_content: newComment,
+    content_namespace: namespace
+  })
+
+export const deleteComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
+export const putComment = (apiUrl, workspaceId, contentId, commentId, newComment) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`, {
     raw_content: newComment
   })
 
 export const getContentComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
+
+export const getFileChildContent = (apiUrl, workspaceId, contentId) => {
+  const queryParam = `parent_ids=${contentId}&content_type=file&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}`
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
+}
 
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
@@ -100,10 +114,13 @@ export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
 export const getFileRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
 
-export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent) =>
+export const getUrlPreview = (apiUrl, url) =>
+  baseFetch('GET', `${apiUrl}/url-preview?url=${encodeURIComponent(url)}`)
+
+export const putFileDescription = (apiUrl, workspaceId, contentId, label, newDescription) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     label: label,
-    raw_content: newContent
+    description: newDescription
   })
 
 export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
@@ -112,5 +129,40 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
+
+export const postContentReaction = (apiUrl, workspaceId, contentId, value) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`, { value })
+
+export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
+
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
+
+export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, targetLanguageCode) => {
+  const name = `comment-${commentId}.html`
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}/translated/${name}?target_language_code=${targetLanguageCode}`)
+}
+
+export const getHtmlDocTranslated = (apiUrl, workspaceId, contentId, revisionId, targetLanguageCode) => {
+  const name = `content-${contentId}-${targetLanguageCode}.html`
+  const url = `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions/${revisionId}/translated/${name}?target_language_code=${targetLanguageCode}`
+  return baseFetch('GET', url)
+}
+
+export const getFavoriteContentList = (apiUrl, userId) => {
+  return baseFetch('GET', `${apiUrl}/users/${userId}/favorite-contents`)
+}
+
+export const postContentToFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('POST', `${apiUrl}/users/${userId}/favorite-contents`, { content_id: contentId })
+}
+
+export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
+}
+
+export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)

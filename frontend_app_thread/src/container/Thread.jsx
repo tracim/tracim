@@ -6,16 +6,16 @@ import {
   appContentFactory,
   addAllResourceI18n,
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
+  PAGE,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
   Timeline,
-  SelectStatus,
-  ArchiveDeleteContent,
-  ROLE,
+  AppContentRightMenu,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -28,7 +28,12 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   getContentComment,
-  permissiveNumberEqual
+  getFileChildContent,
+  permissiveNumberEqual,
+  getDefaultTranslationState,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -51,6 +56,7 @@ export class Thread extends React.Component {
       content: param.content,
       timeline: [],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -83,6 +89,11 @@ export class Thread extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -145,7 +156,7 @@ export class Thread extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id !== state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -164,6 +175,7 @@ export class Thread extends React.Component {
   componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async updateTimelineAndContent () {
@@ -250,14 +262,22 @@ export class Thread extends React.Component {
     const { props, state } = this
 
     const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
-    const [resComment, resRevision] = await Promise.all([
+    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultThreadComment),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resCommentAsFile.body.items,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -291,6 +311,14 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
@@ -299,7 +327,7 @@ export class Thread extends React.Component {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
-      state.config.workspace.memberList,
+      state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
       state.newComment,
       this.setState.bind(this)
@@ -315,6 +343,7 @@ export class Thread extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -353,6 +382,56 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
   handleClickRefresh = () => {
     const { state } = this
 
@@ -373,7 +452,7 @@ export class Thread extends React.Component {
   }
 
   render () {
-    const { state } = this
+    const { props, state } = this
 
     if (!state.isVisible) return null
 
@@ -397,69 +476,89 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div>
-            {state.showRefreshWarning && (
-              <RefreshWarningMessage
-                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                onClickRefresh={this.handleClickRefresh}
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
               />
-            )}
-
-            <div className='thread__rightMenu'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
                 />
               )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            </ToolBar>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              onChangeStatus={this.handleChangeStatus}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
-          <Timeline
-            customClass={`${state.config.slug}__contentpage`}
-            customColor={state.config.hexcolor}
-            loggedUser={state.loggedUser}
-            apiUrl={state.config.apiUrl}
-            timelineData={state.timeline}
-            newComment={state.newComment}
-            disableComment={!state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            allowClickOnRevision={false}
-            onClickRevisionBtn={() => {}}
-            shouldScrollToBottom
-            isArchived={state.content.is_archived}
-            onClickRestoreArchived={this.handleClickRestoreArchive}
-            isDeleted={state.content.is_deleted}
-            onClickRestoreDeleted={this.handleClickRestoreDelete}
-            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-            deprecatedStatus={state.config.availableStatuses[3]}
-            showTitle={false}
-            invalidMentionList={state.invalidMentionList}
-            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitWysiwyg}
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            searchForMentionInQuery={this.searchForMentionInQuery}
-          />
+          {state.config.apiUrl ? (
+            <Timeline
+              customClass={`${state.config.slug}__contentpage`}
+              customColor={state.config.hexcolor}
+              loggedUser={state.loggedUser}
+              memberList={state.config.workspace && state.config.workspace.memberList}
+              apiUrl={state.config.apiUrl}
+              timelineData={state.timeline}
+              newComment={state.newComment}
+              newCommentAsFileList={state.newCommentAsFileList}
+              disableComment={!state.content.is_editable}
+              availableStatusList={state.config.availableStatuses}
+              wysiwyg={state.timelineWysiwyg}
+              onChangeNewComment={this.handleChangeNewComment}
+              onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+              onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+              onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              allowClickOnRevision={false}
+              onClickRevisionBtn={() => {}}
+              shouldScrollToBottom
+              isArchived={state.content.is_archived}
+              onClickRestoreArchived={this.handleClickRestoreArchive}
+              isDeleted={state.content.is_deleted}
+              onClickRestoreDeleted={this.handleClickRestoreDelete}
+              isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+              deprecatedStatus={state.config.availableStatuses[3]}
+              showTitle={false}
+              invalidMentionList={state.invalidMentionList}
+              isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+              onClickCancelSave={this.handleCancelSave}
+              onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+              onInitWysiwyg={this.handleInitWysiwyg}
+              workspaceId={state.content.workspace_id}
+              showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+              searchForMentionInQuery={this.searchForMentionInQuery}
+              onClickTranslateComment={comment => props.handleTranslateComment(
+                comment,
+                state.content.workspace_id,
+                state.loggedUser.lang,
+                this.setState.bind(this)
+              )}
+              onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+              onClickEditComment={this.handleClickEditComment}
+              onClickDeleteComment={this.handleClickDeleteComment}
+              onClickOpenFileComment={this.handleClickOpenFileComment}
+            />
+          ) : null}
         </PopinFixedContent>
       </PopinFixed>
     )

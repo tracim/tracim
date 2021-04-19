@@ -39,8 +39,12 @@ export class JoinWorkspace extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
     this.handleAllAppChangeLanguage()
     await this.loadWorkspaceSubscriptions()
+    if (props.history.location.state && props.history.location.state.fromSearch) {
+      this.setState({ filter: props.spaceSearch.searchString })
+    }
   }
 
   async loadWorkspaceSubscriptions () {
@@ -107,21 +111,21 @@ export class JoinWorkspace extends React.Component {
           icon = SUBSCRIPTION_TYPE.pending.faIcon
           break
       }
-      return <div><i className={`fa fa-${icon}`} /> {text}</div>
+      return <div><i className={`fas fa-${icon}`} /> {text}</div>
     }
 
     switch (workspace.accessType) {
       case SPACE_TYPE.onRequest.slug:
         return (
           <IconButton
-            icon='share'
+            icon='fas fa-share'
             text={props.t('Request access')}
             onClick={() => this.handleClickRequestAccess(workspace, props.user.userId)}
           />)
       case SPACE_TYPE.open.slug:
         return (
           <IconButton
-            icon='sign-in'
+            icon='fas fa-sign-in-alt'
             text={props.t('Join the space')}
             onClick={() => this.joinWorkspace(workspace)}
           />)
@@ -133,8 +137,8 @@ export class JoinWorkspace extends React.Component {
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fa fa-fw fa-2x fa-${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
-      : <i className='fa fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
+      ? <i className={`fas fa-fw fa-2x ${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
+      : <i className='fas fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
     // RJ - 2020-10-30 - NOTE
     // This code uses props.t on a key that is translated in frontend_lib (spaceType.tradKey[0]).
     // This works because translations are grouped during compilation.
@@ -177,7 +181,7 @@ export class JoinWorkspace extends React.Component {
             <PageTitle
               parentClass={className}
               title={props.t('Join a space')}
-              icon='users'
+              icon='fas fa-users'
               breadcrumbsList={props.breadcrumbs}
             />
 
@@ -187,6 +191,7 @@ export class JoinWorkspace extends React.Component {
                 onChange={e => this.handleWorkspaceFilter(e.target.value)}
                 placeholder={props.t('Filter spaces')}
                 icon='search'
+                value={this.state.filter}
               />
               <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
                 <div className={`${className}__content__workspaceList__item`}>
@@ -219,5 +224,11 @@ export class JoinWorkspace extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, accessibleWorkspaceList, workspaceSubscriptionList }) => ({ breadcrumbs, user, accessibleWorkspaceList, workspaceSubscriptionList })
+const mapStateToProps = ({ accessibleWorkspaceList, breadcrumbs, spaceSearch, user, workspaceSubscriptionList }) => ({
+  accessibleWorkspaceList,
+  breadcrumbs,
+  spaceSearch,
+  user,
+  workspaceSubscriptionList
+})
 export default connect(mapStateToProps)(translate()(TracimComponent(JoinWorkspace)))

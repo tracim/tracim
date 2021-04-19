@@ -28,6 +28,7 @@ export const serializeUserProps = {
   lang: 'lang',
   agendaUrl: 'agendaUrl',
   username: 'username',
+  allowed_space: 'allowedSpace',
   is_deleted: 'isDeleted',
   has_avatar: 'hasAvatar',
   has_cover: 'hasCover',

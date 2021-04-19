@@ -7,7 +7,7 @@ const PromptMessage = props => (
     data-cy='promptMessage'
   >
     <div className='promptMessage__msg'>
-      <i className={`fa fa-fw fa-${props.icon}`} />
+      <i className={`fa-fw ${props.icon}`} />
       {props.msg}
     </div>
 
@@ -17,7 +17,7 @@ const PromptMessage = props => (
         onClick={props.onClickBtn}
         title={props.tooltip}
       >
-        <i className={`fa fa-fw fa-${props.icon}`} />
+        <i className={`fa-fw ${props.icon}`} />
         {props.btnLabel}
       </button>
     )}
@@ -36,12 +36,12 @@ const PromptMessage = props => (
 export default PromptMessage
 
 PromptMessage.propTypes = {
-  msg: PropTypes.string,
+  msg: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   btnType: PropTypes.oneOf([
     'button', 'link'
   ]),
   icon: PropTypes.string,
-  btnLabel: PropTypes.string,
+  btnLabel: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   onClickBtn: PropTypes.func,
   tooltip: PropTypes.string
 }

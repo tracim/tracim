@@ -1,0 +1,37 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.search
+  display flex
+  padding .5rem .75rem
+  line-height 1.25
+  background-color white
+  border-width 1px
+  border-style solid
+  border-radius .25rem
+  &__text
+    border none
+    background-color transparent
+    width 100%
+    &:focus
+      box-shadow 0 0 0 0
+      border 0 none
+      outline 0
+  &__btn
+    color grey
+    border none
+    background-color transparent
+    cursor pointer
+    margin-inline-start auto
+    &:focus
+      box-shadow 0 0 0 0
+      border 0 none
+      outline 0
+    &:disabled
+      cursor not-allowed
+    &:hover
+      color fontColor
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  .search
+    &__text
+      width 172px

@@ -116,7 +116,7 @@ class TestTimezonesEndpoint(object):
 
     def test_api__get_timezones__ok_200__nominal_case(self, web_testapp):
         """
-        Get alls timezones list with a registered user.
+        Get all timezones list with a registered user.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/timezones", status=200)
@@ -264,12 +264,14 @@ class TestConfigEndpoint(object):
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
         assert res.json_body["webdav_enabled"] is False
+        assert res.json_body["translation_service__enabled"] is False
         assert res.json_body["webdav_url"] == "https://localhost:3030/webdav"
         assert res.json_body["collaborative_document_edition"] is None
         assert res.json_body["content_length_file_size_limit"] == 0
         assert res.json_body["workspace_size_limit"] == 0
         assert res.json_body["workspaces_number_per_user_limit"] == 0
         assert res.json_body["email_required"] is True
+        assert res.json_body["search_engine"] == "simple"
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self, web_testapp):
@@ -330,12 +332,6 @@ class TestUserCustomPropertiesSchema(object):
     Tests for GET /api/system/custom-user-properties-schema
     """
 
-    def test_api__get_user_custom_properties_schema__ok_200__nominal_case(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
-        json_schema = res.json_body["json_schema"]
-        assert json_schema == {}
-
     @pytest.mark.parametrize(
         "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
     )
@@ -345,13 +341,13 @@ class TestUserCustomPropertiesSchema(object):
         json_schema = res.json_body["json_schema"]
         assert json_schema["title"] == "Test"
         assert json_schema["type"] == "object"
-        assert json_schema["description"] == "just test data"
+        assert json_schema["description"] == "just some test data"
         assert json_schema["$schema"] == "http://json-schema.org/draft-07/schema#"
         assert json_schema.get("properties")
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
         assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["First", "Second", "Third"],
             "enum": ["first", "second", "third"],
@@ -377,8 +373,7 @@ class TestUserCustomPropertiesSchema(object):
         assert json_schema.get("properties")
         assert json_schema["properties"].get("property1")
         assert json_schema["properties"].get("date")
-        assert json_schema["properties"].get("fields")
-        assert json_schema["definitions"]["subfield"]["properties"]["subfield5"]["items"] == {
+        assert json_schema["properties"]["fields"]["properties"]["subfield5"]["items"] == {
             "type": "string",
             "enumNames": ["Premier", "Second", "Troisième"],
             "enum": ["first", "second", "third"],
@@ -402,12 +397,6 @@ class TestUserCustomPropertiesUISchema(object):
     Tests for GET /api/system/users-custom-properties-ui-schema
     """
 
-    def test_api__get_user_custom_properties_ui_schema__ok_200__nominal_case(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
-        ui_schema = res.json_body["ui_schema"]
-        assert ui_schema == {}
-
     @pytest.mark.parametrize(
         "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
     )
@@ -416,6 +405,7 @@ class TestUserCustomPropertiesUISchema(object):
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
         assert ui_schema == {
+            "ui:order": ["date", "property1"],
             "date": {
                 "ui:description": "just a date",
                 "ui:title": "Date",
@@ -425,7 +415,7 @@ class TestUserCustomPropertiesUISchema(object):
             "property1": {
                 "ui:widget": "textarea",
                 "ui:help": "just some help",
-                "ui:placeholder": "write here !",
+                "ui:placeholder": "write here!",
             },
         }
 
@@ -443,6 +433,7 @@ class TestUserCustomPropertiesUISchema(object):
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
         assert ui_schema == {
+            "ui:order": ["date", "property1"],
             "date": {
                 "ui:description": "juste une date",
                 "ui:title": "Date",

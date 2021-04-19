@@ -30,10 +30,12 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   sortTimelineByDate,
   removeAtInUsername,
@@ -53,9 +55,12 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -100,6 +105,13 @@ import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
+import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
+
+import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
+import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
+
+import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
@@ -129,10 +141,11 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.jsx'
 
-import IconButton from './component/Button/IconButton.jsx'
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
+import IconButton from './component/Button/IconButton.jsx'
 import GenericButton from './component/Button/GenericButton.jsx'
+import TranslateButton from './component/Button/TranslateButton.jsx'
 
 import PromptMessage from './component/PromptMessage/PromptMessage.jsx'
 
@@ -187,11 +200,15 @@ import {
   getWorkspaceContentList,
   putFileIsDeleted,
   getFileRevision,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getFileChildContent,
   getContent,
-  getWorkspaceContent
+  getWorkspaceContent,
+  getHtmlDocTranslated,
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -208,6 +225,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 
+export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
 
@@ -221,16 +239,36 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
+export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
+export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
+export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
+
+export {
+  TRANSLATION_STATE,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
+  getTranslationApiErrorMessage,
+  getDefaultTranslationState
+} from './translation.js'
+
 export {
   appContentFactory,
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
+  CommentTextArea,
+  AddFileToUploadButton,
+  DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
+  EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
+  ScrollToBottomWrapper,
   sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,
@@ -243,6 +281,7 @@ export {
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   removeAtInUsername,
   computeProgressionPercentage,
@@ -304,6 +343,7 @@ export {
   ProgressBar,
   RadioBtnGroup,
   CONTENT_TYPE,
+  CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
   RefreshWarningMessage,
   sortTimelineByDate,
@@ -346,9 +386,10 @@ export {
   getWorkspaceContentList,
   putFileIsDeleted,
   getFileRevision,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   getContentComment,
+  getFileChildContent,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,
@@ -359,6 +400,7 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   TextInput,
@@ -375,5 +417,11 @@ export {
   isFileUploadInErrorState,
   getAvatarBaseUrl,
   ProfileNavigation,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  TranslateButton,
+  getCommentTranslated,
+  getHtmlDocTranslated,
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl,
+  getGenericWorkspaceContent
 }

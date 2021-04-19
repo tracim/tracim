@@ -10,6 +10,7 @@ const testComponent = props => {
     { content_id: 1, workspace_id: 1 },
     false,
     'new comment that includes a mention here @admin which should be wrapped',
+    [],
     () => { console.log('setState called') },
     'html-document',
     'foo'
@@ -19,6 +20,7 @@ const testComponent = props => {
     { content_id: 2, workspace_id: 1 },
     true,
     'Another comment that contains HTML and a mention @admin which should be wrapped too',
+    [],
     () => { console.log('setState called') },
     'html-document',
     'foo'

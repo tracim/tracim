@@ -15,7 +15,8 @@ describe('<ComposedIcon />', () => {
     },
     smallIconStyle: {
       color: 'red'
-    }
+    },
+    titleIcon: 'randomTitle'
   }
 
   const wrapper = shallow(
@@ -26,15 +27,19 @@ describe('<ComposedIcon />', () => {
 
   describe('Static design', () => {
     it(`<i> should display the icon "${props.mainIcon}"`, () =>
-      expect(wrapper.find(`i.fa-${props.mainIcon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.${props.mainIcon}`)).to.have.lengthOf(1)
     )
 
     it(`should have the class "${props.mainIconCustomClass}"`, () =>
-      expect(wrapper.find(`i.fa.composedIcon.${props.mainIconCustomClass}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`i.composedIcon.${props.mainIconCustomClass}`)).to.have.lengthOf(1)
     )
 
     it(`should display its text in color ${props.mainIconStyle.color}`, () =>
-      expect(wrapper.find(`i.fa-${props.mainIcon}`).prop('style')).to.deep.equal(props.mainIconStyle)
+      expect(wrapper.find(`i.${props.mainIcon}`).prop('style')).to.deep.equal(props.mainIconStyle)
     )
+
+    it(`should display the title ${props.titleIcon}`, () => {
+      expect(wrapper.find('i.composedIcon').prop('title')).to.equal(props.titleIcon)
+    })
   })
 })

@@ -36,7 +36,7 @@ export const HomeNoWorkspace = props =>
           dataCy='homepagecard__create_btn'
           onClick={props.onClickCreateWorkspace}
           text={props.t('Create a space')}
-          icon='plus'
+          icon='fas fa-plus'
         />
       )}
 
@@ -44,7 +44,7 @@ export const HomeNoWorkspace = props =>
         <IconButton
           dataCy='homepagecard__join_btn'
           onClick={props.onClickJoinWorkspace}
-          icon='users'
+          icon='fas fa-users'
           text={props.t('Join a space')}
           intent='primary'
           mode='light'

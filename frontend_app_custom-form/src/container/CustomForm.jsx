@@ -598,7 +598,7 @@ class CustomForm extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: this.state.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {t('Last version')}
                 </button>
               )}
@@ -656,23 +656,25 @@ class CustomForm extends React.Component {
             />
           )}
 
-          <Timeline
-            customClass={`${config.slug}__contentpage`}
-            customColor={this.state.hexcolor}
-            loggedUser={loggedUser}
-            apiUrl={state.config.apiUrl}
-            timelineData={timeline}
-            showHeader
-            newComment={newComment}
-            disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
-            availableStatusList={config.availableStatuses}
-            wysiwyg={timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={mode !== MODE.REVISION}
-          />
+          {state.config.apiUrl ? (
+            <Timeline
+              customClass={`${config.slug}__contentpage`}
+              customColor={this.state.hexcolor}
+              loggedUser={loggedUser}
+              apiUrl={state.config.apiUrl}
+              timelineData={timeline}
+              showHeader
+              newComment={newComment}
+              disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
+              availableStatusList={config.availableStatuses}
+              wysiwyg={timelineWysiwyg}
+              onChangeNewComment={this.handleChangeNewComment}
+              onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              onClickRevisionBtn={this.handleClickShowRevision}
+              shouldScrollToBottom={mode !== MODE.REVISION}
+            />
+          ) : null}
         </PopinFixedContent>
       </PopinFixed>
     )

@@ -12,6 +12,7 @@ env:
     - TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/open_documents
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
     - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
+    - TRACIM_HERE_PATH=$TRAVIS_BUILD_DIR/backend
     # generated using the guide at https://docs.travis-ci.com/user/encryption-keys/
     - secure: "RuZzQvnHQaa76ndLr9FL4gzorvw437a4V0tP/w8tetk5PjGqJlxOYdyXvNBEjbZtV6XmkNHVNjMIwecREuOxENHK20RPp4zbwTtiWOxh72TBP8hyoigMDhEYfzSj+Hp/wp2hOY/Is3u3W6UzsYmSRq7V5+tkG9+AbVM2BsdKdzQ="
 language: python
@@ -48,6 +49,7 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_SESSION__DATA_DIR
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
     - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+    - for sample_file in frontend/dist/assets/branding/*.sample; do cp "${sample_file}" "${sample_file%.*}"; done
     - ls -R /tmp/test
     # INFO - S.G - 2020-12-30 - needed to avoid an error with "docker login"
     # as the default docker credential helper requires a X11 display which is not present in Travis
@@ -201,9 +203,9 @@ jobs:
       env:
         - TRAVIS_NODE_VERSION="10"
         - NO_VIRTUAL_ENV="1"
-        - TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/schema.json
-        - TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/ui.json
-        - TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH=$TRAVIS_BUILD_DIR/backend/examples/user_custom_properties/organization/locale
+        - TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/schema.json
+        - TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/ui.json
+        - TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/locale
       script:
         - ./run_dev_backend.sh cypress run
       if: commit_message !~ /(\[skip ci cypress\])/

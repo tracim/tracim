@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'tracim_frontend_vendors.js' : 'tracim_frontend_vendors.dev.js',
+    filename: 'tracim_frontend_vendors.js',
     pathinfo: !isProduction,
     library: 'tracim_frontend_vendors',
     libraryTarget: 'var'

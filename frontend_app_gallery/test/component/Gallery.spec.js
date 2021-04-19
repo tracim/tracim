@@ -116,12 +116,13 @@ describe('<Gallery />', () => {
     describe('play button', () => {
       it('should start the slideshow when the button play is clicked', () => {
         wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-pause')).to.be.lengthOf(1)
+        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-pause')
         expect(wrapper.state().autoPlay).to.be.a('object')
       })
+
       it('should stop the slideshow when the button pause is clicked', () => {
         wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play > i.fa.fa-play')).to.be.lengthOf(1)
+        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-play')
         expect(wrapper.state().autoPlay).to.be.a('null')
       })
     })

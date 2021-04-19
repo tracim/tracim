@@ -9,6 +9,7 @@ const GenericButton = props => {
       data-cy={props.dataCy}
       onClick={props.onClick}
       disabled={props.disabled}
+      title={props.title || props.label}
       style={{
         backgroundColor: '#fdfdfd',
         color: '#333',
@@ -23,7 +24,7 @@ const GenericButton = props => {
       }}
     >
       {props.faIcon !== '' && (
-        <i className={`fa fa-${props.faIcon} genericButton__icon`} />
+        <i className={`${props.faIcon} genericButton__icon`} />
       )}
       <span className='genericButton__label'>
         {props.label}
@@ -38,6 +39,7 @@ GenericButton.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   customClass: PropTypes.string,
+  title: PropTypes.string,
   label: PropTypes.string,
   faIcon: PropTypes.string,
   dataCy: PropTypes.string,
@@ -50,6 +52,7 @@ GenericButton.defaultProps = {
   disabled: false,
   customClass: '',
   label: '',
+  title: '',
   dataCy: '',
   faIcon: '',
   style: {},

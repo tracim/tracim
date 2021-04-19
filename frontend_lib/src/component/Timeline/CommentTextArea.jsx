@@ -34,6 +34,13 @@ export class CommentTextArea extends React.Component {
     }
   }
 
+  componentDidMount () {
+    const { props } = this
+    if (props.wysiwyg) {
+      props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+    }
+  }
+
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
       this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
@@ -158,7 +165,6 @@ export class CommentTextArea extends React.Component {
 
   handleTinyMceKeyDown = event => {
     const { state } = this
-
     tinymceAutoCompleteHandleKeyDown(
       event,
       this.setState.bind(this),
@@ -171,7 +177,6 @@ export class CommentTextArea extends React.Component {
 
   handleTinyMceKeyUp = (event) => {
     const { state } = this
-
     tinymceAutoCompleteHandleKeyUp(
       event,
       this.setState.bind(this),
@@ -206,10 +211,12 @@ export class CommentTextArea extends React.Component {
         {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
           <MentionAutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
-            style={style}
+            style={props.disableAutocompletePosition ? {} : style}
             apiUrl={props.apiUrl}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            onClickAutoCompleteItem={(m) => props.wysiwyg ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this)) : this.handleClickAutoCompleteItem(m)}
+            onClickAutoCompleteItem={(m) => props.wysiwyg
+              ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
+              : this.handleClickAutoCompleteItem(m)}
             delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
           />
         )}
@@ -242,18 +249,22 @@ CommentTextArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
+  disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
   searchForMentionInQuery: PropTypes.func,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  onInitWysiwyg: PropTypes.func
 }
 
 CommentTextArea.defaultProps = {
+  disableAutocompletePosition: false,
   disableComment: false,
   customClass: '',
   id: '',
   newComment: '',
   onChangeNewComment: () => {},
   wysiwyg: false,
-  searchForMentionInQuery: () => {}
+  searchForMentionInQuery: () => {},
+  onInitWysiwyg: () => {}
 }

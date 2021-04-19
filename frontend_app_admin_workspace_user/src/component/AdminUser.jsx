@@ -107,7 +107,7 @@ export class AdminUser extends React.Component {
         <PageTitle
           parentClass='adminUser'
           title={props.t('User account management')}
-          icon='users'
+          icon='fas fa-users'
           breadcrumbsList={props.breadcrumbsList}
         />
 
@@ -129,8 +129,8 @@ export class AdminUser extends React.Component {
               {!props.emailNotifActivated && (
                 <div>
                   <ComposedIcon
-                    mainIcon='envelope'
-                    smallIcon='warning'
+                    mainIcon='far fa-envelope'
+                    smallIcon='fas fa-exclamation-triangle'
                     mainIconCustomClass='primaryColorFont'
                     smallIconCustomClass='text-danger'
                   />
@@ -188,7 +188,7 @@ export class AdminUser extends React.Component {
 
                       <td>
                         <i
-                          className={`fa fa-fw fa-2x fa-${userProfile.faIcon}`}
+                          className={`fa-fw fa-2x ${userProfile.faIcon}`}
                           style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />

@@ -25,70 +25,80 @@ function create_dir(){
     DIR_NAME=$1
     DIR_PATH=$2
     if [ ! -d "$DIR_PATH" ]; then
-        log "create $DIR_NAME dir ..."
-        mkdir $DIR_PATH && loggood "creation $DIR_NAME dir success" || logerror "failed to create $DIR_NAME dir ($DIR_PATH)"
+        log "Creating the $DIR_NAME folder..."
+        mkdir $DIR_PATH && loggood "Successfully created the $DIR_NAME folder" || logerror "Failed to create the $DIR_NAME folder ($DIR_PATH)"
     else
-        loggood "$DIR_NAME dir ($DIR_PATH) already exist"
+        loggood "Folder $DIR_NAME ($DIR_PATH) already exists"
     fi
 }
 # Function for backend
 
 function install_backend_system_dep {
-    log "install base debian-packaged-dep for backend..."
+    log "Installing base Debian package dependencies for the backend..."
     $SUDO apt update
     PACKAGE_LIST='python3 python3-venv python3-dev python3-pip zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
     $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 
 function setup_pyenv {
-   log "setup python3 env and activate it.."
-   python3 -m venv env && loggood "setup python3 env successfull" || logerror "failed to setup python3 env"
-   source env/bin/activate && loggood "python3 env activated" || logerror "failed to activate python3 env"
+   log "Setting up the python3 virtual environment..."
+   python3 -m venv env && loggood "Successfully created the python3 virtual environment" || logerror "Failed to setup the python3 virtual environment"
+   source env/bin/activate && loggood "python3 env activated" || logerror "Failed to activate the python3 virtual environment"
 }
 
 function install_backend_python_packages {
-    log "install pip and setuptools"
-    pip install -r "requirements-build.txt" && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
-    log "install dependencies from requirements.txt"
-    pip install -r "requirements.txt" && loggood "install requirements.txt success" || logerror "failed to install requirements.txt"
-    log "install tracim-backend (sqlite_backend)..."
-    pip install -e "." && loggood "install tracim-backend (sqlite_backend) success" || logerror "failed to install tracim-backend (sqlite_backend)"
+    log "Installing pip and setuptools..."
+    pip install -r "requirements-build.txt" && loggood "Successfully installed pip and setuptools" || logerror "Failed to install pip and setuptools"
+    log "Installing dependencies from requirements.txt..."
+    pip install -r "requirements.txt" && loggood "Successfully installed the dependencies in requirements.txt" || logerror "Failed to install dependencies in requirements.txt"
+    log "Installing the Tracim backend (sqlite_backend)..."
+    pip install -e "." && loggood "Successfully installed the Tracim backend (sqlite_backend)" || logerror "Failed to install the Tracim backend (sqlite_backend)"
 }
 
 function setup_config_file {
-    log "configure tracim with default conf..."
+    log "Configuring Tracim with the default configuration..."
     if [ ! -f development.ini ]; then
-        log "generate missing development.ini ..."
-        cp development.ini.sample development.ini && loggood "copy default conf file success" || logerror "failed to copy default conf file"
+        log "Creating development.ini ..."
+        cp development.ini.sample development.ini && loggood "Successfully created the default configuration" || logerror "Failed to copy the default configuration file"
     else
-        loggood "development.ini exist"
+        loggood "development.ini already exists"
     fi
 
     if [ ! -f ../color.json ]; then
-        log "generate missing color.json ..."
-        cp ../color.json.sample ../color.json && loggood "copy default color file success" || logerror "failed to copy default color file"
+        log "Creating color.json ..."
+        cp ../color.json.sample ../color.json && loggood "Successfully copied the default color file" || logerror "Failed to copy the default color file"
     else
-        loggood "color.json exist"
+        loggood "color.json already exists"
+    fi
+
+    if [ ! -f ../frontend/dist/assets/branding/welcome-simple.html ]; then
+        log "Creating default welcome page ..."
+        for sample_file in ../frontend/dist/assets/branding/*.sample; do
+            base=$(basename "${sample_file}")
+            cp "${sample_file}" "${sample_file%.*}" && loggood "Successfully copied ${base}" || logerror "Failed to copy ${base}"
+        done
+    else
+        loggood "welcome page already exists"
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
-        log "remove folder \"sessions_data\" in \"$DEFAULTDIR/backend\" if exist"
-        rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "remove sessions_data folder success" || logerror "failed to remove sessions_data folder"
+        log "Removing folder 'sessions_data' in '$DEFAULTDIR/backend'"
+        rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "Successfully removed the sessions_data folder" || logerror "Failed to remove the sessions_data folder"
     else
-        loggood "sessions_data folder not exist"
+        loggood "The sessions_data folder does not exist"
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_lock/" ]; then
-        log "remove folder \"sessions_lock\" in \"$DEFAULTDIR/backend\" if exist"
-        rm -R $DEFAULTDIR/backend/sessions_lock/ && loggood "remove sessions_lock folder success" || logerror "failed to remove sessions_lock folder"
+        log "Remove folder 'sessions_lock' in '$DEFAULTDIR/backend'"
+        rm -R $DEFAULTDIR/backend/sessions_lock/ && loggood "Successfully removed the sessions_lock folder" || logerror "Failed to remove the sessions_lock folder"
     else
-        loggood "sessions_lock folder not exist"
+        loggood "The sessions_lock folder does not exist"
     fi
 }
 
 
 function create_require_dirs {
-    log "create requires directories"
+    log "Creating the required folders…"
     create_dir "sessions_data" "$DEFAULTDIR/backend/sessions_data"
     create_dir "sessions_lock" "$DEFAULTDIR/backend/sessions_lock"
     create_dir "depot" "$DEFAULTDIR/backend/depot"
@@ -97,51 +107,62 @@ function create_require_dirs {
 }
 
 function setup_db {
-    log "check if database exist"
+    log "Checking whether the database exists..."
     result=$(alembic -c development.ini current)
     if [ $? -eq 0 ] && [ ! "$result" == '' ]; then
-       loggood "database exist"
-       log "database migration..."
-       alembic -c development.ini upgrade head && loggood "alembic upgrade head success" || logerror "alembic upgrade head failed"
+       loggood "The database exists, migrating the database..."
+       alembic -c development.ini upgrade head && loggood "Successfully ran alembic upgrade head" || logerror "Failed to run alembic upgrade head"
     else
-       log "database seems missing, init it..."
-       tracimcli db init && loggood "db init success" || logerror "db init error"
-       alembic -c development.ini stamp head && loggood "alembic stamp head success" || logerror "alembic stamp head failed"
+       log "The database seems missing, initializing it..."
+       tracimcli db init && loggood "Successfully initialized the database" || logerror "Failed to initialize the database"
+       alembic -c development.ini stamp head && loggood "Successfully ran alembic stamp head" || logerror "Failed to run alembic stamp head"
     fi
 }
 
 function install_npm_and_nodejs {
-    log "verify if npm is installed"
-    npm -v
-    if [ $? -eq 0 ]; then
-        loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
+    log "Checking whether npm is installed"
+
+    NPM_VERSION="$(npm -v 2> /dev/null)"
+
+    if [ "$?" = "0" ]; then
+        loggood "npm $NPM_VERSION is installed"
     else
-        log "npm not installed. Installing npm with nodejs"
-        $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
+        if [ -n "$IGNORE_APT_INSTALL" ]; then
+            log "npm not installed. Please install it."
+            exit 1
+        fi
+
+        log "Installing npm..."
+        $SUDO apt install -y curl && loggood "Successfully installed curl" || logerror "Failed to install curl"
         curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
         $SUDO apt update
-        $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
-        log "verify if nodejs 10.x is now installed"
-        dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s10.'
-        if [ $? -eq 0 ]; then
-            loggood "node \"$(node -v)\" is correctly installed"
-            npm -v
-            if [ $? -eq 0 ]; then
-                loggood  "npm \"$(npm -v)\" is correctly installed"
+        $SUDO apt install -y nodejs && loggood "Successfully installed nodejs" || logerror "Failed to install nodejs"
+
+        log "Checking whether Node 10+ is installed..."
+        NODE_MAJOR_VERSION=$(node -v | sed -E 's/v([0-9]+)\..+/\1/g')
+        if [ $? = "0" ]; then
+            if  [ "$NODE_MAJOR_VERSION" -ge "10" ] ; then
+                loggood "Node $NODE_MAJOR_VERSION is correctly installed"
+
+                NPM_VERSION="$(npm -v 2> /dev/null)"
+
+                if [ "$?" = "0" ]; then
+                    loggood  "npm $NPM_VERSION is correctly installed"
+                else
+                    logerror "npm is not installed. Please install it"
+                fi
             else
-                logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+                logerror "Your version of Node ($(node -v)) is too old. Please upgrade it"
             fi
-        else
-            logerror "nodejs 10.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
         fi
     fi
 }
 
 function translate_email {
-    log "install i18next-conv to translate email"
-    $SUDO npm install "i18next-conv@<8" -g && loggood "install i18next-conv success" || logerror "failed to install i18next-conv"
-    log "translate email"
-    ./update_i18n_json_file.sh && loggood "translate email success" || logerror "failed to translate email"
+    log "Installing i18next-conv to translate emails..."
+    $SUDO npm install "i18next-conv@<8" -g && loggood "Successfully installed i18next-conv" || logerror "Failed to install i18next-conv"
+    log "Translating emails..."
+    ./update_i18n_json_file.sh || exit 1
 }
 
 ############################################
@@ -157,19 +178,16 @@ fi
 
 DEFAULTDIR=$(pwd)
 export DEFAULTDIR
-echo "DEFAULTDIR of tracim => \"$DEFAULTDIR\""
+echo "Tracim DEFAULTDIR: $DEFAULTDIR"
 
 install_npm_and_nodejs
-log "go to backend subdir.."
-cd $DEFAULTDIR/backend  || exit 1
-install_backend_system_dep
+cd "$DEFAULTDIR/backend"  || exit 1
+if [ -z "$IGNORE_APT_INSTALL" ]; then
+    install_backend_system_dep
+fi
 setup_pyenv
 install_backend_python_packages
 setup_config_file
 create_require_dirs
 setup_db
 translate_email
-
-# Return to "$DEFAULTDIR/"
-log "cd $DEFAULTDIR"
-cd $DEFAULTDIR || exit 1

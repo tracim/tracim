@@ -3,15 +3,22 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
 import Comment from './Comment.jsx'
+import CommentFilePreview from './CommentFilePreview.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import { ROLE, CONTENT_TYPE, TIMELINE_TYPE, formatAbsoluteDate } from '../../helper.js'
+import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
+import { handleInvalidMentionInComment } from '../../mention.js'
+import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import CommentTextArea from './CommentTextArea.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
+import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
+import AddFileToUploadButton from './AddFileToUploadButton.jsx'
+import DisplayFileToUpload from './DisplayFileToUpload.jsx'
+import EditCommentPopup from './EditCommentPopup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -23,7 +30,14 @@ export class Timeline extends React.Component {
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
-    this.timelineContainerScrollHeight = 0
+    this.state = {
+      commentToDelete: null,
+      invalidMentionList: [],
+      newComment: {},
+      showDeleteCommentPopup: false,
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
+    }
   }
 
   handleAllAppChangeLanguage = data => {
@@ -31,54 +45,71 @@ export class Timeline extends React.Component {
     i18n.changeLanguage(data)
   }
 
-  componentDidMount () {
-    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
-    if (window.innerWidth < 1200) return
-    this.timelineBottom.scrollIntoView({ behavior: 'instant' })
+  handleToggleDeleteCommentPopup = content => {
+    this.setState(prev => ({
+      showDeleteCommentPopup: !prev.showDeleteCommentPopup,
+      commentToDelete: prev.showDeleteCommentPopup ? null : content
+    }))
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.shouldScrollToBottom && this.props.timelineData && prevProps.timelineData) {
-      this.scrollToBottom(prevProps.timelineData)
-    }
-    this.timelineContainerScrollHeight = this.timelineContainer.scrollHeight
+  handleClickValidateDeleteComment = () => {
+    this.props.onClickDeleteComment(this.state.commentToDelete)
+    this.setState({
+      showDeleteCommentPopup: false,
+      commentToDelete: null
+    })
   }
 
-  scrollToBottom = (prevTimeline) => {
+  handleClickEditComment = (comment) => {
+    this.setState({ showEditCommentPopup: true, newComment: comment })
+  }
+
+  handleClickValidateEditComment = async (comment) => {
     const { props } = this
-
-    if (props.timelineData.length === 0) return
-
-    const lastCurrentTimelineItem = props.timelineData[props.timelineData.length - 1]
-    const isNewContent = prevTimeline.length > 0
-      ? this.getTimelineContentId(prevTimeline[prevTimeline.length - 1]) !== this.getTimelineContentId(lastCurrentTimelineItem)
-      : false
-
-    const scrollPosition = this.timelineContainer.scrollTop + this.timelineContainer.clientHeight
-    const isScrollAtTheBottom = scrollPosition === this.timelineContainerScrollHeight
-
-    const isLastTimelineItemAddedFromCurrentToken = props.isLastTimelineItemCurrentToken && props.newComment === ''
-    const isLastTimelineItemTypeComment = props.timelineData[props.timelineData.length - 1].content_type === CONTENT_TYPE.COMMENT
-
-    // GM - INFO - 2020-06-30 - When width >= 1200: Check if the timeline scroll is at the bottom
-    // or if the new item was created by the current session tokenId or if the content_id has changed.
-    // When width >= 1200: Check the if the new comment was created by the current session tokenId.
-    if (
-      (window.innerWidth >= 1200 && (isNewContent || isScrollAtTheBottom || isLastTimelineItemAddedFromCurrentToken)) ||
-      (window.innerWidth < 1200 && isLastTimelineItemAddedFromCurrentToken && isLastTimelineItemTypeComment)
-    ) {
-      const behavior = isScrollAtTheBottom && props.isLastTimelineItemCurrentToken ? 'smooth' : 'instant'
-      this.timelineBottom.scrollIntoView({ behavior })
+    if (!handleInvalidMentionInComment(
+      props.memberList,
+      true,
+      comment,
+      this.setState.bind(this)
+    )) {
+      this.handleClickValidateAnywayEditComment()
     }
   }
 
-  getTimelineContentId = (content) => {
-    if (!content) return -1
-    return content.timelineType === TIMELINE_TYPE.COMMENT ? content.parent_id : content.content_id
+  handleClickValidateAnywayEditComment = () => {
+    const { props, state } = this
+    this.setState({
+      invalidMentionList: [],
+      showEditCommentPopup: false,
+      showInvalidMentionPopupInComment: false
+    })
+    props.onClickEditComment(state.newComment)
+  }
+
+  handleCloseInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickCancelSave()
+      : this.setState({ showInvalidMentionPopupInComment: false })
+  }
+
+  handleValidateInvalidMentionPopup = () => {
+    const { props } = this
+    props.showInvalidMentionPopup
+      ? props.onClickSaveAnyway()
+      : this.handleClickValidateAnywayEditComment()
+  }
+
+  areCommentActionsAllowed = (commentAuthorId) => {
+    const { props } = this
+    return props.loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
+      props.loggedUser.userId === commentAuthorId
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
+    const invalidMentionList = props.invalidMentionList.length ? props.invalidMentionList : state.invalidMentionList
+    const showInvalidMentionPopup = props.showInvalidMentionPopup || state.showInvalidMentionPopupInComment
 
     if (!Array.isArray(props.timelineData)) {
       console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
@@ -87,10 +118,12 @@ export class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        {props.showTitle &&
+        {props.showTitle && (
           <div className='timeline__title'>
             {props.t('Timeline')}
-          </div>}
+          </div>
+        )}
+
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
             <PromptMessage
@@ -113,31 +146,44 @@ export class Timeline extends React.Component {
             <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
-              icon='trash'
+              icon='far fa-trash-alt'
               btnLabel={props.t('Restore')}
               onClickBtn={props.onClickRestoreDeleted}
             />
           )}
         </div>
 
-        <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')} ref={el => { this.timelineContainer = el }}>
+        <ScrollToBottomWrapper
+          customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
+          shouldScrollToBottom={props.shouldScrollToBottom}
+          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
+        >
           {props.timelineData.map(content => {
             switch (content.timelineType) {
-              case 'comment':
+              case TIMELINE_TYPE.COMMENT:
                 return (
                   <Comment
+                    allowCommentActions={this.areCommentActionsAllowed(content.author.user_id)}
                     customClass={props.customClass}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
+                    contentId={Number(content.content_id)}
+                    workspaceId={Number(props.workspaceId)}
                     author={content.author}
+                    loggedUser={props.loggedUser}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
-                    text={content.raw_content}
+                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
+                    onClickTranslate={() => { props.onClickTranslateComment(content) }}
+                    onClickRestore={() => { props.onClickRestoreComment(content) }}
+                    translationState={content.translationState}
+                    onClickEditComment={() => this.handleClickEditComment(content)}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                   />
                 )
-              case 'revision':
+              case TIMELINE_TYPE.REVISION:
                 return (
                   <Revision
                     customClass={props.customClass}
@@ -153,26 +199,61 @@ export class Timeline extends React.Component {
                     key={`revision_${content.revision_id}`}
                   />
                 )
+              case TIMELINE_TYPE.COMMENT_AS_FILE:
+                return (
+                  <CommentFilePreview
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    apiUrl={props.apiUrl}
+                    apiContent={content}
+                    loggedUser={props.loggedUser}
+                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
+                    key={`commentAsFile_${content.content_id}`}
+                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
+                  />
+                )
             }
           })}
-          <li style={{ visibility: 'hidden' }} ref={el => { this.timelineBottom = el }} />
-        </ul>
+        </ScrollToBottomWrapper>
 
-        {props.showInvalidMentionPopup && (
+        {showInvalidMentionPopup && (
           <ConfirmPopup
-            onConfirm={props.onClickCancelSave}
-            onClose={props.onClickCancelSave}
-            onCancel={props.onClickSaveAnyway}
+            onConfirm={this.handleCloseInvalidMentionPopup}
+            onClose={this.handleCloseInvalidMentionPopup}
+            onCancel={this.handleValidateInvalidMentionPopup}
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
                 <div className='timeline__texteditor__mentions'>
-                  {props.invalidMentionList.join(', ')}
+                  {invalidMentionList.join(', ')}
                 </div>
               </>
             }
             confirmLabel={props.t('Edit')}
             cancelLabel={props.t('Validate anyway')}
+          />
+        )}
+
+        {state.showEditCommentPopup && (
+          <EditCommentPopup
+            apiUrl={props.apiUrl}
+            comment={state.newComment.raw_content}
+            customColor={props.customColor}
+            loggedUserLanguage={props.loggedUser.lang}
+            onClickValidate={this.handleClickValidateEditComment}
+            onClickClose={() => this.setState({ showEditCommentPopup: false })}
+            workspaceId={props.workspaceId}
+          />
+        )}
+
+        {state.showDeleteCommentPopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Delete')}
+            confirmIcon='far fa-trash-alt'
+            cancelIcon='fas fa-times'
+            onConfirm={this.handleClickValidateDeleteComment}
+            onCancel={this.handleToggleDeleteCommentPopup}
           />
         )}
 
@@ -185,7 +266,7 @@ export class Timeline extends React.Component {
               )}
             >
               <CommentTextArea
-                id='wysiwygTimelineComment'
+                id={`wysiwygTimelineComment${props.id}`}
                 apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
@@ -209,14 +290,31 @@ export class Timeline extends React.Component {
                 >
                   {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 </button>
+
+                <div>
+                  <DisplayFileToUpload
+                    fileList={props.newCommentAsFileList}
+                    onRemoveCommentAsFile={props.onRemoveCommentAsFile}
+                    color={props.customColor}
+                  />
+                </div>
               </div>
 
               <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
+                <div>
+                  <AddFileToUploadButton
+                    workspaceId={props.workspaceId}
+                    color={props.customColor}
+                    disabled={props.disableComment}
+                    onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
+                  />
+                </div>
+
                 <button
                   type='button'
                   className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn btn highlightBtn')}
                   onClick={props.onClickValidateNewCommentBtn}
-                  disabled={props.disableComment || props.newComment === ''}
+                  disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
                   style={{
                     backgroundColor: props.customColor,
                     color: '#fdfdfd',
@@ -230,7 +328,7 @@ export class Timeline extends React.Component {
                   <div
                     className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
                   >
-                    <i className='fa fa-paper-plane-o' />
+                    <i className='far fa-paper-plane' />
                   </div>
                 </button>
               </div>
@@ -247,13 +345,21 @@ export default translate()(Radium(TracimComponent(Timeline)))
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   newComment: PropTypes.string.isRequired,
+  newCommentAsFileList: PropTypes.array.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
+  availableStatusList: PropTypes.array,
+  deprecatedStatus: PropTypes.object,
   disableComment: PropTypes.bool,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object,
+  memberList: PropTypes.array,
+  onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
@@ -270,18 +376,31 @@ Timeline.propTypes = {
   onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
   searchForMentionInQuery: PropTypes.func,
-  showInvalidMentionPopup: PropTypes.bool
+  showInvalidMentionPopup: PropTypes.bool,
+  onClickTranslateComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
+  onClickRestoreComment: PropTypes.func
 }
 
 Timeline.defaultProps = {
+  availableStatusList: [],
+  deprecatedStatus: {
+    faIcon: ''
+  },
   disableComment: false,
   customClass: '',
   customColor: '',
+  id: '',
+  isDeprecated: false,
+  memberList: [],
   loggedUser: {
     userId: '',
     name: '',
     userRoleIdInWorkspace: ROLE.reader.id
   },
+  onInitWysiwyg: () => { },
   timelineData: [],
   wysiwyg: false,
   onClickWysiwygBtn: () => { },
@@ -297,5 +416,10 @@ Timeline.defaultProps = {
   onClickSaveAnyway: () => { },
   showTitle: true,
   searchForMentionInQuery: () => { },
-  showInvalidMentionPopup: false
+  showInvalidMentionPopup: false,
+  onClickTranslateComment: content => { },
+  onClickDeleteComment: () => {},
+  onClickRestoreComment: content => { },
+  onClickEditComment: () => {},
+  onClickOpenFileComment: () => {}
 }

@@ -35,12 +35,12 @@ class ThumbnailPreview extends React.Component {
       <div className='carousel__thumbnail__item__preview__content'>
         {state.imageLoaded === IMG_LOAD_STATE.LOADING && (
           <div className='gallery__loader'>
-            <i className='fa fa-spinner fa-spin gallery__loader__icon' />
+            <i className='fas fa-spinner fa-spin gallery__loader__icon' />
           </div>
         )}
         {(state.imageLoaded === IMG_LOAD_STATE.ERROR
           ? (
-            <i className='fa fa-fw fa-exclamation-triangle carousel__thumbnail__item__preview__error' />
+            <i className='fas fa-fw fa-exclamation-triangle carousel__thumbnail__item__preview__error' />
           ) : (
             <img
               src={props.previewSrc}

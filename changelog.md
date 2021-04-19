@@ -1,3 +1,119 @@
+# 3.7.1 / 2021-04-14
+
+### Fixed Issues
+
+- Frontend: fix for a problem where the dashboard blinks in some cases
+
+
+# 3.7.0 / 2021-04-02
+
+### New Features
+
+- You can create your own publications to share information with other members without creating a specific content (like a blog page).
+- You can add reactions to contents using emojis like you can find on social networking platforms or instant messaging tools.
+- The activity feed of a space is now visible in the dashboard and replaces the recent activity view.
+
+### Fixed Issues
+
+- Frontend: [#4341](https://github.com/tracim/tracim/issues/4341)
+
+### Breaking Changes
+
+- Database: databases that were created using Tracim v1 need to be updated manually, [more information here](https://github.com/tracim/tracim/issues/4282#issuecomment-801944438) (issue [#4266](https://github.com/tracim/tracim/issues/4266)).
+
+### Other Changes
+
+- This new version requires a special migration for mysql/mariadb (due to the reaction feature): [tracimcli command line](https://github.com/tracim/tracim/blob/2a6aae281046e7a10bf4c5b24dfc60f81214c709/backend/doc/cli.md#migrate-mysqlmariadb-database-to-utf8mb4-added-for-tracim-37) (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+- API: this API`/api/workspaces/<workspace_id>/contents` now returns an object containing the contents in "items" instead of a direct list and also contains pagination information when the count/page_token parameters are used (issue [#4264](https://github.com/tracim/tracim/issues/4264)).
+- Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed to a simpler syntax for `user` and adds filtering for the new notification type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+  - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+
+
+# 3.6.1 / 2021-03-26
+
+### Fixed Issues
+
+- Documentation: [#4355](https://github.com/tracim/tracim/issues/4355)
+
+
+# 3.6.0 / 2021-03-24
+
+### New Features
+
+- Advanced search available with Elasticsearch
+- Translation of Note and Comment directly in Tracim using the Systran service (requires a Systran account)
+
+### Fixed Issues
+
+- Frontend: [#3543](https://github.com/tracim/tracim/issues/3543),
+[#3575](https://github.com/tracim/tracim/issues/3575),
+[#4177](https://github.com/tracim/tracim/issues/4177),
+[#4218](https://github.com/tracim/tracim/issues/4218)
+- UX: [#3553](https://github.com/tracim/tracim/issues/3553),
+[#3557](https://github.com/tracim/tracim/issues/3557),
+[#3791](https://github.com/tracim/tracim/issues/3791)
+- ElasticSearch: [#4146](https://github.com/tracim/tracim/issues/4146),
+[#4147](https://github.com/tracim/tracim/issues/4147),
+[#4149](https://github.com/tracim/tracim/issues/4149)
+- Agenda: [#3553](https://github.com/tracim/tracim/issues/3553)
+- Backend: [#2114](https://github.com/tracim/tracim/issues/2114)
+
+### Breaking Changes
+
+- :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
+If you use docker image, the migration is done automatically when new image is started.
+- ElasticSearch: refactor of the indexing logic.
+- The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias_prefix` (issue [#4147](https://github.com/tracim/tracim/issues/4147)).
+  - It is necessary to drop the existing index, create it again and populate it to use ElasticSearch, use the CLI command for that. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) or see *Updating index of ElasticSearch* section of the [docker documentation](tools_docker/README.md) for more information.
+
+#### Backend configuration file (development.ini)
+
+- On existing Tracim installations, also if using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+
+### Other Changes
+
+- Security: email addresses of users are no longer returned by API when it is not strictly necessary.
+- Translation service: new parameters available in the development.ini file to activate this feature. See the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue [#4093](https://github.com/tracim/tracim/issues/4093)).
+
+
+# 3.5.0 / 2021-02-11
+
+### New Features
+
+- All users have a parameterizable public profile
+- The user interface now uses icons from Font Awesome 5
+
+### Fixed Issues
+
+- Frontend: [#3578](https://github.com/tracim/tracim/issues/3578),
+[#3785](https://github.com/tracim/tracim/issues/3785),
+[#3790](https://github.com/tracim/tracim/issues/3790),
+[#3989](https://github.com/tracim/tracim/issues/3989),
+[#3999](https://github.com/tracim/tracim/issues/3999),
+[#4109](https://github.com/tracim/tracim/issues/4109)
+- Backend: [#4130](https://github.com/tracim/tracim/issues/4130),
+[#4137](https://github.com/tracim/tracim/issues/4137),
+[#4142](https://github.com/tracim/tracim/issues/4142)
+- Other: [#4062](https://github.com/tracim/tracim/issues/4062)
+
+### Known Issues
+
+- SQLite: After deleting a content/user/space directly in the database its id can be re-used (see details [here](https://sqlite.org/autoinc.html)). This can lead Tracim to display information referring to the wrong content/user/space in the notification wall and activity feed. (issue [#4016](https://github.com/tracim/tracim/issues/4016))
+
+### Breaking Changes
+
+- Some wordings in the user interface are changed (issue [#3901](https://github.com/tracim/tracim/issues/3901), [#4113](https://github.com/tracim/tracim/issues/4113), [#4114](https://github.com/tracim/tracim/issues/4114))
+- On existing Tracim installations using the docker image: it is necessary to update your development.ini (use this file [development.ini.sample](backend/development.ini.sample) to compare). These three new parameters need to be added with this default path on your development.ini:
+  - `user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json`
+  - `user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json`
+  - `user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale`
+
+### Others
+
+- Implemented an API to allow users to follow each other (issue [#3916](https://github.com/tracim/tracim/issues/3916))
+- Simplified way to run tests (backend/frontend) in development environments (issue [#4020](https://github.com/tracim/tracim/issues/4020))
+
+
 ## 3.4.3 / 2021-01-11
 
 ### Fixed Issues

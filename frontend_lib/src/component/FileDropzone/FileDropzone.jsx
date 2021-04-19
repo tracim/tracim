@@ -32,7 +32,7 @@ export const FileDropzone = props => {
                     className='filecontent__form__icon d-flex justify-content-center'
                     style={{ color: props.hexcolor }}
                   >
-                    <i className='fa fa-upload' />
+                    <i className='fas fa-upload' />
                   </div>
 
                   <div
@@ -50,7 +50,7 @@ export const FileDropzone = props => {
             case FILE_PREVIEW_STATE.NO_PREVIEW:
               return (
                 <div className='filecontent__preview' drop='true'>
-                  <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{ color: props.hexcolor }} />
+                  <i className='filecontent__preview__nopreview-icon fas fa-paperclip' style={{ color: props.hexcolor }} />
                   <div className='filecontent__preview__nopreview-msg'>
                     {props.filename}
                   </div>

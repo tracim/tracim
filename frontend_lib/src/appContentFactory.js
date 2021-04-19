@@ -6,7 +6,10 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate
+  sortTimelineByDate,
+  sendGlobalFlashMessage,
+  TIMELINE_TYPE,
+  CONTENT_TYPE
 } from './helper.js'
 
 import {
@@ -22,18 +25,31 @@ import {
   getInvalidMentionList,
   getMatchingGroupMentionList
 } from './mention.js'
+
 import {
+  getTranslationApiErrorMessage,
+  TRANSLATION_STATE
+} from './translation.js'
+
+import {
+  deleteComment,
   putEditContent,
+  putComment,
   postNewComment,
   putEditStatus,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownMember
+  getMyselfKnownMember,
+  getCommentTranslated,
+  postContentToFavoriteList,
+  getFavoriteContentList,
+  deleteContentFromFavoriteList
 } from './action.async.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import Autolinker from 'autolinker'
+import { isFileUploadInErrorState, uploadFile } from './fileUpload.js'
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
@@ -48,15 +64,6 @@ export function appContentFactory (WrappedComponent) {
     }
 
     setApiUrl = url => { this.apiUrl = url }
-
-    sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.ADD_FLASH_MSG,
-      data: {
-        msg: msg,
-        type: type || 'warning',
-        delay: delay || undefined
-      }
-    })
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
     appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
@@ -140,13 +147,73 @@ export function appContentFactory (WrappedComponent) {
           case 400:
             switch (response.body.code) {
               case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-              case 3002: this.sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
-              default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
+              case 3002: sendGlobalFlashMessage(i18n.t('A content with same name already exists')); break
+              default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
             }
             break
-          default: this.sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
+          default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentDeleteComment = async (workspaceId, contentId, commentId, contentType = CONTENT_TYPE.COMMENT) => {
+      this.checkApiUrl()
+      let response
+
+      if (contentType === CONTENT_TYPE.COMMENT) {
+        response = await handleFetchResult(await deleteComment(this.apiUrl, workspaceId, contentId, commentId))
+      } else {
+        response = await handleFetchResult(await putContentDeleted(this.apiUrl, workspaceId, commentId))
+      }
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
+      return response
+    }
+
+    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
+      this.checkApiUrl()
+      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
+      let knownMentions = await this.searchForMentionInQuery('', workspaceId)
+      knownMentions = knownMentions.map(member => `@${member.username}`)
+      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+
+      let newCommentForApiWithMention
+      try {
+        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
+      const response = await handleFetchResult(
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
+      )
+
+      switch (response.apiResponse.status) {
+        case 200:
+          break
+        case 400:
+          switch (response.body.code) {
+            case 2067:
+              sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              break
+            case 2003:
+              sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
+              break
+            case 2044:
+              sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              break
+            default:
+              sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
+              break
+          }
+          break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
+      }
+
       return response
     }
 
@@ -162,9 +229,29 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername) => {
-      this.checkApiUrl()
+    appContentAddCommentAsFile = (fileToUploadList, setState) => {
+      if (!fileToUploadList.length) return
+      setState(prev => {
+        const fileToUploadListWithoutDuplicate = fileToUploadList
+          .filter(fileToAdd =>
+            !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
+          )
+        return {
+          newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
+        }
+      })
+    }
 
+    appContentRemoveCommentAsFile = (fileToRemove, setState) => {
+      if (!fileToRemove) return
+      setState(prev => ({
+        newCommentAsFileList: prev.newCommentAsFileList.filter(
+          commentAsFile => commentAsFile.file.name !== fileToRemove.file.name
+        )
+      }))
+    }
+
+    saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
@@ -182,13 +269,13 @@ export function appContentFactory (WrappedComponent) {
       }
 
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention)
+        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention, content.content_namespace)
       )
 
       switch (response.apiResponse.status) {
         case 200:
           setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
 
           removeLocalStorageItem(
             appSlug,
@@ -199,23 +286,67 @@ export function appContentFactory (WrappedComponent) {
         case 400:
           switch (response.body.code) {
             case 2067:
-              this.sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
+              sendGlobalFlashMessage(i18n.t('You are trying to mention an invalid user'))
               break
             case 2003:
-              this.sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
+              sendGlobalFlashMessage(i18n.t("You can't send an empty comment"))
               break
             case 2044:
-              this.sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
+              sendGlobalFlashMessage(i18n.t('You must change the status or restore this content before any change'))
               break
             default:
-              this.sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
+              sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
               break
           }
           break
-        default: this.sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the comment')); break
       }
 
       return response
+    }
+
+    saveCommentAsFile = async (content, newCommentAsFile) => {
+      const errorMessageList = [
+        { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
+        { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
+        { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
+        { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
+      ]
+      const parentNamespace = content.contentNamespace ? content.contentNamespace : content.content_namespace
+      return uploadFile(
+        newCommentAsFile,
+        `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
+        {
+          additionalFormData: {
+            parent_id: content.content_id,
+            content_namespace: parentNamespace
+          },
+          httpMethod: 'POST',
+          progressEventHandler: () => {},
+          errorMessageList: errorMessageList,
+          defaultErrorMessage: i18n.t('Error while uploading file')
+        }
+      )
+    }
+
+    appContentSaveNewComment = async (
+      content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
+    ) => {
+      this.checkApiUrl()
+
+      if (newComment) {
+        await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
+      }
+
+      if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        const responseList = await Promise.all(
+          newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
+        )
+        const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
+        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage, 'warning'))
+
+        setState({ newCommentAsFileList: uploadFailedList })
+      }
     }
 
     appContentChangeStatus = async (content, newStatus, appSlug) => {
@@ -228,7 +359,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       if (response.status !== 204) {
-        this.sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
+        sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
       }
 
       return response
@@ -339,28 +470,105 @@ export function appContentFactory (WrappedComponent) {
       this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
     }
 
-    buildTimelineFromCommentAndRevision = (commentList, revisionList, loggedUser) => {
-      const resCommentWithProperDate = commentList.map(c => ({
-        ...c,
-        created_raw: c.created,
-        created: displayDistanceDate(c.created, loggedUser.lang),
-        raw_content: addClassToMentionsOfUser(c.raw_content, loggedUser.username)
-      }))
+    buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
+      ...content,
+      timelineType: TIMELINE_TYPE.COMMENT,
+      created_raw: content.created,
+      created: displayDistanceDate(content.created, loggedUser.lang),
+      raw_content: addClassToMentionsOfUser(content.raw_content, loggedUser.username),
+      translatedRawContent: null,
+      translationState: initialCommentTranslationState
+    })
 
-      return revisionList
-        .map((revision, i) => ({
-          ...revision,
-          created_raw: revision.created,
-          created: displayDistanceDate(revision.created, loggedUser.lang),
-          timelineType: 'revision',
-          commentList: revision.comment_ids.map(ci => ({
-            timelineType: 'comment',
-            ...resCommentWithProperDate.find(c => c.content_id === ci)
-          })),
-          number: i + 1,
-          hasBeenRead: true
-        }))
-        .flatMap(revision => [revision, ...revision.commentList])
+    addContentToFavoriteList = async (content, loggedUser, setState) => {
+      const response = await handleFetchResult(await postContentToFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      ))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while adding content to favorites'))
+        return
+      }
+      const newFavorite = response.body
+      setState(previousState => {
+        return {
+          favoriteList: [...previousState.favoriteList, newFavorite]
+        }
+      })
+    }
+
+    removeContentFromFavoriteList = async (content, loggedUser, setState) => {
+      const response = await handleFetchResult(await deleteContentFromFavoriteList(
+        this.apiUrl,
+        loggedUser.userId,
+        content.content_id
+      ))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
+        return
+      }
+      setState(previousState => {
+        return {
+          favoriteList: previousState.favoriteList.filter(
+            favorite => favorite.content_id !== content.content_id
+          )
+        }
+      })
+    }
+
+    loadFavoriteContentList = async (loggedUser, setState) => {
+      const response = await handleFetchResult(await getFavoriteContentList(this.apiUrl, loggedUser.userId))
+      if (!response.ok) {
+        sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
+        setState({ favoriteList: [] })
+        return
+      }
+      const favorites = response.body
+      setState({ favoriteList: favorites.items })
+    }
+
+    isContentInFavoriteList = (content, state) => {
+      return state.favoriteList && state.favoriteList.some(
+        favorite => favorite.content_id === content.content_id
+      )
+    }
+
+    buildTimelineItemCommentAsFile = (content, loggedUser) => ({
+      ...content,
+      timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
+      created_raw: content.created,
+      created: displayDistanceDate(content.created, loggedUser.lang)
+    })
+
+    buildTimelineItemRevision = (revision, loggedUser, number) => ({
+      ...revision,
+      created_raw: revision.created,
+      created: displayDistanceDate(revision.created, loggedUser.lang),
+      timelineType: TIMELINE_TYPE.REVISION,
+      number: number
+    })
+
+    buildTimelineFromCommentAndRevision = (
+      commentList, commentAsFileList, revisionList, loggedUser, initialCommentTranslationState = TRANSLATION_STATE.DISABLED
+    ) => {
+      const timelineCommentList = commentList.map(c => this.buildTimelineItemComment(c, loggedUser, initialCommentTranslationState))
+      const timelineCommentAsFileList = commentAsFileList.map(c => this.buildTimelineItemCommentAsFile(c, loggedUser))
+      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser, i + 1))
+
+      const fullTimeline = [
+        ...timelineCommentList,
+        ...timelineCommentAsFileList,
+        ...timelineRevisionList
+      ]
+
+      return sortTimelineByDate(fullTimeline)
+    }
+
+    replaceComment = (comment, timeline) => {
+      return timeline.map(
+        item => item.timelineType === TIMELINE_TYPE.COMMENT && item.content_id === comment.content_id ? comment : item
+      )
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
@@ -370,23 +578,92 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchUserKnownMemberList.apiResponse.status) {
         case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: this.sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+        default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
       }
       return mentionList
     }
 
-    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead) => {
-      return sortTimelineByDate([
-        ...timeline,
-        {
-          ...comment,
-          raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUser.username),
-          created_raw: comment.created,
-          created: displayDistanceDate(comment.created, loggedUser.lang),
-          timelineType: comment.content_type,
-          hasBeenRead: hasBeenRead
+    // INFO - CH - 20210318 - This function can add comment and comment as file
+    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
+      const commentForTimeline = comment.content_type === TIMELINE_TYPE.COMMENT
+        ? this.buildTimelineItemComment(comment, loggedUser, initialCommentTranslationState)
+        : this.buildTimelineItemCommentAsFile(comment, loggedUser)
+
+      return sortTimelineByDate([...timeline, commentForTimeline])
+    }
+
+    updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
+      const oldComment = timeline.find(timelineItem => timelineItem.content_id === comment.content_id)
+
+      if (!oldComment) {
+        sendGlobalFlashMessage(i18n.t('Error while saving the comment'), 'warning')
+        return timeline
+      }
+
+      const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
+        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        : timelineItem
+      )
+      return newTimeline
+    }
+
+    removeCommentFromTimeline = (commentId, timeline) => {
+      return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
+    }
+
+    onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.PENDING },
+            previousState.timeline
+          )
         }
-      ])
+      })
+      const response = await getCommentTranslated(
+        this.apiUrl,
+        workspaceId,
+        comment.parent_id,
+        comment.content_id,
+        lang
+      )
+      const errorMessage = getTranslationApiErrorMessage(response)
+      if (errorMessage) {
+        sendGlobalFlashMessage(errorMessage, 'warning')
+        setState(previousState => {
+          return {
+            timeline: this.replaceComment(
+              { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+              previousState.timeline
+            )
+          }
+        })
+        return
+      }
+      const translatedRawContent = await response.text()
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            {
+              ...comment,
+              translatedRawContent,
+              translationState: TRANSLATION_STATE.TRANSLATED
+            },
+            previousState.timeline
+          )
+        }
+      })
+    }
+
+    onHandleRestoreComment = (comment, setState) => {
+      setState(previousState => {
+        return {
+          timeline: this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+            previousState.timeline
+          )
+        }
+      })
     }
 
     render () {
@@ -401,6 +678,10 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentAddCommentAsFile={this.appContentAddCommentAsFile}
+          appContentDeleteComment={this.appContentDeleteComment}
+          appContentEditComment={this.appContentEditComment}
+          appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
@@ -411,6 +692,14 @@ export function appContentFactory (WrappedComponent) {
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           searchForMentionInQuery={this.searchForMentionInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
+          handleTranslateComment={this.onHandleTranslateComment}
+          handleRestoreComment={this.onHandleRestoreComment}
+          isContentInFavoriteList={this.isContentInFavoriteList}
+          addContentToFavoriteList={this.addContentToFavoriteList}
+          removeContentFromFavoriteList={this.removeContentFromFavoriteList}
+          loadFavoriteContentList={this.loadFavoriteContentList}
+          removeCommentFromTimeline={this.removeCommentFromTimeline}
+          updateCommentOnTimeline={this.updateCommentOnTimeline}
         />
       )
     }

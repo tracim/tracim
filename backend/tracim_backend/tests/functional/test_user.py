@@ -27,6 +27,7 @@ from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import create_png_test_image
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -3340,10 +3341,32 @@ class TestUserEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == res
+        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
         assert last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == author
+        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+
+    @pytest.mark.parametrize("public_name_value", ("🐻‍❄👨‍👨‍👧‍👧️ Emoji Lover",))
+    def test_api__create_user__ok_200__with_emoji_as_public_name(
+        self, web_testapp, user_api_factory, event_helper, public_name_value
+    ):
+        """
+        Non-regression test for emoji char in users table. Emoji use to not work
+        in user table for mysql/mariadb due to specific hack.
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": public_name_value,
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        res = res.json_body
+        assert res["public_name"] == public_name_value
 
     @pytest.mark.parametrize("email_required,status", ((True, 400), (False, 200)))
     def test_api__create_user__with_only_username(
@@ -6313,27 +6336,28 @@ class TestUserCoverEndpoints:
         assert res.json_body["code"] == ErrorCode.MIMETYPE_NOT_ALLOWED
 
     def test_api__get_user_cover_preview__ok__nominal_case(
-        self, admin_user: User, web_testapp
+        self, admin_user: User, bob_user: User, web_testapp
     ) -> None:
         """
         get 256x256 preview of a avatar
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(bob_user.user_id),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(1500, 1500)
         web_testapp.put(
-            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            "/api/users/{}/cover/raw/{}".format(bob_user.user_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         ),
 
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(admin_user.user_id, "image.jpg"),
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(bob_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -6342,8 +6366,7 @@ class TestUserCoverEndpoints:
         assert 1300, 150 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
-            status=200,
+            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"), status=200,
         )
         assert res2.body == res.body
         assert res2.content_type == "image/jpeg"

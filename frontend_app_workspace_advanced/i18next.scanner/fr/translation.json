@@ -9,7 +9,7 @@
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
-  "Error while saving new description": "Erreur lors de la sauvegarde de la description",
+  "Error while saving the new description": "Erreur lors de la sauvegarde de la description",
   "Error while saving new role for member": "Erreur lors de la sauvegarde du rôle",
   "Error while fetching known members list": "Erreur lors du chargement de la liste des membres connus",
   "Please set a name, an email or a username": "Veuillez saisir le nom, l'email ou l'identifiant",
@@ -50,5 +50,9 @@
   "Request accepted": "Demande acceptée",
   "Request rejected": "Demande refusée",
   "There are no requests yet.": "Vous n'avez pas encore de demande.",
-  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace (uniquement pour les espaces ouverts ou sur demande)."
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "C'est le rôle que les membres auront par défaut lorsqu'ils rejoignent votre espace (uniquement pour les espaces ouverts ou sur demande).",
+  "Publications activated": "Publications activées",
+  "Publications deactivated": "Publications desactivées",
+  "Error while activating publications": "Erreur pendant l'activation des publications",
+  "Error while deactivating publications": "Erreur pendant la désactivation des publications"
 }

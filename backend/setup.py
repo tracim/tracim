@@ -76,6 +76,7 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
+    "webpreview",
 ]
 
 tests_require = [
@@ -148,6 +149,7 @@ setup(
             "db_init = tracim_backend.command.database:InitializeDBCommand",
             "db_delete = tracim_backend.command.database:DeleteDBCommand",
             "db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command",
+            "db migrate-mysql-charset = tracim_backend.command.database:MigrateMysqlCharsetCommand",
             # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",

@@ -4,7 +4,7 @@ This list is generated using
 ```
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
-Note that you need to activate all applcations (`app.enabled` setting) for this list to be complete.
+Note that you need to activate all applications (`app.enabled` setting) for this list to be complete.
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
@@ -23,6 +23,9 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |
 | TRACIM_SESSION__SECURE                                                    | session.secure                                                 | SESSION__SECURE                                                    |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
+| TRACIM_WEBSITE__DESCRIPTION                                               | website.description                                            | WEBSITE__DESCRIPTION                                               |
+| TRACIM_WEBSITE__WELCOME_PAGE                                              | website.welcome_page                                           | WEBSITE__WELCOME_PAGE                                              |
+| TRACIM_WEBSITE__WELCOME_PAGE_STYLE                                        | website.welcome_page_style                                     | WEBSITE__WELCOME_PAGE_STYLE                                        |
 | TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
@@ -117,7 +120,7 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_WEBDAV__DIR_BROWSER__ENABLED                                       | webdav.dir_browser.enabled                                     | WEBDAV__DIR_BROWSER__ENABLED                                       |
 | TRACIM_WEBDAV__DIR_BROWSER__FOOTER                                        | webdav.dir_browser.footer                                      | WEBDAV__DIR_BROWSER__FOOTER                                        |
 | TRACIM_SEARCH__ENGINE                                                     | search.engine                                                  | SEARCH__ENGINE                                                     |
-| TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS                                 | search.elasticsearch.index_alias                               | SEARCH__ELASTICSEARCH__INDEX_ALIAS                                 |
+| TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX                          | search.elasticsearch.index_alias_prefix                        | SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX                          |
 | TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE                      | search.elasticsearch.index_pattern_template                    | SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE                      |
 | TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST                                  | search.elasticsearch.use_ingest                                | SEARCH__ELASTICSEARCH__USE_INGEST                                  |
 | TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST                  | search.elasticsearch.ingest.mimetype_whitelist                 | SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST                  |
@@ -130,6 +133,11 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_URI                                | content_security_policy.report_uri                             | CONTENT_SECURITY_POLICY__REPORT_URI                                |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |
 | TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     | content_security_policy.additional_directives                  | CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     |
+| TRACIM_TRANSLATION_SERVICE__ENABLED                                       | translation_service.enabled                                    | TRANSLATION_SERVICE__ENABLED                                       |
+| TRACIM_TRANSLATION_SERVICE__TIMEOUT                                       | translation_service.timeout                                    | TRANSLATION_SERVICE__TIMEOUT                                       |
+| TRACIM_TRANSLATION_SERVICE__PROVIDER                                      | translation_service.provider                                   | TRANSLATION_SERVICE__PROVIDER                                      |
+| TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_URL                              | translation_service.systran.api_url                            | TRANSLATION_SERVICE__SYSTRAN__API_URL                              |
+| TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_KEY                              | translation_service.systran.api_key                            | TRANSLATION_SERVICE__SYSTRAN__API_KEY                              |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |

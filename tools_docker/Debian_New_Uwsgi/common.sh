@@ -50,6 +50,9 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; jobs.async.redis.port = .*|jobs.async.redis.port = 6379|g" /etc/tracim/development.ini
     sed -i "s|^; jobs.async.redis.db = .*|jobs.async.redis.db = 0|g" /etc/tracim/development.ini
     sed -i "s|^; plugin.folder_path = .*|plugin.folder_path = /etc/tracim/plugins|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.json_schema_file_path = .*|user.custom_properties.json_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/schema.json|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.ui_schema_file_path = .*|user.custom_properties.ui_schema_file_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/ui.json|g" /etc/tracim/development.ini
+    sed -i "s|^; user.custom_properties.translations_dir_path = .*|user.custom_properties.translations_dir_path = /tracim/backend/tracim_backend/templates/user_custom_properties/default/locale|g" /etc/tracim/development.ini
     sed -i "s|^; frontend.custom_toolbox_folder_path =.*|frontend.custom_toolbox_folder_path = /etc/tracim/custom_toolbox|g" /etc/tracim/development.ini
     sed -i "s|^; collaborative_document_edition.file_template_dir = .*|collaborative_document_edition.file_template_dir = /tracim/backend/tracim_backend/templates/open_documents|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
@@ -105,6 +108,19 @@ fi
 if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
     ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
 fi
+
+# Create welcome page files if they do not exist
+mkdir -p /etc/tracim/branding
+for sample_file in /tracim/frontend/dist/assets/branding/*.sample; do
+    base=$(basename "$sample_file")
+    file="${base%.*}"
+    if [ ! -f "/etc/tracim/branding/$file" ]; then
+        cp "$sample_file" "/etc/tracim/branding/$file"
+    fi
+    if [ ! -L "/tracim/frontend/dist/assets/branding/$file" ]; then
+        ln -s "/etc/tracim/branding/$file" "/tracim/frontend/dist/assets/branding/$file"
+    fi
+done
 
 # Create folder for plugins (backend) and custom_toolbox (frontend)
 if [ ! -d /etc/tracim/plugins ]; then

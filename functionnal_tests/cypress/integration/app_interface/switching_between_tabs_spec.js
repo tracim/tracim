@@ -17,11 +17,7 @@ describe('Switching between tabs', () => {
 
   const testCases = [
     { from: 'Dashboard', to: 'Contents', fromPage: p.DASHBOARD, toPagePathEnd: 'contents' },
-    { from: 'Dashboard', to: 'Activity feed', fromPage: p.DASHBOARD, toPagePathEnd: 'activity-feed' },
-    { from: 'Activity feed', to: 'Dashboard', fromPage: p.WORKSPACE_ACTIVITY_FEED, toPagePathEnd: 'dashboard' },
-    { from: 'Activity feed', to: 'Contents', fromPage: p.WORKSPACE_ACTIVITY_FEED, toPagePathEnd: 'contents' },
-    { from: 'Contents', to: 'Dashboard', fromPage: p.CONTENTS, toPagePathEnd: 'dashboard' },
-    { from: 'Contents', to: 'Activity feed', fromPage: p.CONTENTS, toPagePathEnd: 'activity-feed' }
+    { from: 'Contents', to: 'Dashboard', fromPage: p.CONTENTS, toPagePathEnd: 'dashboard' }
   ]
 
   for (const testCase of testCases) {

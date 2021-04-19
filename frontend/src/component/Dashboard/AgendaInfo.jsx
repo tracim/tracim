@@ -6,7 +6,7 @@ require('./AgendaInfo.styl')
 
 export const AgendaInfo = props => (
   <div className={`agendaInfo ${props.customClass}`}>
-    <div className='agendaInfo__header subTitle'>
+    <div className='agendaInfo__header'>
       {props.t('Agenda')}
     </div>
 
@@ -27,7 +27,7 @@ export const AgendaInfo = props => (
 
       <div className='agendaInfo__content__link'>
         <div className='agendaInfo__content__link__icon primaryColorBorder'>
-          <i className='fa fa-calendar' />
+          <i className='fas fa-calendar-alt' />
         </div>
 
         <div className='agendaInfo__content__link__url primaryColorBorder'>

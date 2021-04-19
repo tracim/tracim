@@ -25,6 +25,78 @@ export const FETCH_CONFIG = {
   apiUrl: configEnv.apiUrl
 }
 
+export const SEARCH_TYPE = {
+  SIMPLE: 'simple',
+  ADVANCED: 'elasticsearch'
+}
+
+export const ADVANCED_SEARCH_TYPE = {
+  CONTENT: 'content',
+  USER: 'user',
+  SPACE: 'workspace'
+}
+
+export const ADVANCED_SEARCH_FILTER = {
+  SEARCH_FIELD: 'searchFieldList',
+  NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
+  CREATED_RANGE: 'createdRange',
+  MODIFIED_RANGE: 'modifiedRange',
+  SEARCH_FACETS: 'searchFacets'
+}
+
+export const DATE_FILTER_ELEMENT = {
+  AFTER: 'after',
+  BEFORE: 'before'
+}
+
+// INFO - G.B. - 2021-03-01 - All the translations in the object below has as their only purpose
+// to be able to generate translation keys through i18n.scanner
+
+export const SEARCH_USER_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  }
+}
+
+export const SEARCH_CONTENT_FACETS = {
+  SPACE: {
+    slug: 'workspace_names'
+  },
+  STATUS: {
+    slug: 'statuses',
+    items: [
+      i18n.t('open'),
+      i18n.t('closed-deprecated'),
+      i18n.t('closed-unvalidated'),
+      i18n.t('closed-validated')
+    ]
+  },
+  TYPE: {
+    slug: 'content_types',
+    items: [
+      i18n.t('folder_search'),
+      i18n.t('html-document_search'),
+      i18n.t('thread_search'),
+      i18n.t('file_search')
+    ]
+  },
+  EXTENSION: {
+    slug: 'file_extensions'
+  },
+  AUTHOR: {
+    slug: 'author__public_names'
+  }
+}
+
+export const SEARCH_SPACE_FACETS = {
+  MEMBER: {
+    slug: 'members'
+  },
+  AUTHOR: {
+    slug: 'owners'
+  }
+}
+
 export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }
@@ -32,7 +104,7 @@ export const ANCHOR_NAMESPACE = {
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
-  faIcon: 'users',
+  faIcon: 'fas fa-users',
   hexcolor: GLOBAL_primaryColor,
   creationLabel: i18n.t('Create a space'),
   domContainer: 'appFeatureContainer'
@@ -92,8 +164,11 @@ export const compareContents = (a, b, lang) => {
 
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
-  UPLOAD: 'upload'
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
 }
+
+export const publicationColor = '#661F98'
 
 export const sortContentList = (workspaceContents, lang) => {
   return workspaceContents.sort((a, b) => compareContents(a, b, lang))
@@ -143,3 +218,70 @@ export const toggleFavicon = (hasNewNotification) => {
     }
   })
 }
+
+export const parseSearchUrl = (parsedQuery) => {
+  const searchObject = {
+    // INFO - CH - 20210318 - adding this default value because the search page use both this object and the one
+    // from redux. And it needs this property
+    appliedFilters: {
+      searchFieldList: []
+    }
+  }
+
+  searchObject.contentTypes = parsedQuery.t
+  searchObject.searchString = parsedQuery.q || ''
+  searchObject.numberResultsByPage = parseInt(parsedQuery.nr)
+  searchObject.currentPage = parseInt(parsedQuery.p)
+  searchObject.showArchived = !!(parseInt(parsedQuery.arc))
+  searchObject.showDeleted = !!(parseInt(parsedQuery.del))
+  searchObject.showActive = !!(parseInt(parsedQuery.act))
+  searchObject.searchType = parsedQuery.s
+
+  return searchObject
+}
+
+export const handleClickCopyLink = (content) => {
+  // INFO - GB - 2020-11-20 - Algorithm based on
+  // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
+  const tmp = document.createElement('textarea')
+  document.body.appendChild(tmp)
+  tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
+    content.workspaceId || content.workspace_id,
+    content.content_type || content.type,
+    content.id || content.content_id
+  )}`
+  tmp.select()
+  document.execCommand('copy')
+  document.body.removeChild(tmp)
+}
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
+}
+
+export const WELCOME_ELEMENT_ID = 'welcome'

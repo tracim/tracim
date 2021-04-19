@@ -160,15 +160,7 @@ class TestContentApi(object):
         }
         api._set_allowed_content(folder, allowed_content_dict=allowed_content_dict)
         api.save(content=folder)
-        # not in list -> do not allow
-        with pytest.raises(UnallowedSubContent):
-            api.create(
-                content_type_slug=content_type_list.Event.slug,
-                workspace=workspace,
-                parent=folder,
-                label="lapin",
-                do_save=True,
-            )
+
         # in list but false -> do not allow
         with pytest.raises(UnallowedSubContent):
             api.create(
@@ -186,25 +178,6 @@ class TestContentApi(object):
             label="lapin",
             do_save=True,
         )
-
-    def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(
-        self, user_api_factory, workspace_api_factory, content_type_list, session, app_config
-    ):
-        uapi = user_api_factory.get()
-        profile = Profile.ADMIN
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
-        workspace = workspace_api_factory.get(user).create_workspace(
-            "test workspace", save_now=True
-        )
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        with pytest.raises(UnallowedSubContent):
-            api.create(
-                content_type_slug=content_type_list.Event.slug,
-                workspace=workspace,
-                parent=None,
-                label="lapin",
-                do_save=True,
-            )
 
     def test_unit__create_content__err_same_label_as_another_content(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
@@ -1009,14 +982,15 @@ class TestContentApi(object):
         p = api.create(content_type_list.Page.slug, workspace, None, "this_is_a_page", do_save=True)
         c = api.create_comment(workspace, p, "this is the comment", True)
 
-        eq_(Content, c.__class__)
-        eq_(p.content_id, c.parent_id)
-        eq_(user, c.owner)
-        eq_(workspace, c.workspace)
-        eq_(content_type_list.Comment.slug, c.type)
-        eq_("this is the comment", c.description)
-        eq_("", c.label)
-        eq_(ActionDescription.COMMENT, c.revision_type)
+        assert Content == c.__class__
+        assert p.content_id == c.parent_id
+        assert user == c.owner
+        assert workspace == c.workspace
+        assert content_type_list.Comment.slug == c.type
+        assert "this is the comment" == c.raw_content
+        assert "" == c.label
+        assert "" == c.description
+        assert ActionDescription.COMMENT == c.revision_type
 
     def test_unit_move_file_with_comments__different_parent_same_workspace(
         self,
@@ -1112,7 +1086,7 @@ class TestContentApi(object):
         )
         comment_before_move_id = text_file.children[0].id
         comment_before_move_workspace_id = text_file.children[0].workspace_id
-        assert text_file.children[0].description == "just a comment"
+        assert text_file.children[0].raw_content == "just a comment"
         workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace2", save_now=True
         )
@@ -1128,7 +1102,7 @@ class TestContentApi(object):
         transaction.commit()
         api2 = ContentApi(current_user=user, session=session, config=app_config)
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
-        assert text_file_after_move.children[0].description == "just a comment"
+        assert text_file_after_move.children[0].raw_content == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
 
@@ -1184,7 +1158,7 @@ class TestContentApi(object):
         comment_before_move_workspace_id = text_file.children[0].workspace_id
         assert text_file.content_namespace == ContentNamespaces.CONTENT
         assert text_file.children[0].content_namespace == ContentNamespaces.CONTENT
-        assert text_file.children[0].description == "just a comment"
+        assert text_file.children[0].raw_content == "just a comment"
         workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace2", save_now=True
         )
@@ -1209,7 +1183,7 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=user, session=session, config=app_config)
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
         assert text_file_after_move.content_namespace == ContentNamespaces.UPLOAD
-        assert text_file_after_move.children[0].description == "just a comment"
+        assert text_file_after_move.children[0].raw_content == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
@@ -1390,7 +1364,7 @@ class TestContentApi(object):
             workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
         )
         with new_revision(session, transaction.manager, content=text_file):
-            api.update_content(text_file, text_file.label, new_content="just a description")
+            api.update_content(text_file, text_file.label, new_description="just a description")
             api.save(
                 content=text_file, action_description=ActionDescription.EDITION, do_notify=False
             )
@@ -1414,13 +1388,13 @@ class TestContentApi(object):
 
         assert len(text_file.children.all()) == 2
         assert len(text_file_copy.children.all()) == 2
-        assert text_file.children[0].description == "just a comment"
-        assert text_file_copy.children[0].description == text_file.children[0].description
+        assert text_file.children[0].raw_content == "just a comment"
+        assert text_file_copy.children[0].raw_content == text_file.children[0].raw_content
         assert text_file_copy.children[0].id != text_file.children[0].id
         assert text_file_copy.children[0].created == text_file.children[0].created
 
-        assert text_file.children[1].description == "just another comment"
-        assert text_file_copy.children[1].description == text_file.children[1].description
+        assert text_file.children[1].raw_content == "just another comment"
+        assert text_file_copy.children[1].raw_content == text_file.children[1].raw_content
         assert text_file_copy.children[1].id != text_file.children[1].id
         assert text_file_copy.children[1].created == text_file.children[1].created
         # INFO - G.M - 2019-04-30 - check if both recursive
@@ -1922,7 +1896,7 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
-            api2.update_content(content2, "this is an updated page", "new content")
+            api2.update_content(content2, "this is an updated page", new_raw_content="new content")
         api2.save(content2)
         transaction.commit()
 
@@ -1932,14 +1906,12 @@ class TestContentApi(object):
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
         updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        eq_(
-            u2id,
-            updated.owner_id,
-            "the owner id should be {} (found {})".format(u2id, updated.owner_id),
+        assert u2id == updated.owner_id, "the owner id should be {} (found {})".format(
+            u2id, updated.owner_id
         )
-        eq_("this is an updated page", updated.label)
-        eq_("new content", updated.description)
-        eq_(ActionDescription.EDITION, updated.revision_type)
+        assert "this is an updated page" == updated.label
+        assert "new content" == updated.raw_content
+        assert ActionDescription.EDITION == updated.revision_type
 
     def test_unit__update__err__status_closed(
         self,
@@ -3173,6 +3145,30 @@ class TestContentApi(object):
 
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
+
+    def test_unit__get_all_query__with_user(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="foo",
+            do_save=True,
+        )
+        assert len(list(api.get_all_query(user=user))) == 1
+        assert len(list(api.get_all_query(user=admin_user))) == 0
 
 
 @pytest.mark.usefixtures("test_fixture")

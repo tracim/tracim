@@ -4,7 +4,8 @@ import classnames from 'classnames'
 import {
   NewMemberForm,
   Avatar,
-  ROLE
+  ROLE,
+  ProfileNavigation
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -22,7 +23,7 @@ export class MemberList extends React.Component {
     return (
       <div className='memberlist' data-cy='memberlist'>
 
-        <div className='memberlist__header subTitle'>
+        <div className='memberlist__header'>
           {props.t('Member List')}
         </div>
 
@@ -56,7 +57,7 @@ export class MemberList extends React.Component {
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>
                         <div className='memberlist__btnadd__button__avatar__icon'>
-                          <i className='fa fa-plus' />
+                          <i className='fas fa-plus' />
                         </div>
                       </div>
 
@@ -85,12 +86,19 @@ export class MemberList extends React.Component {
 
                       <div className='memberlist__list__item__info'>
                         <div className='memberlist__list__item__info__firstColumn'>
-                          <div
-                            className='memberlist__list__item__info__firstColumn__name'
-                            title={m.publicName}
+                          <ProfileNavigation
+                            user={{
+                              userId: m.id,
+                              publicName: m.publicName
+                            }}
                           >
-                            {m.publicName}
-                          </div>
+                            <span
+                              className='memberlist__list__item__info__firstColumn__name'
+                              title={m.publicName}
+                            >
+                              {m.publicName}
+                            </span>
+                          </ProfileNavigation>
 
                           {m.username && (
                             <div
@@ -112,7 +120,7 @@ export class MemberList extends React.Component {
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
                         >
-                          <i className='fa fa-trash-o' />
+                          <i className='far fa-trash-alt' />
                         </div>
                       )}
                     </li>

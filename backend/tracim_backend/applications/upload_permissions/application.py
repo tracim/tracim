@@ -82,7 +82,7 @@ def create_app() -> TracimApplication:
     return UploadPermissionApp(
         label="Upload permission",
         slug="upload_permission",
-        fa_icon="cloud-upload",
+        fa_icon="fas cloud-upload-alt",
         config={},
         main_route="",
     )

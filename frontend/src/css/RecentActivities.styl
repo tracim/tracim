@@ -1,0 +1,20 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.recentActivities
+  background-color veryLightGrey
+  display flex
+  flex-direction column
+  align-items center
+
+.personalRecentActivities
+  @extend .recentActivities
+  width 100%
+  overflow auto
+  height "calc(100vh - %s)" % headerHeight
+
+  & .activityList
+    margin-top 10px
+    margin-bottom 10px
+
+.workspaceRecentActivities
+  @extend .recentActivities

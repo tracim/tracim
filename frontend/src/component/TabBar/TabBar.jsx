@@ -13,7 +13,7 @@ require('./TabBar.styl')
 export const TabBar = props => {
   const spaceType = (
     SPACE_TYPE_LIST.find(type => type.slug === props.currentSpace.accessType) ||
-    { faIcon: 'spinner fa-spin', label: props.t('Unknown space type') }
+    { faIcon: 'fas fa-spinner fa-spin', label: props.t('Unknown space type') }
   )
   return (
     <div className='tabBar'>
@@ -26,19 +26,21 @@ export const TabBar = props => {
 
       <Tab
         page={PAGE.WORKSPACE.DASHBOARD(props.currentSpace.id)}
-        icon='tachometer'
+        icon='fas fa-fw fa-tachometer-alt'
         label={props.t('Dashboard')}
       />
 
-      <Tab
-        page={PAGE.WORKSPACE.ACTIVITY_FEED(props.currentSpace.id)}
-        icon='newspaper-o'
-        label={props.t('Activity feed')}
-      />
+      {props.currentSpace.publicationEnabled && (
+        <Tab
+          page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
+          icon='fas fa-fw fa-stream'
+          label={props.t('Publications')}
+        />
+      )}
 
       <Tab
         page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
-        icon='th'
+        icon='fas fa-fw fa-th'
         label={props.t('Contents')}
       />
     </div>

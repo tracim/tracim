@@ -21,7 +21,9 @@ describe('<FolderAdvanced />', () => {
     t: key => key,
     registerLiveMessageHandlerList: () => { },
     registerCustomEventHandlerList: () => { },
-    i18n: {}
+    i18n: {},
+    isContentInFavoriteList: () => false,
+    loadFavoriteContentList: () => {}
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()

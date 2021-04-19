@@ -1,10 +1,13 @@
 import React from 'react'
 import {
+  ADVANCED_SEARCH_TYPE,
+  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
 import {
@@ -19,7 +22,8 @@ import {
   NOTIFICATION,
   NOTIFICATION_LIST,
   NOTIFICATION_NOT_READ_COUNT,
-  SEARCHED_KEYWORDS,
+  PUBLICATION_THREAD,
+  SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
   USER,
@@ -48,13 +52,16 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
+  WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
-  WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
+  WORKSPACE_SUBSCRIPTION,
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
   CUSTOM_PROPERTIES_SCHEMA,
-  USER_PUBLIC_PROFILE
+  USER_PUBLIC_PROFILE,
+  FAVORITE_LIST,
+  FAVORITE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -62,7 +69,9 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
-  TLM_ENTITY_TYPE
+  TLM_ENTITY_TYPE,
+  CONTENT_TYPE,
+  uploadFile
 } from 'tracim_frontend_lib'
 
 /*
@@ -443,21 +452,6 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceRead = workspaceId => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/read`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'PUT'
-    },
-    actionName: USER_KNOWN_MEMBER_LIST,
-    dispatch
-  })
-}
-
 export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
@@ -604,21 +598,6 @@ export const getContentPathList = (workspaceId, contentId, folderIdList) => disp
       method: 'GET'
     },
     actionName: WORKSPACE_CONTENT_PATH,
-    dispatch
-  })
-}
-
-export const getMyselfWorkspaceRecentActivityList = (workspaceId, beforeId = null) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: WORKSPACE_RECENT_ACTIVITY,
     dispatch
   })
 }
@@ -805,9 +784,9 @@ export const getUserCalendar = userId => dispatch => {
   })
 }
 
-export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
+export const getSimpleSearchResult = (contentTypes, searchString, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchString)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -815,7 +794,7 @@ export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, 
       },
       method: 'GET'
     },
-    actionName: SEARCHED_KEYWORDS,
+    actionName: SEARCHED_STRING,
     dispatch
   })
 }
@@ -892,11 +871,11 @@ export const getNotificationList = (
     nextPageToken = null,
     workspaceId = null,
     includeNotSent = false,
-    activityFeedEvents = false,
+    recentActivitiesEvents = false,
     relatedContentId = null
   }) => async dispatch => {
   const queryParameterList = [
-    activityFeedEvents
+    recentActivitiesEvents
       ? activityExcludedEventTypesParam
       : defaultExcludedEventTypesParam
   ]
@@ -1000,6 +979,21 @@ export const getWorkspaceSubscriptions = userId => dispatch => {
   })
 }
 
+export const getSubscriptions = workspaceId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_SUBSCRIPTION,
+    dispatch
+  })
+}
+
 export const postUserWorkspace = (workspaceId, userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
@@ -1039,7 +1033,8 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
 export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
+  const filename = encodeURIComponent(label.replace(/\//g, '_'))
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${filename}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
@@ -1097,6 +1092,198 @@ export const putUserCustomPropertiesDataSchema = (userId, formData) => dispatch 
       })
     },
     actionName: USER_PUBLIC_PROFILE,
+    dispatch
+  })
+}
+
+const getUTCMidnight = (dateString) => parseISO(`${dateString}T00:00:00Z`)
+
+const getDateRangeParameters = (range, rangeParameterPrefix) => {
+  const rangeParameterList = []
+  if (range.from) {
+    const fromDate = getUTCMidnight(range.from)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const fromDateString = fromDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_from=${fromDateString}`)
+  }
+  if (range.to) {
+    const toDate = getUTCMidnight(range.to)
+    toDate.setDate(toDate.getDate() + 1)
+    // HACK - S.G - 2021-03-09 - Remove milliseconds as the backend
+    // does not handle them, but keep the UTC zone as it is mandatory.
+    const toDateString = toDate.toISOString().split('.')[0] + 'Z'
+    rangeParameterList.push(`${rangeParameterPrefix}_to=${toDateString}`)
+  }
+  return rangeParameterList
+}
+
+export const getAdvancedSearchResult = (
+  searchString,
+  contentTypes,
+  pageNumber,
+  pageSize,
+  showArchived,
+  showDeleted,
+  showActive,
+  searchType,
+  searchFieldList,
+  createdRange,
+  modifiedRange,
+  newestAuthoredContentRange,
+  searchFacets
+) => dispatch => {
+  let queryParameterList = []
+  if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
+  else queryParameterList.push('search_string=*')
+  if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
+  if (Number.isInteger(pageSize)) queryParameterList.push(`size=${pageSize}`)
+  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+  if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
+  if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
+  if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
+    if (contentTypes) queryParameterList.push(`content_types=${contentTypes}`)
+    if (showArchived) queryParameterList.push(`show_archived=${showArchived ? 1 : 0}`)
+    if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
+    if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
+    if (searchFacets) {
+      if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
+      if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
+      if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
+      if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
+      if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+    }
+  }
+  if (searchType === ADVANCED_SEARCH_TYPE.USER) {
+    if (searchFacets && searchFacets.workspace_ids) queryParameterList.push(`workspace_ids=${searchFacets.workspace_ids}`)
+    if (newestAuthoredContentRange) {
+      queryParameterList = queryParameterList.concat(getDateRangeParameters(newestAuthoredContentRange, 'newest_authored_content_date'))
+    }
+  }
+  if (searchType === ADVANCED_SEARCH_TYPE.SPACE) {
+    if (searchFacets && searchFacets.members) queryParameterList.push(`member_ids=${searchFacets.members}`)
+    if (searchFacets && searchFacets.owners) queryParameterList.push(`owner_ids=${searchFacets.owners}`)
+  }
+
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/advanced_search/${searchType}?${queryParameterList.join('&')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: SEARCHED_STRING,
+    dispatch
+  })
+}
+
+export const getPublicationList = (workspaceId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_PUBLICATION_LIST,
+    dispatch
+  })
+}
+
+export const postThreadPublication = (workspaceId, newContentName) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        parent_id: null,
+        content_type: CONTENT_TYPE.THREAD,
+        content_namespace: CONTENT_NAMESPACE.PUBLICATION,
+        label: newContentName
+      })
+    },
+    actionName: PUBLICATION_THREAD,
+    dispatch
+  })
+}
+
+export const postPublicationFile = (workspaceId, content, label) => async dispatch => {
+  const errorMessageList = [
+    { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
+    { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
+    { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
+    { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
+  ]
+  const result = await uploadFile(
+    content,
+    `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/files`,
+    {
+      additionalFormData: {
+        // FIXME - CH - 20210325 - the parent_id should be the same as the parent_id in postPublication()
+        // see https://github.com/tracim/tracim/issues/1180 and https://github.com/tracim/tracim/issues/3937
+        parent_id: 0,
+        label: label,
+        content_namespace: CONTENT_NAMESPACE.PUBLICATION
+      },
+      httpMethod: 'POST',
+      progressEventHandler: () => {},
+      errorMessageList: errorMessageList,
+      defaultErrorMessage: i18n.t('Error while uploading file')
+    }
+  )
+  return result
+}
+
+export const getFavoriteContentList = (userId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: FAVORITE_LIST,
+    dispatch
+  })
+}
+
+export const postContentToFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: { content_id: contentId }
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const deleteContentFromFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents/${contentId}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'DELETE'
+    },
+    actionName: FAVORITE,
     dispatch
   })
 }

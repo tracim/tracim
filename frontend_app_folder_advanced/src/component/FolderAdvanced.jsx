@@ -8,12 +8,12 @@ const FolderAdvanced = props => {
       {props.isArchived && (
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
-            <i className='fa fa-fw fa-archive' />
+            <i className='fas fa-fw fa-archive' />
             {props.t('This folder is archived')}
           </div>
 
           <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
-            <i className='fa fa-fw fa-archive' />
+            <i className='fas fa-fw fa-archive' />
             {props.t('Restore')}
           </button>
         </div>
@@ -22,12 +22,12 @@ const FolderAdvanced = props => {
       {props.isDeleted && (
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
-            <i className='fa fa-fw fa-trash' />
+            <i className='far fa-fw fa-trash-alt' />
             {props.t('This folder is deleted')}
           </div>
 
           <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
-            <i className='fa fa-fw fa-trash' />
+            <i className='far fa-fw fa-trash-alt' />
             {props.t('Restore')}
           </button>
         </div>
@@ -55,7 +55,7 @@ const FolderAdvanced = props => {
               />
 
               <i
-                className={`folder_advanced__content__form__type__icon fa fa-fw fa-${app.fa_icon}`}
+                className={`folder_advanced__content__form__type__icon fas fa-fw fa-${app.fa_icon}`}
                 style={{ color: app.hexcolor }}
               />
 

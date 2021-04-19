@@ -1,6 +1,20 @@
 import React from 'react'
-// require('./HTMLContent.styl') // see https://github.com/tracim/tracim/issues/1156
+import PropTypes from 'prop-types'
+// require('./HTMLContent.styl')
 
-export default (props) => (
-  <article className='html-content' dangerouslySetInnerHTML={{ __html: props.children }} />
+const HTMLContent = (props) => (
+  <article
+    className={props.isTranslated ? 'html-content--translated' : 'html-content'}
+    dangerouslySetInnerHTML={{ __html: props.children }}
+  />
 )
+
+HTMLContent.propTypes = {
+  isTranslated: PropTypes.bool
+}
+
+HTMLContent.defaultPropTypes = {
+  isTranslated: false
+}
+
+export default HTMLContent

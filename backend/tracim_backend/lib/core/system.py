@@ -53,6 +53,7 @@ class SystemApi(object):
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
             webdav_enabled=self._config.WEBDAV__UI__ENABLED,
+            translation_service__enabled=self._config.TRANSLATION_SERVICE__ENABLED,
             webdav_url=urljoin(self._config.WEBDAV__BASE_URL, self._config.WEBDAV__ROOT_PATH),
             collaborative_document_edition=collaborative_document_edition_config,
             content_length_file_size_limit=self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE,
@@ -60,6 +61,7 @@ class SystemApi(object):
             workspaces_number_per_user_limit=self._config.LIMITATION__SHAREDSPACE_PER_USER,
             instance_name=self._config.WEBSITE__TITLE,
             email_required=self._config.EMAIL__REQUIRED,
+            search_engine=self._config.SEARCH__ENGINE,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

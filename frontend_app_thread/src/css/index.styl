@@ -15,10 +15,8 @@
     &__editionmode
       display none
     &__icon
-      .fa-comments-o
+      .fa-comments
         color white
-  .selectStatus
-    margin-right 15px
   .timeline
     margin 0
     width 100%
@@ -27,13 +25,11 @@
       width 100%
       &__content
         width 100%
+        height calc(100% - 175px)
       &__texteditor
         flex 0 0 auto
-  &__rightMenu
-    display flex
-    margin-left auto
 
-@media (max-width: max-xs)
+@media (min-width: min-sm) and (max-width: max-lg)
   .thread
-    &__contentpage__content
-      height calc(100% - 185px) // wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
+    .thread__contentpage__content
+      height calc(100% - 110px)

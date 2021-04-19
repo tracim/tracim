@@ -1,16 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
+import classnames from 'classnames'
+
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
   MentionAutoComplete,
   PromptMessage,
   HTMLContent,
-  TextAreaApp
+  TextAreaApp,
+  TRANSLATION_STATE,
+  TranslateButton
 } from 'tracim_frontend_lib'
-import { translate } from 'react-i18next'
 
 export const HtmlDocument = props => {
+  const isTranslated = props.translationState === TRANSLATION_STATE.TRANSLATED
+  const noteClass = 'html-document__contentpage__textnote__text'
+  const noteClassName = classnames(
+    noteClass,
+    {
+      [`${noteClass}-translated primaryColorBorder`]: isTranslated
+    }
+  )
+
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.displayNotifyAllMessage && (
@@ -26,8 +39,8 @@ export const HtmlDocument = props => {
             </span>
           }
           btnType='link'
-          icon='hand-o-right'
-          btnLabel={<i className='fa fa-times' />}
+          icon='far fa-hand-point-right'
+          btnLabel={<i className='fas fa-times' />}
           onClickBtn={props.onClickCloseNotifyAllMessage}
         />
       )}
@@ -36,7 +49,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is archived')}
           btnType='button'
-          icon='archive'
+          icon='fas fa-archive'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreArchived}
         />
@@ -46,7 +59,7 @@ export const HtmlDocument = props => {
         <PromptMessage
           msg={props.t('This content is deleted')}
           btnType='button'
-          icon='trash'
+          icon='far fa-trash-alt'
           btnLabel={props.t('Restore')}
           onClickBtn={props.onClickRestoreDeleted}
         />
@@ -64,31 +77,38 @@ export const HtmlDocument = props => {
           <PromptMessage
             msg={props.t('You have a pending draft')}
             btnType='link'
-            icon='hand-o-right'
+            icon='far fa-hand-point-right'
             btnLabel={props.t('Resume writing')}
             onClickBtn={props.onClickShowDraft}
           />
         )}
-
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
-            <div className='html-document__contentpage__textnote__version'>
-              {props.t(
-                'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                    ? props.lastVersion
-                    : props.version
-                }
-              )}
-              {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                <div className='html-document__contentpage__textnote__lastversion'>
-                  ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                </div>
-              )}
+            <div className='html-document__contentpage__textnote__top'>
+              <TranslateButton
+                translationState={props.translationState}
+                onClickTranslate={props.onClickTranslateDocument}
+                onClickRestore={props.onClickRestoreDocument}
+                dataCy='htmlDocumentTranslateButton'
+              />
+              <div className='html-document__contentpage__textnote__top__version'>
+                {props.t(
+                  'Version #{{versionNumber}}', {
+                    versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                      ? props.lastVersion
+                      : props.version
+                  }
+                )}
+                {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                  <div className='html-document__contentpage__textnote__top__lastversion'>
+                    ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                  </div>
+                )}
+              </div>
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className='html-document__contentpage__textnote__text'>
-              <HTMLContent>{props.text}</HTMLContent>
+            <div className={noteClassName}>
+              <HTMLContent isTranslated={isTranslated}>{props.text}</HTMLContent>
             </div>
           </div>
         )}
@@ -170,5 +190,8 @@ HtmlDocument.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  isRefreshNeeded: PropTypes.bool
+  isRefreshNeeded: PropTypes.bool,
+  onClickTranslateDocument: PropTypes.func,
+  onClickRestoreDocument: PropTypes.func,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }

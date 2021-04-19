@@ -10,6 +10,6 @@ describe('navigate :: workspace > create_new > thread', function () {
   })
   it('dashboard > button', function () {
     cy.get('.pageWrapperGeneric .dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents .fa-comments').should('be.visible')
   })
 })

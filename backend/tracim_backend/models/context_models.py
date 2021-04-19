@@ -2,10 +2,12 @@
 import base64
 import cgi
 from datetime import datetime
+import enum
 from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
+from urllib.parse import unquote
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -37,6 +39,7 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -62,6 +65,7 @@ class ConfigModel(object):
         email_notification_activated: bool,
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
+        translation_service__enabled: bool,
         webdav_url: str,
         collaborative_document_edition: CollaborativeDocumentEditionConfig,
         content_length_file_size_limit: int,
@@ -69,6 +73,7 @@ class ConfigModel(object):
         workspaces_number_per_user_limit: int,
         instance_name: str,
         email_required: bool,
+        search_engine: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -80,6 +85,8 @@ class ConfigModel(object):
         self.workspaces_number_per_user_limit = workspaces_number_per_user_limit
         self.instance_name = instance_name
         self.email_required = email_required
+        self.search_engine = search_engine
+        self.translation_service__enabled = translation_service__enabled
 
 
 class ErrorCodeModel(object):
@@ -181,8 +188,11 @@ class FileCreation(object):
     Simple parent_id object
     """
 
-    def __init__(self, parent_id: int = 0) -> None:
+    def __init__(
+        self, content_namespace: ContentNamespaces = ContentNamespaces.CONTENT, parent_id: int = 0
+    ) -> None:
         self.parent_id = parent_id
+        self.content_namespace = content_namespace
 
 
 class SetPassword(object):
@@ -376,6 +386,16 @@ class WorkspaceAndUserPath(object):
         self.user_id = user_id
 
 
+class ContentAndUserPath(object):
+    """
+    Paths params with content id and user_id
+    """
+
+    def __init__(self, content_id: int, user_id: int) -> None:
+        self.content_id = content_id
+        self.user_id = user_id
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
@@ -416,6 +436,30 @@ class CommentPath(object):
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
+
+
+class ReactionPath(object):
+    """
+    Paths params with workspace id and content_id and reaction_id model
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, reaction_id: int) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.reaction_id = reaction_id
+
+
+class CommentPathFilename(object):
+    """
+    Paths params with workspace id and content_id and comment_id model
+    and filename, useful to get preview/translation of a comment.
+    """
+
+    def __init__(self, workspace_id: int, content_id: int, comment_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.comment_id = comment_id
+        self.filename = filename
 
 
 class KnownMembersQuery(object):
@@ -467,6 +511,13 @@ class PageQuery(object):
         self.page = page
 
 
+class ContentSortOrder(str, enum.Enum):
+    LABEL_ASC = "label:asc"
+    MODIFIED_ASC = "modified:asc"
+    LABEL_DESC = "label:desc"
+    MODIFIED_DESC = "modified:desc"
+
+
 class ContentFilter(object):
     """
     Content filter model
@@ -474,17 +525,20 @@ class ContentFilter(object):
 
     def __init__(
         self,
-        workspace_id: int = None,
-        complete_path_to_id: int = None,
-        parent_ids: str = None,
-        show_archived: int = 0,
-        show_deleted: int = 0,
-        show_active: int = 1,
-        content_type: str = None,
-        label: str = None,
-        page_nb: int = None,
-        limit: int = None,
-        namespaces_filter: str = None,
+        workspace_id: Optional[int] = None,
+        complete_path_to_id: Optional[int] = None,
+        parent_ids: Optional[str] = None,
+        show_archived: Optional[int] = 0,
+        show_deleted: Optional[int] = 0,
+        show_active: Optional[int] = 1,
+        content_type: Optional[str] = None,
+        label: Optional[str] = None,
+        page_nb: Optional[int] = None,
+        limit: Optional[int] = None,
+        namespaces_filter: Optional[str] = None,
+        sort: Optional[ContentSortOrder] = None,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
         self.namespaces_filter = string_to_list(namespaces_filter, ",", ContentNamespaces)
@@ -497,6 +551,9 @@ class ContentFilter(object):
         self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
+        self.sort = sort or ContentSortOrder.LABEL_ASC
+        self.page_token = page_token
+        self.count = count
 
 
 class ActiveContentFilter(object):
@@ -550,6 +607,7 @@ class WorkspaceUpdate(object):
         agenda_enabled: Optional[bool] = None,
         public_upload_enabled: Optional[bool] = None,
         public_download_enabled: Optional[bool] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -559,6 +617,7 @@ class WorkspaceUpdate(object):
         self.default_user_role = None
         if default_user_role:
             self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.publication_enabled = publication_enabled
 
 
 class WorkspaceCreate(object):
@@ -576,6 +635,7 @@ class WorkspaceCreate(object):
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
         parent_id: Optional[int] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -585,6 +645,7 @@ class WorkspaceCreate(object):
         self.access_type = WorkspaceAccessType(access_type)
         self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
         self.parent_id = parent_id
+        self.publication_enabled = publication_enabled
 
 
 class ContentCreation(object):
@@ -592,10 +653,17 @@ class ContentCreation(object):
     Content creation model
     """
 
-    def __init__(self, label: str, content_type: str, parent_id: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        label: str,
+        content_type: str,
+        content_namespace: ContentNamespaces,
+        parent_id: Optional[int] = None,
+    ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
+        self.content_namespace = content_namespace
 
 
 class CommentCreation(object):
@@ -607,6 +675,15 @@ class CommentCreation(object):
         self.raw_content = raw_content
 
 
+class ReactionCreation(object):
+    """
+    reaction creation model
+    """
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+
 class SetContentStatus(object):
     """
     Set content status
@@ -616,14 +693,20 @@ class SetContentStatus(object):
         self.status = status
 
 
-class TextBasedContentUpdate(object):
+class ContentUpdate(object):
     """
-    TextBasedContent update model
+    Content update model
     """
 
-    def __init__(self, label: str, raw_content: str) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
+        self.description = description
 
 
 class BasePaginatedQuery(object):
@@ -634,6 +717,20 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
+
+
+class UrlQuery:
+    def __init__(self, url: str):
+        self.url = unquote(url)
+
+
+class TranslationQuery:
+    def __init__(
+        self, source_language_code: str, target_language_code: str, force_download: int = 0,
+    ):
+        self.source_language_code = source_language_code
+        self.target_language_code = target_language_code
+        self.force_download = force_download
 
 
 class LiveMessageQuery(BasePaginatedQuery):
@@ -690,10 +787,17 @@ class FolderContentUpdate(object):
     Folder Content update model
     """
 
-    def __init__(self, label: str, raw_content: str, sub_content_types: List[str]) -> None:
+    def __init__(
+        self,
+        label: Optional[str] = None,
+        raw_content: Optional[str] = None,
+        sub_content_types: Optional[List[str]] = None,
+        description: Optional[str] = None,
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
+        self.description = description
 
 
 class Agenda(object):
@@ -923,6 +1027,10 @@ class WorkspaceInContext(object):
     def parent_id(self) -> int:
         return self.workspace.parent_id
 
+    @property
+    def publication_enabled(self) -> bool:
+        return self.workspace.publication_enabled
+
 
 class UserRoleWorkspaceInContext(object):
     """
@@ -1046,7 +1154,7 @@ class ContentInContext(object):
 
     @property
     def content_namespace(self) -> ContentNamespaces:
-        return self.content.content_namespace.value
+        return self.content.content_namespace
 
     @property
     def parent(self) -> Optional["ContentInContext"]:
@@ -1070,6 +1178,13 @@ class ContentInContext(object):
         p = self.parent
         if p:
             return p.content_type
+        return None
+
+    @property
+    def parent_content_namespace(self) -> Optional[ContentNamespaces]:
+        p = self.parent
+        if p:
+            return p.content_namespace
         return None
 
     @property
@@ -1185,6 +1300,10 @@ class ContentInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.content.raw_content
+
+    @property
+    def description(self) -> str:
         return self.content.description
 
     @property
@@ -1285,7 +1404,7 @@ class ContentInContext(object):
         :return: size of content if available, None if unavailable
         """
         if not self.content.depot_file:
-            return None
+            return len(self.raw_content)
         try:
             return self.content.depot_file.file.content_length
         except IOError:
@@ -1296,7 +1415,11 @@ class ContentInContext(object):
             logger.warning(
                 self, "Unknown Exception Occured when trying to get content size", exc_info=True
             )
-        return None
+        # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
+        # avoid broken search (both simple and elasticsearch)
+        # when broken content exist (content without valid depot file)
+        # see #4267 for better solution.
+        return 0
 
     @property
     def has_pdf_preview(self) -> bool:
@@ -1371,6 +1494,15 @@ class ContentInContext(object):
 
         api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
         return len(api.get_content_shares(self.content))
+
+    @property
+    def content_path(self) -> List["ContentInContext"]:
+        return [
+            ContentInContext(
+                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
+            )
+            for component in self.content.content_path
+        ]
 
 
 class RevisionInContext(object):
@@ -1460,6 +1592,10 @@ class RevisionInContext(object):
 
     @property
     def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @property
+    def description(self) -> str:
         return self.revision.description
 
     @property
@@ -1661,13 +1797,20 @@ class RevisionInContext(object):
 
 
 class PaginatedObject(object):
-    def __init__(self, page: Page) -> None:
-        self.previous_page_token = page.paging.bookmark_previous
-        self.next_page_token = page.paging.bookmark_next
-        self.has_previous = page.paging.has_previous
-        self.has_next = page.paging.has_next
-        self.per_page = page.paging.per_page
-        self.items = page
+    def __init__(self, page: Page, items: Optional[list] = None) -> None:
+        self.items = items or page
+        if page.paging:
+            self.previous_page_token = page.paging.bookmark_previous
+            self.next_page_token = page.paging.bookmark_next
+            self.has_previous = page.paging.has_previous
+            self.has_next = page.paging.has_next
+            self.per_page = page.paging.per_page
+        else:
+            self.previous_page_token = ""
+            self.next_page_token = ""
+            self.has_previous = False
+            self.has_next = False
+            self.per_page = len(self.items)
 
 
 T = TypeVar("T")
@@ -1732,3 +1875,35 @@ class AuthoredContentRevisionsInfos:
     def __init__(self, revisions_count: int, revisions_space_count: int) -> None:
         self.count = revisions_count
         self.space_count = revisions_space_count
+
+
+class FavoriteContentInContext:
+    """
+    Favorite Content objet for api, permitting to override content with the correct filter
+    """
+
+    def __init__(self, favorite_content: FavoriteContent, content: Content):
+        self._favorite_content = favorite_content
+        self._content = content
+
+    @property
+    def user_id(self) -> int:
+        return self._favorite_content.user_id
+
+    @property
+    def content_id(self) -> int:
+        return self._favorite_content.content_id
+
+    @property
+    def content(self) -> ContentInContext:
+        # INFO - G.M - 2021-03-24 - Overriding the content of the favorite content in order to
+        # handle access limitation here.
+        return self._content
+
+    @property
+    def original_label(self) -> str:
+        return self._favorite_content.original_label
+
+    @property
+    def original_type(self) -> str:
+        return self._favorite_content.original_type

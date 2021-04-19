@@ -40,6 +40,7 @@ from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import worker_context
@@ -61,19 +62,18 @@ from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import ReactionSchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
-
-RQ_QUEUE_NAME = "event"
 
 JsonDict = Dict[str, Any]
 
@@ -81,15 +81,16 @@ JsonDict = Dict[str, Any]
 class EventApi:
     """Api to query event & messages"""
 
-    user_schema = UserSchema()
+    user_schema = UserDigestSchema()
     workspace_schema = WorkspaceSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: TextBasedContentSchema(),
+        HTML_DOCUMENTS_TYPE: ContentSchema(),
         FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: TextBasedContentSchema(),
-        THREAD_TYPE: TextBasedContentSchema(),
+        FOLDER_TYPE: ContentSchema(),
+        THREAD_TYPE: ContentSchema(),
     }
+    reaction_schema = ReactionSchema()
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
@@ -105,17 +106,20 @@ class EventApi:
         if event_types:
             event_type_filters = []
             for event_type in event_types:
-                if event_type.subtype:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                        Event.entity_subtype == event_type.subtype,
-                    )
+                if event_type.operation:
+                    if event_type.subtype:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                            Event.entity_subtype == event_type.subtype,
+                        )
+                    else:
+                        event_type_filter = and_(
+                            Event.entity_type == event_type.entity,
+                            Event.operation == event_type.operation,
+                        )
                 else:
-                    event_type_filter = and_(
-                        Event.entity_type == event_type.entity,
-                        Event.operation == event_type.operation,
-                    )
+                    event_type_filter = Event.entity_type == event_type.entity
 
                 event_type_filters.append(event_type_filter)
 
@@ -136,8 +140,8 @@ class EventApi:
         read_status: ReadStatus = ReadStatus.ALL,
         event_id: Optional[int] = None,
         user_id: Optional[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_author_ids: Optional[List[int]] = None,
         after_event_id: int = 0,
         workspace_ids: Optional[List[int]] = None,
@@ -146,18 +150,12 @@ class EventApi:
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
-            query = query.filter(
-                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
-            )
+            query = query.filter(Event.workspace["workspace_id"].as_integer().in_(workspace_ids))
         if related_to_content_ids:
             query = query.filter(
                 or_(
-                    Event.fields[Event.CONTENT_FIELD]["content_id"]
-                    .as_integer()
-                    .in_(related_to_content_ids),
-                    Event.fields[Event.CONTENT_FIELD]["parent_id"]
-                    .as_integer()
-                    .in_(related_to_content_ids),
+                    Event.content["content_id"].as_integer().in_(related_to_content_ids),
+                    Event.content["parent_id"].as_integer().in_(related_to_content_ids),
                 )
             )
         if not include_not_sent:
@@ -177,40 +175,18 @@ class EventApi:
         query = self._filter_event_types(query, include_event_types, False)
         query = self._filter_event_types(query, exclude_event_types, True)
 
-        if exclude_event_types:
-            event_type_filters = []
-            for event_type in exclude_event_types:
-                if event_type.subtype:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                        Event.entity_subtype != event_type.subtype,
-                    )
-                else:
-                    event_type_filter = or_(
-                        Event.entity_type != event_type.entity,
-                        Event.operation != event_type.operation,
-                    )
-
-                event_type_filters.append(event_type_filter)
-
-            if len(event_type_filters) > 1:
-                query = query.filter(and_(*event_type_filters))
-            else:
-                query = query.filter(event_type_filters[0])
-
         if exclude_author_ids:
             for author_id in exclude_author_ids:
                 # RJ & SG - 2020-09-11 - HACK
-                # We wanted to use Event.fields["author"] == JSON.NULL instead of this
+                # We wanted to use Event.author == JSON.NULL instead of this
                 # soup involving a cast and a get out of my way text("'null'") to
                 # know whether a JSON field is null. However, this does not work on
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
                 query = query.filter(
                     or_(
-                        cast(Event.fields["author"], String) == text("'null'"),
-                        Event.fields["author"]["user_id"].as_integer() != author_id,
+                        cast(Event.author, String) == text("'null'"),
+                        Event.author["user_id"].as_integer() != author_id,
                     )
                 )
 
@@ -259,8 +235,8 @@ class EventApi:
         user_id: int,
         read_status: ReadStatus,
         exclude_author_ids: List[int] = None,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         count: Optional[int] = DEFAULT_NB_ITEM_PAGINATION,
         page_token: Optional[int] = None,
         include_not_sent: bool = False,
@@ -283,9 +259,9 @@ class EventApi:
         self,
         user_id: int,
         read_status: ReadStatus,
-        include_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_event_types: List[EventTypeDatabaseParameters] = None,
-        exclude_author_ids: List[int] = None,
+        include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
+        exclude_author_ids: Optional[List[int]] = None,
         include_not_sent=False,
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
@@ -350,7 +326,7 @@ class EventApi:
             Message.receiver_id == user_id
         )
         workspace_event_ids_query = session.query(Event.event_id).filter(
-            Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_(workspace_ids)
+            Event.workspace["workspace_id"].as_integer().in_(workspace_ids)
         )
         if max_messages_count >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
@@ -367,9 +343,17 @@ class EventApi:
         )
         messages = []
         for event in event_query:
-            receiver_ids = BaseLiveMessageBuilder._get_receiver_ids_callables[event.entity_type](
-                event, session, self._config
-            )
+            try:
+                receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
+            except KeyError as exc:
+                # NOTE - 2021-02-03 - S.G.
+                # Safeguard easy mistakes due to changing JSON structure of fields
+                msg = (
+                    "Event {} is missing key '{}' in one of its fields, "
+                    "ignoring it during historic messages creation"
+                ).format(event.event_id, exc)
+                logger.warning(self, msg)
+                receiver_ids = []
             if user_id in receiver_ids:
                 messages.append(
                     Message(
@@ -667,6 +651,19 @@ class EventBuilder:
     ) -> None:
         self._create_subscription_event(OperationType.DELETED, subscription, context)
 
+    # Reaction events
+    @hookimpl
+    def on_reaction_created(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.CREATED, reaction, context)
+
+    @hookimpl
+    def on_reaction_modified(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.MODIFIED, reaction, context)
+
+    @hookimpl
+    def on_reaction_deleted(self, reaction: Reaction, context: TracimContext) -> None:
+        self._create_reaction_event(OperationType.DELETED, reaction, context)
+
     def _create_subscription_event(
         self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
@@ -689,6 +686,37 @@ class EventBuilder:
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _create_reaction_event(
+        self, operation: OperationType, reaction: Reaction, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(reaction.content.workspace_id)
+        )
+        content_api = ContentApi(context.dbsession, current_user, self._config)
+        content_in_context = content_api.get_content_in_context(reaction.content)
+        content_schema = EventApi.get_content_schema_for_type(reaction.content.type)
+        content_dict = content_schema.dump(content_in_context).data
+
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        reaction_author_in_context = user_api.get_user_with_context(reaction.author)
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
+            Event.CONTENT_FIELD: content_dict,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.REACTION,
             operation=operation,
             additional_fields=fields,
             context=context,
@@ -748,7 +776,13 @@ def _get_workspace_event_receiver_ids(
 ) -> Set[int]:
     # Two cases: if workspace is accessible every user should get a message
     # If not, only administrators + members + user subject of the action (for user role events)
-    if WorkspaceAccessType(event.workspace["access_type"]) in Workspace.ACCESSIBLE_TYPES:
+    try:
+        access_type = WorkspaceAccessType(event.workspace["access_type"])
+    except KeyError:
+        # NOTE 2021/01/10 - S.G
+        # Spaces without access_type are necessarily CONFIDENTIAL
+        access_type = WorkspaceAccessType.CONFIDENTIAL
+    if access_type in Workspace.ACCESSIBLE_TYPES:
         user_api = UserApi(current_user=None, session=session, config=config)
         receiver_ids = set(user.user_id for user in user_api.get_all())
     else:
@@ -789,6 +823,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+        EntityType.REACTION: _get_content_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:
@@ -800,6 +835,15 @@ class BaseLiveMessageBuilder(abc.ABC):
     ) -> None:
         """Register a function used to get receiver user ids for a given entity type."""
         cls._get_receiver_ids_callables[entity_type] = get_receiver_ids_callable
+
+    @classmethod
+    def get_receiver_ids(cls, event: Event, session: Session, config: CFG) -> Iterable[int]:
+        """Get the list of user ids that should recieve the given event."""
+        try:
+            get_receiver_ids = cls._get_receiver_ids_callables[event.entity_type]
+        except KeyError:
+            raise ValueError("Unknown entity type {}".format(event.entity_type))
+        return get_receiver_ids(event, session, config)
 
     @contextlib.contextmanager
     @abc.abstractmethod
@@ -814,7 +858,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         with self.context() as context:
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
-            receiver_ids = self._get_receiver_ids(event, session)
+            receiver_ids = self.get_receiver_ids(event, session, self._config)
 
             messages = [
                 Message(
@@ -830,13 +874,6 @@ class BaseLiveMessageBuilder(abc.ABC):
             for message in messages:
                 live_message_lib.publish_message_to_user(message)
 
-    def _get_receiver_ids(self, event: Event, session: Session) -> Iterable[int]:
-        try:
-            get_receiver_ids = self._get_receiver_ids_callables[event.entity_type]
-            return get_receiver_ids(event, session, self._config)
-        except KeyError:
-            raise ValueError("Unknown entity type {}".format(event.entity_type))
-
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
     """"Live message building + sending executed in a RQ job."""
@@ -851,10 +888,12 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
     def publish_messages_for_event(self, event_id: int) -> None:
         redis_connection = get_redis_connection(self._config)
-        queue = get_rq_queue(redis_connection, RQ_QUEUE_NAME)
+        queue = get_rq_queue(redis_connection, RqQueueName.EVENT)
         logger.debug(
             self,
-            "publish event(id={}) asynchronously to RQ queue {}".format(event_id, RQ_QUEUE_NAME),
+            "publish event(id={}) asynchronously to RQ queue {}".format(
+                event_id, RqQueueName.EVENT
+            ),
         )
         queue.enqueue(self._publish_messages_for_event, event_id)
 

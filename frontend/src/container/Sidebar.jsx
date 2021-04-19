@@ -91,21 +91,27 @@ export class Sidebar extends React.Component {
     )
   }
 
-  getSidebarItem = (label, to) => {
+  getSidebarItem = (label, icon, to) => {
     return (
       <Link
         className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
           {
             'sidebar__content__navigation__item__current primaryColorBorder':
               this.props.location.pathname.endsWith(to)
-          })}
+          }
+        )}
         to={to}
       >
         <div
           className='sidebar__content__navigation__item__name'
           title={label}
         >
-          <Icon icon='newspaper-o' title={label} color='white' />&nbsp;{label}
+          <Icon
+            icon={icon}
+            title={label}
+            color='white'
+          />
+          &nbsp;{label}
         </div>
       </Link>
     )
@@ -163,8 +169,8 @@ export class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
-            ? <i className={classnames('fa fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fa fa-chevron-left')} title={props.t('Hide sidebar')} />}
+            ? <i className={classnames('fas fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fas fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
         <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
@@ -172,7 +178,7 @@ export class Sidebar extends React.Component {
             FIXME - CH - 2019-04-04 - button scroll to top removed for now
             see https://github.com/tracim/tracim/issues/1554
             <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
-              <i className='fa fa-chevron-up' />
+              <i className='fas fa-chevron-up' />
             </div>
             */}
 
@@ -180,7 +186,8 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
-                {this.getSidebarItem(props.t('Activity feed'), PAGE.ACTIVITY_FEED)}
+                {this.getSidebarItem(props.t('Recent activities'), 'far fa-fw fa-newspaper', PAGE.RECENT_ACTIVITIES)}
+                {this.getSidebarItem(props.t('Favorites'), 'far fa-fw fa-star', PAGE.FAVORITES)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
@@ -193,7 +200,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickNewWorkspace}
                     dataCy='sidebarCreateWorkspaceBtn'
-                    icon='plus'
+                    icon='fas fa-plus'
                     text={props.t('Create a space')}
                     mode='light'
                   />
@@ -202,7 +209,7 @@ export class Sidebar extends React.Component {
                   <IconButton
                     onClick={this.handleClickJoinWorkspace}
                     dataCy='sidebarJoinWorkspaceBtn'
-                    icon='users'
+                    icon='fas fa-users'
                     text={props.t('Join a space')}
                     intent='primary'
                     mode='light'

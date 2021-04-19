@@ -207,6 +207,12 @@ const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments) => 
     .reply(200, comments)
 }
 
+const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication`)
+    .reply(200, files)
+}
+
 const mockGetContent200 = (apiUrl, contentId, content) => {
   return nock(apiUrl)
     .get(`/contents/${contentId}`)
@@ -225,7 +231,27 @@ const mockGetContentPath200 = (apiUrl, workspaceId, contentId, contentPath) => {
     .reply(200, { items: contentPath })
 }
 
+const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`)
+    .reply(200, { items: publicationList })
+}
+
+const mockPostThreadPublication204 = (apiUrl, workspaceId) => {
+  return nock(apiUrl)
+    .post(`/workspaces/${workspaceId}/contents`)
+    .reply(204)
+}
+
+const mockGenericGetContent400 = (apiUrl, workspaceId, contentId) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}`)
+    .reply(400, {})
+}
+
 export {
+  mockGetFileChildContent200,
+  mockGetPublicationList200,
   mockGetWorkspaceDetail200,
   mockGetWorkspaceMemberList200,
   mockGetMyselfWorkspaceList200,
@@ -256,5 +282,7 @@ export {
   mockGetContentComments200,
   mockGetContent200,
   mockGetFileContent400,
-  mockGetContentPath200
+  mockGetContentPath200,
+  mockPostThreadPublication204,
+  mockGenericGetContent400
 }

@@ -56,7 +56,7 @@ class ShareFolder extends React.Component {
               title={props.t('Folder')}
               style={{ color: (props.contentType.find(c => c.slug === 'folder') || { hexcolor: '' }).hexcolor }}
             >
-              <i className={classnames('fa fa-fw', this.getIcon())} />
+              <i className={classnames('fas fa-fw', this.getIcon())} />
             </div>
 
             <div className='folder__header__name'>
@@ -68,7 +68,7 @@ class ShareFolder extends React.Component {
             <div className='d-none d-md-flex' title={props.t('Actions')}>
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <DropdownMenu
-                  buttonIcon='fa-ellipsis-h'
+                  buttonIcon='fas fa-ellipsis-h'
                   buttonCustomClass='extandedaction outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
                   buttonDataCy='extended_action'
                   isButton
@@ -77,7 +77,7 @@ class ShareFolder extends React.Component {
                     className='transparentButton'
                     onClick={this.handleClickOpenShareFolderApp}
                   >
-                    <i className='fa fa-fw fa-pencil' />
+                    <i className='fas fa-fw fa-pencil-alt' />
                     {props.t('Manage')}
                   </button>
                 </DropdownMenu>

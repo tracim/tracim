@@ -2,16 +2,21 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    % if website_description:
+    <meta name="description" content="${website_description}" />
+    % endif
     <title>${website_title}</title>
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}" nonce="${csp_nonce}">
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}" nonce="${csp_nonce}">
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="manifest" href="/assets/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
-    <link rel="stylesheet" type="text/css" href="/assets/font/font-awesome-4.7.0/css/font-awesome.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
     <style nonce="${csp_nonce}">
       <%
@@ -25,6 +30,7 @@
         param = "color"
         color_change_value = 15
       %>
+
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
@@ -74,7 +80,7 @@
       }
 
       body {
-        font-family: "Quicksand";
+        font-family: Quicksand;
       }
     </style>
 
@@ -86,7 +92,10 @@
 
   <body>
     <div id="content"></div>
-
+    <!-- NOTE - SG - 2021-03-23 - changing the id of this div must be propagated to the login page component.
+         Currently it is Login.jsx.
+      -->
+    <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/tracim_frontend_lib.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>

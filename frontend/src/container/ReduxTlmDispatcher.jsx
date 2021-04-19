@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 import {
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -8,6 +9,7 @@ import {
   ACCESSIBLE_SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
 import {
+  newFlashMessage,
   addNotification,
   addWorkspaceContentList,
   addWorkspaceMember,
@@ -28,7 +30,11 @@ import {
   removeWorkspaceSubscription,
   updateWorkspaceSubscription
 } from '../action-creator.sync.js'
-import { getContent } from '../action-creator.async.js'
+import {
+  getContent,
+  getUser
+} from '../action-creator.async.js'
+import { cloneDeep } from 'lodash'
 
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can use the TracimComponent
 // HOC like apps would do. It also allow using connect() from redux which adds the props dispatch().
@@ -90,7 +96,10 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
-    if (this.props.user.userId !== data.fields.author.user_id && !GLOBAL_excludedNotifications.some(type => data.event_type.startsWith(type))) {
+    if (
+      this.props.user.userId !== data.fields.author.user_id &&
+      !GLOBAL_excludedNotifications.some(type => data.event_type.startsWith(type))
+    ) {
       this.props.dispatch(addNotification(data))
     }
   }
@@ -172,7 +181,8 @@ export class ReduxTlmDispatcher extends React.Component {
         content: {
           ...data.fields.content,
           parent_label: response.json.label,
-          parent_content_type: response.json.content_type
+          parent_content_type: response.json.content_type,
+          parent_content_namespace: response.json.content_namespace
         }
       }
     }
@@ -201,10 +211,31 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleUserModified = data => {
+  fetchUserDetail = async () => {
     const { props } = this
-    props.dispatch(updateUser(data.fields.user))
-    this.handleNotification(data)
+    const fetchGetUser = await props.dispatch(getUser(props.user.userId))
+    if (fetchGetUser.ok) return fetchGetUser.json
+    props.dispatch(newFlashMessage(props.t('Error while loading user')))
+    return null
+  }
+
+  handleUserModified = async (data) => {
+    const { props } = this
+
+    let newData
+
+    if (data.fields.user.user_id === props.user.userId) {
+      const updatedUser = await this.fetchUserDetail(props.user.userId)
+      if (updatedUser) {
+        newData = cloneDeep(data)
+        newData.fields.user = updatedUser
+      }
+    } else {
+      newData = data
+    }
+
+    props.dispatch(updateUser(newData.fields.user))
+    this.handleNotification(newData)
   }
 
   handleUserChanged = data => {
@@ -241,4 +272,4 @@ export class ReduxTlmDispatcher extends React.Component {
 }
 
 const mapStateToProps = ({ workspaceContentList, user }) => ({ workspaceContentList, user })
-export default connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher))
+export default translate()(connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher)))

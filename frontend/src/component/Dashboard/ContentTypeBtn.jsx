@@ -1,33 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
-import classnames from 'classnames'
-const color = require('color')
+import { IconButton } from 'tracim_frontend_lib'
 
 require('./ContentTypeBtn.styl')
 
 export const ContentTypeBtn = props =>
-  <div
-    className={classnames(`${props.customClass}`, 'contentTypeBtn')}
-    data-cy={`contentTypeBtn_${props.appSlug}`}
-    style={{
-      backgroundColor: props.hexcolor,
-      ':hover': {
-        backgroundColor: color(props.hexcolor).darken(0.15).hex()
-      }
-    }}
+  <IconButton
+    text={props.creationLabel}
+    icon={props.faIcon}
+    title={props.creationLabel}
+    type='button'
+    iconColor={props.hexcolor}
     onClick={props.onClickBtn}
-  >
-    <div className={classnames(`${props.customClass}__text`)}>
-      <div className={classnames(`${props.customClass}__text__icon`)}>
-        <i className={`fa fa-${props.faIcon}`} />
-      </div>
-      <div className={classnames(`${props.customClass}__text__title`)}>
-        {props.creationLabel}
-      </div>
-    </div>
-  </div>
-
+    intent='secondary'
+    mode='dark'
+  />
 export default Radium(ContentTypeBtn)
 
 ContentTypeBtn.propTypes = {

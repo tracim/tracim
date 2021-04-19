@@ -19,7 +19,9 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import User  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
 from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
+from tracim_backend.models.favorites import FavoriteContent  # noqa: F401
 from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
+from tracim_backend.models.reaction import Reaction  # noqa: F401
 from tracim_backend.models.tracim_session import TracimSession
 
 if typing.TYPE_CHECKING:

@@ -1,8 +1,8 @@
 import { PAGES, URLS } from '../../support/urls_commands.js'
 
 const activityPages = [
-  { name: 'Personal', page: PAGES.ACTIVITY_FEED, initialItemCount: 3 },
-  { name: 'Space', page: PAGES.WORKSPACE_ACTIVITY_FEED, initialItemCount: 1 }
+  { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
+  { name: 'Space', page: PAGES.WORKSPACE_RECENT_ACTIVITIES, initialItemCount: 1 }
 ]
 
 const fileName2 = 'png_exemple2.png'
@@ -16,7 +16,7 @@ const fileType = 'image/png'
 
 for (const pageTestCase of activityPages) {
   const { name, page, initialItemCount } = pageTestCase
-  describe(`The ${name} activity feed page`, () => {
+  describe(`The ${name} recent activities page`, () => {
     let workspaceId = null
     beforeEach(() => {
       cy.resetDB()
@@ -36,6 +36,11 @@ for (const pageTestCase of activityPages) {
         }
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
+
+      afterEach(function () {
+        cy.cancelXHR()
+      })
+
       it('should display a "See more" button when more than 15 activities exist', () => {
         cy.get('[data-cy=activityList__item]').should('have.length.gte', 15)
         cy.get('[data-cy=activityList__more]').click()
@@ -44,16 +49,23 @@ for (const pageTestCase of activityPages) {
     })
 
     describe('List', () => {
+      let firstContentId = null
       beforeEach(() => {
+        cy.createFile(fileImage, fileType, fileName2, workspaceId).then(content => {
+          firstContentId = content.content_id
+        })
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
 
+      afterEach(function () {
+        cy.cancelXHR()
+      })
+
       it('should have items', () => {
-        cy.get('[data-cy=activityList__item]').should('have.length', initialItemCount)
+        cy.get('[data-cy=activityList__item]').should('have.length', initialItemCount + 1)
       })
 
       it('should add an item in first position when a file is created', () => {
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
         cy.get('[data-cy=activityList__item]')
           .first()
@@ -61,44 +73,35 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should update an already existing item when a comment for its content is posted', () => {
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
-        cy.get('[data-cy=activityList__item]')
-          .first()
-          .should('contain.text', 'modified')
-        cy.postComment(workspaceId, 1, 'A comment')
+        cy.postComment(workspaceId, firstContentId, 'A comment')
         cy.contains('[data-cy=activityList__item]', fileName2WithoutExtention)
           .should('contain.text', 'commented')
       })
 
       // FIXME - GB - 2020-12-29 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3392
       it.skip('should be reordered only when the "Refresh" button is pressed', () => {
-        let firstContentId = null
-        cy.createFile(fileImage, fileType, fileName2, workspaceId)
-          .then(content => {
-            firstContentId = content.content_id
-            cy.createFile(fileImage, fileType, fileName3, workspaceId).then(() => {
-              cy.get('[data-cy=activityList__item]')
-                .should('have.length', initialItemCount + 2)
-                .first()
-                .contains(fileName3WithoutExtention)
+        cy.createFile(fileImage, fileType, fileName3, workspaceId).then(() => {
+          cy.get('[data-cy=activityList__item]')
+            .should('have.length', initialItemCount + 2)
+            .first()
+            .contains(fileName3WithoutExtention)
 
-              cy.get('[data-cy=activityList__refresh]').should('not.exist')
+          cy.get('[data-cy=activityList__refresh]').should('not.exist')
 
-              cy.postComment(workspaceId, firstContentId, 'A comment').then(() => {
-                cy.get('[data-cy=activityList__item]')
-                  .first()
-                  .should('contain.text', fileName3WithoutExtention)
+          cy.postComment(workspaceId, firstContentId, 'A comment').then(() => {
+            cy.get('[data-cy=activityList__item]')
+              .first()
+              .should('contain.text', fileName3WithoutExtention)
 
-                cy.get('[data-cy=activityList__refresh]')
-                  .click()
+            cy.get('[data-cy=activityList__refresh]')
+              .click()
 
-                cy.get('[data-cy=activityList__item]')
-                  .first()
-                  .should('contain.text', fileName2WithoutExtention)
-              })
-            })
+            cy.get('[data-cy=activityList__item]')
+              .first()
+              .should('contain.text', fileName2WithoutExtention)
           })
+        })
       })
     })
 
@@ -109,24 +112,23 @@ for (const pageTestCase of activityPages) {
         cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
 
-      it('should have a "Comment" button, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityFooter__comment]').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
+      afterEach(function () {
+        cy.cancelXHR()
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=contentActivityHeader__label]').click()
+        cy.get('[data-cy=FilenameWithExtension__label]').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a preview, clicking on it opens the content', () => {
-        cy.get('.activityFeed__preview__image > img').click()
+        cy.get('.feedItem__preview__image > img').click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
       })
 
       it('should have a button on last activity, clicking on it opens a short history', () => {
-        cy.get('[data-cy=contentActivityTimedEvent] > .dropdown').click()
-        cy.get('[data-cy=contentActivityTimedEvent] .dropdownMenu').should('exist')
+        cy.get('[data-cy=feedItemTimedEvent] > .dropdown').click()
+        cy.get('[data-cy=feedItemTimedEvent] .dropdownMenu').should('exist')
       })
     })
 
@@ -141,6 +143,10 @@ for (const pageTestCase of activityPages) {
         })
       })
 
+      afterEach(function () {
+        cy.cancelXHR()
+      })
+
       it('should render a small note without the visual overflow', () => {
         cy.updateHtmlDocument(
           contentId,
@@ -149,11 +155,11 @@ for (const pageTestCase of activityPages) {
           contentName
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.activityFeed__preview__overflow').should('not.exist')
+        cy.get('.feedItem__preview__overflow').should('not.exist')
 
-        cy.get('.activityFeed__preview__html')
+        cy.get('.feedItem__preview__html')
           .should('contain.text', smallContent)
       })
 
@@ -176,15 +182,21 @@ for (const pageTestCase of activityPages) {
             ‘It is easy’, It was saying. ‘The trick is that’
             And the Voice stopped speaking. The Light went away.
             I went back to the Holy Randomly Failing Tests.
+            After a few hours,
+            Just when I was about to give up,
+            I realized:
+            My test was just missing a few text lines.
+            So here I am,
+            Writing the final piece.
           </pre>`,
           'The Holy Tests'
         )
 
-        cy.visitPage({ pageName: PAGES.ACTIVITY_FEED, params: { workspaceId }, waitForTlm: true })
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
 
-        cy.get('.activityFeed__preview__overflow').should('be.visible')
+        cy.get('.feedItem__preview__overflow').should('be.visible')
 
-        cy.get('.activityFeed__preview__html')
+        cy.get('.feedItem__preview__html')
           .click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId }))
       })

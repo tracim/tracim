@@ -19,7 +19,6 @@ class ContentThreadApp(TracimApplication):
             label="Thread",
             creation_label="Start a topic",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=False,
             file_extension=".thread.html",
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=self,
@@ -50,7 +49,7 @@ def create_app() -> TracimApplication:
     return ContentThreadApp(
         label="Threads",
         slug="contents/{}".format(THREAD_TYPE),
-        fa_icon="comments-o",
+        fa_icon="far fa-comments",
         config={},
         main_route="",
     )

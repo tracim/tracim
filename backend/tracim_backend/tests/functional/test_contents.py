@@ -6,13 +6,16 @@ from PIL import Image
 import dateutil.parser
 from depot.io.utils import FileIntent
 import pytest
+import responses
 import transaction
 
 from tracim_backend.error import ErrorCode
+from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -307,7 +310,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         headers = {"X-Tracim-ClientToken": "justaclienttoken"}
@@ -342,7 +345,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         modified_event = event_helper.last_event
@@ -375,7 +378,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -408,7 +411,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         res = web_testapp.put_json(
@@ -443,7 +446,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -476,7 +479,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -515,7 +518,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set(
             [content_type_list.Folder.slug, content_type_list.Thread.slug]
         )
@@ -541,7 +544,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -574,7 +577,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
         params = {
@@ -613,7 +616,7 @@ class TestFolder(object):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p> Le nouveau contenu </p>"
+        assert content["description"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])
 
     def test_api__update_folder__err_400__label_already_used(
@@ -644,7 +647,7 @@ class TestFolder(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "already_used",
-            "raw_content": "<p> Le nouveau contenu </p>",
+            "description": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
         res = web_testapp.put_json(
@@ -677,7 +680,7 @@ class TestFolder(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.update_content(
-                folder, new_label="test-folder-updated", new_content="Just a test"
+                folder, new_label="test-folder-updated", new_raw_content="Just a test"
             )
         content_api.save(folder)
         with new_revision(session=session, tm=transaction.manager, content=folder):
@@ -1058,7 +1061,7 @@ class TestHtmlDocuments(object):
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
     @pytest.mark.parametrize("content_raw_data", ["<b>a first html comment</b>"])
-    def test_api__get_thread_html_preview__ok__200__nominal_case(
+    def test_api__get_html_document_html_preview__ok__200__nominal_case(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -1081,7 +1084,9 @@ class TestHtmlDocuments(object):
             do_notify=False,
         )
         with new_revision(session=session, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(test_html_document, "test_page", content_raw_data)
+            content_api.update_content(
+                test_html_document, "test_page", new_raw_content=content_raw_data
+            )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
@@ -1090,7 +1095,7 @@ class TestHtmlDocuments(object):
             ),
             status=200,
         )
-        binary_content_raw_data = test_html_document.description.encode("utf-8")
+        binary_content_raw_data = test_html_document.raw_content.encode("utf-8")
         assert res.body == binary_content_raw_data
         assert res.content_length == len(binary_content_raw_data)
         assert res.charset == "UTF-8"
@@ -1288,6 +1293,60 @@ class TestHtmlDocuments(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
+
+    def test_api__get_html_document_revision__ok_200__nominal_case(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+    ) -> None:
+        """
+        Get a specific revision of an html content
+        """
+        content_label = "test_page"
+        content_raw_content = "<b>html content</b>"
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=business_workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=content_raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/revisions/{}".format(
+                business_workspace.workspace_id,
+                test_html_document.content_id,
+                test_html_document.revision_id,
+            ),
+            status=200,
+        )
+        revision = res.json_body
+        assert revision["content_type"] == "html-document"
+        assert revision["content_id"] == test_html_document.content_id
+        assert revision["is_archived"] is False
+        assert revision["is_deleted"] is False
+        assert revision["is_editable"] is True
+        assert revision["label"] == content_label
+        assert revision["parent_id"] is None
+        assert revision["show_in_ui"] is True
+        assert revision["status"] == "open"
+        assert revision["workspace_id"] == business_workspace.workspace_id
+        assert revision["revision_id"] == test_html_document.revision_id
+        assert revision["revision_type"] == "edition"
+        assert revision["sub_content_types"]
+        assert revision["comment_ids"] == []
+        assert revision["created"]
+        assert revision["author"]
+        assert revision["author"]["user_id"] == 1
+        assert revision["author"]["has_avatar"] is False
+        assert revision["author"]["public_name"] == "Global manager"
+        assert revision["author"]["username"] == "TheAdmin"
 
     def test_api__get_html_document_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """
@@ -1549,7 +1608,7 @@ class TestFiles(object):
         assert content["mimetype"] == ""
         assert content["file_extension"] == ""
         assert content["filename"] == "Test file"
-        assert content["size"] is None
+        assert content["size"] == 0
         assert content["page_nb"] is None
         assert content["has_pdf_preview"] is False
         assert content["has_jpeg_preview"] is False
@@ -2337,6 +2396,7 @@ class TestFiles(object):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
+    @pytest.mark.parametrize("content_namespace", ["content", "publication"])
     def test_api__create_file__ok__200__nominal_case(
         self,
         workspace_api_factory,
@@ -2345,6 +2405,7 @@ class TestFiles(object):
         web_testapp,
         admin_user,
         event_helper,
+        content_namespace: str,
     ) -> None:
         """
         create one file of a content at workspace root
@@ -2358,6 +2419,7 @@ class TestFiles(object):
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
+            params={"content_namespace": content_namespace},
             status=200,
         )
         res = res.json_body
@@ -2366,7 +2428,7 @@ class TestFiles(object):
         assert res["is_archived"] is False
         assert res["is_deleted"] is False
         assert res["is_editable"] is True
-        assert res["content_namespace"] == "content"
+        assert res["content_namespace"] == content_namespace
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
         content_id = res["content_id"]
@@ -2377,7 +2439,7 @@ class TestFiles(object):
         (created_event, modified_event) = event_helper.last_events(2)
         assert created_event.event_type == "content.created.file"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert created_event.author == author
+        assert created_event.author == UserDigestSchema().dump(author).data
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
@@ -2415,7 +2477,7 @@ class TestFiles(object):
         assert content["is_archived"] is False
         assert content["is_deleted"] is False
         assert content["is_editable"] is True
-        assert content["content_namespace"] == "content"
+        assert content["content_namespace"] == content_namespace
         assert content["workspace_id"] == business_workspace.workspace_id
         assert isinstance(content["content_id"], int)
         assert content["status"] == "open"
@@ -2424,6 +2486,52 @@ class TestFiles(object):
         assert content["author"]["user_id"] == admin_user.user_id
         assert content["page_nb"] == 1
         assert content["mimetype"] == "image/png"
+
+    def test_api__create_file_as_publication__err__400__publications_disabled(
+        self, workspace_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        create one file of a content at workspace root
+        """
+
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(
+            label="No publication", publication_enabled=False
+        )
+        transaction.commit()
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.post(
+            "/api/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            params={"content_namespace": "publication"},
+            status=400,
+        )
+        assert res.json_body["code"] == 2072
+
+    def test_api__create_thread_as_publication__err__400__publications_disabled(
+        self, workspace_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        create one file of a content at workspace root
+        """
+
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(
+            label="No publication", publication_enabled=False
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/contents".format(workspace.workspace_id),
+            params={
+                "content_namespace": "publication",
+                "label": "content",
+                "content_type": "thread",
+            },
+            status=400,
+        )
+        assert res.json_body["code"] == 2072
 
     def test_api__create_file__err_400__filename_already_used(
         self, workspace_api_factory, content_api_factory, session, web_testapp
@@ -2536,6 +2644,74 @@ class TestFiles(object):
 
         res = res.json_body
         assert res["parent_id"] == folder.content_id
+        assert res["content_type"] == "file"
+        assert res["is_archived"] is False
+        assert res["is_deleted"] is False
+        assert res["is_editable"] is True
+        assert res["workspace_id"] == business_workspace.workspace_id
+        assert isinstance(res["content_id"], int)
+        assert res["status"] == "open"
+        assert res["label"] == "test_image"
+        assert res["slug"] == "test-image"
+        assert res["author"]["user_id"] == admin_user.user_id
+        assert res["page_nb"] == 1
+        assert res["mimetype"] == "image/png"
+
+    def test_api__create_file__ok__200__in_file(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+    ) -> None:
+        """
+        create one file content in another file
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        parent_file = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"parent_id": parent_file.content_id}
+        image = create_1000px_png_test_image()
+        res = web_testapp.post(
+            "/api/workspaces/{}/files".format(business_workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            params=params,
+            status=200,
+        )
+        res = res.json_body
+        assert res["parent_id"] == parent_file.content_id
+        assert res["content_type"] == "file"
+        assert res["is_archived"] is False
+        assert res["is_deleted"] is False
+        assert res["is_editable"] is True
+        assert res["workspace_id"] == business_workspace.workspace_id
+        assert isinstance(res["content_id"], int)
+        content_id = res["content_id"]
+        assert res["status"] == "open"
+        assert res["label"] == "test_image"
+        assert res["slug"] == "test-image"
+
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/files/{content_id}".format(
+                workspace_id=business_workspace.workspace_id, content_id=content_id
+            ),
+            status=200,
+        )
+
+        res = res.json_body
+        assert res["parent_id"] == parent_file.content_id
         assert res["content_type"] == "file"
         assert res["is_archived"] is False
         assert res["is_deleted"] is False
@@ -2670,7 +2846,7 @@ class TestFiles(object):
         assert last_event.content["sub_content_types"] == res["sub_content_types"]
         assert last_event.content["workspace_id"] == res["workspace_id"]
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == author
+        assert last_event.author == UserDigestSchema().dump(author).data
         workspace = web_testapp.get("/api/workspaces/1", status=200,).json_body
         assert last_event.workspace == workspace
 
@@ -2987,7 +3163,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3065,7 +3241,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3516,7 +3692,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3595,7 +3771,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -4049,7 +4225,7 @@ class TestThreads(object):
         res = web_testapp.get(
             "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=400
         )
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
@@ -4358,7 +4534,7 @@ class TestThreads(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_content="Just a test"
+                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
             )
         content_api.save(test_thread)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
@@ -4716,3 +4892,138 @@ class TestOwnerLimitedContentSize(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+)
+class TestContentTranslation(object):
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_html_document_revision_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get revision translation of a html-content
+        """
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/revisions/{}/translated/{}".format(
+                workspace.workspace_id,
+                test_html_document.content_id,
+                test_html_document.revision_id,
+                translation_filename,
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "raw_content,translated_raw_content,original_lang,destination_lang",
+        (
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "en", "fr"),
+            ("<b>Hello !</b>", "<b>Bonjour !</b>", "auto", "fr"),
+        ),
+    )
+    def test_api__get_html_document_translation__ok__nominal_case(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        raw_content,
+        translated_raw_content,
+        original_lang,
+        destination_lang,
+    ):
+        """
+        Get content translation of a html-content
+        """
+        BASE_API_URL = "https://systran_fake_server.invalid:5050"
+        responses.add(
+            responses.POST,
+            "{}{}".format(BASE_API_URL, FILE_TRANSLATION_ENDPOINT),
+            body=translated_raw_content,
+            status=200,
+            content_type="text/html",
+            stream=True,
+        )
+        translation_filename = "translation.html"
+        content_label = "test_page"
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test")
+        content_api = content_api_factory.get()
+        test_html_document = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label=content_label,
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+            content_api.update_content(
+                test_html_document, content_label, new_raw_content=raw_content
+            )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/workspaces/{}/html-documents/{}/translated/{}".format(
+                workspace.workspace_id, test_html_document.content_id, translation_filename
+            ),
+            params={
+                "source_language_code": original_lang,
+                "target_language_code": destination_lang,
+            },
+            status=200,
+        )
+        assert res.body.decode("utf-8") == translated_raw_content
+        assert res.content_type == "text/html"

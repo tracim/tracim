@@ -2,7 +2,7 @@ export const file = {
   label: 'Files',
   slug: 'contents/file',
   isActive: true,
-  faIcon: 'paperclip',
+  faIcon: 'fas fa-paperclip',
   hexcolor: '#ffa500',
   config: {}
 }

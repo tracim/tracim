@@ -12,12 +12,12 @@ require('./TimedEvent.styl')
 
 const TimedEvent = (props) => {
   const topContents = (
-    <div key={`timedEvent-${props.date}`}>
+    <div key={`timedEvent-${props.date}`} className='timedEvent__topContents'>
       {props.operation && (
         <span className={classnames('timedEvent__operation', { rootTimedEvent__operation: props.isRoot })}>
-          {props.operation}
+          {props.operation}&nbsp;
         </span>
-      )}&nbsp;
+      )}
       <DistanceDate absoluteDate={props.date} lang={props.lang} />
     </div>
   )
@@ -41,18 +41,20 @@ const TimedEvent = (props) => {
       className={classnames('timedEvent', props.customClass, { rootTimedEvent: props.isRoot })}
       data-cy={props.dataCy}
     >
-      {props.onEventClicked
-        ? (
-          <DropdownMenu
-            buttonCustomClass='timedEvent__top'
-            buttonClick={props.onEventClicked} // eslint-disable-line
-            buttonOpts={topContents}
-            buttonTooltip=''
-          >
-            {props.eventList.map(createHistoryTimedEvent)}
-          </DropdownMenu>
-        )
-        : <div>{topContents}</div>}
+      {
+        props.onEventClicked
+          ? (
+            <DropdownMenu
+              buttonCustomClass='timedEvent__top'
+              buttonClick={props.onEventClicked} // eslint-disable-line
+              buttonOpts={topContents}
+              buttonTooltip=''
+            >
+              {props.eventList.map(createHistoryTimedEvent)}
+            </DropdownMenu>
+          )
+          : <div>{topContents}</div>
+      }
       <div className='timedEvent__bottom'>
         {props.t('by')}&nbsp;
         <ProfileNavigation user={props.author}>

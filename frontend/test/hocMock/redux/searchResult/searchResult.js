@@ -2,10 +2,10 @@ import { firstWorkspaceFromApi } from '../../../fixture/workspace/firstWorkspace
 import { userFromApi } from '../user/user.js'
 
 export const searchResult = {
-  currentNumberPage: 1,
+  currentPage: 1,
   numberResultsByPage: 10,
-  searchedKeywords: 'word',
-  resultsList: [
+  searchString: 'word',
+  resultList: [
     {
       modified: '2020-06-12T16:05:08Z',
       created: '2020-06-12T13:17:56Z',
@@ -17,7 +17,7 @@ export const searchResult = {
       isActive: true,
       score: 1,
       status: 'closed-unvalidated',
-      parents: [],
+      path: [{ content_id: 28, content_type: 'html-document', label: 'word8', slug: 'word8' }],
       subContentTypes: ['comment'],
       showInUi: true,
       fileExtension: '.document.html',
@@ -39,15 +39,13 @@ export const searchResult = {
       author: userFromApi,
       workspace: firstWorkspaceFromApi,
       label: 'word',
-      parent: null,
+      path: [{ content_id: 31, content_type: 'thread', label: 'word', slug: 'word' }],
       isActive: true,
       score: 1,
       status: 'open',
-      parents: [],
       subContentTypes: ['comment'],
       showInUi: true,
       fileExtension: '.thread.html',
-      parentId: null,
       slug: 'word',
       isArchived: false,
       isDeleted: false,
@@ -59,4 +57,11 @@ export const searchResult = {
       workspaceId: 1
     }
   ]
+}
+
+export const emptySearchResult = {
+  currentPage: 1,
+  numberResultsByPage: 10,
+  searchString: 'void',
+  resultList: []
 }

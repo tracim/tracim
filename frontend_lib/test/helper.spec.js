@@ -8,6 +8,8 @@ import {
   generateFetchResponse,
   parserStringToList,
   removeAtInUsername,
+  splitFilenameExtension,
+  removeExtensionOfFilename,
   FETCH_CONFIG,
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
@@ -81,7 +83,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         handleFetchResult(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })
@@ -97,7 +99,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         handleFetchResult(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })
@@ -115,7 +117,7 @@ describe('helper.js', () => {
       })
       fetchResult.then((response) => {
         generateFetchResponse(response).then((result) => {
-          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json() })
+          expect(result).to.eql({ apiResponse: response, body: cloneFetchResult.json(), ok: response.ok })
         }).then(done, done)
       })
     })
@@ -130,6 +132,24 @@ describe('helper.js', () => {
 
       expect(substringList).to.deep.equal(parserStringToList(string, separatorList))
     })
+  })
+
+  describe('the removeExtensionOfFilename and splitFilenameExtension', () => {
+    const testCases = [
+      ['withoutextension', 'withoutextension', ''],
+      ['image.jpg', 'image', '.jpg'],
+      ['image.hello.jpg', 'image.hello', '.jpg'],
+      ['archive.tar.gz', 'archive', '.tar.gz'],
+      ['archive.hello.tar.gz', 'archive.hello', '.tar.gz'],
+      ['archive.tar.tar.gz', 'archive.tar', '.tar.gz']
+    ]
+
+    for (const [filename, basename, extension] of testCases) {
+      it(`Correctly splits ${filename} into ${basename} and ${extension}`, () => {
+        expect(removeExtensionOfFilename(filename)).to.equal(basename)
+        expect(splitFilenameExtension(filename)).to.deep.equal({ basename, extension })
+      })
+    }
   })
 
   describe('the removeAtInUsername() function', () => {

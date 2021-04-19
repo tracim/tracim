@@ -27,11 +27,11 @@ describe('<ThumbnailPreview />', () => {
     describe('image state', () => {
       it('should not display the loading spinner when the image is already loaded', () => {
         wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADED })
-        expect(wrapper.find('i.fa.fa-spinner.fa-spin')).to.have.lengthOf(0)
+        expect(wrapper.find('i.fas.fa-spinner.fa-spin')).to.have.lengthOf(0)
       })
       it('should display the loading spinner when the image is not loaded yet', () => {
         wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADING })
-        expect(wrapper.find('i.fa.fa-spinner.fa-spin')).to.have.lengthOf(1)
+        expect(wrapper.find('i.fas.fa-spinner.fa-spin')).to.have.lengthOf(1)
         wrapper.setState({ imageLoaded: IMG_LOAD_STATE.LOADED })
       })
       it('should display the error icon when the file can not have a preview', () => {

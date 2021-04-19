@@ -13,7 +13,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 def html_document(
-    workspace_api_factory, content_api_factory, session, label, description
+    workspace_api_factory, content_api_factory, session, label, raw_content
 ) -> Content:
     workspace_api = workspace_api_factory.get()
     workspace = workspace_api.create_workspace(label="Foobar")
@@ -22,9 +22,9 @@ def html_document(
     # NOTE: MySQL and MariaDB have a maximum of 65536 bytes for description,
     # so the size is chosen accordingly
     if session.connection().dialect.name in ("mysql", "mariadb"):
-        description = 65000 * "a"
+        raw_content = 65000 * "a"
     else:
-        description = 2000000 * "a"
+        raw_content = 2000000 * "a"
     html_document = content_api.create(
         content_type_slug="html-document",
         workspace=workspace,
@@ -33,7 +33,7 @@ def html_document(
         do_notify=False,
     )
     with new_revision(session=session, tm=transaction.manager, content=html_document):
-        content_api.update_content(html_document, new_content=description, new_label=label)
+        content_api.update_content(html_document, new_raw_content=raw_content, new_label=label)
         content_api.save(html_document)
     transaction.commit()
     return html_document
@@ -100,7 +100,7 @@ def one_thread(content_api_factory, content_type_list, workspace_api_factory, se
     )
     with new_revision(session=session, tm=transaction.manager, content=test_thread):
         content_api.update_content(
-            test_thread, new_label="test_thread_updated", new_content="Just a test"
+            test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
         )
     transaction.commit()
     return test_thread
@@ -162,7 +162,6 @@ class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):
-
         headers = {"Accept": "text/event-stream"}
         response = requests.get(
             "http://localhost:7999/api/users/1/live_messages",
@@ -194,6 +193,37 @@ class TestLiveMessages(object):
         assert result["fields"]["author"]
         assert result["fields"]["author"]["user_id"] == 1
         assert event1.event == "message"
+
+    @pytest.mark.pushpin
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__check_email_leaked(
+        self, pushpin, app_config
+    ):
+        headers = {"Accept": "text/event-stream"}
+        response = requests.get(
+            "http://localhost:7999/api/users/1/live_messages",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            stream=True,
+            headers=headers,
+        )
+        client = sseclient.SSEClient(response)
+        client_events = client.events()
+        # INFO - G.M - 2020-06-29 - Skip first event
+        next(client_events)
+        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+        update_user_request = requests.put(
+            "http://localhost:7999/api/users/1",
+            auth=("admin@admin.admin", "admin@admin.admin"),
+            json=params,
+        )
+        assert update_user_request.status_code == 200
+        event1 = next(client_events)
+        response.close()
+        result = json.loads(event1.data)
+        # verify no email are leaked
+        assert not result["fields"]["user"].get("email")
+        assert not result["fields"]["author"].get("email")
+        assert str(result).find("@") == -1
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize(

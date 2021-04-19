@@ -10,6 +10,6 @@ describe('navigate :: workspace > create_new > html-document', function () {
   it('test all button', function () {
     cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.pageWrapperGeneric .dashboard__workspace__detail').should('be.visible')
-    cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents .fa-file-alt').should('be.visible')
   })
 })

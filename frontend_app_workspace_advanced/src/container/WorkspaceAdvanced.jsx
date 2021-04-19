@@ -38,7 +38,8 @@ import {
   putMemberRole,
   deleteMember,
   postWorkspaceMember,
-  getAppList
+  getAppList,
+  putPublicationEnabled
 } from '../action.async.js'
 import Radium from 'radium'
 import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
@@ -318,7 +319,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description', 'warning'))
     }
   }
 
@@ -412,6 +413,29 @@ export class WorkspaceAdvanced extends React.Component {
           newDownloadEnabledValue
             ? props.t('Error while activating download')
             : props.t('Error while deactivating download'),
+          'warning'
+        )
+    }
+  }
+
+  handleTogglePublicationEnabled = async () => {
+    const { props, state } = this
+    const newPublicationEnabledValue = !state.content.publication_enabled
+
+    const fetchTogglePublicationEnabled = await handleFetchResult(await putPublicationEnabled(state.config.apiUrl, state.content, newPublicationEnabledValue))
+
+    switch (fetchTogglePublicationEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newPublicationEnabledValue ? props.t('Publications activated') : props.t('Publications deactivated'),
+          'info'
+        )
+        break
+      default:
+        this.sendGlobalFlashMessage(
+          newPublicationEnabledValue
+            ? props.t('Error while activating publications')
+            : props.t('Error while deactivating publications'),
           'warning'
         )
     }
@@ -636,7 +660,7 @@ export class WorkspaceAdvanced extends React.Component {
     const subscriptionObject = {
       id: 'subscriptions_requests',
       label: props.t('Requests to join the space'),
-      icon: 'fa-sign-in',
+      icon: 'fas fa-sign-in-alt',
       children: (
         <PopinFixedRightPartContent
           label={props.t('Requests to join the space')}
@@ -668,6 +692,8 @@ export class WorkspaceAdvanced extends React.Component {
             uploadEnabled={state.content.public_upload_enabled}
             appUploadAvailable={state.content.appUploadAvailable}
             onToggleUploadEnabled={this.handleToggleUploadEnabled}
+            publicationEnabled={state.content.publication_enabled}
+            onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
           />
         </PopinFixedRightPartContent>
       )

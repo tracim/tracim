@@ -17,7 +17,7 @@ export class UsersSelectField extends React.Component {
 
   componentDidMount = () => {
     this.fetchUsers().catch((r) => {
-      this.sendGlobalFlashMessage('Error while fetch users')
+      this.sendGlobalFlashMessage('Error while fetching users')
     })
   }
 

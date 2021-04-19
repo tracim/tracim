@@ -8,7 +8,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   PageWrapper,
   PageContent,
-  convertBackslashNToBr,
+  IconButton,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ROLE,
@@ -16,16 +16,15 @@ import {
   PROFILE,
   buildHeadTitle,
   PAGE,
-  removeAtInUsername
+  removeAtInUsername,
+  SPACE_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
-  getMyselfWorkspaceRecentActivityList,
-  getMyselfWorkspaceReadStatusList,
   getMyselfKnownMember,
+  getSubscriptions,
   postWorkspaceMember,
-  putMyselfWorkspaceRead,
   deleteWorkspaceMember,
   putMyselfWorkspaceDoNotify,
   getLoggedUserCalendar
@@ -34,9 +33,6 @@ import {
   newFlashMessage,
   setWorkspaceDetail,
   setWorkspaceMemberList,
-  setWorkspaceRecentActivityList,
-  appendWorkspaceRecentActivityList,
-  setWorkspaceReadStatusList,
   updateUserWorkspaceSubscriptionNotif,
   setWorkspaceAgendaUrl,
   setBreadcrumbs,
@@ -45,15 +41,16 @@ import {
 import appFactory from '../util/appFactory.js'
 import {
   FETCH_CONFIG,
+  publicationColor,
   findUserRoleIdInWorkspace
 } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
-import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
+import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
@@ -79,7 +76,8 @@ export class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false
+      displayWebdavBtn: false,
+      newSubscriptionRequestsNumber: 0
     }
 
     props.registerCustomEventHandlerList([
@@ -88,7 +86,9 @@ export class Dashboard extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified }
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.CREATED, handler: this.handleNewSubscriptionRequest },
+      { entityType: TLM_ET.SHAREDSPACE_SUBSCRIPTION, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSubscriptionRequestModified }
     ])
   }
 
@@ -109,7 +109,7 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadRecentActivity()
+    this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -117,7 +117,6 @@ export class Dashboard extends React.Component {
     const { props } = this
 
     if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
-
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
@@ -136,7 +135,7 @@ export class Dashboard extends React.Component {
     })
     await this.loadWorkspaceDetail()
     this.loadMemberList()
-    this.loadRecentActivity()
+    this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
 
@@ -191,23 +190,34 @@ export class Dashboard extends React.Component {
     }
   }
 
-  loadRecentActivity = async () => {
+  loadNewRequestNumber = async () => {
     const { props } = this
 
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(props.match.params.idws))
-    const fetchWorkspaceReadStatusList = await props.dispatch(getMyselfWorkspaceReadStatusList(props.match.params.idws))
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
+    if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
 
-    switch (fetchWorkspaceRecentActivityList.status) {
-      case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+    const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
+    switch (fetchGetWorkspaceSubscriptions.status) {
+      case 200: {
+        const filteredSubscriptionRequestList = fetchGetWorkspaceSubscriptions.json.filter(subscription => subscription.state === 'pending')
+        this.setState({ newSubscriptionRequestsNumber: filteredSubscriptionRequestList.length })
+        break
+      }
       case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('new requests')}`, 'warning')); break
     }
+  }
 
-    switch (fetchWorkspaceReadStatusList.status) {
-      case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
-    }
+  handleNewSubscriptionRequest = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
+    this.setState(prev => ({ newSubscriptionRequestsNumber: prev.newSubscriptionRequestsNumber + 1 }))
+  }
+
+  handleSubscriptionRequestModified = (data) => {
+    if (data.fields.workspace.workspace_id !== this.props.currentWorkspace.id) return
+    data.fields.subscription.state === 'pending'
+      ? this.setState(prev => ({ newSubscriptionRequestsNumber: prev.newSubscriptionRequestsNumber + 1 }))
+      : this.setState(prev => ({ newSubscriptionRequestsNumber: prev.newSubscriptionRequestsNumber - 1 }))
   }
 
   setHeadTitle = () => {
@@ -244,27 +254,6 @@ export class Dashboard extends React.Component {
   handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
-
-  handleClickMarkRecentActivityAsRead = async () => {
-    const { props } = this
-    const fetchUserWorkspaceAllRead = await props.dispatch(putMyselfWorkspaceRead(props.curWs.id))
-    switch (fetchUserWorkspaceAllRead.status) {
-      case 204: this.loadRecentActivity(); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while setting "mark all as read"')}`, 'warning')); break
-    }
-  }
-
-  handleClickSeeMore = async () => {
-    const { props, state } = this
-
-    const lastRecentActivityId = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
-
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl, lastRecentActivityId))
-    switch (fetchWorkspaceRecentActivityList.status) {
-      case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
-    }
-  }
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
@@ -409,7 +398,7 @@ export class Dashboard extends React.Component {
         {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: ''
         },
@@ -449,7 +438,18 @@ export class Dashboard extends React.Component {
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
-    const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
+    let contentTypeButtonList = []
+    if (props.curWs.publicationEnabled) {
+      contentTypeButtonList.push({
+        slug: 'publications',
+        creationLabel: props.t('Publish some information'),
+        route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
+        hexcolor: publicationColor,
+        faIcon: 'fas fa-stream'
+      })
+    }
+
+    contentTypeButtonList = contentTypeButtonList.concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
@@ -496,6 +496,7 @@ export class Dashboard extends React.Component {
           }
         })
       : []
+    )
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
@@ -505,6 +506,8 @@ export class Dashboard extends React.Component {
       route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
+
+    const description = props.curWs.description.trim()
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -517,24 +520,57 @@ export class Dashboard extends React.Component {
 
             <PageContent>
               <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__detail'>
-                  <div
-                    className='dashboard__workspace__detail__title primaryColorFont'
-                    data-cy='dashboardWorkspaceLabel'
-                  >
-                    {props.curWs.label}
-                  </div>
+                <div className='dashboard__workspace__content'>
 
-                  <div
-                    className='dashboard__workspace__detail__description'
-                    dangerouslySetInnerHTML={{ __html: convertBackslashNToBr(props.curWs.description) }}
+                  <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
+
+                  <div className='dashboard__workspace__detail'>
+                    {(description
+                      ? (
+                        <div
+                          className='dashboard__workspace__detail__description'
+                          dangerouslySetInnerHTML={{ __html: description }}
+                        />
+                      )
+                      : (
+                        <div className='dashboard__workspace__detail__description__missing'>
+                          {props.t("This space doesn't have a description yet.")}
+                        </div>
+                      )
+                    )}
+                    <div className='dashboard__workspace__detail__buttons'>
+                      {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
+                        <IconButton
+                          icon='fas fa-fw fa-cog'
+                          text={props.t('Space settings')}
+                          onClick={this.handleClickOpenAdvancedDashboard}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
+                </div>
+
+                <div className='dashboard__workspace__rightMenu'>
+                  <UserStatus
+                    user={props.user}
+                    curWs={props.curWs}
+                    displayNotifBtn={props.system.config.email_notification_activated}
+                    displaySubscriptionRequestsInformation={
+                      userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
+                      props.curWs.accessType === SPACE_TYPE.onRequest.slug
+                    }
+                    newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
+                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                    onClickAddNotify={this.handleClickAddNotification}
+                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    t={props.t}
                   />
 
-                  <div className='dashboard__calltoaction'>
+                  <div className='dashboard__workspace__rightMenu__contents'>
                     {contentTypeButtonList.map(app => {
                       return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
-                          customClass='dashboard__calltoaction__button'
                           hexcolor={app.hexcolor}
                           label={app.label}
                           faIcon={app.faIcon}
@@ -549,92 +585,55 @@ export class Dashboard extends React.Component {
                       )
                     })}
                   </div>
-                </div>
 
-                <div className='dashboard__workspace__detail__right'>
-                  {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
-                    <button
-                      type='button'
-                      className='dashboard__workspace__detail__right__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                      onClick={this.handleClickOpenAdvancedDashboard}
-                    >
-                      <i className='fa fa-fw fa-cog' />
-                      {props.t('Open advanced Dashboard')}
-                    </button>
-                  )}
-
-                  <UserStatus
-                    user={props.user}
-                    curWs={props.curWs}
-                    displayNotifBtn={props.system.config.email_notification_activated}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                  <MemberList
+                    customClass='dashboard__memberlist'
+                    loggedUser={props.user}
+                    apiUrl={FETCH_CONFIG.apiUrl}
+                    memberList={props.curWs.memberList}
+                    roleList={ROLE_LIST}
+                    searchedKnownMemberList={state.searchedKnownMemberList}
+                    autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                    publicName={state.newMember.publicName}
+                    isEmail={state.newMember.isEmail}
+                    onChangePersonalData={this.handleChangePersonalData}
+                    onClickKnownMember={this.handleClickKnownMember}
+                    // createAccount={state.newMember.createAccount}
+                    // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
+                    role={state.newMember.role}
+                    onChangeRole={this.handleChangeNewMemberRole}
+                    onClickValidateNewMember={this.handleClickValidateNewMember}
+                    displayNewMemberForm={state.displayNewMemberForm}
+                    onClickAddMemberBtn={this.handleClickAddMemberBtn}
+                    onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
+                    onClickRemoveMember={this.handleClickRemoveMember}
+                    userRoleIdInWorkspace={userRoleIdInWorkspace}
+                    canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
+                    emailNotifActivated={props.system.config.email_notification_activated}
+                    autoCompleteClicked={state.autoCompleteClicked}
+                    onClickAutoComplete={this.handleClickAutoComplete}
                     t={props.t}
                   />
+
+                  {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
+                    <AgendaInfo
+                      customClass='dashboard__section'
+                      introText={props.t('Use this link to integrate this agenda to your')}
+                      caldavText={props.t('CalDAV compatible software')}
+                      agendaUrl={props.curWs.agendaUrl}
+                    />
+                  )}
+
+                  {props.system.config.webdav_enabled && (
+                    <WebdavInfo
+                      customClass='dashboard__section'
+                      introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                      webdavText={props.t('(protocole WebDAV)')}
+                      webdavUrl={props.system.config.webdav_url}
+                    />
+                  )}
                 </div>
               </div>
-
-              <div className='dashboard__workspaceInfo'>
-                <RecentActivity
-                  customClass='dashboard__activity'
-                  workspaceId={props.curWs.id}
-                  roleIdForLoggedUser={userRoleIdInWorkspace}
-                  recentActivityList={props.curWs.recentActivityList}
-                  readByUserList={props.curWs.contentReadStatusList}
-                  contentTypeList={props.contentType}
-                  onClickMarkAllAsRead={this.handleClickMarkRecentActivityAsRead}
-                  onClickSeeMore={this.handleClickSeeMore}
-                  t={props.t}
-                />
-
-                <MemberList
-                  customClass='dashboard__memberlist'
-                  loggedUser={props.user}
-                  apiUrl={FETCH_CONFIG.apiUrl}
-                  memberList={props.curWs.memberList}
-                  roleList={ROLE_LIST}
-                  searchedKnownMemberList={state.searchedKnownMemberList}
-                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  publicName={state.newMember.publicName}
-                  isEmail={state.newMember.isEmail}
-                  onChangePersonalData={this.handleChangePersonalData}
-                  onClickKnownMember={this.handleClickKnownMember}
-                  // createAccount={state.newMember.createAccount}
-                  // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
-                  role={state.newMember.role}
-                  onChangeRole={this.handleChangeNewMemberRole}
-                  onClickValidateNewMember={this.handleClickValidateNewMember}
-                  displayNewMemberForm={state.displayNewMemberForm}
-                  onClickAddMemberBtn={this.handleClickAddMemberBtn}
-                  onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
-                  onClickRemoveMember={this.handleClickRemoveMember}
-                  userRoleIdInWorkspace={userRoleIdInWorkspace}
-                  canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
-                  emailNotifActivated={props.system.config.email_notification_activated}
-                  autoCompleteClicked={state.autoCompleteClicked}
-                  onClickAutoComplete={this.handleClickAutoComplete}
-                  t={props.t}
-                />
-              </div>
-
-              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
-                <AgendaInfo
-                  customClass='dashboard__section'
-                  introText={props.t('Use this link to integrate this agenda to your')}
-                  caldavText={props.t('CalDAV compatible software')}
-                  agendaUrl={props.curWs.agendaUrl}
-                />
-              )}
-
-              {props.system.config.webdav_enabled && (
-                <WebdavInfo
-                  customClass='dashboard__section'
-                  introText={props.t('Use this link to integrate Tracim in your file explorer')}
-                  webdavText={props.t('(protocole WebDAV)')}
-                  webdavUrl={props.system.config.webdav_url}
-                />
-              )}
             </PageContent>
           </PageWrapper>
         </div>

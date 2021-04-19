@@ -1,0 +1,56 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.publications
+  overflow auto
+  height 100%
+  & .ScrollToBottomContents
+    height 100%
+    display flex
+    flex-direction column
+  &__empty
+    font-weight bold
+    margin-inline-start 10px
+    margin-top 10px
+  & .feedItem
+    margin-block-start 15px
+    margin-block-end 15px
+  &__reorder
+    margin auto auto 10px
+  &__publishArea
+    display flex
+    flex-direction column
+    margin-top auto
+    padding 10px
+    & textarea
+      width 100%
+      order 2
+      &:focus
+        outline-color #661F98
+    & .mce-container
+      order 2
+    & .autocomplete
+      order 1
+    &__buttons
+      display flex
+      justify-content space-between
+      margin-top 10px
+      order 3
+      > :last-child
+        margin-inline-start auto
+      &__submit .iconbutton__icon
+        margin-inline-end 8px
+      &__left
+        &__advancedEdition
+          margin-inline-end auto
+          font-size fontSizeSmall
+      &__right
+        display flex
+        & .AddFileToCommentButton
+          padding 3px 6px
+
+@media (max-width: max-xs)
+  .publications
+    &__publishArea__buttons__advancedEdition
+      display none
+    .pageContentGeneric
+      padding 5px 0

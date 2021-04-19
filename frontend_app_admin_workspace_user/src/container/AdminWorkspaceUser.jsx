@@ -189,27 +189,43 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
+  getDetailedUser = async (user) => {
+    const fetchUserDetail = await handleFetchResult(await getUserDetail(this.state.config.apiUrl, user.user_id))
+
+    if (!fetchUserDetail.apiResponse.ok) {
+      this.displayErrorFetchingUserList()
+      return null
+    }
+
+    return fetchUserDetail.body
+  }
+
+  displayErrorFetchingUserList () {
+    this.sendGlobalFlashMsg(this.props.t('Error while loading users list'), 'warning')
+  }
+
   loadUserContent = async () => {
-    const { props, state } = this
+    const fetchUserList = await handleFetchResult(await getUserList(this.state.config.apiUrl))
 
-    const userList = await handleFetchResult(await getUserList(state.config.apiUrl))
-
-    switch (userList.apiResponse.status) {
+    switch (fetchUserList.apiResponse.status) {
       case 200: {
-        const fetchUserDetailList = await Promise.all(
-          userList.body.map(async u =>
-            handleFetchResult(await getUserDetail(state.config.apiUrl, u.user_id))
-          )
-        )
+        const userList = []
+
+        for (const user of fetchUserList.body) {
+          const detailedUser = await this.getDetailedUser(user)
+          if (!detailedUser) return
+          userList.push(detailedUser)
+        }
+
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList: fetchUserDetailList.map(fu => fu.body)
+            userList
           }
         }))
         break
       }
-      default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
+      default: this.displayErrorFetchingUserList()
     }
   }
 
@@ -475,57 +491,37 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleUserCreated = (message) => {
-    const { state } = this
-
-    const user = message.fields.user
-    const newUserList = state.content.userList.slice()
-    newUserList.push(user)
+  handleUserCreated = async (message) => {
+    const detailedUser = await this.getDetailedUser(message.fields.user)
+    if (!detailedUser) return
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: newUserList
+        userList: [...prev.content.userList, detailedUser]
       }
     }))
   }
 
-  handleUserModified = (message) => {
-    const { state } = this
+  handleUserModified = async (message) => {
+    const tlmUser = message.fields.user
+    const detailedUser = await this.getDetailedUser(tlmUser)
+    if (!detailedUser) return
 
-    const user = message.fields.user
-    const userList = state.content.userList
-    const userIndex = userList.findIndex(u => u.user_id === user.user_id)
-
-    if (userIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: user id ${user.user_id} not found`)
-      // We do not have this user in our list...
-      return
-    }
-
-    const newuserList = [
-      ...userList.slice(0, userIndex),
-      user,
-      ...userList.slice(userIndex + 1)
-    ]
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: newuserList
+        userList: prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u)
       }
     }))
   }
 
   handleUserDeleted = (message) => {
-    const { state } = this
-
-    const user = message.fields.user
-    const userList = state.content.userList
-    const newUserList = userList.filter(u => u.user_id !== user.user_id)
+    const tlmUser = message.fields.user
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: newUserList
+        userList: prev.content.userList.filter(u => u.user_id !== tlmUser.user_id)
       }
     }))
   }
@@ -541,7 +537,7 @@ export class AdminWorkspaceUser extends React.Component {
         config: {
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
-          faIcon: 'users',
+          faIcon: 'fas fa-users',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: '',
           domContainer: 'appFeatureContainer',

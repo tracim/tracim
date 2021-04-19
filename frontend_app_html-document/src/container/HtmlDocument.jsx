@@ -7,9 +7,9 @@ import {
   addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
-  ArchiveDeleteContent,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   getCurrentContentVersionNumber,
   getInvalidMentionList,
@@ -17,6 +17,7 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   NewVersionBtn,
+  PAGE,
   PopinFixed,
   PopinFixedContent,
   PopinFixedHeader,
@@ -24,7 +25,7 @@ import {
   PopinFixedRightPart,
   RefreshWarningMessage,
   ROLE,
-  SelectStatus,
+  AppContentRightMenu,
   Timeline,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -40,10 +41,17 @@ import {
   setLocalStorageItem,
   removeLocalStorageItem,
   getContentComment,
+  getFileChildContent,
   handleMentionsBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  TRANSLATION_STATE,
+  handleTranslateHtmlContent,
+  getDefaultTranslationState,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
@@ -61,7 +69,6 @@ export class HtmlDocument extends React.Component {
 
     const param = props.data || debug
     props.setApiUrl(param.config.apiUrl)
-
     this.state = {
       appName: 'html-document',
       isVisible: true,
@@ -78,6 +85,7 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
@@ -90,7 +98,9 @@ export class HtmlDocument extends React.Component {
       invalidMentionList: [],
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      showInvalidMentionPopupInContent: false
+      showInvalidMentionPopupInContent: false,
+      translatedRawContent: null,
+      translationState: TRANSLATION_STATE.DISABLED
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -108,6 +118,11 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -149,7 +164,7 @@ export class HtmlDocument extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -219,8 +234,8 @@ export class HtmlDocument extends React.Component {
 
   async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
-
     await this.loadContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -373,15 +388,23 @@ export class HtmlDocument extends React.Component {
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
-    const [resHtmlDocument, resComment, resRevision] = await Promise.all([
+    const [resHtmlDocument, resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultHtmlDocument),
       handleFetchResult(await fetchResultComment),
+      handleFetchResult(await fetchResultFileChildContent),
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resCommentAsFile.body.items,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     const localStorageComment = getLocalStorageItem(
       state.appName,
@@ -409,18 +432,22 @@ export class HtmlDocument extends React.Component {
     const hasLocalStorageRawContent = !!localStorageRawContent
 
     const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
-    this.setState({
-      mode: modeToRender,
-      content: {
-        ...resHtmlDocument.body,
-        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
-          ? localStorageRawContent
-          : rawContentBeforeEdit
-      },
-      newComment: localStorageComment || '',
-      rawContentBeforeEdit: rawContentBeforeEdit,
-      timeline: revisionWithComment,
-      isLastTimelineItemCurrentToken: false
+    this.setState(previousState => {
+      return {
+        mode: modeToRender,
+        content: {
+          ...resHtmlDocument.body,
+          raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
+            ? localStorageRawContent
+            : rawContentBeforeEdit
+        },
+        newComment: localStorageComment || '',
+        rawContentBeforeEdit: rawContentBeforeEdit,
+        timeline: revisionWithComment,
+        isLastTimelineItemCurrentToken: false,
+        translationState: getDefaultTranslationState(previousState.config.system.config),
+        translatedRawContent: null
+      }
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
@@ -525,15 +552,19 @@ export class HtmlDocument extends React.Component {
 
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
         globalThis.tinymce.remove('#wysiwygNewVersion')
-        this.setState(prev => ({
-          mode: APP_FEATURE_MODE.VIEW,
-          content: {
-            ...prev.content,
-            raw_content: newDocumentForApiWithMention
-          },
-          oldInvalidMentionList: allInvalidMentionList,
-          showInvalidMentionPopupInContent: false
-        }))
+        this.setState(previousState => {
+          return {
+            mode: APP_FEATURE_MODE.VIEW,
+            content: {
+              ...previousState.content,
+              raw_content: newDocumentForApiWithMention
+            },
+            oldInvalidMentionList: allInvalidMentionList,
+            showInvalidMentionPopupInContent: false,
+            translatedRawContent: null,
+            translationState: getDefaultTranslationState(previousState.config.system.config)
+          }
+        })
         const fetchPutUserConfiguration = await handleFetchResult(
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
         )
@@ -573,6 +604,14 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
+  }
+
   searchForMentionInQuery = async (query) => {
     return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
   }
@@ -584,6 +623,7 @@ export class HtmlDocument extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -651,18 +691,23 @@ export class HtmlDocument extends React.Component {
 
     if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        label: revision.label,
-        raw_content: revision.raw_content,
-        number: revision.number,
-        status: revision.status,
-        is_archived: prev.is_archived, // archived and delete should always be taken from last version
-        is_deleted: prev.is_deleted
-      },
-      mode: APP_FEATURE_MODE.REVISION
-    }))
+    this.setState(previousState => {
+      return {
+        content: {
+          ...previousState.content,
+          label: revision.label,
+          raw_content: revision.raw_content,
+          number: revision.number,
+          status: revision.status,
+          current_revision_id: revision.revision_id,
+          is_archived: previousState.is_archived, // archived and delete should always be taken from last version
+          is_deleted: previousState.is_deleted
+        },
+        translationState: getDefaultTranslationState(previousState.config.system.config),
+        translatedRawContent: null,
+        mode: APP_FEATURE_MODE.REVISION
+      }
+    })
   }
 
   handleClickLastVersion = () => {
@@ -685,12 +730,16 @@ export class HtmlDocument extends React.Component {
       raw_content: state.rawContentBeforeEdit
     }
 
-    this.setState(prev => ({
-      content: newObjectContent,
-      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
-      mode: APP_FEATURE_MODE.VIEW,
-      showRefreshWarning: false
-    }))
+    this.setState(previousState => {
+      return {
+        content: newObjectContent,
+        timeline: previousState.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
+        mode: APP_FEATURE_MODE.VIEW,
+        showRefreshWarning: false,
+        translatedRawContent: null,
+        translationState: getDefaultTranslationState(previousState.config.system.config)
+      }
+    })
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
   }
@@ -743,11 +792,86 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleTranslateDocument = () => {
+    const { state } = this
+    handleTranslateHtmlContent(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      state.content.current_revision_id,
+      state.loggedUser.lang,
+      state.config.system.config,
+      ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+        this.setState({ translatedRawContent, translationState })
+      }
+    )
+  }
+
+  handleRestoreDocument = () => {
+    this.setState(prev => ({
+      translationState: getDefaultTranslationState(prev.config.system.config)
+    }))
+  }
+
   render () {
     const { props, state } = this
 
     if (!state.isVisible) return null
 
+    const displayTranslatedText = (
+      state.mode !== APP_FEATURE_MODE.EDIT &&
+        state.translationState === TRANSLATION_STATE.TRANSLATED
+    )
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -770,15 +894,26 @@ export class HtmlDocument extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div> {/* this div in display flex, justify-content space-between */}
-            <div className='d-flex'>
+          <div>
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+              />
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
-                  icon='plus-circle'
+                  icon='fas fa-plus-circle'
                 />
               )}
 
@@ -788,7 +923,7 @@ export class HtmlDocument extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -799,28 +934,18 @@ export class HtmlDocument extends React.Component {
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
-
-            </div>
-
-            <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            </ToolBar>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              appMode={state.mode}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onChangeStatus={this.handleChangeStatus}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
@@ -842,14 +967,14 @@ export class HtmlDocument extends React.Component {
             onClickValidateBtn={this.handleClickSaveDocument}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            text={state.content.raw_content}
+            text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
-            onClickRestoreArchived={this.handleClickRestoreArchive}
+            // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
@@ -865,6 +990,9 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
+            onClickTranslateDocument={this.handleTranslateDocument}
+            onClickRestoreDocument={this.handleRestoreDocument}
+            translationState={state.translationState}
           />
 
           <PopinFixedRightPart
@@ -873,19 +1001,23 @@ export class HtmlDocument extends React.Component {
             menuItemList={[{
               id: 'timeline',
               label: props.t('Timeline'),
-              icon: 'fa-history',
-              children: (
+              icon: 'fas fa-history',
+              children: state.config.apiUrl ? (
                 <Timeline
                   customClass={`${state.config.slug}__contentpage`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
+                  memberList={state.config.workspace.memberList}
                   timelineData={state.timeline}
                   newComment={state.newComment}
+                  newCommentAsFileList={state.newCommentAsFileList}
                   apiUrl={state.config.apiUrl}
                   disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
                   availableStatusList={state.config.availableStatuses}
                   wysiwyg={state.timelineWysiwyg}
                   onChangeNewComment={this.handleChangeNewComment}
+                  onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                  onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                   onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                   onClickWysiwygBtn={this.handleToggleWysiwyg}
                   onClickRevisionBtn={this.handleClickShowRevision}
@@ -897,8 +1029,19 @@ export class HtmlDocument extends React.Component {
                   onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
                   showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                   invalidMentionList={state.invalidMentionList}
+                  workspaceId={state.content.workspace_id}
+                  onClickTranslateComment={comment => props.handleTranslateComment(
+                    comment,
+                    state.content.workspace_id,
+                    state.loggedUser.lang,
+                    this.setState.bind(this)
+                  )}
+                  onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                  onClickEditComment={this.handleClickEditComment}
+                  onClickDeleteComment={this.handleClickDeleteComment}
+                  onClickOpenFileComment={this.handleClickOpenFileComment}
                 />
-              )
+              ) : null
             }]}
           />
         </PopinFixedContent>

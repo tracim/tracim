@@ -8,7 +8,7 @@ import {
 } from '../../action-creator.async.js'
 import {
   handleFetchResult,
-  CUSTOM_EVENT
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 class DownloadForm extends React.Component {
@@ -26,15 +26,6 @@ class DownloadForm extends React.Component {
     }))
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   handleSubmit = async (e) => {
     const { props } = this
 
@@ -50,19 +41,19 @@ class DownloadForm extends React.Component {
           this.refs.test.submit()
           return true
         case 400:
-          this.sendGlobalFlashMessage(props.t('Error in the URL'))
+          sendGlobalFlashMessage(props.t('Error in the URL'))
           break
         case 403:
           switch (response.body.code) {
             case 2053:
-              this.sendGlobalFlashMessage(props.t('Invalid password'))
+              sendGlobalFlashMessage(props.t('Invalid password'))
               break
             default:
-              this.sendGlobalFlashMessage(props.t('Error while downloading file'))
+              sendGlobalFlashMessage(props.t('Error while downloading file'))
           }
           break
         default:
-          this.sendGlobalFlashMessage(props.t('Error while downloading file'))
+          sendGlobalFlashMessage(props.t('Error while downloading file'))
       }
     } else {
       this.refs.test.submit()
@@ -105,7 +96,7 @@ class DownloadForm extends React.Component {
                 className='guestdownload__card__form__groupepw__question'
                 id='popoverPasswordInfo'
               >
-                <i className='fa fa-fw fa-question-circle' />
+                <i className='fas fa-fw fa-question-circle' />
               </button>
 
               <Popover

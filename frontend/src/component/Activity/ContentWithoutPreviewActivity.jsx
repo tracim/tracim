@@ -1,19 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ContentActivityHeader from './ContentActivityHeader.jsx'
+import FeedItemHeader from '../FeedItem/FeedItemHeader.jsx'
 
 export const ContentWithoutPreviewActivity = props => {
   return (
-    <ContentActivityHeader
-      content={props.activity.newestMessage.fields.content}
-      workspace={props.activity.newestMessage.fields.workspace}
-      eventList={props.activity.eventList}
-      newestMessage={props.activity.newestMessage}
-      onClickCopyLink={props.onClickCopyLink}
-      onEventClicked={props.onEventClicked}
-      breadcrumbsList={props.breadcrumbsList}
-    />
+    <div className='feedItem'>
+      <FeedItemHeader
+        breadcrumbsList={props.breadcrumbsList}
+        content={props.content}
+        eventList={props.activity.eventList}
+        lastModificationType={props.lastModificationType}
+        lastModificationEntityType={props.lastModificationEntityType}
+        lastModificationSubEntityType={props.lastModificationSubEntityType}
+        lastModifier={props.activity.newestMessage.fields.author}
+        isPublication={false}
+        modifiedDate={props.activity.newestMessage.created}
+        onClickCopyLink={props.onClickCopyLink}
+        onEventClicked={props.onEventClicked}
+        workspaceId={props.activity.newestMessage.fields.workspace.workspace_id}
+      />
+    </div>
   )
 }
 
@@ -21,11 +28,17 @@ export default ContentWithoutPreviewActivity
 
 ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,
+  content: PropTypes.object.isRequired,
+  lastModificationType: PropTypes.string.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   breadcrumbsList: PropTypes.array,
+  lastModificationEntityType: PropTypes.string,
+  lastModificationSubEntityType: PropTypes.string,
   onEventClicked: PropTypes.func
 }
 
 ContentWithoutPreviewActivity.defaultProps = {
-  breadcrumbsList: []
+  breadcrumbsList: [],
+  lastModificationEntityType: '',
+  lastModificationSubEntityType: ''
 }

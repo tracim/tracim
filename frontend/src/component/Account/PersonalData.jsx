@@ -84,7 +84,7 @@ export class PersonalData extends React.Component {
             />
             {!props.isUsernameValid && (
               <div className='personaldata__form__txtinput__msgerror'>
-                <i className='personaldata__form__txtinput__msgerror__icon fa fa-times' />
+                <i className='personaldata__form__txtinput__msgerror__icon fas fa-times' />
                 {props.usernameInvalidMsg}
               </div>
             )}

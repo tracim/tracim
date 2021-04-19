@@ -29,7 +29,8 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   PAGE,
-  TracimComponent
+  TracimComponent,
+  IconButton
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -66,7 +67,7 @@ const qs = require('query-string')
 export const HACK_COLLABORA_CONTENT_TYPE = contentType => ({
   label: 'Collaborative document',
   slug: 'collaborative_document_edition',
-  faIcon: 'file-o',
+  faIcon: 'far fa-file',
   hexcolor: '#62676a',
   creationLabel: i18n.t('Create an office document'),
   availableStatuses: contentType[0].availableStatuses
@@ -289,11 +290,12 @@ export class WorkspaceContent extends React.Component {
 
     switch (fetchContentList.status) {
       case 200: {
+        const contentList = fetchContentList.json.items
         const folderToOpen = [
           ...folderIdInUrl,
-          ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
+          ...contentList.filter(c => c.parent_id !== null).map(c => c.parent_id)
         ]
-        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen, parseInt(workspaceId)))
+        props.dispatch(setWorkspaceContentList(contentList, folderToOpen, parseInt(workspaceId)))
         break
       }
       case 400:
@@ -473,7 +475,7 @@ export class WorkspaceContent extends React.Component {
       : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
 
     if (fetchContentList.status === 200) {
-      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json))
+      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json.items))
     }
   }
 
@@ -512,7 +514,7 @@ export class WorkspaceContent extends React.Component {
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     if (fetchMoveContent.status !== 200) {
-      switch (fetchMoveContent.json.code) {
+      switch ((fetchMoveContent.json || { code: 0 }).code) {
         case 3002:
           props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
           break
@@ -579,7 +581,7 @@ export class WorkspaceContent extends React.Component {
 
     switch (response.status) {
       case 200: {
-        const publicSharedContentList = response.json.map(file => file.parent_id === null
+        const publicSharedContentList = response.json.items.map(file => file.parent_id === null
           ? { ...file, parent_id: SHARE_FOLDER_ID }
           : file
         )
@@ -722,15 +724,22 @@ export class WorkspaceContent extends React.Component {
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
             />
-
             <PageContent parentClass='workspace__content'>
-              {userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <DropdownCreateButton
-                  folderId={null} // null because it is workspace root content
-                  onClickCreateContent={this.handleClickCreateContent}
-                  availableApp={createContentAvailableApp}
+              <div className='workspace__content__buttons'>
+                <IconButton
+                  onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                  text={props.t('Open the gallery')}
+                  icon='far fa-image'
+                  dataCy='IconButton_gallery'
                 />
-              )}
+                {userRoleIdInWorkspace >= ROLE.contributor.id && (
+                  <DropdownCreateButton
+                    folderId={null} // null because it is workspace root content
+                    onClickCreateContent={this.handleClickCreateContent}
+                    availableApp={createContentAvailableApp}
+                  />
+                )}
+              </div>
 
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />

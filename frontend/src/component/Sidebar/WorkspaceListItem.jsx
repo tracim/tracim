@@ -92,7 +92,7 @@ class WorkspaceListItem extends React.Component {
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fa fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
+            <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
           )}
 
           {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
@@ -100,9 +100,7 @@ class WorkspaceListItem extends React.Component {
             props.level > 0 && (
               <div
                 style={{
-                  marginLeft:
-                  `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN
-                  }px`
+                  marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
                 }}
               >
                 &#8735;
@@ -120,21 +118,21 @@ class WorkspaceListItem extends React.Component {
 
         {state.showDropdownMenuButton && (
           <DropdownMenu
-            buttonIcon='fa-ellipsis-v'
+            buttonIcon='fas fa-ellipsis-v'
             buttonCustomClass='sidebar__content__navigation__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >
-            {props.allowedAppList.map(allowedApp =>
+            {props.allowedAppList.map(allowedApp => (
               <Link
                 to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
-                <i className={classnames(`fa fa-fw fa-${allowedApp.faIcon}`)} />
+                <i className={`fa-fw ${allowedApp.faIcon}`} />
                 {props.t(allowedApp.label)}
               </Link>
-            )}
+            ))}
           </DropdownMenu>
         )}
       </li>

@@ -43,7 +43,7 @@ describe('<NewVersionBtn />', () => {
     )
 
     it(`should display the icon "${props.icon}"`, () =>
-      expect(wrapper.find(`.fa.fa-${props.icon}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`.${props.icon}`)).to.have.lengthOf(1)
     )
   })
 

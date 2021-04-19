@@ -16,7 +16,6 @@ class ContentFolderApp(TracimApplication):
             label="Folder",
             creation_label="Create a folder",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=True,
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
             app=self,
         )
@@ -43,5 +42,5 @@ class ContentFolderApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ContentFolderApp(
-        label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
+        label="Folder", slug="contents/folder", fa_icon="far fa-folder", config={}, main_route=""
     )

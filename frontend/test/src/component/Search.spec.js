@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { Search as SearchWithoutHOC } from '../../../src/component/Header/Search.jsx'
+import { SearchInput as SearchWithoutHOC } from '../../../src/component/Search/SearchInput.jsx'
 import sinon from 'sinon'
 
-describe('<Search />', () => {
+describe('<SearchInput />', () => {
   const onClickSearchCallBack = sinon.spy()
 
   const props = {
@@ -17,7 +17,7 @@ describe('<Search />', () => {
     it('handleNewSearch should change his state', () => {
       const randomValue = 'randomValue'
       wrapper.instance().handleNewSearch({ target: { value: randomValue } })
-      expect(wrapper.state('searchedKeywords')).to.equal(randomValue)
+      expect(wrapper.state('searchString')).to.equal(randomValue)
     })
 
     it('handleKeyDown should call handleClickSearch which call onClickSearchCallBack when the key is "Enter"', () => {

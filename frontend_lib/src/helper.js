@@ -1,8 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { distanceInWords, isAfter } from 'date-fns'
+import { formatDistance, isAfter } from 'date-fns'
 import color from 'color'
+import dateFnsFr from 'date-fns/locale/fr'
+import dateFnsEn from 'date-fns/locale/en-US'
+import dateFnsPt from 'date-fns/locale/pt'
+
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -24,7 +28,9 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`,
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
-    ACTIVITY_FEED: (idws = ':idws') => `/ui/workspaces/${idws}/activity-feed`
+    RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
+    PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -42,22 +48,24 @@ export const PAGE = {
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
   GUEST_DOWNLOAD: (token = ':token') => `/ui/guest-download/${token}`,
   JOIN_WORKSPACE: '/ui/join-workspace',
-  ACTIVITY_FEED: '/ui/activity-feed',
+  RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
-  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
+  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
+  FAVORITES: '/ui/favorites'
 }
 
-const dateFnsLocale = {
-  fr: require('date-fns/locale/fr'),
-  en: require('date-fns/locale/en'),
-  pt: require('date-fns/locale/pt')
+export const DATE_FNS_LOCALE = {
+  fr: dateFnsFr,
+  en: dateFnsEn,
+  pt: dateFnsPt
 }
 
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
     apiResponse: fetchResult,
-    body: resultJson
+    body: resultJson,
+    ok: fetchResult.ok
   }))
 }
 
@@ -99,7 +107,14 @@ export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
-export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, { locale: dateFnsLocale[lang], addSuffix: true })
+export const displayDistanceDate = (dateToDisplay, lang) => {
+  if (!dateToDisplay) return ''
+  return formatDistance(
+    new Date(dateToDisplay),
+    new Date(),
+    { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
+  )
+}
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
@@ -111,54 +126,64 @@ export const BREADCRUMBS_TYPE = {
 
 export const revisionTypeList = [{
   id: 'archiving',
-  faIcon: 'archive',
-  label: i18n.t('Item archived')
+  faIcon: 'fas fa-archive',
+  tradKey: i18n.t('Item archived'),
+  label: 'Item archived'
 }, {
   id: 'content-comment',
-  faIcon: 'comment-o',
-  label: i18n.t('Comment')
+  faIcon: 'far fa-comment',
+  tradKey: i18n.t('Comment'),
+  label: 'Comment'
 }, {
   id: 'creation',
-  faIcon: 'magic',
-  label: i18n.t('Item created')
+  faIcon: 'fas fa-magic',
+  tradKey: i18n.t('Item created'),
+  label: 'Item created'
 }, {
   id: 'deletion',
-  faIcon: 'trash',
-  label: i18n.t('Item deleted')
+  faIcon: 'far fa-trash-alt',
+  tradKey: i18n.t('Item deleted'),
+  label: 'Item deleted'
 }, {
   id: 'edition',
-  faIcon: 'edit',
-  label: i18n.t('New revision')
+  faIcon: 'fas fa-history',
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'revision',
-  faIcon: 'history',
-  label: i18n.t('New revision')
+  faIcon: 'fas fa-history',
+  tradKey: i18n.t('New revision'),
+  label: 'New revision'
 }, {
   id: 'status-update',
-  faIcon: 'random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', { status: statusLabel })
+  faIcon: 'fas fa-random',
+  label: (statusLabel) => i18n.t('Status changed to {{status}}', { status: statusLabel })
 }, {
   id: 'unarchiving',
-  faIcon: 'file-archive-o',
-  label: i18n.t('Item unarchived')
+  faIcon: 'far fa-file-archive',
+  tradKey: i18n.t('Item unarchived'),
+  label: 'Item unarchived'
 }, {
   id: 'undeletion',
-  faIcon: 'trash-o',
-  label: i18n.t('Item restored')
+  faIcon: 'far fa-trash-alt',
+  tradKey: i18n.t('Item restored'),
+  label: 'Item restored'
 }, {
   id: 'move',
-  faIcon: 'arrows',
-  label: i18n.t('Item moved')
+  faIcon: 'fas fa-arrows-alt',
+  tradKey: i18n.t('Item moved'),
+  label: 'Item moved'
 }, {
   id: 'copy',
-  faIcon: 'files-o',
-  label: i18n.t('Item copied')
+  faIcon: 'far fa-copy',
+  tradKey: i18n.t('Item copied'),
+  label: 'Item copied'
 }]
 
 const WORKSPACE_MANAGER = {
   id: 8,
   slug: 'workspace-manager',
-  faIcon: 'gavel',
+  faIcon: 'fas fa-gavel',
   hexcolor: '#ed0007',
   tradKey: [
     i18n.t('Space manager'),
@@ -170,7 +195,7 @@ const WORKSPACE_MANAGER = {
 const CONTENT_MANAGER = {
   id: 4,
   slug: 'content-manager',
-  faIcon: 'graduation-cap',
+  faIcon: 'fas fa-graduation-cap',
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Content manager'),
@@ -182,7 +207,7 @@ const CONTENT_MANAGER = {
 const CONTRIBUTOR = {
   id: 2,
   slug: 'contributor',
-  faIcon: 'pencil',
+  faIcon: 'fas fa-pencil-alt',
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('Contributor'),
@@ -194,7 +219,7 @@ const CONTRIBUTOR = {
 const READER = {
   id: 1,
   slug: 'reader',
-  faIcon: 'eye',
+  faIcon: 'far fa-eye',
   hexcolor: '#15d948',
   tradKey: [
     i18n.t('Reader'),
@@ -214,7 +239,7 @@ export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READE
 const ADMINISTRATOR = {
   id: 3,
   slug: 'administrators',
-  faIcon: 'shield',
+  faIcon: 'fas fa-shield-alt',
   hexcolor: '#ed0007',
   tradKey: [
     i18n.t('Administrator'),
@@ -226,7 +251,7 @@ const ADMINISTRATOR = {
 const MANAGER = {
   id: 2,
   slug: 'trusted-users',
-  faIcon: 'graduation-cap',
+  faIcon: 'fas fa-graduation-cap',
   hexcolor: '#f2af2d',
   tradKey: [
     i18n.t('Trusted user'),
@@ -238,7 +263,7 @@ const MANAGER = {
 const USER = {
   id: 1,
   slug: 'users',
-  faIcon: 'user',
+  faIcon: 'fas fa-user',
   hexcolor: '#3145f7',
   tradKey: [
     i18n.t('User'),
@@ -257,7 +282,7 @@ export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
 const OPEN = {
   id: 2,
   slug: 'open',
-  faIcon: 'sun-o',
+  faIcon: 'far fa-sun',
   tradKey: [
     i18n.t('Open'),
     i18n.t('Any user will be able to see, join and open this space.')
@@ -268,7 +293,7 @@ const OPEN = {
 const ON_REQUEST = {
   id: 3,
   slug: 'on_request',
-  faIcon: 'handshake-o',
+  faIcon: 'far fa-handshake',
   tradKey: [
     i18n.t('On request'),
     i18n.t('Any user will be able to see and send a request to join this space, the space managers will be able to accept/reject requests.')
@@ -278,8 +303,9 @@ const ON_REQUEST = {
 }
 const CONFIDENTIAL = {
   id: 4,
+  hexcolor: '#B61616',
   slug: 'confidential',
-  faIcon: 'user-secret',
+  faIcon: 'fas fa-user-secret',
   tradKey: [
     i18n.t('Confidential'),
     i18n.t('Only invited users will be able to see and open this space, invitation is sent by space managers.')
@@ -300,7 +326,7 @@ export const ACCESSIBLE_SPACE_TYPE_LIST = [OPEN, ON_REQUEST]
 const SUBSCRIPTION_PENDING = {
   id: 1,
   slug: 'pending',
-  faIcon: 'sign-in',
+  faIcon: 'fas fa-sign-in-alt',
   tradKey: [
     i18n.t('pending')
   ], // trad key allow the parser to generate an entry in the json file
@@ -309,7 +335,7 @@ const SUBSCRIPTION_PENDING = {
 const SUBSCRIPTION_REJECTED = {
   id: 2,
   slug: 'rejected',
-  faIcon: 'times',
+  faIcon: 'fas fa-times',
   tradKey: [
     i18n.t('rejected')
   ], // trad key allow the parser to generate an entry in the json file
@@ -318,7 +344,7 @@ const SUBSCRIPTION_REJECTED = {
 const SUBSCRIPTION_ACCEPTED = {
   id: 3,
   slug: 'accepted',
-  faIcon: 'check',
+  faIcon: 'fas fa-check',
   tradKey: [
     i18n.t('accepted')
   ], // trad key allow the parser to generate an entry in the json file
@@ -434,7 +460,15 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
 }
 
-export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+export const splitFilenameExtension = filename => {
+  const match = filename.match(/^([\s\S]*?)((?:\.tar)?(?:\.[^.]+))$/)
+  return {
+    basename: match ? match[1] : filename,
+    extension: match ? match[2] : ''
+  }
+}
+
+export const removeExtensionOfFilename = filename => splitFilenameExtension(filename).basename
 
 export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
 
@@ -462,13 +496,27 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment'
 }
 
+// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
+// see https://github.com/tracim/tracim/issues/4340
+export const CONTENT_NAMESPACE = {
+  CONTENT: 'content',
+  UPLOAD: 'upload',
+  PUBLICATION: 'publication'
+}
+
 export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
+  COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
 }
 
 export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1)
+  return timeline.sort((a, b) => {
+    // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
+    // may very happen. So we sort on content_id in that case. This isn't ideal
+    if (a.created_raw === b.created_raw) return parseInt(a.content_id) - parseInt(b.content_id)
+    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
+  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
@@ -501,7 +549,7 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: 'revision',
+      timelineType: TIMELINE_TYPE.REVISION,
       hasBeenRead: isTokenClient
     }
   ]
@@ -647,6 +695,25 @@ export const sortWorkspaceList = (workspaceList, lang) => {
   })
 }
 
+export const humanAndList = (list) => {
+  // INFO - RJ - 2021-17-03
+  // This function return a localized string that looks like:
+  //  - 'elem1' (one element in list)
+  //  - 'elem1 and elem2' (two elements)
+  //  - 'elem1, elem2 and elem3' (three elements and more)
+  //  - 'elem1, elem2, elem3 and elem4'
+
+  switch (list.length) {
+    case 0: return ''
+    case 1: return list[0]
+    default: {
+      const allButLast = list.slice(0, list.length - 1).join(', ')
+      const last = list[list.length - 1]
+      return `${allButLast} ${i18n.t('and')} ${last}`
+    }
+  }
+}
+
 export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
   // RJ - 2020-11-05 - INFO
   //
@@ -680,14 +747,16 @@ export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
+  const workspaceId = content.workspace_id || content.workspaceId
+  const contentId = content.content_id || content.contentId
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+    await getContentPath(apiUrl, workspaceId, contentId)
   )
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
       return fetchGetContentPath.body.items.map(crumb => ({
-        link: PAGE.WORKSPACE.CONTENT(content.workspace_id, crumb.content_type, crumb.content_id),
+        link: PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
@@ -698,6 +767,17 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
+export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+  type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  data: {
+    msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
+    type: type || 'warning',
+    delay: delay
+  }
+})
+
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
+
+export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`

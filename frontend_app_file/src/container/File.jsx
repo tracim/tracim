@@ -4,6 +4,7 @@ import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -20,12 +21,11 @@ import {
   Timeline,
   NewVersionBtn,
   GenericButton,
-  ArchiveDeleteContent,
-  SelectStatus,
+  AppContentRightMenu,
   displayDistanceDate,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  Badge,
+  FilenameWithExtension,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -44,13 +44,18 @@ import {
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
   getContentComment,
+  getFileChildContent,
   getFileContent,
   getFileRevision,
   PAGE,
-  putFileContent,
+  putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  getDefaultTranslationState,
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -83,6 +88,7 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
+      newCommentAsFileList: [],
       newContent: {},
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
@@ -122,6 +128,9 @@ export class File extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
     ])
   }
@@ -196,7 +205,9 @@ export class File extends React.Component {
     if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
     const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser)
+    const newTimeline = props.addCommentToTimeline(
+      tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config)
+    )
     this.setState({
       timeline: newTimeline,
       isLastTimelineItemCurrentToken: createdByLoggedUser
@@ -205,25 +216,35 @@ export class File extends React.Component {
 
   handleContentDeletedOrRestored = data => {
     const { state } = this
-    if (data.fields.content.content_id !== state.content.content_id) return
+    const isTlmAboutCurrentContent = data.fields.content.content_id === state.content.content_id
+    const isTlmAboutCurrentContentChildren = data.fields.content.parent_id === state.content.content_id
 
-    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    this.setState(prev =>
-      ({
-        content: clientToken === data.fields.client_token
-          ? { ...prev.content, ...data.fields.content }
-          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-        newContent: {
-          ...prev.content,
-          ...data.fields.content
-        },
-        editionAuthor: data.fields.author.public_name,
-        showRefreshWarning: clientToken !== data.fields.client_token,
-        mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-        timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-      })
-    )
+    if (!isTlmAboutCurrentContent && !isTlmAboutCurrentContentChildren) return
+
+    if (isTlmAboutCurrentContent) {
+      const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+      this.setState(prev =>
+        ({
+          content: clientToken === data.fields.client_token
+            ? { ...prev.content, ...data.fields.content }
+            : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+          newContent: {
+            ...prev.content,
+            ...data.fields.content
+          },
+          editionAuthor: data.fields.author.public_name,
+          showRefreshWarning: clientToken !== data.fields.client_token,
+          mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
+          timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
+          isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+        })
+      )
+      return
+    }
+
+    if (isTlmAboutCurrentContentChildren) {
+      this.handleContentCommentDeleted(data)
+    }
   }
 
   handleUserModified = data => {
@@ -238,6 +259,7 @@ export class File extends React.Component {
   async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async updateTimelineAndContent (pageToLoad = null) {
@@ -332,18 +354,29 @@ export class File extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
-    const [resComment, resRevision] = await Promise.all([
+    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
+      handleFetchResult(await getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     ])
 
-    if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
+    if (
+      resComment.apiResponse.status !== 200 &&
+      resCommentAsFile.apiResponse.status !== 200 &&
+      resRevision.apiResponse.status !== 200
+    ) {
       this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
       console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
       return
     }
 
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(resComment.body, resRevision.body, state.loggedUser)
+    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
+      resComment.body,
+      resCommentAsFile.body.items,
+      resRevision.body,
+      state.loggedUser,
+      getDefaultTranslationState(state.config.system.config)
+    )
 
     this.setState({ timeline: revisionWithComment })
   }
@@ -402,7 +435,7 @@ export class File extends React.Component {
     const { props, state } = this
 
     const fetchResultSaveFile = await handleFetchResult(
-      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
+      await putFileDescription(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: {
@@ -418,16 +451,24 @@ export class File extends React.Component {
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+          default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
     }
   }
 
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
+  }
+
+  handleAddCommentAsFile = fileToUploadList => {
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
+  }
+
+  handleRemoveCommentAsFile = fileToRemove => {
+    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -463,6 +504,7 @@ export class File extends React.Component {
         state.content,
         state.timelineWysiwyg,
         state.newComment,
+        state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -492,6 +534,57 @@ export class File extends React.Component {
   handleClickRestoreArchive = async () => {
     const { props, state } = this
     props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  }
+
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      comment.content_type
+    )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
   }
 
   handleClickRestoreDelete = async () => {
@@ -613,7 +706,7 @@ export class File extends React.Component {
               case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
               case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
               case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
-              case 6004: this.sendGlobalFlashMessage(props.t('You have reach your storage limit, you cannot add new files')); break
+              case 6004: this.sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files')); break
               default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             break
@@ -741,7 +834,7 @@ export class File extends React.Component {
         break
       case 400:
         this.sendGlobalFlashMessage(props.t('Error in the URL'))
-        props.history.push(PAGE.LOGIN)
+        state.config.history.push(PAGE.LOGIN)
         break
       default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
     }
@@ -814,18 +907,22 @@ export class File extends React.Component {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
-      children: (
+      children: state.config.apiUrl ? (
         <Timeline
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
           apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
           timelineData={state.timeline}
+          memberList={state.config.workspace.memberList}
           newComment={state.newComment}
+          newCommentAsFileList={state.newCommentAsFileList}
           disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
           availableStatusList={state.config.availableStatuses}
           wysiwyg={state.timelineWysiwyg}
           onChangeNewComment={this.handleChangeNewComment}
+          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
           onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
           onClickWysiwygBtn={this.handleToggleWysiwyg}
           onClickRevisionBtn={this.handleClickShowRevision}
@@ -838,8 +935,19 @@ export class File extends React.Component {
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
           searchForMentionInQuery={this.searchForMentionInQuery}
+          workspaceId={state.content.workspace_id}
+          onClickTranslateComment={comment => props.handleTranslateComment(
+            comment,
+            state.content.workspace_id,
+            state.loggedUser.lang,
+            this.setState.bind(this)
+          )}
+          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+          onClickEditComment={this.handleClickEditComment}
+          onClickDeleteComment={this.handleClickDeleteComment}
+          onClickOpenFileComment={this.handleClickOpenFileComment}
         />
-      )
+      ) : null
     }
     const propertiesObject = {
       id: 'properties',
@@ -856,7 +964,7 @@ export class File extends React.Component {
           creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
           lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
           lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-          description={state.content.raw_content}
+          description={state.content.description}
           displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
           disableChangeDescription={!state.content.is_editable}
           onClickValidateNewDescription={this.handleClickValidateNewDescription}
@@ -972,7 +1080,7 @@ export class File extends React.Component {
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
-          componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
+          componentTitle={<FilenameWithExtension file={state.content} />}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
@@ -984,15 +1092,26 @@ export class File extends React.Component {
           customClass={`${state.config.slug}`}
           i18n={i18n}
         >
-          <div> {/* this div in display flex, justify-content space-between */}
-            <div className='d-flex'>
+          <div>
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+              />
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
                   label={props.t('Upload a new version')}
-                  icon='upload'
+                  icon='fas fa-upload'
                 />
               )}
 
@@ -1007,7 +1126,7 @@ export class File extends React.Component {
                   style={{
                     marginLeft: '5px'
                   }}
-                  faIcon='edit'
+                  faIcon='fas fa-edit'
                 />
               )}
 
@@ -1018,7 +1137,7 @@ export class File extends React.Component {
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                   data-cy='appFileLastVersionBtn'
                 >
-                  <i className='fa fa-history' />
+                  <i className='fas fa-history' />
                   {props.t('Last version')}
                 </button>
               )}
@@ -1029,7 +1148,7 @@ export class File extends React.Component {
                   customColor={state.config.hexcolor}
                   label={props.t('Play video')}
                   onClick={() => this.setState({ previewVideo: true })}
-                  faIcon='play'
+                  faIcon='fas fa-play'
                   style={{ marginLeft: '5px' }}
                 />
               )}
@@ -1040,28 +1159,18 @@ export class File extends React.Component {
                   onClickRefresh={this.handleClickRefresh}
                 />
               )}
-            </div>
-
-            <div className='d-flex'>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                  mobileVersion={onlineEditionAction}
-                />
-              )}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
+            </ToolBar>
+            <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              content={state.content}
+              availableStatuses={state.config.availableStatuses}
+              appMode={state.mode}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onChangeStatus={this.handleChangeStatus}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            />
           </div>
         </PopinFixedOption>
 
@@ -1101,6 +1210,7 @@ export class File extends React.Component {
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
+            workspaceId={state.content.workspace_id}
             onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}

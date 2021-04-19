@@ -45,7 +45,7 @@ open_status = ContentStatus(
     slug="open",
     global_status=GlobalStatus.OPEN.value,
     label=_("Opened"),
-    fa_icon="square-o",
+    fa_icon="far fa-square",
     hexcolor="#3f52e3",
 )
 
@@ -53,7 +53,7 @@ closed_validated_status = ContentStatus(
     slug="closed-validated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Validated"),
-    fa_icon="check-square-o",
+    fa_icon="far fa-check-square",
     hexcolor="#008000",
 )
 
@@ -61,7 +61,7 @@ closed_unvalidated_status = ContentStatus(
     slug="closed-unvalidated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Cancelled"),
-    fa_icon="close",
+    fa_icon="fas fa-times",
     hexcolor="#f63434",
 )
 
@@ -69,7 +69,7 @@ closed_deprecated_status = ContentStatus(
     slug="closed-deprecated",
     global_status=GlobalStatus.CLOSED.value,
     label=_("Deprecated"),
-    fa_icon="warning",
+    fa_icon="fas fa-exclamation-triangle",
     hexcolor="#ababab",
 )
 
@@ -89,7 +89,7 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def get_all_slugs_values(self) -> typing.List[str]:
-        """ Get alls slugs"""
+        """ Get all slugs"""
         return [item.slug for item in self._content_status]
 
     def get_all(self) -> typing.List[ContentStatus]:
@@ -150,10 +150,6 @@ class ContentTypeInContext(object):
         return self.content_type.slug_aliases
 
     @property
-    def allow_sub_content(self) -> bool:
-        return self.content_type.allow_sub_content
-
-    @property
     def minimal_role_content_creation(self) -> WorkspaceRoles:
         return self.content_type.minimal_role_content_creation
 
@@ -169,17 +165,8 @@ HTML_DOCUMENTS_TYPE = "html-document"
 FOLDER_TYPE = "folder"
 COMMENT_TYPE = "comment"
 
-# TODO - G.M - 31-05-2018 - Set Better Event params
-event_type = TracimContentType(
-    slug="event",
-    fa_icon="",
-    label="Event",
-    creation_label="Event",
-    available_statuses=content_status_list.get_all(),
-    app=None,
-)
 
-# TODO - G.M - 31-05-2018 - Set Better Event params
+# TODO - G.M - 31-05-2018 - Set Better Comment params
 comment_type = TracimContentType(
     slug=COMMENT_TYPE,
     fa_icon="",
@@ -196,7 +183,6 @@ class ContentTypeList(object):
 
     Any_SLUG = "any"
     Comment = comment_type
-    Event = event_type
 
     @property
     def Folder(self) -> TracimContentType:
@@ -232,7 +218,6 @@ class ContentTypeList(object):
         """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)
-        content_types.append(self.Event)
         for item in content_types:
             if item.slug == slug or (item.slug_aliases and slug in item.slug_aliases):
                 return item
@@ -268,7 +253,7 @@ class ContentTypeList(object):
 
     def query_allowed_types_slugs(self) -> typing.List[str]:
         """
-        Return alls allowed types slug : content_type slug + all alias, any
+        Return all allowed types slug : content_type slug + all alias, any
         and special content_type like comment. Do not return event.
         Usefull allowed value to perform query to database.
         """
@@ -283,14 +268,9 @@ class ContentTypeList(object):
         return allowed_types_slug
 
     def default_allowed_content_properties(self, slug: str) -> dict:
-        content_type = self.get_one_by_slug(slug)
-        if content_type.allow_sub_content:
-            sub_content_allowed = self.endpoint_allowed_types_slug()
-        else:
-            sub_content_allowed = [self.Comment.slug]
-
+        allowed_sub_contents = self.endpoint_allowed_types_slug()
         properties_dict = {}
-        for elem in sub_content_allowed:
+        for elem in allowed_sub_contents:
             properties_dict[elem] = True
         return properties_dict
 

@@ -11,7 +11,6 @@ from typing import Optional
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 import sqlalchemy
@@ -43,12 +42,17 @@ from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
+from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
+from tracim_backend.models.mixins import TrashableMixin
+from tracim_backend.models.mixins import UpdateDateMixin
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.types import TracimUploadedFileField
 
 
 class WorkspaceAccessType(enum.Enum):
@@ -59,7 +63,7 @@ class WorkspaceAccessType(enum.Enum):
     OPEN = "open"
 
 
-class Workspace(DeclarativeBase):
+class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     FILEMANAGER_EXTENSION = ".space"
     ACCESSIBLE_TYPES = [WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST]
 
@@ -75,12 +79,6 @@ class Workspace(DeclarativeBase):
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default="")
     description = Column(Text(), unique=False, nullable=False, default="")
-    #  Default value datetime.utcnow,
-    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    #  Default value datetime.utcnow,
-    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     revisions = relationship("ContentRevisionRO")
@@ -99,8 +97,13 @@ class Workspace(DeclarativeBase):
         default=False,
         server_default=sqlalchemy.sql.expression.literal(False),
     )
-    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    owner = relationship("User", remote_side=[User.user_id])
+    publication_enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=True,
+        server_default=sqlalchemy.sql.expression.literal(True),
+    )
     access_type = Column(
         Enum(WorkspaceAccessType),
         nullable=False,
@@ -115,6 +118,9 @@ class Workspace(DeclarativeBase):
         backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
         order_by="Workspace.workspace_id",
     )
+
+    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    owner = relationship("User", remote_side=[User.user_id])
 
     @property
     def recursive_children(self) -> List["Workspace"]:
@@ -222,6 +228,12 @@ class Workspace(DeclarativeBase):
                 if not content_types or child.type in content_types:
                     yield child
 
+    def check_for_publication(self) -> None:
+        if not self.publication_enabled:
+            raise WorkspaceFeatureDisabled(
+                "Feature {} is disabled in workspace {}".format("publication", self.workspace_id)
+            )
+
 
 Index("idx__workspaces__parent_id", Workspace.parent_id)
 
@@ -252,47 +264,6 @@ class UserRoleInWorkspace(DeclarativeBase):
     CONTRIBUTOR = WorkspaceRoles.CONTRIBUTOR.level
     CONTENT_MANAGER = WorkspaceRoles.CONTENT_MANAGER.level
     WORKSPACE_MANAGER = WorkspaceRoles.WORKSPACE_MANAGER.level
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # SLUG = {
-    #     NOT_APPLICABLE: 'not-applicable',
-    #     READER: 'reader',
-    #     CONTRIBUTOR: 'contributor',
-    #     CONTENT_MANAGER: 'content-manager',
-    #     WORKSPACE_MANAGER: 'workspace-manager',
-    # }
-
-    # LABEL = dict()
-    # LABEL[0] = l_('N/A')
-    # LABEL[1] = l_('Reader')
-    # LABEL[2] = l_('Contributor')
-    # LABEL[4] = l_('Content Manager')
-    # LABEL[8] = l_('Workspace Manager')
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    #
-    # STYLE = dict()
-    # STYLE[0] = ''
-    # STYLE[1] = 'color: #1fdb11;'
-    # STYLE[2] = 'color: #759ac5;'
-    # STYLE[4] = 'color: #ea983d;'
-    # STYLE[8] = 'color: #F00;'
-    #
-    # ICON = dict()
-    # ICON[0] = ''
-    # ICON[1] = 'fa-eye'
-    # ICON[2] = 'fa-pencil'
-    # ICON[4] = 'fa-graduation-cap'
-    # ICON[8] = 'fa-legal'
-    #
-    #
-    # @property
-    # def fa_icon(self):
-    #     return UserRoleInWorkspace.ICON[self.role]
-    #
-    # @property
-    # def style(self):
-    #     return UserRoleInWorkspace.STYLE[self.role]
-    #
 
     def role_object(self):
         return WorkspaceRoles.get_role_from_level(level=self.role)
@@ -334,6 +305,7 @@ class WorkspaceSubscription(DeclarativeBase):
         nullable=False,
         server_default=WorkspaceSubscriptionState.PENDING.name,
     )
+    # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     workspace_id = Column(
         Integer,
@@ -356,22 +328,6 @@ class WorkspaceSubscription(DeclarativeBase):
     @property
     def state_slug(self):
         return self.state.value
-
-
-# TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-# class RoleType(object):
-#     def __init__(self, role_id):
-#         self.role_type_id = role_id
-# self.fa_icon = UserRoleInWorkspace.ICON[role_id]
-# self.role_label = UserRoleInWorkspace.LABEL[role_id]
-# self.css_style = UserRoleInWorkspace.STYLE[role_id]
-
-
-# TODO - G.M - 09-04-2018 [Cleanup] It this items really needed ?
-# class LinkItem(object):
-#     def __init__(self, href, label):
-#         self.href = href
-#        self.label = label
 
 
 class ActionDescription(object):
@@ -397,32 +353,18 @@ class ActionDescription(object):
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        "archiving": "archive",
-        "content-comment": "comment-o",
-        "creation": "magic",
-        "deletion": "trash",
-        "edition": "edit",
-        "revision": "history",
-        "status-update": "random",
-        "unarchiving": "file-archive-o",
-        "undeletion": "trash-o",
-        "move": "arrows",
-        "copy": "files-o",
+        "archiving": "fas fa-archive",
+        "content-comment": "far fa-comment",
+        "creation": "fas fa-magic",
+        "deletion": "far trash-alt",
+        "edition": "fas fa-edit",
+        "revision": "fas fa-history",
+        "status-update": "fas fa-random",
+        "unarchiving": "far file-archive",
+        "undeletion": "far fa-trash-alt",
+        "move": "fas fa-arrows-alt",
+        "copy": "far fa-copy",
     }
-    #
-    # _LABELS = {
-    #     'archiving': l_('archive'),
-    #     'content-comment': l_('Item commented'),
-    #     'creation': l_('Item created'),
-    #     'deletion': l_('Item deleted'),
-    #     'edition': l_('item modified'),
-    #     'revision': l_('New revision'),
-    #     'status-update': l_('New status'),
-    #     'unarchiving': l_('Item unarchived'),
-    #     'undeletion': l_('Item undeleted'),
-    #     'move': l_('Item moved'),
-    #     'copy': l_('Item copied'),
-    # }
 
     def __init__(self, id):
         assert id in ActionDescription.allowed_values()
@@ -432,11 +374,6 @@ class ActionDescription(object):
         # find a way to not rely on this.
         self.label = self.id
         self.fa_icon = ActionDescription._ICONS[id]
-        # self.icon = self.fa_icon
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.label = ActionDescription._LABELS[id]
-
-        # self.css = ''
 
     @classmethod
     def allowed_values(cls):
@@ -455,286 +392,26 @@ class ActionDescription(object):
         ]
 
 
-# TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
-# is lost .
-
-
-# class ContentStatus(object):
-#     """
-#     Allowed status are:
-#     - open
-#     - closed-validated
-#     - closed-invalidated
-#     - closed-deprecated
-#     """
-#
-#     OPEN = 'open'
-#     CLOSED_VALIDATED = 'closed-validated'
-#     CLOSED_UNVALIDATED = 'closed-unvalidated'
-#     CLOSED_DEPRECATED = 'closed-deprecated'
-#
-#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#     # _LABELS = {'open': l_('work in progress'),
-#     #            'closed-validated': l_('closed — validated'),
-#     #            'closed-unvalidated': l_('closed — cancelled'),
-#     #            'closed-deprecated': l_('deprecated')}
-#     #
-#     # _LABELS_THREAD = {'open': l_('subject in progress'),
-#     #                   'closed-validated': l_('subject closed — resolved'),
-#     #                   'closed-unvalidated': l_('subject closed — cancelled'),
-#     #                   'closed-deprecated': l_('deprecated')}
-#     #
-#     # _LABELS_FILE = {'open': l_('work in progress'),
-#     #                 'closed-validated': l_('closed — validated'),
-#     #                 'closed-unvalidated': l_('closed — cancelled'),
-#     #                 'closed-deprecated': l_('deprecated')}
-#     #
-#     # _ICONS = {
-#     #     'open': 'fa fa-square-o',
-#     #     'closed-validated': 'fa fa-check-square-o',
-#     #     'closed-unvalidated': 'fa fa-close',
-#     #     'closed-deprecated': 'fa fa-warning',
-#     # }
-#     #
-#     # _CSS = {
-#     #     'open': 'tracim-status-open',
-#     #     'closed-validated': 'tracim-status-closed-validated',
-#     #     'closed-unvalidated': 'tracim-status-closed-unvalidated',
-#     #     'closed-deprecated': 'tracim-status-closed-deprecated',
-#     # }
-#
-#     def __init__(self,
-#                  id,
-#                  # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#                  # type=''
-#     ):
-#         self.id = id
-#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#         # self.icon = ContentStatus._ICONS[id]
-#         # self.css = ContentStatus._CSS[id]
-#         #
-#         # if type==content_type_list.Thread.slug:
-#         #     self.label = ContentStatus._LABELS_THREAD[id]
-#         # elif type==content_type_list.File.slug:
-#         #     self.label = ContentStatus._LABELS_FILE[id]
-#         # else:
-#         #     self.label = ContentStatus._LABELS[id]
-#
-#
-#     @classmethod
-#     def all(cls, type='') -> ['ContentStatus']:
-#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#         # all = []
-#         # all.append(ContentStatus('open', type))
-#         # all.append(ContentStatus('closed-validated', type))
-#         # all.append(ContentStatus('closed-unvalidated', type))
-#         # all.append(ContentStatus('closed-deprecated', type))
-#         # return all
-#         status_list = list()
-#         for elem in cls.allowed_values():
-#             status_list.append(ContentStatus(elem))
-#         return status_list
-#
-#     @classmethod
-#     def allowed_values(cls):
-#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#         # return ContentStatus._LABELS.keys()
-#         return [
-#             ContentStatus.OPEN,
-#             ContentStatus.CLOSED_UNVALIDATED,
-#             ContentStatus.CLOSED_VALIDATED,
-#             ContentStatus.CLOSED_DEPRECATED
-#         ]
-
-
-# class ContentType(object):
-#     Any = 'any'
-#
-#     Folder = 'folder'
-#     File = 'file'
-#     Comment = 'comment'
-#     Thread = 'thread'
-#     Page = 'page'
-#     Event = 'event'
-#
-#     # TODO - G.M - 10-04-2018 - [Cleanup] Do we really need this ?
-#     # _STRING_LIST_SEPARATOR = ','
-#
-#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#     # _ICONS = {  # Deprecated
-#     #     'dashboard': 'fa-home',
-#     #     'workspace': 'fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
-#     # }
-#     #
-#     # _CSS_ICONS = {
-#     #     'dashboard': 'fa fa-home',
-#     #     'workspace': 'fa fa-bank',
-#     #     'folder': 'fa fa-folder-open-o',
-#     #     'file': 'fa fa-paperclip',
-#     #     'page': 'fa fa-file-text-o',
-#     #     'thread': 'fa fa-comments-o',
-#     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-agenda-o',
-#     # }
-#     #
-#     # _CSS_COLORS = {
-#     #     'dashboard': 't-dashboard-color',
-#     #     'workspace': 't-less-visible',
-#     #     'folder': 't-folder-color',
-#     #     'file': 't-file-color',
-#     #     'page': 't-page-color',
-#     #     'thread': 't-thread-color',
-#     #     'comment': 't-thread-color',
-#     #     'event': 't-event-color',
-#     # }
-#
-#     _ORDER_WEIGHT = {
-#         'folder': 0,
-#         'page': 1,
-#         'thread': 2,
-#         'file': 3,
-#         'comment': 4,
-#         'event': 5,
-#     }
-#
-#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#     # _LABEL = {
-#     #     'dashboard': '',
-#     #     'workspace': l_('workspace'),
-#     #     'folder': l_('folder'),
-#     #     'file': l_('file'),
-#     #     'page': l_('page'),
-#     #     'thread': l_('thread'),
-#     #     'comment': l_('comment'),
-#     #     'event': l_('event'),
-#     # }
-#     #
-#     # _DELETE_LABEL = {
-#     #     'dashboard': '',
-#     #     'workspace': l_('Delete this workspace'),
-#     #     'folder': l_('Delete this folder'),
-#     #     'file': l_('Delete this file'),
-#     #     'page': l_('Delete this page'),
-#     #     'thread': l_('Delete this thread'),
-#     #     'comment': l_('Delete this comment'),
-#     #     'event': l_('Delete this event'),
-#     # }
-#     #
-#     # @classmethod
-#     # def get_icon(cls, type: str):
-#     #     assert(type in ContentType._ICONS) # DYN_REMOVE
-#     #     return ContentType._ICONS[type]
-#
-#     @classmethod
-#     def all(cls):
-#         return cls.allowed_types()
-#
-#     @classmethod
-#     def allowed_types(cls):
-#         return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page,
-#                 cls.Event]
-#
-#     @classmethod
-#     def allowed_types_for_folding(cls):
-#         # This method is used for showing only "main"
-#         # types in the left-side treeview
-#         return [cls.Folder, cls.File, cls.Thread, cls.Page]
-#
-#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#     # @classmethod
-#     # def allowed_types_from_str(cls, allowed_types_as_string: str):
-#     #     allowed_types = []
-#     #     # HACK - THIS
-#     #     for item in allowed_types_as_string.split(ContentType._STRING_LIST_SEPARATOR):
-#     #         if item and item in ContentType.allowed_types_for_folding():
-#     #             allowed_types.append(item)
-#     #     return allowed_types
-#     #
-#     # @classmethod
-#     # def fill_url(cls, content: 'Content'):
-#     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
-#     #     # Make this code dynamic loading data types
-#     #
-#     #     if content.type==content_type_list.Folder.slug:
-#     #         return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
-#     #     elif content.type==content_type_list.File.slug:
-#     #         return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==content_type_list.Thread.slug:
-#     #         return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==content_type_list.Page.slug:
-#     #         return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #
-#     # @classmethod
-#     # def fill_url_for_workspace(cls, workspace: Workspace):
-#     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
-#     #     # Make this code dynamic loading data types
-#     #     return '/workspaces/{}'.format(workspace.workspace_id)
-#
-#     @classmethod
-#     def sorted(cls, types: ['ContentType']) -> ['ContentType']:
-#         return sorted(types, key=lambda content_type: content_type.priority)
-#
-#     @property
-#     def type(self):
-#         return self.id
-#
-#     def __init__(self, type):
-#         self.id = type
-#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#         # self.icon = ContentType._CSS_ICONS[type]
-#         # self.color = ContentType._CSS_COLORS[type]  # deprecated
-#         # self.css = ContentType._CSS_COLORS[type]
-#         # self.label = ContentType._LABEL[type]
-#         self.priority = ContentType._ORDER_WEIGHT[type]
-#
-#     def toDict(self):
-#         return dict(id=self.type,
-#                     type=self.type,
-#                     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-#                     # icon=self.icon,
-#                     # color=self.color,
-#                     # label=self.label,
-#                     priority=self.priority)
-
-
 class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if item.type == content_type_list.Event.slug:
-            if "name" not in properties.keys():
-                return False
-            if "raw" not in properties.keys():
-                return False
-            if "start" not in properties.keys():
-                return False
-            if "end" not in properties.keys():
-                return False
-            return True
-        else:
-            if "allowed_content" in properties.keys():
-                for content_slug, value in properties["allowed_content"].items():
-                    if not isinstance(value, bool):
-                        return False
-                    if content_slug not in content_type_list.endpoint_allowed_types_slug():
-                        return False
-            if "origin" in properties.keys():
-                pass
-            return True
+        if "allowed_content" in properties.keys():
+            for content_slug, value in properties["allowed_content"].items():
+                if not isinstance(value, bool):
+                    return False
+                if content_slug not in content_type_list.endpoint_allowed_types_slug():
+                    return False
+        return True
 
 
-class ContentNamespaces(enum.Enum):
+class ContentNamespaces(str, enum.Enum):
     CONTENT = "content"
     UPLOAD = "upload"
+    PUBLICATION = "publication"
 
 
-class ContentRevisionRO(DeclarativeBase):
+class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     """
     Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
     ContentRevisionUpdateError errors.
@@ -742,33 +419,39 @@ class ContentRevisionRO(DeclarativeBase):
 
     __tablename__ = "content_revisions"
 
-    revision_id = Column(Integer, primary_key=True)
+    revision_id = Column(
+        Integer,
+        Sequence("seq__content_revisions__revision_id"),
+        autoincrement=True,
+        primary_key=True,
+    )
     # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
-    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author" ?
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    owner = relationship("User", remote_side=[User.user_id])
 
-    label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
+    raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
     file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
-    #  INFO - A.P - 2017-07-03 - Depot Doc
-    #  http://depot.readthedocs.io/en/latest/#attaching-files-to-models
+    # INFO - A.P - 2017-07-03 - Depot Doc
+    # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
-    depot_file = Column(UploadedFileField, unique=False, nullable=True)
+    depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
+    # INFO - G.M - same type are used for FavoriteContent.
+    label = Column(Unicode(1024), unique=False, nullable=False)
     type = Column(Unicode(32), unique=False, nullable=False)
+
     status = Column(
         Unicode(32),
         unique=False,
         nullable=False,
         default=str(content_status_list.get_default_status().slug),
     )
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
     is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(Unicode(32), unique=False, nullable=False, default="")
@@ -782,35 +465,36 @@ class ContentRevisionRO(DeclarativeBase):
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
-    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-    owner = relationship("User", remote_side=[User.user_id])
     content_namespace = Column(
         Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
     )
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
+        # db_column
         "content_id",
+        "content_namespace",
         "created",
         "description",
-        "file_mimetype",
         "file_extension",
+        "file_mimetype",
         "is_archived",
         "is_deleted",
+        "is_temporary",
         "label",
-        "owner",
         "owner_id",
-        "parent",
         "parent_id",
         "properties",
+        "raw_content",
         "revision_type",
         "status",
         "type",
         "updated",
-        "workspace",
         "workspace_id",
-        "is_temporary",
-        "content_namespace",
+        # object
+        "owner",
+        "parent",
+        "workspace",
     )
 
     # Read by must be used like this:
@@ -1017,7 +701,7 @@ class Content(DeclarativeBase):
         -0
     )  # This flag allow to serialize a given revision if required by the user
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence("seq__content__id"), autoincrement=True, primary_key=True)
     cached_revision_id = Column(
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
@@ -1114,6 +798,18 @@ class Content(DeclarativeBase):
     @description.expression
     def description(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.description
+
+    @hybrid_property
+    def raw_content(self) -> str:
+        return self.revision.raw_content
+
+    @raw_content.setter
+    def raw_content(self, value: str) -> None:
+        self.revision.raw_content = value
+
+    @raw_content.expression
+    def raw_content(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.raw_content
 
     @hybrid_property
     def file_name(self) -> str:
@@ -1380,8 +1076,7 @@ class Content(DeclarativeBase):
             """
         )
         children_ids = [
-            elem[0]
-            for elem in object_session(self).execute(statement, {"content_id": self.id}).fetchall()
+            elem[0] for elem in object_session(self).execute(statement, {"content_id": self.id})
         ]
         if children_ids:
             return (
@@ -1485,11 +1180,10 @@ class Content(DeclarativeBase):
             properties = {}
         else:
             properties = json.loads(self._properties)
-        if content_type_list.get_one_by_slug(self.type) != content_type_list.Event:
-            if "allowed_content" not in properties:
-                properties[
-                    "allowed_content"
-                ] = content_type_list.default_allowed_content_properties(self.type)
+        if "allowed_content" not in properties:
+            properties["allowed_content"] = content_type_list.default_allowed_content_properties(
+                self.type
+            )
         return properties
 
     @properties.setter
@@ -1575,10 +1269,10 @@ class Content(DeclarativeBase):
 
         return None
 
-    def description_as_raw_text(self) -> str:
+    def raw_content_as_raw_text(self) -> str:
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        return BeautifulSoup(self.description, "html.parser").text
+        return BeautifulSoup(self.raw_content, "html.parser").text
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
@@ -1760,10 +1454,6 @@ class VirtualEvent(object):
         self.ref_object = ref_object
 
         assert hasattr(type, "id")
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # assert hasattr(type, 'css')
-        # assert hasattr(type, 'fa_icon')
-        # assert hasattr(type, 'label')
 
     def created_as_delta(self, delta_from_datetime: datetime = None):
         if not delta_from_datetime:

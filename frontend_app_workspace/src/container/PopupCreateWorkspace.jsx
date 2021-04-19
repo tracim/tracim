@@ -110,7 +110,7 @@ export class PopupCreateWorkspace extends React.Component {
               const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type)
               const spaceLabel = (
                 <span title={space.label}>
-                  {'-'.repeat(level)} <i className={`fa fa-fw fa-${spaceType.faIcon}`} /> {space.label}
+                  {'-'.repeat(level)} <i className={`fa-fw ${spaceType.faIcon}`} /> {space.label}
                 </span>
               )
               spaceList.push({ value: space.label, label: spaceLabel, parentId: space.parent_id, spaceId: space.workspace_id })
@@ -176,7 +176,7 @@ export class PopupCreateWorkspace extends React.Component {
         const apiTypeList = fetchGetAllowedSpaceTypes.body.items
         const allowedTypesList = SPACE_TYPE_LIST.filter(type => apiTypeList.some(apiType => apiType === type.slug))
         this.setState({
-          allowedTypes: allowedTypesList,
+          allowedTypes: allowedTypesList.map(type => ({ ...type, hexcolor: '' })),
           newType: (allowedTypesList.find(type => type.slug === SPACE_TYPE.confidential.slug) || allowedTypesList[0]).slug
         })
         break
@@ -198,7 +198,7 @@ export class PopupCreateWorkspace extends React.Component {
           <div className='newSpace__title'>
             <div className='newSpace__title__icon'>
               <i
-                className={`fa fa-${state.config.faIcon}`}
+                className={`fas fa-${state.config.faIcon}`}
                 style={{ color: state.config.hexcolor }}
                 title={props.t('New space')}
               />
@@ -241,7 +241,7 @@ export class PopupCreateWorkspace extends React.Component {
                     title={props.t('Next')}
                     type='button'
                   >
-                    {props.t('Next')} <i className='fa fa-arrow-right newSpace__icon__right' />
+                    {props.t('Next')} <i className='fas fa-arrow-right newSpace__icon__right' />
                   </button>
                 </div>
               </>
@@ -258,7 +258,7 @@ export class PopupCreateWorkspace extends React.Component {
                 />
                 {state.showWarningMessage && (
                   <div className='newSpace__warningMessage'>
-                    <i className='fa fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
+                    <i className='fas fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
                     {props.t('Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.')}
                   </div>
                 )}
@@ -270,7 +270,7 @@ export class PopupCreateWorkspace extends React.Component {
                     className='btn transparentButton newSpace__label__info'
                     id='popoverDefaultRoleInfo'
                   >
-                    <i className='fa fa-fw fa-question-circle' />
+                    <i className='fas fa-fw fa-question-circle' />
                   </button>
 
                   <Popover
@@ -301,7 +301,7 @@ export class PopupCreateWorkspace extends React.Component {
                     title={props.t('Back')}
                     type='button'
                   >
-                    <i className='fa fa-arrow-left newSpace__icon__left' /> {props.t('Back')}
+                    <i className='fas fa-arrow-left newSpace__icon__left' /> {props.t('Back')}
                   </button>
 
                   <button
@@ -311,7 +311,7 @@ export class PopupCreateWorkspace extends React.Component {
                     title={props.t('Create')}
                     type='button'
                   >
-                    {props.t('Create')} <i className='fa fa-check newSpace__icon__right' />
+                    {props.t('Create')} <i className='fas fa-check newSpace__icon__right' />
                   </button>
                 </div>
               </>

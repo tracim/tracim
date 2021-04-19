@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 
 import { getAvatarBaseUrl } from '../../helper.js'
 
-require('./Avatar.styl')
+// require('./Avatar.styl')  // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
 
 export const AVATAR_SIZE = {

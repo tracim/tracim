@@ -10,6 +10,9 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
 
+const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
+const WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR = `#${WORKSPACE_DESCRIPTION_TEXTAREA_ID}`
+
 export class WorkspaceAdvancedConfiguration extends React.Component {
   constructor (props) {
     super(props)
@@ -20,6 +23,18 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 
   handleTogglePopoverDefaultRoleInfo = () => {
     this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
+  }
+
+  componentDidMount () {
+    globalThis.wysiwyg(
+      WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR,
+      this.props.i18n.language,
+      this.props.onChangeDescription
+    )
+  }
+
+  componentWillUnmount () {
+    globalThis.tinymce.remove(WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR)
   }
 
   render () {
@@ -34,6 +49,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 
           <div className='formBlock__field workspace_advanced__description__text '>
             <textarea
+              id={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
               className='workspace_advanced__description__text__textarea'
               placeholder={props.t("Space's description")}
               value={props.description}
@@ -62,7 +78,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               className='btn transparentButton workspace_advanced__defaultRole__info'
               id='popoverDefaultRoleInfo'
             >
-              <i className='fa fa-fw fa-question-circle' />
+              <i className='fas fa-fw fa-question-circle' />
             </button>
 
             <Popover

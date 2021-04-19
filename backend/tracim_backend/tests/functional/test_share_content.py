@@ -5,6 +5,7 @@ import transaction
 from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.error import ErrorCode
+from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.models.auth import User
@@ -634,7 +635,7 @@ class TestPrivateShareEndpointsWithNotification(object):
         mailhog.cleanup_mailhog()
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)
-        queue = get_rq_queue(redis, "mail_sender")
+        queue = get_rq_queue(redis, RqQueueName.MAIL_SENDER)
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
 

@@ -12,9 +12,7 @@ environnement variable (see `env_var_name`).
 The priority order is (from less to more priority):
 - default values
 - configuration file
-- environnement variables
-
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
+- environment variables
 
 In most of the cases you'll want to serve Tracim behind an HTTP reverse-proxy to add TLS/caching support.
 You can configure Tracim's external URL with the `website.base_url` parameter, for example:
@@ -411,7 +409,7 @@ You then need to setup the configuration file:
     search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
-    search.elasticsearch.index_alias = tracim_contents
+    search.elasticsearch.index_alias_prefix = tracim
 
 Your Elasticsearch server needs to be running. You can then set up the index with:
 
@@ -538,3 +536,22 @@ Tracim can also be configured to use a Amazon S3 compatible storage back-end by 
 If you want to use your own S3 compatible back-end we recommend [minio](https://min.io) as we have tested its usage with Tracim.
 
 You can find an example docker compose file for storing files in minio [here](../../tools_docker/docker-compose-minio.yml)
+
+## Translation Feature
+
+Tracim has a feature allowing translation of notes(html-documents) and comments through external translation service (only systran supported now)
+To enable it in config file:
+
+```
+translation_service.enabled = True
+translation_service.provider = systran
+translation_service.systran.api_url = https://translate.systran.net/
+translation_service.systran.api_key = your-systran-api-key
+```
+
+To avoid waiting too long for a translation request you can tune its timeout (in which case an error will be displayed):
+
+```
+# timeout is in seconds
+translation_service.timeout = 5
+```

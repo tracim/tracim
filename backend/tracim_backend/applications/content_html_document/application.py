@@ -20,7 +20,6 @@ class ContentHTMLDocumentApp(TracimApplication):
             creation_label="Write a note",
             available_statuses=content_status_list.get_all(),
             slug_aliases=["page"],
-            allow_sub_content=False,
             file_extension=".document.html",
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=self,
@@ -53,7 +52,7 @@ def create_app() -> TracimApplication:
     return ContentHTMLDocumentApp(
         label="Notes",  # TODO - G.M - 24-05-2018 - Check label
         slug="contents/{}".format(HTML_DOCUMENTS_TYPE),
-        fa_icon="file-text-o",
+        fa_icon="far fa-file-alt",
         config={},
         main_route="",
     )

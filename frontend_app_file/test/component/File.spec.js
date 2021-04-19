@@ -27,7 +27,9 @@ describe('<File />', () => {
     registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
-    t: key => key
+    t: key => key,
+    isContentInFavoriteList: () => false,
+    loadFavoriteContentList: () => {}
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
@@ -134,7 +136,7 @@ describe('<File />', () => {
             fields: {
               content: {
                 ...contentFile.file,
-                raw_content: 'new random description'
+                description: 'new random description'
               },
               author: contentFile.file.author
             }
@@ -145,10 +147,10 @@ describe('<File />', () => {
           })
 
           it('should be updated with the content modified', () => {
-            expect(wrapper.state('newContent').raw_content).to.equal(tlmData.fields.content.raw_content)
+            expect(wrapper.state('newContent').description).to.equal(tlmData.fields.content.description)
           })
           it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].raw_content).to.equal(tlmData.fields.content.raw_content)
+            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].description).to.equal(tlmData.fields.content.description)
           })
         })
 

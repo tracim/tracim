@@ -7,7 +7,7 @@ require('./InputGroupText.styl')
 const InputGroupText = props => {
   return (
     <div className={classnames(`inputGroupText ${props.parentClassName}`, props.customClass, 'form-group')}>
-      {props.icon !== '' && <i className={classnames('inputGroupText__icon fa fa-fw', props.icon)} />}
+      {props.icon !== '' && <i className={classnames('inputGroupText__icon fas fa-fw', props.icon)} />}
       <input
         type={props.type}
         className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', { 'is-invalid': props.isInvalid })}

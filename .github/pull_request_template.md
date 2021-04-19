@@ -13,6 +13,7 @@
   - if there are modifications in the Tracim configuration files (eg. `development.ini`), they are documented in `backend/doc/setting.md`
   - any migration process required for existing instances is documented
   - relevant people for these changes are notified
+- [ ] Original authors of the features included in a multi-feature branch (maintenance fixes -> develop, security fixes -> develop, …) should be part of the reviewers, especially if you encountered merge conflicts.
 
 **For code reviewers**
 

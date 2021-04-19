@@ -1,4 +1,3 @@
-from datetime import datetime
 import enum
 from hashlib import sha256
 import os
@@ -18,6 +17,7 @@ from sqlalchemy.orm import synonym
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.mixins import CreationDateMixin
 
 
 class UploadPermissionType(enum.Enum):
@@ -25,7 +25,7 @@ class UploadPermissionType(enum.Enum):
     PUBLIC_LINK = "public-link"
 
 
-class UploadPermission(DeclarativeBase):
+class UploadPermission(CreationDateMixin, DeclarativeBase):
 
     MIN_PASSWORD_LENGTH = 6
     MAX_PASSWORD_LENGTH = 512
@@ -53,7 +53,6 @@ class UploadPermission(DeclarativeBase):
     type = Column(Enum(UploadPermissionType), nullable=False)
     _password = Column("password", Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
     enabled = Column(Boolean, unique=False, nullable=False, default=True)
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     disabled = Column(DateTime, unique=False, nullable=True, default=None)
     workspace = relationship(
         "Workspace", remote_side=[Workspace.workspace_id], backref="upload_permissions"

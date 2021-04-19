@@ -18,7 +18,6 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
-from tracim_backend import app_list
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -66,6 +65,7 @@ from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
@@ -305,6 +305,27 @@ class UserApi(object):
 
         query = query.limit(nb_elems)
         return query.all()
+
+    def get_known_user_ids(self, user_id: int) -> typing.List[int]:
+        if (
+            self._config.KNOWN_MEMBERS__FILTER
+            and self._user
+            and self._user.profile.id <= Profile.USER.id
+        ):
+            return [r[0] for r in self.get_users_ids_in_same_workpaces(user_id)]
+        return [r[0] for r in self._session.query(User.user_id).all()]
+
+    def get_all_known_users(self, user_id: int) -> typing.List[User]:
+        if (
+            self._config.KNOWN_MEMBERS__FILTER
+            and self._user
+            and self._user.profile.id <= Profile.USER.id
+        ):
+            query = self._apply_base_filters(self._session.query(User))
+            users_in_workspaces = self._get_user_ids_in_same_workspace(user_id=user_id)
+            query = query.filter(User.user_id.in_(users_in_workspaces))
+            return query.all()
+        return self.get_all()
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         return ALL__GROUP_MENTIONS
@@ -1276,7 +1297,7 @@ class UserApi(object):
         user = self.get_one(user_id)
         if not user.cropped_avatar:
             raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
-        _, original_file_extension = os.path.splitext(self._user.cropped_avatar.filename)
+        _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
             filename=filename,
@@ -1324,7 +1345,7 @@ class UserApi(object):
         user = self.get_one(user_id)
         if not user.cropped_cover:
             raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
-        _, original_file_extension = os.path.splitext(self._user.cropped_cover.filename)
+        _, original_file_extension = os.path.splitext(user.cropped_cover.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_cover,
             filename=filename,

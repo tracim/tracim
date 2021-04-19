@@ -27,6 +27,7 @@ from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import InvalidId
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import PageNotFound
+from tracim_backend.exceptions import ReactionNotFound
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
@@ -58,9 +59,12 @@ from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.favorite_content_controller import FavoriteContentController
+from tracim_backend.views.core_api.reaction_controller import ReactionController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
+from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
@@ -134,14 +138,26 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
-    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
-    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
-    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
-    tracim_setting_for_beaker["session.httponly"] = app_config.SESSION__HTTPONLY
-    tracim_setting_for_beaker["session.secure"] = app_config.SESSION__SECURE
-    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
+    tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
+    tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
+    tracim_setting_for_beaker_session["session.secure"] = app_config.SESSION__SECURE
+    session_factory = pyramid_beaker.session_factory_from_settings(
+        tracim_setting_for_beaker_session
+    )
     configurator.set_session_factory(session_factory)
-    pyramid_beaker.set_cache_regions_from_settings(tracim_setting_for_beaker)
+
+    # TODO - G.M - 2021-03-31 Make beaker cache configurable like sessions
+    #  through tracim config, see https://github.com/tracim/tracim/issues/4386
+    cached_region_settings = {
+        "cache.enabled": "True",
+        "cache.regions": "url_preview",
+        "cache.type": "memory",
+        "cache.url_preview.expire": "1800",  # = 30 min
+    }
+    pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
+
     # Add AuthPolicy
     configurator.include("pyramid_multiauth")
     policies = []
@@ -212,6 +228,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ReactionNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentInNotEditableState, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -236,6 +253,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
+    reaction_controller = ReactionController()
+    url_preview_controller = URLPreviewController()
+    favorite_content_controller = FavoriteContentController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
@@ -243,6 +263,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API)
     configurator.include(comment_controller.bind, route_prefix=BASE_API)
+    configurator.include(reaction_controller.bind, route_prefix=BASE_API)
+    configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
+    configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():

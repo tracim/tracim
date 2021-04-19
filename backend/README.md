@@ -245,7 +245,7 @@ Features such as async email notification and email reply system need additional
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
     # RQ worker for live messages
-    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event &
+    rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event elasticsearch_indexer &
 
 #### Stop Daemons
 
@@ -292,7 +292,7 @@ Example of `supervisord.conf`:
     ; RQ worker (if async jobs processing is enabled)
     [program:rq_database_worker]
     directory=<PATH>/tracim/backend/
-    command=rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event
+    command=rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event elasticsearch_indexer
     stdout_logfile =/tmp/rq_database_worker.log
     redirect_stderr=true
     autostart=true

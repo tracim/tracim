@@ -6,7 +6,7 @@ require('./WebdavInfo.styl')
 
 export const WebdavInfo = props => (
   <div className={`webdavInfo ${props.customClass}`}>
-    <div className='webdavInfo__header subTitle'>Webdav</div>
+    <div className='webdavInfo__header'>Webdav</div>
 
     <div className='webdavInfo__content'>
       <div className='webdavInfo__content__text'>
@@ -25,7 +25,7 @@ export const WebdavInfo = props => (
 
       <div className='webdavInfo__content__link'>
         <div className='webdavInfo__content__link__icon primaryColorBorder'>
-          <i className='fa fa-hdd-o' />
+          <i className='far fa-hdd' />
         </div>
 
         <div className='webdavInfo__content__link__url primaryColorBorder'>

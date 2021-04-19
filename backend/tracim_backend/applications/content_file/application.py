@@ -16,7 +16,6 @@ class ContentFileApp(TracimApplication):
             label="File",
             creation_label="Upload files",
             available_statuses=content_status_list.get_all(),
-            allow_sub_content=False,
             minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
             app=self,
         )
@@ -43,5 +42,5 @@ class ContentFileApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ContentFileApp(
-        label="Files", slug="contents/file", fa_icon="paperclip", config={}, main_route="",
+        label="Files", slug="contents/file", fa_icon="fas fa-paperclip", config={}, main_route="",
     )

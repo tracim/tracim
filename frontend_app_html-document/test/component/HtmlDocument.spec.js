@@ -5,16 +5,18 @@ import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
 import {
   TextAreaApp,
   PromptMessage,
-  APP_FEATURE_MODE
+  APP_FEATURE_MODE,
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 const props = {
+  apiUrl: 'http://localhost/api',
   mode: APP_FEATURE_MODE.VIEW,
   customColor: '#654321',
   wysiwygNewVersion: 'wysiwygNewVersionTest',
   disableValidateBtn: false,
   version: '42',
-  lastVersion: '1337',
+  lastVersion: 1337,
   text: "Hi, I'm a Html Document.",
   isArchived: false,
   isDeleted: false,
@@ -36,6 +38,8 @@ const props = {
   onClickShowDraft: () => {},
   onClickNotifyAll: () => {},
   onClickCloseNotifyAllMessage: () => {},
+  onClickToggleTranslation: () => {},
+  translationState: TRANSLATION_STATE.DISABLED,
   t: (s, opts) => {
     for (const p in opts) {
       s = s.replace('{{' + p + '}}', opts[p])
@@ -51,7 +55,7 @@ describe('<HtmlDocument />', () => {
     )
 
     it(`should display the last version number ${props.lastVersion}`, () =>
-      expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.lastVersion)
+      expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.lastVersion)
     )
 
     it('should display the content of the document', () =>
@@ -70,7 +74,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-hand-o-right')
+          .have.html().to.contains('far fa-hand-point-right')
       )
     })
 
@@ -102,7 +106,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-trash')
+          .have.html().to.contains('fa-trash-alt')
       )
     })
 
@@ -118,7 +122,7 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__left__wrapper'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
+          .have.html().to.contains(`${props.deprecatedStatus.faIcon}`)
       )
     })
 
@@ -134,13 +138,13 @@ describe('<HtmlDocument />', () => {
         expect(wrapper.find('.html-document__contentpage__textnote'))
           .to.have.descendants(PromptMessage)
           .and
-          .have.html().to.contains('fa-hand-o-right')
+          .have.html().to.contains('far fa-hand-point-right')
       )
     })
   })
 })
 
-describe('in REVISON mode', () => {
+describe('in REVISION mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
@@ -149,10 +153,10 @@ describe('in REVISON mode', () => {
   )
 
   it(`should display the version number ${props.version}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.version)
+    expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.version)
   )
   it(`should display the last version number ${props.lastVersion}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__lastversion').render().text()).to.contains(props.lastVersion)
+    expect(wrapper.find('.html-document__contentpage__textnote__top__lastversion').render().text()).to.contains(props.lastVersion)
   )
 })
 
