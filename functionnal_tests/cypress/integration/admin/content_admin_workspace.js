@@ -16,6 +16,7 @@ describe('content :: admin > workspace', function () {
 
   it('checks the columns of the space table', function () {
     cy.get('.adminWorkspace__workspaceTable .table__id').should('be.visible')
+    cy.get('.adminWorkspace__workspaceTable .table__type').should('be.visible')
     cy.get('.adminWorkspace__workspaceTable .table__sharedSpace').should('be.visible')
     cy.get('.adminWorkspace__workspaceTable .table__description').should('be.visible')
     cy.get('.adminWorkspace__workspaceTable .table__memberCount').should('be.visible')
