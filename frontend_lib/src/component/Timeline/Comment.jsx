@@ -138,12 +138,14 @@ const Comment = props => {
         <div
           className={classnames(`${props.customClass}__footer`, 'comment__footer')}
         >
-          <TranslateButton
-            translationState={props.translationState}
-            onClickTranslate={props.onClickTranslate}
-            onClickRestore={props.onClickRestore}
-            dataCy='commentTranslateButton'
-          />
+          {!isFile && (
+            <TranslateButton
+              translationState={props.translationState}
+              onClickTranslate={props.onClickTranslate}
+              onClickRestore={props.onClickRestore}
+              dataCy='commentTranslateButton'
+            />
+          )}
           <EmojiReactions
             apiUrl={props.apiUrl}
             loggedUser={props.loggedUser}
