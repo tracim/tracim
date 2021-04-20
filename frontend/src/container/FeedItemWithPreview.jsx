@@ -317,6 +317,7 @@ export class FeedItemWithPreview extends React.Component {
                   customClass='feedItem__publication'
                   apiUrl={FETCH_CONFIG.apiUrl}
                   contentId={Number(props.content.id)}
+                  apiContent={props.content}
                   workspaceId={Number(props.workspaceId)}
                   author={firstComment.author}
                   loggedUser={props.user}

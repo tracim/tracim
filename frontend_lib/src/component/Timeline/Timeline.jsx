@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
 import Comment from './Comment.jsx'
-import CommentFilePreview from './CommentFilePreview.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
@@ -155,13 +154,15 @@ export class Timeline extends React.Component {
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
+              case TIMELINE_TYPE.COMMENT_AS_FILE:
                 return (
                   <Comment
                     isPublication={false}
-                    customClass={props.customClass}
+                    customClass={`${props.customClass}__comment`}
                     customColor={props.customColor}
                     apiUrl={props.apiUrl}
                     contentId={Number(content.content_id)}
+                    apiContent={content}
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
@@ -175,6 +176,7 @@ export class Timeline extends React.Component {
                     translationState={content.translationState}
                     onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
+                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -191,19 +193,6 @@ export class Timeline extends React.Component {
                     allowClickOnRevision={props.allowClickOnRevision}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
                     key={`revision_${content.revision_id}`}
-                  />
-                )
-              case TIMELINE_TYPE.COMMENT_AS_FILE:
-                return (
-                  <CommentFilePreview
-                    customClass={props.customClass}
-                    customColor={props.customColor}
-                    apiUrl={props.apiUrl}
-                    apiContent={content}
-                    loggedUser={props.loggedUser}
-                    onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
-                    key={`commentAsFile_${content.content_id}`}
-                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
             }

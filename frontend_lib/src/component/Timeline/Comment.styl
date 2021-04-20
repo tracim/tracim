@@ -1,45 +1,52 @@
 @import '../../css/Variable.styl'
 
 .comment
+  border-radius 5px
+  padding 10px
+  border 1px solid grey
+  background-color offWhite
+  display flex
+  flex-direction column
+
   &.sent
-    padding-left 5%
-    margin-left auto
+    margin-left 5%
   &.received
-    padding-right 5%
-    margin-right auto
+    margin-right 5%
   &__body
-    border-radius 5px
-    padding 10px
-    border 1px solid grey
-    flex-direction column
-    background-color offWhite
     display flex
+    flex-direction row
+
+    .avatar-wrapper
+      margin-inline-end 10px
+
     &__content
-      display flex
-      .avatar-wrapper
-        margin-inline-end 10px
+      flex 1
+      &__text
+        img
+          max-width 100%
+          height auto
+          box-shadow 0px 0px 10px mediumDarkGrey
+
       &__textAndPreview
         flex 1
-      &__actions
-        padding 0
-        color grey
-        &::after
-          display none
-        &:hover
-          color fontColor
-    &__header
-      display flex
-      flex-direction row
-      margin-bottom 10px
-      font-size 12px
-      &__meta
-        flex 1
-        &__author
-          overflow-wrap anywhere
-    img
-      max-width 100%
-      height auto
-      box-shadow 0px 0px 10px mediumDarkGrey
+
+      &__header
+        display flex
+        flex-direction row
+        margin-bottom 10px
+        font-size 12px
+        &__meta
+          flex 1
+          &__author
+            overflow-wrap anywhere
+            font-size 16px
+        &__actions
+          padding 0
+          color grey
+          &::after
+            display none
+          &:hover
+            color fontColor
   &__footer
     display flex
     margin-top 10px
