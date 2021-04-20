@@ -366,7 +366,7 @@ export class AdminWorkspaceUser extends React.Component {
       is_active: message.fields.user.is_active,
       role: message.fields.member.role
     })
-    const newWorkspace = { ...message.workspace, memberList: newMemberList }
+    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       newWorkspace,
