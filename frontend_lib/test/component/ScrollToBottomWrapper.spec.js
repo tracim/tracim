@@ -53,7 +53,6 @@ describe('<ScrollToBottomWrapper />', () => {
 
           before(() => {
             scrollToCallBack.resetHistory()
-            const instance = wrapper.instance()
             instance.atBottom = testCase.atBottom
             instance.handleResizeChildren()
             instance.handleResizeChildren.flush()
