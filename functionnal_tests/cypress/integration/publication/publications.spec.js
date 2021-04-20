@@ -8,7 +8,6 @@ const fakePreview = {
 }
 
 describe('Publications', () => {
-  console.error("HHIIIIIIIII")
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
