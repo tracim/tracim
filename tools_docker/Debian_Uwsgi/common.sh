@@ -97,7 +97,7 @@ if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
 fi
 
 # Create and link branding directory if it does not exist
-if [ ! -e /etc/tracim/branding ]; then
+if [ ! -d /etc/tracim/branding ]; then
     cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
 fi
 if [ ! -L /tracim/frontend/dist/assets/branding ]; then
