@@ -25,7 +25,7 @@ describe('<Revision />', () => {
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__messagelist__version'`, () => {
-      expect(wrapper.find(`li.${props.customClass}__messagelist__version`)).to.have.lengthOf(1)
+      expect(wrapper.find(`div.${props.customClass}__messagelist__version`)).to.have.lengthOf(1)
     })
 
     it(`the span ".revision__data__nb" should contains "${props.number}"`, () => {
@@ -40,11 +40,11 @@ describe('<Revision />', () => {
   describe('Handlers', () => {
     it('should call onClickRevision when click and when allowClickOnRevision', () => {
       wrapper.setProps({ allowClickOnRevision: true })
-      wrapper.find(`li.${props.customClass}__messagelist__version`).simulate('click')
+      wrapper.find(`div.${props.customClass}__messagelist__version`).simulate('click')
       expect(onClickRevisionCallBack.called).to.equal(true)
       onClickRevisionCallBack.resetHistory()
       wrapper.setProps({ allowClickOnRevision: props.allowClickOnRevision })
-      wrapper.find(`li.${props.customClass}__messagelist__version`).simulate('click')
+      wrapper.find(`div.${props.customClass}__messagelist__version`).simulate('click')
       expect(onClickRevisionCallBack.called).to.equal(false)
     })
   })
