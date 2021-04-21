@@ -289,9 +289,9 @@ export class FeedItemWithPreview extends React.Component {
     const publicationContent = (
       props.isPublication
         ? (
-          this.props.content.type === CONTENT_TYPE.FILE
+          props.content.type === CONTENT_TYPE.FILE
             ? props.content
-            : props.content.firstComment
+            : this.getFirstComment()
         )
         : null
     )
