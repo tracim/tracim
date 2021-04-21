@@ -1189,6 +1189,12 @@ class WorkspaceModifySchema(marshmallow.Schema):
         allow_none=True,
         default=None,
     )
+    publication_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="define whether a user can create and view publications in this workspace",
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1233,6 +1239,12 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         default=None,
         required=False,
         validate=positive_int_validator,
+    )
+    publication_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="define whether a user can create and view publications in this workspace",
+        default=None,
+        allow_none=True,
     )
 
     @post_load
@@ -1309,6 +1321,10 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         allow_none=True,
         required=True,
         validate=positive_int_validator,
+    )
+    publication_enabled = marshmallow.fields.Bool(
+        default=True,
+        description="define whether a user can create and view publications in this workspace",
     )
 
     class Meta:

@@ -22,8 +22,10 @@ describe('App Workspace Advanced', function () {
     cy.cancelXHR()
   })
 
+  // FIXME - GB - 16-04-2021 - The test below is unstable. Sometimes waitForTinyMCELoaded() doesn't works
+  // See https://github.com/tracim/tracim/issues/4352
   describe("Changing the workspace's description", () => {
-    it('Should update the description in the dashboard', function () {
+    it.skip('Should update the description in the dashboard', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
@@ -198,5 +200,57 @@ describe('App Workspace Advanced', function () {
 
       cy.enableUser(userId)
     })
+  })
+
+  describe('Optional features', () => {
+    beforeEach(() => {
+      cy.loginAs('administrators')
+      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
+        .click()
+    })
+    const testCases = [
+      {
+        feature: 'publication',
+        buttonSelector: '[data-cy=publication_enabled]',
+        deactivatedMessage: 'Publications deactivated',
+        activatedMessage: 'Publications activated'
+      },
+      {
+        feature: 'agenda',
+        buttonSelector: '[data-cy=agenda_enabled]',
+        deactivatedMessage: 'Agenda deactivated',
+        activatedMessage: 'Agenda activated'
+      },
+      {
+        feature: 'download',
+        buttonSelector: '[data-cy=download_enabled]',
+        deactivatedMessage: 'Download deactivated',
+        activatedMessage: 'Download activated'
+      },
+      {
+        feature: 'upload',
+        buttonSelector: '[data-cy=upload_enabled]',
+        deactivatedMessage: 'Upload deactivated',
+        activatedMessage: 'Upload activated'
+      }
+    ]
+    for (const testCase of testCases) {
+      it(`should allow to toggle ${testCase.feature}`, () => {
+        cy.get('[data-cy=popin_right_part_optional_functionalities]').click()
+        cy.get('.wsContentGeneric__content__right__content__title').should('be.visible')
+        cy.contains(`${testCase.buttonSelector}`, testCase.activatedMessage)
+        cy.get(`${testCase.buttonSelector} > .btnswitch > .switch > .slider`).click()
+        cy.contains(`${testCase.buttonSelector}`, testCase.deactivatedMessage)
+        cy.contains('.flashmessage__container__content__text__paragraph', testCase.deactivatedMessage)
+          .should('be.visible')
+          .get('.flashmessage__container__close__icon')
+          .click()
+        cy.get(`${testCase.buttonSelector} > .btnswitch > .switch > .slider`).click()
+        cy.contains(`${testCase.buttonSelector}`, testCase.activatedMessage)
+        cy.contains('.flashmessage__container__content__text__paragraph', testCase.activatedMessage)
+      })
+    }
   })
 })

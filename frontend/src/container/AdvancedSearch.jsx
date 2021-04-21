@@ -51,7 +51,7 @@ export class AdvancedSearch extends React.Component {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: false,
+      isFilterMenuOpen: true,
       searchType: ADVANCED_SEARCH_TYPE.CONTENT
     }
 
@@ -420,14 +420,20 @@ export class AdvancedSearch extends React.Component {
     const { props, state } = this
     const currentSearch = this.getCurrentSearchObject()
     const currentNumberSearchResults = currentSearch.resultList.length
+
+    const i18nOpts = {
+      keywords: currentSearch.searchString,
+      interpolation: { escapeValue: false }
+    }
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='advancedSearch__wrapper'>
             <PageTitle
               title={(currentNumberSearchResults === 1
-                ? props.t('Result for "{{keywords}}"', { keywords: currentSearch.searchString })
-                : props.t('Results for "{{keywords}}"', { keywords: currentSearch.searchString })
+                ? props.t('Result for: {{keywords}}', i18nOpts)
+                : props.t('Results for: {{keywords}}', i18nOpts)
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
@@ -495,7 +501,7 @@ export class AdvancedSearch extends React.Component {
 
                   {currentNumberSearchResults === 0 && (
                     <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms')}: "${currentSearch.searchString}"`}
+                      {`${props.t('No results for the search terms:')} ${currentSearch.searchString}`}
                     </div>
                   )}
 

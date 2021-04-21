@@ -207,7 +207,8 @@ import {
   getContent,
   getWorkspaceContent,
   getHtmlDocTranslated,
-  getCommentTranslated
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -227,6 +228,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
+export { default as Comment } from './component/Timeline/Comment.jsx'
 
 export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
@@ -421,5 +423,6 @@ export {
   getCommentTranslated,
   getHtmlDocTranslated,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  getGenericWorkspaceContent
 }

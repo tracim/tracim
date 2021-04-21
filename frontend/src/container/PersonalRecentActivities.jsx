@@ -95,6 +95,7 @@ export class PersonalRecentActivities extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
+          workspaceList={props.workspaceList}
         />
       </div>
     )
@@ -109,7 +110,7 @@ PersonalRecentActivities.propTypes = {
   onEventClicked: PropTypes.func
 }
 
-const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
+const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, workspaceList })
 const component = withActivity(
   TracimComponent(PersonalRecentActivities),
   setUserActivityList,

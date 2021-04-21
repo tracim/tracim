@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import debounce from 'lodash/debounce'
 
 /* NOTE - RJ - 2021-04-09
  *
@@ -12,6 +13,14 @@ import PropTypes from 'prop-types'
  */
 
 const SCROLL_THRESHOLD = 2
+
+/* NOTE - RJ - 2021-04-19
+ * While loading, a container can resize a lot of times. Debouncing avoids
+ * scrolling to many times, which would feel janky and sometimes lead to the
+ * wrong scroll position. It also allows scrolling when the size of the
+ * container is likely settled
+ */
+const SCROLL_DEBOUCE_TIME = 500
 
 /*
  * DOC - SG - 2021-04-08
@@ -57,7 +66,7 @@ export class ScrollToBottomWrapper extends React.Component {
     this.handleResizeChildren()
   }
 
-  handleResizeChildren = () => {
+  handleResizeChildren = debounce(() => {
     const { props } = this
 
     if (!this.container) return
@@ -81,7 +90,7 @@ export class ScrollToBottomWrapper extends React.Component {
       top: scrollTop,
       behavior
     })
-  }
+  }, SCROLL_DEBOUCE_TIME)
 
   render () {
     const { props } = this

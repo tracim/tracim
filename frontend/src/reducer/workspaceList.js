@@ -24,7 +24,8 @@ export const serializeWorkspaceListProps = {
   workspace_id: 'id',
   description: 'description',
   memberList: 'memberList',
-  access_type: 'accessType'
+  access_type: 'accessType',
+  publication_enabled: 'publicationEnabled'
 }
 
 export function workspaceList (state = [], action, lang) {

@@ -507,6 +507,9 @@ class ContentApi(object):
         if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
 
+        if content_namespace == ContentNamespaces.PUBLICATION:
+            workspace.check_for_publication()
+
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
         # can call here with None. Must update create_comment to require the
         # workspace.
@@ -1182,6 +1185,8 @@ class ContentApi(object):
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
+        if new_content_namespace == ContentNamespaces.PUBLICATION:
+            (new_workspace or item.workspace).check_for_publication()
         self._move_current(
             item, new_parent, must_stay_in_same_workspace, new_workspace, new_content_namespace
         )
@@ -1335,6 +1340,8 @@ class ContentApi(object):
         :param do_notify: notify copy or not
         :return: Newly copied item
         """
+        if new_content_namespace == ContentNamespaces.PUBLICATION:
+            (new_workspace or item.workspace).check_for_publication()
         if (not new_parent and not new_label and not new_file_extension and not new_workspace) or (
             new_parent == item.parent
             and new_label == item.label

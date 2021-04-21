@@ -14,6 +14,7 @@ const newWrapper = (props) => {
 
 describe('<ScrollToBottomWrapper />', () => {
   const scrollToCallBack = sinon.spy()
+
   window.HTMLElement.prototype.scrollTo = scrollToCallBack
 
   describe('functions', () => {
@@ -44,17 +45,23 @@ describe('<ScrollToBottomWrapper />', () => {
           props: { shouldScrollToBottom: false }
         }
       ]
+
       for (const testCase of testCases) {
         describe(testCase.description, () => {
           const wrapper = newWrapper(testCase.props)
+          const instance = wrapper.instance()
+
           before(() => {
             scrollToCallBack.resetHistory()
-            wrapper.instance().atBottom = testCase.atBottom
-            wrapper.instance().handleResizeChildren()
+            instance.atBottom = testCase.atBottom
+            instance.handleResizeChildren()
+            instance.handleResizeChildren.flush()
           })
+
           const expectString = testCase.scrollToCalled
             ? 'scrollTo should have been called'
             : 'scrollTo should not have been called'
+
           it(expectString, () => {
             expect(scrollToCallBack.called).to.equal(testCase.scrollToCalled)
           })

@@ -13549,6 +13549,7 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
+    react-router-dom: ^5.2.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13601,6 +13602,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-router-dom: ^5.2.0
     reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
@@ -13716,6 +13718,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-router-dom: ^5.2.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13770,6 +13773,7 @@ fsevents@^1.2.7:
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-router-dom: ^5.2.0
     reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
@@ -13823,6 +13827,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-router-dom: ^5.2.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13926,6 +13931,7 @@ fsevents@^1.2.7:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
+    react-router-dom: ^5.2.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14

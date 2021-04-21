@@ -255,8 +255,8 @@ export function appContentFactory (WrappedComponent) {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
-        ? tinymce.activeEditor.getContent()
-        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+        ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
       let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)

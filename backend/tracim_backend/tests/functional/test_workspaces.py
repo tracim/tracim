@@ -442,6 +442,7 @@ class TestWorkspaceEndpoint(object):
             "public_upload_enabled": False,
             "public_download_enabled": False,
             "default_user_role": "contributor",
+            "publication_enabled": False,
         }
         # Before
         res = web_testapp.get("/api/workspaces/1", status=200)
@@ -458,6 +459,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is True
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
+        assert workspace["publication_enabled"] is True
 
         # modify workspace
         res = web_testapp.put_json("/api/workspaces/1", status=200, params=params)
@@ -477,6 +479,7 @@ class TestWorkspaceEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
         assert last_event.workspace == workspace
+        assert workspace["publication_enabled"] is False
 
         # after
         res = web_testapp.get("/api/workspaces/1", status=200)
@@ -493,6 +496,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
+        assert workspace["publication_enabled"] is False
 
     def test_api__update_workspace__ok_200__partial_change_label_only(
         self, workspace_api_factory, application_api_factory, web_testapp, app_config
@@ -713,6 +717,7 @@ class TestWorkspaceEndpoint(object):
             "access_type": "open",
             "default_user_role": "contributor",
             "parent_id": None,
+            "publication_enabled": False,
         }
         res = web_testapp.post_json("/api/workspaces", status=200, params=params)
         assert res.json_body
@@ -727,6 +732,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
+        assert workspace["publication_enabled"] is False
         workspace_id = res.json_body["workspace_id"]
         (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
@@ -1185,12 +1191,15 @@ class TestWorkspacesEndpoints(object):
         assert len(res) == 3
         workspace = res[0]
         assert workspace["label"] == "test"
+        assert workspace["publication_enabled"] is True
         assert workspace["slug"] == "test"
         workspace = res[1]
         assert workspace["label"] == "test2"
+        assert workspace["publication_enabled"] is True
         assert workspace["slug"] == "test2"
         workspace = res[2]
         assert workspace["label"] == "test3"
+        assert workspace["publication_enabled"] is True
         assert workspace["slug"] == "test3"
 
     def test_api__get_workspaces__ok_200__with_parent_ids(self, workspace_api_factory, web_testapp):

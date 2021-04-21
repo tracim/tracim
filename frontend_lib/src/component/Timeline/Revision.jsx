@@ -16,7 +16,7 @@ const Revision = props => {
     : props.t(revisionType.label)
 
   return (
-    <li
+    <div
       className={classnames(`${props.customClass}__messagelist__version`, 'revision')}
       onClick={props.allowClickOnRevision ? props.onClickRevision : () => {}}
       style={{
@@ -47,7 +47,7 @@ const Revision = props => {
           </span>
         </div>
       </span>
-    </li>
+    </div>
   )
 }
 

@@ -9,7 +9,6 @@ import {
   PageWrapper,
   PageContent,
   IconButton,
-  convertBackslashNToBr,
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   ROLE,
@@ -439,13 +438,18 @@ export class Dashboard extends React.Component {
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
-    const contentTypeButtonList = [{
-      slug: 'publications',
-      creationLabel: props.t('Publish some information'),
-      route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
-      hexcolor: publicationColor,
-      faIcon: 'fas fa-stream'
-    }].concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
+    let contentTypeButtonList = []
+    if (props.curWs.publicationEnabled) {
+      contentTypeButtonList.push({
+        slug: 'publications',
+        creationLabel: props.t('Publish some information'),
+        route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
+        hexcolor: publicationColor,
+        faIcon: 'fas fa-stream'
+      })
+    }
+
+    contentTypeButtonList = contentTypeButtonList.concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
@@ -503,7 +507,7 @@ export class Dashboard extends React.Component {
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
-    const description = convertBackslashNToBr(props.curWs.description)
+    const description = props.curWs.description.trim()
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -521,7 +525,7 @@ export class Dashboard extends React.Component {
                   <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
 
                   <div className='dashboard__workspace__detail'>
-                    {(description.trim()
+                    {(description
                       ? (
                         <div
                           className='dashboard__workspace__detail__description'

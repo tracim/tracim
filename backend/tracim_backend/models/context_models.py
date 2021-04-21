@@ -607,6 +607,7 @@ class WorkspaceUpdate(object):
         agenda_enabled: Optional[bool] = None,
         public_upload_enabled: Optional[bool] = None,
         public_download_enabled: Optional[bool] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -616,6 +617,7 @@ class WorkspaceUpdate(object):
         self.default_user_role = None
         if default_user_role:
             self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.publication_enabled = publication_enabled
 
 
 class WorkspaceCreate(object):
@@ -633,6 +635,7 @@ class WorkspaceCreate(object):
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
         parent_id: Optional[int] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -642,6 +645,7 @@ class WorkspaceCreate(object):
         self.access_type = WorkspaceAccessType(access_type)
         self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
         self.parent_id = parent_id
+        self.publication_enabled = publication_enabled
 
 
 class ContentCreation(object):
@@ -1022,6 +1026,10 @@ class WorkspaceInContext(object):
     @property
     def parent_id(self) -> int:
         return self.workspace.parent_id
+
+    @property
+    def publication_enabled(self) -> bool:
+        return self.workspace.publication_enabled
 
 
 class UserRoleWorkspaceInContext(object):

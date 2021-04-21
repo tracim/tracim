@@ -42,6 +42,7 @@ from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
+from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
@@ -95,6 +96,13 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         nullable=False,
         default=False,
         server_default=sqlalchemy.sql.expression.literal(False),
+    )
+    publication_enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=True,
+        server_default=sqlalchemy.sql.expression.literal(True),
     )
     access_type = Column(
         Enum(WorkspaceAccessType),
@@ -219,6 +227,12 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
             ):
                 if not content_types or child.type in content_types:
                     yield child
+
+    def check_for_publication(self) -> None:
+        if not self.publication_enabled:
+            raise WorkspaceFeatureDisabled(
+                "Feature {} is disabled in workspace {}".format("publication", self.workspace_id)
+            )
 
 
 Index("idx__workspaces__parent_id", Workspace.parent_id)

@@ -50,5 +50,9 @@
   "Request accepted": "Pedido aceito",
   "Request rejected": "Pedido rejeitado",
   "There are no requests yet.": "Ainda não tem pedidos.",
-  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Esta é a função que os membros terão por pré-definição quando se juntarem ao seu espaço (apenas para espaços abertos ou a pedido)."
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Esta é a função que os membros terão por pré-definição quando se juntarem ao seu espaço (apenas para espaços abertos ou a pedido).",
+  "Publications activated": "Publicações ativadas",
+  "Publications deactivated": "Publicações desativadas",
+  "Error while activating publications": "Erro ao activar publicações",
+  "Error while deactivating publications": "Erro ao desactivar publicações"
 }
