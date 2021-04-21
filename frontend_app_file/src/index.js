@@ -2,6 +2,7 @@ import React from 'react'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import ReactDOM from 'react-dom'
+import { Router } from 'react-router-dom'
 import File from './container/File.jsx'
 import PopupCreateFile from './container/PopupCreateFile.jsx'
 
@@ -12,7 +13,9 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: (data) => {
     return ReactDOM.render(
-      <File data={data} />
+      <Router history={data.config.history}>
+        <File data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },
