@@ -15,6 +15,12 @@ describe('<Comment />', () => {
     createdDistance: 'randomCreatedDistance',
     contentId: 1337,
     workspaceId: 42,
+    apiContent: {
+      id: 1337,
+      workspaceId: 42,
+      type: 'comment',
+      CurrentRevisionId: 1338
+    },
     onClickTranslate: () => {},
     onClickRestore: () => {},
     onClickEditComment: () => {},
@@ -29,7 +35,7 @@ describe('<Comment />', () => {
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__messagelist__item'`, () => {
-      expect(wrapper.find(`li.${props.customClass}__messagelist__item`)).to.have.lengthOf(1)
+      expect(wrapper.find(`div.${props.customClass}__messagelist__item`)).to.have.lengthOf(1)
     })
 
     it(`should have the class '${props.customClass}'`, () => {
@@ -41,15 +47,15 @@ describe('<Comment />', () => {
     })
 
     it(`should display the author ${props.author.public_name} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__author`)).to.have.text().equal(props.author.public_name)
+      expect(wrapper.find(`div.${props.customClass}__body__content__header__meta__author`)).to.have.text().equal(props.author.public_name)
     })
 
     it(`should display the created Distance ${props.createdDistance} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__date`)).to.have.text().equal(props.createdDistance)
+      expect(wrapper.find(`div.${props.customClass}__body__content__header__meta__date`)).to.have.text().equal(props.createdDistance)
     })
 
     it(`should display the text ${props.text} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__text`).render()).to.have.text().equal(props.text)
+      expect(wrapper.find(`div.${props.customClass}__body__content__text`).render()).to.have.text().equal(props.text)
     })
 
     it('should have the className "sent" when it is your comment', () => {

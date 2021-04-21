@@ -1004,7 +1004,7 @@ export class HtmlDocument extends React.Component {
               icon: 'fas fa-history',
               children: state.config.apiUrl ? (
                 <Timeline
-                  customClass={`${state.config.slug}__contentpage`}
+                  customClass={`${state.config.slug}__contentpage__timeline`}
                   customColor={state.config.hexcolor}
                   loggedUser={state.loggedUser}
                   memberList={state.config.workspace.memberList}

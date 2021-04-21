@@ -1,42 +1,53 @@
 @import '../../css/Variable.styl'
 
 .comment
+  border-radius 5px
+  padding 10px
+  border 1px solid grey
+  background-color offWhite
+  display flex
+  flex-direction column
+
   &.sent
-    padding-left 5%
-    margin-left auto
+    margin-left 5%
   &.received
-    padding-right 5%
-    margin-right auto
+    margin-right 5%
   &__body
-    border-radius 5px
-    padding 15px 15px 15px 20px
-    border 1px solid grey
-    background-color offWhite
     display flex
-    flex-direction column
+    flex-direction row
+
+    .avatar-wrapper
+      margin-inline-end 10px
+
     &__content
       flex 1
-      display flex
       &__text
-        margin 10px 10px 10px 20px
-        width calc(100% - 50px) // 50px is the avatar size
+        img
+          max-width 100%
+          height auto
+          box-shadow 0px 0px 10px mediumDarkGrey
+
       &__textAndPreview
-        width calc(100% - 50px) // 50px is the avatar size
-      &__actions
-        padding 0
-        color grey
-        &::after
-          display none
-        &:hover
-          color fontColor
-    &__date
-      font-size 12px
-    &__text
-      margin-top 10px
-    img
-      max-width 100%
-      height auto
-      box-shadow 0px 0px 10px mediumDarkGrey
+        flex 1
+
+      &__header
+        display flex
+        flex-direction row
+        margin-bottom 10px
+        font-size 12px
+        &__meta
+          flex 1
+          &__author
+            overflow-wrap anywhere
+            font-size 16px
+        &__actions
+          padding 0
+          color grey
+          &::after
+            display none
+          &:hover
+            color fontColor
   &__footer
     display flex
+    margin-top 10px
     justify-content space-between
