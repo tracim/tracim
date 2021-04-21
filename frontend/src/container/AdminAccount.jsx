@@ -377,6 +377,9 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            userEmail={state.userToEdit.email}
+                            userUsername={state.userToEdit.username}
+                            userPublicName={state.userToEdit.publicName}
                             userAuthType={state.userToEdit.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}

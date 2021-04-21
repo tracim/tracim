@@ -290,6 +290,9 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            userEmail={props.user.email}
+                            userUsername={props.user.username}
+                            userPublicName={props.user.publicName}
                             userAuthType={props.user.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}
