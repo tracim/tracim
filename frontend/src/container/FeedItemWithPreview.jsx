@@ -286,7 +286,15 @@ export class FeedItemWithPreview extends React.Component {
       }
     }
 
-    const firstComment = this.getFirstComment()
+    const publicationContent = (
+      props.isPublication
+        ? (
+          this.props.content.type === CONTENT_TYPE.FILE
+            ? props.content
+            : props.content.firstComment
+        )
+        : null
+    )
 
     return (
       <div className='feedItem' ref={props.innerRef}>
@@ -311,7 +319,7 @@ export class FeedItemWithPreview extends React.Component {
         {props.contentAvailable && (
           <>
             {(props.isPublication
-              ? (firstComment &&
+              ? (publicationContent &&
                 <Comment
                   isPublication
                   customClass='feedItem__publication'
@@ -319,16 +327,16 @@ export class FeedItemWithPreview extends React.Component {
                   contentId={Number(props.content.id)}
                   apiContent={props.content}
                   workspaceId={Number(props.workspaceId)}
-                  author={firstComment.author}
+                  author={publicationContent.author}
                   loggedUser={props.user}
-                  createdRaw={firstComment.created_raw}
-                  createdDistance={firstComment.created}
+                  createdRaw={publicationContent.created_raw}
+                  createdDistance={publicationContent.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
-                      : firstComment.raw_content
+                      : publicationContent.raw_content
                   }
-                  fromMe={props.user.userId === firstComment.author.user_id}
+                  fromMe={props.user.userId === publicationContent.author.user_id}
                   onClickTranslate={this.handleTranslate}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
