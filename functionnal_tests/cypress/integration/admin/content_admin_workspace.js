@@ -23,13 +23,15 @@ describe('content :: admin > workspace', function () {
     cy.get('.adminWorkspace__workspaceTable .table__delete').should('be.visible')
   })
 
+
+
   it('checks the delete space button', function () {
     cy.get('.adminWorkspace__workspaceTable tbody tr:first .adminWorkspace__table__delete__icon').click()
 
     // Cancel
     cy.get('.confirm_popup').should('be.visible')
     cy.get('[data-cy=confirm_popup__button_cancel]').click()
-    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'My space')
+    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(3)', 'My space')
 
     // Delete
     cy.get('.adminWorkspace__workspaceTable tbody tr:first .adminWorkspace__table__delete__icon').click()
