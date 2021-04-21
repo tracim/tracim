@@ -1,4 +1,6 @@
 import React from 'react'
+import { Provider } from 'react-redux'
+import configureMockStore from 'redux-mock-store'
 import { MemoryRouter } from 'react-router-dom'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { expect } from 'chai'
@@ -21,6 +23,8 @@ describe('In <AdvancedSearch />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
   const setHeadTitleCallBack = sinon.spy()
   const setAppliedFilterCallBack = sinon.spy()
+  const mockStore = configureMockStore()
+  const store = mockStore({})
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
@@ -147,9 +151,12 @@ describe('In <AdvancedSearch />', () => {
         }
       ]
       for (const testCase of testCases) {
-        const wrapper = mount(<MemoryRouter><AdvancedSearchWithHOC {...testCase.props} /></MemoryRouter>)
+        const wrapper = mount(<Provider store={store}><MemoryRouter><AdvancedSearchWithHOC {...testCase.props} /></MemoryRouter></Provider>)
         it(`should always exist (${testCase.description})`, () => {
-          expect(wrapper.find('.advancedSearch__content__detail__filter').length).to.equal(1)
+          expect(
+            wrapper.find('.advancedSearch__content__detail__filter').length +
+            wrapper.find('.advancedSearch__openMenu').length
+          ).to.equal(1)
         })
       }
     })

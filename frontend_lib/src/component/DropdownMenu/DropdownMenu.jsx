@@ -11,13 +11,13 @@ const DropdownMenu = props => {
         aria-haspopup='true'
         className={classnames(
           'btn dropdown-toggle',
+          'dropdownMenuButton',
           props.isButton ? 'primaryColorBorder' : 'transparentButton',
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
-        id='dropdownMenuButton'
         onClick={e => { e.stopPropagation(); props.buttonClick() }}
         title={props.buttonTooltip ? props.buttonTooltip : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)}
         type='button'
