@@ -148,6 +148,7 @@ export class PersonalData extends React.Component {
 PersonalData.propTypes = {
   userEmail: PropTypes.string,
   userUsername: PropTypes.string,
+  userPublicName: PropTypes.string,
   userAuthType: PropTypes.string,
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
