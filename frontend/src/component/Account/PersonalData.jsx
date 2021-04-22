@@ -65,7 +65,7 @@ export class PersonalData extends React.Component {
         <form className='personaldata__form'>
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <label>
-              {props.t('New full name')}
+              {props.t('New full name:')&nbsp;
               <input
                 className='personaldata__form__txtinput primaryColorBorderLighten form-control'
                 type='text'
