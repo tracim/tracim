@@ -10,6 +10,7 @@ import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
+import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import {
   ROLE,
   CONTENT_TYPE,
@@ -54,9 +55,16 @@ const Comment = props => {
             {!props.isPublication && (
               <div className={classnames(`${props.customClass}__body__content__header`, 'comment__body__content__header')}>
                 <div className={classnames(`${props.customClass}__body__content__header__meta`, 'comment__body__content__header__meta')}>
-                  <div className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
-                    {props.author.public_name}
-                  </div>
+                  <ProfileNavigation
+                    user={{
+                      userId: props.author.user_id,
+                      publicName: props.author.public_name
+                    }}
+                  >
+                    <div className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
+                      {props.author.public_name}
+                    </div>
+                  </ProfileNavigation>
 
                   <div
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
