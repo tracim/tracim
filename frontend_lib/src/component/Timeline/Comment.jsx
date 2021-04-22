@@ -177,7 +177,7 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.string.isRequired,
+  createdRaw: PropTypes.string,
   createdDistance: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
@@ -189,6 +189,7 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
+  createdRaw: '',
   customClass: '',
   text: '',
   fromMe: false,

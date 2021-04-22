@@ -46,7 +46,8 @@ export class FeedItemWithPreview extends React.Component {
   getFirstComment () {
     // NOTE - RJ - 2021-04-09 is commentList[0] either the first comment (in recent activities)
     // or the second comment (in publications), and then firstComment is the first comment
-    return this.props.content.firstComment || this.props.commentList[0]
+    const { props } = this
+    return props.inRecentActivities ? props.commentList[0] : props.content.firstComment
   }
 
   getInitialTranslationState (props) {
@@ -282,7 +283,7 @@ export class FeedItemWithPreview extends React.Component {
         : props.t('Open_action')
     } else {
       if (props.previewLinkType !== LINK_TYPE.NONE) {
-        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName })
+        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName, interpolation: { escapeValue: false } })
       }
     }
 
