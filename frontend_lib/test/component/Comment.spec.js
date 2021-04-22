@@ -1,14 +1,18 @@
 import React from 'react'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import Comment from '../../src/component/Timeline/Comment.jsx'
+import { TRANSLATION_STATE } from '../../src/translation.js'
 
 describe('<Comment />', () => {
   const props = {
     apiUrl: '',
+    createdRaw: 'date',
     customClass: 'randomCustomClass',
     customColor: '#252525',
     author: { public_name: 'randomAuthor' },
+    isPublication: false,
     loggedUser: { public_name: 'randomUser' },
     text: 'randomText',
     createdFormated: 'randomCreatedFormated',
@@ -26,12 +30,11 @@ describe('<Comment />', () => {
     onClickEditComment: () => {},
     onClickDeleteComment: () => {},
     fromMe: true,
-    translationState: ''
+    translationState: TRANSLATION_STATE.DISABLED
   }
 
-  const wrapper = mount(
-    <Comment {...props} />
-  )
+  const CommentWithHOC = withRouterMock(Comment)
+  const wrapper = mount(<CommentWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__messagelist__item'`, () => {
