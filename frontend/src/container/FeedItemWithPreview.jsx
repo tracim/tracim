@@ -419,7 +419,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, user }) => ({ system, user })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
@@ -449,7 +449,6 @@ FeedItemWithPreview.propTypes = {
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
   showTimeline: PropTypes.bool,
-  user: PropTypes.object,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
   previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
@@ -470,7 +469,6 @@ FeedItemWithPreview.defaultProps = {
   onClickEdit: () => {},
   reactionList: [],
   showTimeline: false,
-  user: {},
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
   previewLink: null
