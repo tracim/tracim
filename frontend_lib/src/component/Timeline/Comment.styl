@@ -1,5 +1,4 @@
 @import '../../css/Variable.styl'
-linkColor = #007bff // This color comes from bootstrap
 
 .comment
   border-radius 5px
@@ -28,9 +27,9 @@ linkColor = #007bff // This color comes from bootstrap
           height auto
           box-shadow 0px 0px 10px mediumDarkGrey
         & a:not(.linkPreview)
-          color linkColor
+          color bootstrapLinkColor
           &:hover
-            color linkColor
+            color bootstrapLinkColor
             text-decoration underline
       &__textAndPreview
         flex 1
@@ -58,4 +57,3 @@ linkColor = #007bff // This color comes from bootstrap
     display flex
     margin-top 10px
     justify-content space-between
-
