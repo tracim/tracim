@@ -62,9 +62,9 @@ const Comment = props => {
                       publicName: props.author.public_name
                     }}
                   >
-                    <div className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
+                    <span className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
                       {props.author.public_name}
-                    </div>
+                    </span>
                   </ProfileNavigation>
 
                   <div
