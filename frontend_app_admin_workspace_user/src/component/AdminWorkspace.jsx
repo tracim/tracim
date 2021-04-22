@@ -58,14 +58,15 @@ const AdminWorkspace = props =>
                     <td className='table__id'>{ws.workspace_id}</td>
                     <td
                       className='table__type'
-                      style={{ color: spaceType.hexcolor }}
                     >
-                      <Icon
-                        icon={`fa-fw ${spaceType.faIcon}`}
-                        title={props.t(spaceType.label)}
-                        color={spaceType.hexcolor}
-                      />
-                      <span>{props.t(spaceType.label)}</span>
+                      <span>
+                        <Icon
+                          icon={`fa-fw ${spaceType.faIcon}`}
+                          title={props.t(spaceType.label)}
+                          color={spaceType.hexcolor}
+                        />
+                      </span>
+                      <span className='label'>{props.t(spaceType.label)}</span>
                     </td>
                     <td
                       className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
