@@ -47,7 +47,8 @@ function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
 
   const i18nOpts = {
     reaction: emoji ? (emoji.id || emoji.name) : value,
-    users: users
+    users: users,
+    interpolation: { escapeValue: false }
   }
 
   return (
