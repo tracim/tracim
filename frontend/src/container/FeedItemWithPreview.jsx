@@ -287,11 +287,16 @@ export class FeedItemWithPreview extends React.Component {
       }
     }
 
-    const publicationContent = (
-      props.isPublication
+    const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
+    const commentToShow = (
+      shouldShowComment
         ? (
-          props.content.type === CONTENT_TYPE.FILE
-            ? props.content
+          props.isPublication
+            ? (
+              props.content.type === CONTENT_TYPE.FILE
+                ? props.content
+                : this.getFirstComment()
+            )
             : this.getFirstComment()
         )
         : null
@@ -319,8 +324,8 @@ export class FeedItemWithPreview extends React.Component {
         />
         {props.contentAvailable && (
           <>
-            {(props.isPublication
-              ? (publicationContent &&
+            {(shouldShowComment
+              ? (commentToShow &&
                 <Comment
                   isPublication
                   customClass='feedItem__publication'
@@ -328,16 +333,16 @@ export class FeedItemWithPreview extends React.Component {
                   contentId={Number(props.content.id)}
                   apiContent={props.content}
                   workspaceId={Number(props.workspaceId)}
-                  author={publicationContent.author}
+                  author={commentToShow.author}
                   loggedUser={props.user}
-                  createdRaw={publicationContent.created_raw}
-                  createdDistance={publicationContent.created}
+                  createdRaw={commentToShow.created_raw}
+                  createdDistance={commentToShow.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
-                      : publicationContent.raw_content
+                      : commentToShow.raw_content
                   }
-                  fromMe={props.user.userId === publicationContent.author.user_id}
+                  fromMe={props.user.userId === commentToShow.author.user_id}
                   onClickTranslate={this.handleTranslate}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
