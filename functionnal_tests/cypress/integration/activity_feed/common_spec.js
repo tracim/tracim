@@ -173,7 +173,7 @@ for (const pageTestCase of activityPages) {
             They would fail randomly, you know?
             Business as usual.
             Not only my tests were failing, but tests others wrote too.
-            I was beginning to feel desesperate.
+            I was beginning to feel desperate.
             this.skip() was looking at me, amused.
             ‘I am strong though’, I said to myself.
             And then, I saw a Light.

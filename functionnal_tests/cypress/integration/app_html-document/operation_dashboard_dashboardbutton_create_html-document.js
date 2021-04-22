@@ -26,7 +26,7 @@ describe('operation :: workspace > create_new > html-document', function () {
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('not.be.visible')
     cy.get('.html-document.visible').should('be.visible')
-    cy.get('.html-document.visible .html-document__contentpage__messagelist__version.revision').should('be.visible')
+    cy.get('.html-document.visible .html-document__contentpage__timeline__messagelist__version.revision').should('be.visible')
     cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
 
     cy.waitForTinyMCELoaded()

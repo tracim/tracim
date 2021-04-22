@@ -39,6 +39,7 @@ export class Sidebar extends React.Component {
     this.frameRef = React.createRef()
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+      foldedSpaceList: [],
       sidebarClose: isMobile
     }
 
@@ -79,16 +80,29 @@ export class Sidebar extends React.Component {
         <WorkspaceListItem
           activeWorkspaceId={state.activeWorkspaceId}
           allowedAppList={space.sidebarEntryList}
+          foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
+          hasChildren={space.children.length > 0}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
           id={this.spaceItemId(space.id)}
+          onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
         />
-        {space.children.length !== 0 && this.displaySpace(spaceLevel + 1, space.children)}
+        {!state.foldedSpaceList.find(id => id === space.id) &&
+          space.children.length !== 0 &&
+          this.displaySpace(spaceLevel + 1, space.children)}
       </React.Fragment>
     )
+  }
+
+  handleToggleFoldChildren = (id) => {
+    const { state } = this
+    if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
+      const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
+      this.setState({ foldedSpaceList: newFoldedSpaceList })
+    } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
   }
 
   getSidebarItem = (label, icon, to) => {

@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
-import { ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')
@@ -70,7 +70,7 @@ class WorkspaceListItem extends React.Component {
   render () {
     const { props, state } = this
     const INDENT_WIDTH = 20
-    const BASE_MARGIN = 10
+    const BASE_MARGIN = 15
 
     return (
       <li
@@ -87,26 +87,38 @@ class WorkspaceListItem extends React.Component {
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
       >
+        {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
+          // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
+          props.level > 0 && (
+            <div
+              style={{
+                marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
+              }}
+            />
+          )
+        }
+
+        {props.hasChildren && (
+          <IconButton
+            customClass='transparentButton sidebar__content__navigation__item__foldChildren'
+            icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
+            title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
+            intent='link'
+            mode='light'
+            onClick={props.onToggleFoldChildren}
+          />
+        )}
+
         <Link
-          className='sidebar__content__navigation__item__wrapper'
+          className={classnames(
+            'sidebar__content__navigation__item__wrapper',
+            { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
+          )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
         >
           {(props.canDrop && props.isOver) && (
             <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
           )}
-
-          {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
-            // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
-            props.level > 0 && (
-              <div
-                style={{
-                  marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
-                }}
-              >
-                &#8735;
-              </div>
-            )
-          }
 
           <div
             className='sidebar__content__navigation__item__name'
@@ -161,16 +173,22 @@ WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
+  hasChildren: PropTypes.bool,
+  foldChildren: PropTypes.bool,
   onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
   level: PropTypes.number,
+  onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
   allowedAppList: [],
+  hasChildren: false,
+  foldChildren: false,
   onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   level: 0,
+  onToggleFoldChildren: () => {},
   userRoleIdInWorkspace: ROLE.reader.id
 }

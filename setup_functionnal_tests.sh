@@ -44,7 +44,7 @@ cd functionnal_tests || logerror "Could not change directory."
 
 # modify cypress.json
 log "Checking whether cypress.json exists."
-if [ ! -f cypress.json ]; then
-    log "cypress.json does not exist. Copying from cypress.json.sample."
+if [ ! -s cypress.json ]; then
+    log "cypress.json does not exist or is empty. Copying from cypress.json.sample."
     cp cypress.json.sample cypress.json && loggood "success" || logerror "some error"
 fi
