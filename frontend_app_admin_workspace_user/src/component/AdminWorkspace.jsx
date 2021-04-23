@@ -66,7 +66,7 @@ const AdminWorkspace = props =>
                           color={spaceType.hexcolor}
                         />
                       </span>
-                      <span className='label'>{props.t(spaceType.label)}</span>
+                      <div className='label'>{props.t(spaceType.label)}</div>
                     </td>
                     <td
                       className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
