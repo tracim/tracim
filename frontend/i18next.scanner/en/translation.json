@@ -161,8 +161,6 @@
   "{{userName}} account edition": "{{userName}} account edition",
   "Change the password": "Change the password",
   "Change the account settings": "Change the account settings",
-  "New full name": "New full name",
-  "New email": "New email",
   "Do not show this popup again": "Do not show this popup again",
   "Change my password": "Change my password",
   "Change my account settings": "Change my account settings",
@@ -197,7 +195,6 @@
   "Search": "Search",
   "Folder": "Folder",
   "Actions": "Actions",
-  "New username": "New username",
   "No results for the search terms:": "No results for the search terms:",
   "A content with the same name already exists": "A content with the same name already exists",
   "Error while archiving content": "Error while archiving content",
@@ -454,5 +451,8 @@
   "Download {{filename}}": "Download {{filename}}",
   "Show in publications": "Show in publications",
   "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page.",
-  "Open as content": "Open as content"
+  "Open as content": "Open as content",
+  "New full name:": "New full name:",
+  "New username:": "New username:",
+  "New email:": "New email:"
 }

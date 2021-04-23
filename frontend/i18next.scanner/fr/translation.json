@@ -167,8 +167,6 @@
   "{{userName}} account edition": "Edition du compte {{userName}}",
   "Change the password": "Changer le mot de passe",
   "Change the account settings": "Changer les paramètres du compte",
-  "New full name": "Nouveau nom complet",
-  "New email": "Nouvel email",
   "Do not show this popup again": "Ne plus afficher cette fenêtre",
   "Change my password": "Changer mon mot de passe",
   "Change my account settings": "Changer les paramètres de mon compte",
@@ -203,7 +201,6 @@
   "Search": "Rechercher",
   "Folder": "Dossier",
   "Actions": "Actions",
-  "New username": "Nouvel identifiant",
   "No results for the search terms:": "Aucun résultat pour les termes de recherche :",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while archiving content": "Erreur lors de l'archivage du contenu",
@@ -454,5 +451,8 @@
   "Download {{filename}}": "Télécharger {{filename}}",
   "Show in publications": "Afficher dans les publications",
   "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page.",
-  "Open as content": "Ouvrir en tant que contenu"
+  "Open as content": "Ouvrir en tant que contenu",
+  "New full name:": "Nouveau nom complet:",
+  "New username:": "Nouvel identifiant:",
+  "New email:": "Nouvel email:"
 }
