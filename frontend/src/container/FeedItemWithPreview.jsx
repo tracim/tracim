@@ -8,8 +8,8 @@ import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
 
 import {
-    findUserRoleIdInWorkspace,
-    FETCH_CONFIG
+  findUserRoleIdInWorkspace,
+  FETCH_CONFIG
 } from '../util/helper.js'
 
 import {

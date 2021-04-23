@@ -50,7 +50,7 @@ describe('<Comment />', () => {
     })
 
     it(`should display the author ${props.author.public_name} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__content__header__meta__author`)).to.have.text().equal(props.author.public_name)
+      expect(wrapper.find(`span.${props.customClass}__body__content__header__meta__author`)).to.have.text().equal(props.author.public_name)
     })
 
     it(`should display the created Distance ${props.createdDistance} of the comment`, () => {
