@@ -1,0 +1,12 @@
+{
+    "Error while loading space list": "Fehler beim Laden der Raumliste",
+    "User": "Benutzer",
+    "Spaces": "Räume",
+    "Space": "Raum",
+    "All my agendas": "Alle meine Agenden",
+    "Agenda of space {{workspaceLabel}}": "Agenda des Raumes {{workspaceLabel}}",
+    "Agenda": "Agenda",
+    "Some agenda could not be loaded": "Einige Agenden konnten nicht geladen werden",
+    "My agendas": "Meine Agenden",
+    "Some information was modified by {{author}}": "Einige Informationen wurden geändert von {{author}}"
+  }
