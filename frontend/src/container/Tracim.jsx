@@ -1,8 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import * as Cookies from 'js-cookie'
-import i18n from '../util/i18n.js'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -23,15 +21,12 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   CUSTOM_EVENT,
   PROFILE,
-  NUMBER_RESULTS_BY_PAGE,
-  serialize,
   TracimComponent,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   PAGE
 } from 'tracim_frontend_lib'
 import {
-  COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile,
   toggleFavicon,
@@ -40,42 +35,25 @@ import {
   WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import {
-  getAppList,
-  getConfig,
-  getContentTypeList,
-  getMyselfWorkspaceList,
-  getNotificationList,
-  getUserConfiguration,
-  getUserIsConnected,
-  putUserLang,
-  getUserMessagesSummary,
-  getWorkspaceMemberList,
-  getAccessibleWorkspaces
+  connectUser,
+  loadConfig
+} from '../util/load.js'
+import {
+  getUserIsConnected
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   removeFlashMessage,
-  setConfig,
-  setAppList,
-  setContentTypeList,
-  setNextPage,
-  setNotificationList,
-  setUserConfiguration,
   setUserConnected,
-  setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
-  setNotificationNotReadCounter,
-  setHeadTitle,
-  setAccessibleWorkspaceList
+  setHeadTitle
 } from '../action-creator.sync.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
 import SimpleSearch from './SimpleSearch.jsx'
 import GuestUpload from './GuestUpload.jsx'
 import GuestDownload from './GuestDownload.jsx'
-import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalRecentActivities from './PersonalRecentActivities.jsx'
@@ -165,7 +143,7 @@ export class Tracim extends React.Component {
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-    await this.loadWorkspaceLists()
+    await loadWorkspaceLists()
     this.props.history.push(data.url)
   }
 
@@ -195,27 +173,11 @@ export class Tracim extends React.Component {
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200: {
-        const fetchUser = fetchGetUserIsConnected.json
+        connectUser(fetchGetUserIsConnected.json, props.user, props.dispatch)
 
-        if (fetchUser.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
+        loadConfig(props.dispatch)
 
-        props.dispatch(setUserConnected({
-          ...fetchUser,
-          logged: true
-        }))
-
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchUser.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-
-        i18n.changeLanguage(fetchUser.lang)
-
-        this.loadAppConfig()
-        this.loadWorkspaceLists()
-        this.loadNotificationNotRead(fetchUser.user_id)
-        this.loadNotificationList(fetchUser.user_id)
-        this.loadUserConfiguration(fetchUser.user_id)
-
-        this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
+        this.liveMessageManager.openLiveMessageConnection(fetchGetUserIsConnected.json.user_id, FETCH_CONFIG.apiUrl)
         break
       }
       case 401: props.dispatch(setUserConnected({ logged: false })); break
@@ -232,122 +194,6 @@ export class Tracim extends React.Component {
   }
 
   loadAppConfig = async () => {
-    const { props } = this
-
-    const fetchGetConfig = await props.dispatch(getConfig())
-    if (fetchGetConfig.status === 200) {
-      props.dispatch(setConfig(fetchGetConfig.json))
-    }
-
-    const fetchGetAppList = await props.dispatch(getAppList())
-    // FIXME - GB - 2019-07-23 - Hack to add the share folder app at appList while he still doesn't exist in backend
-    if (fetchGetAppList.status === 200) {
-      fetchGetAppList.json.push(
-        {
-          hexcolor: '#414548',
-          slug: 'contents/share_folder',
-          config: {},
-          fa_icon: 'share-alt',
-          is_active: true,
-          label: 'Share Folder'
-        }
-      )
-      props.dispatch(setAppList(fetchGetAppList.json))
-    }
-
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
-    if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
-  }
-
-  loadUserConfiguration = async userId => {
-    const { props } = this
-
-    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
-    switch (fetchGetUserConfig.status) {
-      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
-    }
-  }
-
-  loadWorkspaceLists = async () => {
-    const { props } = this
-
-    const showOwnedWorkspace = false
-
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
-
-    if (fetchGetWorkspaceList.status !== 200) return false
-
-    props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-    this.setState({ workspaceListLoaded: true })
-
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
-
-    if (fetchAccessibleWorkspaceList.status !== 200) return false
-
-    props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
-
-    return true
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
-  }
-
-  loadNotificationNotRead = async (userId) => {
-    const { props } = this
-
-    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
-
-    switch (fetchNotificationNotRead.status) {
-      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
-    }
-  }
-
-  setDefaultUserLang = async loggedUser => {
-    const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
-    switch (fetchPutUserLang.status) {
-      case 200: break
-      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
-    }
   }
 
   handleHeadTitleAndFavicon = (prevHeadTitle, prevNotificationNotReadCount) => {

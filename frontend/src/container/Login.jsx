@@ -9,44 +9,24 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
+  connectUser,
+  loadConfig
+} from '../util/load.js'
+import {
   CUSTOM_EVENT,
-  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
-  PAGE,
-  serialize
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
-  setUserConnected,
-  setWorkspaceList,
-  setContentTypeList,
-  setAppList,
-  setConfig,
   resetBreadcrumbs,
-  setUserConfiguration,
   setUserLang,
-  setWorkspaceListMemberList,
-  setNotificationNotReadCounter,
-  setNotificationList,
-  setNextPage,
-  setHeadTitle,
-  setAccessibleWorkspaceList
+  setHeadTitle
 } from '../action-creator.sync.js'
 import {
-  getAppList,
-  getConfig,
-  getContentTypeList,
-  getMyselfWorkspaceList,
-  getNotificationList,
-  getUserConfiguration,
-  getUserMessagesSummary,
-  getWorkspaceMemberList,
-  postUserLogin,
-  putUserLang,
-  getAccessibleWorkspaces
+  postUserLogin
 } from '../action-creator.async.js'
 import { COOKIE_FRONTEND, WELCOME_ELEMENT_ID } from '../util/helper.js'
-import { serializeUserProps } from '../reducer/user.js'
 
 const qs = require('query-string')
 
@@ -104,7 +84,7 @@ class Login extends React.Component {
       props.history.push(props.location.pathname)
     }
 
-    await this.loadConfig()
+    await loadConfig(props.dispatch)
   }
 
   setHeadTitle = () => {
@@ -139,26 +119,9 @@ class Login extends React.Component {
 
     switch (fetchPostUserLogin.status) {
       case 200: {
-        const loggedUser = {
-          ...fetchPostUserLogin.json,
-          logged: true
-        }
+        connectUser(fetchPostUserLogin.json, props.user, props.dispatch)
 
-        if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
-
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        props.dispatch(setUserConnected(loggedUser))
         props.dispatchCustomEvent(CUSTOM_EVENT.USER_CONNECTED, fetchPostUserLogin.json)
-
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
-        i18n.changeLanguage(loggedUser.lang)
-
-        this.loadAppList()
-        this.loadContentTypeList()
-        this.loadWorkspaceLists()
-        this.loadNotificationNotRead(loggedUser.user_id)
-        this.loadNotificationList(loggedUser.user_id)
-        this.loadUserConfiguration(loggedUser.user_id)
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -176,111 +139,6 @@ class Login extends React.Component {
         break
       case 403: props.dispatch(newFlashMessage(props.t('Invalid credentials'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
-    }
-  }
-
-  loadConfig = async () => {
-    const { props } = this
-
-    const fetchGetConfig = await props.dispatch(getConfig())
-    if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
-  }
-
-  loadAppList = async () => {
-    const { props } = this
-
-    const fetchGetAppList = await props.dispatch(getAppList())
-    if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
-  }
-
-  loadContentTypeList = async () => {
-    const { props } = this
-
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
-    if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
-  }
-
-  loadWorkspaceLists = async () => {
-    const { props } = this
-    const showOwnedWorkspace = false
-
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
-    if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-    }
-
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
-    if (fetchAccessibleWorkspaceList.status !== 200) return
-    props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
-  }
-
-  loadUserConfiguration = async userId => {
-    const { props } = this
-
-    const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
-    switch (fetchGetUserConfig.status) {
-      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
-    }
-  }
-
-  loadNotificationNotRead = async (userId) => {
-    const { props } = this
-
-    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
-
-    switch (fetchNotificationNotRead.status) {
-      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
-    }
-  }
-
-  setDefaultUserLang = async loggedUser => {
-    const { props } = this
-    const fetchPutUserLang = await props.dispatch(putUserLang(serialize(loggedUser, serializeUserProps), props.user.lang))
-    switch (fetchPutUserLang.status) {
-      case 200: break
-      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
     }
   }
 
