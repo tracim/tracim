@@ -1,0 +1,37 @@
+{
+    "click here!": "Klicken Sie hier!",
+    "Last version": "Letzte Version",
+    "Validate and create": "Validieren und erstellen",
+    "Note's title": "Titel der Notiz",
+    "latest version: {{versionNumber}}": "letzte Version: {{versionNumber}}",
+    "Version #{{versionNumber}}": "Version #{{versionNumber}}",
+    "Write a note": "Schreibe eine Notiz",
+    "Notes": "Notizen",
+    "Edit": "Bearbeiten",
+    "A content with the same name already exists": "Ein Inhalt mit demselben Namen ist bereits vorhanden",
+    "Error while creating note": "Fehler beim Anlegen der Notiz",
+    "Error while saving the comment": "Fehler beim Speichern des Kommentars",
+    "This content is archived": "Dieser Inhalt ist archiviert",
+    "Restore": "Wiederherstellen",
+    "This content is deleted": "Dieser Inhalt ist gelöscht",
+    "You have a pending draft": "Sie haben einen ausstehenden Entwurf",
+    // doute
+    "Resume writing": "Schreiben fortsetzen",
+    // doute
+    "Error while saving the new version": "Fehler beim Speichern der neuen Version",
+    "Note": "Hinweis",
+    "note": "Hinweis",
+    "notes": "Hinweis",
+    // pas au pluriel ?
+    "This content is deprecated": "Dieser Inhalt ist veraltet",
+    // doute
+    "Timeline": "Zeitleiste",
+    "To notify all members of the space of your modification": "Um alle Mitglieder des Raums über Ihre Änderung zu informieren",
+    "New note": "Neue Notiz",
+    "You are trying to mention an invalid user": "Sie versuchen, einen ungültigen Benutzer zu erwähnen",
+    "You must change the status or restore this note before any change": "Sie müssen vor jeder Änderung den Status ändern oder diese Notiz wiederherstellen",
+    "The content has been modified by {{author}}": "Der Inhalt wurde von {{author}} geändert",
+    "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
+    "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Raums übereinstimmen:",
+    "Validate anyway": "Trotzdem validieren"
+  }

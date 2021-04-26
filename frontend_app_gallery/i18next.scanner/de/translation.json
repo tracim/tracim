@@ -1,0 +1,27 @@
+{
+    "{picture}Next": "Weiter",
+    "Previous": "Zurück",
+    "Pause": "Pause",
+    "Play": "Spielen",
+    "Delete": "Löschen",
+    "Disable fullscreen": "Vollbildschirm deaktivieren",
+    "Enable fullscreen": "Vollbildmodus einschalten",
+    "Are you sure?": "Sind Sie sicher?",
+    "Cancel": "Abbrechen",
+    "Error while loading folder detail": "Fehler beim Laden von Ordnerdetails",
+    "Error while loading content list": "Fehler beim Laden der Inhaltsliste",
+    "Error while loading file preview": "Fehler beim Laden der Dateivorschau",
+    "Error while loading space detail": "Fehler beim Laden von Raumdetails",
+    "Error while deleting document": "Fehler beim Löschen des Dokuments",
+    "Insufficient permissions": "Unzureichende Berechtigungen",
+    // doute
+    "Open raw file": "Rohdatei öffnen",
+    "There isn't any previewable content at that space's root.": "Es gibt keinen vorzeigbaren Inhalt an der Wurzel dieses Raums.",
+    // root ?
+    "There isn't any previewable content at that folder's root.": "Im Stammverzeichnis dieses Ordners gibt es keine vorzeigbaren Inhalte.",
+    "There isn't any picture to delete.": "Es gibt kein Bild zu löschen.",
+    "Rotate 90° left": "90° nach links drehen",
+    "Rotate 90° right": "90° nach rechts drehen",
+    "Gallery": "Galerie",
+    "No preview available": "Keine Vorschau verfügbar"
+  }
