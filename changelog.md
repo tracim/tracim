@@ -2,20 +2,20 @@
 
 ### New Features
 
-- Content can be added to personnal favourites
+- Content can be added to personal favourites
 - Add and comment a publication
-- Home/login page can be customizable 
-- Preview of links can be genearated in comment
-- Be able to fold the subspaces in the sidebar
-- New space dashboard
-- Possibilities to modify comments
-- New navigation links to user profile
-- Add button "open the gallery" on the content page
-- Allow to open file uploaded in a comment as a content
-- Rich text available in dashboard description
+- The Home/login page can be customized
+- Links in comments and publications are now previewed when possible
+- Subspaces can be folded in the sidebar
+- The dashboard has been improved
+- Comments can be edited and removed
+- User profile can now be reached from places where the user has commented something and from the member's list of a space
+- There is a new button on the content page to open the gallery
+- Files uploaded in a comment can now be opened as a content
+- The space description is now editable using a rich text editor
 
 ### Fixed Issues
-[#](https://github.com/tracim/tracim/issues/)
+
 Frontend: [#3787](https://github.com/tracim/tracim/issues/3787),
 [#3811](https://github.com/tracim/tracim/issues/3811),
 [#4464](https://github.com/tracim/tracim/issues/4464),
