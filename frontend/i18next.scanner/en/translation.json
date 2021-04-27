@@ -94,11 +94,6 @@
   "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
   "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
   "New passwords are different": "New passwords are different",
-  "Old password": "Old password",
-  "New password": "New password",
-  "Repeat new password": "Repeat new password",
-  "Administrator's password": "Administrator's password",
-  "Type your password": "Type your password",
   "Validate": "Validate",
   "Change your Timezone": "Change your Timezone",
   "Member List": "Member List",
@@ -454,5 +449,10 @@
   "Open as content": "Open as content",
   "New full name:": "New full name:",
   "New username:": "New username:",
-  "New email:": "New email:"
+  "New email:": "New email:",
+  "Old password:": "Old password:",
+  "New password:": "New password:",
+  "Repeat new password:": "Repeat new password:",
+  "Administrator's password:": "Administrator's password:",
+  "Type your password:": "Type your password:"
 }

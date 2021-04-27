@@ -65,8 +65,6 @@
   "Add a member": "Ajouter un membre",
   "Implement Tracim in your explorer": "Implémenter Tracim dans votre explorateur",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.",
-  "Old password": "Ancien mot de passe",
-  "New password": "Nouveau mot de passe",
   "Connection": "Connexion",
   "Forgotten password?": "Mot de passe oublié ?",
   "member list": "Liste des membres",
@@ -90,7 +88,6 @@
   "My account": "Mon compte",
   "Error while saving new lang": "Erreur lors de l'enregistrement d'une nouvelle langue",
   "List of contents": "Liste des contenus",
-  "Repeat new password": "Répéter le nouveau mot de passe",
   "An error has happened while getting": "Une erreur s'est produite lors de l'obtention de ",
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
   "Create in folder": "Créer dans ce dossier ",
@@ -105,8 +102,6 @@
   "Wrong old password": "Ancien mot de passe incorrect",
   "New passwords are different": "Les nouveaux mots de passe sont différents",
   "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
-  "Administrator's password": "Mot de passe administrateur",
-  "Type your password": "Entrer votre mot de passe",
   "Member added": "Membre ajouté",
   "Member removed": "Membre supprimé",
   "Contents": "Contenus",
@@ -454,5 +449,10 @@
   "Open as content": "Ouvrir en tant que contenu",
   "New full name:": "Nouveau nom complet :",
   "New username:": "Nouvel identifiant :",
-  "New email:": "Nouvel email :"
+  "New email:": "Nouvel email :",
+  "Old password:": "Ancien mot de passe :",
+  "New password:": "Nouveau mot de passe :",
+  "Repeat new password:": "Répéter le nouveau mot de passe :",
+  "Administrator's password:": "Mot de passe administrateur :",
+  "Type your password:": "Entrer votre mot de passe :"
 }

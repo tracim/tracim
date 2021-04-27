@@ -98,11 +98,6 @@
   "New password is too short (minimum 6 characters)": "A nova palavra-passe é demasiada curta (mínimo de 6 carateres)",
   "New password is too long (maximum 512 characters)": "A nova palavra-passe é demasiada longa (máximo de 512 carateres)",
   "New passwords are different": "As novas palavras-passe são diferentes",
-  "Old password": "Palavra-passe antiga",
-  "New password": "Nova palavra-passe",
-  "Repeat new password": "Repetir nova palavra-passe",
-  "Administrator's password": "Palavra-passe do Administrador",
-  "Type your password": "Escreva sua palavra-passe",
   "Validate": "Validar",
   "Change your Timezone": "Mudar seu Fuso Horário",
   "Member List": "Lista de Membros",
@@ -454,5 +449,10 @@
   "Open as content": "Abrir como conteúdo",
   "New full name:": "Novo nome completo:",
   "New username:": "Novo identificador:",
-  "New email:": "Novo e-mail:"
+  "New email:": "Novo e-mail:",
+  "Old password:": "Palavra-passe antiga:",
+  "New password:": "nova palavra-passe:",
+  "Repeat new password:": "Repetir nova palavra-passe",
+  "Administrator's password:": "Palavra-passe do Administrador",
+  "Type your password:": "Escreva sua palavra-passe:"
 }
