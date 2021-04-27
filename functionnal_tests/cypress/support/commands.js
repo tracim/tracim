@@ -74,6 +74,19 @@ Cypress.Commands.add('inputInTinyMCE', (content) => {
     })
 })
 
+Cypress.Commands.add('clearTinyMCE', () => {
+  cy.window()
+    .its('tinyMCE')
+    .its('activeEditor')
+    .then(activeEditor => {
+      activeEditor.focus()
+      activeEditor.execCommand('mceSetContent', false, '')
+      activeEditor.fire('input', { data: '' })
+      activeEditor.fire('keyup', { key: '' })
+      activeEditor.fire('keydown', { key: '' })
+    })
+})
+
 Cypress.Commands.add('assertTinyMCEContent', (content) => {
   cy.window({ timeout: 5000 })
     .its('tinyMCE')

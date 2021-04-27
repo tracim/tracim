@@ -15,46 +15,45 @@ describe('Login page', function () {
     cy.cancelXHR()
   })
 
-  it('should renders every components', function () {
+  it('should render every component', function () {
     cy.url().should('include', '/login')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.card-header.loginpage__card__header')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .should('be.visible')
 
     cy.getTag({ selectorName: s.HEADER })
       .find('.dropdownMenu__image')
       .should('be.visible')
 
-    cy.get('.loginpage__footer__text')
+    cy.get('.loginpage__main__footer__text')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .should('have.attr', 'placeholder')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .should('have.attr', 'placeholder')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .should('be.visible')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .should('have.attr', 'type', 'submit')
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__pwforgot')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__forgot_password')
       .should('be.visible')
   })
 

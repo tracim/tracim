@@ -256,6 +256,22 @@ Cypress.Commands.add('postComment', (workspaceId, contentId, comment) => {
     .then(handleUndefinedResponse)
 })
 
+Cypress.Commands.add('putComment', (workspaceId, contentId, commentId, comment) => {
+  const url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`
+
+  return cy
+    .request('PUT', url, { raw_content: comment })
+    .then(handleUndefinedResponse)
+})
+
+Cypress.Commands.add('deleteComment', (workspaceId, contentId, commentId, comment) => {
+  const url = `/api/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`
+
+  return cy
+    .request('DELETE', url, { raw_content: comment })
+    .then(handleUndefinedResponse)
+})
+
 Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {
   cy.exec(`echo "${message}" >> ${logPath}`)
   cy.exec(`echo "\n" >> ${logPath}`)

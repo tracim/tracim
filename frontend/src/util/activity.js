@@ -1,9 +1,10 @@
 import {
   TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getWorkspaceContent,
+  getGenericWorkspaceContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -11,7 +12,9 @@ const createActivityEvent = (message) => {
   const [, eventType, subEntityType] = message.event_type.split('.')
   return {
     eventId: message.event_id,
-    eventType: subEntityType === TLM_ST.COMMENT ? 'commented' : eventType,
+    eventType: subEntityType === TLM_ST.COMMENT
+      ? eventType === 'created' ? 'commented' : `comment ${eventType}`
+      : eventType,
     author: message.fields.author,
     created: message.created
   }
@@ -27,45 +30,60 @@ const createSingleMessageActivity = (activityParams, messageList) => {
   }
 }
 
-// INFO - SG - 2020-11-12 - this function assumes that the list is ordered from newest to oldest
-const createContentActivity = async (activityParams, messageList, apiUrl) => {
-  const first = messageList[0]
+const getCommentList = async (content, apiUrl) => {
+  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
+  return response.apiResponse.status === 200 ? response.body : []
+}
 
-  let content = first.fields.content
+/**
+ * DOC - SG - 2021-04-16
+ * Create a content activity from a list of messages.
+ * Can return null if a the content is not accessible anymore: as messages are an history,
+ * the content can be inaccessible when calling this function.
+ * This function assumes that the list is ordered from newest to oldest.
+ */
+const createContentActivity = async (activityParams, messageList, apiUrl) => {
+  const newestMessage = messageList[0]
+
+  let content = newestMessage.fields.content
+
   if (content.content_type === TLM_ST.COMMENT) {
-    const response = await handleFetchResult(await getWorkspaceContent(
+    // INFO - SG - 2021-04-16
+    // We have to get the parent content as comments shall produce an activity
+    // for it and not for the comment.
+    const response = await handleFetchResult(await getGenericWorkspaceContent(
       apiUrl,
-      first.fields.workspace.workspace_id,
-      content.parent_content_type + 's',
+      newestMessage.fields.workspace.workspace_id,
       content.parent_id
     ))
-    if (response.apiResponse.status === 200) {
-      content = response.body
-    } else return null
+    if (!response.apiResponse.ok) return null
+    content = response.body
   }
 
-  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  const commentList = response.apiResponse.status === 200 ? response.body : []
-
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, content.workspace_id, content.content_id)
+    await getContentPath(apiUrl, newestMessage.fields.workspace.workspace_id, content.content_id)
   )
-  const contentPath = fetchGetContentPath.apiResponse.status === 200 ? fetchGetContentPath.body.items : []
+  if (!fetchGetContentPath.apiResponse.ok) return null
+
+  const contentPath = fetchGetContentPath.body.items
+  const commentList = await getCommentList(content, apiUrl)
 
   return {
     ...activityParams,
     eventList: [],
     commentList: commentList,
-    newestMessage: first,
+    newestMessage: newestMessage,
     content: content,
-    contentPath: contentPath
+    contentPath: contentPath,
+    contentAvailable: !!contentPath
   }
 }
 
 const getActivityParams = (message) => {
-  const [entityType, , subEntityType] = message.event_type.split('.')
+  const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
+      if (subEntityType === TLM_ST.COMMENT && coreEventType !== TLM_CET.CREATED) return null
       const id = (subEntityType === TLM_ST.COMMENT)
         ? message.fields.content.parent_id
         : message.fields.content.content_id
@@ -161,7 +179,7 @@ const updateActivity = (message, activity) => {
       ...activity.eventList
     ],
     commentList: isComment
-      ? [message.fields.content, ...activity.commentList]
+      ? [...activity.commentList, message.fields.content]
       : activity.commentList,
     newestMessage: message,
     content: isComment || isMentionOnComment ? activity.content : message.fields.content

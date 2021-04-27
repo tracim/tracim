@@ -1,0 +1,65 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+// NOTE - S.G. - 2021-04-01 - The positioning properties (flex/sizes) of the "columns"
+// should be kept in sync with Favorites.styl
+// Or a better solution (flex-grid?) be implemented.
+.contentListItem
+  display flex
+  justify-content space-between
+  color fontColor
+  height 65px
+  align-items center
+  &:hover
+    color fontColor
+  &__link
+    z-index 1
+    position absolute
+    width 100%
+    height 100%
+  &__type
+    width 90px
+  &__name_path
+    flex 2
+    text-overflow ellipsis
+    overflow hidden
+    white-space nowrap
+  &__modification
+    flex 1
+    &.timedEvent
+      overflow hidden
+  &__information
+    flex 1
+    color fontColor
+    display flex
+    &__comments
+      display inline-block
+      padding-right 10px
+    & > *
+      font-size fontSizeSmall
+    & > i
+      margin-inline-end 5px
+      margin-inline-start 2px
+
+@media (max-width: max-lg)
+  .contentListItem
+    &__type
+      width 50px
+    &__modification
+      overflow hidden
+      text-overflow ellipsis
+  .timedEvent.contentListItem__modification
+    & .timedEvent__operation
+      display none
+
+@media (max-width: max-md)
+  .contentListItem
+    &__information
+      display none
+
+@media (max-width: max-sm)
+  .contentListItem
+    &__name_path
+      & > .breadcrumbs
+        display none
+    &__modification
+      display none

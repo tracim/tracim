@@ -66,6 +66,10 @@ export class Preview extends React.Component {
   }
 
   async getHTMLPreviewCode (content) {
+    if (Object.hasOwnProperty.call(content, 'translatedRawContent')) {
+      return content.translatedRawContent
+    }
+
     if (content.type === CONTENT_TYPE.HTML_DOCUMENT) {
       return content.rawContent
     }
@@ -96,8 +100,11 @@ export class Preview extends React.Component {
       this.handleUnavailablePreview()
     }
 
+    const previewHtmlCode = this.props.linkType !== LINK_TYPE.NONE
+      ? removeInteractiveContentFromHTML(htmlCode)
+      : htmlCode
     this.setState({
-      previewHtmlCode: removeInteractiveContentFromHTML(htmlCode),
+      previewHtmlCode,
       previewUnavailable: htmlCode === null
     })
   }
@@ -170,7 +177,9 @@ export class Preview extends React.Component {
   }
 
   isContentDifferent = (oldContent, newContent) => (
+    newContent.firstComment !== oldContent.firstComment ||
     newContent.commentList !== oldContent.commentList ||
+    newContent.translatedRawContent !== oldContent.translatedRawContent ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )
 
@@ -309,7 +318,7 @@ export class Preview extends React.Component {
 }
 
 Preview.propTypes = {
-  fallbackToAttachedFile: PropTypes.boolean,
+  fallbackToAttachedFile: PropTypes.bool,
   content: PropTypes.object.isRequired,
   link: PropTypes.string.isRequired,
   linkType: PropTypes.oneOf(Object.values(LINK_TYPE))

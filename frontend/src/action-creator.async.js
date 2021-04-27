@@ -55,10 +55,13 @@ import {
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
+  WORKSPACE_SUBSCRIPTION,
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
   CUSTOM_PROPERTIES_SCHEMA,
-  USER_PUBLIC_PROFILE
+  USER_PUBLIC_PROFILE,
+  FAVORITE_LIST,
+  FAVORITE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -976,6 +979,21 @@ export const getWorkspaceSubscriptions = userId => dispatch => {
   })
 }
 
+export const getSubscriptions = workspaceId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_SUBSCRIPTION,
+    dispatch
+  })
+}
+
 export const postUserWorkspace = (workspaceId, userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
@@ -1222,4 +1240,50 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     }
   )
   return result
+}
+
+export const getFavoriteContentList = (userId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: FAVORITE_LIST,
+    dispatch
+  })
+}
+
+export const postContentToFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: { content_id: contentId }
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const deleteContentFromFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents/${contentId}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'DELETE'
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
 }

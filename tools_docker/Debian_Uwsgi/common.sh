@@ -96,6 +96,14 @@ if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
     ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
 fi
 
+# Create and link branding directory if it does not exist
+if [ ! -d /etc/tracim/branding ]; then
+    cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
+fi
+if [ ! -L /tracim/frontend/dist/assets/branding ]; then
+    ln -s /etc/tracim/branding /tracim/frontend/dist/assets/branding
+fi
+
 # Create folder for plugins (backend) and custom_toolbox (frontend)
 if [ ! -d /etc/tracim/plugins ]; then
     mkdir /etc/tracim/plugins -p

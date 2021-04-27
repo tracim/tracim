@@ -33,7 +33,7 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.15.4",
+    "preview-generator>=0.16.2",
     "colour",
     "python-dateutil",
     "gitpython",
@@ -76,6 +76,7 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
+    "webpreview",
 ]
 
 tests_require = [

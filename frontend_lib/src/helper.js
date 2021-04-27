@@ -50,7 +50,8 @@ export const PAGE = {
   JOIN_WORKSPACE: '/ui/join-workspace',
   RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
-  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
+  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
+  FAVORITES: '/ui/favorites'
 }
 
 export const DATE_FNS_LOCALE = {

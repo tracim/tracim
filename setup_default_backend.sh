@@ -71,6 +71,13 @@ function setup_config_file {
         loggood "color.json already exists"
     fi
 
+    if [ ! -d ../frontend/dist/assets/branding ]; then
+        log "Creating default welcome page ..."
+        cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding && loggood "Successfully created default welcome page" || logerror "Failed to create default welcome page"
+    else
+        loggood "welcome page already exists"
+    fi
+
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
         log "Removing folder 'sessions_data' in '$DEFAULTDIR/backend'"
         rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "Successfully removed the sessions_data folder" || logerror "Failed to remove the sessions_data folder"

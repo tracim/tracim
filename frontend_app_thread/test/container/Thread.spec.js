@@ -22,12 +22,15 @@ describe('<Thread />', () => {
     addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
+
     i18n: {},
     content: contentThread,
     loggedUser: {
       userId: 1
     },
-    t: key => key
+    t: key => key,
+    isContentInFavoriteList: () => false,
+    loadFavoriteContentList: () => {}
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()

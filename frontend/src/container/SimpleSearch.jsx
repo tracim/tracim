@@ -215,7 +215,7 @@ export class SimpleSearch extends React.Component {
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms')}: "${props.simpleSearch.searchString}"`}
+                    {`${props.t('No results for the search terms:')} ${props.simpleSearch.searchString}`}
                   </div>
                 )}
 

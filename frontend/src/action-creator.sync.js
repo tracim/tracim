@@ -249,3 +249,10 @@ export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLIC
 export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })
 export const updatePublication = (publication) => ({ type: `${UPDATE}/${PUBLICATION}`, publication })
 export const setCommentListToPublication = (publicationId, commentList) => ({ type: `${SET}/${PUBLICATION}/${COMMENT_LIST}`, publicationId, commentList })
+export const setFirstComment = (publicationId, comment) => ({ type: `${SET}/${COMMENT}`, publicationId, comment })
+
+export const FAVORITE = 'Favorite'
+export const FAVORITE_LIST = `${FAVORITE}List`
+export const setFavoriteList = (favoriteList) => ({ type: `${SET}/${FAVORITE_LIST}`, favoriteList })
+export const removeFavorite = (favorite) => ({ type: `${REMOVE}/${FAVORITE}`, favorite })
+export const addFavorite = (favorite) => ({ type: `${ADD}/${FAVORITE}`, favorite })

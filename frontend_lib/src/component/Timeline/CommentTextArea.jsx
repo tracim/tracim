@@ -34,6 +34,13 @@ export class CommentTextArea extends React.Component {
     }
   }
 
+  componentDidMount () {
+    const { props } = this
+    if (props.wysiwyg) {
+      props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+    }
+  }
+
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
       this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
@@ -158,7 +165,6 @@ export class CommentTextArea extends React.Component {
 
   handleTinyMceKeyDown = event => {
     const { state } = this
-
     tinymceAutoCompleteHandleKeyDown(
       event,
       this.setState.bind(this),
@@ -171,7 +177,6 @@ export class CommentTextArea extends React.Component {
 
   handleTinyMceKeyUp = (event) => {
     const { state } = this
-
     tinymceAutoCompleteHandleKeyUp(
       event,
       this.setState.bind(this),

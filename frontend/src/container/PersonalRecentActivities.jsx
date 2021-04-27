@@ -9,6 +9,8 @@ import {
   CUSTOM_EVENT,
   PAGE,
   PageTitle,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent
 } from 'tracim_frontend_lib'
 import ActivityList from '../component/Activity/ActivityList.jsx'
@@ -21,13 +23,14 @@ import {
   setUserActivityEventList
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
+import { getWorkspaceMemberList } from '../action-creator.async.js'
 
 require('../css/RecentActivities.styl')
 
 export class PersonalRecentActivities extends React.Component {
   constructor (props) {
     super(props)
-    props.registerGlobalLiveMessageHandler(props.handleTlm)
+    props.registerGlobalLiveMessageHandler(this.handleTlm)
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
@@ -37,6 +40,18 @@ export class PersonalRecentActivities extends React.Component {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
     this.setHeadTitle()
     this.buildBreadcrumbs()
+  }
+
+  handleTlm = async (data) => {
+    const { props } = this
+    if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
+      const fetchGetWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(data.fields.workspace.workspace_id))
+      if (fetchGetWorkspaceMemberList.status !== 200) return
+
+      const member = fetchGetWorkspaceMemberList.json.find(user => user.id === data.fields.user.user_id)
+      if (!member || member.role === data.fields.member.role) return
+    }
+    props.handleTlm(data)
   }
 
   handleAllAppChangeLanguage = () => {
@@ -80,6 +95,7 @@ export class PersonalRecentActivities extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
+          workspaceList={props.workspaceList}
         />
       </div>
     )
@@ -94,7 +110,7 @@ PersonalRecentActivities.propTypes = {
   onEventClicked: PropTypes.func
 }
 
-const mapStateToProps = ({ lang, user, userActivity, breadcrumbs }) => ({ lang, user, activity: userActivity, breadcrumbs })
+const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, workspaceList })
 const component = withActivity(
   TracimComponent(PersonalRecentActivities),
   setUserActivityList,

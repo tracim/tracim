@@ -59,7 +59,8 @@ describe('reducer currentWorkspace.js', () => {
           description: firstWorkspaceFromApi.description,
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
-          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
+          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled,
+          publicationEnabled: firstWorkspaceFromApi.publication_enabled
         })
       })
     })

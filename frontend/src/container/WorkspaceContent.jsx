@@ -29,7 +29,8 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   PAGE,
-  TracimComponent
+  TracimComponent,
+  IconButton
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -513,7 +514,7 @@ export class WorkspaceContent extends React.Component {
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     if (fetchMoveContent.status !== 200) {
-      switch (fetchMoveContent.json.code) {
+      switch ((fetchMoveContent.json || { code: 0 }).code) {
         case 3002:
           props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
           break
@@ -723,15 +724,22 @@ export class WorkspaceContent extends React.Component {
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
             />
-
             <PageContent parentClass='workspace__content'>
-              {userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <DropdownCreateButton
-                  folderId={null} // null because it is workspace root content
-                  onClickCreateContent={this.handleClickCreateContent}
-                  availableApp={createContentAvailableApp}
+              <div className='workspace__content__buttons'>
+                <IconButton
+                  onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                  text={props.t('Open the gallery')}
+                  icon='far fa-image'
+                  dataCy='IconButton_gallery'
                 />
-              )}
+                {userRoleIdInWorkspace >= ROLE.contributor.id && (
+                  <DropdownCreateButton
+                    folderId={null} // null because it is workspace root content
+                    onClickCreateContent={this.handleClickCreateContent}
+                    availableApp={createContentAvailableApp}
+                  />
+                )}
+              </div>
 
               <div className='workspace__content__fileandfolder folder__content active'>
                 <ContentItemHeader />

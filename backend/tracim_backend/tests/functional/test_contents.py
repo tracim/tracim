@@ -2487,6 +2487,52 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["mimetype"] == "image/png"
 
+    def test_api__create_file_as_publication__err__400__publications_disabled(
+        self, workspace_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        create one file of a content at workspace root
+        """
+
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(
+            label="No publication", publication_enabled=False
+        )
+        transaction.commit()
+        image = create_1000px_png_test_image()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.post(
+            "/api/workspaces/{}/files".format(workspace.workspace_id),
+            upload_files=[("files", image.name, image.getvalue())],
+            params={"content_namespace": "publication"},
+            status=400,
+        )
+        assert res.json_body["code"] == 2072
+
+    def test_api__create_thread_as_publication__err__400__publications_disabled(
+        self, workspace_api_factory, session, web_testapp, admin_user
+    ) -> None:
+        """
+        create one file of a content at workspace root
+        """
+
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace(
+            label="No publication", publication_enabled=False
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/contents".format(workspace.workspace_id),
+            params={
+                "content_namespace": "publication",
+                "label": "content",
+                "content_type": "thread",
+            },
+            status=400,
+        )
+        assert res.json_body["code"] == 2072
+
     def test_api__create_file__err_400__filename_already_used(
         self, workspace_api_factory, content_api_factory, session, web_testapp
     ) -> None:
@@ -3117,7 +3163,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3195,7 +3241,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3646,7 +3692,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -3725,7 +3771,7 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -4179,7 +4225,7 @@ class TestThreads(object):
         res = web_testapp.get(
             "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=400
         )
-        assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
         """

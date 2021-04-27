@@ -1,0 +1,34 @@
+@import '../../css/Variable.styl'
+
+.linkPreview
+  position relative
+  display block
+  padding 10px
+  margin-top 10px
+  border 1px solid mediumGrey
+  background veryLightGrey
+  color inherit
+  text-decoration none
+  & .linkPreview__img
+    margin-left 10px
+    border 1px solid mediumGrey
+    float right
+    max-width 33%
+
+  &__content
+    &__link
+      color blue
+    &__description
+      margin-top 5px
+
+  &:hover
+    text-decoration none
+    color inherit
+
+    .linkPreview__content__link
+      text-decoration underline
+
+  &::after // RJ - NOTE - 2021-04-19 - this ensures the image does not overflows
+    content ""
+    display block
+    clear both

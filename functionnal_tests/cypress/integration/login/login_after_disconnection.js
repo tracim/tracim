@@ -13,16 +13,16 @@ describe('Login after a disconnection ', function () {
     cy.setupBaseDB()
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '?dc=1' }, waitForTlm: false })
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .type(login)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .type(login)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .click()
   })
 

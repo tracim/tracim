@@ -60,6 +60,8 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentDeleteComment',
+        'appContentEditComment',
         'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
@@ -73,7 +75,13 @@ describe('appContentFactory.js', () => {
         'buildTimelineFromCommentAndRevision',
         'searchForMentionInQuery',
         'handleTranslateComment',
-        'handleRestoreComment'
+        'handleRestoreComment',
+        'addContentToFavoriteList',
+        'isContentInFavoriteList',
+        'loadFavoriteContentList',
+        'removeContentFromFavoriteList',
+        'removeCommentFromTimeline',
+        'updateCommentOnTimeline'
       )
     })
   })
@@ -324,17 +332,17 @@ describe('appContentFactory.js', () => {
       let response
       const newComment = 'Edited comment'
       const fakeTinymceSetContent = sinon.spy()
+      const activeEditor = {
+        dom: {
+          select: () => []
+        },
+        getContent: () => newComment,
+        setContent: fakeTinymceSetContent
+      }
+
       global.tinymce = {
         ...global.tinymce,
-        get: () => ({
-          setContent: fakeTinymceSetContent
-        }),
-        activeEditor: {
-          dom: {
-            select: () => []
-          },
-          getContent: () => newComment
-        }
+        get: (id) => activeEditor
       }
 
       before(async () => {

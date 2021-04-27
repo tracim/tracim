@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { BtnSwitch } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -37,6 +38,15 @@ const OptionalFeatures = props => {
           />
         </div>
       )}
+
+      <div className='formBlock__field workspace_advanced__optionalfunctionalities__content' data-cy='publication_enabled'>
+        <BtnSwitch
+          checked={props.publicationEnabled}
+          onChange={props.onTogglePublicationEnabled}
+          activeLabel={props.t('Publications activated')}
+          inactiveLabel={props.t('Publications deactivated')}
+        />
+      </div>
     </div>
   )
 }

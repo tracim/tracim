@@ -106,6 +106,7 @@ import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
@@ -205,7 +206,9 @@ import {
   getFileChildContent,
   getContent,
   getWorkspaceContent,
-  getCommentTranslated
+  getHtmlDocTranslated,
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -225,6 +228,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
+export { default as Comment } from './component/Timeline/Comment.jsx'
 
 export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
@@ -239,9 +243,14 @@ export {
 export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
+export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
+export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 
 export {
   TRANSLATION_STATE,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
   getTranslationApiErrorMessage,
   getDefaultTranslationState
 } from './translation.js'
@@ -256,6 +265,7 @@ export {
   DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
+  EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
   naturalCompareLabels,
@@ -411,6 +421,8 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
+  getHtmlDocTranslated,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  getGenericWorkspaceContent
 }

@@ -22,6 +22,7 @@ from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
+from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -183,6 +184,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
+            publication_enabled=hapic_data.body.publication_enabled,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -215,6 +217,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
+            publication_enabled=hapic_data.body.publication_enabled,
             parent=parent,
         )
         wapi.execute_created_workspace_actions(workspace)
@@ -515,6 +518,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceFeatureDisabled, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_content)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
@@ -627,6 +631,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ConflictingMoveInItself, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ConflictingMoveInChild, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceFeatureDisabled, HTTPStatus.BAD_REQUEST)
     @check_right(can_move_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())

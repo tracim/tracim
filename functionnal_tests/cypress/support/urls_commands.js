@@ -16,7 +16,8 @@ const PAGES = {
   RECENT_ACTIVITIES: 'recent-activities',
   PUBLICATION: 'publication',
   PROFILE: 'profile',
-  WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities'
+  WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities',
+  FAVORITES: 'favorites'
 }
 
 const URLS = {
@@ -37,7 +38,8 @@ const URLS = {
   [PAGES.JOIN_WORKSPACE]: () => '/ui/join-workspace',
   [PAGES.RECENT_ACTIVITIES]: () => '/ui/recent-activities',
   [PAGES.PUBLICATION]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/publications`,
-  [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`
+  [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`,
+  [PAGES.FAVORITES]: () => 'ui/favorites'
 }
 
 /**
@@ -77,9 +79,11 @@ const TRACIM_LIVE_MESSAGE_STATUS_CHANGED = 'TracimLiveMessageStatusChanged'
 const APP_CUSTOM_EVENT_LISTENER = 'appCustomEventListener'
 // Same here with LiveMessagesManager.js
 const OPENED_LIVE_MESSAGE_STATUS = 'opened'
-Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
+Cypress.Commands.add('visitAndWaitForTlmConnection', (url, options = {}) => {
   const tlm = { opened: false }
+
   const signalOpenedTlmConnection = (win) => {
+    if (options.onBeforeLoad) options.onBeforeLoad(win)
     win.document.addEventListener(APP_CUSTOM_EVENT_LISTENER, (event) => {
       if (tlm.opened) return
       tlm.opened = (
@@ -90,7 +94,9 @@ Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
       )
     })
   }
+
   cy.visit(url, {
+    ...options,
     onBeforeLoad: signalOpenedTlmConnection
   }).then(() => {
     return new Cypress.Promise((resolve, reject) => {
@@ -103,10 +109,16 @@ Cypress.Commands.add('visitAndWaitForTlmConnection', (url) => {
   })
 })
 
-Cypress.Commands.add('visitPage', ({ pageName, params = {}, getters = null, waitForTlm = false }) => {
+Cypress.Commands.add('visitPage', ({
+  pageName,
+  params = {},
+  getters = null,
+  waitForTlm = false,
+  options = undefined
+}) => {
   const url = formatUrl({ pageName: pageName, params: params, getters: getters })
-  if (waitForTlm) return cy.visitAndWaitForTlmConnection(url)
-  return cy.visit(url)
+  if (waitForTlm) return cy.visitAndWaitForTlmConnection(url, options)
+  return cy.visit(url, options)
 })
 export { PAGES, URLS, reverseUrl, formatUrl }
 

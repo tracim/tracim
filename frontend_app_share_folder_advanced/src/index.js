@@ -4,6 +4,7 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import ShareFolderAdvanced from './container/ShareFolderAdvanced.jsx'
 import { ROLE } from 'tracim_frontend_lib'
+import { Router } from 'react-router-dom'
 
 require('./css/index.styl')
 
@@ -17,7 +18,9 @@ const appInterface = {
     }
 
     return ReactDOM.render(
-      <ShareFolderAdvanced data={data} />
+      <Router history={data.config.history}>
+        <ShareFolderAdvanced data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },

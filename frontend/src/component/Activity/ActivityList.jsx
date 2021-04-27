@@ -49,6 +49,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
       : (
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
+          contentAvailable={activity.contentAvailable}
           commentList={activity.commentList}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
@@ -84,7 +85,7 @@ const ActivityList = (props) => {
       isALink: true
     }
 
-    if (activity.contentPath.length > 0) {
+    if (activity.contentAvailable && activity.contentPath.length > 0) {
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
@@ -125,10 +126,18 @@ const ActivityList = (props) => {
       DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
   }
 
+  const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+    if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+        !activity.newestMessage.fields.workspace) return true
+    const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+    if (!currentWorkspace) return true
+    return currentWorkspace.publicationEnabled
+  }
+
   const activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
       (
-        activity.entityType === TLM_ET.CONTENT ||
+        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
         isSubscriptionRequestOrRejection(activity) ||
         isMemberCreatedOrModified(activity)
       )
@@ -174,7 +183,8 @@ ActivityList.propTypes = {
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  onEventClicked: PropTypes.func
+  onEventClicked: PropTypes.func,
+  workspaceList: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default translate()(ActivityList)

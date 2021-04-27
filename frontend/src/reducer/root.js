@@ -19,6 +19,7 @@ import workspaceSubscriptionList from './workspaceSubscriptionList.js'
 import workspaceActivity from './workspaceActivity.js'
 import userActivity from './userActivity.js'
 import { ADVANCED_SEARCH_TYPE, SEARCH_TYPE } from '../util/helper.js'
+import favoriteList from './favoriteList.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -42,7 +43,8 @@ const rootReducer = combineReducers({
   publicationList,
   workspaceSubscriptionList,
   workspaceActivity,
-  userActivity
+  userActivity,
+  favoriteList
 })
 
 export default rootReducer

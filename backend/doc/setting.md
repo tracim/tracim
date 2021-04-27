@@ -12,9 +12,7 @@ environnement variable (see `env_var_name`).
 The priority order is (from less to more priority):
 - default values
 - configuration file
-- environnement variables
-
-<!--- Maintainer: use tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"  with all apps enabled to update this list properly --->
+- environment variables
 
 In most of the cases you'll want to serve Tracim behind an HTTP reverse-proxy to add TLS/caching support.
 You can configure Tracim's external URL with the `website.base_url` parameter, for example:

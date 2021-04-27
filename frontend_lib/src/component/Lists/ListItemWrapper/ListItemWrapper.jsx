@@ -12,6 +12,7 @@ const ListItemWrapper = props => {
       }
       title={props.label}
       id={props.id}
+      data-cy={props.dataCy}
     >
       {props.children}
     </div>
@@ -26,7 +27,8 @@ ListItemWrapper.propTypes = {
   contentType: PropTypes.object,
   isLast: PropTypes.bool,
   read: PropTypes.bool,
-  id: PropTypes.string
+  id: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 ListItemWrapper.defaultProps = {
@@ -34,5 +36,6 @@ ListItemWrapper.defaultProps = {
   customClass: '',
   isLast: false,
   read: false,
-  id: undefined
+  id: undefined,
+  dataCy: null
 }

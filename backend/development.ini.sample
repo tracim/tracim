@@ -167,6 +167,11 @@ workspace.join.max_messages_history_count = -1
 # additional directives to tune the CSP header, they are added without any change to the header
 ; content_security_policy.additional_directives =
 
+###
+# URL PREVIEW
+###
+# timeout for fetching URL preview (in sec).
+; url_preview.fetch_timeout = 30
 
 ####
 # LIMITATION
@@ -379,9 +384,17 @@ api.key = %(basic_setup.api_key)s
 ####
 
 ### Website config ###
-## title of website, used in email
+## title of website, used in email and is part of the title in browsers
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
+## description of website, used by search engines to display their results
+; website.description =
+## Custom welcome page displayed during login
+## The path of those files is relative to frontend/dist/assets/branding/
+## Please read the documentation in doc/branding.md for further information
+; website.welcome_page = welcome-simple.html
+; website.welcome_page_style = welcome-simple.css
+
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
 ; website.base_url = http://localhost:6543
@@ -433,7 +446,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.ui.enabled = True
 
 ### Notifications ###
-# Comma-separated events listed in this setting are not displayed in notifications to the user.
+# Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
