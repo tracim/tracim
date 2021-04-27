@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { ALLOWED_CHARACTERS_USERNAME } from 'tracim_frontend_lib'
+import {
+  ALLOWED_CHARACTERS_USERNAME,
+  IconButton
+} from 'tracim_frontend_lib'
 
 import {
   editableUserAuthTypeList
@@ -120,25 +123,28 @@ export class PersonalData extends React.Component {
 
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div className='align-items-center flex-wrap mb-4'>
-              <input
-                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
-                type='password'
-                placeholder={props.displayAdminInfo ? props.t("Administrator's password") : props.t('Type your password')}
-                value={state.checkPassword}
-                onChange={this.handleChangeCheckPassword}
-                disabled={state.newEmail === '' && state.newUsername === ''}
-              />
+              <label>
+                {props.displayAdminInfo ? props.t("Administrator's password:") : props.t('Type your password:')}
+                <input
+                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                  type='password'
+                  placeholder=''
+                  value={state.checkPassword}
+                  onChange={this.handleChangeCheckPassword}
+                  disabled={state.newEmail === '' && state.newUsername === ''}
+                />
+              </label>
             </div>
           )}
 
-          <button
-            type='button'
-            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
-            onClick={this.handleClickSubmit}
+          <IconButton
+            customClass='personaldata__form__button'
+            intent='secondary'
             disabled={!props.isUsernameValid}
-          >
-            {props.t('Validate')}
-          </button>
+            onClick={this.handleClickSubmit}
+            icon='fas fa-check'
+            text={props.t('Validate')}
+          />
         </form>
       </div>
     )
