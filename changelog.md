@@ -2,8 +2,7 @@
 
 ### New Features
 
-- Content can be added to personal favourites
-- Add and comment a publication
+- Contents can be added to personal favourites
 - The Home/login page can be customized
 - Links in comments and publications are now previewed when possible
 - Subspaces can be folded in the sidebar
@@ -25,7 +24,7 @@ Backend: [#4552](https://github.com/tracim/tracim/issues/4552)
 
 ### Breaking/Important change
 
-- Renaming some wording in Tracim (issue [#4348](https://github.com/tracim/tracim/issues/4348)):
+- Some rewording (issue [#4348](https://github.com/tracim/tracim/issues/4348)):
   - `Open advanced Dashboard` is changed to `Space settings`
   - `Recent activity` and `Activity feed` is changed to `Recent activities`
   - `Click here to unsubscribe/subscribe` is changed to `Email notifications`
