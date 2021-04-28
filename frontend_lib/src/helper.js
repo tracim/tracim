@@ -747,7 +747,7 @@ export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
 export const htmlCodeToDocumentFragment = (htmlCode) => {
-  // NOTE - RJ - 2020-04-28 - <template> provides a convenient content property.
+  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
   // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
   const template = document.createElement('template')
   template.innerHTML = htmlCode
