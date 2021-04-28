@@ -131,7 +131,6 @@ export class Password extends React.Component {
               <input
                 className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
                 type='password'
-                placeholder=''
                 value={state.newPassword2}
                 onChange={this.handleChangeNewPassword2}
                 maxLength={513}
