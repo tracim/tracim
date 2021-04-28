@@ -17,7 +17,7 @@
   "Copy content link": "Link zum Inhalt kopieren",
   "Empty note": "Leere Notiz",
   "Empty thread": "Leeres Thread",
-  "Unknown space type": "Unbekannter Bereichtyp",
+  "Unknown space type": "Unbekannter Bereichsart",
   "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen: {{allowedCharactersUsername}}",
   "Create a space": "Bereich schaffen",
   "Dashboard": "Dashboard",
@@ -67,7 +67,7 @@
   "Error while loading read status list": "Fehler beim Laden, bitte Statusliste lesen",
   "List of contents": "Verzeichnis der Inhalte",
   "This space has no content yet": "Dieser Bereich hat noch keinen Inhalt",
-  ", create the first content by clicking on the button 'Create'": ", erstellen Sie den ersten Inhalt, indem Sie auf die Schaltfläche 'Erstellen' klicken",
+  ", create the first content by clicking on the button 'Create'": ", erstellen Sie den ersten Inhalt, indem Sie auf das Button 'Erstellen' klicken",
   "Calendar": "Kalender",
   "Access your personal calendar": "Zugriff auf Ihren persönlichen Kalender",
   "Space": "Bereich",
@@ -104,7 +104,7 @@
   "Download": "Herunterladen",
   "Archive": "Archiv",
   "Delete": "Löschen",
-  "Type": "Typ",
+  "Type": "Art",
   "Title": "Titel",
   "Status": "Status",
   "Create in folder": "Im Ordner erstellen",
@@ -159,18 +159,18 @@
   "Click here to subscribe": "Hier geht's zum Abo",
   "Explore contents": "Inhalte erkunden",
   "Open the agenda": "Kalender öffnen",
-  "Agenda": "Agenda",
-  "Error while loading your agenda": "Fehler beim Laden Ihrer Agenda",
-  "agenda details": "Agenda-Details",
+  "Agenda": "Kalender",
+  "Error while loading your agenda": "Fehler beim Laden Ihrer Kalender",
+  "agenda details": "Kalender-Details",
   "Home": "Startseite",
   "Invalid password": "Ungültiges Passwort",
   "Error while saving your language": "Fehler beim Speichern Ihrer Sprache",
-  "Use this link to integrate this agenda to your": "Verwenden Sie diesen Link, um diese Agenda in Ihre",
+  "Use this link to integrate this agenda to your": "Verwenden Sie diesen Link, um diese Kalender in Ihre",
   "Use this link to integrate Tracim in your file explorer": "Verwenden Sie diesen Link, um Tracim in Ihren Datei-Explorer zu integrieren",
   "CalDAV compatible software": "CalDAV-kompatible Software",
   "(protocole WebDAV)": "(WebDAV-Protokoll)",
   "Administration": "Verwaltung",
-  "Agendas": "Agendas",
+  "Agendas": "Kalender",
   "See sidebar": "Siehe Seitenleiste",
   "Hide sidebar": "Seitenleiste ausblenden",
   "Hello, you don't have a username yet!": "Hallo, Sie haben noch keinen Benutzernamen!",
@@ -197,16 +197,11 @@
   "Error while marking the notification as read": "Fehler beim Markieren der Benachrichtigung als gelesen",
   "Move this content": "Diesen Inhalt verschieben",
   "Move this folder": "Diesen Ordner verschieben",
-  // doute
   "A content with same name already exists": "Ein Inhalt mit gleichem Namen existiert bereits",
-  "The destination folder doesn't allow this content type": "Der Zielordner lässt diesen Inhaltstyp nicht zu",
-  // done
-  ", create the first content of that type by clicking on the button 'Create'": ", erstellen Sie den ersten Inhalt dieses Typs, indem Sie auf die Schaltfläche 'Erstellen' klicken",
-  // doute ==> typs oder Art ?
+  "The destination folder doesn't allow this content type": "Der Zielordner lässt diesen Inhaltsart nicht zu",
+  ", create the first content of that type by clicking on the button 'Create'": ", erstellen Sie den ersten Inhalt dieses Arts, indem Sie auf das Button 'Erstellen' klicken",
   "This space has no content of that type yet": "Dieser Bereich hat noch keinen Inhalt dieser Art",
-  // Art oder Typ ?
   "Insufficient rights": "Unzureichende Rechte",
-  // Unzureichende // Ungenügend ?
   "Download file": "Datei herunterladen",
   "Upload files": "Dateien hochladen",
   "Attached files": "Angehängte Dateien",
@@ -223,7 +218,6 @@
   "Error while loading uploaded files": "Fehler beim Laden hochgeladener Dateien",
   "Error while downloading file": "Fehler beim Laden Herunterladen Dateien",
   "Manage": "Verwalten",
-  // doute
   "Files already added:": "Bereits hinzugefügte Dateien:",
   "Full name must be at least 1 character": "Der vollständige Name muss mindestens 1 Zeichen lang sein",
   "Full name must be less than 255 characters": "Der vollständige Name muss weniger als 255 Zeichen enthalten",
@@ -234,7 +228,6 @@
   "Error while loading file information": "Fehler beim Laden von Dateiinformationen",
   "Error, this link is invalid or has expired": "Fehler, dieser Link ist ungültig oder abgelaufen",
   "Error while loading upload information": "Fehler beim Laden von Upload-Informationen",
-  // c'est correct la phase en anglais ?
   "You must select at least 1 file to upload": "Sie müssen mindestens 1 Datei zum Hochladen auswählen",
   "you can set your username on page My Account": "Sie können Ihren Benutzernamen auf der Seite Mein Konto festlegen",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Ihr Benutzername ist falsch, die erlaubten Zeichen sind {{allowedCharactersUsername}}",
@@ -245,10 +238,8 @@
   "Open the gallery": "Öffnen Sie die Galerie",
   "Gallery": "Galerie",
   "The file is larger than the maximum file size allowed": "Die Datei ist größer als die maximal zulässige Dateigröße",
-  //  erlaubt ?
   "Error, the space exceed its maximum size": "Fehler, der Bereich hat seine maximale Größe überschritten",
-  "Upload impossible, the destination storage capacity has been reached": "Upload unmöglich, die Speicherkapazität des Ziels ist erreicht",
-  //  den Zielspeicher
+  "Upload impossible, the destination storage capacity has been reached": "Upload unmöglich, keine Speicherkapazität mehr",
   "Public download": "Öffentlicher Download",
   "Login": "Anmeldung",
   "User administration": "Benutzerverwaltung",
@@ -257,7 +248,6 @@
   "Public upload": "Öffentliches Hochladen",
   "Password reset": "Passwort zurücksetzen",
   "Find all your documents put online directly on your computer via the workstation, without going through the software.": "Finden Sie alle Ihre online gestellten Dokumente direkt auf Ihrem Computer über die Workstation, ohne den Umweg über die Software.",
-  // zu gehen ?
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Der vollständige Name muss mindestens {{minimumCharactersPublicName}} Zeichen enthalten",
   "Your personal data has been changed": "Ihre persönlichen Daten wurden geändert",
   "Your username and your name has been changed": "Ihr Benutzername und Ihr Name wurden geändert",
@@ -280,7 +270,6 @@
   "Error loading unread notification number": "Fehler beim Laden der ungelesenen Benachrichtigungsnummer",
   "{{author}} deleted {{content}} from {{space}}": "{{author}} hat {{content}} aus {{space}} gelöscht",
   "{{author}} restored {{content}} in {{space}}": "{{author}} wiederhergestellt {{content}} im {{space}}",
-  // restauriert ?
   "{{author}} created {{user}}'s account": "{{author}} hat das Konto von {{user}} erstellt",
   "{{author}} modified {{user}}'s account": "{{author}} hat das Konto von {{user}} geändert",
   "{{author}} deleted {{user}}'s account": "{{author}} hat das Konto von {{user}} gelöscht",
@@ -297,10 +286,8 @@
   "You cannot remove this member because there are no other space managers.": "Sie können dieses Mitglied nicht entfernen, da es keine anderen Bereichmanager gibt.",
   "Are you sure you want to remove this member from the space?": "Sind Sie sicher, dass Sie dieses Mitglied aus dem Bereich entfernen möchten?",
   "{{author}} requested access to {{space}}": "{{author}} beantragte Zugriff auf {{space}}",
-  "{{author}} rejected your access to {{space}}": "{{author}} hat Ihren Zugriff auf den {{space}} abgelehnt",
-  // zum ?
-  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} hat Zugriff auf {{space}} für {{user}} abgelehnt",
-  // zum ?
+  "{{author}} rejected your access to {{space}}": "{{author}} hat Ihren Zugriff auf den {{space}} blockiert",
+  "{{author}} rejected access to {{space}} for {{user}}": "{{author}} hat Zugriff auf {{space}} für {{user}} blockiert",
   "Only an administrator can see this user's account": "Nur ein Administrator kann das Konto dieses Benutzers sehen",
   "This notification has no associated content": "Diese Meldung hat keinen zugehörigen Inhalt",
   "Join a space": "Einem Bereich beitreten",
@@ -314,8 +301,7 @@
   "You can create your first space": "Sie können Ihren ersten Bereich erstellen",
   "You can join an existing space": "Sie können einem bestehenden Bereich beitreten",
   "You joined the space {{space}}": "Sie sind dem Bereich {{space}} beigetreten",
-  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Ihre Anfrage, dem {{space}} beizutreten, wird von einem Bereichmanager bearbeitet. Das Ergebnis wird an der Benachrichtigungswand angezeigt.",
-  // notification wall ==> Benachrichtigungswand ? Aktivitäts-Feed
+  "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "Ihre Anfrage, dem {{space}} beizutreten, wird von einem Bereichsmanager bearbeitet. Das Ergebnis wird an der Benachrichtigungswand angezeigt.",
   "Refresh": "Aktualisieren",
   "Unknown space": "Unbekannter Bereich",
   "Request accepted": "Anfrage angenommen",
@@ -328,27 +314,23 @@
   "by": "von",
   "Please ask access to spaces to an administrator or space manager": "Bitte wenden Sie sich für den Zugang zu Bereichen an einen Administrator oder Bereichmanager",
   "mention made": "erwähnte",
-  // doute
   "unknown": "unbekannt",
-  "Unknown activity type": "Unbekannter Aktivitätstyp",
-  // art ?
+  "Unknown activity type": "Unbekannter Aktivitätsart",
   "status modified": "Status geändert",
   "Loading activity feed…": "Aktivitäts-Feed laden...",
   "No activity": "Keine Aktivität",
   "Preview of {{content}}": "Vorschau auf {{content}}",
   "No preview available": "Keine Vorschau verfügbar",
   "Preview loading...": "Vorschau wird geladen...",
-  "Unknown entity type": "Unbekannter Entitätstyp",
+  "Unknown entity type": "Unbekannter Entitätsart",
   "Open content": "Inhalt öffnen",
-  "The link has been copied to clipboard": "Der Link wurde in die Zwischenablage kopiert",
-  // ablage
+  "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
   "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  trat in den Bereich<2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>{{userPublicName}}</0></0>s Rolle wurde geändert in <2>{{role}}</2>",
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  möchte dem Bereich beitreten <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "Die Anfrage von <0><0>{{userPublicName}}</0></0> dem Bereich beizutreten, wurde <2>{{state}}</2>",
   "Account": "Konto",
   "User account management": "Verwaltung von Benutzerkonten",
-  // doute
   "{{user}}'s profile": "{{user}}'s Profil",
   "Loading": "Laden",
   "Information_plural": "Informationen",
@@ -356,18 +338,14 @@
   "Error while saving public profile": "Fehler beim Speichern des öffentlichen Profils",
   "Personal Page": "Persönliche Seite",
   "{{ count }} intervention ": "{{ count }} Eingriff ",
-  // doute
   "{{ count }} intervention _plural": "{{ count }} Eingriffe ",
-  // same
   "in {{ count }} space": "in {{ count }} Bereich",
   "in {{ count }} space_plural": "in {{ count }} Bereichen",
   "Upload an image": "Ein Bild hochladen",
   "Recommended dimensions:": "Empfohlene Abmessungen:",
-  // doute ==> Masse, dimensionen
   "Change avatar": "Avatar ändern",
   "Maximum size: {{size}} MB": "Maximale Größe: {{size}} MB",
   "Registration date:": "Datum der Registrierung:",
   "Cover image of {{publicName}}": "Titelbild von {{publicName}}",
-  // coverbild
   "Change cover": "Abdeckung ändern"
 }
