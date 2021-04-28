@@ -71,12 +71,9 @@ function setup_config_file {
         loggood "color.json already exists"
     fi
 
-    if [ ! -f ../frontend/dist/assets/branding/welcome-simple.html ]; then
+    if [ ! -d ../frontend/dist/assets/branding ]; then
         log "Creating default welcome page ..."
-        for sample_file in ../frontend/dist/assets/branding/*.sample; do
-            base=$(basename "${sample_file}")
-            cp "${sample_file}" "${sample_file%.*}" && loggood "Successfully copied ${base}" || logerror "Failed to copy ${base}"
-        done
+        cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding && loggood "Successfully created default welcome page" || logerror "Failed to create default welcome page"
     else
         loggood "welcome page already exists"
     fi

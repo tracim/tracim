@@ -18,7 +18,7 @@ dashboard_menu_entry = WorkspaceMenuEntry(
     hexcolor="#fdfdfd",
     fa_icon="fas fa-tachometer-alt",
 )
-activity_menu_entry = WorkspaceMenuEntry(
+publication_menu_entry = WorkspaceMenuEntry(
     slug="publication",
     label="Publications",
     route="/ui/workspaces/{workspace_id}/publications",

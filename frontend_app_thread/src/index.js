@@ -4,6 +4,7 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import Thread from './container/Thread.jsx'
 import PopupCreateThread from './container/PopupCreateThread.jsx'
+import { Router } from 'react-router-dom'
 
 require('./css/index.styl')
 
@@ -12,7 +13,9 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     return ReactDOM.render(
-      <Thread data={data} />
+      <Router history={data.config.history}>
+        <Thread data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },

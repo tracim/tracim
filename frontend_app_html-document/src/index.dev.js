@@ -6,6 +6,9 @@ import HtmlDocument from './container/HtmlDocument.jsx'
 import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 // import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
+import { Router } from 'react-router-dom'
+
+export const history = require('history').createBrowserHistory()
 
 require('./css/index.styl')
 
@@ -13,7 +16,9 @@ const manager = new LiveMessageManager()
 manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
-  <HtmlDocument data={undefined} />
+  <Router history={history}>
+    <HtmlDocument data={undefined} />
+  </Router>
   , document.getElementById('content')
 )
 
