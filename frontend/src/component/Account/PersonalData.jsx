@@ -128,7 +128,6 @@ export class PersonalData extends React.Component {
                 <input
                   className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
                   type='password'
-                  placeholder=''
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
                   disabled={state.newEmail === '' && state.newUsername === ''}
