@@ -42,6 +42,7 @@ The paths of the files in `development.ini` are relative to `<branding_folder>`.
 These parameters can also be changed with an environment variable as described in [setting.md](setting.md).
 
 In case you use CSS styling, we recommend to use the `tracimBrandingWelcomePage` class name prefix to avoid collisions with Tracim's own class names.
+The additional files/images added in `<branding_folder>` are available to the browser in `/assets/branding/`, so setup the source/link references in your HTML accordingly.
 
 You can use [welcome-simple.html.sample](../../frontend/dist/assets/branding/welcome-simple.html.sample) and [welcome.css.sample](../../frontend/dist/assets/branding/welcome-simple.css.sample) as a starting point.
 

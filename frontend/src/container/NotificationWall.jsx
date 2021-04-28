@@ -135,11 +135,7 @@ export class NotificationWall extends React.Component {
               icon: 'far fa-comments',
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}} in {{space}}', i18nOpts),
-              url: (
-                notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
-                  ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
-                  : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
-              )
+              url: this.linkToComment(notification)
             }
           }
 
@@ -192,7 +188,7 @@ export class NotificationWall extends React.Component {
           icon: 'far fa-comment',
           title: props.t('Mention'),
           text: props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts),
-          url: PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+          url: this.linkToComment(notification)
         }
       }
 
@@ -405,6 +401,14 @@ export class NotificationWall extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
     }
+  }
+
+  linkToComment (notification) {
+    return (
+      notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
+        ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
+        : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+    )
   }
 
   render () {

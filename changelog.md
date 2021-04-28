@@ -1,3 +1,35 @@
+# 3.8.0 / 2021-04-27
+
+### New Features
+
+- Contents can be added to personal favourites
+- The Home/login page can be customized
+- Links in comments and publications are now previewed when possible
+- Subspaces can be folded in the sidebar
+- The dashboard has been improved
+- Comments can be edited and removed
+- User profile can now be reached from places where the user has commented something and from the member's list of a space
+- There is a new button on the content page to open the gallery
+- Files uploaded in a comment can now be opened as a content
+- The space description is now editable using a rich text editor
+
+### Fixed Issues
+
+Frontend: [#3787](https://github.com/tracim/tracim/issues/3787),
+[#3811](https://github.com/tracim/tracim/issues/3811),
+[#4464](https://github.com/tracim/tracim/issues/4464),
+[#4532](https://github.com/tracim/tracim/issues/4532),
+[#4567](https://github.com/tracim/tracim/issues/4567)
+Backend: [#4552](https://github.com/tracim/tracim/issues/4552)
+
+### Breaking/Important change
+
+- Some rewording (issue [#4348](https://github.com/tracim/tracim/issues/4348)):
+  - `Open advanced Dashboard` is changed to `Space settings`
+  - `Recent activity` and `Activity feed` is changed to `Recent activities`
+  - `Click here to unsubscribe/subscribe` is changed to `Email notifications`
+
+
 # 3.7.1 / 2021-04-14
 
 ### Fixed Issues

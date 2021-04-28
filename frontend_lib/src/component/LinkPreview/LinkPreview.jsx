@@ -13,7 +13,8 @@ export default class LinkPreview extends React.Component {
     this.state = {
       title: '',
       url: '',
-      description: ''
+      description: '',
+      image: ''
     }
   }
 
@@ -35,10 +36,18 @@ export default class LinkPreview extends React.Component {
     return null
   }
 
-  async componentDidMount () {
+  async updatePreview () {
     const url = this.getSelectedLink()
 
-    if (!url) return
+    if (!url) {
+      if (this.state.url) {
+        this.setState({ title: '', url: '', description: '', image: '' })
+      }
+
+      return
+    }
+
+    if (url === this.state.url) return
 
     const fetchGetUrlPreview = await handleFetchResult(await getUrlPreview(this.props.apiUrl, url))
 
@@ -54,6 +63,18 @@ export default class LinkPreview extends React.Component {
         ),
         image
       })
+    } else {
+      this.setState({ title: '', description: '', image: '' })
+    }
+  }
+
+  componentDidMount () {
+    this.updatePreview()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.findLinkInHTML !== this.props.findLinkInHTML) {
+      this.updatePreview()
     }
   }
 
