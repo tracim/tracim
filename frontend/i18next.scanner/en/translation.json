@@ -450,9 +450,9 @@
   "New full name:": "New full name:",
   "New username:": "New username:",
   "New email:": "New email:",
-  "Old password:": "Old password:",
   "New password:": "New password:",
   "Repeat new password:": "Repeat new password:",
   "Administrator's password:": "Administrator's password:",
-  "Type your password:": "Type your password:"
+  "Type your password:": "Type your password:",
+  "Current password:": "Current password:"
 }

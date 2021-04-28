@@ -99,7 +99,7 @@ export class Password extends React.Component {
           {props.displayAdminInfo === false && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
               <label>
-                {props.t('Old password:')}
+                {props.t('Current password:')}
                 <input
                   className='personaldata__form__txtinput primaryColorBorderLighten form-control'
                   type='password'

@@ -450,9 +450,9 @@
   "New full name:": "Novo nome completo:",
   "New username:": "Novo identificador:",
   "New email:": "Novo e-mail:",
-  "Old password:": "Palavra-passe antiga:",
   "New password:": "nova palavra-passe:",
   "Repeat new password:": "Repetir nova palavra-passe",
   "Administrator's password:": "Palavra-passe do Administrador",
-  "Type your password:": "Escreva sua palavra-passe:"
+  "Type your password:": "Escreva sua palavra-passe:",
+  "Current password:": "Palavra-passe atual:"
 }

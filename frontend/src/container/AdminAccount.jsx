@@ -212,7 +212,7 @@ export class Account extends React.Component {
       const fetchPutUserPublicName = await props.dispatch(putUserPublicName(state.userToEdit, newPublicName))
       switch (fetchPutUserPublicName.status) {
         case 200:
-          if (newEmail === '') {
+          if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
           }
@@ -221,7 +221,6 @@ export class Account extends React.Component {
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
       }
     }
-
     if (newUsername !== '') {
       const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, newUsername, checkPassword))
       switch (fetchPutUsername.status) {
