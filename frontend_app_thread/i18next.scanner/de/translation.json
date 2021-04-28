@@ -1,19 +1,14 @@
 {
   "Validate and create": "Validieren und erstellen",
-  "Topic's subject": "Thema des Betreff",
-  // doute
-  "New Thread": "Neues Thema",
-  "Threads": "Fäden",
-  // doute
+  "Topic's subject": "Thema des Betreffs",
+  "New Thread": "Neues Thread",
+  "Threads": "Threads",
   "Start a topic": "Ein Thema beginnen",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
-  "Error while creating thread": "Fehler beim Erzeugen des Fadens",
-  // Faden / Thread
+  "Error while creating thread": "Fehler beim Erzeugen des Threads",
   "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "Thread": "Thread",
-  // Gewinde ? Thema ?
   "thread": "Thread",
   "threads": "Threads",
-  "The content has been modified by {{author}}": "Der Inhalt wurde geändert durch {{author}}"
-  // von ? durch ?
+  "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}"
 }
