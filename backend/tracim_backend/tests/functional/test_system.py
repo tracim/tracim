@@ -223,10 +223,10 @@ class TestUsageConditions(object):
         assert res.json == {
             "items": [
                 {
-                    "title": "a super test'with some spécials characters.txt",
+                    "title": "a super test'with some spécials characters",
                     "url": "http://localhost:6543/assets/branding/a%20super%20test%27with%20some%20sp%C3%A9cials%20characters.txt",
                 },
-                {"title": "hello.pdf", "url": "http://localhost:6543/assets/branding/hello.pdf"},
+                {"title": "hello", "url": "http://localhost:6543/assets/branding/hello.pdf"},
             ]
         }
 

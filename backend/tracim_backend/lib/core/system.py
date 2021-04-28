@@ -1,4 +1,5 @@
 import datetime
+import os
 import typing
 from urllib.parse import quote
 from urllib.parse import urljoin
@@ -69,9 +70,10 @@ class SystemApi(object):
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:
         usages_conditions_files = []
         for file_name in self._config.WEBSITE__USAGE_CONDITIONS:
+            label, extension = os.path.splitext(file_name)
             usages_conditions_files.append(
                 UsageConditionModel(
-                    title=file_name,
+                    title=label,
                     url=str(
                         "{base_url}/assets/branding/{condition_file_name}".format(
                             base_url=self._config.WEBSITE__BASE_URL,
