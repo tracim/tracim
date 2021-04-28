@@ -1,0 +1,29 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.conditions
+  &__main
+    &__wrapper
+      display flex
+      flex-direction column
+      width 80%
+      margin-block-start 40px
+      margin-inline-start 40px
+      margin-inline-end auto
+    &__title
+      font-size fontSizeTitle
+      margin-bottom 30px
+    &__label
+      vertical-align middle
+      margin-inline-start 10px
+      margin-inline-end 10px
+    &__buttons
+      display flex
+      justify-content space-between
+      margin-top 20px
+
+@media (max-width: max-md)
+  .conditions
+    &__main
+      &__wrapper
+        margin-inline-start auto
+        margin-top 10px

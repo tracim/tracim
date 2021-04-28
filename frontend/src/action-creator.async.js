@@ -1287,3 +1287,18 @@ export const deleteContentFromFavoriteList = (userId, contentId) => async dispat
     dispatch
   })
 }
+
+export const getUsageConditions = () => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/usage_conditions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: 'test',
+    dispatch
+  })
+}
