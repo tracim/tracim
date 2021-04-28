@@ -1,5 +1,5 @@
 import datetime
-import os
+from pathlib import PurePath
 import typing
 from urllib.parse import quote
 from urllib.parse import urljoin
@@ -70,7 +70,7 @@ class SystemApi(object):
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:
         usages_conditions_files = []
         for file_name in self._config.WEBSITE__USAGE_CONDITIONS:
-            label, extension = os.path.splitext(file_name)
+            label = PurePath(file_name).stem
             usages_conditions_files.append(
                 UsageConditionModel(
                     title=label,

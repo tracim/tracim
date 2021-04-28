@@ -227,6 +227,10 @@ class TestUsageConditions(object):
                     "url": "http://localhost:6543/assets/branding/a%20super%20test%27with%20some%20sp%C3%A9cials%20characters.txt",
                 },
                 {"title": "hello", "url": "http://localhost:6543/assets/branding/hello.pdf"},
+                {
+                    "title": "way",
+                    "url": "http://localhost:6543/assets/branding/we/can/support/subdirectory/this/way.jpg",
+                },
             ]
         }
 
