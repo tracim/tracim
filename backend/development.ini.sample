@@ -400,6 +400,11 @@ website.title = %(basic_setup.website_title)s
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
+# names of conditions files (stored in frontend/dist/assets/branding)
+# separated by ",", by default there is not conditions files.
+website.usage_conditions =
+
+
 ### Frontend ###
 ## if you want to use Tracim API without frontend, change this parameter
 ; frontend.serve = True
