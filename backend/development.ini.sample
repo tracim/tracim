@@ -400,8 +400,8 @@ website.title = %(basic_setup.website_title)s
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
-# names of conditions files (stored in frontend/dist/assets/branding)
-# separated by ",", by default there is not conditions files.
+# paths to usage conditions files (relative to frontend/dist/assets/branding)
+# separated by ",", by default there are no usage conditions files.
 website.usage_conditions =
 
 
