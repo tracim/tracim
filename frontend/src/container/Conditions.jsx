@@ -48,9 +48,8 @@ export class Conditions extends React.Component {
 
   handleClickCheckbox = (index) => {
     const { state } = this
-    if (state.usageConditionsCheckedList.find(id => id === index)) {
-      const newUsageConditionsCheckedList = state.usageConditionsCheckedList.filter(id => id !== index)
-      this.setState({ usageConditionsCheckedList: newUsageConditionsCheckedList })
+    if (state.usageConditionsCheckedList.includes(index)) {
+      this.setState(prev => { usageConditionsCheckedList: prev.usageConditionsCheckedList.filter(id => id !== index) })
     } else this.setState(prev => ({ usageConditionsCheckedList: [...prev.usageConditionsCheckedList, index] }))
   }
 
@@ -62,9 +61,9 @@ export class Conditions extends React.Component {
         {props.usageConditionsList.map((condition, index) => (
           <div className='conditions__main__checkbox' key={`condition${index}`}>
             <Checkbox
-              checked={!!state.usageConditionsCheckedList.find(id => id === index + 1)}
+              checked={state.usageConditionsCheckedList.includes(index)}
               name={`condition${index}`}
-              onClickCheckbox={() => this.handleClickCheckbox(index + 1)}
+              onClickCheckbox={() => this.handleClickCheckbox(index)}
               styleCheck={{ top: '-5px' }}
               styleLabel={{ marginBottom: '0px' }}
             />
