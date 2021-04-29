@@ -53,8 +53,8 @@ describe('Publications', () => {
     cy.get(`.linkPreview__img[src="${fakePreview.image}"]`).should('be.visible')
   })
 
-  it('A translation button should be visible', function () {
-    const text = 'Hello, world'
+  const text = 'Hello, world'
+  it('A translation button should be visible', () => {
     cy.get('#wysiwygTimelineCommentPublication').type(text)
     cy.get('button').contains('Publish').click()
     cy.get('[data-cy=commentTranslateButton]').click()
@@ -64,7 +64,6 @@ describe('Publications', () => {
   })
 
   it('a menu should allow to change the target language', () => {
-    const text = 'Hello, world'
     cy.get('#wysiwygTimelineCommentPublication').type(text)
     cy.get('button').contains('Publish').click()
     cy.get('[data-cy=commentTranslateButton__languageMenu]').click()
