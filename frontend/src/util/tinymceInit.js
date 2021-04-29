@@ -104,7 +104,9 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
           // after initialization instead of using TinyMCE's own mechanism works
           // around a performance issue in Chrome with big base64 images.
           // See https://github.com/tracim/tracim/issues/4591
-          $editor.contentDocument.body.replaceChildren(content)
+          const body = $editor.contentDocument.body
+          body.textContent = ''
+          body.appendChild(content)
 
           // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
           const id = uniqueId()
