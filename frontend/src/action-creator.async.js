@@ -26,6 +26,7 @@ import {
   SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
+  USAGE_CONDITIONS,
   USER,
   USER_CONFIGURATION,
   USER_CONNECTED,
@@ -1298,7 +1299,7 @@ export const getUsageConditions = () => async dispatch => {
       },
       method: 'GET'
     },
-    actionName: 'test',
+    actionName: USAGE_CONDITIONS,
     dispatch
   })
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -78,6 +79,7 @@ class Conditions extends React.Component {
               href={condition.url}
               rel='noopener noreferrer'
               target='_blank'
+              title={condition.title}
             >
               {condition.title}
             </a>
@@ -107,3 +109,9 @@ class Conditions extends React.Component {
 
 const mapStateToProps = ({ system }) => ({ system })
 export default withRouter(connect(mapStateToProps)(translate()(Conditions)))
+
+Conditions.propTypes = {
+  onClickValidate: PropTypes.func.isRequired,
+  onClickCancel: PropTypes.func.isRequired,
+  usageConditionsList: PropTypes.array.isRequired
+}

@@ -59,6 +59,9 @@ import { serializeUserProps } from '../reducer/user.js'
 import Conditions from './Conditions.jsx'
 
 const qs = require('query-string')
+const USAGE_CONDITIONS_STATUS = {
+  ACCEPTED: 'accepted'
+}
 
 class Login extends React.Component {
   constructor (props) {
@@ -192,7 +195,7 @@ class Login extends React.Component {
     const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(
       FETCH_CONFIG.apiUrl,
       props.user.userId,
-      { ...props.user.config, usage_conditions__status: 'accepted' }
+      { ...props.user.config, usage_conditions__status: USAGE_CONDITIONS_STATUS.ACCEPTED }
     ))
 
     if (fetchPutUserConfiguration.status !== 204) {
@@ -280,7 +283,7 @@ class Login extends React.Component {
       case 200: {
         props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters))
 
-        if (fetchGetUserConfig.json.parameters.usage_conditions__status !== 'accepted') {
+        if (fetchGetUserConfig.json.parameters.usage_conditions__status !== USAGE_CONDITIONS_STATUS.ACCEPTED) {
           const fetchGetUsageConditions = await props.dispatch(getUsageConditions())
           switch (fetchGetUsageConditions.status) {
             case 200: {
