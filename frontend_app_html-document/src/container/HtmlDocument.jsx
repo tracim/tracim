@@ -100,7 +100,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInComment: false,
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
-      translationState: TRANSLATION_STATE.DISABLED
+      translationState: TRANSLATION_STATE.DISABLED,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -849,7 +850,7 @@ export class HtmlDocument extends React.Component {
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.loggedUser.lang,
+      state.translationTargetLanguageCode,
       state.config.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, translationState })
@@ -861,6 +862,10 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       translationState: getDefaultTranslationState(prev.config.system.config)
     }))
+  }
+
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
   }
 
   render () {
@@ -993,6 +998,9 @@ export class HtmlDocument extends React.Component {
             onClickTranslateDocument={this.handleTranslateDocument}
             onClickRestoreDocument={this.handleRestoreDocument}
             translationState={state.translationState}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            translationTargetLanguageCode={state.translationTargetLanguageCode}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
           />
 
           <PopinFixedRightPart
@@ -1033,13 +1041,16 @@ export class HtmlDocument extends React.Component {
                   onClickTranslateComment={comment => props.handleTranslateComment(
                     comment,
                     state.content.workspace_id,
-                    state.loggedUser.lang,
+                    state.translationTargetLanguageCode,
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
                   onClickEditComment={this.handleClickEditComment}
                   onClickDeleteComment={this.handleClickDeleteComment}
                   onClickOpenFileComment={this.handleClickOpenFileComment}
+                  translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                  translationTargetLanguageCode={state.translationTargetLanguageCode}
+                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 />
               ) : null
             }]}
