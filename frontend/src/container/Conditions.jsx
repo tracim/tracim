@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   Checkbox,
@@ -12,7 +11,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 
-class Conditions extends React.Component {
+export class Conditions extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -108,7 +107,7 @@ class Conditions extends React.Component {
 }
 
 const mapStateToProps = ({ system }) => ({ system })
-export default withRouter(connect(mapStateToProps)(translate()(Conditions)))
+export default connect(mapStateToProps)(translate()(Conditions))
 
 Conditions.propTypes = {
   onClickValidate: PropTypes.func.isRequired,
