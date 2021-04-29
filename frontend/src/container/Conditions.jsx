@@ -72,7 +72,7 @@ export class Conditions extends React.Component {
               className='conditions__main__label'
               htmlFor={`checkbox-condition${index}`}
             >
-              {props.t('I read and I agree to ')}
+              {props.t('I read and I agree to')}
             </label>
             <a
               href={condition.url}
