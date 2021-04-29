@@ -200,6 +200,36 @@ for (const pageTestCase of activityPages) {
           .click()
         cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId }))
       })
+
+      it('A translation button should be visible', function () {
+        cy.updateHtmlDocument(
+          contentId,
+          workspaceId,
+          smallContent,
+          contentName
+        )
+
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+        cy.get('[data-cy=commentTranslateButton]').click()
+        cy.contains('.feedItem__preview > a', 'en')
+        cy.get('[data-cy=commentTranslateButton]').click()
+        cy.contains('.feedItem__preview > a', smallContent)
+      })
+
+      it('a menu should allow to change the target language', () => {
+        cy.updateHtmlDocument(
+          contentId,
+          workspaceId,
+          smallContent,
+          contentName
+        )
+
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+        cy.get('[data-cy=commentTranslateButton__languageMenu]').click()
+        cy.get('[data-cy=commentTranslateButton__language__fr]').click()
+        cy.get('[data-cy=commentTranslateButton]').click()
+        cy.contains('.feedItem__preview > a', 'fr')
+      })
     })
   })
 }

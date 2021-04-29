@@ -35,7 +35,7 @@ export const TranslateButton = props => {
           customClass={className}
           dataCy={props.dataCy}
         />
-        <DropdownMenu>
+        <DropdownMenu buttonDataCy={props.dataCy ? `${props.dataCy}__languageMenu` : null}>
           {props.targetLanguageList.map(language => {
             return (
               <IconButton
@@ -44,6 +44,7 @@ export const TranslateButton = props => {
                 onClick={() => { props.onChangeTargetLanguageCode(language.code) }}
                 intent='link'
                 mode='light'
+                dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
               />
             )
           }
