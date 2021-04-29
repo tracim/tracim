@@ -5,22 +5,17 @@ import { translate } from 'react-i18next'
 import {
   Checkbox,
   CUSTOM_EVENT,
-  IconButton,
-  PAGE
+  IconButton
 } from 'tracim_frontend_lib'
 import {
-  newFlashMessage,
   setHeadTitle
 } from '../action-creator.sync.js'
-import {
-  getUsageConditions
-} from '../action-creator.async.js'
 
 class Conditions extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      usageConditionsList: []
+      usageConditionsCheckedList: []
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
@@ -44,7 +39,6 @@ class Conditions extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.loadUsageConditionsList()
   }
 
   setHeadTitle = () => {
@@ -52,18 +46,12 @@ class Conditions extends React.Component {
     props.dispatch(setHeadTitle(props.t('Conditions')))
   }
 
-  loadUsageConditionsList = async () => {
-    const { props } = this
-
-    const fetchGetUsageConditions = await props.dispatch(getUsageConditions())
-    switch (fetchGetUsageConditions.status) {
-      case 200: {
-        if (fetchGetUsageConditions.json.items.length === 0) props.history.push(PAGE.HOME)
-        else this.setState({ usageConditionsList: fetchGetUsageConditions.json.items })
-        break
-      }
-      default: props.dispatch(newFlashMessage(props.t('Error while loading the usage conditions')))
-    }
+  handleClickCheckbox = (index) => {
+    const { state } = this
+    if (state.usageConditionsCheckedList.find(id => id === index)) {
+      const newUsageConditionsCheckedList = state.usageConditionsCheckedList.filter(id => id !== index)
+      this.setState({ usageConditionsCheckedList: newUsageConditionsCheckedList })
+    } else this.setState(prev => ({ usageConditionsCheckedList: [...prev.usageConditionsCheckedList, index] }))
   }
 
   render () {
@@ -71,13 +59,14 @@ class Conditions extends React.Component {
     return (
       <div className='conditions__main__wrapper'>
         <h1 className='conditions__main__title'>{props.t('In order to start using our platform, you must be aware of our conditions')}</h1>
-        {state.usageConditionsList.map((condition, index) => (
-          <div key={`condition${index}`}>
+        {props.usageConditionsList.map((condition, index) => (
+          <div className='conditions__main__checkbox' key={`condition${index}`}>
             <Checkbox
+              checked={!!state.usageConditionsCheckedList.find(id => id === index + 1)}
               name={`condition${index}`}
-              onClickCheckbox={() => { }}
-              checked={true}
+              onClickCheckbox={() => this.handleClickCheckbox(index + 1)}
               styleCheck={{ top: '-5px' }}
+              styleLabel={{ marginBottom: '0px' }}
             />
             <label
               className='conditions__main__label'
@@ -87,26 +76,28 @@ class Conditions extends React.Component {
             </label>
             <a
               href={condition.url}
-              target='_blank'
               rel='noopener noreferrer'
+              target='_blank'
             >
               {condition.title}
             </a>
           </div>
         ))}
+
         <div className='conditions__main__buttons'>
           <IconButton
+            icon='fas fa-times'
             onClick={props.onClickCancel}
             text={props.t('Cancel')}
-            icon='fas fa-times'
           />
 
           <IconButton
-            onClick={props.onClickValidate}
+            disabled={state.usageConditionsCheckedList.length !== props.usageConditionsList.length}
             icon='fas fa-check'
-            text={props.t('Validate')}
             intent='primary'
             mode='light'
+            onClick={props.onClickValidate}
+            text={props.t('Validate')}
           />
         </div>
       </div>

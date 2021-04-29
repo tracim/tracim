@@ -10,14 +10,17 @@ import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   PAGE,
+  putUserConfiguration,
   serialize
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
+  setUserDisconnected,
   setWorkspaceList,
   setContentTypeList,
   setAppList,
@@ -38,14 +41,20 @@ import {
   getContentTypeList,
   getMyselfWorkspaceList,
   getNotificationList,
+  getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
   getWorkspaceMemberList,
+  postUserLogout,
   postUserLogin,
   putUserLang,
   getAccessibleWorkspaces
 } from '../action-creator.async.js'
-import { COOKIE_FRONTEND, WELCOME_ELEMENT_ID } from '../util/helper.js'
+import {
+  COOKIE_FRONTEND,
+  FETCH_CONFIG,
+  WELCOME_ELEMENT_ID
+} from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 import Conditions from './Conditions.jsx'
 
@@ -64,6 +73,7 @@ class Login extends React.Component {
     this.state = {
       inputRememberMe: false,
       showUsageConditions: false,
+      usageConditionsList: [],
       welcomeHtml: welcomeElement.innerHTML
     }
 
@@ -158,12 +168,6 @@ class Login extends React.Component {
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
-
-        if (props.user.config.usage_conditions__status !== 'accepted') {
-          this.setState({ showUsageConditions: true })
-        } else {
-          this.handleUserConnection()
-        }
         break
       }
       case 400:
@@ -177,15 +181,41 @@ class Login extends React.Component {
     }
   }
 
-  handleUserConnection = () => {
+  handleUserConnection = async () => {
     const { props } = this
     props.dispatch(setUserConnected({ ...props.user, logged: true }))
-    // TODO set props.user.config.usage_conditions__status and showUsageConditions
     if (props.system.redirectLogin !== '') {
       props.history.push(props.system.redirectLogin)
       return
     }
+
+    const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(
+      FETCH_CONFIG.apiUrl,
+      props.user.userId,
+      { ...props.user.config, usage_conditions__status: 'accepted' }
+    ))
+
+    if (fetchPutUserConfiguration.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while saving the user configuration')))
+    }
+
     props.history.push(PAGE.HOME)
+  }
+
+  handleClickLogout = async () => {
+    const { props } = this
+
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
+    if (fetchPostUserLogout.status === 204) {
+      props.dispatch(setUserDisconnected())
+      props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+      this.setState({
+        usageConditionsList: [],
+        showUsageConditions: false
+      })
+    } else {
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
+    }
   }
 
   loadConfig = async () => {
@@ -247,7 +277,29 @@ class Login extends React.Component {
 
     const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
     switch (fetchGetUserConfig.status) {
-      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      case 200: {
+        props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters))
+
+        if (fetchGetUserConfig.json.parameters.usage_conditions__status !== 'accepted') {
+          const fetchGetUsageConditions = await props.dispatch(getUsageConditions())
+          switch (fetchGetUsageConditions.status) {
+            case 200: {
+              if (fetchGetUsageConditions.json.items.length === 0) this.handleUserConnection()
+              else {
+                this.setState({
+                  usageConditionsList: fetchGetUsageConditions.json.items,
+                  showUsageConditions: true
+                })
+              }
+              break
+            }
+            default: props.dispatch(newFlashMessage(props.t('Error while loading the usage conditions'))); break
+          }
+        } else {
+          this.handleUserConnection()
+        }
+        break
+      }
       default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
     }
   }
@@ -304,8 +356,9 @@ class Login extends React.Component {
           {state.showUsageConditions
             ? (
               <Conditions
-                onClickCancel={() => console.log('cancel')}
+                onClickCancel={this.handleClickLogout}
                 onClickValidate={this.handleUserConnection}
+                usageConditionsList={state.usageConditionsList}
               />
             ) : (
               <div className='loginpage__main__wrapper'>
