@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { BrowserRouter } from 'react-router-dom'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { Breadcrumbs } from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
 require('../../src/component/Breadcrumbs/Breadcrumbs.styl')
 
@@ -28,15 +28,9 @@ describe('<Breadcrumbs />', () => {
     keepLastBreadcrumbAsLink: true,
     t: key => key
   }
-  const history = require('history').createBrowserHistory()
 
-  // INFO - CH - 2020-01-11 - <Breadcrumbs /> contains <Link> components from react router.
-  // So we need to wrap it in a Router so we need to use mount() instead of shallow()
-  const wrapper = mount(
-    <BrowserRouter history={history}>
-      <Breadcrumbs {...props} />
-    </BrowserRouter>
-  )
+  const BreadcrumbsWithHOC = withRouterMock(Breadcrumbs)
+  const wrapper = mount(<BreadcrumbsWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('The first level', () => {
     it('should display "First level"', () => expect(wrapper.find('.breadcrumbs__item').at(1)).to.have.text().to.be.equal('First level'))

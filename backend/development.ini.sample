@@ -451,7 +451,7 @@ website.usage_conditions =
 ; webdav.ui.enabled = True
 
 ### Notifications ###
-# Comma-separated events listed in this setting are not displayed in notifications to the user.
+# Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted

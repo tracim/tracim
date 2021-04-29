@@ -269,7 +269,7 @@ export class Account extends React.Component {
             <PageTitle
               parentClass='account'
               title={props.t('Account Settings')}
-              icon='user-o'
+              icon='fas fa-cogs'
               breadcrumbsList={props.breadcrumbs}
             />
 

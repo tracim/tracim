@@ -484,7 +484,7 @@ export class Publications extends React.Component {
 
     if (state.newComment !== '') {
       try {
-        props.appContentSaveNewComment(
+        await props.appContentSaveNewComment(
           fetchPostPublicationFile.responseJson,
           state.publicationWysiwyg,
           state.newComment,
@@ -492,7 +492,7 @@ export class Publications extends React.Component {
           this.setState.bind(this),
           fetchPostPublicationFile.responseJson.slug,
           props.user.username,
-          fetchPostPublicationFile.responseJson.content_id
+          'Publication'
         )
       } catch (e) {
         props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
@@ -605,12 +605,6 @@ export class Publications extends React.Component {
             inRecentActivities={false}
             onClickEdit={() => this.handleClickEdit(publication)}
             showTimeline
-            user={{
-              userId: props.user.userId,
-              username: props.user.username,
-              name: props.user.publicName,
-              userRoleIdInWorkspace: userRoleIdInWorkspace
-            }}
             workspaceId={Number(publication.workspaceId)}
             {...this.getPreviewLinkParameters(publication)}
           />

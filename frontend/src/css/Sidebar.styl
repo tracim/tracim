@@ -3,9 +3,6 @@
 sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
-sidebarColor = #333
-sidebarColorDarken = darken(sidebarColor, 15%)
-
 .sidebar
   position relative
   &__expand
@@ -16,13 +13,13 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     z-index 15
     justify-content center
     align-items center
-    border 1px solid sidebarColor
+    border 1px solid var(--sidebarColor)
     border-bottom-right-radius 15px
     padding 8px 15px
     cursor pointer
     color offWhite
     transition all sidebar-animate-speed
-    background-color sidebarColor
+    background-color var(--sidebarColor)
     &.sidebarclose
       left 0
   &__frame
@@ -31,8 +28,8 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     width sidebar-width
     height "calc(100vh - %s)" % headerHeight
     z-index 10
-    box-shadow -1px 2px 2px 1px sidebarColor
-    background-color sidebarColor
+    box-shadow -1px 2px 2px 1px var(--sidebarColor)
+    background-color var(--sidebarColor)
     &.sidebarclose
       width 0
       overflow hidden
@@ -52,13 +49,13 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     display flex
     justify-content center
     align-items center
-    border 1px solid sidebarColor
+    border 1px solid var(--sidebarColor)
     border-top-right-radius 15px
     padding 8px 12px
     cursor pointer
     color offWhite
     transition all sidebar-animate-speed
-    background-color sidebarColor
+    background-color var(--sidebarColor)
     ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
@@ -77,13 +74,13 @@ sidebarColorDarken = darken(sidebarColor, 15%)
         border-left-width 0
         border-left-style solid
         padding-left 5px
-        border-bottom 1px solid darkGrey
-        background-color sidebarColor
+        border-bottom 1px solid var(--sidebarColorDarken)
+        background-color var(--sidebarColor)
         justify-content space-between
         width 100%
         height 100%
         &:hover
-          background-color sidebarColorDarken
+          background-color var(--sidebarColorDarken)
         &__withoutChildren
           padding-inline-start 20px
         &__foldChildren
@@ -128,7 +125,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
           text-overflow ellipsis
         &__current
           padding-left 0
-          background-color lightDarkGrey
+          background-color var(--sidebarColorLighten)
           border-left-width 5px
           font-weight bold
   &__footer

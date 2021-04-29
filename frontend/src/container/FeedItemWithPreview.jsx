@@ -6,12 +6,19 @@ import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
-import { FETCH_CONFIG } from '../util/helper.js'
+
+import {
+  findUserRoleIdInWorkspace,
+  FETCH_CONFIG
+} from '../util/helper.js'
+
 import {
   appContentFactory,
   CONTENT_TYPE,
   CUSTOM_EVENT,
   TRANSLATION_STATE,
+  ROLE,
+  ROLE_LIST,
   handleInvalidMentionInComment,
   handleTranslateComment,
   handleTranslateHtmlContent,
@@ -46,7 +53,8 @@ export class FeedItemWithPreview extends React.Component {
   getFirstComment () {
     // NOTE - RJ - 2021-04-09 is commentList[0] either the first comment (in recent activities)
     // or the second comment (in publications), and then firstComment is the first comment
-    return this.props.content.firstComment || this.props.commentList[0]
+    const { props } = this
+    return props.inRecentActivities ? props.commentList[0] : props.content.firstComment
   }
 
   getInitialTranslationState (props) {
@@ -282,19 +290,35 @@ export class FeedItemWithPreview extends React.Component {
         : props.t('Open_action')
     } else {
       if (props.previewLinkType !== LINK_TYPE.NONE) {
-        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName })
+        previewTitle = props.t('Download {{filename}}', { filename: props.content.fileName, interpolation: { escapeValue: false } })
       }
     }
 
-    const publicationContent = (
-      props.isPublication
+    const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
+    const commentToShow = (
+      shouldShowComment
         ? (
-          this.props.content.type === CONTENT_TYPE.FILE
-            ? props.content
-            : props.content.firstComment
+          props.isPublication
+            ? (
+              props.content.type === CONTENT_TYPE.FILE
+                ? props.content
+                : this.getFirstComment()
+            )
+            : this.getFirstComment()
         )
         : null
     )
+
+    const userRoleIdInWorkspace = (
+      props.currentWorkspace
+        ? findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+        : ROLE.reader.id
+    )
+
+    const loggedUser = {
+      ...props.user,
+      userRoleIdInWorkspace
+    }
 
     return (
       <div className='feedItem' ref={props.innerRef}>
@@ -318,8 +342,8 @@ export class FeedItemWithPreview extends React.Component {
         />
         {props.contentAvailable && (
           <>
-            {(props.isPublication
-              ? (publicationContent &&
+            {(shouldShowComment
+              ? (commentToShow &&
                 <Comment
                   isPublication
                   customClass='feedItem__publication'
@@ -327,16 +351,16 @@ export class FeedItemWithPreview extends React.Component {
                   contentId={Number(props.content.id)}
                   apiContent={props.content}
                   workspaceId={Number(props.workspaceId)}
-                  author={publicationContent.author}
-                  loggedUser={props.user}
-                  createdRaw={publicationContent.created_raw}
-                  createdDistance={publicationContent.created}
+                  author={commentToShow.author}
+                  loggedUser={loggedUser}
+                  createdRaw={commentToShow.created_raw}
+                  createdDistance={commentToShow.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
-                      : publicationContent.raw_content
+                      : commentToShow.raw_content
                   }
-                  fromMe={props.user.userId === publicationContent.author.user_id}
+                  fromMe={props.user.userId === commentToShow.author.user_id}
                   onClickTranslate={this.handleTranslate}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
@@ -370,7 +394,7 @@ export class FeedItemWithPreview extends React.Component {
                 customColor={props.customColor}
                 id={props.content.id}
                 invalidMentionList={state.invalidMentionList}
-                loggedUser={props.user}
+                loggedUser={loggedUser}
                 memberList={props.memberList}
                 newComment={state.newComment}
                 newCommentAsFileList={state.newCommentAsFileList}
@@ -413,7 +437,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, user, currentWorkspace }) => ({ system, user, currentWorkspace })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
@@ -443,7 +467,6 @@ FeedItemWithPreview.propTypes = {
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
   showTimeline: PropTypes.bool,
-  user: PropTypes.object,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
   previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
@@ -464,7 +487,6 @@ FeedItemWithPreview.defaultProps = {
   onClickEdit: () => {},
   reactionList: [],
   showTimeline: false,
-  user: {},
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
   previewLink: null

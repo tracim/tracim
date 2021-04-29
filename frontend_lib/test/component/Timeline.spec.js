@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { Timeline } from '../../src/component/Timeline/Timeline.jsx'
@@ -44,14 +45,12 @@ describe('<Timeline />', () => {
     isLastTimelineItemCurrentToken: false,
     availableStatusList: [],
     registerCustomEventHandlerList: () => {},
-    t: key => key
+    t: key => key,
+    workspaceId: 1
   }
 
-  const wrapper = mount(
-    <Timeline
-      {...props}
-    />
-  )
+  const TimelineWithHOC = withRouterMock(Timeline)
+  const wrapper = mount(<TimelineWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('Static design', () => {
     it('The advanced mode button should be disabled when disableComment is true', () => {
