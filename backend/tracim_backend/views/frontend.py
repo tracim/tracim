@@ -125,7 +125,10 @@ class FrontendController(Controller):
         return render_to_response(
             self._get_index_file_path(),
             {
-                "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
+                "colors": {
+                    "primary": ExtendedColor(app_config.APPS_COLORS["primary"]),
+                    "sidebar": ExtendedColor(app_config.APPS_COLORS["sidebar"]),
+                },
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
                 "website_description": app_config.WEBSITE__DESCRIPTION,

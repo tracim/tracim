@@ -42,7 +42,11 @@ export class DisplayFileToUpload extends React.Component {
             title={props.t('See files')}
           />
           <div className='DisplayFileToUpload__message__text'>
-            {props.t('{{numberOfFile}} files added', { numberOfFile: props.fileList.length })}
+            {(
+              props.fileList.length === 1
+                ? props.t('1 file selected')
+                : props.t('{{numberOfFile}} files selected', { numberOfFile: props.fileList.length })
+            )}
           </div>
           <Icon
             icon='fas fa-th-list'

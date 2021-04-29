@@ -4,6 +4,9 @@ import 'regenerator-runtime/runtime'
 import WorkspaceAdvanced from './container/WorkspaceAdvanced.jsx'
 import { debug } from './debug.js'
 import { LiveMessageManager } from 'tracim_frontend_lib'
+import { Router } from 'react-router-dom'
+
+export const history = require('history').createBrowserHistory()
 
 require('./css/index.styl')
 
@@ -11,6 +14,8 @@ const manager = new LiveMessageManager()
 manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
-  <WorkspaceAdvanced data={undefined} />
+  <Router history={history}>
+    <WorkspaceAdvanced data={undefined} />
+  </Router>
   , document.getElementById('content')
 )

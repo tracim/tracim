@@ -239,6 +239,8 @@ describe('App Workspace Advanced', function () {
     for (const testCase of testCases) {
       it(`should allow to toggle ${testCase.feature}`, () => {
         cy.get('[data-cy=popin_right_part_optional_functionalities]').click()
+        cy.get('.wsContentGeneric__content__right__content__title').should('be.visible')
+        cy.contains(`${testCase.buttonSelector}`, testCase.activatedMessage)
         cy.get(`${testCase.buttonSelector} > .btnswitch > .switch > .slider`).click()
         cy.contains(`${testCase.buttonSelector}`, testCase.deactivatedMessage)
         cy.contains('.flashmessage__container__content__text__paragraph', testCase.deactivatedMessage)
