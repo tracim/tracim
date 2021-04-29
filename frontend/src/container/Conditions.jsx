@@ -62,7 +62,7 @@ export class Conditions extends React.Component {
         {props.usageConditionsList.map((condition, index) => (
           <div className='conditions__main__checkbox' key={`condition${index}`}>
             <Checkbox
-              checked={!!state.usageConditionsCheckedList.find(id => id === index + 1)}
+              checked={state.usageConditionsCheckedList.includes(index)}
               name={`condition${index}`}
               onClickCheckbox={() => this.handleClickCheckbox(index + 1)}
               styleCheck={{ top: '-5px' }}
