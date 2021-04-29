@@ -49,7 +49,9 @@ export class Conditions extends React.Component {
   handleClickCheckbox = (index) => {
     const { state } = this
     if (state.usageConditionsCheckedList.includes(index)) {
-      this.setState(prev => { usageConditionsCheckedList: prev.usageConditionsCheckedList.filter(id => id !== index) })
+      this.setState(prev => ({
+        usageConditionsCheckedList: prev.usageConditionsCheckedList.filter(id => id !== index)
+      }))
     } else this.setState(prev => ({ usageConditionsCheckedList: [...prev.usageConditionsCheckedList, index] }))
   }
 

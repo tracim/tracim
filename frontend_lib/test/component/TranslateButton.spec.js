@@ -7,6 +7,8 @@ import { TRANSLATION_STATE } from '../../src/translation.js'
 const props = {
   translationState: TRANSLATION_STATE.DISABLED,
   onClickToggleTranslation: () => {},
+  onClickTranslate: () => {},
+  onClickRestore: () => {},
   t: text => text
 }
 
