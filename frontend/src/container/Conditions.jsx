@@ -64,7 +64,7 @@ export class Conditions extends React.Component {
             <Checkbox
               checked={state.usageConditionsCheckedList.includes(index)}
               name={`condition${index}`}
-              onClickCheckbox={() => this.handleClickCheckbox(index + 1)}
+              onClickCheckbox={() => this.handleClickCheckbox(index)}
               styleCheck={{ top: '-5px' }}
               styleLabel={{ marginBottom: '0px' }}
             />
