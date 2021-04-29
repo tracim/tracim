@@ -50,7 +50,7 @@ export class Conditions extends React.Component {
     const { state } = this
     if (state.usageConditionsCheckedList.find(id => id === index)) {
       const newUsageConditionsCheckedList = state.usageConditionsCheckedList.filter(id => id !== index)
-      this.setState({ usageConditionsCheckedList: newUsageConditionsCheckedList })
+      this.setState(prev => { usageConditionsCheckedList: prev.newUsageConditionsCheckedList.filter(id => id !== index) })
     } else this.setState(prev => ({ usageConditionsCheckedList: [...prev.usageConditionsCheckedList, index] }))
   }
 
