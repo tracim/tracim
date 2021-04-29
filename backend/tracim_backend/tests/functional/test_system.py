@@ -272,6 +272,11 @@ class TestConfigEndpoint(object):
         assert res.json_body["workspaces_number_per_user_limit"] == 0
         assert res.json_body["email_required"] is True
         assert res.json_body["search_engine"] == "simple"
+        assert res.json_body["translation_service__target_languages"] == [
+            {"code": "fr", "display": "Français"},
+            {"code": "en", "display": "English"},
+            {"code": "pt", "display": "Português"},
+        ]
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self, web_testapp):

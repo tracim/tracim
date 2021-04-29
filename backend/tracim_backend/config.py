@@ -63,6 +63,11 @@ class DepotFileStorageType(Enum):
         self.depot_storage_backend = depot_storage_backend
 
 
+def create_target_langage(value: str) -> typing.Tuple[str, str]:
+    code, display = value.split(":")
+    return (code, display)
+
+
 class ConfigParam(object):
     def __init__(
         self,
@@ -848,6 +853,19 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
+        default_target_languages = "fr:Français,en:English,pt:Português"
+        target_language_pairs = string_to_unique_item_list(
+            self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
+            separator=",",
+            cast_func=create_target_langage,
+            do_strip=True,
+        )
+        try:
+            self.TRANSLATION_SERVICE__TARGET_LANGUAGES = [
+                {"code": code, "display": display} for code, display in target_language_pairs
+            ]
+        except ValueError:
+            raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

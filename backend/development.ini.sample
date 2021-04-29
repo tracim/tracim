@@ -785,6 +785,12 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ; translation_service.enabled = False
 
+## Translation service target languages that will be proposed in Tracim's interface
+# It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
+# The string can use any UTF-8 character.
+; translation_service.target_languages = en:English,fr:Français,pt:Português
+# example:
+# translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
 ## Translation service timeout in seconds.
 # This timeout will be applied to each translation request.

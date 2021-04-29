@@ -62,6 +62,7 @@ class SystemApi(object):
             instance_name=self._config.WEBSITE__TITLE,
             email_required=self._config.EMAIL__REQUIRED,
             search_engine=self._config.SEARCH__ENGINE,
+            translation_service__target_languages=self._config.TRANSLATION_SERVICE__TARGET_LANGUAGES,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:
