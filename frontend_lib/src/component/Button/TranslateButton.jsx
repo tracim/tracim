@@ -5,6 +5,7 @@ import { translate } from 'react-i18next'
 
 import { TRANSLATION_STATE } from '../../translation.js'
 import IconButton from './IconButton.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 
 require('./TranslateButton.styl')
 
@@ -21,16 +22,34 @@ export const TranslateButton = props => {
     )
   }
 
+  const targetLanguage = props.targetLanguageList.find(target => target.code === props.targetLanguageCode) || { display: props.targetLanguageCode }
+
   if (props.translationState === TRANSLATION_STATE.UNTRANSLATED) {
     return (
-      <IconButton
-        text={props.t('Show translation')}
-        onClick={props.onClickTranslate}
-        intent='link'
-        mode='light'
-        customClass={className}
-        dataCy={props.dataCy}
-      />
+      <>
+        <IconButton
+          text={props.t('Translate to {{language}}', { language: targetLanguage.display })}
+          onClick={props.onClickTranslate}
+          intent='link'
+          mode='light'
+          customClass={className}
+          dataCy={props.dataCy}
+        />
+        <DropdownMenu>
+          {props.targetLanguageList.map(language => {
+            return (
+              <IconButton
+                key={language.code}
+                text={language.display}
+                onClick={() => { props.onChangeTargetLanguageCode(language.code) }}
+                intent='link'
+                mode='light'
+              />
+            )
+          }
+          )}
+        </DropdownMenu>
+      </>
     )
   }
 
@@ -49,7 +68,10 @@ export const TranslateButton = props => {
 TranslateButton.propTypes = {
   onClickTranslate: PropTypes.func.isRequired,
   onClickRestore: PropTypes.func.isRequired,
+  onChangeTargetLanguageCode: PropTypes.func.isRequired,
+  targetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  targetLanguageCode: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   dataCy: PropTypes.string
 }
