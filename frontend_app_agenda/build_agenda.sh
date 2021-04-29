@@ -40,4 +40,4 @@ cp i18next.scanner/fr/translation.json ../frontend/dist/app/agenda_fr_translatio
 log "copying pt translation.json"
 cp i18next.scanner/pt/translation.json ../frontend/dist/app/agenda_pt_translation.json && loggood "success" || logerror "some error"
 log "copying de translation.json"
-cp i18next.scanner/pt/translation.json ../frontend/dist/app/agenda_de_translation.json && loggood "success" || logerror "some error"
+cp i18next.scanner/de/translation.json ../frontend/dist/app/agenda_de_translation.json && loggood "success" || logerror "some error"

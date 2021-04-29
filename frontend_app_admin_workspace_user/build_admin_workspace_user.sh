@@ -38,4 +38,4 @@ cp i18next.scanner/fr/translation.json ../frontend/dist/app/admin_workspace_user
 log "copying pt translation.json"
 cp i18next.scanner/pt/translation.json ../frontend/dist/app/admin_workspace_user_pt_translation.json && loggood "success" || logerror "some error"
 log "copying de translation.json"
-cp i18next.scanner/pt/translation.json ../frontend/dist/app/admin_workspace_user_de_translation.json && loggood "success" || logerror "some error"
+cp i18next.scanner/de/translation.json ../frontend/dist/app/admin_workspace_user_de_translation.json && loggood "success" || logerror "some error"
