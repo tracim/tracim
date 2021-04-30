@@ -26,13 +26,12 @@ export const TranslateButton = props => {
 
   if (props.translationState === TRANSLATION_STATE.UNTRANSLATED) {
     return (
-      <>
+      <div className={className}>
         <IconButton
           text={props.t('Translate to {{language}}', { language: targetLanguage.display })}
           onClick={props.onClickTranslate}
           intent='link'
           mode='light'
-          customClass={className}
           dataCy={props.dataCy}
         />
         <DropdownMenu buttonDataCy={props.dataCy ? `${props.dataCy}__languageMenu` : null}>
@@ -50,7 +49,7 @@ export const TranslateButton = props => {
           }
           )}
         </DropdownMenu>
-      </>
+      </div>
     )
   }
 
