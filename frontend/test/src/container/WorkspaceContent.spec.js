@@ -175,7 +175,7 @@ describe('<WorkspaceContent />', () => {
       })
     })
 
-    describe('appGalleryActive is false', () => {
+    describe('if appList is empty', () => {
       it('should not contain a span with the gallery button', () => {
         wrapper.setProps({ appList: [] })
         expect(wrapper.find('span.iconbutton__text_with_icon').length).to.equal(0)
