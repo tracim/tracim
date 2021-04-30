@@ -1790,6 +1790,11 @@ class SetContentStatusSchema(marshmallow.Schema):
         return SetContentStatus(**data)
 
 
+class TargetLanguageSchema(marshmallow.Schema):
+    code = marshmallow.fields.String(required=True, example="fr")
+    display = marshmallow.fields.String(required=True, example="Français")
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -1805,6 +1810,9 @@ class ConfigSchema(marshmallow.Schema):
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
     search_engine = marshmallow.fields.String()
+    translation_service__target_languages = marshmallow.fields.Nested(
+        TargetLanguageSchema, many=True
+    )
 
 
 class ConditionFileSchema(marshmallow.Schema):
