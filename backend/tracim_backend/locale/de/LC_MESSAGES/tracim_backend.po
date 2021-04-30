@@ -1,23 +1,25 @@
-# Portuguese translations for tracim_backend.
-# Copyright (C) 2020 ORGANIZATION
+# German translations for tracim_backend.
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the tracim_backend
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# marie <marie.begue@algoo.fr>, 2021.
 msgid ""
 msgstr ""
-"Project-Id-Version: tracim_backend 2.6.3\n"
+"Project-Id-Version: tracim_backend 3.7.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-04-30 16:36+0200\n"
-"PO-Revision-Date: 2020-04-15 16:26+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: pt\n"
-"Language-Team: pt <LL@li.org>\n"
+"PO-Revision-Date: 2021-04-30 16:42+0100\n"
+"Last-Translator: marie <marie.begue@algoo.fr>\n"
+"Language: de\n"
+"Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
+"X-Generator: Lokalize 2.0\n"
 
 #: tracim_backend/config.py:628
 msgid ""
@@ -27,140 +29,125 @@ msgstr ""
 
 #: tracim_backend/config.py:637
 msgid "[{website_title}] Someone created an account for you"
-msgstr "[{website_title}] Alguém criou uma conta para você"
+msgstr "bnjiur"
 
 #: tracim_backend/config.py:647
 msgid "[{website_title}] A password reset has been requested"
-msgstr "[{website_title}] Uma reposição da palavra-passe foi pedida"
+msgstr ""
 
 #: tracim_backend/app_models/contents.py:47
 msgid "Opened"
-msgstr "Aberto"
+msgstr ""
 
 #: tracim_backend/app_models/contents.py:55
 msgid "Validated"
-msgstr "Validado"
+msgstr ""
 
 #: tracim_backend/app_models/contents.py:63
 msgid "Cancelled"
-msgstr "Cancelado"
+msgstr ""
 
 #: tracim_backend/app_models/contents.py:71
 msgid "Deprecated"
-msgstr "Obsoleto"
+msgstr ""
 
 #: tracim_backend/applications/share/application.py:25
 msgid ""
 "[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
 "with you"
 msgstr ""
-"[{website_title}] {emitter_name} partilhou o ficheiro "
-"\"{content_filename}\" com você"
 
 #: tracim_backend/applications/share/application.py:33
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
 msgstr ""
-"[{website_title}] Você partilhou \"{content_filename}\" com "
-"{nb_receivers} pessoas"
 
 #: tracim_backend/applications/upload_permissions/application.py:24
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
-msgstr "{emitter_name} convidou-o a subir ficheiros no \"{website_title}\""
+msgstr ""
 
 #: tracim_backend/applications/upload_permissions/application.py:32
 msgid ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
-"[{website_title}] Você convidou {nb_receivers} pessoas para subir "
-"ficheiros no \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/application.py:42
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
 " in \"{workspace_name}\""
 msgstr ""
-"[{website_title}] {uploader_username} partilhou {nb_uploaded_contents} "
-"ficheiros em \"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/lib.py:258
 msgid "Files uploaded by {username} on {date} at {time}"
-msgstr "Ficheiros subidos por {username} em {date} às {time}"
+msgstr ""
 
 #: tracim_backend/applications/upload_permissions/lib.py:280
 msgid "Message from {username}: {message}"
-msgstr "Mensagem de {username}: {message}"
+msgstr ""
 
 #: tracim_backend/applications/upload_permissions/lib.py:284
 msgid "Uploaded by {username}."
-msgstr "Subido por {username}."
+msgstr ""
 
 #: tracim_backend/lib/core/content.py:2082
 msgid "New folder"
-msgstr "Nova pasta"
+msgstr ""
 
 #: tracim_backend/lib/core/content.py:2087
 msgid "New folder {0}"
-msgstr "Nova pasta {0}"
+msgstr ""
 
 #: tracim_backend/lib/core/workspace.py:546
 msgid "Space"
-msgstr "Espaço"
+msgstr ""
 
 #: tracim_backend/lib/core/workspace.py:549
 msgid "Space {}"
-msgstr "Espaço {}"
+msgstr ""
 
 #: tracim_backend/lib/mail_notifier/notifier.py:280
 msgid "{username} & all members of {workspace}"
-msgstr "{username} e todos os membros de {workspace}"
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:31
 msgid ""
 "I modified the status of {content_name}. The new status is "
 "<i>{new_status}</i>"
 msgstr ""
-"Eu modifiquei o status de {content_name}. O novo status é "
-"<i>{new_status}</i>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:35
 msgid "I added an item entitled {content_name}."
-msgstr "Eu adicionei um item chamado {content_name}."
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:41
 msgid "I updated {content_name}."
-msgstr "Eu atualizei {content_name}."
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:48
 msgid "Here is an overview of the changes:"
-msgstr "Aqui está uma visão geral das mudanças:"
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:61
 msgid ""
 "Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
 "on tracim</a>"
 msgstr ""
-"Responda à esse e-mail diretamente ou <a "
-"href=\"{call_to_action_url}\">veja isso no Tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:63
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
-msgstr "<a href=\"{call_to_action_url}\">veja isso no Tracim</a>"
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
 msgid "You're receiving this email because of your account on {website_title}."
-msgstr "Está a receber este e-mail por causa da sua conta no {website_title}."
+msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:66
 msgid ""
 "If you'd like to receive fewer emails, you can <a "
 "href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
 msgstr ""
-"Se desejar receber menos e-mails, você pode <a "
-"href=\"{website_title}/ui/account\">anular a subscrição das "
-"notificações</a>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:5
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
@@ -170,50 +157,46 @@ msgstr ""
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
 msgid "Hello {username},"
-msgstr "Olá {username},"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:8
 msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
-msgstr "{origin_user_name} convidou-o a participar de <i>{website_title}</i>."
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr "Alguém o convidou a participar de <i>{website_title}</i>."
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:13
 msgid "Your credentials are:"
-msgstr "As suas credenciais são:"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:16
 msgid "login: {email_address}"
-msgstr "conta: {email_address}"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:17
 msgid "password: {password}"
-msgstr "palavra-passe: {password}"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
 msgstr ""
-"Comece a discutir, partilhar ficheiros, agenda e documentação com os "
-"colaboradores, entrando no seu espaço: {a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
 msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
 msgstr ""
-"nota: assim que estiver conectado, recomendamos fortemente que altere a "
-"sua senha e apague este e-mail."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:24
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:16
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:16
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:16
 msgid "Enjoy your day :)"
-msgstr "Aproveite o seu dia :)"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:25
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
@@ -221,7 +204,7 @@ msgstr "Aproveite o seu dia :)"
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
-msgstr "Suricato, o seu assistente digital"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
@@ -229,7 +212,7 @@ msgstr "Suricato, o seu assistente digital"
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
-msgstr "Suricato, o robô"
+msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
@@ -239,7 +222,7 @@ msgstr "Suricato, o robô"
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
-msgstr "gerado pelo software Tracim"
+msgstr ""
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:5
 msgid ""
@@ -247,41 +230,36 @@ msgid ""
 "files with you in this space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
-"{username} (<a href=\"{email_link}\">{email}</a>) partilhou um ou vários "
-"ficheiros com você no espaço: <a "
-"href={sharedspace_url}>{sharedspace_name}</a>"
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
 msgid "Message:"
-msgstr "Mensagem:"
+msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:6
 msgid ""
 "Someone has requested to reset the password for your account on "
 "<i>{website_title}</i>."
 msgstr ""
-"Alguém pediu para repor a palavra-passe da sua conta em "
-"<i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:8
 msgid "If you did not perform this request, you can safely ignore this email."
-msgstr "Se não efectuou este pedido, pode ignorar este e-mail em segurança."
+msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:11
 msgid "In order to reset your password, please click on following link :"
-msgstr "Para repor a sua palavra-passe, por favor clique no seguinte link :"
+msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:12
 msgid "Reset my password"
-msgstr "Repor minha palavra-passe"
+msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:14
 msgid "If the link is not working, I suggest to copy/paste the full url: "
-msgstr "Se o link não estiver funcionando, sugiro copiar/colar a url completa: "
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 msgid "You shared the file <i>{content_filename}</i> with:"
-msgstr "Você partilhou o ficheiro <i>{content_filename}</i> com:"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:8
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:8
@@ -289,91 +267,75 @@ msgid ""
 "<i><a href=\"{email_link}\">{email}</a></i> at this link: <a "
 "href=\"{url}\">{url}</a>"
 msgstr ""
-"<i><a href=\"{email_link}\">{email}</a></i> nesse link: <a "
-"href=\"{url}\">{url}</a>"
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 msgid "This file is protected by this password: \"{share_password}\""
-msgstr "Esse ficheiro é protegido por palavra-passe: \"{share_password}\""
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
 msgid "Hello,"
-msgstr "Olá,"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:9
 msgid "I share a file with you, download it here:"
-msgstr "Eu partilhei um ficheiro com você, faça aqui o download:"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:11
 msgid ""
 "<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
 "({file_size})"
 msgstr ""
-"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
-"({file_size})"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:18
 msgid ""
 "This file is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
-"Este ficheiro está protegido por uma palavra-passe, por favor contacte-me"
-" (<a href=\"mailto:{emitter_email}\">{username}</a>) para obter a "
-"palavra-passe."
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
 msgid "Note: You can also use this link: {url}"
-msgstr "Nota: Você também pode utilizar este link: {url}"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:21
 msgid "Note: You can also use this direct link: {direct_url}"
-msgstr "Nota: Você também pode utilizar este link direto: {direct_url}"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:18
 msgid "Thanks a lot"
-msgstr "Muito obrigado"
+msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:25
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:19
 msgid "{username} (through tracim)"
-msgstr "{username} (através de Tracim)"
+msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
-#, fuzzy
-#| msgid "" "You have invited {nb_receivers} people to upload files in this
-#| shared " "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
-"Você convidou {nb_receivers} pessoas a carregar ficheiros neste espaço <a"
-" href={sharedspace_url}>{sharedspace_name}</a>:"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid ""
 "This upload is protected by this password: "
 "\"{upload_permission_password}\""
 msgstr ""
-"Esse upload é protegido por essa palavra-passe: "
-"\"{upload_permission_password}\""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:9
 msgid "I invited you to upload files here:"
-msgstr "Eu convido-o a subir ficheiros aqui:"
+msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
 msgid "Upload files"
-msgstr "Subir ficheiros"
+msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
 msgid ""
 "This upload is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
-"Esse upload é protegido por uma palavra-passe, por favor contacte-me (<a "
-"href=\"mailto:{emitter_email}\">{username}</a>) para obter a palavra-"
-"passe."
+
 
