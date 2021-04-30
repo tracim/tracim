@@ -168,7 +168,7 @@ describe('<WorkspaceContent />', () => {
   })
 
   describe('static design', () => {
-    describe('appGalleryActive is true', () => {
+    describe('if appList contains gallery', () => {
       it('should contain a span with the gallery button', () => {
         wrapper.setProps({ appList: [{ slug: 'gallery' }] })
         expect(wrapper.find('span.iconbutton__text_with_icon'))
