@@ -2,6 +2,7 @@
 from enum import Enum
 import json
 import os
+import pathlib
 import typing
 
 from depot.manager import DepotManager
@@ -391,6 +392,12 @@ class CFG(object):
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__USAGE_CONDITIONS = string_to_unique_item_list(
+            self.get_raw_config("website.usage_conditions", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
         self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
             "website.welcome_page", "welcome-simple.html"
         )
@@ -954,6 +961,13 @@ class CFG(object):
             self.check_directory_path_param(
                 "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
             )
+            for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
+                condition_file_path = pathlib.Path(
+                    self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding", condition_file_name
+                )
+                self.check_file_path_param(
+                    param_name="WEBSITE__USAGE_CONDITIONS", path=str(condition_file_path)
+                )
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(

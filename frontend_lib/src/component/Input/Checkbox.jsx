@@ -11,7 +11,8 @@ const style = {
     border: '1px solid #999',
     borderRadius: '3px',
     backgroundColor: '#eee',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    minHeight: '18px'
   },
   checked: {
     position: 'absolute',

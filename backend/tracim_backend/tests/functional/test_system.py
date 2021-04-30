@@ -204,6 +204,37 @@ class TestUsernameEndpoints(object):
         assert set(res.json["items"]) == set(("all", "tous", "todos"))
 
 
+@pytest.mark.usefixtures("test_fixture")
+class TestUsageConditions(object):
+    """
+    Tests for:
+     - /api/system/usage_conditions
+    """
+
+    def test_api__get_usage_conditions__ok_200__empty(self, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/usage_conditions", status=200)
+        assert res.json == {"items": []}
+
+    @pytest.mark.parametrize("config_section", [{"name": "usage_condition_test"}], indirect=True)
+    def test_api__get_usage_conditions__ok_200__nominal_case(self, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/usage_conditions", status=200)
+        assert res.json == {
+            "items": [
+                {
+                    "title": "a super test'with some spécials characters",
+                    "url": "http://localhost:6543/assets/branding/a%20super%20test%27with%20some%20sp%C3%A9cials%20characters.txt",
+                },
+                {"title": "hello", "url": "http://localhost:6543/assets/branding/hello.pdf"},
+                {
+                    "title": "way",
+                    "url": "http://localhost:6543/assets/branding/we/can/support/subdirectory/this/way.jpg",
+                },
+            ]
+        }
+
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestConfigEndpointCollabora(object):

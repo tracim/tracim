@@ -59,12 +59,14 @@ export const defaultUser = {
 
 export default function user (state = defaultUser, action) {
   switch (action.type) {
-    case `${SET}/${USER_CONNECTED}`:
+    case `${SET}/${USER_CONNECTED}`: {
+      const user = action.user.userId ? action.user : serialize(action.user, serializeUserProps)
       return {
         ...state,
-        ...serialize(action.user, serializeUserProps),
+        ...user,
         lang: action.user.lang || state.lang
       }
+    }
 
     case `${SET}/${USER_DISCONNECTED}`:
       return { ...defaultUser, lang: state.lang, logged: false }

@@ -101,6 +101,12 @@ class PreviewAllowedDim(object):
         self.dimensions = dimensions
 
 
+class UsageConditionModel(object):
+    def __init__(self, title: str, url: str = None) -> None:
+        self.title = title
+        self.url = url
+
+
 class MoveParams(object):
     """
     Json body params for move action model

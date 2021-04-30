@@ -1807,6 +1807,15 @@ class ConfigSchema(marshmallow.Schema):
     search_engine = marshmallow.fields.String()
 
 
+class ConditionFileSchema(marshmallow.Schema):
+    title = marshmallow.fields.String()
+    url = marshmallow.fields.URL()
+
+
+class UsageConditionsSchema(marshmallow.Schema):
+    items = marshmallow.fields.Nested(ConditionFileSchema, many=True)
+
+
 class EventSchema(marshmallow.Schema):
     """Event structure transmitted to workers."""
 
