@@ -1285,7 +1285,8 @@ class WorkspaceDigestSchema(marshmallow.Schema):
     label = StrippedString(example="Intranet")
 
 
-class WorkspaceSchema(WorkspaceDigestSchema):
+# NOTE - SG - 2021-04-29 - Used to avoid transmitting description in all TLMs
+class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
@@ -1297,7 +1298,6 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         required=True,
         description="default role for new users in this workspace",
     )
-    description = StrippedString(example="All intranet data.")
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
@@ -1326,6 +1326,10 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         default=True,
         description="define whether a user can create and view publications in this workspace",
     )
+
+
+class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
+    description = StrippedString(example="All intranet data.")
 
     class Meta:
         description = "Full workspace information"
