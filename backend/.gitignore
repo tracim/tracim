@@ -70,3 +70,6 @@ radicale_storage/
 
 backend.json
 radicale.ini
+
+# plugin folder
+/plugins/
