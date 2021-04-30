@@ -3,9 +3,9 @@ import typing
 from typing import List
 
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.app_models.workspace_menu_entries import activity_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
+from tracim_backend.app_models.workspace_menu_entries import publication_menu_entry
 from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.app import TracimContentType
@@ -74,11 +74,11 @@ class ApplicationApi(object):
         """
         Get default menu entry for a workspace
         """
-        menu_entries = [
-            copy(dashboard_menu_entry),
-            copy(activity_menu_entry),
-            copy(all_content_menu_entry),
-        ]
+        menu_entries = [copy(dashboard_menu_entry)]
+        if workspace.publication_enabled:
+            menu_entries.append(copy(publication_menu_entry))
+        menu_entries.append(copy(all_content_menu_entry))
+
         applications_in_context = [
             self.get_application_in_context(app, app_config) for app in self.get_all()
         ]

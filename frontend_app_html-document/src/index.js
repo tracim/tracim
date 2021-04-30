@@ -4,6 +4,7 @@ import 'regenerator-runtime/runtime'
 import ReactDOM from 'react-dom'
 import HtmlDocument from './container/HtmlDocument.jsx'
 import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
+import { Router } from 'react-router-dom'
 
 require('./css/index.styl')
 
@@ -12,7 +13,9 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     return ReactDOM.render(
-      <HtmlDocument data={data} />
+      <Router history={data.config.history}>
+        <HtmlDocument data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },

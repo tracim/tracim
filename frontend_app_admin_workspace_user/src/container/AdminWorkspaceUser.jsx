@@ -535,6 +535,7 @@ export class AdminWorkspaceUser extends React.Component {
           userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
+          history: state.config.history,
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
           faIcon: 'fas fa-users',

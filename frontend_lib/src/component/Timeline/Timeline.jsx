@@ -340,7 +340,7 @@ Timeline.propTypes = {
   customColor: PropTypes.string,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isDeprecated: PropTypes.bool,
-  loggedUser: PropTypes.object,
+  loggedUser: PropTypes.object.isRequired,
   memberList: PropTypes.array,
   onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
@@ -378,11 +378,6 @@ Timeline.defaultProps = {
   id: '',
   isDeprecated: false,
   memberList: [],
-  loggedUser: {
-    userId: '',
-    name: '',
-    userRoleIdInWorkspace: ROLE.reader.id
-  },
   onInitWysiwyg: () => { },
   timelineData: [],
   wysiwyg: false,

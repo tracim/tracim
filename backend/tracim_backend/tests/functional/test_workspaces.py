@@ -469,7 +469,8 @@ class TestWorkspaceEndpoint(object):
         assert workspace["slug"] == "superworkspace"
         assert workspace["label"] == "superworkspace"
         assert workspace["description"] == "mysuperdescription"
-        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        # no publication entry anymore
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry) - 1
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
@@ -489,7 +490,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["slug"] == "superworkspace"
         assert workspace["label"] == "superworkspace"
         assert workspace["description"] == "mysuperdescription"
-        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry) - 1
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
