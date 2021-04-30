@@ -167,32 +167,19 @@ describe('<WorkspaceContent />', () => {
     })
   })
 
-  const props = {
-    appGalleryActive: true,
-    appGalleryActive: false,
-  }
+  describe('static design', () => {
+    describe('appGalleryActive is true', () => {
+      it('should contain a span with the gallery button', () => {
+        wrapper.setProps({ appList: [{ slug: 'gallery' }] })
+        expect(wrapper.find('span.iconbutton__text_with_icon'))
+      })
+    })
 
-  // describe('static design', () => {
-  //   describe('canOpenGallery is true', () => {
-  //     it('should contain a div with a message to create a new Workspace', () => {
-  //       wrapper.setProps({ appGalleryActive: true })
-  //       expect(wrapper.find('div.homepagecard__text')).to.text().contain('You can create your first space')
-  //     })
-  //     it('should display a button to create a new Workspace', () => {
-  //       wrapper.setProps({ appGalleryActive: true })
-  //       expect(wrapper.find(IconButton).length).to.equal(1)
-  //     })
-  //   })
-
-  //   describe('canOpenGallery is false', () => {
-  //     it('should contain a div with a message to create a new Workspace', () => {
-  //       wrapper.setProps({ appGalleryActive: false })
-  //       expect(wrapper.find('div.homepagecard__text')).to.text().contain('You can create your first space')
-  //     })
-  //     it('should display a button to create a new Workspace', () => {
-  //       wrapper.setProps({ appGalleryActive: false })
-  //       expect(wrapper.find(IconButton).length).to.equal(0)
-  //     })
-  //   })
-  // })
+    describe('appGalleryActive is false', () => {
+      it('should not contain a span with the gallery button', () => {
+        wrapper.setProps({ appList: [] })
+        expect(wrapper.find('span.iconbutton__text_with_icon').length).to.equal(0)
+      })
+    })
+  })
 })
