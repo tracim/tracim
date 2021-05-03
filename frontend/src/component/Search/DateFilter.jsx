@@ -137,7 +137,7 @@ export class DateFilter extends React.Component {
       en: 'MM/dd/yyyy',
       fr: 'dd/MM/yyyy',
       pt: 'dd/MM/yyyy',
-      de: 'TT/MM/JJJJ'
+      de: 'dd/MM/yyyy'
     }
 
     return (
