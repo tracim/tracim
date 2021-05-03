@@ -62,7 +62,7 @@ import { uniqueId } from 'lodash'
         case 'pt':
           return 'pt_PT'
         case 'de':
-          return 'pt_DE'
+          return 'de_DE'
         default:
           return lang
       }
