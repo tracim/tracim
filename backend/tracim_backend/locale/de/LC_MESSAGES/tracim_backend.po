@@ -147,8 +147,8 @@ msgid ""
 "Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
 "on tracim</a>"
 msgstr ""
-"Antworten Sie direkt auf diese E-Mail oder <a "
-"href=\"{call_to_action_url}\">sehen Sie sie auf tracim</a>"
+"Antworten Sie direkt auf diese E-Mail oder <a href=\"{call_to_action_url}\">sehen Sie "
+"auf tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:63
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
