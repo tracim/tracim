@@ -5,7 +5,6 @@ import fr from '../i18next.scanner/fr/translation.json'
 import pt from '../i18next.scanner/pt/translation.json'
 import de from '../i18next.scanner/de/translation.json'
 
-
 i18n
   .use(reactI18nextModule)
   .init({
