@@ -364,48 +364,10 @@ class Login extends React.Component {
                 usageConditionsList={state.usageConditionsList}
               />
             ) : (
-              <div className='loginpage__main__wrapper'>
-                <h1 className='loginpage__main__title'>{props.t('Sign in')}</h1>
-                <form onSubmit={this.handleClickSubmit} noValidate className='loginpage__main__form'>
-                  <div>{props.t('Login:')}</div>
-                  <InputGroupText
-                    parentClassName='loginpage__main__form__groupelogin'
-                    icon='fa-user'
-                    type='text'
-                    placeHolder={props.t('Email address or username')}
-                    invalidMsg={props.t('Invalid email or username')}
-                    maxLength={512}
-                    name='login'
-                  />
-                  <div>{props.t('Password:')}</div>
-                  <InputGroupText
-                    parentClassName='loginpage__main__form__groupepw'
-                    customClass=''
-                    icon='fa-lock'
-                    type='password'
-                    placeHolder={props.t('Password')}
-                    invalidMsg={props.t('Invalid password')}
-                    maxLength={512}
-                    name='password'
-                  />
-
-                  <Link
-                    className='loginpage__main__form__forgot_password'
-                    to={props.system.config.email_notification_activated
-                      ? PAGE.FORGOT_PASSWORD
-                      : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
-                  >
-                    {props.t('Forgotten password?')}
-                  </Link>
-
-                  <Button
-                    htmlType='submit'
-                    bootstrapType=''
-                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__main__form__btnsubmit ml-auto'
-                    label={props.t('Connection')}
-                  />
-                </form>
-              </div>
+              <SignIn
+                onClickSubmit={this.handleClickSubmit}
+                isEmailNotificationActivated={props.system.config.email_notification_activated}
+              />
             )}
           <FooterLogin />
         </section>
