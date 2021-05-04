@@ -1,16 +1,17 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .profile__mainBar__info
-    &__wrapper
-        max-width 90%
-    &__user
-        overflow hidden
-        text-overflow ellipsis
-        &__username
-            overflow hidden
-            text-overflow ellipsis
-            &__wrapper
-                display flex
+  &__wrapper
+    max-width 90%
+  &__user
+    &__name
+      overflow hidden
+      text-overflow ellipsis
+    &__username
+      overflow hidden
+      text-overflow ellipsis
+      &__wrapper
+        display flex
 
 @media (max-width: max-xs)
   .profile__mainBar__info__wrapper
