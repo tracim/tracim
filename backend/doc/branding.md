@@ -54,8 +54,8 @@ The default `welcome-simple.html` file loads the HTML from `welcome-simple-text.
 
 ### Add Registrations Terms
 
-Tracim permit to configure some files thats newly registered user should accept before using tracim.
-By default, there is none, but you can add any files you want.
+Tracim allows showing documents that newly registered user should accept before using Tracim.
+By default, there are none, but you can add any file you want.
 To do so, you can set a list of files separated by `,` in `development.ini`, an empty list mean no conditions:
 
 ```
@@ -65,5 +65,5 @@ website.usage_conditions = Terms Of Service.pdf,Privacy Policy.pdf
 The paths of the files in `development.ini` are relative to `<branding_folder>`.
 These parameters can also be changed with an environment variable as described in [setting.md](setting.md).
 
-NB: there is no restriction on the type of file, but we can suggest a format that can been viewed
-directly from the browser, has it will be accessible through link.
+NB: there are no restrictions on the type of file you can add, but we suggest using a format
+supported by browsers. These files it will be accessible through links.
