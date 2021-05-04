@@ -74,6 +74,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
+from tracim_backend.views.core_api.schemas import WorkspaceWithoutDescriptionSchema
 
 JsonDict = Dict[str, Any]
 
@@ -83,6 +84,7 @@ class EventApi:
 
     user_schema = UserDigestSchema()
     workspace_schema = WorkspaceSchema()
+    workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
         HTML_DOCUMENTS_TYPE: ContentSchema(),
@@ -548,7 +550,9 @@ class EventBuilder:
         )
         fields = {
             Event.CONTENT_FIELD: content_dict,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -621,7 +625,9 @@ class EventBuilder:
         role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
             Event.USER_FIELD: user_field,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
@@ -677,7 +683,9 @@ class EventBuilder:
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         subscription_author_in_context = user_api.get_user_with_context(subscription.author)
         fields = {
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
                 subscription
             ).data,
@@ -709,7 +717,9 @@ class EventBuilder:
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         reaction_author_in_context = user_api.get_user_with_context(reaction.author)
         fields = {
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
             Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
             Event.CONTENT_FIELD: content_dict,

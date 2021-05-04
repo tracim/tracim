@@ -6,7 +6,11 @@ import { TRANSLATION_STATE } from '../../src/translation.js'
 
 const props = {
   translationState: TRANSLATION_STATE.DISABLED,
-  onClickToggleTranslation: () => {},
+  onClickTranslate: () => {},
+  onClickRestore: () => {},
+  onChangeTargetLanguageCode: () => {},
+  targetLanguageList: [{ code: 'fr', display: 'Français' }],
+  targetLanguageCode: 'fr',
   t: text => text
 }
 
@@ -22,8 +26,8 @@ describe('<TranslateButton />', () => {
       {
         description: 'with translation enabled',
         state: TRANSLATION_STATE.UNTRANSLATED,
-        containedText: 'Show translation',
-        expectation: 'should contain show translation'
+        containedText: 'Translate to {{language}}',
+        expectation: 'should contain translate to… string'
       },
       {
         description: 'with translation disabled',

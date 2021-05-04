@@ -107,7 +107,8 @@ export class File extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       isLastTimelineItemCurrentToken: false,
-      showInvalidMentionPopupInComment: false
+      showInvalidMentionPopupInComment: false,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -869,15 +870,15 @@ export class File extends React.Component {
   // see https://github.com/tracim/tracim/issues/1804
   getDownloadRawUrl = ({ config: { apiUrl }, content, mode }) =>
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${encodeURIComponent(content.filenameNoExtension + content.file_extension)}?force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) =>
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${encodeURIComponent(content.filenameNoExtension) + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) =>
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${encodeURIComponent(content.filenameNoExtension) + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
   getOnlineEditionAction = () => {
     const { state } = this
@@ -939,13 +940,16 @@ export class File extends React.Component {
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,
             state.content.workspace_id,
-            state.loggedUser.lang,
+            state.translationTargetLanguageCode,
             this.setState.bind(this)
           )}
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
           onClickEditComment={this.handleClickEditComment}
           onClickDeleteComment={this.handleClickDeleteComment}
           onClickOpenFileComment={this.handleClickOpenFileComment}
+          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+          translationTargetLanguageCode={state.translationTargetLanguageCode}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
         />
       ) : null
     }
@@ -1062,6 +1066,10 @@ export class File extends React.Component {
     ) return false
 
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
+  }
+
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
   }
 
   render () {

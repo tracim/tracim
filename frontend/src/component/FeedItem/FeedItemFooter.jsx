@@ -35,6 +35,9 @@ export class FeedItemFooter extends React.Component {
             translationState={props.translationState}
             onClickTranslate={props.onClickTranslate}
             onClickRestore={props.onClickRestore}
+            onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+            targetLanguageList={props.translationTargetLanguageList}
+            targetLanguageCode={props.translationTargetLanguageCode}
             dataCy='commentTranslateButton'
           />
         </div>
@@ -64,6 +67,9 @@ export default connect(mapStateToProps)(withRouter(translate()(FeedItemFooter)))
 FeedItemFooter.propTypes = {
   onClickTranslate: PropTypes.func.isRequired,
   onClickRestore: PropTypes.func.isRequired,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  content: PropTypes.object.isRequired
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)).isRequired,
+  content: PropTypes.object.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
 }

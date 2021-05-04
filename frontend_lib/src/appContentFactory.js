@@ -256,7 +256,7 @@ export function appContentFactory (WrappedComponent) {
       // see https://github.com/tracim/tracim/issues/1101
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`)
+        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
       let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)

@@ -179,7 +179,7 @@ const updateActivity = (message, activity) => {
       ...activity.eventList
     ],
     commentList: isComment
-      ? [message.fields.content, ...activity.commentList]
+      ? [...activity.commentList, message.fields.content]
       : activity.commentList,
     newestMessage: message,
     content: isComment || isMentionOnComment ? activity.content : message.fields.content

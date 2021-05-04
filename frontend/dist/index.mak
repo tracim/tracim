@@ -66,6 +66,15 @@
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
+
+      <%
+        sidebar = colors["sidebar"]
+      %>
+      :root {
+          --sidebarColor: ${sidebar.web};
+          --sidebarColorDarken: ${sidebar.darken.web};
+          --sidebarColorLighten: ${sidebar.lighten.web};
+      }
     </style>
 
     <style nonce="${csp_nonce}">

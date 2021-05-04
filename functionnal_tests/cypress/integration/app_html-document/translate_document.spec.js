@@ -1,7 +1,7 @@
 import { PAGES as p } from '../../support/urls_commands.js'
 
 describe('Note/html document translation', function () {
-  before(() => {
+  beforeEach(() => {
     const workspaceId = 1
     let contentId = 1
     cy.resetDB()
@@ -27,5 +27,12 @@ describe('Note/html document translation', function () {
     cy.contains('.wsContentHtmlDocument__contentpage__textnote', 'source_lang_code')
     cy.get('[data-cy=htmlDocumentTranslateButton]').click()
     cy.contains('.wsContentHtmlDocument__contentpage__textnote', 'Hello, world')
+  })
+
+  it('a menu should allow to change the target language', () => {
+    cy.get('[data-cy=htmlDocumentTranslateButton__languageMenu]').click()
+    cy.get('[data-cy=htmlDocumentTranslateButton__language__fr]').click()
+    cy.get('[data-cy=htmlDocumentTranslateButton]').click()
+    cy.contains('.wsContentHtmlDocument__contentpage__textnote', 'fr')
   })
 })
