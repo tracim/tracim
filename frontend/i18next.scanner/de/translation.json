@@ -337,7 +337,7 @@
   "0 comments": "0 Kommentare",
   "{{numberComments}} comment": "{{numberComments}} Kommentar",
   "{{numberComments}} comments": "{{numberComments}} Kommentare",
-  "Showing {{displayedResults}} of {{totalResults}} results": "Zeigt {{displayedResults}} von {{totalResults}} Ergebnissen{{numberComments}} Kommentar",
+  "Showing {{displayedResults}} of {{totalResults}} results": "Zeigt {{displayedResults}} von {{totalResults}} Ergebnissen{{numberComments}}",
   "Result for: {{keywords}}": "Ergebnis für: {{keywords}}",
   "Results for: {{keywords}}": "Ergebnisse für: {{keywords}}",
   "Filter": "Filter",
