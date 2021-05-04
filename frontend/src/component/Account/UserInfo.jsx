@@ -11,14 +11,14 @@ export class UserInfo extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      popoverPublicNameOpen: false,
+      popoverFullNameOpen: false,
       popoverUsernameOpen: false
     }
   }
 
-  handleTogglePopoverPublicName = () => {
+  handleTogglePopoverFullName = () => {
     this.setState(prevState => ({
-      popoverPublicNameOpen: !prevState.popoverPublicNameOpen
+      popoverFullNameOpen: !prevState.popoverFullNameOpen
     }))
   }
 
@@ -43,18 +43,18 @@ export class UserInfo extends React.Component {
 
         <div className='userinfo__wrapper'>
           <div div className='userinfo__name primaryColorFont' data-cy='userinfo__name'>
-            <span href='#' id='popoverPublicName'>{`${props.user.publicName}`}
+            <span href='#' id='popoverFullName'>{`${props.user.publicName}`}
             </span>
             <Popover
               placement='right'
-              isOpen={this.state.popoverPublicNameOpen}
-              target='popoverPublicName'
+              isOpen={this.state.popoverFullNameOpen}
+              target='popoverFullName'
               // INFO - CR - 2021-04-29 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-              toggle={this.handleTogglePopoverPublicName}// eslint-disable-line react/jsx-handler-names
+              toggle={this.handleTogglePopoverFullName}// eslint-disable-line react/jsx-handler-names
               trigger={isMobile ? 'focus' : 'hover'}
             >
               <PopoverBody>
-                {props.t('Public Name')}
+                {props.t('Full name')}
               </PopoverBody>
             </Popover>
           </div>
