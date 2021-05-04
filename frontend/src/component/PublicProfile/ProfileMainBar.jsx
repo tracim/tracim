@@ -44,15 +44,15 @@ export const ProfileMainBar = props => {
       </div>
       {hasUser
         ? (
-          <div className='profile__mainBar_info__wrapper'>
+          <div className='profile__mainBar__info__wrapper'>
             <div className='profile__mainBar__info'>
               <div className='profile__mainBar__info__user'>
                 <span className='profile__mainBar__info__user__name'>{props.displayedUser.publicName}</span>
                 {props.displayedUser.username && (
-                  <>
+                  <span className='profile__mainBar__info__user__username__wrapper'>
                     <span className='profile__mainBar__info__user__separator'> - </span>
                     <span className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</span>
-                  </>
+                  </span>
                 )}
               </div>
               <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />

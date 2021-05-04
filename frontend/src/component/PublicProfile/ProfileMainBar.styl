@@ -1,26 +1,18 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-.profile__mainBar_info__wrapper
-    display flex
-    flex-wrap wrap
-    border 1px solid orange
-
 .profile__mainBar__info
-    border 1px solid red
-    max-width 100%
-    flex-direction column
+    &__wrapper
+        max-width 90%
+    &__user
+        overflow hidden
+        text-overflow ellipsis
+        &__username
+            overflow hidden
+            text-overflow ellipsis
+            &__wrapper
+                display flex
 
-.profile__mainBar__info__user
-    border 1px solid blue
+@media (max-width: max-xs)
+  .profile__mainBar__info__wrapper
+    max-width 80%
 
-.profile__mainBar__info__user__name
-    color green
-    overflow hidden
-    text-overflow ellipsis
-
-.profile__mainBar__info__user__username
-    // flex-direction column
-    // flex-wrap wrap
-    color pink
-    overflow hidden
-    text-overflow ellipsis
