@@ -143,6 +143,7 @@ export class PersonalData extends React.Component {
             onClick={this.handleClickSubmit}
             icon='fas fa-check'
             text={props.t('Validate')}
+            dataCy='IconButton_PersonalData'
           />
         </form>
       </div>

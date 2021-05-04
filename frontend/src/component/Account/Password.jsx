@@ -158,6 +158,7 @@ export class Password extends React.Component {
             onClick={this.handleClickSubmit}
             icon='fas fa-check'
             text={props.t('Validate')}
+            dataCy='IconButton_password'
           />
         </form>
 
