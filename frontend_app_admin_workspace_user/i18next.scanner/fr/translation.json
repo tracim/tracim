@@ -46,5 +46,6 @@
   "If you do not link an email to this new user, please notify manually the username and password.": "Si vous ne liez pas un e-mail à ce nouvel utilisateur, veuillez notifier manuellement l'identifiant et le mot de passe.",
   "Username": "Identifiant",
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",
-  "Choose the user's type": "Choisir le type d'utilisateur"
+  "Choose the user's type": "Choisir le type d'utilisateur",
+  "Type": "Type"
 }

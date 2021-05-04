@@ -135,7 +135,6 @@
   "Avatar of {{publicName}}": "Avatar von {{publicName}}",
   "Close": "Schließen",
   "Restore the original language": "Ursprüngliche Sprache wiederherstellen",
-  "Show translation": "Übersetzung anzeigen",
   "Translation pending…": "Übersetzung ausstehend…",
   "Translation is not available": "Übersetzung ist nicht verfügbar",
   "Unknown error": "Unbekannter Fehler",
@@ -176,7 +175,6 @@
   "Dark Skin Tone": "Dunkler Hautton",
   "Upload a file": "Hochladen einer Datei",
   "See files": "Siehe Dateien",
-  "{{numberOfFile}} files added": "{{numberOfFile}} Dateien hinzugefügt",
   "Remove file": "Datei entfernen",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
   "The file is larger than the maximum file size allowed": "Die Datei ist größer als die maximal zulässige Dateigröße",
@@ -192,5 +190,8 @@
   "Error while deleting the comment": "Fehler beim Löschen des Kommentars",
   "You have reached your storage limit, you cannot add new files": "Sie haben Ihr Speicherlimit erreicht, Sie können keine neuen Dateien hinzufügen",
   "Attach files": "Dateien anhängen",
-  "Download {{filename}}": "Herunterladen {{filename}}"
+  "Download {{filename}}": "Herunterladen {{filename}}",
+  "Translate to {{language}}": "Übersetzen in {{language}}",
+  "1 file selected": "1 Datei ausgewählt",
+  "{{numberOfFile}} files selected": "{{numberOfFile}} ausgewählte Dateien"
 }
