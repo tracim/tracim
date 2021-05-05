@@ -11,8 +11,6 @@ import {
 
 import { FETCH_CONFIG } from '../../util/helper.js'
 
-require('./ProfileMainBar.styl')
-
 export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length > 0
   return (
@@ -47,9 +45,12 @@ export const ProfileMainBar = props => {
           <div className='profile__mainBar__info__wrapper'>
             <div className='profile__mainBar__info'>
               <div className='profile__mainBar__info__user'>
-                <span className='profile__mainBar__info__user__name'>{props.displayedUser.publicName}</span>
+                <div className='profile__mainBar__info__user__name'>{props.displayedUser.publicName} </div>
                 {props.displayedUser.username && (
-                  <span className='profile__mainBar__info__user__username'> - @{props.displayedUser.username}</span>
+                  <div className='profile__mainBar__info__user__username__wrapper'>
+                   <div className='profile__mainBar__info__user__username__separator'> - </div>
+                   <div className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</div>
+                  </div>
                 )}
               </div>
               <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />

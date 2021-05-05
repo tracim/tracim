@@ -54,6 +54,21 @@
       margin-left 10px
       font-size fontSizeTitle
       align-self center
+      &__user
+        display flex
+        &__name
+          max-width calc(50% - 440px)
+          overflow hidden
+          text-overflow ellipsis
+        &__username
+          overflow hidden
+          text-overflow ellipsis
+          &__wrapper
+            max-width calc(50% - 440px)
+            display inline-flex
+            font-size 18px
+          &__separator
+            margin 0px 5px
 
   &__content
     display flex
@@ -106,10 +121,11 @@
         &__user
           display flex
           flex-direction column
-          &__separator
-            display none
+          width 100%
           &__username
             font-size fontSizeSmall
+            &__separator
+              display none
 
     &__content
       flex-direction column
