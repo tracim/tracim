@@ -3,6 +3,10 @@
 #
 # https://github.com/fanout/docker-pushpin
 #
+# NOTE - S.G. - 2021-05-05
+# This dockerfile is based on the official Dockerfile from fanout
+# But changes the configuration zurl changes so that it properly
+# works with mongrel2.
 
 # Pull the base image
 FROM ubuntu:18.04

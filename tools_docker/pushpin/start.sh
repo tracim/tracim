@@ -3,6 +3,8 @@ teardown () {
     if [ -n "$ZURL_PID" ]; then kill "$ZURL_PID"; fi
 }
 
+# Starting zurl separately to use /etc/zurl.conf instead of /var/run/pushpin/zurl.conf
+# So that zurl shares the same parameters with mongrel2.
 mkdir -p /var/run/zurl
 trap teardown HUP INT TERM
 zurl --config=/etc/zurl.conf &
