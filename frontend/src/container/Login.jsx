@@ -1,12 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Redirect, Link } from 'react-router-dom'
+import { withRouter, Redirect } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import * as Cookies from 'js-cookie'
-import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
@@ -48,19 +46,28 @@ import {
   postUserLogout,
   postUserLogin,
   putUserLang,
-  getAccessibleWorkspaces
+  getAccessibleWorkspaces,
+  postUserRegister
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
   FETCH_CONFIG,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
   WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
 import Conditions from './Conditions.jsx'
+import SignIn from '../component/Login/SignIn.jsx'
+import CreateAccount from '../component/Login/CreateAccount.jsx'
 
 const qs = require('query-string')
 const USAGE_CONDITIONS_STATUS = {
   ACCEPTED: 'accepted'
+}
+const DISPLAY = {
+  CONDITIONS: 'Conditions',
+  CREATE: 'CreateAccount',
+  SIGN_IN: 'SignIn'
 }
 
 class Login extends React.Component {
@@ -74,8 +81,8 @@ class Login extends React.Component {
     // The original welcome element is hidden unconditionally in Tracim.jsx
     const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
+      displayedOption: DISPLAY.SIGN_IN,
       inputRememberMe: false,
-      showUsageConditions: false,
       usageConditionsList: [],
       welcomeHtml: welcomeElement.innerHTML
     }
@@ -92,9 +99,15 @@ class Login extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { props } = this
+    const { props, state } = this
 
-    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+    if (
+      prevProps.system.config.instance_name !== props.system.config.instance_name ||
+      (
+        prevState.displayedOption !== state.displayedOption &&
+        state.displayedOption === DISPLAY.SIGN_IN
+      )
+    ) {
       this.setHeadTitle()
     }
   }
@@ -133,7 +146,60 @@ class Login extends React.Component {
     this.setState(prev => ({ inputRememberMe: !prev.inputRememberMe }))
   }
 
-  handleClickSubmit = async (event) => {
+  handleClickCreateAccount = async (event) => {
+    const { props } = this
+
+    event.preventDefault()
+
+    const { name, login, password } = event.target
+
+    if (name.value === '' || login.value === '' || password.value === '') {
+      props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
+      return
+    }
+
+    if (!checkEmailValidity(login.value)) {
+      props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
+      return
+    }
+
+    if (name.value.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+      props.dispatch(newFlashMessage(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+        , 'warning'))
+      return
+    }
+
+    if (password.value.length < 6) {
+      props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
+      return
+    }
+
+    if (password.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
+      return
+    }
+
+    const fetchPostUserRegister = await props.dispatch(postUserRegister({
+      email: login.value,
+      password: password.value,
+      public_name: name.value
+    }))
+
+    switch (fetchPostUserRegister.status) {
+      case 200: this.handleClickSignIn(event); break
+      case 400:
+        switch (fetchPostUserRegister.json.code) {
+          case 2001: props.dispatch(newFlashMessage(props.t('Invalid email'), 'warning')); break
+          case 2036: props.dispatch(newFlashMessage(props.t('Email already exists'), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('Error while creating account'), 'warning')); break
+        }
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while creating account'), 'warning')); break
+    }
+  }
+
+  handleClickSignIn = async (event) => {
     const { props, state } = this
 
     event.preventDefault()
@@ -214,7 +280,7 @@ class Login extends React.Component {
       props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
       this.setState({
         usageConditionsList: [],
-        showUsageConditions: false
+        displayedOption: DISPLAY.SIGN_IN
       })
     } else {
       props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
@@ -291,7 +357,7 @@ class Login extends React.Component {
               else {
                 this.setState({
                   usageConditionsList: fetchGetUsageConditions.json.items,
-                  showUsageConditions: true
+                  displayedOption: DISPLAY.CONDITIONS
                 })
               }
               break
@@ -356,19 +422,27 @@ class Login extends React.Component {
       <div className='loginpage'>
         <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
         <section className='loginpage__main'>
-          {state.showUsageConditions
-            ? (
-              <Conditions
-                onClickCancel={this.handleClickLogout}
-                onClickValidate={this.handleUserConnection}
-                usageConditionsList={state.usageConditionsList}
-              />
-            ) : (
-              <SignIn
-                onClickSubmit={this.handleClickSubmit}
-                isEmailNotificationActivated={props.system.config.email_notification_activated}
-              />
-            )}
+          {state.displayedOption === DISPLAY.SIGN_IN && (
+            <SignIn
+              onClickCreateAccount={() => this.setState({ displayedOption: DISPLAY.CREATE })}
+              onClickSubmit={this.handleClickSignIn}
+            />
+          )}
+
+          {state.displayedOption === DISPLAY.CONDITIONS && (
+            <Conditions
+              onClickCancel={this.handleClickLogout}
+              onClickValidate={this.handleUserConnection}
+              usageConditionsList={state.usageConditionsList}
+            />
+          )}
+
+          {state.displayedOption === DISPLAY.CREATE && (
+            <CreateAccount
+              onClickSignIn={() => this.setState({ displayedOption: DISPLAY.SIGN_IN })}
+              onClickCreateAccount={this.handleClickCreateAccount}
+            />
+          )}
           <FooterLogin />
         </section>
       </div>

@@ -160,6 +160,20 @@ export const postUserLogin = (credentials, rememberMe) => async dispatch => {
   })
 }
 
+export const postUserRegister = (newUser) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/register`,
+    param: {
+      credentials: 'include',
+      headers: { ...FETCH_CONFIG.headers },
+      method: 'POST',
+      body: JSON.stringify(newUser)
+    },
+    actionName: USER_LOGIN,
+    dispatch
+  })
+}
+
 export const postForgotPassword = login => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
