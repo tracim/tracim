@@ -26,7 +26,11 @@
           max-width 100%
           height auto
           box-shadow 0px 0px 10px mediumDarkGrey
-
+        & a:not(.linkPreview)
+          color bootstrapLinkColor
+          &:hover
+            color bootstrapLinkColor
+            text-decoration underline
       &__textAndPreview
         flex 1
 
@@ -40,6 +44,8 @@
           &__author
             overflow-wrap anywhere
             font-size 16px
+            &:hover
+              text-decoration underline
         &__actions
           padding 0
           color grey

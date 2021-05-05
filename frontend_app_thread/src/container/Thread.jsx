@@ -70,7 +70,8 @@ export class Thread extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       isLastTimelineItemCurrentToken: false,
-      showInvalidMentionPopupInComment: false
+      showInvalidMentionPopupInComment: false,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -451,6 +452,10 @@ export class Thread extends React.Component {
     this.buildBreadcrumbs(newObjectContent)
   }
 
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
+  }
+
   render () {
     const { props, state } = this
 
@@ -550,13 +555,16 @@ export class Thread extends React.Component {
               onClickTranslateComment={comment => props.handleTranslateComment(
                 comment,
                 state.content.workspace_id,
-                state.loggedUser.lang,
+                state.translationTargetLanguageCode,
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
               onClickEditComment={this.handleClickEditComment}
               onClickDeleteComment={this.handleClickDeleteComment}
               onClickOpenFileComment={this.handleClickOpenFileComment}
+              translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+              translationTargetLanguageCode={state.translationTargetLanguageCode}
+              onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             />
           ) : null}
         </PopinFixedContent>

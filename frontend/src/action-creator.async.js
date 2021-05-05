@@ -26,6 +26,7 @@ import {
   SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
+  USAGE_CONDITIONS,
   USER,
   USER_CONFIGURATION,
   USER_CONNECTED,
@@ -1284,6 +1285,21 @@ export const deleteContentFromFavoriteList = (userId, contentId) => async dispat
       method: 'DELETE'
     },
     actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const getUsageConditions = () => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/usage_conditions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USAGE_CONDITIONS,
     dispatch
   })
 }

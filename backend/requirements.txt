@@ -63,7 +63,7 @@ plaster-pastedeploy==0.6  # via pyramid, tracim_backend (setup.py)
 plaster==1.0              # via plaster-pastedeploy, pyramid
 pluggy==0.13.1            # via tracim_backend (setup.py)
 prettytable==0.7.2        # via cliff
-preview-generator==0.15.4  # via tracim_backend (setup.py)
+preview-generator==0.16.2 # via tracim_backend (setup.py)
 pubcontrol==3.0.0         # via gripcontrol
 pyasn1==0.4.4             # via ldap3
 pycparser==2.19           # via cffi

@@ -135,7 +135,6 @@
   "Avatar of {{publicName}}": "Avatar of {{publicName}}",
   "Close": "Close",
   "Restore the original language": "Restore the original language",
-  "Show translation": "Show translation",
   "Translation pending…": "Translation pending…",
   "Translation is not available": "Translation is not available",
   "Unknown error": "Unknown error",
@@ -176,7 +175,8 @@
   "Dark Skin Tone": "Dark Skin Tone",
   "Upload a file": "Upload a file",
   "See files": "See files",
-  "{{numberOfFile}} files added": "{{numberOfFile}} files added",
+  "{{numberOfFile}} files selected": "{{numberOfFile}} files selected",
+  "1 file selected": "1 file selected",
   "Remove file": "Remove file",
   "A content with the same name already exists": "A content with the same name already exists",
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
@@ -192,5 +192,6 @@
   "Error while deleting the comment": "Error while deleting the comment",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Attach files": "Attach files",
-  "Download {{filename}}": "Download {{filename}}"
+  "Download {{filename}}": "Download {{filename}}",
+  "Translate to {{language}}": "Translate to {{language}}"
 }

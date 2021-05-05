@@ -1,0 +1,8 @@
+frontend/dist/assets/tinymce*
+frontend/dist/assets/bootstrap/
+frontend/dist/assets/font/*/webfonts/*.svg
+frontend/dist/assets/_caldavzap/fonts/
+frontend/dist/assets/_caldavzap/localization.js
+frontend/dist/assets/_caldavzap/timezones.js
+*.min.css
+*.min.js

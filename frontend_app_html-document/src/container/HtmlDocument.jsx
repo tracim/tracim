@@ -53,7 +53,6 @@ import {
   FAVORITE_STATE,
   ToolBar
 } from 'tracim_frontend_lib'
-import { initWysiwyg } from '../helper.js'
 import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
@@ -100,7 +99,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInComment: false,
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
-      translationState: TRANSLATION_STATE.DISABLED
+      translationState: TRANSLATION_STATE.DISABLED,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -224,12 +224,24 @@ export class HtmlDocument extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
-    const { state } = this
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+    this.reloadContentWysiwyg()
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.loadContent()
+  }
+
+  reloadContentWysiwyg () {
+    if (!document.getElementById('wysiwygNewVersion') || this.state.mode !== APP_FEATURE_MODE.EDIT) return
+    globalThis.tinymce.remove('#wysiwygNewVersion')
+    globalThis.wysiwyg('#wysiwygNewVersion',
+      this.state.loggedUser.lang,
+      this.handleChangeText,
+      this.handleTinyMceInput,
+      this.handleTinyMceKeyDown,
+      this.handleTinyMceKeyUp,
+      this.handleTinyMceSelectionChange
+    )
   }
 
   async componentDidMount () {
@@ -241,52 +253,26 @@ export class HtmlDocument extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
+    const becameVisible = !prevState.isVisible && state.isVisible
+
     // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg('#wysiwygNewVersion',
-        state.loggedUser.lang,
-        this.handleChangeText,
-        this.handleTinyMceInput,
-        this.handleTinyMceKeyDown,
-        this.handleTinyMceKeyUp,
-        this.handleTinyMceSelectionChange
-      )
+      this.reloadContentWysiwyg()
     }
 
-    if (state.mode === APP_FEATURE_MODE.EDIT && prevState.mode !== APP_FEATURE_MODE.EDIT) {
+    if (state.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevState.mode !== APP_FEATURE_MODE.EDIT)) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
-      globalThis.tinymce.remove('#wysiwygNewVersion')
-      globalThis.wysiwyg(
-        '#wysiwygNewVersion',
-        state.loggedUser.lang,
-        this.handleChangeText,
-        this.handleTinyMceInput,
-        this.handleTinyMceKeyDown,
-        this.handleTinyMceKeyUp,
-        this.handleTinyMceSelectionChange
-      )
+      this.reloadContentWysiwyg()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygNewVersion')
-    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
-
-    // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
-    if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(
-        state,
-        state.loggedUser.lang,
-        this.handleChangeText,
-        this.handleTinyMceInput,
-        this.handleTinyMceKeyDown,
-        this.handleTinyMceKeyUp,
-        this.handleTinyMceSelectionChange
-      )
+    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) {
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
     }
   }
 
@@ -849,7 +835,7 @@ export class HtmlDocument extends React.Component {
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.loggedUser.lang,
+      state.translationTargetLanguageCode,
       state.config.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, translationState })
@@ -861,6 +847,10 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({
       translationState: getDefaultTranslationState(prev.config.system.config)
     }))
+  }
+
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
   }
 
   render () {
@@ -993,6 +983,9 @@ export class HtmlDocument extends React.Component {
             onClickTranslateDocument={this.handleTranslateDocument}
             onClickRestoreDocument={this.handleRestoreDocument}
             translationState={state.translationState}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            translationTargetLanguageCode={state.translationTargetLanguageCode}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
           />
 
           <PopinFixedRightPart
@@ -1033,13 +1026,16 @@ export class HtmlDocument extends React.Component {
                   onClickTranslateComment={comment => props.handleTranslateComment(
                     comment,
                     state.content.workspace_id,
-                    state.loggedUser.lang,
+                    state.translationTargetLanguageCode,
                     this.setState.bind(this)
                   )}
                   onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
                   onClickEditComment={this.handleClickEditComment}
                   onClickDeleteComment={this.handleClickDeleteComment}
                   onClickOpenFileComment={this.handleClickOpenFileComment}
+                  translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                  translationTargetLanguageCode={state.translationTargetLanguageCode}
+                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 />
               ) : null
             }]}

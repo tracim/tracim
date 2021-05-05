@@ -10,6 +10,7 @@ import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
+import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import {
   ROLE,
   CONTENT_TYPE,
@@ -20,7 +21,7 @@ import CommentFilePreview from './CommentFilePreview.jsx'
 
 function areCommentActionsAllowed (loggedUser, commentAuthorId) {
   return (
-    loggedUser.userRoleIdInWorkspace === ROLE.workspaceManager.id ||
+    loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id ||
     loggedUser.userId === commentAuthorId
   )
 }
@@ -32,6 +33,7 @@ const Comment = props => {
 
   const createdFormated = formatAbsoluteDate(props.createdRaw, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
+  const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -54,9 +56,16 @@ const Comment = props => {
             {!props.isPublication && (
               <div className={classnames(`${props.customClass}__body__content__header`, 'comment__body__content__header')}>
                 <div className={classnames(`${props.customClass}__body__content__header__meta`, 'comment__body__content__header__meta')}>
-                  <div className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
-                    {props.author.public_name}
-                  </div>
+                  <ProfileNavigation
+                    user={{
+                      userId: props.author.user_id,
+                      publicName: props.author.public_name
+                    }}
+                  >
+                    <span className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
+                      {props.author.public_name}
+                    </span>
+                  </ProfileNavigation>
 
                   <div
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
@@ -66,7 +75,7 @@ const Comment = props => {
                   </div>
                 </div>
 
-                {areCommentActionsAllowed(props.loggedUser, props.author) && (
+                {(isFile || actionsAllowed) && (
                   <DropdownMenu
                     buttonCustomClass='comment__body__content__header__actions'
                     buttonIcon='fas fa-ellipsis-v'
@@ -96,15 +105,17 @@ const Comment = props => {
                       )
                     )}
 
-                    <IconButton
-                      icon='far fa-fw fa-trash-alt'
-                      intent='link'
-                      key='deleteComment'
-                      mode='dark'
-                      onClick={props.onClickDeleteComment}
-                      text={props.t('Delete')}
-                      title={props.t('Delete comment')}
-                    />
+                    {(actionsAllowed &&
+                      <IconButton
+                        icon='far fa-fw fa-trash-alt'
+                        intent='link'
+                        key='deleteComment'
+                        mode='dark'
+                        onClick={props.onClickDeleteComment}
+                        text={props.t('Delete')}
+                        title={props.t('Delete comment')}
+                      />
+                    )}
                   </DropdownMenu>
                 )}
               </div>
@@ -143,6 +154,9 @@ const Comment = props => {
               translationState={props.translationState}
               onClickTranslate={props.onClickTranslate}
               onClickRestore={props.onClickRestore}
+              onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+              targetLanguageCode={props.translationTargetLanguageCode}
+              targetLanguageList={props.translationTargetLanguageList}
               dataCy='commentTranslateButton'
             />
           )}
@@ -169,18 +183,22 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.string.isRequired,
+  createdRaw: PropTypes.string,
   createdDistance: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
-  onClickTranslate: PropTypes.func,
-  onClickRestore: PropTypes.func
+  onClickTranslate: PropTypes.func.isRequired,
+  onClickRestore: PropTypes.func.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 Comment.defaultProps = {
+  createdRaw: '',
   customClass: '',
   text: '',
   fromMe: false,

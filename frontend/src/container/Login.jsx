@@ -10,14 +10,17 @@ import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   PAGE,
+  putUserConfiguration,
   serialize
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
+  setUserDisconnected,
   setWorkspaceList,
   setContentTypeList,
   setAppList,
@@ -38,17 +41,27 @@ import {
   getContentTypeList,
   getMyselfWorkspaceList,
   getNotificationList,
+  getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
   getWorkspaceMemberList,
+  postUserLogout,
   postUserLogin,
   putUserLang,
   getAccessibleWorkspaces
 } from '../action-creator.async.js'
-import { COOKIE_FRONTEND, WELCOME_ELEMENT_ID } from '../util/helper.js'
+import {
+  COOKIE_FRONTEND,
+  FETCH_CONFIG,
+  WELCOME_ELEMENT_ID
+} from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
+import Conditions from './Conditions.jsx'
 
 const qs = require('query-string')
+const USAGE_CONDITIONS_STATUS = {
+  ACCEPTED: 'accepted'
+}
 
 class Login extends React.Component {
   constructor (props) {
@@ -62,6 +75,8 @@ class Login extends React.Component {
     const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
       inputRememberMe: false,
+      showUsageConditions: false,
+      usageConditionsList: [],
       welcomeHtml: welcomeElement.innerHTML
     }
 
@@ -139,10 +154,7 @@ class Login extends React.Component {
 
     switch (fetchPostUserLogin.status) {
       case 200: {
-        const loggedUser = {
-          ...fetchPostUserLogin.json,
-          logged: true
-        }
+        const loggedUser = fetchPostUserLogin.json
 
         if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
 
@@ -159,13 +171,6 @@ class Login extends React.Component {
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
-
-        if (props.system.redirectLogin !== '') {
-          props.history.push(props.system.redirectLogin)
-          return
-        }
-
-        props.history.push(PAGE.HOME)
         break
       }
       case 400:
@@ -176,6 +181,43 @@ class Login extends React.Component {
         break
       case 403: props.dispatch(newFlashMessage(props.t('Invalid credentials'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
+    }
+  }
+
+  handleUserConnection = async () => {
+    const { props } = this
+    props.dispatch(setUserConnected({ ...props.user, logged: true }))
+    if (props.system.redirectLogin !== '') {
+      props.history.push(props.system.redirectLogin)
+      return
+    }
+
+    const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(
+      FETCH_CONFIG.apiUrl,
+      props.user.userId,
+      { ...props.user.config, usage_conditions__status: USAGE_CONDITIONS_STATUS.ACCEPTED }
+    ))
+
+    if (fetchPutUserConfiguration.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while saving the user configuration')))
+    }
+
+    props.history.push(PAGE.HOME)
+  }
+
+  handleClickLogout = async () => {
+    const { props } = this
+
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
+    if (fetchPostUserLogout.status === 204) {
+      props.dispatch(setUserDisconnected())
+      props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+      this.setState({
+        usageConditionsList: [],
+        showUsageConditions: false
+      })
+    } else {
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
     }
   }
 
@@ -238,7 +280,29 @@ class Login extends React.Component {
 
     const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
     switch (fetchGetUserConfig.status) {
-      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      case 200: {
+        props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters))
+
+        if (fetchGetUserConfig.json.parameters.usage_conditions__status !== USAGE_CONDITIONS_STATUS.ACCEPTED) {
+          const fetchGetUsageConditions = await props.dispatch(getUsageConditions())
+          switch (fetchGetUsageConditions.status) {
+            case 200: {
+              if (fetchGetUsageConditions.json.items.length === 0) this.handleUserConnection()
+              else {
+                this.setState({
+                  usageConditionsList: fetchGetUsageConditions.json.items,
+                  showUsageConditions: true
+                })
+              }
+              break
+            }
+            default: props.dispatch(newFlashMessage(props.t('Error while loading the usage conditions'))); break
+          }
+        } else {
+          this.handleUserConnection()
+        }
+        break
+      }
       default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
     }
   }
@@ -292,48 +356,57 @@ class Login extends React.Component {
       <div className='loginpage'>
         <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
         <section className='loginpage__main'>
-          <div className='loginpage__main__wrapper'>
-            <h1 className='loginpage__main__title'>{props.t('Sign in')}</h1>
-            <form onSubmit={this.handleClickSubmit} noValidate className='loginpage__main__form'>
-              <div>{props.t('Login:')}</div>
-              <InputGroupText
-                parentClassName='loginpage__main__form__groupelogin'
-                icon='fa-user'
-                type='text'
-                placeHolder={props.t('Email address or username')}
-                invalidMsg={props.t('Invalid email or username')}
-                maxLength={512}
-                name='login'
+          {state.showUsageConditions
+            ? (
+              <Conditions
+                onClickCancel={this.handleClickLogout}
+                onClickValidate={this.handleUserConnection}
+                usageConditionsList={state.usageConditionsList}
               />
-              <div>{props.t('Password:')}</div>
-              <InputGroupText
-                parentClassName='loginpage__main__form__groupepw'
-                customClass=''
-                icon='fa-lock'
-                type='password'
-                placeHolder={props.t('Password')}
-                invalidMsg={props.t('Invalid password')}
-                maxLength={512}
-                name='password'
-              />
+            ) : (
+              <div className='loginpage__main__wrapper'>
+                <h1 className='loginpage__main__title'>{props.t('Sign in')}</h1>
+                <form onSubmit={this.handleClickSubmit} noValidate className='loginpage__main__form'>
+                  <div>{props.t('Login:')}</div>
+                  <InputGroupText
+                    parentClassName='loginpage__main__form__groupelogin'
+                    icon='fa-user'
+                    type='text'
+                    placeHolder={props.t('Email address or username')}
+                    invalidMsg={props.t('Invalid email or username')}
+                    maxLength={512}
+                    name='login'
+                  />
+                  <div>{props.t('Password:')}</div>
+                  <InputGroupText
+                    parentClassName='loginpage__main__form__groupepw'
+                    customClass=''
+                    icon='fa-lock'
+                    type='password'
+                    placeHolder={props.t('Password')}
+                    invalidMsg={props.t('Invalid password')}
+                    maxLength={512}
+                    name='password'
+                  />
 
-              <Link
-                className='loginpage__main__form__forgot_password'
-                to={props.system.config.email_notification_activated
-                  ? PAGE.FORGOT_PASSWORD
-                  : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
-              >
-                {props.t('Forgotten password?')}
-              </Link>
+                  <Link
+                    className='loginpage__main__form__forgot_password'
+                    to={props.system.config.email_notification_activated
+                      ? PAGE.FORGOT_PASSWORD
+                      : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
+                  >
+                    {props.t('Forgotten password?')}
+                  </Link>
 
-              <Button
-                htmlType='submit'
-                bootstrapType=''
-                customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__main__form__btnsubmit ml-auto'
-                label={props.t('Connection')}
-              />
-            </form>
-          </div>
+                  <Button
+                    htmlType='submit'
+                    bootstrapType=''
+                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__main__form__btnsubmit ml-auto'
+                    label={props.t('Connection')}
+                  />
+                </form>
+              </div>
+            )}
           <FooterLogin />
         </section>
       </div>

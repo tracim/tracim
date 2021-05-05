@@ -152,7 +152,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]
@@ -277,7 +277,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]
@@ -304,7 +304,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]

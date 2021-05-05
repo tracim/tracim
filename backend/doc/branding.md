@@ -42,6 +42,7 @@ The paths of the files in `development.ini` are relative to `<branding_folder>`.
 These parameters can also be changed with an environment variable as described in [setting.md](setting.md).
 
 In case you use CSS styling, we recommend to use the `tracimBrandingWelcomePage` class name prefix to avoid collisions with Tracim's own class names.
+The additional files/images added in `<branding_folder>` are available to the browser in `/assets/branding/`, so setup the source/link references in your HTML accordingly.
 
 You can use [welcome-simple.html.sample](../../frontend/dist/assets/branding/welcome-simple.html.sample) and [welcome.css.sample](../../frontend/dist/assets/branding/welcome-simple.css.sample) as a starting point.
 
@@ -50,3 +51,19 @@ You can use [welcome-simple.html.sample](../../frontend/dist/assets/branding/wel
 Tracim loads the HTML from `website.welcome_page` in its index HTML page. The CSS file `website.welcome_page_style` is loaded as an external CSS link.
 
 The default `welcome-simple.html` file loads the HTML from `welcome-simple-text.html` and renders it in a rectangle whose background is `welcome-simple-bg.jpg`.
+
+### Add Registrations Terms
+
+Tracim allows showing documents that newly registered user should accept before using Tracim.
+By default, there are none, but you can add any file you want.
+To do so, you can set a list of files separated by `,` in `development.ini`, an empty list mean no conditions:
+
+```
+website.usage_conditions = Terms Of Service.pdf,Privacy Policy.pdf
+```
+
+The paths of the files in `development.ini` are relative to `<branding_folder>`.
+These parameters can also be changed with an environment variable as described in [setting.md](setting.md).
+
+NB: there are no restrictions on the type of file you can add, but we suggest using a format
+supported by browsers. These files it will be accessible through links.
