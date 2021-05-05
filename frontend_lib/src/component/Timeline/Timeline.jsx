@@ -174,6 +174,9 @@ export class Timeline extends React.Component {
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
+                    onChangeTranslationTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                    translationTargetLanguageCode={props.translationTargetLanguageCode}
+                    translationTargetLanguageList={props.translationTargetLanguageList}
                     onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
@@ -340,7 +343,7 @@ Timeline.propTypes = {
   customColor: PropTypes.string,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isDeprecated: PropTypes.bool,
-  loggedUser: PropTypes.object,
+  loggedUser: PropTypes.object.isRequired,
   memberList: PropTypes.array,
   onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
@@ -360,11 +363,14 @@ Timeline.propTypes = {
   showTitle: PropTypes.bool,
   searchForMentionInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
-  onClickTranslateComment: PropTypes.func,
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
-  onClickRestoreComment: PropTypes.func
+  onClickTranslateComment: PropTypes.func.isRequired,
+  onClickRestoreComment: PropTypes.func.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onChangeTargetLanguageCode: PropTypes.func.isRequired
 }
 
 Timeline.defaultProps = {
@@ -378,11 +384,6 @@ Timeline.defaultProps = {
   id: '',
   isDeprecated: false,
   memberList: [],
-  loggedUser: {
-    userId: '',
-    name: '',
-    userRoleIdInWorkspace: ROLE.reader.id
-  },
   onInitWysiwyg: () => { },
   timelineData: [],
   wysiwyg: false,

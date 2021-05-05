@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt
+# Available parameter: en, fr, pt, de
 ; default_lang = en
 
 ### Apps ###
@@ -400,6 +400,11 @@ website.title = %(basic_setup.website_title)s
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
+# paths to usage conditions files (relative to frontend/dist/assets/branding)
+# separated by ",", by default there are no usage conditions files.
+website.usage_conditions =
+
+
 ### Frontend ###
 ## if you want to use Tracim API without frontend, change this parameter
 ; frontend.serve = True
@@ -446,7 +451,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.ui.enabled = True
 
 ### Notifications ###
-# Comma-separated events listed in this setting are not displayed in notifications to the user.
+# Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
@@ -785,6 +790,12 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ; translation_service.enabled = False
 
+## Translation service target languages that will be proposed in Tracim's interface
+# It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
+# The string can use any UTF-8 character.
+; translation_service.target_languages = en:English,fr:Français,pt:Português
+# example:
+# translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
 ## Translation service timeout in seconds.
 # This timeout will be applied to each translation request.

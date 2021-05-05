@@ -1,5 +1,7 @@
 import datetime
+from pathlib import PurePath
 import typing
+from urllib.parse import quote
 from urllib.parse import urljoin
 
 from importlib_metadata import metadata
@@ -17,6 +19,7 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
+from tracim_backend.models.context_models import UsageConditionModel
 
 
 class SystemApi(object):
@@ -62,7 +65,25 @@ class SystemApi(object):
             instance_name=self._config.WEBSITE__TITLE,
             email_required=self._config.EMAIL__REQUIRED,
             search_engine=self._config.SEARCH__ENGINE,
+            translation_service__target_languages=self._config.TRANSLATION_SERVICE__TARGET_LANGUAGES,
         )
+
+    def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:
+        usages_conditions_files = []
+        for file_name in self._config.WEBSITE__USAGE_CONDITIONS:
+            label = PurePath(file_name).stem
+            usages_conditions_files.append(
+                UsageConditionModel(
+                    title=label,
+                    url=str(
+                        "{base_url}/assets/branding/{condition_file_name}".format(
+                            base_url=self._config.WEBSITE__BASE_URL,
+                            condition_file_name=quote(file_name),
+                        )
+                    ),
+                )
+            )
+        return usages_conditions_files
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:
         error_codes = []

@@ -469,7 +469,8 @@ class TestWorkspaceEndpoint(object):
         assert workspace["slug"] == "superworkspace"
         assert workspace["label"] == "superworkspace"
         assert workspace["description"] == "mysuperdescription"
-        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        # no publication entry anymore
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry) - 1
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
@@ -489,7 +490,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["slug"] == "superworkspace"
         assert workspace["label"] == "superworkspace"
         assert workspace["description"] == "mysuperdescription"
-        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry) - 1
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
         assert workspace["public_upload_enabled"] is False
@@ -1632,7 +1633,7 @@ class TestWorkspaceMembersEndpoint(object):
             "do_notify": user_role_found["do_notify"],
         }
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == user_schema.dump(author).data
         user = web_testapp.get("/api/users/2", status=200).json_body
@@ -1997,7 +1998,9 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_dict = web_testapp.get(
             "/api/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace_dict
+        assert last_event.workspace == {
+            k: v for k, v in workspace_dict.items() if k != "description"
+        }
         author = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
         assert last_event.author == user_schema.dump(author).data
 
@@ -2284,7 +2287,9 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_dict = web_testapp.get(
             "/api/workspaces/{}".format(workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace_dict
+        assert last_event.workspace == {
+            k: v for k, v in workspace_dict.items() if k != "description"
+        }
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == user_schema.dump(author).data
         user_dict = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body

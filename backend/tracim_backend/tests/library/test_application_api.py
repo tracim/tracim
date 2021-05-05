@@ -1,12 +1,13 @@
 from hapic.ext.pyramid import PyramidContext
 from mock import Mock
 from pyramid.config import Configurator
+import pytest
 
 from tracim_backend import CFG
 from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.app_models.workspace_menu_entries import activity_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
+from tracim_backend.app_models.workspace_menu_entries import publication_menu_entry
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.app import TracimContentType
@@ -88,7 +89,7 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__folder_case(self):
@@ -124,7 +125,7 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
     def test_get_default_workspace_menu_entry__ok__agenda_enabled_workspace_case(self):
@@ -149,7 +150,7 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 4
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
         assert default_workspace_menu_entry[3].label == agenda.label
 
@@ -175,5 +176,20 @@ class TestApplicationApi(object):
         )
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
-        assert default_workspace_menu_entry[1].label == activity_menu_entry.label
+        assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
+
+    def test_get_default_workspace_menu_entry__ok__publication_disabled_workspace_case(self):
+        app_config = Mock()
+        app_config.APPS_COLORS = {}
+        app_config.APPS_COLORS["primary"] = "#fff"
+
+        app_api = ApplicationApi(app_list=[], show_inactive=False)
+        workspace = Mock()
+        workspace.workspace_id = 12
+        workspace.publication_enabled = False
+        menu_entries = app_api.get_default_workspace_menu_entry(
+            workspace=workspace, app_config=app_config
+        )
+        with pytest.raises(StopIteration):
+            next(entry for entry in menu_entries if entry.slug == publication_menu_entry.slug)

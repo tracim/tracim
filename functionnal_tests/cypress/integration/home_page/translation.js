@@ -14,6 +14,9 @@ describe('content :: home_page', function () {
 
     cy.changeLanguage('pt')
     cy.get('#content').contains('Criar um espaço')
+
+    cy.changeLanguage('de')
+    cy.get('#content').contains('Einen Bereich schaffen')
   })
 
   it('should have translations', () => {
@@ -30,5 +33,8 @@ describe('content :: home_page', function () {
 
     cy.changeLanguage('pt')
     cy.get('#content').contains('Bem-vindo ao Tracim')
+
+    cy.changeLanguage('de')
+    cy.get('#content').contains('Willkommen bei Tracim')
   })
 })

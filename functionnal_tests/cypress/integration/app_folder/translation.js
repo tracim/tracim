@@ -28,5 +28,8 @@ describe('App Folder Advanced', function () {
 
     cy.changeLanguage('pt')
     cy.get('.folder_advanced__content__title').contains('Tipo de conteúdo permitido para esta pasta')
+
+    cy.changeLanguage('de')
+    cy.get('.folder_advanced__content__title').contains('Erlaubte Inhaltsarten für diesen Ordner')
   })
 })

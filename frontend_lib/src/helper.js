@@ -6,6 +6,7 @@ import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
+import dateFnsDe from 'date-fns/locale/de'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -57,7 +58,8 @@ export const PAGE = {
 export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
-  pt: dateFnsPt
+  pt: dateFnsPt,
+  de: dateFnsDe
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -745,6 +747,14 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
+
+export const htmlCodeToDocumentFragment = (htmlCode) => {
+  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
+  // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
+  const template = document.createElement('template')
+  template.innerHTML = htmlCode
+  return template.content
+}
 
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId
