@@ -166,4 +166,20 @@ describe('<WorkspaceContent />', () => {
       expect(contentList.length).to.equal(uniqueContentList.length)
     })
   })
+
+  describe('static design', () => {
+    describe('if appList contains gallery', () => {
+      it('should contain a span with the gallery button', () => {
+        wrapper.setProps({ appList: [{ slug: 'gallery' }] })
+        expect(wrapper.find('span.iconbutton__text_with_icon'))
+      })
+    })
+
+    describe('if appList is empty', () => {
+      it('should not contain a span with the gallery button', () => {
+        wrapper.setProps({ appList: [] })
+        expect(wrapper.find('span.iconbutton__text_with_icon').length).to.equal(0)
+      })
+    })
+  })
 })

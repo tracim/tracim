@@ -107,7 +107,8 @@ export class File extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       isLastTimelineItemCurrentToken: false,
-      showInvalidMentionPopupInComment: false
+      showInvalidMentionPopupInComment: false,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -939,13 +940,16 @@ export class File extends React.Component {
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,
             state.content.workspace_id,
-            state.loggedUser.lang,
+            state.translationTargetLanguageCode,
             this.setState.bind(this)
           )}
           onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
           onClickEditComment={this.handleClickEditComment}
           onClickDeleteComment={this.handleClickDeleteComment}
           onClickOpenFileComment={this.handleClickOpenFileComment}
+          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+          translationTargetLanguageCode={state.translationTargetLanguageCode}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
         />
       ) : null
     }
@@ -1062,6 +1066,10 @@ export class File extends React.Component {
     ) return false
 
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
+  }
+
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
   }
 
   render () {

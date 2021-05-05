@@ -2,6 +2,7 @@
 from enum import Enum
 import json
 import os
+import pathlib
 import typing
 
 from depot.manager import DepotManager
@@ -61,6 +62,11 @@ class DepotFileStorageType(Enum):
     def __init__(self, slug: str, depot_storage_backend: str):
         self.slug = slug
         self.depot_storage_backend = depot_storage_backend
+
+
+def create_target_langage(value: str) -> typing.Tuple[str, str]:
+    code, display = value.split(":")
+    return (code, display)
 
 
 class ConfigParam(object):
@@ -391,6 +397,12 @@ class CFG(object):
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__USAGE_CONDITIONS = string_to_unique_item_list(
+            self.get_raw_config("website.usage_conditions", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
         self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
             "website.welcome_page", "welcome-simple.html"
         )
@@ -848,6 +860,19 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
+        default_target_languages = "fr:Français,en:English,pt:Português"
+        target_language_pairs = string_to_unique_item_list(
+            self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
+            separator=",",
+            cast_func=create_target_langage,
+            do_strip=True,
+        )
+        try:
+            self.TRANSLATION_SERVICE__TARGET_LANGUAGES = [
+                {"code": code, "display": display} for code, display in target_language_pairs
+            ]
+        except ValueError:
+            raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 
@@ -954,6 +979,13 @@ class CFG(object):
             self.check_directory_path_param(
                 "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
             )
+            for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
+                condition_file_path = pathlib.Path(
+                    self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding", condition_file_name
+                )
+                self.check_file_path_param(
+                    param_name="WEBSITE__USAGE_CONDITIONS", path=str(condition_file_path)
+                )
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(

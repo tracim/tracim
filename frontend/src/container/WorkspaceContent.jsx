@@ -726,12 +726,14 @@ export class WorkspaceContent extends React.Component {
             />
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__buttons'>
-                <IconButton
-                  onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
-                  text={props.t('Open the gallery')}
-                  icon='far fa-image'
-                  dataCy='IconButton_gallery'
-                />
+                {props.appList.some(app => app.slug === 'gallery') && (
+                  <IconButton
+                    onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                    text={props.t('Open the gallery')}
+                    icon='far fa-image'
+                    dataCy='IconButton_gallery'
+                  />
+                )}
                 {userRoleIdInWorkspace >= ROLE.contributor.id && (
                   <DropdownCreateButton
                     folderId={null} // null because it is workspace root content

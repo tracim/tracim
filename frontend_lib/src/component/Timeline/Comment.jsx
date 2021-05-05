@@ -154,6 +154,9 @@ const Comment = props => {
               translationState={props.translationState}
               onClickTranslate={props.onClickTranslate}
               onClickRestore={props.onClickRestore}
+              onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+              targetLanguageCode={props.translationTargetLanguageCode}
+              targetLanguageList={props.translationTargetLanguageList}
               dataCy='commentTranslateButton'
             />
           )}
@@ -187,8 +190,11 @@ Comment.propTypes = {
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
-  onClickTranslate: PropTypes.func,
-  onClickRestore: PropTypes.func
+  onClickTranslate: PropTypes.func.isRequired,
+  onClickRestore: PropTypes.func.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 Comment.defaultProps = {

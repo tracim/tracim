@@ -355,7 +355,9 @@ class TestFolder(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert modified_event.workspace == workspace
+        assert modified_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
     def test_api__update_folder__err_400__not_modified(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
@@ -1215,7 +1217,9 @@ class TestHtmlDocuments(object):
         assert modified_event.content["sub_content_types"] == content["sub_content_types"]
         assert modified_event.content["workspace_id"] == content["workspace_id"]
         workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
-        assert modified_event.workspace == workspace
+        assert modified_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
     def test_api__update_html_document__err_400__not_editable(self, web_testapp) -> None:
         """
@@ -2443,7 +2447,7 @@ class TestFiles(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
-        assert created_event.workspace == workspace
+        assert created_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
 
         assert modified_event.event_type == "content.modified.file"
         content = web_testapp.get(
@@ -2470,7 +2474,9 @@ class TestFiles(object):
         assert modified_event.content["sub_content_types"] == res["sub_content_types"]
         assert modified_event.content["workspace_id"] == res["workspace_id"]
 
-        assert modified_event.workspace == workspace
+        assert modified_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
         assert content["parent_id"] is None
         assert content["content_type"] == "file"
@@ -2848,7 +2854,7 @@ class TestFiles(object):
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         workspace = web_testapp.get("/api/workspaces/1", status=200,).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
 
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
@@ -4364,7 +4370,9 @@ class TestThreads(object):
         assert modified_event.content["sub_content_types"] == content["sub_content_types"]
         assert modified_event.content["workspace_id"] == content["workspace_id"]
         workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
-        assert modified_event.workspace == workspace
+        assert modified_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
     def test_api__update_thread__err_400__not_modified(self, web_testapp) -> None:
         """
