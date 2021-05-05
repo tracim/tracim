@@ -36,6 +36,8 @@ var globalInterfaceLanguage = (function (lang) {
   switch (lang) {
     case 'fr':
       return 'fr_FR'
+    case 'de':
+      return 'de_DE'
     case 'en':
       return 'en_US'
     default:
@@ -43,7 +45,7 @@ var globalInterfaceLanguage = (function (lang) {
   }
 })(configObj.userLang)
 
-var globalInterfaceCustomLanguages=['en_US', 'fr_FR']
+var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE']
 var globalSortAlphabet=' 0123456789'+
   'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+
   'PQRŔŘSŚŠȘșŞşẞTŤȚțŢţUÙÚÛÜŰŮŪVWXYÝŸZŹŻŽ'+

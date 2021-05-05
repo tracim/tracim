@@ -26,5 +26,8 @@ describe('App HTML Document', function () {
 
     cy.changeLanguage('pt')
     cy.get('.wsContentGeneric__option__menu__addversion').contains('Editar')
+
+    cy.changeLanguage('de')
+    cy.get('.wsContentGeneric__option__menu__addversion').contains('Bearbeiten')
   })
 })

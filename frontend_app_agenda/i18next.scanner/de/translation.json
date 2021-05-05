@@ -1,0 +1,12 @@
+{
+  "Error while loading space list": "Fehler beim Laden der Bereichliste",
+  "User": "Benutzer",
+  "Spaces": "Bereiche",
+  "Space": "Bereich",
+  "All my agendas": "Alle meine Kalender",
+  "Agenda of space {{workspaceLabel}}": "Bereichskalender {{workspaceLabel}}",
+  "Agenda": "Kalender",
+  "Some agenda could not be loaded": "Einige Kalender konnten nicht geladen werden",
+  "My agendas": "Meine Kalender",
+  "Some information was modified by {{author}}": "Einige Informationen wurden geändert von {{author}}"
+}

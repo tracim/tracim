@@ -22,6 +22,9 @@
 //       cy.changeLanguage('pt')
 //       cy.get('.agendaPage__title').contains('Todas as minhas agendas')
 //
+//       cy.changeLanguage('de')
+//       cy.get('.agendaPage__title').contains('Alle meine Kalender')
+//
 //       cy.visitPage({ pageName: PAGES.AGENDA, params: { workspaceId: workspace.workspace_id } })
 //
 //       cy.get('.agendaPage__title').contains('Agenda of space My Workspace')
@@ -31,6 +34,9 @@
 //
 //       cy.changeLanguage('pt')
 //       cy.get('.agendaPage__title').contains('Agenda do espaço My Workspace')
+//
+//       cy.changeLanguage('de')
+//       cy.get('.agendaPage__title').contains('Bereichskalender My Workspace')
 //     })
 //   })
 // })

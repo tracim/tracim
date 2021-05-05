@@ -30,5 +30,8 @@ describe('Timeline', () => {
 
     cy.changeLanguage('pt')
     cy.get('.timeline__title').contains('Linha cronológica')
+
+    cy.changeLanguage('de')
+    cy.get('.timeline__title').contains('Zeitleiste')
   })
 })

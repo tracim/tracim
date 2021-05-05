@@ -16,6 +16,9 @@ describe('content :: admin > workspace', function () {
 
     cy.changeLanguage('pt')
     cy.get('.adminWorkspace__description').contains('Lista de todos os espaços')
+
+    cy.changeLanguage('de')
+    cy.get('.adminWorkspace__description').contains('Liste aller Bereiche')
   })
 })
 
@@ -35,5 +38,8 @@ describe('content :: admin > user', function () {
 
     cy.changeLanguage('pt')
     cy.get('.adminUser__description').contains('Nesta página você pode gerir os utilizadores da instância do Tracim.')
+
+    cy.changeLanguage('de')
+    cy.get('.adminUser__description').contains('Auf dieser Seite können Sie die Benutzer Ihrer Tracim-Instanz verwalten.')
   })
 })

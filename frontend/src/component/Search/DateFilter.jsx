@@ -47,13 +47,23 @@ export class DateFilter extends React.Component {
         'Quinta-feira',
         'Sexta-feira',
         'Sábado'
+      ],
+      de: [
+        'Sonntag',
+        'Montag',
+        'Dienstag',
+        'Mittwoch',
+        'Donnerstag',
+        'Freitag',
+        'Samstag'
       ]
     }
 
     const WEEKDAYS_SHORT = {
       en: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
       fr: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
-      pt: ['Do', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sá']
+      pt: ['Do', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sá'],
+      de: ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.']
     }
 
     const MONTHS = {
@@ -98,6 +108,20 @@ export class DateFilter extends React.Component {
         'Outubro',
         'Novembro',
         'Dezembro'
+      ],
+      de: [
+        'Januar',
+        'Februar',
+        'März',
+        'April',
+        'Mai',
+        'Juni',
+        'Juli',
+        'August',
+        'September',
+        'Oktober',
+        'November',
+        'Dezember'
       ]
     }
 
@@ -105,13 +129,15 @@ export class DateFilter extends React.Component {
     const FIRST_DAY_OF_WEEK = {
       en: 0,
       fr: 1,
-      pt: 0
+      pt: 0,
+      de: 1
     }
 
     const FORMAT = {
       en: 'MM/dd/yyyy',
       fr: 'dd/MM/yyyy',
-      pt: 'dd/MM/yyyy'
+      pt: 'dd/MM/yyyy',
+      de: 'dd/MM/yyyy'
     }
 
     return (
