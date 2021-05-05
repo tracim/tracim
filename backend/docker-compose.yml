@@ -6,7 +6,7 @@
 version: '3'
 services:
   pushpin:
-    image: fanout/pushpin:1.31.0
+    build: ../tools_docker/pushpin
     network_mode: host
     volumes:
       - ${PUSHPIN_CONFIG_DIR}:/etc/pushpin
