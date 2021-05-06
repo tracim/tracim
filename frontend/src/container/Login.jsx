@@ -165,8 +165,8 @@ class Login extends React.Component {
 
     if (name.value.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       props.dispatch(newFlashMessage(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
-        , 'warning'))
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
+        'warning'))
       return
     }
 

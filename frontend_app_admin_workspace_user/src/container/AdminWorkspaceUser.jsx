@@ -434,8 +434,8 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       this.sendGlobalFlashMsg(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
-        , 'warning')
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
+        'warning')
       return
     }
 
