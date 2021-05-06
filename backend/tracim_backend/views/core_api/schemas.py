@@ -1817,6 +1817,7 @@ class ConfigSchema(marshmallow.Schema):
     translation_service__target_languages = marshmallow.fields.Nested(
         TargetLanguageSchema, many=True
     )
+    user__self_registration__enabled = marshmallow.fields.Bool()
 
 
 class ConditionFileSchema(marshmallow.Schema):

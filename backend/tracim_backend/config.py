@@ -448,7 +448,9 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
-
+        self.USER__SELF_REGISTRATION__ENABLED = asbool(
+            self.get_raw_config("user.self_registration.enabled", "False")
+        )
         default_user_custom_properties_path = self.here_macro_replace(
             "%(here)s/tracim_backend/templates/user_custom_properties/default/"
         )
