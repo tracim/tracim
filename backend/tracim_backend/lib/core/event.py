@@ -152,7 +152,7 @@ class EventApi:
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
-            query = query.filter(Event.workspace["workspace_id"].as_integer().in_(workspace_ids))
+            query = query.filter(Event.workspace_id.in_(workspace_ids))
         if related_to_content_ids:
             query = query.filter(
                 or_(
@@ -308,6 +308,7 @@ class EventApi:
             operation=operation,
             entity_subtype=entity_subtype,
             fields=fields,
+            workspace_id=fields.get("workspace", {}).get("workspace_id"),
         )
         context.dbsession.add(event)
         context.pending_events.append(event)
@@ -328,7 +329,7 @@ class EventApi:
             Message.receiver_id == user_id
         )
         workspace_event_ids_query = session.query(Event.event_id).filter(
-            Event.workspace["workspace_id"].as_integer().in_(workspace_ids)
+            Event.workspace_id.in_(workspace_ids)
         )
         if max_messages_count >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
@@ -771,7 +772,7 @@ def _get_members_and_administrators_ids(
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     receiver_ids = set(administrators + workspace_members)
     try:
         receiver_ids.add(event.user["user_id"])
@@ -808,14 +809,14 @@ def _get_workspace_subscription_event_receiver_ids(
     author = event.subscription["author"]["user_id"]
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_managers = role_api.get_workspace_member_ids(
-        event.workspace["workspace_id"], min_role=WorkspaceRoles.WORKSPACE_MANAGER
+        event.workspace_id, min_role=WorkspaceRoles.WORKSPACE_MANAGER
     )
     return set(administrators + workspace_managers + [author])
 
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
 
 
