@@ -7,7 +7,7 @@ import {
 } from 'tracim_frontend_lib'
 import { mergeWithActivityList, addMessageToActivityList } from '../../src/util/activity.js'
 
-import { mockGetContentComments200, mockGenericGetContent400, mockGetContentPath200 } from '../apiMock.js'
+import { mockGetContentComments200, mockGetFileContent400, mockGetContentPath200 } from '../apiMock.js'
 
 const createMessage = (eventId, entityType, coreEventType, subEntityType, fields) => {
   return {
@@ -121,7 +121,7 @@ describe('In activity.js module', () => {
         workspace: workspace
       })
       const mockContentPath = mockGetContentPath200(apiUrl, commentContent.workspace_id, commentContent.content_id, [])
-      const mock = mockGenericGetContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
+      const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
       const resultActivityList = await mergeWithActivityList([message], [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(mockContentPath.isDone()).to.equal(false)
@@ -220,7 +220,7 @@ describe('In activity.js module', () => {
         workspace: workspace
       })
       const mockContentPath = mockGetContentPath200(apiUrl, commentContent.workspace_id, commentContent.content_id, [])
-      const mock = mockGenericGetContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
+      const mock = mockGetFileContent400(apiUrl, fileContent.workspace_id, fileContent.content_id)
       const resultActivityList = await addMessageToActivityList(message, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(mockContentPath.isDone()).to.equal(false)
