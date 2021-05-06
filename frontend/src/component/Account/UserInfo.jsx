@@ -43,7 +43,8 @@ export class UserInfo extends React.Component {
 
         <div className='userinfo__wrapper'>
           <div div className='userinfo__name primaryColorFont' data-cy='userinfo__name'>
-            <span id='popoverFullName'>{`${props.user.publicName}`}
+            <span id='popoverFullName'>
+              {props.user.publicName}
             </span>
             <Popover
               placement='right'
@@ -61,7 +62,8 @@ export class UserInfo extends React.Component {
 
           {props.user.username && (
             <div className='userinfo__username' data-cy='userinfo__username'>
-              <span id='popoverUsername'>{`@${props.user.username}`}
+              <span id='popoverUsername'>
+                {props.user.username}
               </span>
               <Popover
                 placement='right'
