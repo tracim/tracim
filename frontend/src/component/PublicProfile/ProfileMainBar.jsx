@@ -48,8 +48,8 @@ export const ProfileMainBar = props => {
                 <div className='profile__mainBar__info__user__name'>{props.displayedUser.publicName} </div>
                 {props.displayedUser.username && (
                   <div className='profile__mainBar__info__user__username__wrapper'>
-                   <div className='profile__mainBar__info__user__username__separator'> - </div>
-                   <div className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</div>
+                    <div className='profile__mainBar__info__user__username__separator'> - </div>
+                    <div className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</div>
                   </div>
                 )}
               </div>
