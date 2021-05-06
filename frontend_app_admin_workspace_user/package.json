@@ -84,7 +84,8 @@
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
-      "GLOBAL_primaryColor"
+      "GLOBAL_primaryColor",
+      "DOMParser"
     ],
     "parser": "babel-eslint",
     "ignore": []

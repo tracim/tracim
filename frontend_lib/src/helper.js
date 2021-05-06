@@ -789,3 +789,5 @@ export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/a
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
 
 export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
+
+export const htmlToText = (domParser, htmlString) => domParser.parseFromString(htmlString, 'text/html').documentElement.textContent

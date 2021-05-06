@@ -61,7 +61,8 @@ import {
   getAvatarBaseUrl,
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  htmlToText
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -426,5 +427,6 @@ export {
   getHtmlDocTranslated,
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
-  getGenericWorkspaceContent
+  getGenericWorkspaceContent,
+  htmlToText
 }
