@@ -22,7 +22,7 @@ import { newFlashMessage } from '../action-creator.sync.js'
 
 const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 const ACTIVITY_HISTORY_COUNT = 5
-const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
+const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE*3
 
 const makeCancelable = (promise) => {
   let isCanceled = false
