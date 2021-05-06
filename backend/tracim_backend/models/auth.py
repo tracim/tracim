@@ -19,6 +19,7 @@ import uuid
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import synonym
@@ -39,6 +40,13 @@ if TYPE_CHECKING:
     from tracim_backend.models.data import Workspace
     from tracim_backend.models.data import UserRoleInWorkspace
 __all__ = ["User"]
+
+
+class UserCreationType(str, enum.Enum):
+    ADMIN = "admin"
+    INVITATION = "invitation"
+    REGISTER = "register"
+    CLI = "cli"
 
 
 class AuthType(enum.Enum):
@@ -141,6 +149,10 @@ class User(TrashableMixin, DeclarativeBase):
     cropped_avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cover = Column(TracimUploadedFileField, unique=False, nullable=True)
     cropped_cover = Column(TracimUploadedFileField, unique=False, nullable=True)
+    creation_author_id = Column(
+        Integer, ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
+    )
+    creation_type = Column(Enum(UserCreationType), nullable=True)
 
     @hybrid_property
     def email_address(self):
