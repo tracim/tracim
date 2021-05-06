@@ -34,6 +34,7 @@ from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UserImageNotFound
 from tracim_backend.exceptions import UsernameAlreadyExists
+from tracim_backend.exceptions import UserSelfRegistrationDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
@@ -418,6 +419,40 @@ class UserController(Controller):
             user,
             creation_type=UserCreationType.ADMIN,
             creation_author_id=request.current_user.user_id,
+        )
+        uapi.execute_created_user_actions(user)
+        return uapi.get_user_with_context(user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserSelfRegistrationDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.input_body(UserCreationSchema())
+    @hapic.output_body(UserSchema())
+    def register_user(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Register a new user (this is a public endpoint)
+        """
+        if not request.app_config.USER__SELF_REGISTRATION__ENABLED:
+            raise UserSelfRegistrationDisabledException("Self registration is disabled")
+        uapi = UserApi(
+            current_user=None, session=request.dbsession, config=request.app_config  # User
+        )
+        user = uapi.create_user(
+            auth_type=AuthType.UNKNOWN,
+            email=hapic_data.body.email,
+            password=hapic_data.body.password,
+            timezone=hapic_data.body.timezone,
+            lang=hapic_data.body.lang,
+            name=hapic_data.body.public_name,
+            username=hapic_data.body.username,
+            do_save=True,
+            do_notify=False,  # TODO: REMOVE THIS WHEN POSSIBLE
+        )
+        uapi.add_user_creation_info(
+            user, creation_type=UserCreationType.REGISTER, creation_author_id=user.user_id,
         )
         uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
@@ -1336,6 +1371,10 @@ class UserController(Controller):
         # create user
         configurator.add_route("create_user", "/users", request_method="POST")
         configurator.add_view(self.create_user, route_name="create_user")
+
+        # register user (public endpoint)
+        configurator.add_route("register_user", "/users/register", request_method="POST")
+        configurator.add_view(self.register_user, route_name="register_user")
 
         # enable user
         configurator.add_route(

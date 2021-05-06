@@ -502,6 +502,44 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         return UserAllowedSpace(**data)
 
 
+class UserRegistrationSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
+    )
+    username = String(
+        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
+    )
+    password = String(
+        example="8QLa$<w",
+        required=True,
+        validate=user_password_validator,
+        allow_none=True,
+        default=None,
+    )
+    timezone = StrippedString(
+        description=FIELD_TIMEZONE_DESC,
+        example="Europe/Paris",
+        required=False,
+        default="",
+        validate=user_timezone_validator,
+    )
+    public_name = StrippedString(
+        example="John Doe", required=True, default=None, validate=user_public_name_validator
+    )
+    lang = StrippedString(
+        description=FIELD_LANG_DESC,
+        example="en",
+        required=False,
+        validate=user_lang_validator,
+        allow_none=True,
+        default=None,
+    )
+
+    @post_load
+    def register_user(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserCreation(**data)
+
+
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
@@ -532,10 +570,7 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe",
-        required=False,
-        default=None,
-        # validate=user_public_name_validator
+        example="John Doe", required=False, default=None, validate=user_public_name_validator
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
