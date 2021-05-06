@@ -16,5 +16,7 @@ describe('App Gallery', function () {
     cy.get('.gallery__action__button').contains('Lecture')
     cy.changeLanguage('pt')
     cy.get('.gallery__action__button').contains('Reproduzir')
+    cy.changeLanguage('de')
+    cy.get('.gallery__action__button').contains('Abspielen')
   })
 })

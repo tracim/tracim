@@ -46,5 +46,6 @@
   "Username": "Username",
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
   "Please enter a name, an email, a password and select a type": "Please enter a name, an email, a password and select a type",
-  "Choose the user's type": "Choose the user's type"
+  "Choose the user's type": "Choose the user's type",
+  "Type": "Type"
 }

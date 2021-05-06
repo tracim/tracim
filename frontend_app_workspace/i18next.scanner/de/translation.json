@@ -1,0 +1,19 @@
+{
+  "Back": "Zurück",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Seien Sie vorsichtig, wir empfehlen nicht, mehr als zwei Bereichniveaus zu erstellen, weil dadurch die Informationen viel weniger zugänglich werden.",
+  "Create": "Erstellen",
+  "Default role:": "Standard-Rolle:",
+  "Error while getting user spaces": "Fehler beim Abrufen von Benutzerbereichen",
+  "Space's name": "Name des Bereichs",
+  "New space": "Neuer Bereich",
+  "A space with that name already exists": "Ein Bereich mit diesem Namen existiert bereits",
+  "Error while saving new space": "Fehler beim Speichern von neuem Bereich",
+  "None": "Kein",
+  "Next": "Weiter",
+  "Parent space:": "Ursprünglicher Bereich:",
+  "Some input are invalid": "Einige Eingaben sind ungültig",
+  "Space's name:": "Name des Bereichs:",
+  "Space's type:": "Art des Bereichs:",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Dies ist die Rolle, die Mitglieder standardmäßig haben, wenn sie Ihrem Bereich beitreten (nur für offene Bereiche und Bereiche auf Anfrage).",
+  "You cannot create anymore space": "Sie können keinen weiteren Bereich erzeugen"
+}

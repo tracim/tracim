@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt
+# Available parameter: en, fr, pt, de
 ; default_lang = en
 
 ### Apps ###

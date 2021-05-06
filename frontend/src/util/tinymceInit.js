@@ -62,6 +62,8 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
           return 'fr_FR'
         case 'pt':
           return 'pt_PT'
+        case 'de':
+          return 'de'
         default:
           return lang
       }
