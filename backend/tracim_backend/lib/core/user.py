@@ -78,6 +78,7 @@ from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -889,6 +890,16 @@ class UserApi(object):
                 "email modification disallowed".format(user.login, user.auth_type)
             )
         return True
+
+    def add_user_creation_info(
+        self,
+        user: User,
+        creation_type: typing.Optional[UserCreationType] = None,
+        creation_author_id: typing.Optional[int] = None,
+    ) -> User:
+        user.creation_type = creation_type
+        user.creation_author_id = creation_author_id
+        return user
 
     def create_user(
         self,

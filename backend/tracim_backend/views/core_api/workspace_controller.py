@@ -45,6 +45,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
@@ -412,6 +413,11 @@ class WorkspaceController(Controller):
                     password=None,
                     do_notify=False,
                 )
+            uapi.add_user_creation_info(
+                user,
+                creation_type=UserCreationType.INVITATION,
+                creation_author_id=request.current_user.user_id,
+            )
             uapi.execute_created_user_actions(user)
             newly_created = True
 

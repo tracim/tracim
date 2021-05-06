@@ -56,6 +56,7 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
@@ -412,6 +413,11 @@ class UserController(Controller):
             allowed_space=hapic_data.body.allowed_space,
             profile=profile,
             do_save=True,
+        )
+        uapi.add_user_creation_info(
+            user,
+            creation_type=UserCreationType.ADMIN,
+            creation_author_id=request.current_user.user_id,
         )
         uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
