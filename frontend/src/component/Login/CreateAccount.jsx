@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { withRouter, Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
@@ -63,3 +64,8 @@ const CreateAccount = props => {
 }
 
 export default withRouter(translate()((CreateAccount)))
+
+CreateAccount.propTypes = {
+  onClickCreateAccount: PropTypes.func.isRequired,
+  onClickSignIn: PropTypes.func.isRequired
+}

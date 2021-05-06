@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -10,7 +11,7 @@ const SignIn = props => {
     <div className='loginpage__main__wrapper'>
       <div className='loginpage__main__header'>
         <h1 className='loginpage__main__header__title'>{props.t('Sign in')}</h1>
-        {true && ( // props.system.config.user__self_registration__enabled && (
+        {props.system.config.user__self_registration__enabled && (
           <IconButton
             customClass='loginpage__main__header__createButton'
             text={props.t('Create account')}
@@ -67,3 +68,7 @@ const SignIn = props => {
 
 const mapStateToProps = ({ system }) => ({ system })
 export default withRouter(connect(mapStateToProps)(translate()(SignIn)))
+
+SignIn.propTypes = {
+  onClickSubmit: PropTypes.func.isRequired
+}
