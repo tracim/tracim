@@ -17,8 +17,10 @@
   &__name
     font-size fontSizeTitle
     font-weight bold
-  &__email
+  &__email > a
     color fontColor
+    &:hover
+      text-decoration underline
 
 @media (max-width: max-xs)
   .hamburger-box

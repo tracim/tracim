@@ -83,9 +83,9 @@ export class UserInfo extends React.Component {
           {props.user.email && (
             <div className='userinfo__email d-block mt-3' data-cy='userinfo__email'>
               <i
-                className='fas fa-envelope mr-2'
+                className='far fa-envelope mr-2'
               />
-              <a data-cy='userinfo__email__mailto' href={`mailto:${props.user.email}`}>
+              <a href={`mailto:${props.user.email}`} data-cy='userinfo__email__mailto'>
                 {props.user.email}
               </a>
             </div>
