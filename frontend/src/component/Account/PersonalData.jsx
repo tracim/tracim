@@ -3,7 +3,11 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { ALLOWED_CHARACTERS_USERNAME } from 'tracim_frontend_lib'
+import {
+  ALLOWED_CHARACTERS_USERNAME,
+  IconButton
+} from 'tracim_frontend_lib'
+
 import {
   editableUserAuthTypeList
 } from '../../util/helper.js'
@@ -63,25 +67,31 @@ export class PersonalData extends React.Component {
 
         <form className='personaldata__form'>
           <div className='d-flex align-items-center flex-wrap mb-4'>
-            <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-              type='text'
-              data-cy='personaldata__form__txtinput__fullname'
-              placeholder={props.t('New full name')}
-              value={state.newPublicName}
-              onChange={this.handleChangePublicName}
-            />
+            <label>
+              {props.t('New full name:')}
+              <input
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                type='text'
+                data-cy='personaldata__form__txtinput__fullname'
+                placeholder={props.userPublicName}
+                value={state.newPublicName}
+                onChange={this.handleChangePublicName}
+              />
+            </label>
           </div>
 
           <div>
-            <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-              type='text'
-              data-cy='personaldata__form__txtinput__username'
-              placeholder={props.t('New username')}
-              value={state.newUsername}
-              onChange={this.handleChangeUserName}
-            />
+            <label>
+              {props.t('New username:')}
+              <input
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                type='text'
+                data-cy='personaldata__form__txtinput__username'
+                placeholder={props.userUsername}
+                value={state.newUsername}
+                onChange={this.handleChangeUserName}
+              />
+            </label>
             {!props.isUsernameValid && (
               <div className='personaldata__form__txtinput__msgerror'>
                 <i className='personaldata__form__txtinput__msgerror__icon fas fa-times' />
@@ -97,38 +107,44 @@ export class PersonalData extends React.Component {
 
           {editableUserAuthTypeList.includes(props.userAuthType) && (
             <div className='d-flex align-items-center flex-wrap mb-4 mt-4'>
-              <input
-                className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
-                type='email'
-                data-cy='personaldata__form__txtinput__email'
-                placeholder={props.t('New email')}
-                value={state.newEmail}
-                onChange={this.handleChangeEmail}
-              />
+              <label>
+                {props.t('New email:')}
+                <input
+                  className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
+                  type='email'
+                  data-cy='personaldata__form__txtinput__email'
+                  placeholder={props.userEmail}
+                  value={state.newEmail}
+                  onChange={this.handleChangeEmail}
+                />
+              </label>
             </div>
           )}
 
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div className='align-items-center flex-wrap mb-4'>
-              <input
-                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
-                type='password'
-                placeholder={props.displayAdminInfo ? props.t("Administrator's password") : props.t('Type your password')}
-                value={state.checkPassword}
-                onChange={this.handleChangeCheckPassword}
-                disabled={state.newEmail === '' && state.newUsername === ''}
-              />
+              <label>
+                {props.displayAdminInfo ? props.t("Administrator's password:") : props.t('Type your password:')}
+                <input
+                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                  type='password'
+                  value={state.checkPassword}
+                  onChange={this.handleChangeCheckPassword}
+                  disabled={state.newEmail === '' && state.newUsername === ''}
+                />
+              </label>
             </div>
           )}
 
-          <button
-            type='button'
-            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
-            onClick={this.handleClickSubmit}
+          <IconButton
+            customClass='personaldata__form__button'
+            intent='secondary'
             disabled={!props.isUsernameValid}
-          >
-            {props.t('Validate')}
-          </button>
+            onClick={this.handleClickSubmit}
+            icon='fas fa-check'
+            text={props.t('Validate')}
+            dataCy='IconButton_PersonalData'
+          />
         </form>
       </div>
     )
@@ -136,6 +152,9 @@ export class PersonalData extends React.Component {
 }
 
 PersonalData.propTypes = {
+  userEmail: PropTypes.string,
+  userUsername: PropTypes.string,
+  userPublicName: PropTypes.string,
   userAuthType: PropTypes.string,
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
@@ -144,6 +163,9 @@ PersonalData.propTypes = {
 }
 
 PersonalData.defaultProps = {
+  userEmail: '',
+  userUsername: '',
+  userPublicName: '',
   isUsernameValid: true,
   userAuthType: '',
   onClickSubmit: () => {},
