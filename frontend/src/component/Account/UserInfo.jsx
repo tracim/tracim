@@ -63,7 +63,7 @@ export class UserInfo extends React.Component {
           {props.user.username && (
             <div className='userinfo__username' data-cy='userinfo__username'>
               <span id='popoverUsername'>
-                {props.user.username}
+                @{props.user.username}
               </span>
               <Popover
                 placement='right'
