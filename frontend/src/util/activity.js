@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getGenericWorkspaceContent,
+  getWorkspaceContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -51,10 +51,14 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     // INFO - SG - 2021-04-16
     // We have to get the parent content as comments shall produce an activity
     // for it and not for the comment.
-    const response = await handleFetchResult(await getGenericWorkspaceContent(
+    const parentContentType = content.parent_content_type
+    const parentId = content.parent_id
+    if (!(parentContentType && parentId)) return null
+    const response = await handleFetchResult(await getWorkspaceContent(
       apiUrl,
       newestMessage.fields.workspace.workspace_id,
-      content.parent_id
+      `${parentContentType}s`,
+      parentId
     ))
     if (!response.apiResponse.ok) return null
     content = response.body

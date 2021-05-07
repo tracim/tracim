@@ -153,11 +153,6 @@ export class PublicProfile extends React.Component {
     const { props, state } = this
 
     props.dispatch(setBreadcrumbs([{
-      link: PAGE.HOME,
-      type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Home'),
-      isALink: true
-    }, {
       link: PAGE.PUBLIC_PROFILE,
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t("{{user}}'s profile", { user: state.displayedUser.publicName }),

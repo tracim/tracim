@@ -198,7 +198,10 @@ class TestEventReceiver:
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
-            entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.WORKSPACE,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -234,7 +237,10 @@ class TestEventReceiver:
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
-            entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.WORKSPACE,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -271,7 +277,10 @@ class TestEventReceiver:
             Event.WORKSPACE_FIELD: workspace_dict,
         }
         event = Event(
-            entity_type=EntityType.WORKSPACE, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.WORKSPACE,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_dict.get("workspace_id"),
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -308,7 +317,10 @@ class TestEventReceiver:
             Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
-            entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.WORKSPACE_MEMBER,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -351,7 +363,10 @@ class TestEventReceiver:
             Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
-            entity_type=EntityType.WORKSPACE_MEMBER, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.WORKSPACE_MEMBER,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -395,7 +410,10 @@ class TestEventReceiver:
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
         }
         event = Event(
-            entity_type=EntityType.CONTENT, operation=OperationType.MODIFIED, fields=fields
+            entity_type=EntityType.CONTENT,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -468,6 +486,7 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
             operation=OperationType.CREATED,
             fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
@@ -542,6 +561,7 @@ class TestEventReceiver:
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
             operation=OperationType.MODIFIED,
             fields=fields,
+            workspace_id=workspace_in_context.workspace_id,
         )
 
         receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
