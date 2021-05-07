@@ -149,11 +149,9 @@ class CreateUserCommand(UserCommand):
                 lang=parsed_args.lang,
                 allowed_space=parsed_args.allowed_space,
                 profile=profile,
+                creation_type=UserCreationType.CLI,
                 do_save=True,
                 do_notify=parsed_args.send_email,
-            )
-            self._user_api.add_user_creation_info(
-                user, creation_type=UserCreationType.CLI, creation_author_id=None,
             )
             self._user_api.execute_created_user_actions(user)
         except TracimException as exc:

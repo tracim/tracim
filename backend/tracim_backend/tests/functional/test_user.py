@@ -3132,7 +3132,7 @@ class TestUserEndpointWithRegistrationActive(object):
     Tests for GET /api/users/{user_id}
     """
 
-    def test_api__register_user__ok_200__nominal_case(self, web_testapp, user_api_factory):
+    def test_api__register_user__ok_200__nominal_case(self, web_testapp, user_api_factory, mailhog):
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -3153,6 +3153,8 @@ class TestUserEndpointWithRegistrationActive(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 134217728
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 1
 
     def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
         params = {

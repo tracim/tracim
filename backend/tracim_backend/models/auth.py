@@ -22,6 +22,8 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -151,6 +153,9 @@ class User(TrashableMixin, DeclarativeBase):
     cropped_cover = Column(TracimUploadedFileField, unique=False, nullable=True)
     creation_author_id = Column(
         Integer, ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
+    )
+    created_users = relationship(
+        "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
 

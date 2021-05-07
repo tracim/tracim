@@ -399,6 +399,8 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
@@ -412,12 +414,9 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=None,
                     do_notify=False,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
-            uapi.add_user_creation_info(
-                user,
-                creation_type=UserCreationType.INVITATION,
-                creation_author_id=request.current_user.user_id,
-            )
             uapi.execute_created_user_actions(user)
             newly_created = True
 

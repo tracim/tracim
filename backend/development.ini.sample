@@ -357,7 +357,8 @@ api.key = %(basic_setup.api_key)s
 ; user.reset_password.token_lifetime = 900
 ## Default profile of created user, valid values are: users, trusted-users, administrators
 ; user.default_profile = users
-## Allow external people to register themself publicly to the server.
+## Allow people to register/create an account themselves without authentication.
+## The profile of those users will be user.default_profile
 ; user.self_registration.enabled = False
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about

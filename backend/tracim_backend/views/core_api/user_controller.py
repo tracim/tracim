@@ -412,13 +412,10 @@ class UserController(Controller):
             username=hapic_data.body.username,
             do_notify=hapic_data.body.email_notification,
             allowed_space=hapic_data.body.allowed_space,
+            creation_type=UserCreationType.ADMIN,
+            creation_author=request.current_user,
             profile=profile,
             do_save=True,
-        )
-        uapi.add_user_creation_info(
-            user,
-            creation_type=UserCreationType.ADMIN,
-            creation_author_id=request.current_user.user_id,
         )
         uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
@@ -440,6 +437,11 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=None, session=request.dbsession, config=request.app_config  # User
         )
+        do_notify = (
+            request.app_config.EMAIL__NOTIFICATION__ACTIVATED
+            and request.app_config.NEW_USER__INVITATION__DO_NOTIFY
+            and request.app_config.JOBS__PROCESSING_MODE == request.app_config.CST.SYNC
+        )
         user = uapi.create_user(
             auth_type=AuthType.UNKNOWN,
             email=hapic_data.body.email,
@@ -448,11 +450,9 @@ class UserController(Controller):
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
             username=hapic_data.body.username,
+            creation_type=UserCreationType.REGISTER,
             do_save=True,
-            do_notify=False,  # TODO: REMOVE THIS WHEN POSSIBLE
-        )
-        uapi.add_user_creation_info(
-            user, creation_type=UserCreationType.REGISTER, creation_author_id=user.user_id,
+            do_notify=do_notify,
         )
         uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)

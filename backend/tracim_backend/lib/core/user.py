@@ -891,16 +891,6 @@ class UserApi(object):
             )
         return True
 
-    def add_user_creation_info(
-        self,
-        user: User,
-        creation_type: typing.Optional[UserCreationType] = None,
-        creation_author_id: typing.Optional[int] = None,
-    ) -> User:
-        user.creation_type = creation_type
-        user.creation_author_id = creation_author_id
-        return user
-
     def create_user(
         self,
         email: typing.Optional[str] = None,
@@ -912,6 +902,8 @@ class UserApi(object):
         auth_type: AuthType = AuthType.UNKNOWN,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
+        creation_type: typing.Optional[UserCreationType] = None,
+        creation_author: typing.Optional[User] = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> User:
@@ -934,6 +926,11 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
+        new_user.creation_type = creation_type
+        if creation_type == UserCreationType.REGISTER and not creation_author:
+            new_user.creation_author = new_user
+        else:
+            new_user.creation_author = creation_author
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
         # new auth system
