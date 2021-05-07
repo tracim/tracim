@@ -187,7 +187,13 @@ class Login extends React.Component {
     }))
 
     switch (fetchPostUserRegister.status) {
-      case 200: this.handleClickSignIn(event); break
+      case 200:
+        this.handleClickSignIn({
+          login: login,
+          password: password
+
+        })
+        break
       case 400:
         switch (fetchPostUserRegister.json.code) {
           case 2001: props.dispatch(newFlashMessage(props.t('Invalid email'), 'warning')); break
@@ -199,12 +205,18 @@ class Login extends React.Component {
     }
   }
 
-  handleClickSignIn = async (event) => {
+  handleClickSignInEvent = async (event) => {
+    event.preventDefault()
+    this.handleClickSignIn({
+      login: event.target.login,
+      password: event.target.password
+    })
+  }
+
+  handleClickSignIn = async (signInObject) => {
     const { props, state } = this
 
-    event.preventDefault()
-
-    const { login, password } = event.target
+    const { login, password } = signInObject
 
     if (login.value === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
@@ -425,7 +437,7 @@ class Login extends React.Component {
           {state.displayedOption === DISPLAY.SIGN_IN && (
             <SignIn
               onClickCreateAccount={() => this.setState({ displayedOption: DISPLAY.CREATE })}
-              onClickSubmit={this.handleClickSignIn}
+              onClickSubmit={this.handleClickSignInEvent}
             />
           )}
 
