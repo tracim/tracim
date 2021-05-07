@@ -52,17 +52,19 @@ export const ProfileMainBar = props => {
       </div>
       {hasUser
         ? (
-          <div className='profile__mainBar__info'>
-            <div className='profile__mainBar__info__user'>
-              {props.displayedUser.publicName}
-              {props.displayedUser.username && (
-                <>
-                  <span className='profile__mainBar__info__user__separator'> - </span>
-                  <span className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</span>
-                </>
-              )}
+          <div className='profile__mainBar__info__wrapper'>
+            <div className='profile__mainBar__info'>
+              <div className='profile__mainBar__info__user'>
+                <div className='profile__mainBar__info__user__name'>{props.displayedUser.publicName} </div>
+                {props.displayedUser.username && (
+                  <div className='profile__mainBar__info__user__username__wrapper'>
+                    <div className='profile__mainBar__info__user__username__separator'> - </div>
+                    <div className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</div>
+                  </div>
+                )}
+              </div>
+              <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
-            <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
           </div>
         )
         : (

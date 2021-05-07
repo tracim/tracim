@@ -9,6 +9,7 @@
   font-size 18px
   &__wrapper
     flex-direction column
+    max-width 100%
   &__avatar
     margin-right 50px
     img
@@ -16,6 +17,11 @@
       height 100px
   &__name
     font-size 22px
+    overflow hidden
+    text-overflow ellipsis
+  &__username
+    overflow hidden
+    text-overflow ellipsis
   &__email
     color fontColor
 
