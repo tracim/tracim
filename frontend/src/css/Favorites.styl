@@ -44,20 +44,22 @@
       width 90px
     &__link
       width 50%
-      &__right
-        border 1px color red
+      border 1px solid blue
+
+.bla
+  border solid 1px red
+  color red
+  //  margin-right 100px
+  flex 1
 
 @media (max-width: max-lg)
   .favoritesHeader
     &__type
       width 50px
   .favorites
-    // &__item__link
-    //   // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
-    //   // 50px == favorite button column width
-    //   width calc(50% - 50px)
-    //   border solid 1px blue
-
+    &__item__link
+      width calc(50% - 50px)
+      border solid 1px blue
 
 @media (max-width: max-md)
   .favoritesHeader

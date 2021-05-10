@@ -47,6 +47,13 @@ const ContentListItem = (props) => {
       customClass={classnames('contentListItem', props.customClass)}
       dataCy={props.dataCy}
     >
+      <Link
+        to={contentAppUrl}
+        className={classnames(
+          'contentListItem__link',
+          { [`${props.customClass}__link`]: props.customClass }
+        )}
+      />
       <ContentType
         contentTypeInfo={props.contentTypeInfo}
         customClass='contentListItem__type'
@@ -67,13 +74,13 @@ const ContentListItem = (props) => {
         lang={props.userLang}
         author={content.lastModifier}
       />
-      <Link
+      {/* <Link
         to={contentAppUrl}
         className={classnames(
-          'contentListItem__link__right',
-          { [`${props.customClass}__link__right`]: props.customClass }
+          'blabla'
         )}
-      >
+      > */}
+      <div className='bla'>
         <div className='contentListItem__information'>
           {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
             <>
@@ -101,8 +108,9 @@ const ContentListItem = (props) => {
             </>
           )}
         </div>
+        {/* </Link> */}
         {props.children}
-      </Link>
+      </div>
     </ListItemWrapper>
   )
 }
