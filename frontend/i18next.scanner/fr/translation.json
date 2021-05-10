@@ -266,13 +266,13 @@
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximum autorisée",
   "Error, the space exceed its maximum size": "Erreur, l'espace dépasse la taille maximum autorisée",
   "Upload impossible, the destination storage capacity has been reached": "Téléversement impossible, la capacité de stockage de la destination a été atteinte",
-  "Public download": "Téléchargement publique",
+  "Public download": "Téléchargement public",
   "Login": "S'identifier",
   "User administration": "Administration d'utilisateur",
   "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "L'identifiant doit être composé de {{minimumCharactersUsername}} à {{maximumCharactersUsername}} caractères",
   "Forgotten password": "Mot de passe perdu",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Le nom complet doit comporter au moins {{minimumCharactersPublicName}} caractères",
-  "Public upload": "Téléversement publique",
+  "Public upload": "Téléversement public",
   "Password reset": "Réinitialisation mot de passe",
   "Your personal data has been changed": "Vos données personnelles ont été modifiées",
   "Your username and your name has been changed": "Votre identifiant et votre nom a été changé",
@@ -470,5 +470,7 @@
   "Repeat new password:": "Répéter le nouveau mot de passe :",
   "Administrator's password:": "Mot de passe administrateur :",
   "Type your password:": "Entrer votre mot de passe :",
-  "Current password:": "Mot de passe actuel :"
+  "Current password:": "Mot de passe actuel :",
+  "Alex Doe": "Alix Martin",
+  "alex.doe@jco.co": "alix.martin@alm.fr"
 }

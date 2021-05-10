@@ -29,6 +29,7 @@ const CreateAccount = props => {
           name='name'
           parentClassName='loginpage__main__form__grouplogin'
           type='text'
+          placeHolder={props.t('Alex Doe')}
           dataCy='loginGroup'
         />
 
@@ -40,6 +41,7 @@ const CreateAccount = props => {
           name='login'
           parentClassName='loginpage__main__form__groupemail'
           type='email'
+          placeHolder={props.t('alex.doe@jco.co')}
           dataCy='emailGroup'
         />
 

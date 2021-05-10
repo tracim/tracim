@@ -470,5 +470,7 @@
   "Repeat new password:": "Repeat new password:",
   "Administrator's password:": "Administrator's password:",
   "Type your password:": "Type your password:",
-  "Current password:": "Current password:"
+  "Current password:": "Current password:",
+  "Alex Doe": "Alex Doe",
+  "alex.doe@jco.co": "alex.doe@jco.co"
 }
