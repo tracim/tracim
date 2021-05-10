@@ -67,42 +67,42 @@ const ContentListItem = (props) => {
         lang={props.userLang}
         author={content.lastModifier}
       />
-
-      <div className='contentListItem__information'>
-        {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
-          <>
-            {commentCountTitle && (
-              <span className='contentListItem__information__comments'>
-                <Icon
-                  icon='fa-fw far fa-comment'
-                  title={commentCountTitle}
-                />
-                <span title={commentCountTitle}>{props.commentsCount}</span>
-              </span>
-            )}
-            <span className='contentListItem__information__status'>
-              <Icon
-                icon={`fa-fw ${statusInfo.faIcon}`}
-                title={props.t(statusInfo.label)}
-                color={statusInfo.hexcolor}
-              />
-              <span
-                title={props.t(statusInfo.label)}
-              >
-                {props.t(statusInfo.label)}
-              </span>
-            </span>
-          </>
-        )}
-      </div>
-      {props.children}
       <Link
         to={contentAppUrl}
         className={classnames(
-          'contentListItem__link',
-          { [`${props.customClass}__link`]: props.customClass }
+          'contentListItem__link__right',
+          { [`${props.customClass}__link__right`]: props.customClass }
         )}
-      />
+      >
+        <div className='contentListItem__information'>
+          {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
+            <>
+              {commentCountTitle && (
+                <span className='contentListItem__information__comments'>
+                  <Icon
+                    icon='fa-fw far fa-comment'
+                    title={commentCountTitle}
+                  />
+                  <span title={commentCountTitle}>{props.commentsCount}</span>
+                </span>
+              )}
+              <span className='contentListItem__information__status'>
+                <Icon
+                  icon={`fa-fw ${statusInfo.faIcon}`}
+                  title={props.t(statusInfo.label)}
+                  color={statusInfo.hexcolor}
+                />
+                <span
+                  title={props.t(statusInfo.label)}
+                >
+                  {props.t(statusInfo.label)}
+                </span>
+              </span>
+            </>
+          )}
+        </div>
+        {props.children}
+      </Link>
     </ListItemWrapper>
   )
 }
