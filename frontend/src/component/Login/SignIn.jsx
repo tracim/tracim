@@ -18,6 +18,7 @@ const SignIn = props => {
             icon='fas fa-user-plus'
             onClick={props.onClickCreateAccount}
             intent='secondary'
+            dataCy='showCreateAccountFormButton'
           />
         )}
       </div>
@@ -60,6 +61,7 @@ const SignIn = props => {
           mode='light'
           text={props.t('Connection')}
           type='submit'
+          dataCy='connectButton'
         />
       </form>
     </div>

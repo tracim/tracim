@@ -14,6 +14,7 @@ const CreateAccount = props => {
         <Link
           onClick={props.onClickSignIn}
           to={PAGE.LOGIN}
+          data-cy='signInLink'
         >
           {props.t('Sign in')}
         </Link>
@@ -28,6 +29,7 @@ const CreateAccount = props => {
           name='name'
           parentClassName='loginpage__main__form__grouplogin'
           type='text'
+          dataCy='loginGroup'
         />
 
         <div>{props.t('Email:')}</div>
@@ -38,6 +40,7 @@ const CreateAccount = props => {
           name='login'
           parentClassName='loginpage__main__form__groupemail'
           type='email'
+          dataCy='emailGroup'
         />
 
         <div>{props.t('Password:')}</div>
@@ -48,6 +51,7 @@ const CreateAccount = props => {
           name='password'
           parentClassName='loginpage__main__form__grouppw'
           type='password'
+          dataCy='passwordGroup'
         />
 
         <IconButton
@@ -57,6 +61,7 @@ const CreateAccount = props => {
           mode='light'
           text={props.t('Create account')}
           type='submit'
+          dataCy='createAccountButton'
         />
       </form>
     </div>
