@@ -99,6 +99,7 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
+      paste_data_images: true,
       height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
