@@ -1,5 +1,6 @@
 import { PAGES } from '../../support/urls_commands.js'
 import defaultAdmin from '../../fixtures/defaultAdmin.json'
+import user from '../../fixtures/defaultAdmin.json'
 
 const threadTitle = 'Title'
 const htmlDocTitle = 'Note'
@@ -87,6 +88,12 @@ describe('Favorites', function () {
       cy.get('[data-cy=favoriteButton] > .fa-fw.far.fa-star')
       cy.get('[data-cy=favoriteButton]').click()
       cy.get('[data-cy=favoriteButton] > .fa-fw.fas.fa-star')
+    })
+
+    it('should redirect to users profile if click at author name', () => {
+      // cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+      cy.get('.timedEvent__author').first().click()
+      cy.url().should('include', URLS[PAGES.PROFILE]({ userId: user.user_id }))
     })
   })
 })

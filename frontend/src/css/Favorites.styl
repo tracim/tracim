@@ -44,7 +44,9 @@
       text-align center
       width 90px
     &__link
-      width 50%
+      // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
+      // 90px == favorite button column width
+      width calc(100% - 90px)
 
 @media (max-width: max-lg)
   .favoritesHeader
@@ -52,9 +54,9 @@
       width 50px
   .favorites
     &__item__link
-    // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
-    // 50px == favorite button column width
-      width calc(50% - 50px)
+      // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
+      // 50px == favorite button column width
+      width calc(100% - 50px)
 
 @media (max-width: max-md)
   .favoritesHeader
