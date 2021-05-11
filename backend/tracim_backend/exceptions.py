@@ -94,6 +94,10 @@ class AlreadyRunningDaemon(DaemonException):
     pass
 
 
+class UserSelfRegistrationDisabledException(TracimException):
+    error_code = ErrorCode.USER_SELF_REGISTRATION_DISABLED
+
+
 class WorkspaceAgendaDisabledException(TracimException):
     error_code = ErrorCode.WORKSPACE_AGENDA_DISABLED
 

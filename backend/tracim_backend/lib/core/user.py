@@ -78,6 +78,7 @@ from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -901,6 +902,8 @@ class UserApi(object):
         auth_type: AuthType = AuthType.UNKNOWN,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
+        creation_type: typing.Optional[UserCreationType] = None,
+        creation_author: typing.Optional[User] = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> User:
@@ -923,6 +926,11 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
+        new_user.creation_type = creation_type
+        if creation_type == UserCreationType.REGISTER and not creation_author:
+            new_user.creation_author = new_user
+        else:
+            new_user.creation_author = creation_author
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
         # new auth system

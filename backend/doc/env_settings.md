@@ -35,6 +35,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_USER__SELF_REGISTRATION__ENABLED                                   | user.self_registration.enabled                                 | USER__SELF_REGISTRATION__ENABLED                                   |
 | TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     | user.custom_properties.json_schema_file_path                   | USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     |
 | TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       | user.custom_properties.ui_schema_file_path                     | USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       |
 | TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     | user.custom_properties.translations_dir_path                   | USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     |
