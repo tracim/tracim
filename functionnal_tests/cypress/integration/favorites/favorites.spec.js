@@ -1,4 +1,4 @@
-import { PAGES } from '../../support/urls_commands.js'
+import { PAGES, URLS } from '../../support/urls_commands.js'
 import defaultAdmin from '../../fixtures/defaultAdmin.json'
 import user from '../../fixtures/defaultAdmin.json'
 
@@ -62,21 +62,27 @@ describe('Favorites', function () {
       cy.get('[data-cy=favorites__item]').first().click()
       cy.location('pathname')
         .should('equal', `/ui/workspaces/${workspaceId}/contents/file/${fileContentId}`)
-    })
-  })
 
-  describe('Favorite button in apps', () => {
-    beforeEach(() => {
-      cy.loginAs('administrators')
-      cy.visitPage({
-        pageName: PAGES.CONTENT_OPEN,
-        params: {
-          contentId: fileContentId,
-          contentType: 'file',
-          workspaceId
-        }
+      })
+
+      it('should redirect to users profile if click at author name', () => {
+        cy.get('.timedEvent__author').first().click()
+        cy.url().should('include', URLS[PAGES.PROFILE]({ userId: user.user_id }))
       })
     })
+
+    describe('Favorite button in apps', () => {
+      beforeEach(() => {
+        cy.loginAs('administrators')
+        cy.visitPage({
+          pageName: PAGES.CONTENT_OPEN,
+          params: {
+            contentId: fileContentId,
+            contentType: 'file',
+            workspaceId
+          }
+        })
+      })
 
     it('clicking on the favorite button should remove the content from favorites', () => {
       cy.get('[data-cy=favoriteButton] > .fa-fw.fas.fa-star')
@@ -90,10 +96,5 @@ describe('Favorites', function () {
       cy.get('[data-cy=favoriteButton] > .fa-fw.fas.fa-star')
     })
 
-    it('should redirect to users profile if click at author name', () => {
-      // cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
-      cy.get('.timedEvent__author').first().click()
-      cy.url().should('include', URLS[PAGES.PROFILE]({ userId: user.user_id }))
-    })
   })
 })
