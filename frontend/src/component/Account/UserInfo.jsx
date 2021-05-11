@@ -32,7 +32,7 @@ export class UserInfo extends React.Component {
     const { props } = this
 
     return (
-      <div className='userinfo' data-cy='userinfo'>
+      <div className='userinfo mr-5 ml-5 mb-5' data-cy='userinfo'>
         <div className='userinfo__avatar' data-cy='userinfo__avatar'>
           <Avatar
             size={AVATAR_SIZE.BIG}
@@ -42,7 +42,7 @@ export class UserInfo extends React.Component {
         </div>
 
         <div className='userinfo__wrapper'>
-          <div div className='userinfo__name' data-cy='userinfo__name'>
+          <div div className='userinfo__name primaryColorFont' data-cy='userinfo__name'>
             <span id='popoverFullName'>
               {props.user.publicName}
             </span>
@@ -63,7 +63,7 @@ export class UserInfo extends React.Component {
           {props.user.username && (
             <div className='userinfo__username' data-cy='userinfo__username'>
               <span id='popoverUsername'>
-                @{props.user.username}
+                {`@${props.user.username}`}
               </span>
               <Popover
                 placement='right'
