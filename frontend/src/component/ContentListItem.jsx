@@ -74,43 +74,35 @@ const ContentListItem = (props) => {
         lang={props.userLang}
         author={content.lastModifier}
       />
-      {/* <Link
-        to={contentAppUrl}
-        className={classnames(
-          'blabla'
-        )}
-      > */}
-      <div className='bla'>
-        <div className='contentListItem__information'>
-          {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
-            <>
-              {commentCountTitle && (
-                <span className='contentListItem__information__comments'>
-                  <Icon
-                    icon='fa-fw far fa-comment'
-                    title={commentCountTitle}
-                  />
-                  <span title={commentCountTitle}>{props.commentsCount}</span>
-                </span>
-              )}
-              <span className='contentListItem__information__status'>
+
+      <div className='contentListItem__information'>
+        {props.contentTypeInfo.slug !== CONTENT_TYPE.FOLDER && (
+          <>
+            {commentCountTitle && (
+              <span className='contentListItem__information__comments'>
                 <Icon
-                  icon={`fa-fw ${statusInfo.faIcon}`}
-                  title={props.t(statusInfo.label)}
-                  color={statusInfo.hexcolor}
+                  icon='fa-fw far fa-comment'
+                  title={commentCountTitle}
                 />
-                <span
-                  title={props.t(statusInfo.label)}
-                >
-                  {props.t(statusInfo.label)}
-                </span>
+                <span title={commentCountTitle}>{props.commentsCount}</span>
               </span>
-            </>
-          )}
-        </div>
-        {/* </Link> */}
-        {props.children}
+            )}
+            <span className='contentListItem__information__status'>
+              <Icon
+                icon={`fa-fw ${statusInfo.faIcon}`}
+                title={props.t(statusInfo.label)}
+                color={statusInfo.hexcolor}
+              />
+              <span
+                title={props.t(statusInfo.label)}
+              >
+                {props.t(statusInfo.label)}
+              </span>
+            </span>
+          </>
+        )}
       </div>
+      {props.children}
     </ListItemWrapper>
   )
 }
