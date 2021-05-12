@@ -3,7 +3,10 @@
 .profileNavigation
   cursor pointer
   color fontColor
-  z-index 1
+  // MB - 12/05/2021 - the z-index is used for nesting the link into another, on the favorites page. We already used a z-index: 1 in favorites.
+  // A better solution should be found to avoid nesting links and to harmonize with the advanced searchbar
+  // see this ticket https://github.com/tracim/tracim/issues/4232
+  z-index 2
   &:hover
     color fontColor
   & span:hover
