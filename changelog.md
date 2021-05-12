@@ -2,7 +2,7 @@
 
 ### New Features
 
-- The color of the sidebar in color.json can be configured
+- The color of the sidebar can be configured in color.json
 - Terms and conditions validation are displayed when a user signs in for the first time
 - Documentation was added about the usage of env_settings.md and branding.md
 - A user can now create a public account
