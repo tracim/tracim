@@ -2,17 +2,12 @@
 
 ### New Features
 
-- Recent activities display faster
-- HTML code is displayed as text in the description of join space screen and the admin space screens
-- Better styling in the public profile page (some margin at the bottom, add missing home icon, handle long name/username)
-- Update pushpin's repository url
-- Update preview-generator version
-- Fix errors with pushpin version 1.30
-- The color(s) of the sidebar in color.json has been configured
+- The color of the sidebar in color.json can be configured
 - Terms and conditions validation are displayed when a user signs in for the first time
-- The space advanced parameters popup opens faster when an image is included in the space description
-- The gallery button in the content list page is only displayed when it is enabled
 - Documentation was added about the usage of env_settings.md and branding.md
+- A user can now create a public account
+- German translation is available
+- The user account interface uses explicit placeholders and labels for guidance
 
 
 ### Fixed Issues
