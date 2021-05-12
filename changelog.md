@@ -6,7 +6,7 @@
 - Terms and conditions validation are displayed when a user signs in for the first time
 - env_settings.md and branding.md have been documented
 - A user can now create a public account
-- German translation is available
+- The user interface is now available in German
 - The user account interface uses explicit placeholders and labels for guidance
 
 
