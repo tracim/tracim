@@ -3,7 +3,7 @@
 ### New Features
 
 - The color of the sidebar can be configured in color.json
-- Terms and conditions validation are displayed when a user signs in for the first time
+- Terms and conditions are displayed when a user signs in for the first time
 - env_settings.md and branding.md have been documented
 - A user can now create a public account
 - The user interface is now available in German
