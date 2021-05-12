@@ -339,10 +339,19 @@ class EventApi:
         # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
         # mysql/mariadb doesn't support limit operator in subquery
         workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
+
+        # INFO - S.G - 2021-05-12 - Do not create messages for pending events
+        # as messages for those will be handled by EventPublisher.
+        # This avoids to create twice the same Message() which causes an integrity error.
+        pending_event_ids = [
+            event.event_id for event in session.context.pending_events if event.event_id is not None
+        ]
+
         event_query = (
             session.query(Event)
             .filter(Event.event_id.in_(workspace_event_ids))
-            .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(pending_event_ids))
         )
         messages = []
         for event in event_query:
