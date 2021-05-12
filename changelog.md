@@ -12,22 +12,18 @@
 
 ### Fixed Issues
 
-Frontend: [#4555](https://github.com/tracim/tracim/issues/4555)
-[#3786](https://github.com/tracim/tracim/issues/3786)
-[#4500](https://github.com/tracim/tracim/issues/4500)
+Frontend: [#3786](https://github.com/tracim/tracim/issues/3786)
 [#4495](https://github.com/tracim/tracim/issues/4495)
 [#4591](https://github.com/tracim/tracim/issues/4591)
 [#4521](https://github.com/tracim/tracim/issues/4521)
-Frontend/Backend: [#4594](https://github.com/tracim/tracim/issues/4594)
-[#4590](https://github.com/tracim/tracim/issues/4590)
-[#4589](https://github.com/tracim/tracim/issues/4589)
+[#3899](https://github.com/tracim/tracim/issues/3899)
+Frontend/Backend: [#4590](https://github.com/tracim/tracim/issues/4590)
 [#4539](https://github.com/tracim/tracim/issues/4539)
-[#4596](https://github.com/tracim/tracim/issues/4596)
 [#4557](https://github.com/tracim/tracim/issues/4557)
 [#4586](https://github.com/tracim/tracim/issues/4586)
-[#4171](https://github.com/tracim/tracim/issues/4171)
 Backend: [#4587](https://github.com/tracim/tracim/issues/4587)
 [#3911](https://github.com/tracim/tracim/issues/3911)
+[#4632](https://github.com/tracim/tracim/issues/4632)
 Docker: [#4603](https://github.com/tracim/tracim/issues/4603)
 Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 
@@ -37,6 +33,8 @@ Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 - An alternative target language can be chosen for content and comment translation
 - Update pushpin's version
 - Update preview-generator version
+- Change of the graphic charter (tracim logo, standard image for login page)
+
 
 # 3.8.0 / 2021-04-27
 
