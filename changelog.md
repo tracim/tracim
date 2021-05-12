@@ -34,10 +34,9 @@ Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 
 ### Breaking/Important change
 
-- A user can now create a public account
-- German translation is available
-- The user account interface uses explicit placeholders and labels for guidance
 - An alternative target language can be chosen for content and comment translation
+- Update pushpin's version
+- Update preview-generator version
 
 # 3.8.0 / 2021-04-27
 
