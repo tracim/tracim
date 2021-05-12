@@ -18,6 +18,10 @@
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
+    <!-- Apple icons -->
+    <link rel="apple-touch-icon" href="/assets/images/wa-tracim-logo-180x180.png">
+    <link rel="mask-icon" href="/assets/images/safari-pinned-tab-icon.svg" color="${colors['primary'].web}">
+
     <style nonce="${csp_nonce}">
       <%
         primary = colors["primary"]

@@ -12,7 +12,6 @@ import Help from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
-import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
@@ -37,6 +36,8 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   PAGE
 } from 'tracim_frontend_lib'
+
+const TRACIM_LOGO_PATH = '/assets/images/logo-tracim.png'
 
 const qs = require('query-string')
 
@@ -113,7 +114,7 @@ export class Header extends React.Component {
     return (
       <header className='header'>
         <nav className='navbar navbar-expand-lg navbar-light bg-light'>
-          <Logo to={props.user.logged ? PAGE.HOME : PAGE.LOGIN} logoSrc={logoHeader} />
+          <Logo to={props.user.logged ? PAGE.HOME : PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
 
           <NavbarToggler />
 
