@@ -86,7 +86,7 @@ ENV LC_ALL C.UTF-8
 ENV ENABLE_GOCRYPTFS_ENCRYPTION=0
 ENV DOCKER_SCRIPT_DIR="/tracim/tools_docker/Debian_New_Uwsgi"
 RUN \
-    printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
+    printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
     && apt install -qy \
         apt-transport-https \
         software-properties-common \
