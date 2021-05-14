@@ -783,7 +783,7 @@ def _get_members_and_administrators_ids(
     receiver_ids = set(administrators + workspace_members)
     try:
         receiver_ids.add(event.user["user_id"])
-    except AttributeError:
+    except (AttributeError, TypeError):
         # no user in event
         pass
     return receiver_ids
