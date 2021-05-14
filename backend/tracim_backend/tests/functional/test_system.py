@@ -307,6 +307,7 @@ class TestConfigEndpoint(object):
             {"code": "fr", "display": "Français"},
             {"code": "en", "display": "English"},
             {"code": "pt", "display": "Português"},
+            {"code": "de", "display": "Deutsch"},
         ]
         assert res.json_body["user__self_registration__enabled"] is False
 
