@@ -619,7 +619,7 @@ class TestEventApi:
         [{"name": "base_test_historic_message_generation_disabled"}],
         indirect=True,
     )
-    @pytest.mark.parametrize("max_message_generated", [1, 2, 100])
+    @pytest.mark.parametrize("max_message_generated", [2, 100])
     def test__create_messages_history_for_user__ok__positive_max_message(
         self,
         session,
@@ -629,6 +629,7 @@ class TestEventApi:
         message_helper,
         role_api_factory,
         max_message_generated,
+        workspace_api_factory,
     ):
         """
         Test more specifically generate_historic_workspaces_messages method, we do set
@@ -656,7 +657,12 @@ class TestEventApi:
         )
         assert last_messages == []
 
-        # join workspace: should not generated message these feature are disabled
+        wapi = workspace_api_factory.get(event_initiator)
+        wapi.update_workspace(my_workspace, label="Foo bar", save_now=True)
+        transaction.commit()
+
+        # join workspace: should not generate message as the automatic history is disabled
+        # in this test
         rapi = role_api_factory.get(current_user=event_initiator)
         rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
@@ -665,7 +671,7 @@ class TestEventApi:
         )
         assert last_messages == []
 
-        # retry generate workspace message: should return message list
+        # generate workspace message: should return a message list
         event_api = EventApi(current_user=admin_user, session=session, config=app_config)
         generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
@@ -746,6 +752,6 @@ class TestEventApi:
             100, my_workspace.workspace_id, other_user.user_id
         )
         if max_message_generated == -1:
-            assert len(last_messages) == 5
+            assert len(last_messages) == 4
         elif not max_message_generated:
             assert len(last_messages) == 0

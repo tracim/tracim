@@ -26,7 +26,7 @@ from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.event import EventPublisher
+from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.core.subscription import SubscriptionLib
@@ -292,6 +292,7 @@ class MessageHelper(object):
                 Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_([workspace_id])
             )
             .filter(Message.receiver_id == user_id)
+            .filter(Message.sent.is_(None))
             .order_by(Message.event_id.desc())
             .limit(count)
             .all()
@@ -314,9 +315,7 @@ class TracimTestContext(TracimContext):
 
             # mock event publishing to avoid requiring a working
             # pushpin instance for every test
-            EventPublisher._publish_pending_events_of_context = mock.Mock(
-                side_effect=self.clear_pending_events
-            )
+            LiveMessagesLib.publish_message_to_user = mock.Mock()
         else:
             self._plugin_manager = create_plugin_manager()
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)

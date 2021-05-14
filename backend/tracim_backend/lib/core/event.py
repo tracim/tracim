@@ -346,7 +346,6 @@ class EventApi:
         pending_event_ids = [
             event.event_id for event in session.context.pending_events if event.event_id is not None
         ]
-
         event_query = (
             session.query(Event)
             .filter(Event.event_id.in_(workspace_event_ids))
@@ -429,7 +428,6 @@ class EventPublisher:
 
         Only events which have been flushed to the database (thus having an id) are published.
         """
-
         # NOTE SGD 2020-06-30: do not keep a reference on the context
         # as this would lead to keep all of them in memory
         context = session.context
@@ -858,7 +856,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
     @classmethod
     def get_receiver_ids(cls, event: Event, session: Session, config: CFG) -> Iterable[int]:
-        """Get the list of user ids that should recieve the given event."""
+        """Get the list of user ids that should receive the given event."""
         try:
             get_receiver_ids = cls._get_receiver_ids_callables[event.entity_type]
         except KeyError:
@@ -879,7 +877,6 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-
             messages = [
                 Message(
                     receiver_id=receiver_id,
