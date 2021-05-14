@@ -575,19 +575,31 @@ class TestEventReceiver:
 @pytest.mark.usefixtures("base_fixture")
 class TestEventApi:
     def test__message_history_creation_with_workspace_join_hook__ok__nominal_case(
-        self, session, app_config, admin_user, workspace_and_users, message_helper, role_api_factory
+        self,
+        session,
+        app_config,
+        admin_user,
+        workspace_and_users,
+        message_helper,
+        role_api_factory,
+        workspace_api_factory,
     ):
         """
         Test hook on workspace_join about adding previous workspace event as user messages,
         Default tracim config should add all previous event as user message without sent set.
         Please notice that only those message are generated in this test, MessageBuilder is disabled
-        in this test context, so anly created message are historic one.
+        in this test context, so only created message are historic one.
         """
         (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
         )
         assert default_workspace_messages == []
+
+        # Let's make a change before other_user joins the space
+        wapi = workspace_api_factory.get(current_user=event_initiator)
+        wapi.update_workspace(my_workspace, label="Foo bar")
+        transaction.commit()
 
         rapi = role_api_factory.get(current_user=event_initiator)
         rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)

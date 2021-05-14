@@ -311,9 +311,12 @@ class TracimTestContext(TracimContext):
         self._app_config = app_config
         if init_plugins:
             self._plugin_manager = init_plugin_manager(app_config)
+
             # mock event publishing to avoid requiring a working
             # pushpin instance for every test
-            EventPublisher._publish_pending_events_of_context = mock.Mock()
+            EventPublisher._publish_pending_events_of_context = mock.Mock(
+                side_effect=self.clear_pending_events
+            )
         else:
             self._plugin_manager = create_plugin_manager()
         self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
@@ -335,6 +338,9 @@ class TracimTestContext(TracimContext):
     @property
     def app_config(self):
         return self._app_config
+
+    def clear_pending_events(self, *args, **kwargs) -> None:
+        self.pending_events.clear()
 
 
 def eq_(a: Any, b: Any, msg: Optional[str] = None) -> None:
