@@ -315,16 +315,17 @@ export class FeedItemWithPreview extends React.Component {
         : null
     )
 
-    const userRoleIdInWorkspace = (
-      props.currentWorkspace
-        ? findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-        : ROLE.reader.id
-    )
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId,
+      (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || {}).memberList || [],
+      ROLE_LIST
+    ) || ROLE.reader.id
 
     const loggedUser = {
       ...props.user,
       userRoleIdInWorkspace
     }
+
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
@@ -451,7 +452,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system, user, currentWorkspace }) => ({ system, user, currentWorkspace })
+const mapStateToProps = ({ system, user, currentWorkspace, workspaceList }) => ({ system, user, currentWorkspace, workspaceList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
