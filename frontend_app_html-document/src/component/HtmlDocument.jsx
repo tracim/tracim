@@ -87,6 +87,9 @@ export const HtmlDocument = props => {
             <div className='html-document__contentpage__textnote__top'>
               <TranslateButton
                 translationState={props.translationState}
+                targetLanguageList={props.translationTargetLanguageList}
+                targetLanguageCode={props.translationTargetLanguageCode}
+                onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
                 onClickTranslate={props.onClickTranslateDocument}
                 onClickRestore={props.onClickRestoreDocument}
                 dataCy='htmlDocumentTranslateButton'
@@ -193,5 +196,8 @@ HtmlDocument.propTypes = {
   isRefreshNeeded: PropTypes.bool,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
 }

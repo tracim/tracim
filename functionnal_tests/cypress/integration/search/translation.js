@@ -24,5 +24,8 @@ describe('Search', () => {
 
     cy.changeLanguage('pt')
     cy.get('.searchResult__title').contains('Resultados da pesquisa')
+
+    cy.changeLanguage('de')
+    cy.get('.searchResult__title').contains('Suchergebnisse')
   })
 })

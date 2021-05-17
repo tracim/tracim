@@ -45,6 +45,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
@@ -398,6 +399,8 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
@@ -411,6 +414,8 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=None,
                     do_notify=False,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
             uapi.execute_created_user_actions(user)
             newly_created = True

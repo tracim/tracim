@@ -74,6 +74,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
+from tracim_backend.views.core_api.schemas import WorkspaceWithoutDescriptionSchema
 
 JsonDict = Dict[str, Any]
 
@@ -83,6 +84,7 @@ class EventApi:
 
     user_schema = UserDigestSchema()
     workspace_schema = WorkspaceSchema()
+    workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
         HTML_DOCUMENTS_TYPE: ContentSchema(),
@@ -150,7 +152,7 @@ class EventApi:
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
-            query = query.filter(Event.workspace["workspace_id"].as_integer().in_(workspace_ids))
+            query = query.filter(Event.workspace_id.in_(workspace_ids))
         if related_to_content_ids:
             query = query.filter(
                 or_(
@@ -306,6 +308,7 @@ class EventApi:
             operation=operation,
             entity_subtype=entity_subtype,
             fields=fields,
+            workspace_id=fields.get("workspace", {}).get("workspace_id"),
         )
         context.dbsession.add(event)
         context.pending_events.append(event)
@@ -326,7 +329,7 @@ class EventApi:
             Message.receiver_id == user_id
         )
         workspace_event_ids_query = session.query(Event.event_id).filter(
-            Event.workspace["workspace_id"].as_integer().in_(workspace_ids)
+            Event.workspace_id.in_(workspace_ids)
         )
         if max_messages_count >= 0:
             workspace_event_ids_query = workspace_event_ids_query.order_by(
@@ -336,10 +339,18 @@ class EventApi:
         # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
         # mysql/mariadb doesn't support limit operator in subquery
         workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
+
+        # INFO - S.G - 2021-05-12 - Do not create messages for pending events
+        # as messages for those will be handled by EventPublisher.
+        # This avoids to create twice the same Message() which causes an integrity error.
+        pending_event_ids = [
+            event.event_id for event in session.context.pending_events if event.event_id is not None
+        ]
         event_query = (
             session.query(Event)
             .filter(Event.event_id.in_(workspace_event_ids))
-            .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(pending_event_ids))
         )
         messages = []
         for event in event_query:
@@ -417,7 +428,6 @@ class EventPublisher:
 
         Only events which have been flushed to the database (thus having an id) are published.
         """
-
         # NOTE SGD 2020-06-30: do not keep a reference on the context
         # as this would lead to keep all of them in memory
         context = session.context
@@ -548,7 +558,9 @@ class EventBuilder:
         )
         fields = {
             Event.CONTENT_FIELD: content_dict,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -621,7 +633,9 @@ class EventBuilder:
         role_in_context = role_api.get_user_role_workspace_with_context(role)
         fields = {
             Event.USER_FIELD: user_field,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
@@ -677,7 +691,9 @@ class EventBuilder:
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         subscription_author_in_context = user_api.get_user_with_context(subscription.author)
         fields = {
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
                 subscription
             ).data,
@@ -709,7 +725,9 @@ class EventBuilder:
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         reaction_author_in_context = user_api.get_user_with_context(reaction.author)
         fields = {
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
             Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
             Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
             Event.CONTENT_FIELD: content_dict,
@@ -761,11 +779,11 @@ def _get_members_and_administrators_ids(
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     receiver_ids = set(administrators + workspace_members)
     try:
         receiver_ids.add(event.user["user_id"])
-    except AttributeError:
+    except (AttributeError, TypeError):
         # no user in event
         pass
     return receiver_ids
@@ -798,14 +816,14 @@ def _get_workspace_subscription_event_receiver_ids(
     author = event.subscription["author"]["user_id"]
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_managers = role_api.get_workspace_member_ids(
-        event.workspace["workspace_id"], min_role=WorkspaceRoles.WORKSPACE_MANAGER
+        event.workspace_id, min_role=WorkspaceRoles.WORKSPACE_MANAGER
     )
     return set(administrators + workspace_managers + [author])
 
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace["workspace_id"])
+    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
 
 
@@ -838,7 +856,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
     @classmethod
     def get_receiver_ids(cls, event: Event, session: Session, config: CFG) -> Iterable[int]:
-        """Get the list of user ids that should recieve the given event."""
+        """Get the list of user ids that should receive the given event."""
         try:
             get_receiver_ids = cls._get_receiver_ids_callables[event.entity_type]
         except KeyError:
@@ -859,7 +877,6 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-
             messages = [
                 Message(
                     receiver_id=receiver_id,

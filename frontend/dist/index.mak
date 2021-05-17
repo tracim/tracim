@@ -18,6 +18,10 @@
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
+    <!-- Apple icons -->
+    <link rel="apple-touch-icon" href="/assets/images/wa-tracim-logo-180x180.png">
+    <link rel="mask-icon" href="/assets/images/safari-pinned-tab-icon.svg" color="${colors['primary'].web}">
+
     <style nonce="${csp_nonce}">
       <%
         primary = colors["primary"]
@@ -66,6 +70,15 @@
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
+
+      <%
+        sidebar = colors["sidebar"]
+      %>
+      :root {
+          --sidebarColor: ${sidebar.web};
+          --sidebarColorDarken: ${sidebar.darken.web};
+          --sidebarColorLighten: ${sidebar.lighten.web};
+      }
     </style>
 
     <style nonce="${csp_nonce}">

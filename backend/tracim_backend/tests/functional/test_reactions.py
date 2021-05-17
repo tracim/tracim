@@ -169,7 +169,7 @@ class TestReactionsEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
@@ -289,7 +289,7 @@ class TestReactionsEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == workspace
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id

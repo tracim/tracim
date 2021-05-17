@@ -24,6 +24,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_SESSION__SECURE                                                    | session.secure                                                 | SESSION__SECURE                                                    |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
 | TRACIM_WEBSITE__DESCRIPTION                                               | website.description                                            | WEBSITE__DESCRIPTION                                               |
+| TRACIM_WEBSITE__USAGE_CONDITIONS                                          | website.usage_conditions                                       | WEBSITE__USAGE_CONDITIONS                                          |
 | TRACIM_WEBSITE__WELCOME_PAGE                                              | website.welcome_page                                           | WEBSITE__WELCOME_PAGE                                              |
 | TRACIM_WEBSITE__WELCOME_PAGE_STYLE                                        | website.welcome_page_style                                     | WEBSITE__WELCOME_PAGE_STYLE                                        |
 | TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
@@ -34,6 +35,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_USER__SELF_REGISTRATION__ENABLED                                   | user.self_registration.enabled                                 | USER__SELF_REGISTRATION__ENABLED                                   |
 | TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     | user.custom_properties.json_schema_file_path                   | USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     |
 | TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       | user.custom_properties.ui_schema_file_path                     | USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       |
 | TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     | user.custom_properties.translations_dir_path                   | USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     |
@@ -50,6 +52,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
+| TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
 | TRACIM_UPLOADED_FILES__STORAGE__STORAGE_NAME                              | uploaded_files.storage.storage_name                            | UPLOADED_FILES__STORAGE__STORAGE_NAME                              |
@@ -138,6 +141,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_TRANSLATION_SERVICE__PROVIDER                                      | translation_service.provider                                   | TRANSLATION_SERVICE__PROVIDER                                      |
 | TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_URL                              | translation_service.systran.api_url                            | TRANSLATION_SERVICE__SYSTRAN__API_URL                              |
 | TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_KEY                              | translation_service.systran.api_key                            | TRANSLATION_SERVICE__SYSTRAN__API_KEY                              |
+| TRACIM_TRANSLATION_SERVICE__TARGET_LANGUAGES                              | translation_service.target_languages                           | TRANSLATION_SERVICE__TARGET_LANGUAGES                              |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |

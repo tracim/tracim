@@ -122,7 +122,7 @@ class RoleApi(object):
             role.user_id, role.workspace_id
         ):
             raise LastWorkspaceManagerRoleCantBeModified(
-                "last workspace manager {} can't change is own role in workspace".format(
+                "last workspace manager {} can't change their own role in workspace".format(
                     role.user_id
                 )
             )
@@ -162,7 +162,7 @@ class RoleApi(object):
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
         if self._is_last_workspace_manager(user_id, workspace_id):
             raise LastWorkspaceManagerRoleCantBeModified(
-                "last workspace manager {} can't remove is own role in workspace".format(user_id)
+                "last workspace manager {} can't remove their own role in workspace".format(user_id)
             )
         role = self.get_one(user_id, workspace_id)
         self._session.delete(role)

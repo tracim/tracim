@@ -203,8 +203,8 @@ export class Account extends React.Component {
     if (newPublicName !== '') {
       if (newPublicName.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
         props.dispatch(newFlashMessage(
-          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
-          , 'warning')
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
+          'warning')
         )
         return false
       }
@@ -212,7 +212,7 @@ export class Account extends React.Component {
       const fetchPutUserPublicName = await props.dispatch(putUserPublicName(state.userToEdit, newPublicName))
       switch (fetchPutUserPublicName.status) {
         case 200:
-          if (newEmail === '') {
+          if (newEmail === '' && newUsername === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
           }
@@ -221,7 +221,6 @@ export class Account extends React.Component {
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
       }
     }
-
     if (newUsername !== '') {
       const fetchPutUsername = await props.dispatch(putUserUsername(state.userToEdit, newUsername, checkPassword))
       switch (fetchPutUsername.status) {
@@ -377,6 +376,9 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            userEmail={state.userToEdit.email}
+                            userUsername={state.userToEdit.username}
+                            userPublicName={state.userToEdit.publicName}
                             userAuthType={state.userToEdit.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}

@@ -111,7 +111,8 @@
       "FormData",
       "XMLHttpRequest",
       "Image",
-      "globalThis"
+      "globalThis",
+      "DOMParser"
     ],
     "parser": "babel-eslint",
     "ignore": []

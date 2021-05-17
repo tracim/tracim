@@ -14,7 +14,8 @@ import {
   SUBSCRIPTION_TYPE,
   IconButton,
   PAGE,
-  TextInput
+  TextInput,
+  htmlToText
 } from 'tracim_frontend_lib'
 
 import {
@@ -167,13 +168,14 @@ export class JoinWorkspace extends React.Component {
   filterWorkspaces (workspace) {
     return (
       workspace.label.toLowerCase().includes(this.state.filter) ||
-      workspace.description.toLowerCase().includes(this.state.filter)
+        workspace.description.toLowerCase().includes(this.state.filter)
     )
   }
 
   render () {
     const { props } = this
     const className = 'joinWorkspace'
+    const parser = new DOMParser()
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -200,21 +202,24 @@ export class JoinWorkspace extends React.Component {
                   <b>{props.t('Access request')}</b>
                 </div>
 
-                {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) =>
-                  <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
-                    {this.createIconForAccessType(workspace.accessType)}
-                    <div className={`${className}__content__workspaceList__item__title_description`}>
-                      <span>{workspace.label}</span>
-                      <span
-                        className={`${className}__content__workspaceList__item__description`}
-                        title={workspace.description}
-                      >
-                        {workspace.description}
-                      </span>
+                {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
+                  const descriptionText = htmlToText(parser, workspace.description)
+                  return (
+                    <div key={workspace.id} className={`${className}__content__workspaceList__item`}>
+                      {this.createIconForAccessType(workspace.accessType)}
+                      <div className={`${className}__content__workspaceList__item__title_description`}>
+                        <span>{workspace.label}</span>
+                        <span
+                          className={`${className}__content__workspaceList__item__description`}
+                          title={descriptionText}
+                        >
+                          {descriptionText}
+                        </span>
+                      </div>
+                      {this.createRequestComponent(workspace)}
                     </div>
-                    {this.createRequestComponent(workspace)}
-                  </div>
-                )}
+                  )
+                })}
               </div>
             </PageContent>
           </PageWrapper>

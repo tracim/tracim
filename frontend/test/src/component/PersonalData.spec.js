@@ -1,6 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
+import { IconButton } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
 
@@ -31,7 +32,7 @@ describe('<PersonalData />', () => {
       for (let i = 0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
         wrapper.find('input.personaldata__form__txtinput').at(i).simulate('change', { target: { value: 'newRandomPassWord' } })
       }
-      wrapper.find('button').simulate('click')
+      wrapper.find(IconButton).simulate('click')
       expect(onClickSubmitCallBack.called).to.equal(true)
     })
     it('onChangeUsernameCallBack should be called when the username has been changed', () => {

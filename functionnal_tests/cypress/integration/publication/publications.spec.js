@@ -8,7 +8,7 @@ const fakePreview = {
 }
 
 describe('Publications', () => {
-  before(function () {
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -51,5 +51,24 @@ describe('Publications', () => {
     cy.get('.linkPreview__content__title').contains(fakePreview.title)
     cy.get('.linkPreview__content__description').contains(fakePreview.description)
     cy.get(`.linkPreview__img[src="${fakePreview.image}"]`).should('be.visible')
+  })
+
+  const text = 'Hello, world'
+  it('A translation button should be visible', () => {
+    cy.get('#wysiwygTimelineCommentPublication').type(text)
+    cy.get('button').contains('Publish').click()
+    cy.get('[data-cy=commentTranslateButton]').click()
+    cy.contains('.feedItem__publication', 'en')
+    cy.get('[data-cy=commentTranslateButton]').click()
+    cy.contains('.feedItem__publication', text)
+  })
+
+  it('a menu should allow to change the target language', () => {
+    cy.get('#wysiwygTimelineCommentPublication').type(text)
+    cy.get('button').contains('Publish').click()
+    cy.get('[data-cy=commentTranslateButton__languageMenu]').click()
+    cy.get('[data-cy=commentTranslateButton__language__fr]').click()
+    cy.get('[data-cy=commentTranslateButton]').click()
+    cy.contains('.feedItem__publication', 'fr')
   })
 })
