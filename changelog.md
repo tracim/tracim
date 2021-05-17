@@ -24,6 +24,7 @@ Frontend/Backend: [#4590](https://github.com/tracim/tracim/issues/4590)
 Backend: [#4587](https://github.com/tracim/tracim/issues/4587)
 [#3911](https://github.com/tracim/tracim/issues/3911)
 [#4632](https://github.com/tracim/tracim/issues/4632)
+[#4631](https://github.com/tracim/tracim/issues/4631)
 Docker: [#4603](https://github.com/tracim/tracim/issues/4603)
 Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 
