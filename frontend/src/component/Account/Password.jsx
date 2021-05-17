@@ -2,6 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
+import {
+  IconButton
+} from 'tracim_frontend_lib'
 
 export class Password extends React.Component {
   constructor (props) {
@@ -95,58 +98,68 @@ export class Password extends React.Component {
         <form className='personaldata__form mr-5'>
           {props.displayAdminInfo === false && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
-              <input
-                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-                type='password'
-                placeholder={props.t('Old password')}
-                value={state.oldPassword}
-                onChange={this.handleChangeOldPassword}
-                maxLength={513}
-              />
+              <label>
+                {props.t('Current password:')}
+                <input
+                  className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                  type='password'
+                  placeholder=''
+                  value={state.oldPassword}
+                  onChange={this.handleChangeOldPassword}
+                  maxLength={513}
+                />
+              </label>
             </div>
           )}
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
-            <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-              type='password'
-              placeholder={props.t('New password')}
-              value={state.newPassword}
-              onChange={this.handleChangeNewPassword}
-              maxLength={513}
-            />
+            <label>
+              {props.t('New password:')}
+              <input
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                type='password'
+                value={state.newPassword}
+                onChange={this.handleChangeNewPassword}
+                maxLength={513}
+              />
+            </label>
           </div>
 
           <div className='align-items-center flex-wrap mb-4'>
-            <input
-              className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
-              type='password'
-              placeholder={props.t('Repeat new password')}
-              value={state.newPassword2}
-              onChange={this.handleChangeNewPassword2}
-              maxLength={513}
-            />
-
-            {props.displayAdminInfo && state.newPassword !== '' && (
+            <label>
+              {props.t('Repeat new password:')}
               <input
-                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3'
+                className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
                 type='password'
-                placeholder={props.t("Administrator's password")}
-                value={state.checkAdminPassword}
-                onChange={this.handleChangeCheckAdminPassword}
-                disabled={state.newPassword === '' && state.newPassword2 === ''}
+                value={state.newPassword2}
+                onChange={this.handleChangeNewPassword2}
+                maxLength={513}
               />
+            </label>
+          </div>
+          <div className=' d-flex align-items-center flex-wrap mb-4'>
+            {props.displayAdminInfo && state.newPassword !== '' && (
+              <label>
+                {props.t("Administrator's password:")}
+                <input
+                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3'
+                  type='password'
+                  value={state.checkAdminPassword}
+                  onChange={this.handleChangeCheckAdminPassword}
+                  disabled={state.newPassword === '' && state.newPassword2 === ''}
+                />
+              </label>
             )}
           </div>
-
-          <button
-            type='button'
-            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
-            onClick={this.handleClickSubmit}
+          <IconButton
+            customClass='personaldata__password__form__button'
+            intent='secondary'
             disabled={this.isSubmitDisabled()}
-          >
-            {props.t('Validate')}
-          </button>
+            onClick={this.handleClickSubmit}
+            icon='fas fa-check'
+            text={props.t('Validate')}
+            dataCy='IconButton_password'
+          />
         </form>
 
       </div>

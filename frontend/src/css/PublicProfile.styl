@@ -54,6 +54,25 @@
       margin-left 10px
       font-size fontSizeTitle
       align-self center
+      &__wrapper
+        width calc(100% - 130px) // INFO - MB - 2021-05-06 - the total width minus the avatar width (100px) and its margin (30px) on the ProfileMainbar
+      &__user
+        display flex
+        &__name
+          max-width 50%
+          overflow hidden
+          text-overflow ellipsis
+          white-space pre
+        &__username
+          overflow hidden
+          text-overflow ellipsis
+          &__wrapper
+            max-width 50%
+            display inline-flex
+            font-size 18px
+            align-items center
+          &__separator
+            margin 0px 5px
 
   &__content
     display flex
@@ -66,6 +85,7 @@
       border 1px grey solid
       border-radius 5px
       padding 20px
+      margin-bottom 10px
     &__information
       margin 30px 0 30px 30px
       width 30%
@@ -105,10 +125,11 @@
         &__user
           display flex
           flex-direction column
-          &__separator
-            display none
+          width 100%
           &__username
             font-size fontSizeSmall
+            &__separator
+              display none
 
     &__content
       flex-direction column

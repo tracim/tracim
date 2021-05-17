@@ -22,7 +22,10 @@ import { newFlashMessage } from '../action-creator.sync.js'
 
 const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 const ACTIVITY_HISTORY_COUNT = 5
-const NOTIFICATION_COUNT_PER_REQUEST = ACTIVITY_COUNT_PER_PAGE
+const ACTIVITY_BATCH_COUNT = 5
+// NOTE - SG - 2021-05-05 - empirically we noted that building an activity
+// needs three messages in average.
+const NOTIFICATION_COUNT_PER_REQUEST = 3 * ACTIVITY_BATCH_COUNT
 
 const makeCancelable = (promise) => {
   let isCanceled = false
@@ -135,35 +138,18 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     }
 
     /**
-       Wrap loadActivitiesImpl() so that the dispatch in redux can be cancelled.
+     * DOC - SG - 2021-05-05
+     * Load the given count of activities.
+     * Activities are loaded & dispatched by batch to update the display quicker.
+     * @param {Number} minActivityCount minimum count of new activites to load
+     * @param {Boolean} resetList if true, the current list in props is reset before loading activities
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     * Wraps loadActivitiesBatch() so that the dispatches in redux can be cancelled.
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
       const { props } = this
-
-      this.loadActivitiesPromise = makeCancelable(
-        this.loadActivitiesImpl(
-          minActivityCount,
-          resetList,
-          workspaceId
-        )
-      )
-      try {
-        const activitiesParams = await this.loadActivitiesPromise.promise
-        props.dispatch(setActivityList(activitiesParams.list))
-        props.dispatch(setActivityNextPage(activitiesParams.hasNextPage, activitiesParams.nextPageToken))
-      } catch {}
-      this.loadActivitiesPromise = null
-    }
-
-    /**
-     * Load at minimum the given count of activities by getting messages through
-     * /api/users/<user_id>/messages
-     * @param {Number} minActivityCount minimum activity count to load
-     * @param {boolean} resetList if true the current activity list will be cleared before load
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
-     */
-    loadActivitiesImpl = async (minActivityCount, resetList = false, workspaceId = null) => {
-      const { props } = this
+      await this.waitForNoChange()
+      this.changingActivityList = true
       let activityList = props.activity.list
       let hasNextPage = props.activity.hasNextPage
       let nextPageToken = props.activity.nextPageToken
@@ -173,9 +159,45 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         hasNextPage = true
         nextPageToken = ''
       }
-      await this.waitForNoChange()
-      this.changingActivityList = true
       while (hasNextPage && activityList.length < minActivityCount) {
+        this.loadActivitiesPromise = makeCancelable(
+          this.loadActivitiesBatch(
+            activityList,
+            hasNextPage,
+            nextPageToken,
+            workspaceId
+          )
+        )
+        try {
+          const activitiesParams = await this.loadActivitiesPromise.promise
+          activityList = activitiesParams.activityList
+          hasNextPage = activitiesParams.hasNextPage
+          nextPageToken = activitiesParams.nextPageToken
+          props.dispatch(setActivityList(activityList))
+          props.dispatch(setActivityNextPage(hasNextPage, nextPageToken))
+        } catch {
+          this.changingActivityList = false
+          this.loadActivitiesPromise = null
+          return
+        }
+        this.loadActivitiesPromise = null
+      }
+      this.changingActivityList = false
+    }
+
+    /**
+     * DOC - SG - 2021-05-05
+     * Load a batch of activities and merge them into the given list
+     * Activities are built by calling /api/users/<user_id>/messages
+     * @param {Array} activityList activity list to update
+     * @param {boolean} hasNextPage is there still messages to load
+     * @param {string} nextPageToken token to get the next page of messages
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     */
+    loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
+      const { props } = this
+      const initialActivityListLength = activityList.length
+      while (hasNextPage && activityList.length < initialActivityListLength + ACTIVITY_BATCH_COUNT) {
         const messageListResponse = await props.dispatch(getNotificationList(
           props.user.userId,
           {
@@ -194,9 +216,8 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }
-      this.changingActivityList = false
       return {
-        list: activityList,
+        activityList,
         hasNextPage,
         nextPageToken
       }

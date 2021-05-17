@@ -326,6 +326,7 @@ class StorageLib:
                 # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
                 with open(file_path, "wb",) as tmp:
                     tmp.write(depot_stored_file.read())
+                    tmp.flush()
                     yield file_path
             finally:
                 try:

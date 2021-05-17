@@ -46,7 +46,8 @@ export class FeedItemWithPreview extends React.Component {
       translationStateByCommentId: {},
       newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
-      timelineWysiwyg: false
+      timelineWysiwyg: false,
+      translationTargetLanguageCode: props.user.lang
     }
   }
 
@@ -193,33 +194,34 @@ export class FeedItemWithPreview extends React.Component {
     return await this.props.searchForMentionInQuery(query, this.props.workspaceId)
   }
 
-  handleTranslate = () => {
-    const { state, props } = this
-    if (props.content.type === CONTENT_TYPE.THREAD) {
-      handleTranslateComment(
-        FETCH_CONFIG.apiUrl,
-        props.content.workspaceId,
-        props.content.id,
-        this.getFirstComment().content_id,
-        props.i18n.language,
-        props.system.config,
-        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
-          this.setState({ translatedRawContent, contentTranslationState: translationState })
-        }
-      )
-    } else {
-      handleTranslateHtmlContent(
-        FETCH_CONFIG.apiUrl,
-        props.content.workspaceId,
-        props.content.id,
-        props.content.currentRevisionId,
-        props.i18n.language,
-        props.system.config,
-        ({ translatedRawContent = state.translatedRawContent, translationState }) => {
-          this.setState({ translatedRawContent, contentTranslationState: translationState })
-        }
-      )
-    }
+  handleTranslateComment = () => {
+    const { props, state } = this
+    handleTranslateComment(
+      FETCH_CONFIG.apiUrl,
+      props.content.workspaceId,
+      props.content.id,
+      this.getFirstComment().content_id,
+      state.translationTargetLanguageCode,
+      props.system.config,
+      ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+        this.setState({ translatedRawContent, contentTranslationState: translationState })
+      }
+    )
+  }
+
+  handleTranslateHtmlDocument = () => {
+    const { props, state } = this
+    handleTranslateHtmlContent(
+      FETCH_CONFIG.apiUrl,
+      props.content.workspaceId,
+      props.content.id,
+      props.content.currentRevisionId,
+      state.translationTargetLanguageCode,
+      props.system.config,
+      ({ translatedRawContent = state.translatedRawContent, translationState }) => {
+        this.setState({ translatedRawContent, contentTranslationState: translationState })
+      }
+    )
   }
 
   handleRestoreContentTranslation = () => {
@@ -280,6 +282,10 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
+  }
+
   render () {
     const { props, state } = this
 
@@ -309,11 +315,11 @@ export class FeedItemWithPreview extends React.Component {
         : null
     )
 
-    const userRoleIdInWorkspace = (
-      props.currentWorkspace
-        ? findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
-        : ROLE.reader.id
-    )
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId,
+      (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || {}).memberList || [],
+      ROLE_LIST
+    ) || ROLE.reader.id
 
     const loggedUser = {
       ...props.user,
@@ -361,9 +367,12 @@ export class FeedItemWithPreview extends React.Component {
                       : commentToShow.raw_content
                   }
                   fromMe={props.user.userId === commentToShow.author.user_id}
-                  onClickTranslate={this.handleTranslate}
+                  onClickTranslate={this.handleTranslateComment}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
+                  translationTargetLanguageList={props.system.config.translation_service__target_languages}
+                  translationTargetLanguageCode={state.translationTargetLanguageCode}
+                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 />
               )
               : (
@@ -379,9 +388,12 @@ export class FeedItemWithPreview extends React.Component {
                     link={props.previewLink}
                   />
                   <FeedItemFooter
-                    onClickTranslate={this.handleTranslate}
+                    onClickTranslate={this.handleTranslateHtmlDocument}
                     onClickRestore={this.handleRestoreContentTranslation}
                     translationState={state.contentTranslationState}
+                    translationTargetLanguageList={props.system.config.translation_service__target_languages}
+                    translationTargetLanguageCode={state.translationTargetLanguageCode}
+                    onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                     content={props.content}
                   />
                 </div>
@@ -422,12 +434,15 @@ export class FeedItemWithPreview extends React.Component {
                     props.content.workspaceId,
                     props.content.id,
                     comment.content_id,
-                    props.i18n.language,
+                    state.translationTargetLanguageCode,
                     props.system.config,
                     (...args) => this.commentSetState(comment.content_id, ...args)
                   )
                 )}
                 onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
+                translationTargetLanguageList={props.system.config.translation_service__target_languages}
+                translationTargetLanguageCode={state.translationTargetLanguageCode}
+                onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
               />
             )}
           </>
@@ -437,7 +452,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system, user, currentWorkspace }) => ({ system, user, currentWorkspace })
+const mapStateToProps = ({ system, user, currentWorkspace, workspaceList }) => ({ system, user, currentWorkspace, workspaceList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />

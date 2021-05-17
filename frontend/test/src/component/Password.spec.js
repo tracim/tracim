@@ -1,6 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
+import { IconButton } from 'tracim_frontend_lib'
 import { Password as PasswordWithoutHOC } from '../../../src/component/Account/Password.jsx'
 import sinon from 'sinon'
 
@@ -18,7 +19,7 @@ describe('<Password />', () => {
 
   describe('static design', () => {
     it('should have one button', () => {
-      expect(wrapper.find('button').length).to.equal(1)
+      expect(wrapper.find(IconButton).length).to.equal(1)
     })
   })
 
@@ -30,7 +31,7 @@ describe('<Password />', () => {
     })
 
     it('onClickSubmitCallBack should not be called when the button is clicked but the new password is not valid', () => {
-      wrapper.find('button').simulate('click')
+      wrapper.find(IconButton).simulate('click')
       expect(onClickSubmitCallBack.called).to.equal(false)
     })
 
@@ -38,7 +39,7 @@ describe('<Password />', () => {
       for (let i = 0; i < wrapper.find('input.personaldata__form__txtinput').length; i++) {
         wrapper.find('input.personaldata__form__txtinput').at(i).simulate('change', { target: { value: 'newRandomPassWord' } })
       }
-      wrapper.find('button').simulate('click')
+      wrapper.find(IconButton).simulate('click')
       expect(onClickSubmitCallBack.called).to.equal(true)
     })
   })

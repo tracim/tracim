@@ -135,7 +135,6 @@
   "Avatar of {{publicName}}": "Avatar of {{publicName}}",
   "Close": "Close",
   "Restore the original language": "Restore the original language",
-  "Show translation": "Show translation",
   "Translation pending…": "Translation pending…",
   "Translation is not available": "Translation is not available",
   "Unknown error": "Unknown error",
@@ -193,5 +192,6 @@
   "Error while deleting the comment": "Error while deleting the comment",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Attach files": "Attach files",
-  "Download {{filename}}": "Download {{filename}}"
+  "Download {{filename}}": "Download {{filename}}",
+  "Translate to {{language}}": "Translate to {{language}}"
 }

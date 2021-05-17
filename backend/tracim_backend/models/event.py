@@ -8,6 +8,7 @@ import typing
 from marshmallow import ValidationError
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Sequence
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import relationship
@@ -150,6 +151,10 @@ class Event(CreationDateMixin, DeclarativeBase):
     client_token = index_property("fields", CLIENT_TOKEN_FIELD)
     reaction = index_property("fields", REACTION_FIELD)
 
+    # INFO - SG - 2021-05-05
+    # duplicated from fields.workspace.workspace_id to ease indexing of this value
+    workspace_id = Column(Integer, default=None)
+
     @property
     def event_type(self) -> str:
         type_ = "{}.{}".format(self.entity_type.value, self.operation.value)
@@ -164,6 +169,9 @@ class Event(CreationDateMixin, DeclarativeBase):
             repr(self.created),
             repr(self.fields),
         )
+
+
+Index("ix__events__event_id__workspace_id", Event.event_id, Event.workspace_id)
 
 
 class Message(DeclarativeBase):

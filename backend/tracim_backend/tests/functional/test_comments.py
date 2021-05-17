@@ -177,7 +177,7 @@ class TestCommentsEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
-        assert created.workspace == workspace
+        assert created.workspace == {k: v for k, v in workspace.items() if k != "description"}
 
     def test_api__post_content_comment__err_400__content_not_editable(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list

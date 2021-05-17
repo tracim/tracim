@@ -55,12 +55,14 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  htmlToText
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
@@ -224,6 +226,7 @@ document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventRed
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
+export const deTranslation = require('../i18next.scanner/de/translation.json')
 
 export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
@@ -401,6 +404,7 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
@@ -424,5 +428,6 @@ export {
   getHtmlDocTranslated,
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
-  getGenericWorkspaceContent
+  getGenericWorkspaceContent,
+  htmlToText
 }

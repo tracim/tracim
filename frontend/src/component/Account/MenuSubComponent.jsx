@@ -12,7 +12,7 @@ export const MenuSubComponent = props => {
     <nav className='menusubcomponent navbar'>
 
       <div className='menusubcomponent__header'>
-        <div className='menusubcomponent__menutitle primaryColorFontDarken'>Menu</div>
+        <div className='menusubcomponent__menutitle primaryColorFontDarken'>{props.t('Account Settings')}</div>
       </div>
 
       <ul className='menusubcomponent__list nav flex-column'>

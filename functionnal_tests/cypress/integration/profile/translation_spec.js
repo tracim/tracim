@@ -18,5 +18,8 @@ describe('Profile', () => {
 
     cy.changeLanguage('pt')
     cy.get('.breadcrumbs').contains('Perfil').should('be.visible')
+
+    cy.changeLanguage('de')
+    cy.get('.breadcrumbs').contains('Profil').should('be.visible')
   })
 })

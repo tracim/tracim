@@ -1,5 +1,6 @@
 {
   "primary": "#7d4e24",
+  "sidebar": "#333",
   "contents/html-document": "#3f52e3",
   "contents/thread": "#ad4cf9",
   "contents/file": "#ff9900"

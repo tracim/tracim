@@ -141,7 +141,10 @@ fi
 trap teardown HUP INT TERM
 
 export TRACIM_TRANSLATION_SERVICE__ENABLED=True
+export TRACIM_TRANSLATION_SERVICE__ENABLED=True
 export TRACIM_TRANSLATION_SERVICE__PROVIDER=test
+export TRACIM_USER__SELF_REGISTRATION__ENABLED=True
+
 if [ "$mode" = "cypress" ]; then
     run_docker_services "$sleep"
     tracimcli db delete --force || true

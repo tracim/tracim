@@ -3,6 +3,7 @@ import base64
 import cgi
 from datetime import datetime
 import enum
+from typing import Dict
 from typing import Generic
 from typing import List
 from typing import Optional
@@ -74,6 +75,8 @@ class ConfigModel(object):
         instance_name: str,
         email_required: bool,
         search_engine: str,
+        translation_service__target_languages: List[Dict[str, str]],
+        user__self_registration__enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -87,6 +90,8 @@ class ConfigModel(object):
         self.email_required = email_required
         self.search_engine = search_engine
         self.translation_service__enabled = translation_service__enabled
+        self.translation_service__target_languages = translation_service__target_languages
+        self.user__self_registration__enabled = user__self_registration__enabled
 
 
 class ErrorCodeModel(object):
@@ -99,6 +104,12 @@ class PreviewAllowedDim(object):
     def __init__(self, restricted: bool, dimensions: List[PreviewDim]) -> None:
         self.restricted = restricted
         self.dimensions = dimensions
+
+
+class UsageConditionModel(object):
+    def __init__(self, title: str, url: str = None) -> None:
+        self.title = title
+        self.url = url
 
 
 class MoveParams(object):

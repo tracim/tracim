@@ -135,7 +135,6 @@
   "Avatar of {{publicName}}": "Avatar de {{publicName}}",
   "Close": "Fermer",
   "Restore the original language": "Rétablir la langue d'origine",
-  "Show translation": "Voir la traduction",
   "Translation pending…": "Traduction en cours…",
   "Translation is not available": "La traduction est indisponible",
   "Unknown error": "Erreur inconnue",
@@ -193,5 +192,6 @@
   "Error while deleting the comment": "Erreur pendant la suppression du commentaire",
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Attach files": "Joindre des fichiers",
-  "Download {{filename}}": "Télécharger {{filename}}"
+  "Download {{filename}}": "Télécharger {{filename}}",
+  "Translate to {{language}}": "Traduire en {{language}}"
 }
