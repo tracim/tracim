@@ -339,10 +339,18 @@ class EventApi:
         # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
         # mysql/mariadb doesn't support limit operator in subquery
         workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
+
+        # INFO - S.G - 2021-05-12 - Do not create messages for pending events
+        # as messages for those will be handled by EventPublisher.
+        # This avoids to create twice the same Message() which causes an integrity error.
+        pending_event_ids = [
+            event.event_id for event in session.context.pending_events if event.event_id is not None
+        ]
         event_query = (
             session.query(Event)
             .filter(Event.event_id.in_(workspace_event_ids))
-            .filter(~Event.event_id.in_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(already_known_event_ids_query.subquery()))
+            .filter(Event.event_id.notin_(pending_event_ids))
         )
         messages = []
         for event in event_query:
@@ -420,7 +428,6 @@ class EventPublisher:
 
         Only events which have been flushed to the database (thus having an id) are published.
         """
-
         # NOTE SGD 2020-06-30: do not keep a reference on the context
         # as this would lead to keep all of them in memory
         context = session.context
@@ -776,7 +783,7 @@ def _get_members_and_administrators_ids(
     receiver_ids = set(administrators + workspace_members)
     try:
         receiver_ids.add(event.user["user_id"])
-    except AttributeError:
+    except (AttributeError, TypeError):
         # no user in event
         pass
     return receiver_ids
@@ -849,7 +856,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
     @classmethod
     def get_receiver_ids(cls, event: Event, session: Session, config: CFG) -> Iterable[int]:
-        """Get the list of user ids that should recieve the given event."""
+        """Get the list of user ids that should receive the given event."""
         try:
             get_receiver_ids = cls._get_receiver_ids_callables[event.entity_type]
         except KeyError:
@@ -870,7 +877,6 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-
             messages = [
                 Message(
                     receiver_id=receiver_id,
