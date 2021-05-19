@@ -19,7 +19,7 @@ describe('Join space page', () => {
   })
   describe('The space list', () => {
     it('should contain a header plus two spaces', () => {
-      cy.get('.joinWorkspace__content__workspaceList__item').should('have.length', 3)
+      cy.get('.joinWorkspace__content__workspaceList__item').should('have.length', 3).should('not.contain', '<b>')
     })
   })
 

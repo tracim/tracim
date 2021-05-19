@@ -86,18 +86,15 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN \
-    printf "Package: pushpin\nPin: version 1.30.*\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin \
+    printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
     && apt install -qy \
         apt-transport-https \
         software-properties-common \
         gnupg2 \
-        # NOTE - S.G. - 2020-08-10 - Installing zurl before adding pushpin repository
-        # as the zurl package in it cannot be installed on stretch.
-        zurl \
-    && echo deb https://dl.bintray.com/fanout/debian fanout-stretch main \
+    && echo deb https://fanout.jfrog.io/artifactory/debian fanout-stretch main \
         | tee /etc/apt/sources.list.d/fanout.list \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
-        --recv-keys 379CE192D401AB61 \
+        --recv-keys EA01C1E777F95324 \
     && apt update \
     && apt install -qy \
         apache2 \

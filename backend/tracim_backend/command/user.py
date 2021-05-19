@@ -19,6 +19,7 @@ from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import UserCreationType
 
 
 class ValidatorType:
@@ -148,6 +149,7 @@ class CreateUserCommand(UserCommand):
                 lang=parsed_args.lang,
                 allowed_space=parsed_args.allowed_space,
                 profile=profile,
+                creation_type=UserCreationType.CLI,
                 do_save=True,
                 do_notify=parsed_args.send_email,
             )

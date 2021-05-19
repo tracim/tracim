@@ -18,5 +18,8 @@ describe('App Workspace Advanced', function () {
 
     cy.changeLanguage('pt')
     cy.get('.adminWorkspace__workspaceTable').contains('Espaço')
+
+    cy.changeLanguage('de')
+    cy.get('.adminWorkspace__workspaceTable').contains('Bereich')
   })
 })

@@ -337,5 +337,6 @@ class TestMentionBuilder:
                 "mention": {"recipient": recipient, "id": "foobar123"},
                 "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
             },
+            workspace_id=one_content_with_a_mention.workspace.workspace_id,
         )
         assert receiver_ids == MentionBuilder.get_receiver_ids(event, session, app_config)

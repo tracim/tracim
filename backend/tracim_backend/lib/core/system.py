@@ -66,6 +66,7 @@ class SystemApi(object):
             email_required=self._config.EMAIL__REQUIRED,
             search_engine=self._config.SEARCH__ENGINE,
             translation_service__target_languages=self._config.TRANSLATION_SERVICE__TARGET_LANGUAGES,
+            user__self_registration__enabled=self._config.USER__SELF_REGISTRATION__ENABLED,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

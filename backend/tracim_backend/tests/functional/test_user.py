@@ -3124,6 +3124,60 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_self_registration_active"}], indirect=True
+)
+class TestUserEndpointWithRegistrationActive(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/users/{user_id}
+    """
+
+    def test_api__register_user__ok_200__nominal_case(self, web_testapp, user_api_factory, mailhog):
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "username": "testu",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["username"] == "testu"
+        assert res["timezone"] == "Europe/Paris"
+        assert res["lang"] == "fr"
+        assert res["allowed_space"] == 134217728
+        response = mailhog.get_mailhog_mails()
+        assert len(response) == 1
+
+    def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
+        params = {
+            "email": "test@test.test",
+            "password": "mysuperpassword",
+            "public_name": "test user",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test user"
+        assert res["username"] is None
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["allowed_space"] == 134217728
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
     "config_section",
     [{"name": "functional_test_with_trusted_user_as_default_profile"}],
     indirect=True,

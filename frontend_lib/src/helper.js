@@ -6,6 +6,7 @@ import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
+import dateFnsDe from 'date-fns/locale/de'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -57,7 +58,8 @@ export const PAGE = {
 export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
-  pt: dateFnsPt
+  pt: dateFnsPt,
+  de: dateFnsDe
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -789,3 +791,5 @@ export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/a
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
 
 export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
+
+export const htmlToText = (domParser, htmlString) => domParser.parseFromString(htmlString, 'text/html').documentElement.textContent

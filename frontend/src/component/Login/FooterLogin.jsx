@@ -1,5 +1,7 @@
 import React from 'react'
 
+require('./FooterLogin.styl')
+
 export const FooterLogin = () =>
   <footer className='loginpage__main__footer'>
     <div className='loginpage__main__footer__text'>

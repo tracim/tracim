@@ -16,5 +16,8 @@ describe('Login page', function () {
 
     cy.changeLanguage('pt')
     cy.contains('.loginpage__main__form__btnsubmit', 'Conexão')
+
+    cy.changeLanguage('de')
+    cy.contains('.loginpage__main__form__btnsubmit', 'Verbindung')
   })
 })

@@ -448,7 +448,9 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
-
+        self.USER__SELF_REGISTRATION__ENABLED = asbool(
+            self.get_raw_config("user.self_registration.enabled", "False")
+        )
         default_user_custom_properties_path = self.here_macro_replace(
             "%(here)s/tracim_backend/templates/user_custom_properties/default/"
         )
@@ -860,7 +862,7 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
-        default_target_languages = "fr:Français,en:English,pt:Português"
+        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch"
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",

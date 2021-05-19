@@ -2,6 +2,8 @@ import { PAGES } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
 
+
+
 describe('Account page', () => {
   beforeEach(() => {
     cy.cancelXHR()
@@ -11,6 +13,7 @@ describe('Account page', () => {
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.log('Todo must be reworked')
   })
+  const validateButton = 'Validate'
 
   describe('Account header', () => {
     it('should have the title and user preferences visible', () => {
@@ -107,30 +110,28 @@ describe('Account page', () => {
         .find('.personaldata__sectiontitle')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(1) > .personaldata__form__txtinput')
+        .find('.mr-5 div:nth-child(1) .personaldata__form__txtinput')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(1) > .personaldata__form__txtinput')
-        .should('have.attr', 'placeholder')
+        .find('.mr-5 div:nth-child(1) .personaldata__form__txtinput')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(2) > .personaldata__form__txtinput')
+        .find('.mr-5 div:nth-child(2) .personaldata__form__txtinput')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(2) > .personaldata__form__txtinput')
-        .should('have.attr', 'placeholder')
+        .find('.mr-5 div:nth-child(2) .personaldata__form__txtinput')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(3) > .personaldata__form__txtinput')
+        .find('.mr-5 div:nth-child(3) .personaldata__form__txtinput')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(3) > .personaldata__form__txtinput')
-        .should('have.attr', 'placeholder')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 .personaldata__form__button')
-        .should('be.visible')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 .personaldata__form__button')
-        .should('have.attr', 'type', 'button')
+        .find('.mr-5 div:nth-child(3) .personaldata__form__txtinput')
     })
+
+    it('should have a specific icon for validate button', () => {
+      cy.contains('[data-cy=IconButton_PersonalData]', validateButton)
+        .find('.iconbutton__icon')
+        .should('have.class', 'fa-check')
+    })
+    
     it('should have agenda field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__agenda]')

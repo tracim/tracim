@@ -17,5 +17,8 @@ describe('Notification Wall', () => {
 
     cy.changeLanguage('pt')
     cy.get('.notification__header__title').contains('Notificações').should('be.visible')
+
+    cy.changeLanguage('de')
+    cy.get('.notification__header__title').contains('Benachrichtigungen').should('be.visible')
   })
 })

@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt
+# Available parameter: en, fr, pt, de
 ; default_lang = en
 
 ### Apps ###
@@ -357,6 +357,9 @@ api.key = %(basic_setup.api_key)s
 ; user.reset_password.token_lifetime = 900
 ## Default profile of created user, valid values are: users, trusted-users, administrators
 ; user.default_profile = users
+## Allow people to register/create an account themselves without authentication.
+## The profile of those users will be user.default_profile
+; user.self_registration.enabled = False
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about
 ## member with no common space. If False, it can access to these informations.
@@ -793,7 +796,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ## Translation service target languages that will be proposed in Tracim's interface
 # It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
 # The string can use any UTF-8 character.
-; translation_service.target_languages = en:English,fr:Français,pt:Português
+; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch
 # example:
 # translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
