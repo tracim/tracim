@@ -371,7 +371,9 @@ class CFG(object):
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
+        default_color_config_file_path = os.path.join(
+            tracim_folder, "frontend/dist/assets/branding/color.json"
+        )
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -946,12 +948,15 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
         )
 
-        try:
-            self.APPS_COLORS["primary"]
-        except KeyError as e:
-            raise ConfigurationError(
-                "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
-            ) from e
+        for required_color in ("primary", "sidebar"):
+            try:
+                self.APPS_COLORS[required_color]
+            except KeyError as e:
+                raise ConfigurationError(
+                    "Error: {} color is required in {} file".format(
+                        required_color, self.COLOR__CONFIG_FILE_PATH
+                    )
+                ) from e
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)

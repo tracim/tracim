@@ -1,5 +1,11 @@
 # Customize Tracim's appearance to your brand
 
+All editable files (with the exception of `development.ini`) are available in a `branding` folder which is located:
+- in `frontend/dist/assets/branding` if you have installed Tracim directly on your computer
+- in `/etc/tracim/branding` if you are using the official Docker image (which exposes `/etc/tracim` as a docker volume).
+
+This folder will be named `<branding_folder>` in the following documentation.
+
 ## Title and description
 
 The title and description of Tracim's page can be changed through `development.ini`:
@@ -13,15 +19,57 @@ The title is displayed in the browser's page. The title and the description are 
 
 These parameters can also be changed with environment variables as described in [setting.md](setting.md).
 
-## Custom login page
+## Main colors used by the user interface
+
+You can change the default colors used in Tracim by editing the `color.json` file which you can find in the branding folder. See [color.json.sample](../../frontend/dist/assets/branding.sample/color.json) for the default configuration file.
+
+## Logos used in the user interface
+
+### Website's favorite icons
+
+Prepare 4 favorite icons and copy them in:
+
+|Icon|Path|
+|----|----|
+|PNG, 16x16 pixels|`<branding_folder>/images/favicon/tracim-16x16.png`|
+|PNG, 32x32 pixels|`<branding_folder>/images/favicon/tracim-32x32.png`|
+|PNG, 64x64 pixels|`<branding_folder>/images/favicon/tracim-64x64.png`|
+|ICO, 16x16 pixels|`<branding_folder>/images/favicon/favicon.ico`|
+
+### Main logo displayed in the top-left of the header bar
+
+Copy your image in `<branding_folder>/images/tracim-logo.png`. Its size should be 150x38 pixels.
+
+### Progressive webapp icons for Android and iOS devices
+
+Prepare 10 images and copy them in:
+
+|Icon|Path|
+|----|----|
+|PNG, 72x72 pixels|`<branding_folder>/images/wa-tracim-logo-72x72.png`|
+|PNG, 96x96 pixels|`<branding_folder>/images/wa-tracim-logo-96x96.png`|
+|PNG, 120x120 pixels|`<branding_folder>/images/wa-tracim-logo-120x120.png`|
+|PNG, 128x128 pixels|`<branding_folder>/images/wa-tracim-logo-128x128.png`|
+|PNG, 144x144 pixels|`<branding_folder>/images/wa-tracim-logo-144x144.png`|
+|PNG, 152x152 pixels|`<branding_folder>/images/wa-tracim-logo-152x152.png`|
+|PNG, 180x180 pixels|`<branding_folder>/images/wa-tracim-logo-180x180.png`|
+|PNG, 192x192 pixels|`<branding_folder>/images/wa-tracim-logo-192x192.png`|
+|PNG, 384x384 pixels|`<branding_folder>/images/wa-tracim-logo-384x384.png`|
+|PNG, 512x512 pixels|`<branding_folder>/images/wa-tracim-logo-512x512.png`|
+
+You can also tune the manifest file used by progressive web apps located in `<branding_folder>/manifest.json`
+
+More documentation about this manifest file is available on [W3C website](https://www.w3.org/TR/appmanifest/).
+
+### Safari pinned tab icon
+
+This icon can be changed by copying your image in `<branding_folder>/images/safari-pinned-tab-icon.svg`. Its color will automatically be the primary color setup in `color.json`.
+
+Documentation about this feature in Safari is available on [Apple's website](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/pinnedTabs/pinnedTabs.html).
+
+## Customize the login page
 
 The login page can be customized by creating/editing some simple HTML files.
-
-All editable files are available in a "branding" folder which is located:
-- in `frontend/dist/assets/branding` if you have installed Tracim directly on your computer
-- in `/etc/tracim/branding` if you are using the official Docker image.
-
-This folder will be named `<branding_folder>` in the following documentation.
 
 ### Simple customization
 
@@ -31,7 +79,7 @@ You can use a markdown editor to generate your HTML text, for instance [CuteMark
 
 ### Advanced customization
 
-Create your HTML page as you want, put its CSS file(s) and image(s) in `<branding_folder>` and change the welcome page name in `development.ini`:
+Create your HTML page as you want, copy its CSS file(s) and image(s) in `<branding_folder>` and change the welcome page name in `development.ini`:
 
 ```
 website.welcome_page = my-welcome-page.html
@@ -52,7 +100,7 @@ Tracim loads the HTML from `website.welcome_page` in its index HTML page. The CS
 
 The default `welcome-simple.html` file loads the HTML from `welcome-simple-text.html` and renders it in a rectangle whose background is `welcome-simple-bg.jpg`.
 
-### Add Registrations Terms
+### Add Registration Terms
 
 Tracim allows showing documents that newly registered user should accept before using Tracim.
 By default, there are none, but you can add any file you want.
