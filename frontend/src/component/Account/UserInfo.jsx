@@ -27,9 +27,11 @@ export const UserInfo = props =>
       )}
 
       {props.user.email && (
-        <a href={`mailto:${props.user.email}`} className='userinfo__email d-block mt-3' data-cy='userinfo__email'>
-          {props.user.email}
-        </a>
+        <div className='userinfo__email d-block mt-3' data-cy='userinfo__email'>
+          <a href={`mailto:${props.user.email}`}>
+            {props.user.email}
+          </a>
+        </div>
       )}
 
       <div className='userinfo__profile mt-3 mb-3' data-cy='userinfo__profile'>
