@@ -143,7 +143,11 @@ describe('reducer currentWorkspace.js', () => {
       it('should return a workspace object with the new member', () => {
         const rez = currentWorkspace(
           initialStateWithMember,
-          addWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.workspaceManager.slug, do_notify: true })
+          addWorkspaceMember(
+            globalManagerFromApi,
+            initialState.id,
+            { role: ROLE.workspaceManager.slug, do_notify: true }
+          )
         )
 
         expect(rez).to.deep.equal({
@@ -158,7 +162,11 @@ describe('reducer currentWorkspace.js', () => {
       it('should return a uniq by id object the same member is added twice', () => {
         const rez = currentWorkspace(
           initialStateWithMember,
-          addWorkspaceMember({ user_id: randomMember.id }, initialState.id, randomMember)
+          addWorkspaceMember(
+            { user_id: randomMember.id },
+            initialState.id,
+            randomMember
+          )
         )
 
         expect(rez).to.deep.equal(initialStateWithMember)

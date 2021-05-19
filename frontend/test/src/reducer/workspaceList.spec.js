@@ -100,7 +100,11 @@ describe('workspaceList reducer', () => {
               memberList: []
             }
           ],
-          addWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager })
+          addWorkspaceMember(
+            globalManagerFromApi,
+            firstWorkspaceFromApi.workspace_id,
+            { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager }
+          )
         )
 
         expect(rez).to.deep.equal([
@@ -128,7 +132,11 @@ describe('workspaceList reducer', () => {
         ]
         const rez = workspaceList(
           initialStateWithMember,
-          addWorkspaceMember(globalManagerFromApi, initialState.id, { id: globalManagerFromApi.user_id })
+          addWorkspaceMember(
+            globalManagerFromApi,
+            initialState.id,
+            { id: globalManagerFromApi.user_id }
+          )
         )
 
         expect(rez).to.deep.equal(initialStateWithMember)
