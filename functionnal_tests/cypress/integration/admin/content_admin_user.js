@@ -120,7 +120,7 @@ describe("An admin seeing a user's profile", () => {
           .find('.personaldata__form__button')
           .click()
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
-          .find('[data-cy=userinfo__email]')
+          .find('[data-cy=userinfo__email__mailto]')
           .should('have.attr', 'href').and('include', newRandomEmail)
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
           .find('[data-cy=userinfo__email]')

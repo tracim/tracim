@@ -102,10 +102,10 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        memberList: [
+        memberList: uniqBy([
           ...state.memberList,
           serializeMember(action.newMember)
-        ]
+        ], 'id')
       }
 
     case `${UPDATE}/${WORKSPACE_MEMBER}`:

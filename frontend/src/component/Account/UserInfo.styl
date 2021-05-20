@@ -5,7 +5,7 @@
   justify-content center
   align-items center
   flex-wrap wrap
-  padding 25px
+  padding 20px
   font-size 18px
   &__wrapper
     flex-direction column
@@ -16,14 +16,23 @@
       width 100px
       height 100px
   &__name
-    font-size 22px
     overflow hidden
     text-overflow ellipsis
+    font-size fontSizeTitle
+    font-weight bold
+    span
+      padding-inline-end 10px
+  &__email > a
+    overflow hidden
+    text-overflow ellipsis
+    color fontColor
+    &:hover
+      text-decoration underline
   &__username
     overflow hidden
     text-overflow ellipsis
-  &__email
-    color fontColor
+    span
+      padding-inline-end 10px
 
 @media (max-width: max-xs)
   .hamburger-box

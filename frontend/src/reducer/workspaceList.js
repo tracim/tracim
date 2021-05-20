@@ -11,6 +11,7 @@ import {
 } from '../action-creator.sync.js'
 import { serialize, sortWorkspaceList } from 'tracim_frontend_lib'
 import { serializeSidebarEntryProps, serializeMember } from './currentWorkspace.js'
+import { uniqBy } from 'lodash'
 
 export const serializeWorkspaceListProps = {
   agenda_enabled: 'agendaEnabled',
@@ -75,10 +76,10 @@ export function workspaceList (state = [], action, lang) {
       return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
-          memberList: [
+          memberList: uniqBy([
             ...ws.memberList,
             serializeMember(action.newMember)
-          ]
+          ], 'id')
         }
         : ws
       )
