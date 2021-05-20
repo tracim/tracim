@@ -21,7 +21,7 @@ These parameters can also be changed with environment variables as described in 
 
 ## Main colors used by the user interface
 
-You can change the default colors used in Tracim by editing the `color.json` file which you can find in the branding folder. See [color.json.sample](../../frontend/dist/assets/branding.sample/color.json) for the default configuration file.
+You can change the default colors used in Tracim by editing the `color.json` file which you can find in the branding folder. See the [color.json sample](../../frontend/dist/assets/branding.sample/color.json) for the default configuration file.
 
 ## Logos used in the user interface
 
@@ -73,7 +73,7 @@ The login page can be customized by creating/editing some simple HTML files.
 
 ### Simple customization
 
-Copy [welcome-simple-text.html.sample](../../frontend/dist/assets/branding/welcome-simple-text.html.sample) to `<branding_folder>/welcome-simple-text.html` then write your HTML text in it and write your background image to `<branding_folder>/welcome-simple-bg.jpg`.
+Copy the [welcome-simple-text.html sample](../../frontend/dist/assets/branding.sample/welcome-simple-text.html) to `<branding_folder>/welcome-simple-text.html` then write your HTML text in it and write your background image to `<branding_folder>/welcome-simple-bg.jpg`.
 
 You can use a markdown editor to generate your HTML text, for instance [CuteMarkEd](https://cloose.github.io/CuteMarkEd/) or the [web-based StackEdit](https://stackedit.io/app#).
 
@@ -92,7 +92,7 @@ These parameters can also be changed with an environment variable as described i
 In case you use CSS styling, we recommend to use the `tracimBrandingWelcomePage` class name prefix to avoid collisions with Tracim's own class names.
 The additional files/images added in `<branding_folder>` are available to the browser in `/assets/branding/`, so setup the source/link references in your HTML accordingly.
 
-You can use [welcome-simple.html.sample](../../frontend/dist/assets/branding/welcome-simple.html.sample) and [welcome.css.sample](../../frontend/dist/assets/branding/welcome-simple.css.sample) as a starting point.
+You can use the [welcome-simple.html sample](../../frontend/dist/assets/branding.sample/welcome-simple.html) and [welcome.css sample](../../frontend/dist/assets/branding.sample/welcome-simple.css) as a starting point.
 
 ### Structure of the welcome page files
 
