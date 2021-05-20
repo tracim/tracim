@@ -15,8 +15,13 @@
       height 100%
       min-height 400px
   &__lastversionbtn
+    color red
+    border solid orange
     & > i
       font-size 20px
+      color red
+      border solid orange
+      display none
   &__contentpage, &__contentpage__edition
     width 100%
     &__left
@@ -83,16 +88,24 @@
         &__content
           color darkGrey
       &__version
+      // MB -
         &__btn
           padding 5px 25px
           border-radius 5px
           width 145px
           color white
           font-size 17px
+          color red
+          border solid orange
           & > i
             margin-right 10px
             color darkGrey
             font-size 20px
+            color red
+            border solid orange
+          & > span
+            color red
+            border solid orange
         &__date
           color fontColor
           font-size 17px
@@ -132,6 +145,8 @@
 
 @media (max-width: max-xs)
   .html-document
+    &__lastversionbtn > span
+      border solid red
     &__contentpage
       &, &__contentpage__edition
         &__left

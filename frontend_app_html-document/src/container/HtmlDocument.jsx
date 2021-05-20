@@ -914,7 +914,7 @@ export class HtmlDocument extends React.Component {
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fas fa-history' />
-                  {props.t('Last version')}
+                  <span>{props.t('Last version')}</span>
                 </button>
               )}
 
