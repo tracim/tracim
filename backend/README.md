@@ -103,9 +103,9 @@ Create [configuration file](doc/setting.md) for a development environment:
 The provided default configuration is suitable for local-test. If you need to run Tracim
 over network, see [configuration file documentation](doc/setting.md).
 
-You need to create a color.json file at root of Tracim:
+You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
-    cp ../color.json.sample ../color.json
+    cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding
 
 You should also create requested folder for running Tracim:
 

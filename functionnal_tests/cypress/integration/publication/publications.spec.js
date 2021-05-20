@@ -2,7 +2,7 @@ import { PAGES } from '../../support/urls_commands'
 
 const fakeLink = 'https://awesomearticle.invalid/littletest.html'
 const fakePreview = {
-  "image": "/assets/images/logo-tracim.png",
+  "image": "/assets/branding/images/tracim-logo.png",
   "title": "The Holy Tests",
   "description": "I was writing a Cypress test and a Voice came to tell me something."
 }

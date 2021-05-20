@@ -65,10 +65,8 @@ RUN \
     && ./build_full_frontend.sh
 
 RUN \
-# Move some file
-    mv /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default \
 # Clean frontend installation
-    && rm -rf /tracim/frontend*/node_modules \
+    rm -rf /tracim/frontend*/node_modules \
     && rm -rf /tracim/node_modules
 
 
