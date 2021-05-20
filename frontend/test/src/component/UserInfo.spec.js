@@ -25,8 +25,8 @@ describe('<UserInfo />', () => {
       expect(wrapper.find('div.userinfo__username')).to.text().contains(props.user.username)
     )
 
-    it('should display the email of the user in a <a/> tag', () =>
-      expect(wrapper.find('a.userinfo__email')).to.text().contains(props.user.email)
+    it('should display the email of the user in a div', () =>
+      expect(wrapper.find('div.userinfo__email')).to.text().contains(props.user.email)
     )
 
     it('should display the profile label of the user in a div', () =>
