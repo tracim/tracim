@@ -459,7 +459,6 @@
   "moved": "Verschoben",
   "copied": "Kopiert",
   "Conditions": "Bedingungen",
-  "In order to start using our platform, you must be aware of our conditions": "Um mit der Nutzung unserer Plattform zu beginnen, müssen Sie sich mit unseren Bedingungen auseinandersetzen.",
   "I read and I agree to": "Ich habe gelesen und stimme zu",
   "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
   "Error while loading the usage conditions": "Fehler beim Laden der Nutzungsbedingungen:",
@@ -472,5 +471,6 @@
   "New email:": "Neue E-Mail:",
   "Type your password:": "Geben Sie Ihr Passwort ein:",
   "Alex Doe": "Alex Müller",
-  "alex.doe@jco.co": "alex.muller@alm.de"
+  "alex.doe@jco.co": "alex.muller@alm.de",
+  "In order to finish your sign in, please read the following usage conditions and accept them": "Um Ihre Anmeldung abzuschließen, lesen Sie bitte die folgenden Nutzungsbedingungen und akzeptieren Sie diese"
 }
