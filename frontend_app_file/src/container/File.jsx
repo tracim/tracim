@@ -1146,7 +1146,7 @@ export class File extends React.Component {
                   data-cy='appFileLastVersionBtn'
                 >
                   <i className='fas fa-history' />
-                  {props.t('Last version')}
+                  <span>{props.t('Last version')}</span>
                 </button>
               )}
 

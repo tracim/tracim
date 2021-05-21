@@ -133,6 +133,11 @@
 @media (max-width: max-xs)
   .file
     height "calc(100% - %s)" % headerHeight
+    &__lastversionbtn
+      > span
+        display none
+      > i
+        margin 0
     &__option__menu
       &__addversion
         padding 8px 5px
@@ -169,3 +174,4 @@
                 margin-left 10px
                 &__icon
                   margin-left 15px
+
