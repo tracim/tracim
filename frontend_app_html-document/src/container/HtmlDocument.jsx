@@ -909,7 +909,7 @@ export class HtmlDocument extends React.Component {
 
               {state.mode === APP_FEATURE_MODE.REVISION && (
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
+                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
