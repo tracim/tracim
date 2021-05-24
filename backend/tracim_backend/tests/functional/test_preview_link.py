@@ -47,6 +47,12 @@ class TestUrlPreview(object):
                 simple_opengraph_html_result_endpoint,
                 id="simple link example",
             ),
+            pytest.param(
+                "http://example.invalid/with%2520escaped_space",
+                simple_opengraph_html,
+                simple_opengraph_html_result_endpoint,
+                id="simple link with space",
+            ),
         ),
     )
     def test_api__url_preview__ok_200__nominal_case(
@@ -102,6 +108,17 @@ class TestUrlPreview(object):
         self, web_testapp,
     ):
         params = {"url": "http://thisurldoesnotexist.invalid"}
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/url-preview?{params}".format(params=urlencode(params)), status=400,
+        )
+        assert res.json_body["code"] == ErrorCode.UNAVAILABLE_URL_PREVIEW
+
+    @responses.activate
+    def test_api__url_preview__err_400__unescaped_space(
+        self, web_testapp,
+    ):
+        params = {"url": "https://example.org.invalid/unescaped%20space"}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)), status=400,

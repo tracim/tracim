@@ -76,7 +76,6 @@ from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TranslationQuery
-from tracim_backend.models.context_models import UrlQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
@@ -1902,10 +1901,6 @@ class ContentPathInfoSchema(marshmallow.Schema):
 
 class UrlQuerySchema(marshmallow.Schema):
     url = marshmallow.fields.URL()
-
-    @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> UrlQuery:
-        return UrlQuery(**data)
 
 
 class UrlPreviewSchema(marshmallow.Schema):
