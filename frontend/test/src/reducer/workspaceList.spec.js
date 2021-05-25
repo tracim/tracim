@@ -91,18 +91,22 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
-      const rez = workspaceList(
-        [
-          ...initialState,
-          {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: []
-          }
-        ],
-        addWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager })
-      )
-
       it('should return a workspace list with the member correctly added in the right workspace', () => {
+        const rez = workspaceList(
+          [
+            ...initialState,
+            {
+              ...serializedFirstWorkspaceFromApi,
+              memberList: []
+            }
+          ],
+          addWorkspaceMember(
+            globalManagerFromApi,
+            firstWorkspaceFromApi.workspace_id,
+            { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager }
+          )
+        )
+
         expect(rez).to.deep.equal([
           ...initialState,
           {
@@ -116,6 +120,26 @@ describe('workspaceList reducer', () => {
             }]
           }
         ])
+      })
+
+      it('should return a uniq by id object the same member is added twice', () => {
+        const initialStateWithMember = [
+          ...initialState,
+          {
+            ...serializedFirstWorkspaceFromApi,
+            memberList: [{ id: globalManagerFromApi.user_id }]
+          }
+        ]
+        const rez = workspaceList(
+          initialStateWithMember,
+          addWorkspaceMember(
+            globalManagerFromApi,
+            initialState.id,
+            { id: globalManagerFromApi.user_id }
+          )
+        )
+
+        expect(rez).to.deep.equal(initialStateWithMember)
       })
     })
 

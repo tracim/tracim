@@ -7,10 +7,10 @@
     <meta name="description" content="${website_description}" />
     % endif
     <title>${website_title}</title>
-    <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/images/favicon/tracim_64x64.png?token=${cache_token}" nonce="${csp_nonce}">
-    <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon/tracim_32x32.png?token=${cache_token}" nonce="${csp_nonce}">
-    <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon/tracim_16x16.png?token=${cache_token}" nonce="${csp_nonce}">
-    <link rel="manifest" href="/assets/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64" href="/assets/branding/images/favicon/tracim-64x64.png?token=${cache_token}" nonce="${csp_nonce}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32" href="/assets/branding/images/favicon/tracim-32x32.png?token=${cache_token}" nonce="${csp_nonce}">
+    <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/branding/images/favicon/tracim-16x16.png?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="manifest" href="/assets/branding/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
@@ -19,8 +19,8 @@
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
     <!-- Apple icons -->
-    <link rel="apple-touch-icon" href="/assets/images/wa-tracim-logo-180x180.png">
-    <link rel="mask-icon" href="/assets/images/safari-pinned-tab-icon.svg" color="${colors['primary'].web}">
+    <link rel="apple-touch-icon" href="/assets/branding/images/wa-tracim-logo-180x180.png">
+    <link rel="mask-icon" href="/assets/images/branding/safari-pinned-tab-icon.svg" color="${colors['primary'].web}">
 
     <style nonce="${csp_nonce}">
       <%

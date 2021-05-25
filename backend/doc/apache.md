@@ -19,7 +19,7 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         ServerName [domain_name]
 
         Alias "/assets" "[TRACIM_PATH]/frontend/dist/assets"
-        Alias "/favicon.ico" "[TRACIM_PATH]/frontend/dist/assets/favicon.ico"
+        Alias "/favicon.ico" "[TRACIM_PATH]/frontend/dist/assets/branding/images/favicon/favicon.ico"
         <Directory "[TRACIM_PATH]/frontend/dist/assets">
             Require all granted
         </Directory>

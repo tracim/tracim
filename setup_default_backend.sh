@@ -64,18 +64,11 @@ function setup_config_file {
         loggood "development.ini already exists"
     fi
 
-    if [ ! -f ../color.json ]; then
-        log "Creating color.json ..."
-        cp ../color.json.sample ../color.json && loggood "Successfully copied the default color file" || logerror "Failed to copy the default color file"
-    else
-        loggood "color.json already exists"
-    fi
-
     if [ ! -d ../frontend/dist/assets/branding ]; then
-        log "Creating default welcome page ..."
-        cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding && loggood "Successfully created default welcome page" || logerror "Failed to create default welcome page"
+        log "Creating default branding folder ..."
+        cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding && loggood "Successfully created default branding folder" || logerror "Failed to create default branding folder"
     else
-        loggood "welcome page already exists"
+        loggood "branding folder already exists"
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then

@@ -37,7 +37,7 @@ import {
   PAGE
 } from 'tracim_frontend_lib'
 
-const TRACIM_LOGO_PATH = '/assets/images/logo-tracim.png'
+const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 
 const qs = require('query-string')
 

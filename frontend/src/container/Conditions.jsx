@@ -59,7 +59,7 @@ export class Conditions extends React.Component {
     const { props, state } = this
     return (
       <div className='conditions__main__wrapper'>
-        <h1 className='conditions__main__title'>{props.t('In order to start using our platform, you must be aware of our conditions')}</h1>
+        <h1 className='conditions__main__title'>{props.t('In order to finish your sign in, please read the following usage conditions and accept them')}</h1>
         {props.usageConditionsList.map((condition, index) => (
           <div className='conditions__main__checkbox' key={`condition${index}`}>
             <Checkbox

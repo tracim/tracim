@@ -47,7 +47,6 @@
   "Error loading publication comments": "Erreur de chargement des commentaires de la publication",
   "Hide subspaces": "Masquer les sous-espaces",
   "I read and I agree to": "Lu et approuvé",
-  "In order to start using our platform, you must be aware of our conditions": "Afin de commencer à utiliser notre plateforme, vous devez prendre connaissance de nos conditions",
   "Invalid email": "Email non valide",
   "Invalid email. Please enter a valid email.": "Email non valide. Veuillez entrer un email valide.",
   "Invalid name": "Nom non valide",
@@ -472,5 +471,6 @@
   "Type your password:": "Entrer votre mot de passe :",
   "Current password:": "Mot de passe actuel :",
   "Alex Doe": "Alix Martin",
-  "alex.doe@jco.co": "alix.martin@alm.fr"
+  "alex.doe@jco.co": "alix.martin@alm.fr",
+  "In order to finish your sign in, please read the following usage conditions and accept them": "Pour finaliser votre connexion, merci de prendre connaissance des conditions d'utilisation et de les valider"
 }

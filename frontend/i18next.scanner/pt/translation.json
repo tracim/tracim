@@ -48,7 +48,6 @@
   "Error loading publication comments": "Erro ao carregar comentários de publicação",
   "Hide subspaces": "Ocultar subespaços",
   "I read and I agree to": "Li e concordo com",
-  "In order to start using our platform, you must be aware of our conditions": "Para começar a utilizar a nossa plataforma, deve estar ciente das nossas condições",
   "Invalid email": "E-mail inválido",
   "Invalid email. Please enter a valid email.": "E-mail inválido. Por favor, introduza um e-mail válido.",
   "Invalid name": "Nome inválido",
@@ -472,5 +471,6 @@
   "Type your password:": "Escreva sua palavra-passe:",
   "Current password:": "Palavra-passe atual:",
   "Alex Doe": "Carmo Da Silva",
-  "alex.doe@jco.co": "carmo.dasilva@cds.pt"
+  "alex.doe@jco.co": "carmo.dasilva@cds.pt",
+  "In order to finish your sign in, please read the following usage conditions and accept them": "Para terminar a sua sessão, por favor leia as seguintes condições de utilização e aceite-as"
 }
