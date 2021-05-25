@@ -8,8 +8,8 @@ import {
   IconButton,
   PAGE,
   serialize,
-  // SUBSCRIPTION_TYPE,
-  // TLM_CORE_EVENT_TYPE as TLM_CET,
+  SUBSCRIPTION_TYPE,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 import { serializeContentProps } from '../../reducer/workspaceContentList.js'
@@ -72,8 +72,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
 ])
-// const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
-// const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
+const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
+const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 const ActivityList = (props) => {
   const buildActivityBreadcrumbsList = (activity) => {
@@ -115,33 +115,33 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
-  // const isSubscriptionRequestOrRejection = (activity) => {
-  //   return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
-  //     DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
-  // }
+  const isSubscriptionRequestOrRejection = (activity) => {
+    return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
+      DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
+  }
 
-  // const isMemberCreatedOrModified = (activity) => {
-  //   const coreEventType = activity.newestMessage.event_type.split('.')[1]
-  //   return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
-  //     DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
-  // }
+  const isMemberCreatedOrModified = (activity) => {
+    const coreEventType = activity.newestMessage.event_type.split('.')[1]
+    return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+      DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
+  }
 
-  // const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
-  //   if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-  //       !activity.newestMessage.fields.workspace) return true
-  //   const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
-  //   if (!currentWorkspace) return true
-  //   return currentWorkspace.publicationEnabled
-  // }
+  const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+    if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+        !activity.newestMessage.fields.workspace) return true
+    const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+    if (!currentWorkspace) return true
+    return currentWorkspace.publicationEnabled
+  }
 
-  // const activityDisplayFilter = (activity) => {
-  //   return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
-  //     (
-  //       (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-  //       isSubscriptionRequestOrRejection(activity) ||
-  //       isMemberCreatedOrModified(activity)
-  //     )
-  // }
+  const activityDisplayFilter = (activity) => {
+    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
+      (
+        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+        isSubscriptionRequestOrRejection(activity) ||
+        isMemberCreatedOrModified(activity)
+      )
+  }
 
   return (
     <div className='activityList'>
@@ -157,8 +157,7 @@ const ActivityList = (props) => {
       )}
       <div className='activityList__list' data-cy='activityList__list'>
         {(props.activity.list.length > 0
-          ? props.activity.list.map(renderActivityComponent)
-          : (
+          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)          : (
             <div className='activityList__placeholder'>
               {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
             </div>

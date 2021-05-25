@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { CONTENT_NAMESPACE } from '../../util/helper.js'
 import {
   CONTENT_TYPE,
   NUMBER_RESULTS_BY_PAGE,
@@ -17,7 +16,8 @@ import {
 } from '../util/activity.js'
 import {
   FETCH_CONFIG,
-  handleClickCopyLink
+  handleClickCopyLink,
+  CONTENT_NAMESPACE
 } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -202,6 +202,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     }
 
     isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+      const { props } = this
       if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
           !activity.newestMessage.fields.workspace) return true
       const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
@@ -213,9 +214,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION]
       return entityType.includes(activity.entityType) &&
         (
-          (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-          isSubscriptionRequestOrRejection(activity) ||
-          isMemberCreatedOrModified(activity)
+          (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+          this.isSubscriptionRequestOrRejection(activity) ||
+          this.isMemberCreatedOrModified(activity)
         )
     }
     /**
@@ -226,8 +227,8 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {boolean} hasNextPage is there still messages to load
      * @param {string} nextPageToken token to get the next page of messages
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
-
      */
+
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
       const initialActivityListLength = activityList.length
@@ -247,7 +248,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           activityList,
           FETCH_CONFIG.apiUrl
         )
-        activityList = activityList.filter(activityDisplayFilter)
+        activityList = activityList.filter(this.activityDisplayFilter)
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }
