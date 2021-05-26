@@ -190,7 +190,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = false
     }
 
-    // MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
+    // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
     // See this ticket https://github.com/tracim/tracim/issues/4677
 
     isSubscriptionRequestOrRejection = (activity) => {
