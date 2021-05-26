@@ -27,6 +27,7 @@ import {
   ROLE,
   AppContentRightMenu,
   Timeline,
+  IconButton,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -908,15 +909,16 @@ export class HtmlDocument extends React.Component {
               )}
 
               {state.mode === APP_FEATURE_MODE.REVISION && (
-                <button
-                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+                <IconButton
+                  customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+                  color={state.config.hexcolor}
+                  intent='primary'
+                  mode='light'
                   onClick={this.handleClickLastVersion}
-                  style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  icon='fas fa-history'
+                  text={props.t('Last version')}
                   title={props.t('Last version')}
-                >
-                  <i className='fas fa-history' />
-                  <span>{props.t('Last version')}</span>
-                </button>
+                />
               )}
 
               {state.showRefreshWarning && (
