@@ -190,6 +190,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = false
     }
 
+    // MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
+    // See this ticket https://github.com/tracim/tracim/issues/4677
+
     isSubscriptionRequestOrRejection = (activity) => {
       return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
         DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))

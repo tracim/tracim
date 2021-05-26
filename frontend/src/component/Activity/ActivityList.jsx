@@ -115,6 +115,9 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
+  // MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in withActivity
+  // See this ticket https://github.com/tracim/tracim/issues/4677
+
   const isSubscriptionRequestOrRejection = (activity) => {
     return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
       DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
@@ -157,7 +160,7 @@ const ActivityList = (props) => {
       )}
       <div className='activityList__list' data-cy='activityList__list'>
         {(props.activity.list.length > 0
-          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)          : (
+          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent) : (
             <div className='activityList__placeholder'>
               {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
             </div>
