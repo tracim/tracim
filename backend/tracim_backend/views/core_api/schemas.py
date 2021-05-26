@@ -1853,6 +1853,7 @@ class ConfigSchema(marshmallow.Schema):
         TargetLanguageSchema, many=True
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
+    ui__spaces__creation__parent_space_choice__enabled = marshmallow.fields.Bool()
 
 
 class ConditionFileSchema(marshmallow.Schema):

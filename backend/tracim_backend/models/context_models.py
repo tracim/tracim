@@ -77,6 +77,7 @@ class ConfigModel(object):
         search_engine: str,
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
+        ui__spaces__creation__parent_space_choice__enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -92,6 +93,9 @@ class ConfigModel(object):
         self.translation_service__enabled = translation_service__enabled
         self.translation_service__target_languages = translation_service__target_languages
         self.user__self_registration__enabled = user__self_registration__enabled
+        self.ui__spaces__creation__parent_space_choice__enabled = (
+            ui__spaces__creation__parent_space_choice__enabled
+        )
 
 
 class ErrorCodeModel(object):

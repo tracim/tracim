@@ -551,3 +551,14 @@ To avoid waiting too long for a translation request you can tune its timeout (in
 # timeout is in seconds
 translation_service.timeout = 5
 ```
+
+## User Interface Customization
+
+The user interface of Tracim can be customized. For instance, you can disable
+the input that lets the user choose the parent space during space creation:
+
+```
+ui.spaces.creation.parent_space_choice.enabled = False
+```
+
+By default, this parameter is set to `True`.

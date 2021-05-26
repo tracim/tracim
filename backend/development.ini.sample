@@ -464,6 +464,12 @@ website.usage_conditions =
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
 ; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*
 
+### UI Customization
+# These parameters configure the user interface without affecting the backend proper
+
+# Enable the parent space choice when creating a new space from the user interface.
+; ui.spaces.creation.parent_space_choice.enabled = True
+
 ####
 # JOB EXECUTION
 ####

@@ -529,6 +529,10 @@ class CFG(object):
             self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
+        self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__ENABLED = asbool(
+            self.get_raw_config("ui.spaces.creation.parent_space_choice.enabled", "True")
+        )
+
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
