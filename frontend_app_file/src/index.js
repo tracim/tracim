@@ -20,7 +20,7 @@ const appInterface = {
   renderAppFeature: data => {
     const element = document.getElementById(data.config.domContainer)
     if (element._reactRootContainer) {
-      console.log('Component is already mounted, waiting for unmount!!', appInterface)
+      console.log('HACK (#4679): component is already mounted, waiting for unmount!!', appInterface)
       setTimeout(() => { appInterface.renderAppFeature(data) }, 50)
       return
     }
@@ -34,7 +34,7 @@ const appInterface = {
   unmountApp: domId => {
     const element = document.getElementById(domId)
     if (domId === 'appFeatureContainer' && !element._reactRootContainer) {
-      console.log('Component is not mounted, waiting for mount!!', appInterface)
+      console.log('HACK (#4679): component is not mounted, waiting for mount!!', appInterface)
       setTimeout(() => { appInterface.unmountApp(domId) }, 50)
       return
     }
