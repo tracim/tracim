@@ -1144,6 +1144,7 @@ export class File extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                   data-cy='appFileLastVersionBtn'
+                  title={props.t('Last version')}
                 >
                   <i className='fas fa-history' />
                   <span>{props.t('Last version')}</span>

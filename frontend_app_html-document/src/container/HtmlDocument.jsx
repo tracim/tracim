@@ -912,6 +912,7 @@ export class HtmlDocument extends React.Component {
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
+                  title={props.t('Last version')}
                 >
                   <i className='fas fa-history' />
                   <span>{props.t('Last version')}</span>
