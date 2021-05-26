@@ -468,7 +468,7 @@ website.usage_conditions =
 # These parameters configure the user interface without affecting the backend proper
 
 # Enable the parent space choice when creating a new space from the user interface.
-; ui.spaces.creation.parent_space_choice.enabled = True
+; ui.spaces.creation.parent_space_choice.visible = True
 
 ####
 # JOB EXECUTION

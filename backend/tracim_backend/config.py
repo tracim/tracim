@@ -529,8 +529,8 @@ class CFG(object):
             self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
-        self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__ENABLED = asbool(
-            self.get_raw_config("ui.spaces.creation.parent_space_choice.enabled", "True")
+        self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
+            self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
     def __load_uploaded_files_config(self) -> None:

@@ -188,7 +188,7 @@ export class PopupCreateWorkspace extends React.Component {
   render () {
     const { props, state } = this
     const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-    const areParentSpacesEnabled = state.config.system.config.ui__spaces__creation__parent_space_choice__enabled
+    const areParentSpacesVisible = state.config.system.config.ui__spaces__creation__parent_space_choice__visible
 
     return (
       <CardPopup
@@ -250,7 +250,7 @@ export class PopupCreateWorkspace extends React.Component {
             )
             : (
               <>
-                {areParentSpacesEnabled && (
+                {areParentSpacesVisible && (
                   <div>
                     <div className='newSpace__label'> {props.t('Parent space:')} </div>
                     <Select
