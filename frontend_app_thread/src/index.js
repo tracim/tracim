@@ -12,7 +12,7 @@ require('./css/index.styl')
 // The code of the functions relies on the _reactRootContainer property to know whether the element is a React element or not and
 // should be rendered or unmounted (see https://github.com/facebook/react/blob/7841d0695ae4bde9848cf8953baf34d312d0cced/packages/react-dom/src/client/ReactDOMLegacy.js).
 // The workaround ensures that a new render is only executed if the unmount of the previous elements has been executed and vice versa.
-// More Information:
+// More Information: https://github.com/tracim/tracim/issues/4679
 
 const appInterface = {
   name: 'thread',
