@@ -160,7 +160,8 @@ const ActivityList = (props) => {
       )}
       <div className='activityList__list' data-cy='activityList__list'>
         {(props.activity.list.length > 0
-          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent) : (
+          ? props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent) 
+          : (
             <div className='activityList__placeholder'>
               {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
             </div>
