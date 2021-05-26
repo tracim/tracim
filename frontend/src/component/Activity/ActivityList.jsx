@@ -115,7 +115,7 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
-  // MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in withActivity
+  // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in withActivity
   // See this ticket https://github.com/tracim/tracim/issues/4677
 
   const isSubscriptionRequestOrRejection = (activity) => {
