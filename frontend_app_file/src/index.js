@@ -8,11 +8,15 @@ import PopupCreateFile from './container/PopupCreateFile.jsx'
 
 require('./css/index.styl')
 
+// FIXME - GB - 2021-05-26 - Both if in the appInterface const are workarounds for the asynchrony problem of the renderAppFeature and unmountApp functions.
+// The code of the functions relies on the _reactRootContainer property to know whether the element is a React element or not and
+// should be rendered or unmounted (see https://github.com/facebook/react/blob/7841d0695ae4bde9848cf8953baf34d312d0cced/packages/react-dom/src/client/ReactDOMLegacy.js).
+// The workaround ensures that a new render is only executed if the unmount of the previous elements has been executed and vice versa.
+// More Information:
+
 const appInterface = {
   name: 'file',
   isRendered: false,
-  component: null,
-
   renderAppFeature: data => {
     const element = document.getElementById(data.config.domContainer)
     if (element._reactRootContainer) {
@@ -20,15 +24,12 @@ const appInterface = {
       setTimeout(() => { appInterface.renderAppFeature(data) }, 50)
       return
     }
-
-    const component = ReactDOM.render(
+    return ReactDOM.render(
       <Router history={data.config.history}>
         <File data={data} />
       </Router>
       , element
     )
-    appInterface.component = component
-    return appInterface.component
   },
   unmountApp: domId => {
     const element = document.getElementById(domId)
@@ -37,7 +38,6 @@ const appInterface = {
       setTimeout(() => { appInterface.unmountApp(domId) }, 50)
       return
     }
-    appInterface.component = null
     return ReactDOM.unmountComponentAtNode(element) // returns bool
   },
   renderAppPopupCreation: data => {
