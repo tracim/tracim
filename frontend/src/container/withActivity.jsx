@@ -16,8 +16,8 @@ import {
 } from '../util/activity.js'
 import {
   FETCH_CONFIG,
-  handleClickCopyLink,
-  CONTENT_NAMESPACE
+  CONTENT_NAMESPACE,
+  handleClickCopyLink
 } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
