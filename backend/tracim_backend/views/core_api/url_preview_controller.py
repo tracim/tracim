@@ -35,7 +35,7 @@ class URLPreviewController(Controller):
             logger.debug(self, "getting url preview of {}".format(url))
             return url_preview_lib.get_preview(url=url)
 
-        return get_cached_preview(hapic_data.query.url)
+        return get_cached_preview(hapic_data.query["url"])
 
     def bind(self, configurator: Configurator) -> None:
         configurator.add_route(

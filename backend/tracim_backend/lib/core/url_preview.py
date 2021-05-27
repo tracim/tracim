@@ -1,5 +1,6 @@
 from typing import Optional
 
+from requests.exceptions import InvalidURL
 from webpreview import WebpreviewException
 from webpreview import web_preview
 
@@ -55,6 +56,6 @@ class URLPreviewLib(object):
                     "Cookie": "CONSENT=PENDING+999",
                 },
             )
-        except WebpreviewException as exc:
+        except (WebpreviewException, InvalidURL) as exc:
             raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
         return URLPreview(title=title, description=description, image=image)
