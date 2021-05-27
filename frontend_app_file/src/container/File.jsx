@@ -1149,7 +1149,7 @@ export class File extends React.Component {
                   icon='fas fa-history'
                   text={props.t('Last version')}
                   title={props.t('Last version')}
-                  data-cy='appFileLastVersionBtn'
+                  dataCy='appFileLastVersionBtn'
                 />
               )}
 
