@@ -1,3 +1,41 @@
+# 3.8.2 / 2021-05-27
+
+### New Features
+
+- Add link to the public profile via favorites page
+- Configuration parameter (in server config) permit to disable the space parent input when creating a space
+
+### Fixed Issues
+
+UX:
+
+
+### Breaking/Important change
+
+- All necessary files to customize Tracim instance (logo, color) are now available in `branding/` folder. Some manually change is need to run this version (same process for local installation or docker installation):
+  - for Tracim >= 3.8.0
+  :warning: if you not apply that, Tracim cant start and use your customization
+    - First, it's necessary to backup the existing branding folder if you have added some customization (if not, its necessary to delete branding folder `rm -r /{docker-volume}/etc/branding`). To do that, you need to:
+      - `mv /{docker-volume}/etc/branding/ /{docker-volume}/etc/branding-back/`
+      - The `branding/` folder is created automatically by Tracim if it not exists
+    - Second, start Tracim 3.8.2 and after that you need to:
+      - if you have customized your `logo.png`:
+        - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
+      - if you have customized your `color.json`:
+        - its better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
+      - if you have customized some files in the old `branding/` folder, you need to copy your file from `/{docker-volume}/etc/branding-back/` folder
+    - Finally, restart Tracim
+  - for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`
+  :warning: if you not apply that, Tracim cant use your customization
+    - After first start of the version 3.8.2, you need to:
+      - if you have customized your `logo.png`:
+        - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
+      - if you have customized your `color.json`:
+        - its better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
+- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
+:warning: if you not apply this, Tracim cant show the `favicon.ico`
+
+
 # 3.8.1 / 2021-05-12
 
 ### New Features
