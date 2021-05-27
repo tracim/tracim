@@ -69,6 +69,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_LIMITATION__CONTENT_LENGTH_FILE_SIZE                               | limitation.content_length_file_size                            | LIMITATION__CONTENT_LENGTH_FILE_SIZE                               |
 | TRACIM_LIMITATION__WORKSPACE_SIZE                                         | limitation.workspace_size                                      | LIMITATION__WORKSPACE_SIZE                                         |
 | TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             | limitation.user_default_allowed_space                          | LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             |
+| TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
 | TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
 | TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
