@@ -1,39 +1,48 @@
 # 3.8.2 / 2021-05-27
 
 ### New Features
-
-- Add link to the public profile via favorites page
-- Configuration parameter (in server config) permit to disable the space parent input when creating a space
+ 
+- Add links to the public profile in the favorites page
+- Configuration parameter (in server config) allows disabling the space parent input when creating a space
 
 ### Fixed Issues
 
-UX:
+- UX: [#4551](https://github.com/tracim/tracim/issues/4551)
+- Frontend: [#3796](https://github.com/tracim/tracim/issues/3796),
+[#4190](https://github.com/tracim/tracim/issues/4190),
+[#4430](https://github.com/tracim/tracim/issues/4430),
+[#4573](https://github.com/tracim/tracim/issues/4573),
+[#4637](https://github.com/tracim/tracim/issues/4637),
+[#4646](https://github.com/tracim/tracim/issues/4646),
+[#4654](https://github.com/tracim/tracim/issues/4654)
+- Misc: [#4649](https://github.com/tracim/tracim/issues/4649),
+[#4656](https://github.com/tracim/tracim/issues/4656)
 
 
 ### Breaking/Important change
 
-- All necessary files to customize Tracim instance (logo, color) are now available in `branding/` folder. Some manually change is need to run this version (same process for local installation or docker installation):
+- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
+:warning: if you not apply this, Tracim can't show the `favicon.ico`.
+- All necessary files to customize Tracim instance (logo, color) must be placed in the `branding/` folder (issue [#4606](https://github.com/tracim/tracim/issues/4606)). A `branding.sample`folder is given as an example. Some manual changes are required to run this version (same process for local installation or docker installation):
   - for Tracim >= 3.8.0
-  :warning: if you not apply that, Tracim cant start and use your customization
-    - First, it's necessary to backup the existing branding folder if you have added some customization (if not, its necessary to delete branding folder `rm -r /{docker-volume}/etc/branding`). To do that, you need to:
+  :warning: if you not apply that, Tracim won't start and use your customization
+    - First, it's necessary to backup the existing branding folder if you have added some customization (if not, it's necessary to delete the branding folder: `rm -r /{docker-volume}/etc/branding`). To do that, you need to:
       - `mv /{docker-volume}/etc/branding/ /{docker-volume}/etc/branding-back/`
-      - The `branding/` folder is created automatically by Tracim if it not exists
+      - The `branding/` folder is created automatically by Tracim if it does not exist
     - Second, start Tracim 3.8.2 and after that you need to:
       - if you have customized your `logo.png`:
         - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
       - if you have customized your `color.json`:
-        - its better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
+        - it's better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
       - if you have customized some files in the old `branding/` folder, you need to copy your file from `/{docker-volume}/etc/branding-back/` folder
     - Finally, restart Tracim
   - for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`
-  :warning: if you not apply that, Tracim cant use your customization
+  :warning: if you not apply that, Tracim can't use your customization
     - After first start of the version 3.8.2, you need to:
       - if you have customized your `logo.png`:
         - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
       - if you have customized your `color.json`:
-        - its better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
-- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
-:warning: if you not apply this, Tracim cant show the `favicon.ico`
+        - it's better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
 
 
 # 3.8.1 / 2021-05-12
@@ -47,25 +56,23 @@ UX:
 - The user interface is now available in German
 - The user account interface uses explicit placeholders and labels for guidance
 
-
 ### Fixed Issues
 
-Frontend: [#3786](https://github.com/tracim/tracim/issues/3786)
-[#4495](https://github.com/tracim/tracim/issues/4495)
+- Frontend: [#3786](https://github.com/tracim/tracim/issues/3786),
+[#3899](https://github.com/tracim/tracim/issues/3899),
+[#4495](https://github.com/tracim/tracim/issues/4495),
+[#4521](https://github.com/tracim/tracim/issues/4521),
 [#4591](https://github.com/tracim/tracim/issues/4591)
-[#4521](https://github.com/tracim/tracim/issues/4521)
-[#3899](https://github.com/tracim/tracim/issues/3899)
-Frontend/Backend: [#4590](https://github.com/tracim/tracim/issues/4590)
-[#4539](https://github.com/tracim/tracim/issues/4539)
-[#4557](https://github.com/tracim/tracim/issues/4557)
-[#4586](https://github.com/tracim/tracim/issues/4586)
-Backend: [#4587](https://github.com/tracim/tracim/issues/4587)
-[#3911](https://github.com/tracim/tracim/issues/3911)
+- Frontend/Backend: [#4539](https://github.com/tracim/tracim/issues/4539),
+[#4557](https://github.com/tracim/tracim/issues/4557),
+[#4586](https://github.com/tracim/tracim/issues/4586),
+[#4590](https://github.com/tracim/tracim/issues/4590)
+- Backend: [#3911](https://github.com/tracim/tracim/issues/3911),
+[#4587](https://github.com/tracim/tracim/issues/4587),
+[#4631](https://github.com/tracim/tracim/issues/4631),
 [#4632](https://github.com/tracim/tracim/issues/4632)
-[#4631](https://github.com/tracim/tracim/issues/4631)
-Docker: [#4603](https://github.com/tracim/tracim/issues/4603)
-Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
-
+- Docker: [#4603](https://github.com/tracim/tracim/issues/4603)
+- Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 
 ### Breaking/Important change
 
@@ -92,12 +99,12 @@ Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
 
 ### Fixed Issues
 
-Frontend: [#3787](https://github.com/tracim/tracim/issues/3787),
+- Frontend: [#3787](https://github.com/tracim/tracim/issues/3787),
 [#3811](https://github.com/tracim/tracim/issues/3811),
 [#4464](https://github.com/tracim/tracim/issues/4464),
 [#4532](https://github.com/tracim/tracim/issues/4532),
 [#4567](https://github.com/tracim/tracim/issues/4567)
-Backend: [#4552](https://github.com/tracim/tracim/issues/4552)
+- Backend: [#4552](https://github.com/tracim/tracim/issues/4552)
 
 ### Breaking/Important change
 
