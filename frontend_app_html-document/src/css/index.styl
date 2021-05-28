@@ -15,6 +15,7 @@
       height 100%
       min-height 400px
   &__lastversionbtn
+    cursor pointer
     & > i
       font-size 20px
   &__contentpage, &__contentpage__edition
@@ -83,6 +84,8 @@
         &__content
           color darkGrey
       &__version
+      // MB - 2021-05-21 - FIXME (#4671 - https://github.com/tracim/tracim/issues/4671)
+      // This bit of code doesn't seem to be used anywhere
         &__btn
           padding 5px 25px
           border-radius 5px
@@ -132,6 +135,11 @@
 
 @media (max-width: max-xs)
   .html-document
+    &__lastversionbtn
+      > span
+        display none
+      > i
+        margin 0
     &__contentpage
       &, &__contentpage__edition
         &__left

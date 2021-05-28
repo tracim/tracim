@@ -83,6 +83,7 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
   } else {
     if (previouslySelectedAppFeature !== selectedApp.name) {
       globalThis.GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.UNMOUNT_APP_FEATURE, data: {} })
+      unMountAppFeature()
     }
 
     selectedApp.renderAppFeature(app)
@@ -200,7 +201,6 @@ globalThis.GLOBAL_eventReducer = function (event) {
       break
     case CUSTOM_EVENT.UNMOUNT_APP_FEATURE:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
-      unMountAppFeature()
       break
   }
 }

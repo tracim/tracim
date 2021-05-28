@@ -42,7 +42,6 @@
   "Full name:": "Full name:",
   "Hide subspaces": "Hide subspaces",
   "I read and I agree to": "I read and I agree to",
-  "In order to start using our platform, you must be aware of our conditions": "In order to start using our platform, you must be aware of our conditions",
   "Invalid email": "Invalid email",
   "Invalid email. Please enter a valid email.": "Invalid email. Please enter a valid email.",
   "Invalid name": "Invalid name",
@@ -472,5 +471,6 @@
   "Type your password:": "Type your password:",
   "Current password:": "Current password:",
   "Alex Doe": "Alex Doe",
-  "alex.doe@jco.co": "alex.doe@jco.co"
+  "alex.doe@jco.co": "alex.doe@jco.co",
+  "In order to finish your sign in, please read the following usage conditions and accept them": "In order to finish your sign in, please read the following usage conditions and accept them"
 }

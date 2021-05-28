@@ -5,7 +5,8 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_SUB
+  TLM_SUB_TYPE as TLM_SUB,
+  SUBSCRIPTION_TYPE
 } from 'tracim_frontend_lib'
 
 import {
@@ -15,6 +16,7 @@ import {
 } from '../util/activity.js'
 import {
   FETCH_CONFIG,
+  CONTENT_NAMESPACE,
   handleClickCopyLink
 } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
@@ -40,6 +42,9 @@ const makeCancelable = (promise) => {
     cancel: () => { isCanceled = true }
   }
 }
+
+const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
+const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
@@ -185,6 +190,38 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = false
     }
 
+    // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
+    // See this ticket https://github.com/tracim/tracim/issues/4677
+
+    isSubscriptionRequestOrRejection = (activity) => {
+      return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
+        DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
+    }
+
+    isMemberCreatedOrModified = (activity) => {
+      const coreEventType = activity.newestMessage.event_type.split('.')[1]
+      return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+        DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
+    }
+
+    isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+      const { props } = this
+      if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+          !activity.newestMessage.fields.workspace) return true
+      const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+      if (!currentWorkspace) return true
+      return currentWorkspace.publicationEnabled
+    }
+
+    activityDisplayFilter = (activity) => {
+      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION]
+      return entityType.includes(activity.entityType) &&
+        (
+          (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+          this.isSubscriptionRequestOrRejection(activity) ||
+          this.isMemberCreatedOrModified(activity)
+        )
+    }
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list
@@ -194,6 +231,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {string} nextPageToken token to get the next page of messages
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
+
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
       const initialActivityListLength = activityList.length
@@ -213,6 +251,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           activityList,
           FETCH_CONFIG.apiUrl
         )
+        activityList = activityList.filter(this.activityDisplayFilter)
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }

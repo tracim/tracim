@@ -394,10 +394,6 @@ to have more/less log about something.
     ...
     level = INFO
 
-## Customize the main Tracim colors
-
-You can change the default colors used in Tracim by editing the `color.json` file which you can find at the root of the Tracim directory. See [color.json.sample](../../color.json.sample) for the default configuration file.
-
 ## Configure indexing and search to use Elasticsearch (Tracim v2.3+)
 
 First, you need an Elasticsearch server. An easy way to have one with docker can be (don't use this for production):
@@ -555,3 +551,14 @@ To avoid waiting too long for a translation request you can tune its timeout (in
 # timeout is in seconds
 translation_service.timeout = 5
 ```
+
+## User Interface Customization
+
+The user interface of Tracim can be customized. For instance, you can disable
+the input that lets the user choose the parent space during space creation:
+
+```
+ui.spaces.creation.parent_space_choice.visible = False
+```
+
+By default, this parameter is set to `True`.

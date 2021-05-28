@@ -6,10 +6,7 @@ import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
-import {
-  addWorkspaceList,
-  addWorkspaceMember
-} from '../action-creator.sync.js'
+import { addWorkspaceList } from '../action-creator.sync.js'
 import {
   NO_ACTIVE_SPACE_ID,
   workspaceConfig,
@@ -66,7 +63,6 @@ export class Sidebar extends React.Component {
 
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
-      props.dispatch(addWorkspaceMember(tlmUser, tlmWorkspace.workspace_id, tlmFieldObject.fields.member))
     }
   }
 

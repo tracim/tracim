@@ -8,7 +8,6 @@ from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
-from urllib.parse import unquote
 
 from slugify import slugify
 from sqlakeyset import Page
@@ -77,6 +76,7 @@ class ConfigModel(object):
         search_engine: str,
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
+        ui__spaces__creation__parent_space_choice__visible: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -92,6 +92,9 @@ class ConfigModel(object):
         self.translation_service__enabled = translation_service__enabled
         self.translation_service__target_languages = translation_service__target_languages
         self.user__self_registration__enabled = user__self_registration__enabled
+        self.ui__spaces__creation__parent_space_choice__visible = (
+            ui__spaces__creation__parent_space_choice__visible
+        )
 
 
 class ErrorCodeModel(object):
@@ -728,11 +731,6 @@ class BasePaginatedQuery(object):
     def __init__(self, count: int, page_token: Optional[str] = None) -> None:
         self.count = count
         self.page_token = page_token
-
-
-class UrlQuery:
-    def __init__(self, url: str):
-        self.url = unquote(url)
 
 
 class TranslationQuery:

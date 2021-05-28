@@ -188,6 +188,8 @@ export class PopupCreateWorkspace extends React.Component {
   render () {
     const { props, state } = this
     const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+    const areParentSpacesVisible = state.config.system.config.ui__spaces__creation__parent_space_choice__visible
+
     return (
       <CardPopup
         customClass='newSpace'
@@ -248,21 +250,24 @@ export class PopupCreateWorkspace extends React.Component {
             )
             : (
               <>
-                <div className='newSpace__label'> {props.t('Parent space:')} </div>
-                <Select
-                  className='newSpace__input'
-                  isSearchable
-                  onChange={this.handleChangeParentSpace}
-                  options={state.parentOptions}
-                  defaultValue={state.newParentSpace}
-                />
-                {state.showWarningMessage && (
-                  <div className='newSpace__warningMessage'>
-                    <i className='fas fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
-                    {props.t('Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.')}
+                {areParentSpacesVisible && (
+                  <div>
+                    <div className='newSpace__label'> {props.t('Parent space:')} </div>
+                    <Select
+                      className='newSpace__input'
+                      isSearchable
+                      onChange={this.handleChangeParentSpace}
+                      options={state.parentOptions}
+                      defaultValue={state.newParentSpace}
+                    />
+                    {state.showWarningMessage && (
+                      <div className='newSpace__warningMessage'>
+                        <i className='fas fa-exclamation-triangle slowblink newSpace__icon__left' style={{ color: state.config.hexcolor }} />
+                        {props.t('Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.')}
+                      </div>
+                    )}
                   </div>
                 )}
-
                 <div className='newSpace__label'>
                   {props.t('Default role:')}
                   <button

@@ -26,6 +26,7 @@ import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   FilenameWithExtension,
+  IconButton,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -1139,15 +1140,17 @@ export class File extends React.Component {
               )}
 
               {state.mode === APP_FEATURE_MODE.REVISION && (
-                <button
-                  className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
+                <IconButton
+                  customClass='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
+                  color={state.config.hexcolor}
+                  intent='primary'
+                  mode='light'
                   onClick={this.handleClickLastVersion}
-                  style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
-                  data-cy='appFileLastVersionBtn'
-                >
-                  <i className='fas fa-history' />
-                  {props.t('Last version')}
-                </button>
+                  icon='fas fa-history'
+                  text={props.t('Last version')}
+                  title={props.t('Last version')}
+                  dataCy='appFileLastVersionBtn'
+                />
               )}
 
               {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (

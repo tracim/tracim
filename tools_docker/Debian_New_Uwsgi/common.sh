@@ -93,22 +93,6 @@ fi
 # Create pushpin route file
 echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
-# Create color.json file if no exist
-if [ ! -f /etc/tracim/color.json ]; then
-    cp /tracim/color.json.sample /etc/tracim/color.json
-fi
-if [ ! -L /tracim/color.json ]; then
-    ln -s /etc/tracim/color.json /tracim/color.json
-fi
-
-# Create logo.png file if no exist
-if [ ! -f /etc/tracim/logo.png ]; then
-    cp /tracim/frontend/dist/assets/images/logo-tracim.png.default /etc/tracim/logo.png
-fi
-if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
-    ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
-fi
-
 # Create and link branding directory if it does not exist
 if [ ! -d /etc/tracim/branding ]; then
     cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding

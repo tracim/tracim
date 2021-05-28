@@ -2,7 +2,6 @@
 from enum import Enum
 import json
 import os
-import pathlib
 import typing
 
 from depot.manager import DepotManager
@@ -179,6 +178,10 @@ class CFG(object):
             )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
+
+    @property
+    def branding_folder_path(self) -> str:
+        return os.path.join(self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding")
 
     def deprecate_parameter(
         self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
@@ -371,10 +374,6 @@ class CFG(object):
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
-        self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
-            "color.config_file_path", default_color_config_file_path
-        )
         default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
 
@@ -511,6 +510,12 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
+
+        default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
+        self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
+            "color.config_file_path", default_color_config_file_path
+        )
+
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
         self.PLUGIN__FOLDER_PATH = self.get_raw_config(
             "plugin.folder_path", default_plugin_folder_path
@@ -522,6 +527,10 @@ class CFG(object):
 
         self.URL_PREVIEW__FETCH_TIMEOUT = int(
             self.get_raw_config("url_preview.fetch_timeout", "30")
+        )
+
+        self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
+            self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
     def __load_uploaded_files_config(self) -> None:
@@ -946,12 +955,15 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
         )
 
-        try:
-            self.APPS_COLORS["primary"]
-        except KeyError as e:
-            raise ConfigurationError(
-                "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
-            ) from e
+        for required_color in ("primary", "sidebar"):
+            try:
+                self.APPS_COLORS[required_color]
+            except KeyError as e:
+                raise ConfigurationError(
+                    "Error: {} color is required in {} file".format(
+                        required_color, self.COLOR__CONFIG_FILE_PATH
+                    )
+                ) from e
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
@@ -972,22 +984,15 @@ class CFG(object):
         )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND__SERVE:
-            self.check_mandatory_param(
-                "FRONTEND__DIST_FOLDER_PATH",
-                self.FRONTEND__DIST_FOLDER_PATH,
-                when_str="if frontend serving is activated",
+        self.check_directory_path_param(
+            "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
+        )
+
+        for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
+            condition_file_path = os.path.join(self.branding_folder_path, condition_file_name)
+            self.check_file_path_param(
+                param_name="WEBSITE__USAGE_CONDITIONS", path=condition_file_path
             )
-            self.check_directory_path_param(
-                "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
-            )
-            for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
-                condition_file_path = pathlib.Path(
-                    self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding", condition_file_name
-                )
-                self.check_file_path_param(
-                    param_name="WEBSITE__USAGE_CONDITIONS", path=str(condition_file_path)
-                )
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(
