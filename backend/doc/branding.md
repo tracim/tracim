@@ -38,7 +38,7 @@ Prepare 4 favorite icons and copy them in:
 
 ### Main logo displayed in the top-left of the header bar
 
-Copy your image in `<branding_folder>/images/tracim-logo.png`. Its size should be 150x38 pixels.
+Copy your image in `<branding_folder>/images/tracim-logo.png`. Its size should be between 150x30 and 150x50 pixels.
 
 ### Progressive webapp icons for Android and iOS devices
 
