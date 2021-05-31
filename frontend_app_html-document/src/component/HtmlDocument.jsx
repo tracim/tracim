@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
-  MentionAutoComplete,
+  AutoComplete,
   PromptMessage,
   HTMLContent,
   TextAreaApp,
@@ -137,7 +137,7 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <MentionAutoComplete
+              <AutoComplete
                 apiUrl={props.apiUrl}
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}

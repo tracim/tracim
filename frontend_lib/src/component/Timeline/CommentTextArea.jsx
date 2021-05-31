@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import MentionAutoComplete from '../Input/MentionAutoComplete/MentionAutoComplete'
+import AutoComplete from '../Input/AutoComplete/AutoComplete'
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
@@ -58,11 +58,11 @@ export class CommentTextArea extends React.Component {
       return
     }
 
-    const mentionList = await this.props.searchForMentionInQuery(mentionCandidate)
+    const autoCompleteItemList = await this.props.searchForMentionInQuery(mentionCandidate)
     this.setState({
       isAutoCompleteActivated: true,
-      autoCompleteCursorPosition: mentionList.length - 1,
-      autoCompleteItemList: mentionList
+      autoCompleteCursorPosition: autoCompleteItemList.length - 1,
+      autoCompleteItemList: autoCompleteItemList
     })
   }
 
@@ -70,8 +70,8 @@ export class CommentTextArea extends React.Component {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
-      if (newComment[index] === '@' && (index === 0 || newComment[index - 1] === ' ')) {
-        return newComment.slice(index + 1, lastCharBeforeCursorIndex + 1)
+      if ((newComment[index] === '@' || newComment[index] === '#') && (index === 0 || newComment[index - 1] === ' ')) {
+        return newComment.slice(index, lastCharBeforeCursorIndex + 1)
       }
       index--
     }
@@ -115,11 +115,16 @@ export class CommentTextArea extends React.Component {
     }
   }
 
+  handleClickAutoCompleteItem = (autoCompleteItem) => {
+    if (autoCompleteItem.content_id) {
+      console.log('Test')
+    } else this.handleClickAutoCompleteItemMention(autoCompleteItem)
+  }
+
   // RJ - 2020-09-25 - FIXME
   // Duplicate code with tinymceAutoCompleteHelper.js
   // See https://github.com/tracim/tracim/issues/3639
-
-  handleClickAutoCompleteItem = (autoCompleteItem) => {
+  handleClickAutoCompleteItemMention = (autoCompleteItem) => {
     if (!autoCompleteItem.mention) {
       console.log('Error: this member does not have a username')
       return
@@ -209,7 +214,7 @@ export class CommentTextArea extends React.Component {
     return (
       <>
         {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-          <MentionAutoComplete
+          <AutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
             style={props.disableAutocompletePosition ? {} : style}
             apiUrl={props.apiUrl}

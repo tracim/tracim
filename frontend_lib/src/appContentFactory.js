@@ -41,6 +41,7 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
+  getMyselfKnownContent,
   getMyselfKnownMember,
   getCommentTranslated,
   postContentToFavoriteList,
@@ -572,15 +573,27 @@ export function appContentFactory (WrappedComponent) {
     }
 
     searchForMentionInQuery = async (query, workspaceId) => {
-      const mentionList = getMatchingGroupMentionList(query)
+      let autoCompleteItemList = []
+      const keyword = query.substring(1)
+      if (query.includes('#')) {
+        const fetchUserKnownContent = await handleFetchResult(
+          await getMyselfKnownContent(this.apiUrl, keyword, NUMBER_RESULTS_BY_PAGE)
+        )
 
-      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+        switch (fetchUserKnownContent.apiResponse.status) {
+          case 200: return fetchUserKnownContent.body.contents.map(m => ({ detail: m.label, ...m }))
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
+        }
+      } else {
+        const autoCompleteItemList = getMatchingGroupMentionList(keyword)
+        const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, keyword, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
 
-      switch (fetchUserKnownMemberList.apiResponse.status) {
-        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+        switch (fetchUserKnownMemberList.apiResponse.status) {
+          case 200: return [...autoCompleteItemList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+        }
       }
-      return mentionList
+      return autoCompleteItemList
     }
 
     // INFO - CH - 20210318 - This function can add comment and comment as file

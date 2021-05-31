@@ -4,40 +4,43 @@ import Avatar, { AVATAR_SIZE } from '../../Avatar/Avatar'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
-export const MentionAutoComplete = props => {
+export const AutoComplete = props => {
   return (
     <div className='autocomplete' style={props.style}>
-      {props.autoCompleteItemList.map((m, i) => (
-        <>
+      {props.autoCompleteItemList.map((autocompleteItem, i) => (
+        <div key={autocompleteItem.mention}>
           <div
             className={
               classnames('autocomplete__item', { autocomplete__item__active: props.autoCompleteCursorPosition === i })
             }
-            key={m.mention}
-            onClick={() => props.onClickAutoCompleteItem(m)}
+            onClick={() => props.onClickAutoCompleteItem(autocompleteItem)}
           >
-            {m.username && (
+            {autocompleteItem.username && (
               <Avatar
-                user={{ ...m, publicName: m.detail }}
+                user={{ ...autocompleteItem, publicName: autocompleteItem.detail }}
                 apiUrl={props.apiUrl}
                 size={AVATAR_SIZE.MINI}
                 style={{ marginTop: '5px' }}
               />
             )}
-            <b className='autocomplete__item__mention'>@{m.mention}</b>&nbsp;-&nbsp;{props.t(m.detail)}
+            <b className='autocomplete__item__highlight'>
+              {autocompleteItem.mention ? `@${autocompleteItem.mention}` : `#${autocompleteItem.content_id}`}
+            </b>
+            &nbsp;-&nbsp;
+            {props.t(autocompleteItem.detail)}
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (
             <div className='autocomplete__delimiter' key={`delimiter${i}`} />
           )}
-        </>
+        </div>
       ))}
     </div>
   )
 }
 
-export default translate()(MentionAutoComplete)
+export default translate()(AutoComplete)
 
-MentionAutoComplete.propTypes = {
+AutoComplete.propTypes = {
   autoCompleteItemList: PropTypes.array,
   style: PropTypes.object,
   autoCompleteCursorPosition: PropTypes.number,
@@ -45,7 +48,7 @@ MentionAutoComplete.propTypes = {
   delimiterIndex: PropTypes.number
 }
 
-MentionAutoComplete.defaultProps = {
+AutoComplete.defaultProps = {
   autoCompleteItemList: [],
   style: {},
   autoCompleteCursorPosition: 0,

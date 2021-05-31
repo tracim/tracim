@@ -119,7 +119,7 @@ import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
 import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
-import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
+import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -361,7 +361,7 @@ export {
   NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
-  MentionAutoComplete,
+  AutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
