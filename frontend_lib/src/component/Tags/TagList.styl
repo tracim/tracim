@@ -1,0 +1,107 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.memberlist
+  margin-top 10px
+  &__header
+    font-weight bold
+    margin-bottom 10px
+
+  &__wrapper
+    position relative
+    border 1px solid grey
+    background-color offWhite
+  &__list
+    margin 0
+    padding 0
+    list-style none
+    &__item
+      display flex
+      border-bottom 1px solid grey
+      padding 10px 15px
+      &:hover
+        background-color grey-hover
+      &__avatar
+        margin-right 20px
+        & > img
+          width 50px
+          height 50px
+      &__info
+        margin-right auto
+        width calc(100% - 81px) // 81px is the avatar's size
+        display flex
+        flex-direction row
+        &__firstColumn
+          overflow hidden
+          white-space nowrap
+          &__name
+            font-size 20px
+            text-overflow ellipsis
+            overflow hidden
+          &__username
+            font-size 14px
+            color mediumDarkGrey
+            text-overflow ellipsis
+            overflow hidden
+        &__role
+          font-size 14px
+          color mediumDarkGrey
+          margin auto 5px
+      &__delete
+        font-size 20px
+        color darkGrey
+        cursor pointer
+      &__last
+        border none
+  &__btnadd
+    border-bottom 2px solid grey
+    padding 15px
+    &__button
+      display flex
+      align-items center
+      border-color grey
+      color grey
+      &__avatar
+        display flex
+        justify-content center
+        align-items center
+        margin-right 20px
+        border-width 2px
+        border-style dashed
+        border-radius 50%
+        width 50px
+        height 50px
+        cursor pointer
+        &__icon
+          font-size 25px
+      &__text
+        font-size 18px
+        cursor pointer
+
+
+// MEDIAQUERIES
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .memberlist
+    width 100%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .memberlist
+    margin 50px 0
+    width 100%
+
+@media (max-width: max-xs)
+  .memberlist
+    margin 50px 0
+    width 100%
+    &__title
+      margin-left 10px
+    &__wrapper
+      height auto
+    &__list
+      height auto
+      overflow-Y visible
+      &__item:nth-last-child(1)
+        border-bottom 1px solid grey
+    &__btnadd
+      border-top 0
