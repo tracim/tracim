@@ -75,6 +75,8 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
+from tracim_backend.models.context_models import TagCreation
+from tracim_backend.models.context_models import TagPath
 from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
@@ -870,6 +872,23 @@ class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
         return ReactionPath(**data)
 
 
+class TagPathSchema(WorkspaceIdPathSchema):
+    tag_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid tag related to content content_id",
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagPath(**data)
+
+
+class ContentTagPathSchema(ContentIdPathSchema, TagPathSchema):
+    pass
+
+
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
         example=6,
@@ -1556,7 +1575,9 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
+        ContentNamespaces,
+        missing=ContentNamespaces.CONTENT,
+        example="content",
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -1741,6 +1762,12 @@ class ReactionSchema(marshmallow.Schema):
     )
 
 
+class TagSchema(marshmallow.Schema):
+    tag_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    tag_name = StrippedString(example="todo")
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1771,11 +1798,27 @@ class SetCommentSchema(marshmallow.Schema):
 
 
 class SetReactionSchema(marshmallow.Schema):
-    value = StrippedString(example="😀", validate=not_empty_string_validator, required=True,)
+    value = StrippedString(
+        example="😀",
+        validate=not_empty_string_validator,
+        required=True,
+    )
 
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
         return ReactionCreation(**data)
+
+
+class SetTagSchema(marshmallow.Schema):
+    tag_name = StrippedString(
+        example="todo",
+        validate=not_empty_string_validator,
+        required=True,
+    )
+
+    @post_load()
+    def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):

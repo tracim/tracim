@@ -463,6 +463,17 @@ class ReactionPath(object):
         self.reaction_id = reaction_id
 
 
+class TagPath(object):
+    """
+    Paths params with workspace id and content_id and tag_id model
+    """
+
+    def __init__(self, workspace_id: int, tag_id: int, content_id: Optional[int] = None) -> None:
+        self.workspace_id = workspace_id
+        self.content_id = content_id
+        self.tag_id = tag_id
+
+
 class CommentPathFilename(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -698,6 +709,15 @@ class ReactionCreation(object):
         self.value = value
 
 
+class TagCreation(object):
+    """
+    tag creation model
+    """
+
+    def __init__(self, tag_name: str) -> None:
+        self.tag_name = tag_name
+
+
 class SetContentStatus(object):
     """
     Set content status
@@ -735,7 +755,10 @@ class BasePaginatedQuery(object):
 
 class TranslationQuery:
     def __init__(
-        self, source_language_code: str, target_language_code: str, force_download: int = 0,
+        self,
+        source_language_code: str,
+        target_language_code: str,
+        force_download: int = 0,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
@@ -1508,7 +1531,10 @@ class ContentInContext(object):
     def content_path(self) -> List["ContentInContext"]:
         return [
             ContentInContext(
-                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
+                content=component,
+                dbsession=self.dbsession,
+                config=self.config,
+                user=self._user,
             )
             for component in self.content.content_path
         ]
