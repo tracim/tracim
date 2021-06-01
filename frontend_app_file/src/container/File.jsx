@@ -56,7 +56,8 @@ import {
   getDefaultTranslationState,
   FavoriteButton,
   FAVORITE_STATE,
-  ToolBar
+  ToolBar,
+  TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -959,7 +960,7 @@ export class File extends React.Component {
       label: props.t('Label'),
       icon: 'fas fa-tag',
       children: (
-        <div>Test </div>
+        <TagList/>
       )
     }
     const propertiesObject = {
