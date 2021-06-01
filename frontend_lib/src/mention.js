@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
-
+import { PAGE } from './helper.js'
 export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
@@ -15,6 +15,8 @@ export const GROUP_MENTION_LIST = [
     isCommon: true
   }
 ]
+export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
+export const LINK_TAG_NAME = 'a'
 
 export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos']
 
@@ -159,4 +161,54 @@ export const getMatchingGroupMentionList = (query) => {
     if (translatedMention.mention.indexOf(query.toLowerCase()) >= 0) matching.push(translatedMention)
   }
   return matching
+}
+
+export const handleLinksBeforeSave = (htmlString) => {
+  // Content get ?
+  try {
+    const doc = getDocumentFromHTMLString(htmlString)
+    const bodyWithWrappedMentions = wrapLinksInATags(doc.body, doc)
+    return bodyWithWrappedMentions.innerHTML
+  } catch (e) {
+    console.error('Error while parsing links', e)
+    throw new Error(i18n.t('Error while detecting the links'))
+  }
+}
+
+export const wrapLinksInATags = (node, doc) => {
+  const resultingNode = node.cloneNode(false)
+
+  for (const child of node.childNodes) {
+    resultingNode.appendChild(
+      (child.nodeName === '#text')
+        ? wrapLinksFromText(child.textContent, doc)
+        : wrapLinksInATags(child, doc)
+    )
+  }
+
+  return resultingNode
+}
+
+
+const wrapLinksFromText = (text, doc) => {
+  // takes a text as string, and returns a document fragment
+  // containing this text, with tags added for the link
+  const match = text.match(LINK_REGEX)
+  if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
+    return doc.createTextNode(text)
+  }
+
+  const fragment = doc.createDocumentFragment()
+
+  fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
+
+  const wrappedLink = doc.createElement(LINK_TAG_NAME)
+  wrappedLink.href = PAGE.WORKSPACE.CONTENT(workspaceId, contentType, match[0].substring(1))
+  wrappedLink.textContent = match[0]
+  fragment.appendChild(wrappedLink)
+
+  const linkEndIndex = match.index + match[0].length
+  fragment.appendChild(wrapLinksFromText(text.substring(linkEndIndex), doc))
+
+  return fragment
 }

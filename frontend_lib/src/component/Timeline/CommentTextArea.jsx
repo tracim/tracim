@@ -115,19 +115,18 @@ export class CommentTextArea extends React.Component {
     }
   }
 
-  handleClickAutoCompleteItem = (autoCompleteItem) => {
-    if (autoCompleteItem.content_id) {
-      console.log('Test')
-    } else this.handleClickAutoCompleteItemMention(autoCompleteItem)
-  }
-
   // RJ - 2020-09-25 - FIXME
   // Duplicate code with tinymceAutoCompleteHelper.js
   // See https://github.com/tracim/tracim/issues/3639
-  handleClickAutoCompleteItemMention = (autoCompleteItem) => {
-    if (!autoCompleteItem.mention) {
-      console.log('Error: this member does not have a username')
-      return
+  handleClickAutoCompleteItem = (autoCompleteItem) => {
+    let character, keyword
+
+    if (autoCompleteItem.content_id) {
+      character = '#'
+      keyword = autoCompleteItem.content_id
+    } else {
+      character = '@'
+      keyword = autoCompleteItem.mention
     }
 
     const cursorPos = this.textAreaRef.selectionStart
@@ -135,16 +134,16 @@ export class CommentTextArea extends React.Component {
 
     const charAtCursor = cursorPos - 1
     const text = this.props.newComment
-    const posAt = text.lastIndexOf('@', charAtCursor)
+    const posAt = text.lastIndexOf(character, charAtCursor)
     let textBegin, textEnd
 
     if (posAt > -1) {
       const end = seekUsernameEnd(text, cursorPos)
-      textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+      textBegin = text.substring(0, posAt) + character + keyword + spaceAfterMention
       textEnd = text.substring(end)
     } else {
-      console.log('Error: mention autocomplete: did not find "@"')
-      textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
+      console.log(`Error in autocompletion: did not find ${character}`)
+      textBegin = `${text} ${character}${keyword}${spaceAfterMention}`
       textEnd = ''
     }
 

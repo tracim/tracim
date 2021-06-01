@@ -23,7 +23,8 @@ import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
   getInvalidMentionList,
-  getMatchingGroupMentionList
+  getMatchingGroupMentionList,
+  handleLinksBeforeSave
 } from './mention.js'
 
 import {
@@ -269,8 +270,21 @@ export function appContentFactory (WrappedComponent) {
         return Promise.reject(e)
       }
 
+      let newCommentForApiWithMentionAndLink
+      try {
+        newCommentForApiWithMentionAndLink = handleLinksBeforeSave(newCommentForApiWithMention)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention, content.content_namespace)
+        await postNewComment(
+          this.apiUrl,
+          content.workspace_id,
+          content.content_id,
+          newCommentForApiWithMentionAndLink,
+          content.content_namespace
+        )
       )
 
       switch (response.apiResponse.status) {
