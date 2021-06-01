@@ -700,9 +700,9 @@ export class WorkspaceAdvanced extends React.Component {
     }
 
     if (state.content.access_type === SPACE_TYPE.onRequest.slug) {
-      return [memberlistObject, subscriptionObject, functionalitesObject]
+      return [memberlistObject, subscriptionObject, functionalitesObject,functionfdalitesObject]
     } else {
-      return [memberlistObject, functionalitesObject]
+      return [memberlistObject, functionalitesObject, functionfdalitesObject]
     }
   }
 

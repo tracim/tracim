@@ -990,7 +990,7 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
           />
-
+          
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
@@ -1042,8 +1042,20 @@ export class HtmlDocument extends React.Component {
                 />
               ) : null
             }]}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            menuItemList={[{
+              id: 'label',
+              label: props.t('Label'),
+              icon: 'fas fa-envelop',
+              children: state.config.apiUrl ? (
+                <div>zob</div>
+              ) : null
+            }]}
           />
         </PopinFixedContent>
+        
+
       </PopinFixed>
     )
   }

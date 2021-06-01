@@ -954,6 +954,14 @@ export class File extends React.Component {
         />
       ) : null
     }
+    const label = {
+      id: 'label',
+      label: props.t('Label'),
+      icon: 'fa-star',
+      children: (
+        <div></div>
+      )
+    }
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -1006,7 +1014,7 @@ export class File extends React.Component {
         propertiesObject
       ]
     } else {
-      return [timelineObject, propertiesObject]
+      return [timelineObject, propertiesObject, label]
     }
   }
 
