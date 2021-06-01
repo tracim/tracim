@@ -68,7 +68,7 @@ import {
 import FileProperties from '../component/FileProperties.jsx'
 
 export class File extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const param = props.data || debug
@@ -226,20 +226,20 @@ export class File extends React.Component {
     if (isTlmAboutCurrentContent) {
       const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
       this.setState(prev =>
-        ({
-          content: clientToken === data.fields.client_token
-            ? { ...prev.content, ...data.fields.content }
-            : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-          newContent: {
-            ...prev.content,
-            ...data.fields.content
-          },
-          editionAuthor: data.fields.author.public_name,
-          showRefreshWarning: clientToken !== data.fields.client_token,
-          mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-          timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-          isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-        })
+      ({
+        content: clientToken === data.fields.client_token
+          ? { ...prev.content, ...data.fields.content }
+          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+        newContent: {
+          ...prev.content,
+          ...data.fields.content
+        },
+        editionAuthor: data.fields.author.public_name,
+        showRefreshWarning: clientToken !== data.fields.client_token,
+        mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
+        timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
+        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      })
       )
       return
     }
@@ -258,13 +258,13 @@ export class File extends React.Component {
     this.setState({ timeline: newTimeline })
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent (pageToLoad = null) {
+  async updateTimelineAndContent(pageToLoad = null) {
     this.setState({
       newComment: getLocalStorageItem(
         this.state.appName,
@@ -278,7 +278,7 @@ export class File extends React.Component {
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -292,7 +292,7 @@ export class File extends React.Component {
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
@@ -957,9 +957,9 @@ export class File extends React.Component {
     const label = {
       id: 'label',
       label: props.t('Label'),
-      icon: 'fa-star',
+      icon: 'fas fa-tag',
       children: (
-        <div></div>
+        <div>Test </div>
       )
     }
     const propertiesObject = {
@@ -989,6 +989,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
+        label,
         {
           id: 'share',
           label: props.t('Share'),
@@ -1012,9 +1013,10 @@ export class File extends React.Component {
           )
         },
         propertiesObject
+
       ]
     } else {
-      return [timelineObject, propertiesObject, label]
+      return [timelineObject, label, propertiesObject]
     }
   }
 
@@ -1081,7 +1083,7 @@ export class File extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
-  render () {
+  render() {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
 
