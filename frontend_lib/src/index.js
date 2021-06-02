@@ -249,6 +249,7 @@ export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
+export { default as TagList } from './component/Tags/TagList.jsx'
 
 export {
   TRANSLATION_STATE,

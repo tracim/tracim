@@ -27,6 +27,7 @@ import {
   ROLE,
   AppContentRightMenu,
   Timeline,
+  TagList,
   IconButton,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -910,36 +911,33 @@ export class HtmlDocument extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <div>tags WIP</div>
-      ) 
-      return (
         <TagList
-          customClass='dashboard__memberlist'
-          loggedUser={props.user}
-          apiUrl={FETCH_CONFIG.apiUrl}
-          memberList={props.curWs.memberList}
-          roleList={ROLE_LIST}
-          searchedKnownMemberList={state.searchedKnownMemberList}
-          autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-          publicName={state.newMember.publicName}
-          isEmail={state.newMember.isEmail}
-          onChangePersonalData={this.handleChangePersonalData}
-          onClickKnownMember={this.handleClickKnownMember}
-          // createAccount={state.newMember.createAccount}
-          // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
-          role={state.newMember.role}
-          onChangeRole={this.handleChangeNewMemberRole}
-          onClickValidateNewMember={this.handleClickValidateNewMember}
-          displayNewMemberForm={state.displayNewMemberForm}
-          onClickAddMemberBtn={this.handleClickAddMemberBtn}
-          onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
-          onClickRemoveMember={this.handleClickRemoveMember}
-          userRoleIdInWorkspace={userRoleIdInWorkspace}
-          canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
-          emailNotifActivated={props.system.config.email_notification_activated}
-          autoCompleteClicked={state.autoCompleteClicked}
-          onClickAutoComplete={this.handleClickAutoComplete}
-          t={props.t}
+          // customClass='dashboard__memberlist'
+          // loggedUser={props.user}
+          // apiUrl={FETCH_CONFIG.apiUrl}
+          // memberList={props.curWs.memberList}
+          // roleList={ROLE_LIST}
+          // searchedKnownMemberList={state.searchedKnownMemberList}
+          // autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+          // publicName={state.newMember.publicName}
+          // isEmail={state.newMember.isEmail}
+          // onChangePersonalData={this.handleChangePersonalData}
+          // onClickKnownMember={this.handleClickKnownMember}
+          // // createAccount={state.newMember.createAccount}
+          // // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
+          // role={state.newMember.role}
+          // onChangeRole={this.handleChangeNewMemberRole}
+          // onClickValidateNewMember={this.handleClickValidateNewMember}
+          // displayNewMemberForm={state.displayNewMemberForm}
+          // onClickAddMemberBtn={this.handleClickAddMemberBtn}
+          // onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
+          // onClickRemoveMember={this.handleClickRemoveMember}
+          // userRoleIdInWorkspace={userRoleIdInWorkspace}
+          // canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
+          // emailNotifActivated={props.system.config.email_notification_activated}
+          // autoCompleteClicked={state.autoCompleteClicked}
+          // onClickAutoComplete={this.handleClickAutoComplete}
+          // t={props.t}
         />
       )
     }
@@ -1082,7 +1080,7 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
           />
-          
+
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
