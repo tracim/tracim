@@ -1,19 +1,69 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
+import {
+  // postContentReaction,
+  // deleteContentReaction,
+  getContentTagList
+} from '../../action.async.js'
+import { handleFetchResult } from '../../helper.js'
 
-// import classnames from 'classnames'
-// import {
-//   NewTagForm,
-//   Tag
-// } from '../Tags'
+import classnames from 'classnames'
+import {
+  NewTagForm
+  // Tag
+} from './NewTagForm.jsx'
 
 require('./TagList.styl')
 
 class TagList extends React.Component {
-  handleClickBtnValidate = async () => {
-    if (await this.props.onClickValidateNewTag()) {
-      this.setState({ displayNewTagList: true })
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      tagList: []
+    }
+  }
+
+  componentDidMount () {
+    this.updateTagList()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.contentId !== props.contentId) {
+      this.updateTagList()
+    }
+  }
+
+  // sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+  //   type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  //   data: {
+  //     msg: msg,
+  //     type: 'warning',
+  //     delay: undefined
+  //   }
+  // })
+
+  // handleClickBtnValidate = async () => {
+  //   if (await this.props.onClickValidateNewTag()) {
+  //     this.setState({ displayNewTagList: true })
+  //   }
+  // }
+
+  async updateTagList () {
+    const { props } = this
+
+    const fetchGetContentTagList = await handleFetchResult(
+      await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
+    )
+
+    if (fetchGetContentTagList.apiResponse.ok) {
+      this.setState({ tagList: fetchGetContentTagList.body })
+    } else {
+      // sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+      console.log('flashmessage')
     }
   }
 
@@ -30,80 +80,79 @@ class TagList extends React.Component {
         <div className='taglist__wrapper'>
           {(props.displayNewTagForm
             ? (
-              // <NewTagForm
-              // />
-              <div>jldfjqslkj</div>
+              <NewTagForm
+              />
             )
             : (
               <div>
-                  <div>
-                      <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddMemberBtn}>
-                        <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                          <div className='taglist__btnadd__button__avatar'>
-                            <div className='taglist__btnadd__button__avatar__icon'>
-                              <i className='fas fa-plus' />
-                            </div>
-                          </div>
-
-                          <div className='taglist__btnadd__button__text'>
-                            {props.t('Add a tag')}
-                          </div>
+                <div>
+                  <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddMemberBtn}>
+                    <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
+                      <div className='taglist__btnadd__button__avatar'>
+                        <div className='taglist__btnadd__button__avatar__icon'>
+                          <i className='fas fa-plus' />
                         </div>
                       </div>
+
+                      <div className='taglist__btnadd__button__text'>
+                        {props.t('Add a tag')}
+                      </div>
+                    </div>
+                  </div>
                     )
                   {/* </div>
                 </div> */}
-                <ul className={classnames('memberlist__list')}>
-                  {props.tagList.map((m, index) =>
-                    <li
-                      className={classnames(
-                        'memberlist__list__item',
-                        { memberlist__list__item__last: props.tagList.length === index + 1 }
-                      )}
-                      key={m.id}
-                    >
-                      <div className='memberlist__list__item__avatar'>
-                        {/* <Tag
+                  <ul className={classnames('memberlist__list')}>
+                    {props.tagList.map((m, index) =>
+                      <li
+                        className={classnames(
+                          'memberlist__list__item',
+                          { memberlist__list__item__last: props.tagList.length === index + 1 }
+                        )}
+                        key={m.id}
+                      >
+                        <div className='memberlist__list__item__avatar'>
+                          {/* <Tag
                           user={m}
                           apiUrl={props.apiUrl}
                         /> */}
-                        <div>tag avatar</div>
-                      </div>
+                          <div>tag avatar</div>
+                        </div>
 
-                      <div className='memberlist__list__item__info'>
-                        <div className='memberlist__list__item__info__firstColumn'>
-                          {/* { <ProfileNavigation
+                        <div className='memberlist__list__item__info'>
+                          <div className='memberlist__list__item__info__firstColumn'>
+                            {/* { <ProfileNavigation
                             user={{
                               userId: m.id,
                               publicName: m.publicName
                             }}
                           > */}
-                          <div>tag id</div>
+                            <div>tag id</div>
                             <span
                               className='memberlist__list__item__info__firstColumn__name'
-                              // title={m.publicName}
+                            // title={m.publicName}
                             >
                               {/* {m.publicName} */}
                             </span>
-                          {/* </ProfileNavigation> } */}
+                            {/* </ProfileNavigation> } */}
 
-                          {/* { {m.username && ( */}
+                            {/* { {m.username && ( */}
                             <div
                               className='memberlist__list__item__info__firstColumn__username'
-                              // title={`@${m.username}`}
+                            // title={`@${m.username}`}
                             >
                               {/* @{m.username} */}
                               <div>tag name</div>
                             </div>
-                          {/* )} } */}
-                        </div>
+                            {/* )} } */}
+                          </div>
 
-                        {/* { <div className='memberlist__list__item__info__role'>
+                          {/* { <div className='memberlist__list__item__info__role'>
                           - {props.t(props.roleList.find(r => r.slug === m.role).label)}
                         </div> } */}
-                      </div>
+                        </div>
 
-                      {/* {{props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (
+                        {/* {{props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -111,13 +160,13 @@ class TagList extends React.Component {
                           <i className='far fa-trash-alt' />
                         </div>
                       )} } */}
-                    </li>
-                  )}
-                </ul>
+                      </li>
+                    )}
+                  </ul>
+                </div>
               </div>
             )
-            ))}
-          </div>
+          )}
         </div>
       </div>
     )
