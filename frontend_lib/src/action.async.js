@@ -68,7 +68,7 @@ export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToIncl
 }
 
 export const getMyselfKnownContent = (apiUrl, contentToSearch, limit = 0) => {
-  let queryParameterList = []
+  const queryParameterList = []
   if (contentToSearch) queryParameterList.push(`search_string=${encodeURIComponent(contentToSearch)}`)
   else queryParameterList.push('search_string=*')
   if (Number.isInteger(limit)) queryParameterList.push(`size=${limit}`)

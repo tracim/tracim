@@ -272,7 +272,7 @@ export function appContentFactory (WrappedComponent) {
 
       let newCommentForApiWithMentionAndLink
       try {
-        newCommentForApiWithMentionAndLink = handleLinksBeforeSave(newCommentForApiWithMention)
+        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
       } catch (e) {
         return Promise.reject(e)
       }
@@ -599,7 +599,7 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
         }
       } else {
-        const autoCompleteItemList = getMatchingGroupMentionList(keyword)
+        autoCompleteItemList = getMatchingGroupMentionList(keyword)
         const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, keyword, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
 
         switch (fetchUserKnownMemberList.apiResponse.status) {

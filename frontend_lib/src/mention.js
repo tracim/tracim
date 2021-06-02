@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
-import { PAGE } from './helper.js'
+import { handleFetchResult, PAGE } from './helper.js'
+import { getContent } from './action.async.js'
+
 export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
@@ -163,11 +165,10 @@ export const getMatchingGroupMentionList = (query) => {
   return matching
 }
 
-export const handleLinksBeforeSave = (htmlString) => {
-  // Content get ?
+export const handleLinksBeforeSave = async (htmlString, apiUrl) => {
   try {
     const doc = getDocumentFromHTMLString(htmlString)
-    const bodyWithWrappedMentions = wrapLinksInATags(doc.body, doc)
+    const bodyWithWrappedMentions = await wrapLinksInATags(doc.body, doc, apiUrl)
     return bodyWithWrappedMentions.innerHTML
   } catch (e) {
     console.error('Error while parsing links', e)
@@ -175,22 +176,21 @@ export const handleLinksBeforeSave = (htmlString) => {
   }
 }
 
-export const wrapLinksInATags = (node, doc) => {
+export const wrapLinksInATags = async (node, doc, apiUrl) => {
   const resultingNode = node.cloneNode(false)
 
   for (const child of node.childNodes) {
     resultingNode.appendChild(
       (child.nodeName === '#text')
-        ? wrapLinksFromText(child.textContent, doc)
-        : wrapLinksInATags(child, doc)
+        ? await wrapLinksFromText(child.textContent, doc, apiUrl)
+        : await wrapLinksInATags(child, doc, apiUrl)
     )
   }
 
   return resultingNode
 }
 
-
-const wrapLinksFromText = (text, doc) => {
+const wrapLinksFromText = async (text, doc, apiUrl) => {
   // takes a text as string, and returns a document fragment
   // containing this text, with tags added for the link
   const match = text.match(LINK_REGEX)
@@ -198,17 +198,30 @@ const wrapLinksFromText = (text, doc) => {
     return doc.createTextNode(text)
   }
 
-  const fragment = doc.createDocumentFragment()
+  const contentId = match[0].substring(1)
+  const fetchGetContent = await handleFetchResult(
+    await getContent(apiUrl, contentId)
+  )
+  switch (fetchGetContent.apiResponse.status) {
+    case 200: {
+      const fragment = doc.createDocumentFragment()
 
-  fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
+      fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
 
-  const wrappedLink = doc.createElement(LINK_TAG_NAME)
-  wrappedLink.href = PAGE.WORKSPACE.CONTENT(workspaceId, contentType, match[0].substring(1))
-  wrappedLink.textContent = match[0]
-  fragment.appendChild(wrappedLink)
+      const wrappedLink = doc.createElement(LINK_TAG_NAME)
+      wrappedLink.href = PAGE.WORKSPACE.CONTENT(
+        fetchGetContent.body.workspace_id,
+        fetchGetContent.body.content_type,
+        contentId
+      )
+      wrappedLink.textContent = match[0]
+      fragment.appendChild(wrappedLink)
 
-  const linkEndIndex = match.index + match[0].length
-  fragment.appendChild(wrapLinksFromText(text.substring(linkEndIndex), doc))
+      const linkEndIndex = match.index + match[0].length
+      fragment.appendChild(await wrapLinksFromText(text.substring(linkEndIndex), doc, apiUrl))
 
-  return fragment
+      return fragment
+    }
+    default: return doc.createTextNode(text)
+  }
 }

@@ -8,7 +8,7 @@ export const AutoComplete = props => {
   return (
     <div className='autocomplete' style={props.style}>
       {props.autoCompleteItemList.map((autocompleteItem, i) => (
-        <div key={autocompleteItem.mention}>
+        <div key={autocompleteItem.mention || autocompleteItem.content_id}>
           <div
             className={
               classnames('autocomplete__item', { autocomplete__item__active: props.autoCompleteCursorPosition === i })
