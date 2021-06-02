@@ -168,13 +168,4 @@ export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)
 
 export const getContentTagList = (apiUrl, workspaceId, contentId) =>
-// baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)
-({
-  apiResponse: {
-    ok: true,
-    body: [
-      { tag_name: 'blabla', content_id: contentId, workspace_id: workspaceId },
-      { tag_name: 'blaili', content_id: contentId, workspace_id: workspaceId }
-    ]
-  }
-})
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)

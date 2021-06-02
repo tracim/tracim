@@ -9,10 +9,7 @@ import {
 import { handleFetchResult } from '../../helper.js'
 
 import classnames from 'classnames'
-import {
-  NewTagForm
-  // Tag
-} from './NewTagForm.jsx'
+import NewTagForm from './NewTagForm.jsx'
 
 require('./TagList.styl')
 
@@ -55,9 +52,17 @@ class TagList extends React.Component {
   async updateTagList () {
     const { props } = this
 
-    const fetchGetContentTagList = await handleFetchResult(
+    const fetchGetContentTagList = /* await handleFetchResult(
       await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
-    )
+    ) */ {
+      apiResponse: {
+        ok: true,
+      },
+      body: [
+        { tag_name: 'blabla' },
+        { tag_name: 'blaili' }
+      ]
+    }
 
     if (fetchGetContentTagList.apiResponse.ok) {
       this.setState({ tagList: fetchGetContentTagList.body })
@@ -68,7 +73,7 @@ class TagList extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <div className='taglist' data-cy='taglist'>
@@ -78,7 +83,7 @@ class TagList extends React.Component {
         </div>
 
         <div className='taglist__wrapper'>
-          {(props.displayNewTagForm
+          {(true || props.displayNewTagForm
             ? (
               <NewTagForm
               />
@@ -103,11 +108,11 @@ class TagList extends React.Component {
                   {/* </div>
                 </div> */}
                   <ul className={classnames('memberlist__list')}>
-                    {props.tagList.map((m, index) =>
+                    {state.tagList.map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',
-                          { memberlist__list__item__last: props.tagList.length === index + 1 }
+                          { memberlist__list__item__last: state.tagList.length === index + 1 }
                         )}
                         key={m.id}
                       >

@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-// require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
+// require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const NewTagForm = props => {
   return (
