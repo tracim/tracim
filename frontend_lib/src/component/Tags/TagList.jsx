@@ -1,12 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-// import PropTypes from 'prop-types'
+/*import PropTypes from 'prop-types'
 import {
   // postContentReaction,
   // deleteContentReaction,
-  getContentTagList
+  // getContentTagList
 } from '../../action.async.js'
-import { handleFetchResult } from '../../helper.js'
+import { handleFetchResult } from '../../helper.js'*/
 
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
@@ -50,7 +50,6 @@ class TagList extends React.Component {
   // }
 
   async updateTagList () {
-    const { props } = this
 
     const fetchGetContentTagList = /* await handleFetchResult(
       await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)

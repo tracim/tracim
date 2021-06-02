@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-// require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
+require('./TagList.styl')
 
 export const NewTagForm = props => {
   return (
@@ -11,10 +11,10 @@ export const NewTagForm = props => {
         <i className='fas fa-times' />
       </div>
 
-      <div className='membertag__form__member'>
-        <div className='membertag__form__title'>{props.t('Add a tag')}</div>
+      <div className='taglist__form__tag'>
+        <div className='taglist__form__title'>{props.t('Add a tag')}</div>
 
-        <div className='membertag__form__member__name'>
+        <div className='taglist__form__member__tag'>
           <label className='name__label' htmlFor='addtag'>
             {props.t('Enter the tag')}
           </label>
@@ -25,14 +25,13 @@ export const NewTagForm = props => {
             id='addtag'
             placeholder={props.t('Search tag...')}
             data-cy='addtag'
-            value={props.tagName}
-            // CR - 2021/06/02 - TO DO
+            //value={props.tagName}
             //onChange={e => props.onChangePersonalData(e.target.value)}
             autoComplete='off'
             autoFocus
           />
 
-          {props.autoCompleteActive && props.tagName.length >= 2 && (
+          {props.autoCompleteActive && props.fetchGetContentTagList.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
             <div className='autocomplete primaryColorBorder'>
               {props.searchedKnownTagList.length > 0
@@ -100,8 +99,8 @@ NewTagForm.propTypes = {
   autoCompleteClicked: PropTypes.bool,
   onClickBtnValidate: PropTypes.func,
   onClickKnownTag: PropTypes.func,
-  //onChangePersonalData: PropTypes.func,
-  autoCompleteActive: PropTypes.bool,
+  // onChangePersonalData: PropTypes.func,
+  autoCompleteActive: PropTypes.bool
 }
 
 NewTagForm.defaultProps = {
@@ -111,7 +110,7 @@ NewTagForm.defaultProps = {
   autoCompleteActive: false,
   onClickBtnValidate: () => { },
   onClickKnownTag: () => { },
-  //onChangePersonalData: () => { },
+  // onChangePersonalData: () => { },
   onClickAutoComplete: () => { },
   onClickCloseAddTagBtn: () => { }
 }
