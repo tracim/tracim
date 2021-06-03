@@ -1,15 +1,10 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-/*import PropTypes from 'prop-types'
-import {
-  // postContentReaction,
-  // deleteContentReaction,
-  // getContentTagList
-} from '../../action.async.js'
-import { handleFetchResult } from '../../helper.js'*/
+import PropTypes from 'prop-types'
 
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
+import Tag from './Tag.jsx'
 
 require('./TagList.styl')
 
@@ -34,35 +29,17 @@ class TagList extends React.Component {
     }
   }
 
-  // sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-  //   type: CUSTOM_EVENT.ADD_FLASH_MSG,
-  //   data: {
-  //     msg: msg,
-  //     type: 'warning',
-  //     delay: undefined
-  //   }
-  // })
-
-  // handleClickBtnValidate = async () => {
-  //   if (await this.props.onClickValidateNewTag()) {
-  //     this.setState({ displayNewTagList: true })
-  //   }
-  // }
-
   async updateTagList () {
-
-    const fetchGetContentTagList = /* await handleFetchResult(
-      await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
-    ) */ {
+    const fetchGetContentTagList = 
+    {
       apiResponse: {
-        ok: true,
+        ok: true
       },
       body: [
-        { tag_name: 'blabla' },
-        { tag_name: 'blaili' }
+        { name: 'blabla', description: 'description blabla', checked: true, id: 1 },
+        { name: 'blaili', description: 'description blabla', checked: false, id: 3 }
       ]
     }
-
     if (fetchGetContentTagList.apiResponse.ok) {
       this.setState({ tagList: fetchGetContentTagList.body })
     } else {
@@ -82,10 +59,9 @@ class TagList extends React.Component {
         </div>
 
         <div className='taglist__wrapper'>
-          {props.displayNewTagForm
+          {true || props.displayNewTagForm
             ? (
               <NewTagForm
-                
               />
             )
             : (
@@ -104,49 +80,24 @@ class TagList extends React.Component {
               </div>
             )
           }
-          <ul className='memberlist__list'>
+          <ul className='taglist__list'>
             {state.tagList.map((m, index) =>
               <li
                 className={classnames(
-                  'memberlist__list__item',
-                  { memberlist__list__item__last: state.tagList.length === index + 1 }
+                  'taglist__list__item',
+                  { taglist__list__item__last: state.tagList.length === index + 1 }
                 )}
                 key={m.id}
               >
-                <div className='memberlist__list__item__avatar'>
-                  {/* <Tag
-                      user={m}
-                      apiUrl={props.apiUrl}
-                    /> */}
-                  <div>tag avatar</div>
-                </div>
-
-                <div className='memberlist__list__item__info'>
-                  <div className='memberlist__list__item__info__firstColumn'>
-                    {/* { <ProfileNavigation
-                        user={{
-                          userId: m.id,
-                          publicName: m.publicName
-                        }}
-                      > */}
-                    <div>tag id</div>
-                    <span
-                      className='memberlist__list__item__info__firstColumn__name'
-                    // title={m.publicName}
-                    >
-                      {/* {m.publicName} */}
-                    </span>
-                    {/* </ProfileNavigation> } */}
-
-                    {/* { {m.username && ( */}
-                    <div
-                      className='memberlist__list__item__info__firstColumn__username'
-                    // title={`@${m.username}`}
-                    >
-                      {/* @{m.username} */}
-                      <div>tag name</div>
-                    </div>
-                  </div>
+                <div className='taglist__list__item'>
+                  <Tag
+                    title={m.name}
+                    done={m.done}
+                    checked={m.checked}
+                    name={m.name}
+                    description={m.description}
+                    onClick={e => this.markAsChecked(m.id)} 
+                  />
                 </div>
               </li>
             )}
