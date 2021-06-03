@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
-require('./TagList.styl')
+require('./NewTagForm.styl')
 
 export const NewTagForm = props => {
   return (
@@ -23,10 +23,10 @@ export const NewTagForm = props => {
             type='text'
             className='name__input form-control'
             id='addtag'
-            placeholder={props.t('Search tag...')}
+            placeholder={props.t('Add a new tag or search a tag...')}
             data-cy='addtag'
-            //value={props.tagName}
-            //onChange={e => props.onChangePersonalData(e.target.value)}
+            // value={props.tagName}
+            // onChange={e => props.onChangePersonalData(e.target.value)}
             autoComplete='off'
             autoFocus
           />

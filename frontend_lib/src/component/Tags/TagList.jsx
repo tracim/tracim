@@ -81,10 +81,9 @@ class TagList extends React.Component {
         </div>
 
         <div className='taglist__wrapper'>
-          {true || props.displayNewTagForm
+          {props.displayNewTagForm
             ? (
-              <NewTagForm
-              />
+              <NewTagForm />
             )
             : (
               <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddTagBtn}>
@@ -100,9 +99,8 @@ class TagList extends React.Component {
                   </div>
                 </div>
               </div>
-            )
-          }
-          <ul className='taglist__list'>
+            )}
+          <ul className='memberlist__list'>
             {state.tagList.map((m, index) =>
               <li
                 className={classnames(
