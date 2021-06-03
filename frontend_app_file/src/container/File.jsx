@@ -82,6 +82,7 @@ export class File extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       timeline: [],
+      displayNewTagForm: false,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -824,7 +825,14 @@ export class File extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
-  handleClickAddTagBtn = () => {}
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewTagActive: false,
+    autoCompleteClicked: true
+  })
+
+  handleClickAddTagBtn = () => this.setState({ displayNewTagForm: true })
+
+  handleClickCloseAddTagBtn = () => this.setState({ displayNewTagForm: false })
 
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
@@ -963,7 +971,11 @@ export class File extends React.Component {
       icon: 'fas fa-tag',
       children: (
         <TagList
+          displayNewTagForm={state.displayNewTagForm}
           onClickAddTagBtn={this.handleClickAddTagBtn}
+          onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
+          searchedKnownTagList={props.searchedKnownTagList}
+          onClickAutoComplete={this.handleClickAutoComplete}
         />
       )
     }
