@@ -83,7 +83,9 @@ class TagList extends React.Component {
         <div className='taglist__wrapper'>
           {props.displayNewTagForm
             ? (
-              <NewTagForm />
+              <NewTagForm 
+              onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
+              />
             )
             : (
               <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddTagBtn}>
