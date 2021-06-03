@@ -824,6 +824,8 @@ export class File extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
+  handleClickAddTagBtn = () => {}
+
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -955,12 +957,14 @@ export class File extends React.Component {
         />
       ) : null
     }
-    const label = {
-      id: 'label',
-      label: props.t('Label'),
+    const tag = {
+      id: 'tag',
+      label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <TagList/>
+        <TagList
+          onClickAddTagBtn={this.handleClickAddTagBtn}
+        />
       )
     }
     const propertiesObject = {
@@ -990,7 +994,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
-        label,
+        tag,
         {
           id: 'share',
           label: props.t('Share'),
@@ -1017,7 +1021,7 @@ export class File extends React.Component {
 
       ]
     } else {
-      return [timelineObject, label, propertiesObject]
+      return [timelineObject, tag, propertiesObject]
     }
   }
 

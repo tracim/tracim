@@ -45,9 +45,9 @@ export const NewTagForm = props => {
                     <div
                       className='autocomplete__item__name'
                       data-cy='autocomplete__item__name'
-                      title={u.tag_name}
+                      title={u.tagName}
                     >
-                      {u.tag_name}
+                      {u.tagName}
                     </div>
                   </div>
                 )

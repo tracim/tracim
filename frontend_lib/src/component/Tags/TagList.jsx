@@ -82,95 +82,75 @@ class TagList extends React.Component {
         </div>
 
         <div className='taglist__wrapper'>
-          {(true || props.displayNewTagForm
+          {props.displayNewTagForm
             ? (
               <NewTagForm
+                
               />
             )
             : (
-              <div>
-                <div>
-                  <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddMemberBtn}>
-                    <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                      <div className='taglist__btnadd__button__avatar'>
-                        <div className='taglist__btnadd__button__avatar__icon'>
-                          <i className='fas fa-plus' />
-                        </div>
-                      </div>
-
-                      <div className='taglist__btnadd__button__text'>
-                        {props.t('Add a tag')}
-                      </div>
+              <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddTagBtn}>
+                <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
+                  <div className='taglist__btnadd__button__avatar'>
+                    <div className='taglist__btnadd__button__avatar__icon'>
+                      <i className='fas fa-plus' />
                     </div>
                   </div>
-                    )
-                  {/* </div>
-                </div> */}
-                  <ul className={classnames('memberlist__list')}>
-                    {state.tagList.map((m, index) =>
-                      <li
-                        className={classnames(
-                          'memberlist__list__item',
-                          { memberlist__list__item__last: state.tagList.length === index + 1 }
-                        )}
-                        key={m.id}
-                      >
-                        <div className='memberlist__list__item__avatar'>
-                          {/* <Tag
-                          user={m}
-                          apiUrl={props.apiUrl}
-                        /> */}
-                          <div>tag avatar</div>
-                        </div>
 
-                        <div className='memberlist__list__item__info'>
-                          <div className='memberlist__list__item__info__firstColumn'>
-                            {/* { <ProfileNavigation
-                            user={{
-                              userId: m.id,
-                              publicName: m.publicName
-                            }}
-                          > */}
-                            <div>tag id</div>
-                            <span
-                              className='memberlist__list__item__info__firstColumn__name'
-                            // title={m.publicName}
-                            >
-                              {/* {m.publicName} */}
-                            </span>
-                            {/* </ProfileNavigation> } */}
-
-                            {/* { {m.username && ( */}
-                            <div
-                              className='memberlist__list__item__info__firstColumn__username'
-                            // title={`@${m.username}`}
-                            >
-                              {/* @{m.username} */}
-                              <div>tag name</div>
-                            </div>
-                            {/* )} } */}
-                          </div>
-
-                          {/* { <div className='memberlist__list__item__info__role'>
-                          - {props.t(props.roleList.find(r => r.slug === m.role).label)}
-                        </div> } */}
-                        </div>
-
-                        {/* {{props.userRoleIdInWorkspace >= ROLE.workspaceManager.id && m.id !== props.loggedUser.userId && (
-                        <div
-                          className='memberlist__list__item__delete primaryColorFontHover'
-                          onClick={() => props.onClickRemoveMember(m.id)}
-                        >
-                          <i className='far fa-trash-alt' />
-                        </div>
-                      )} } */}
-                      </li>
-                    )}
-                  </ul>
+                  <div className='taglist__btnadd__button__text'>
+                    {props.t('Add a tag')}
+                  </div>
                 </div>
               </div>
             )
-          )}
+          }
+          <ul className='memberlist__list'>
+            {state.tagList.map((m, index) =>
+              <li
+                className={classnames(
+                  'memberlist__list__item',
+                  { memberlist__list__item__last: state.tagList.length === index + 1 }
+                )}
+                key={m.id}
+              >
+                <div className='memberlist__list__item__avatar'>
+                  {/* <Tag
+                      user={m}
+                      apiUrl={props.apiUrl}
+                    /> */}
+                  <div>tag avatar</div>
+                </div>
+
+                <div className='memberlist__list__item__info'>
+                  <div className='memberlist__list__item__info__firstColumn'>
+                    {/* { <ProfileNavigation
+                        user={{
+                          userId: m.id,
+                          publicName: m.publicName
+                        }}
+                      > */}
+                    <div>tag id</div>
+                    <span
+                      className='memberlist__list__item__info__firstColumn__name'
+                    // title={m.publicName}
+                    >
+                      {/* {m.publicName} */}
+                    </span>
+                    {/* </ProfileNavigation> } */}
+
+                    {/* { {m.username && ( */}
+                    <div
+                      className='memberlist__list__item__info__firstColumn__username'
+                    // title={`@${m.username}`}
+                    >
+                      {/* @{m.username} */}
+                      <div>tag name</div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            )}
+          </ul>
         </div>
       </div>
     )
@@ -179,7 +159,7 @@ class TagList extends React.Component {
 
 export default translate()(TagList)
 
-// MemberList.propTypes = {
-//   memberList: PropTypes.array.isRequired,
-//   onChangeName: PropTypes.func
-// }
+TagList.propTypes = {
+  tagList: PropTypes.array.isRequired,
+  onChangeTag: PropTypes.func
+}
