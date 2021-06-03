@@ -10,7 +10,7 @@ export const Tag = props => {
         <div className="taglist__list__item__info__firstColumn__name">
             <div className='taglist__list__item_avatar'>    
                 <Checkbox
-                    onClickCheckbox={() => props.onClick}
+                    onClickCheckbox={() => props.onClickCheckbox}
                     checked={props.checked}
                 />
             </div>
@@ -40,7 +40,7 @@ export default translate()(Tag)
 
 Tag.defaultProps = {
     checked: false,
-    onClick: () => { }
+    onClickCheckbox: () => { }
 }
 
 Tag.propTypes = {
