@@ -14,7 +14,7 @@ describe('<CommentTextArea />', () => {
     disableComment: false,
     id: 'autoCompleteInputId',
     t: key => key,
-    searchForMentionInQuery: () => []
+    searchForMentionOrLinkInQuery: () => []
   }
 
   const wrapper = shallow(

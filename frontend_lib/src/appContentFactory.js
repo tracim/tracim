@@ -179,7 +179,7 @@ export function appContentFactory (WrappedComponent) {
     appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
       const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      let knownMentions = await this.searchForMentionInQuery('', workspaceId)
+      let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
@@ -259,7 +259,7 @@ export function appContentFactory (WrappedComponent) {
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
@@ -586,7 +586,7 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    searchForMentionInQuery = async (query, workspaceId) => {
+    searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       let autoCompleteItemList = []
       const keyword = query.substring(1)
       if (query.includes('#')) {
@@ -717,7 +717,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionInQuery={this.searchForMentionInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}

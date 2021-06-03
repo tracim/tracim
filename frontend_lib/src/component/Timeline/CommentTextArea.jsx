@@ -47,18 +47,18 @@ export class CommentTextArea extends React.Component {
     }
 
     if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
-      this.searchForMentionCandidate()
+      this.searchForMentionOrLinkCandidate()
     }
   }
 
-  searchForMentionCandidate = async () => {
-    const mentionCandidate = this.getMentionCandidate(this.props.newComment)
-    if (mentionCandidate === undefined) {
+  searchForMentionOrLinkCandidate = async () => {
+    const mentionOrLinkCandidate = this.getMentionOrLinkCandidate(this.props.newComment)
+    if (mentionOrLinkCandidate === undefined) {
       if (this.state.isAutoCompleteActivated) this.setState({ isAutoCompleteActivated: false })
       return
     }
 
-    const autoCompleteItemList = await this.props.searchForMentionInQuery(mentionCandidate)
+    const autoCompleteItemList = await this.props.searchForMentionOrLinkInQuery(mentionOrLinkCandidate)
     this.setState({
       isAutoCompleteActivated: true,
       autoCompleteCursorPosition: autoCompleteItemList.length - 1,
@@ -66,7 +66,7 @@ export class CommentTextArea extends React.Component {
     })
   }
 
-  getMentionCandidate = newComment => {
+  getMentionOrLinkCandidate = newComment => {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
@@ -130,7 +130,7 @@ export class CommentTextArea extends React.Component {
     }
 
     const cursorPos = this.textAreaRef.selectionStart
-    const spaceAfterMention = ' '
+    const endSpace = ' '
 
     const charAtCursor = cursorPos - 1
     const text = this.props.newComment
@@ -139,11 +139,11 @@ export class CommentTextArea extends React.Component {
 
     if (posAt > -1) {
       const end = seekUsernameEnd(text, cursorPos)
-      textBegin = text.substring(0, posAt) + character + keyword + spaceAfterMention
+      textBegin = text.substring(0, posAt) + character + keyword + endSpace
       textEnd = text.substring(end)
     } else {
       console.log(`Error in autocompletion: did not find ${character}`)
-      textBegin = `${text} ${character}${keyword}${spaceAfterMention}`
+      textBegin = `${text} ${character}${keyword}${endSpace}`
       textEnd = ''
     }
 
@@ -162,7 +162,7 @@ export class CommentTextArea extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.props.searchForMentionInQuery,
+      this.props.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -175,7 +175,7 @@ export class CommentTextArea extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.props.searchForMentionInQuery
+      this.props.searchForMentionOrLinkInQuery
     )
   }
 
@@ -185,14 +185,14 @@ export class CommentTextArea extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.props.searchForMentionInQuery
+      this.props.searchForMentionOrLinkInQuery
     )
   }
 
   handleTinyMceSelectionChange = (e, position) => {
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.props.searchForMentionInQuery,
+      this.props.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -256,7 +256,7 @@ CommentTextArea.propTypes = {
   disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
   onInitWysiwyg: PropTypes.func
 }
@@ -269,6 +269,6 @@ CommentTextArea.defaultProps = {
   newComment: '',
   onChangeNewComment: () => {},
   wysiwyg: false,
-  searchForMentionInQuery: () => {},
+  searchForMentionOrLinkInQuery: () => {},
   onInitWysiwyg: () => {}
 }

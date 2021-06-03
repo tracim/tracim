@@ -258,7 +258,7 @@ export class Timeline extends React.Component {
                 newComment={props.newComment}
                 disableComment={props.disableComment}
                 wysiwyg={props.wysiwyg}
-                searchForMentionInQuery={props.searchForMentionInQuery}
+                searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
                 onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
@@ -361,7 +361,7 @@ Timeline.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
@@ -399,7 +399,7 @@ Timeline.defaultProps = {
   onClickCancelSave: () => { },
   onClickSaveAnyway: () => { },
   showTitle: true,
-  searchForMentionInQuery: () => { },
+  searchForMentionOrLinkInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },
   onClickDeleteComment: () => {},

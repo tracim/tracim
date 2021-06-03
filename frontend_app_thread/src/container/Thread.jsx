@@ -320,8 +320,8 @@ export class Thread extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -551,7 +551,7 @@ export class Thread extends React.Component {
               onInitWysiwyg={this.handleInitWysiwyg}
               workspaceId={state.content.workspace_id}
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-              searchForMentionInQuery={this.searchForMentionInQuery}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
               onClickTranslateComment={comment => props.handleTranslateComment(
                 comment,
                 state.content.workspace_id,
