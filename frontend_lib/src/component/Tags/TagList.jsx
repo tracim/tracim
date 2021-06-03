@@ -17,6 +17,27 @@ class TagList extends React.Component {
     }
   }
 
+  markAsChecked = tagId => {
+    this.setState(previousState => {
+      // const elem = previousState.tagList.find((tag) => {
+      //   return tag.id === tagId
+      // })
+      // if (elem === undefined) return previousState
+      return {
+        taskList: previousState.tagList.map((tag) => {
+          if (tag.id === tagId) {
+            return {
+              ...tag,
+              checked: !tag.checked
+            }
+          } else {
+            return tag
+          }
+        })
+      }
+    })
+  }
+
   componentDidMount () {
     this.updateTagList()
   }
@@ -28,6 +49,7 @@ class TagList extends React.Component {
       this.updateTagList()
     }
   }
+
 
   async updateTagList () {
     const fetchGetContentTagList = 
@@ -96,7 +118,7 @@ class TagList extends React.Component {
                     checked={m.checked}
                     name={m.name}
                     description={m.description}
-                    onClick={e => this.markAsChecked(m.id)} 
+                    onClick={() => this.markAsChecked(m.id)} 
                   />
                 </div>
               </li>
