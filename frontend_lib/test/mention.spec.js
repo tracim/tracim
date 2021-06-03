@@ -11,7 +11,7 @@ import {
 
 const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
-describe('mentionOrLink.js', () => {
+describe('mentions on mentionOrLink.js', () => {
   describe('function wrapMentionsInSpanTags', () => {
     const parser = new global.DOMParser()
 
