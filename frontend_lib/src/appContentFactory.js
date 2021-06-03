@@ -25,7 +25,7 @@ import {
   getInvalidMentionList,
   getMatchingGroupMentionList,
   handleLinksBeforeSave
-} from './mention.js'
+} from './mentionOrLink.js'
 
 import {
   getTranslationApiErrorMessage,

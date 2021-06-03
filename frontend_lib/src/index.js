@@ -69,7 +69,7 @@ import {
   getInvalidMentionList,
   handleInvalidMentionInComment,
   handleMentionsBeforeSave
-} from './mention.js'
+} from './mentionOrLink.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {

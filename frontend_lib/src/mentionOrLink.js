@@ -168,8 +168,8 @@ export const getMatchingGroupMentionList = (query) => {
 export const handleLinksBeforeSave = async (htmlString, apiUrl) => {
   try {
     const doc = getDocumentFromHTMLString(htmlString)
-    const bodyWithWrappedMentions = await wrapLinksInATags(doc.body, doc, apiUrl)
-    return bodyWithWrappedMentions.innerHTML
+    const bodyWithWrappedLinks = await wrapLinksInATags(doc.body, doc, apiUrl)
+    return bodyWithWrappedLinks.innerHTML
   } catch (e) {
     console.error('Error while parsing links', e)
     throw new Error(i18n.t('Error while detecting the links'))
