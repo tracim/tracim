@@ -476,6 +476,9 @@ export class HtmlDocument extends React.Component {
 
   handleClickAddTagBtn = () => this.setState({ displayNewTagForm: true })
 
+  handleClickCloseAddTagBtn = () => this.setState({ displayNewTagForm: false })
+
+
   handleCloseNewVersion = () => {
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
@@ -917,6 +920,7 @@ export class HtmlDocument extends React.Component {
         <TagList
           displayNewTagForm={state.displayNewTagForm}
           onClickAddTagBtn={this.handleClickAddTagBtn}
+          onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
         />
       )
     }
