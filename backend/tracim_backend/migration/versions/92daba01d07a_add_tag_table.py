@@ -58,7 +58,7 @@ def upgrade():
     )
 
     op.create_table(
-        "tag_content",
+        "content_tag",
         sa.Column(
             "tag_id",
             sa.Integer,
@@ -80,7 +80,7 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["content_id"],
             ["contents.content_id"],
-            name=op.f("fk_tag_content_content_id_contents"),
+            name=op.f("fk_content_tag_content_id_contents"),
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),

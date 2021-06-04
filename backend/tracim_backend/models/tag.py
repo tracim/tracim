@@ -38,7 +38,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
 
 
 class TagOnContent(CreationDateMixin, DeclarativeBase):
-    __tablename__ = "tag_content"
+    __tablename__ = "content_tag"
     __table_args__ = (UniqueConstraint("tag_id", "content_id"),)
 
     tag_id = Column(
