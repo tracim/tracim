@@ -16,7 +16,6 @@ from tracim_backend.models.tracim_session import TracimSession
 class TagLib:
     def __init__(self, session: TracimSession) -> None:
         self._session = session
-        pass
 
     def _base_query(self):
         return self._session.query(Tag)
