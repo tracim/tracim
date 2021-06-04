@@ -55,7 +55,7 @@ class TagList extends React.Component {
 
 
   async updateTagList () {
-    const fetchGetContentTagList = 
+    const fetchGetContentTagList =
     {
       apiResponse: {
         ok: true
@@ -86,7 +86,7 @@ class TagList extends React.Component {
         <div className='taglist__wrapper'>
           {props.displayNewTagForm
             ? (
-              <NewTagForm 
+              <NewTagForm
               onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
               />
             )
@@ -114,16 +114,14 @@ class TagList extends React.Component {
                 )}
                 key={m.id}
               >
-                <div className='taglist__list__item'>
-                  <Tag
-                    title={m.name}
-                    done={m.done}
-                    checked={m.checked}
-                    name={m.name}
-                    description={m.description}
-                    onClickCheckbox={() => this.markAsChecked(m.id)} 
-                  />
-                </div>
+                <Tag
+                  title={m.name}
+                  done={m.done}
+                  checked={m.checked}
+                  name={m.name}
+                  description={m.description}
+                  onClickCheckbox={() => this.markAsChecked(m.id)}
+                />
               </li>
             )}
           </ul>
