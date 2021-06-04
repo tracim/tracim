@@ -7,12 +7,14 @@ require('./TagList.styl')
 
 export const Tag = props => {
     return (
-        <div>
-            <div className='taglist__list__item_avatar'>
+        <div className="taglist__list__item">
+            <div className='taglist__list__item__avatar'>
                 <Checkbox
                     onClickCheckbox={props.onClickCheckbox}
                     checked={props.checked}
                     name={'tag-' + props.name}
+                    styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+                    styleCheck={{ top: '-5px' }}
                 />
             </div>
 

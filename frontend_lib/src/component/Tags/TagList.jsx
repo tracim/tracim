@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-
+import { sendGlobalFlashMessage, naturalCompare } from '../../helper.js'
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
@@ -18,27 +18,12 @@ class TagList extends React.Component {
   }
 
   markAsChecked = tagId => {
-    console.log("tag")
-    this.setState(previousState => {
-      // const elem = previousState.tagList.find((tag) => {
-      //   return tag.id === tagId
-      // })
-      // if (elem === undefined) return previousState
-      return {
-        tagList: previousState.tagList.map((tag) => {
-          if (tag.id === tagId) {
-            console.log('c mon tag à  moi', tag)
-            return {
-              ...tag,
-              checked: !tag.checked
-            }
-          } else {
-            console.log('c mon tag à  moi ELSE', tag)
-            return tag
-          }
-        })
+    this.setState(previousState => ({
+      tagIsChecked: {
+        ...previousState.tagIsChecked,
+        [tagId]: !previousState.tagIsChecked[tagId]
       }
-    })
+    }))
   }
 
   componentDidMount () {
@@ -53,24 +38,69 @@ class TagList extends React.Component {
     }
   }
 
-
   async updateTagList () {
-    const fetchGetContentTagList =
+    const { props } = this
+    const fetchGetWsTagList =
     {
       apiResponse: {
         ok: true
       },
       body: [
-        { name: 'blabla', description: 'description blabla', checked: true, id: 1 },
-        { name: 'blaili', description: 'description blabla', checked: false, id: 3 }
+        { name: 'blopblo', id: 31 },
+        { name: 'blabla', id: 1 },
+        { name: 'blailfdsi', id: 13 },
+        { name: 'blaili', id: 3 }
       ]
     }
-    if (fetchGetContentTagList.apiResponse.ok) {
-      this.setState({ tagList: fetchGetContentTagList.body })
-    } else {
-      // sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
-      console.log('flashmessage')
+
+    if (!fetchGetWsTagList.apiResponse.ok) {
+      sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+      return
     }
+
+    const fetchGetContentTagList = {
+      apiResponse: {
+        ok: true
+      },
+      body: [
+        { name: 'blabla', id: 1 },
+        { name: 'blaili', id: 3 }
+      ]
+    }
+
+    if (!fetchGetContentTagList.apiResponse.ok) {
+      sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+    }
+
+    const isContentTag = (tag) => {
+      return fetchGetContentTagList.body.some(t => t.id === tag.id)
+    }
+
+    const sortTagList = (tagA, tagB) => {
+      const isTagAContent = isContentTag(tagA)
+      const isTagBContent = isContentTag(tagB)
+
+      if (!isTagAContent && isTagBContent) {
+        return 1
+      }
+
+      if (isTagAContent && !isTagBContent) {
+        return -1
+      }
+
+      return naturalCompare(tagA, tagB, props.i18n.language, 'name')
+    }
+
+    const sortedTagList = fetchGetWsTagList.body.sort(sortTagList)
+
+    const tagIsChecked = {}
+
+    for (const tag of fetchGetContentTagList.body) {
+      tagIsChecked[tag.id] = true
+    }
+
+    console.log('SALUT', sortedTagList)
+    this.setState({ tagList: sortedTagList, tagIsChecked: tagIsChecked })
   }
 
   render () {
@@ -87,7 +117,7 @@ class TagList extends React.Component {
           {props.displayNewTagForm
             ? (
               <NewTagForm
-              onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
+                onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
               />
             )
             : (
@@ -105,11 +135,11 @@ class TagList extends React.Component {
                 </div>
               </div>
             )}
-          <ul className='memberlist__list'>
+          <ul className='taglist__list'>
             {state.tagList.map((m, index) =>
               <li
                 className={classnames(
-                  'taglist__list__item',
+                  'taglist__list__item_wrapper',
                   { taglist__list__item__last: state.tagList.length === index + 1 }
                 )}
                 key={m.id}
@@ -117,7 +147,7 @@ class TagList extends React.Component {
                 <Tag
                   title={m.name}
                   done={m.done}
-                  checked={m.checked}
+                  checked={state.tagIsChecked[m.id]}
                   name={m.name}
                   description={m.description}
                   onClickCheckbox={() => this.markAsChecked(m.id)}
