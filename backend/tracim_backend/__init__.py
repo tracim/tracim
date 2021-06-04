@@ -64,6 +64,7 @@ from tracim_backend.views.core_api.reaction_controller import ReactionController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
+from tracim_backend.views.core_api.tag_controller import TagController
 from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
@@ -254,6 +255,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
     reaction_controller = ReactionController()
+    tag_controller = TagController()
     url_preview_controller = URLPreviewController()
     favorite_content_controller = FavoriteContentController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
@@ -264,6 +266,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(workspace_controller.bind, route_prefix=BASE_API)
     configurator.include(comment_controller.bind, route_prefix=BASE_API)
     configurator.include(reaction_controller.bind, route_prefix=BASE_API)
+    configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
 
