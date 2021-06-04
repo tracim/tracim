@@ -755,10 +755,7 @@ class BasePaginatedQuery(object):
 
 class TranslationQuery:
     def __init__(
-        self,
-        source_language_code: str,
-        target_language_code: str,
-        force_download: int = 0,
+        self, source_language_code: str, target_language_code: str, force_download: int = 0,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
@@ -1531,10 +1528,7 @@ class ContentInContext(object):
     def content_path(self) -> List["ContentInContext"]:
         return [
             ContentInContext(
-                content=component,
-                dbsession=self.dbsession,
-                config=self.config,
-                user=self._user,
+                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
             )
             for component in self.content.content_path
         ]

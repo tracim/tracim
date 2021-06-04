@@ -1575,9 +1575,7 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces,
-        missing=ContentNamespaces.CONTENT,
-        example="content",
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -1798,11 +1796,7 @@ class SetCommentSchema(marshmallow.Schema):
 
 
 class SetReactionSchema(marshmallow.Schema):
-    value = StrippedString(
-        example="😀",
-        validate=not_empty_string_validator,
-        required=True,
-    )
+    value = StrippedString(example="😀", validate=not_empty_string_validator, required=True,)
 
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1810,11 +1804,7 @@ class SetReactionSchema(marshmallow.Schema):
 
 
 class SetTagSchema(marshmallow.Schema):
-    tag_name = StrippedString(
-        example="todo",
-        validate=not_empty_string_validator,
-        required=True,
-    )
+    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=True,)
 
     @post_load()
     def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:

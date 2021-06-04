@@ -89,9 +89,7 @@ class TagController(Controller):
         """
         tag_lib = TagLib(session=request.dbsession)
         return tag_lib.add_tag_to_content(
-            content=request.current_content,
-            tag_name=hapic_data.body.tag_name,
-            do_save=True,
+            content=request.current_content, tag_name=hapic_data.body.tag_name, do_save=True,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__TAG_ENDPOINTS])
@@ -142,9 +140,7 @@ class TagController(Controller):
     def bind(self, configurator: Configurator):
         # Get tags
         configurator.add_route(
-            "get_workspace_tags",
-            "/workspaces/{workspace_id}/tags",
-            request_method="GET",
+            "get_workspace_tags", "/workspaces/{workspace_id}/tags", request_method="GET",
         )
         configurator.add_view(self.get_workspace_tags, route_name="get_workspace_tags")
 
@@ -158,17 +154,13 @@ class TagController(Controller):
 
         # Get a tag
         configurator.add_route(
-            "get_tag",
-            "/workspaces/{workspace_id}/tags/{tag_id}",
-            request_method="GET",
+            "get_tag", "/workspaces/{workspace_id}/tags/{tag_id}", request_method="GET",
         )
         configurator.add_view(self.get_tag, route_name="get_tag")
 
         # Add a tag to a workspace
         configurator.add_route(
-            "add_workspace_tag",
-            "/workspaces/{workspace_id}/tags",
-            request_method="POST",
+            "add_workspace_tag", "/workspaces/{workspace_id}/tags", request_method="POST",
         )
         configurator.add_view(self.add_workspace_tag, route_name="add_workspace_tag")
 

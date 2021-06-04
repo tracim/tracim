@@ -39,8 +39,7 @@ class TestTagsEndpoint(object):
     """
 
     @pytest.mark.parametrize(
-        "tag_names",
-        [(SAMPLE_TAG_LIST)],
+        "tag_names", [(SAMPLE_TAG_LIST)],
     )
     def test_api__get_contents_tags__ok_200__nominal_case(
         self,
@@ -80,8 +79,7 @@ class TestTagsEndpoint(object):
                 assert tag_res["tag_name"] == tag_name
 
     @pytest.mark.parametrize(
-        "tag_name",
-        SAMPLE_TAG_LIST,
+        "tag_name", SAMPLE_TAG_LIST,
     )
     def test_api__get_one_tag__ok_200__nominal_case(
         self,
@@ -113,8 +111,7 @@ class TestTagsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id,
-                tag_id=tag.tag_id,
+                workspace_id=test_workspace.workspace_id, tag_id=tag.tag_id,
             ),
             status=200,
         )
@@ -153,8 +150,7 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -206,16 +202,14 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
             ),
             status=200,
             params=params,
         )
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
             ),
             status=400,
             params=params,
@@ -252,8 +246,7 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -333,8 +326,7 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -371,8 +363,7 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id,
-                tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
             ),
             status=403,
         )
@@ -380,8 +371,7 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id,
-                tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
             ),
             status=200,
         )
