@@ -7,7 +7,6 @@ from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
-# from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 TAG_URLS = (
     "/api/workspaces/{workspace_id}/contents/{content_id}/tags",
