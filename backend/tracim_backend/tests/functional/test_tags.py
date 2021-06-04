@@ -7,7 +7,6 @@ from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
-
 TAG_URLS = (
     "/api/workspaces/{workspace_id}/contents/{content_id}/tags",
     "/api/workspaces/{workspace_id}/tags",
@@ -62,7 +61,7 @@ class TestTagsEndpoint(object):
         )
         tag_lib = TagLib(session)
         for tag in tag_names:
-            tag_lib.add_tag_to_content(folder, tag, do_save=True)
+            tag_lib.add_tag_to_content(admin_user, folder, tag, do_save=True)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -104,7 +103,7 @@ class TestTagsEndpoint(object):
             do_notify=False,
         )
         tag_lib = TagLib(session)
-        tag = tag_lib.add_tag_to_content(folder, tag_name, do_save=True)
+        tag = tag_lib.add_tag_to_content(riyad_user, folder, tag_name, do_save=True)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -157,7 +156,6 @@ class TestTagsEndpoint(object):
         tag_res = res.json_body
         assert tag_res["tag_id"]
         assert tag_res["tag_name"] == tag_name
-
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
     def test_api__post_content_tag__err_400__already_exist(
@@ -263,7 +261,6 @@ class TestTagsEndpoint(object):
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.TAG_NOT_FOUND
-
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
     def test_api__delete_content_tag__ok_400__is_not_contributor(

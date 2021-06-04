@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Integer
 
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import User
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
@@ -26,6 +27,9 @@ class Tag(CreationDateMixin, DeclarativeBase):
 
     workspace = relationship("Workspace", remote_side=[Workspace.workspace_id], lazy="joined")
 
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    author = relationship("User", remote_side=[User.user_id])
+
     def __repr__(self):
         return "<Tag(workspace_id=%s, tag_name=%s)>" % (
             repr(self.workspace_id),
@@ -33,7 +37,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
         )
 
 
-class TagOnContent(DeclarativeBase):
+class TagOnContent(CreationDateMixin, DeclarativeBase):
     __tablename__ = "tag_content"
     __table_args__ = (UniqueConstraint("tag_id", "content_id"),)
 
@@ -46,6 +50,9 @@ class TagOnContent(DeclarativeBase):
     content_id = Column(
         Integer, ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",), nullable=False,
     )
+
+    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    author = relationship("User", remote_side=[User.user_id])
 
     content = relationship("Content", remote_side=[Content.id], lazy="joined")
     tag = relationship("Tag", remote_side=[Tag.tag_id], lazy="joined")

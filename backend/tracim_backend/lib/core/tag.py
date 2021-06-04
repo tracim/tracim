@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.exceptions import TagAlreadyExistsError
 from tracim_backend.exceptions import TagNotFound
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import User
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
@@ -81,7 +82,7 @@ class TagLib:
         except NoResultFound:
             return None
 
-    def add_tag_to_content(self, content: Content, tag_name: str, do_save: bool) -> Tag:
+    def add_tag_to_content(self, user: User, content: Content, tag_name: str, do_save: bool) -> Tag:
         try:
             tag = self.get_one(workspace_id=content.workspace_id, tag_name=tag_name)
             content_tag = self.get_content_tag(content=content, tag=tag)
@@ -94,16 +95,18 @@ class TagLib:
                 )
 
         except TagNotFound:
-            tag = self.add(workspace=content.workspace, tag_name=tag_name, do_save=do_save)
+            tag = self.add(
+                user=user, workspace=content.workspace, tag_name=tag_name, do_save=do_save
+            )
 
-        tag_content = TagOnContent(tag=tag, content=content)
+        tag_content = TagOnContent(author=user, tag=tag, content=content)
         self._session.add(tag_content)
         if do_save:
             self._session.flush()
         return tag
 
-    def add(self, workspace: Workspace, tag_name: str, do_save: bool):
-        tag = Tag(workspace=workspace, tag_name=tag_name)
+    def add(self, user: User, workspace: Workspace, tag_name: str, do_save: bool):
+        tag = Tag(author=user, workspace=workspace, tag_name=tag_name)
         self._session.add(tag)
         if do_save:
             self._session.flush()

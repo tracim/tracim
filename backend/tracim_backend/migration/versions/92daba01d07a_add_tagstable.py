@@ -37,14 +37,15 @@ def upgrade():
         sa.Column(
             "workspace_id",
             sa.Integer,
-            sa.ForeignKey(
-                "workspace.id",
-                onupdate="CASCADE",
-                ondelete="CASCADE",
-            ),
+            sa.ForeignKey("workspace.id", onupdate="CASCADE", ondelete="CASCADE",),
             nullable=False,
         ),
         sa.Column("tag_name", sa.Unicode(), nullable=False),
+        sa.Column("author_id", sa.Integer(), nullable=False),
+        sa.Column("created", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["author_id"], ["users.user_id"], name=op.f("fk_reaction_author_id_users")
+        ),
         sa.PrimaryKeyConstraint("tag_id", name=op.f("pk_tag")),
         sa.ForeignKeyConstraint(
             ["workspace_id"],
@@ -68,12 +69,13 @@ def upgrade():
         sa.Column(
             "content_id",
             sa.Integer,
-            sa.ForeignKey(
-                "content.id",
-                onupdate="CASCADE",
-                ondelete="CASCADE",
-            ),
+            sa.ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",),
             nullable=False,
+        ),
+        sa.Column("author_id", sa.Integer(), nullable=False),
+        sa.Column("created", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["author_id"], ["users.user_id"], name=op.f("fk_reaction_author_id_users")
         ),
         sa.ForeignKeyConstraint(
             ["content_id"],

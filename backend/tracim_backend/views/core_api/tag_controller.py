@@ -89,7 +89,10 @@ class TagController(Controller):
         """
         tag_lib = TagLib(session=request.dbsession)
         return tag_lib.add_tag_to_content(
-            content=request.current_content, tag_name=hapic_data.body.tag_name, do_save=True,
+            user=request.current_user,
+            content=request.current_content,
+            tag_name=hapic_data.body.tag_name,
+            do_save=True,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__TAG_ENDPOINTS])
@@ -105,6 +108,7 @@ class TagController(Controller):
         """
         tag_lib = TagLib(session=request.dbsession)
         return tag_lib.add(
+            user=request.current_user,
             workspace_id=request.current_workspace.workspace_id,
             tag_name=hapic_data.body.tag_name,
             do_save=True,
