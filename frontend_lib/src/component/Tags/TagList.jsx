@@ -5,7 +5,10 @@ import { sendGlobalFlashMessage, naturalCompare } from '../../helper.js'
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
-
+import {
+  getWorkspaceTagList,
+  getContentTagList
+} from '../../action.async.js'
 require('./TagList.styl')
 
 class TagList extends React.Component {
@@ -40,33 +43,14 @@ class TagList extends React.Component {
 
   async updateTagList () {
     const { props } = this
-    const fetchGetWsTagList =
-    {
-      apiResponse: {
-        ok: true
-      },
-      body: [
-        { name: 'blopblo', id: 31 },
-        { name: 'blabla', id: 1 },
-        { name: 'blailfdsi', id: 13 },
-        { name: 'blaili', id: 3 }
-      ]
-    }
+    const fetchGetWsTagList = await getWorkspaceTagList(props.apiUrl, props.workspaceId)
 
     if (!fetchGetWsTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
       return
     }
 
-    const fetchGetContentTagList = {
-      apiResponse: {
-        ok: true
-      },
-      body: [
-        { name: 'blabla', id: 1 },
-        { name: 'blaili', id: 3 }
-      ]
-    }
+    const fetchGetContentTagList = await getContentTagList(props.apiUrl, props.workspaceId, props.contentIdv)
 
     if (!fetchGetContentTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
@@ -164,5 +148,8 @@ class TagList extends React.Component {
 export default translate()(TagList)
 
 TagList.propTypes = {
-  onChangeTag: PropTypes.func
+  onChangeTag: PropTypes.func,
+  apiUrl: PropTypes.string.isRequired,
+  workspaceId: PropTypes.string.isRequired,
+  contentId: PropTypes.string.isRequired
 }

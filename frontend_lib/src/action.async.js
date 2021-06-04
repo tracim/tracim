@@ -169,3 +169,6 @@ export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
 
 export const getContentTagList = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)
+
+export const getWorkspaceTagList = (apiUrl, workspaceId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/tags`)

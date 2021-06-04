@@ -971,6 +971,9 @@ export class File extends React.Component {
       icon: 'fas fa-tag',
       children: (
         <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
           displayNewTagForm={state.displayNewTagForm}
           onClickAddTagBtn={this.handleClickAddTagBtn}
           onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
