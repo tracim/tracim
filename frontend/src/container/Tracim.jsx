@@ -82,6 +82,7 @@ import PersonalRecentActivities from './PersonalRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
+import ContentRedirection from './ContentRedirection.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -567,6 +568,7 @@ export class Tracim extends React.Component {
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
           <Route path={PAGE.JOIN_WORKSPACE} component={JoinWorkspace} />
+          <Route path={PAGE.CONTENT(':idcts')} component={ContentRedirection} />
 
           {/* the 3 divs below must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />
