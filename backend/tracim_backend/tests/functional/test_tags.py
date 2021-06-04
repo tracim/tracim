@@ -159,20 +159,6 @@ class TestTagsEndpoint(object):
         assert tag_res["tag_id"]
         assert tag_res["tag_name"] == tag_name
 
-        # TODO - RJ - 2021-06-02 - handle live messages when they are implemented
-        # tag_id = tag_res["tag_id"]
-        #
-        # last_event = event_helper.last_event
-        # assert last_event.event_type == "tag.created"
-        # author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
-        # assert last_event.author == UserDigestSchema().dump(author).data
-        # web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        # workspace = web_testapp.get(
-        # "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
-        # ).json_body
-        # assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
-        # assert last_event.tag["tag_id"] == tag_id
-        # assert last_event.tag["tag_name"] == tag_name
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
     def test_api__post_content_tag__err_400__already_exist(
