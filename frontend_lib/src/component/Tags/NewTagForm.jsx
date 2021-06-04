@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+// import { putContentTagList } from '../../action.async.js'
 
 require('./NewTagForm.styl')
 
