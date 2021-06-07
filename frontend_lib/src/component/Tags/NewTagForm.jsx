@@ -47,7 +47,7 @@ export class NewTagForm extends React.Component {
               type='text'
               className='name__input form-control'
               id='addtag'
-              placeholder={props.t('Create a new tag...')}
+              placeholder={props.t('Create new tag...')}
               data-cy='addtag'
               value={this.state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}
