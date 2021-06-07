@@ -1,7 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { sendGlobalFlashMessage, naturalCompare } from '../../helper.js'
+import {
+  sendGlobalFlashMessage,
+  naturalCompare,
+  handleFetchResult
+} from '../../helper.js'
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
@@ -9,7 +13,8 @@ import {
   getWorkspaceTagList,
   getContentTagList
 } from '../../action.async.js'
-require('./TagList.styl')
+
+// require('./TagList.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class TagList extends React.Component {
   constructor (props) {
@@ -43,14 +48,18 @@ class TagList extends React.Component {
 
   async updateTagList () {
     const { props } = this
-    const fetchGetWsTagList = await getWorkspaceTagList(props.apiUrl, props.workspaceId)
+    const fetchGetWsTagList = await handleFetchResult(
+      await getWorkspaceTagList(props.apiUrl, props.workspaceId)
+    )
 
     if (!fetchGetWsTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
       return
     }
 
-    const fetchGetContentTagList = await getContentTagList(props.apiUrl, props.workspaceId, props.contentIdv)
+    const fetchGetContentTagList = await handleFetchResult(
+      await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
+    )
 
     if (!fetchGetContentTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
@@ -83,7 +92,6 @@ class TagList extends React.Component {
       tagIsChecked[tag.id] = true
     }
 
-    console.log('SALUT', sortedTagList)
     this.setState({ tagList: sortedTagList, tagIsChecked: tagIsChecked })
   }
 
@@ -101,6 +109,9 @@ class TagList extends React.Component {
           {props.displayNewTagForm
             ? (
               <NewTagForm
+                apiUrl={props.apiUrl}
+                workspaceId={props.workspaceId}
+                contentId={props.contentId}
                 onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
               />
             )
@@ -148,8 +159,9 @@ class TagList extends React.Component {
 export default translate()(TagList)
 
 TagList.propTypes = {
+  onClickAddTagBtn: PropTypes.func.isRequired,
   onChangeTag: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
-  workspaceId: PropTypes.string.isRequired,
-  contentId: PropTypes.string.isRequired
+  workspaceId: PropTypes.number.isRequired,
+  contentId: PropTypes.number.isRequired
 }

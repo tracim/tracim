@@ -173,5 +173,5 @@ export const getContentTagList = (apiUrl, workspaceId, contentId) =>
 export const getWorkspaceTagList = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/tags`)
 
-export const putContentTagList = (apiUrl, workspaceId, contentId) =>
-  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)
+export const postContentTag = (apiUrl, workspaceId, contentId, tagName) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`, { tag_name: tagName })
