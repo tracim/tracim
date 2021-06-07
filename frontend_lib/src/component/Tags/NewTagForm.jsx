@@ -23,6 +23,8 @@ export class NewTagForm extends React.Component {
     if (!response.ok) {
       sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
     }
+    this.setState({tagName:''})
+
   }
 
   render () {
@@ -61,7 +63,6 @@ export class NewTagForm extends React.Component {
                     <div
                       className='autocomplete__item'
                       onClick={() => props.onClickKnownTag(u)}
-                      // CR - 2021/06/02 - TO DO
                       key={u.tag_id}
                     >
                       <div
@@ -114,7 +115,6 @@ NewTagForm.propTypes = {
   onClickAutoComplete: PropTypes.func,
   autoCompleteClicked: PropTypes.bool,
   onClickKnownTag: PropTypes.func,
-  // onChangePersonalData: PropTypes.func,
   autoCompleteActive: PropTypes.bool
 }
 
@@ -123,7 +123,6 @@ NewTagForm.defaultProps = {
   autoCompleteClicked: false,
   autoCompleteActive: false,
   onClickKnownTag: () => { },
-  // onChangePersonalData: () => { },
   onClickAutoComplete: () => { },
   onClickCloseAddTagBtn: () => { }
 }
