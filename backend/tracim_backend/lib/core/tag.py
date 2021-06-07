@@ -82,9 +82,16 @@ class TagLib:
         except NoResultFound:
             return None
 
-    def add_tag_to_content(self, user: User, content: Content, tag_name: str, do_save: bool) -> Tag:
+    def add_tag_to_content(
+        self,
+        user: User,
+        content: Content,
+        tag_name: typing.Optional[str] = None,
+        tag_id: typing.Optional[int] = None,
+        do_save=True,
+    ) -> Tag:
         try:
-            tag = self.get_one(workspace_id=content.workspace_id, tag_name=tag_name)
+            tag = self.get_one(workspace_id=content.workspace_id, tag_name=tag_name, tag_id=tag_id)
             content_tag = self.get_content_tag(content=content, tag=tag)
 
             if content_tag:

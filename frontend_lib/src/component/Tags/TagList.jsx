@@ -11,7 +11,9 @@ import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
 import {
   getWorkspaceTagList,
-  getContentTagList
+  getContentTagList,
+  deleteContentTag,
+  putContentTag
 } from '../../action.async.js'
 
 // require('./TagList.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -25,13 +27,23 @@ class TagList extends React.Component {
     }
   }
 
-  markAsChecked = tagId => {
-    this.setState(previousState => ({
-      tagIsChecked: {
-        ...previousState.tagIsChecked,
-        [tagId]: !previousState.tagIsChecked[tagId]
+  toggleChecked = tagId => {
+    this.setState(previousState => {
+      const { props } = this
+      const checkedToggled = !previousState.tagIsChecked[tagId]
+      if (checkedToggled) {
+        putContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
+      } else {
+        deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
       }
-    }))
+
+      return {
+        tagIsChecked: {
+          ...previousState.tagIsChecked,
+          [tagId]: checkedToggled
+        }
+      }
+    })
   }
 
   componentDidMount () {
@@ -66,7 +78,7 @@ class TagList extends React.Component {
     }
 
     const isContentTag = (tag) => {
-      return fetchGetContentTagList.body.some(t => t.id === tag.id)
+      return fetchGetContentTagList.body.some(t => t.tag_id === tag.tag_id)
     }
 
     const sortTagList = (tagA, tagB) => {
@@ -81,7 +93,7 @@ class TagList extends React.Component {
         return -1
       }
 
-      return naturalCompare(tagA, tagB, props.i18n.language, 'name')
+      return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
     }
 
     const sortedTagList = fetchGetWsTagList.body.sort(sortTagList)
@@ -89,7 +101,7 @@ class TagList extends React.Component {
     const tagIsChecked = {}
 
     for (const tag of fetchGetContentTagList.body) {
-      tagIsChecked[tag.id] = true
+      tagIsChecked[tag.tag_id] = true
     }
 
     this.setState({ tagList: sortedTagList, tagIsChecked: tagIsChecked })
@@ -131,21 +143,21 @@ class TagList extends React.Component {
               </div>
             )}
           <ul className='taglist__list'>
-            {state.tagList.map((m, index) =>
+            {state.tagList.map((tag, index) =>
               <li
                 className={classnames(
                   'taglist__list__item_wrapper',
                   { taglist__list__item__last: state.tagList.length === index + 1 }
                 )}
-                key={m.id}
+                key={tag.tag_id}
               >
                 <Tag
-                  title={m.name}
-                  done={m.done}
-                  checked={state.tagIsChecked[m.id]}
-                  name={m.name}
-                  description={m.description}
-                  onClickCheckbox={() => this.markAsChecked(m.id)}
+                  title={tag.tag_name}
+                  done={tag.done}
+                  checked={state.tagIsChecked[tag.tag_id]}
+                  name={tag.tag_name}
+                  description={tag.description}
+                  onClickCheckbox={() => this.toggleChecked(tag.tag_id)}
                 />
               </li>
             )}

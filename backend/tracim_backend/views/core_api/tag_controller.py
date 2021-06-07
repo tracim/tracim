@@ -92,6 +92,7 @@ class TagController(Controller):
             user=request.current_user,
             content=request.current_content,
             tag_name=hapic_data.body.tag_name,
+            tag_id=hapic_data.body.tag_id,
             do_save=True,
         )
 
@@ -175,6 +176,14 @@ class TagController(Controller):
             request_method="POST",
         )
         configurator.add_view(self.add_content_tag, route_name="add_content_tag")
+
+        # Put a tag to a content
+        configurator.add_route(
+            "add_content_tag_by_id",
+            "/workspaces/{workspace_id}/contents/{content_id}/tags/{tag_id}",
+            request_method="PUT",
+        )
+        configurator.add_view(self.add_content_tag, route_name="add_content_tag_by_id")
 
         # delete a tag from a workspace
         configurator.add_route(

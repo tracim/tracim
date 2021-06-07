@@ -714,8 +714,9 @@ class TagCreation(object):
     tag creation model
     """
 
-    def __init__(self, tag_name: str) -> None:
+    def __init__(self, tag_name: Optional[str] = None, tag_id: Optional[int] = None) -> None:
         self.tag_name = tag_name
+        self.tag_id = tag_id
 
 
 class SetContentStatus(object):

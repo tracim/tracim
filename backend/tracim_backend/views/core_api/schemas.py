@@ -1804,7 +1804,14 @@ class SetReactionSchema(marshmallow.Schema):
 
 
 class SetTagSchema(marshmallow.Schema):
-    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=True,)
+    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=False,)
+    tag_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid tag related to content content_id",
+        required=False,
+        default=None,
+        validate=strictly_positive_int_validator,
+    )
 
     @post_load()
     def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
