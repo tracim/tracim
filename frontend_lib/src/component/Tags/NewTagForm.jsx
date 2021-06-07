@@ -38,14 +38,14 @@ export class NewTagForm extends React.Component {
 
           <div className='taglist__form__member__tag'>
             <label className='name__label' htmlFor='addtag'>
-              {props.t('Enter the tag')}
+              {props.t('Create a tag or choose one in the list for this content')}
             </label>
 
             <input
               type='text'
               className='name__input form-control'
               id='addtag'
-              placeholder={props.t('Add a new tag or search a tag...')}
+              placeholder={props.t('Create a new tag...')}
               data-cy='addtag'
               value={this.state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}

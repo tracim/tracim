@@ -18,7 +18,10 @@ export const Tag = props => {
         />
       </div>
 
-      <div className='taglist__list__item__info'>
+      <div
+        className='taglist__list__item__info'
+        onClick={props.onClickCheckbox}
+      >
         <div>
           <span
             // className='taglist__list__item__info__firstColumn__name'
