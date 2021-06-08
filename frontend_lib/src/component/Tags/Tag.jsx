@@ -23,12 +23,12 @@ export const Tag = props => {
         onClick={props.onClickCheckbox}
       >
         <div>
-          <span
+          <label
             // className='taglist__list__item__info__firstColumn__name'
             title={props.name}
           >
             {props.name}
-          </span>
+          </label>
 
           <div
             // className='taglist__list__item__info__firstColumn__username'

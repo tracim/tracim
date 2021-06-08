@@ -861,6 +861,11 @@ export class HtmlDocument extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewTagActive: false,
+    autoCompleteClicked: true
+  })
+  
   getMenuItemList = () => {
     const { props, state } = this
     const timelineObject = {
@@ -918,9 +923,14 @@ export class HtmlDocument extends React.Component {
       icon: 'fas fa-tag',
       children: (
         <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
           displayNewTagForm={state.displayNewTagForm}
           onClickAddTagBtn={this.handleClickAddTagBtn}
           onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
+          searchedKnownTagList={props.searchedKnownTagList}
+          onClickAutoComplete={this.handleClickAutoComplete}
         />
       )
     }

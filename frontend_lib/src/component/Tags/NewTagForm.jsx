@@ -94,6 +94,7 @@ export class NewTagForm extends React.Component {
             className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
             disabled={!this.state.tagName}
             onClick={this.handleClickBtnValidate}
+            data-cy='ValidateTag'
           >
             {props.t('Validate')}&nbsp;
             <i className='fas fa-fw fa-check' />
