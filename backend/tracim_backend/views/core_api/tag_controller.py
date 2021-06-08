@@ -18,7 +18,7 @@ from tracim_backend.models.tag import Tag
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentTagPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import SetTagSchema
+from tracim_backend.views.core_api.schemas import SetTagByNameSchema
 from tracim_backend.views.core_api.schemas import TagPathSchema
 from tracim_backend.views.core_api.schemas import TagSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
@@ -81,9 +81,9 @@ class TagController(Controller):
     @hapic.handle_exception(TagAlreadyExistsError, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(SetTagSchema())
+    @hapic.input_body(SetTagByNameSchema())
     @hapic.output_body(TagSchema())
-    def add_content_tag(self, context, request: TracimRequest, hapic_data=None) -> Tag:
+    def add_content_tag_by_name(self, context, request: TracimRequest, hapic_data=None) -> Tag:
         """
         Add new tag to content
         """
@@ -92,7 +92,24 @@ class TagController(Controller):
             user=request.current_user,
             content=request.current_content,
             tag_name=hapic_data.body.tag_name,
-            tag_id=hapic_data.body.tag_id,
+            do_save=True,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__TAG_ENDPOINTS])
+    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TagAlreadyExistsError, HTTPStatus.BAD_REQUEST)
+    @check_right(is_contributor)
+    @hapic.input_path(ContentTagPathSchema())
+    @hapic.output_body(TagSchema())
+    def add_content_tag_by_id(self, context, request: TracimRequest, hapic_data=None) -> Tag:
+        """
+        Add new tag to content
+        """
+        tag_lib = TagLib(session=request.dbsession)
+        return tag_lib.add_tag_to_content(
+            user=request.current_user,
+            content=request.current_content,
+            tag_id=hapic_data.path.tag_id,
             do_save=True,
         )
 
@@ -101,7 +118,7 @@ class TagController(Controller):
     @hapic.handle_exception(TagAlreadyExistsError, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.input_body(SetTagSchema())
+    @hapic.input_body(SetTagByNameSchema())
     @hapic.output_body(TagSchema())
     def add_workspace_tag(self, context, request: TracimRequest, hapic_data=None) -> Tag:
         """
@@ -145,7 +162,9 @@ class TagController(Controller):
     def bind(self, configurator: Configurator):
         # Get tags
         configurator.add_route(
-            "get_workspace_tags", "/workspaces/{workspace_id}/tags", request_method="GET",
+            "get_workspace_tags",
+            "/workspaces/{workspace_id}/tags",
+            request_method="GET",
         )
         configurator.add_view(self.get_workspace_tags, route_name="get_workspace_tags")
 
@@ -159,23 +178,27 @@ class TagController(Controller):
 
         # Get a tag
         configurator.add_route(
-            "get_tag", "/workspaces/{workspace_id}/tags/{tag_id}", request_method="GET",
+            "get_tag",
+            "/workspaces/{workspace_id}/tags/{tag_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_tag, route_name="get_tag")
 
         # Add a tag to a workspace
         configurator.add_route(
-            "add_workspace_tag", "/workspaces/{workspace_id}/tags", request_method="POST",
+            "add_workspace_tag",
+            "/workspaces/{workspace_id}/tags",
+            request_method="POST",
         )
         configurator.add_view(self.add_workspace_tag, route_name="add_workspace_tag")
 
         # Add a tag to a content
         configurator.add_route(
-            "add_content_tag",
+            "add_content_tag_by_name",
             "/workspaces/{workspace_id}/contents/{content_id}/tags",
             request_method="POST",
         )
-        configurator.add_view(self.add_content_tag, route_name="add_content_tag")
+        configurator.add_view(self.add_content_tag_by_name, route_name="add_content_tag_by_name")
 
         # Put a tag to a content
         configurator.add_route(
@@ -183,7 +206,7 @@ class TagController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/tags/{tag_id}",
             request_method="PUT",
         )
-        configurator.add_view(self.add_content_tag, route_name="add_content_tag_by_id")
+        configurator.add_view(self.add_content_tag_by_id, route_name="add_content_tag_by_id")
 
         # delete a tag from a workspace
         configurator.add_route(

@@ -6,6 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import TagAlreadyExistsError
 from tracim_backend.exceptions import TagNotFound
+from tracim_backend.exceptions import TracimException
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import User
 from tracim_backend.models.data import Workspace
@@ -64,7 +65,9 @@ class TagLib:
         return tag
 
     def get_all(
-        self, workspace_id: typing.Optional[int] = None, content_id: typing.Optional[int] = None,
+        self,
+        workspace_id: typing.Optional[int] = None,
+        content_id: typing.Optional[int] = None,
     ) -> typing.List[Tag]:
         query = self.base_filter(
             self._base_query(), workspace_id=workspace_id, content_id=content_id
@@ -90,6 +93,9 @@ class TagLib:
         tag_id: typing.Optional[int] = None,
         do_save=True,
     ) -> Tag:
+        if not tag_name and not tag_id:
+            raise TracimException("Please provide either tag_name or tag_id")
+
         try:
             tag = self.get_one(workspace_id=content.workspace_id, tag_name=tag_name, tag_id=tag_id)
             content_tag = self.get_content_tag(content=content, tag=tag)
@@ -106,8 +112,8 @@ class TagLib:
                 user=user, workspace=content.workspace, tag_name=tag_name, do_save=do_save
             )
 
-        tag_content = TagOnContent(author=user, tag=tag, content=content)
-        self._session.add(tag_content)
+        content_tag = TagOnContent(author=user, tag=tag, content=content)
+        self._session.add(content_tag)
         if do_save:
             self._session.flush()
         return tag
@@ -122,6 +128,13 @@ class TagLib:
     def delete_from_content(self, content: Content, tag_id: int, do_save: bool) -> None:
         tag = self.get_one(workspace_id=content.workspace_id, tag_id=tag_id)
         content_tag = self.get_content_tag(content=content, tag=tag)
+        if not content_tag:
+            raise TagNotFound(
+                "Tag #{tag_id} is not attached to content #{content_id}.".format(
+                    tag_id=tag_id, content_id=content.content_id
+                )
+            )
+
         self._session.delete(content_tag)
         if do_save:
             self._session.flush()
