@@ -56,6 +56,7 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import KnownContentsQuery
 from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
@@ -920,6 +921,21 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return KnownMembersQuery(**data)
+
+
+class KnownContentsQuerySchema(marshmallow.Schema):
+    acp = StrippedString(example="test", description="search text to query", required=True)
+
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=15,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return KnownContentsQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):

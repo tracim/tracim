@@ -493,7 +493,7 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         content_filter = hapic_data.query
-        api = ContentApi(
+        content_api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -502,10 +502,10 @@ class WorkspaceController(Controller):
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
         )
-        paged_contents = api.get_all(
+        paged_contents = content_api.get_all(
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
-            workspace=request.current_workspace,
+            workspaces=[request.current_workspace],
             content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,
             order_by_properties=[
@@ -515,7 +515,7 @@ class WorkspaceController(Controller):
             count=content_filter.count,
             page_token=content_filter.page_token,
         )
-        contents = [api.get_content_in_context(content) for content in paged_contents]
+        contents = [content_api.get_content_in_context(content) for content in paged_contents]
         return PaginatedObject(paged_contents, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])

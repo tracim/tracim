@@ -42,7 +42,7 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownContent,
+  getMyselfKnownContents,
   getMyselfKnownMember,
   getCommentTranslated,
   postContentToFavoriteList,
@@ -589,13 +589,38 @@ export function appContentFactory (WrappedComponent) {
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       let autoCompleteItemList = []
       const keyword = query.substring(1)
+
       if (query.includes('#')) {
-        const fetchUserKnownContent = await handleFetchResult(
-          await getMyselfKnownContent(this.apiUrl, keyword, NUMBER_RESULTS_BY_PAGE)
+
+        function matchingContentIdsLast(contentA, contentB) {
+          const aContentId = contentA.content_id.toString()
+          const bContentId = contentB.content_id.toString()
+
+          if (keyword) {
+            const idOfAStartsWithKeyword = aContentId.startsWith(keyword)
+            const idOfBStartsWithKeyword = bContentId.startsWith(keyword)
+
+            if (idOfAStartsWithKeyword && !idOfBStartsWithKeyword) {
+              return 1
+            }
+
+            if (idOfBStartsWithKeyword && !idOfAStartsWithKeyword) {
+              return -1
+            }
+          }
+
+          return bContentId.localeCompare(aContentId, undefined, {numeric: true})
+        }
+
+        const fetchUserKnownContents = await handleFetchResult(
+          await getMyselfKnownContents(this.apiUrl, keyword, NUMBER_RESULTS_BY_PAGE)
         )
 
-        switch (fetchUserKnownContent.apiResponse.status) {
-          case 200: return fetchUserKnownContent.body.contents.map(m => ({ detail: m.label, ...m }))
+        switch (fetchUserKnownContents.apiResponse.status) {
+          case 200: {
+            const matchingList = fetchUserKnownContents.body.map(m => ({ detail: m.label, ...m }))
+            return matchingList.sort(matchingContentIdsLast)
+          }
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
         }
       } else {

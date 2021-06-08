@@ -238,15 +238,18 @@ class ContentApi(object):
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
         return content_list
 
-    def __real_base_query(self, workspace: Workspace = None) -> Query:
+    def __real_base_query(
+        self, workspaces: typing.Optional[typing.List[Workspace]] = None
+    ) -> Query:
         result = self.get_canonical_query()
 
         # Exclude non displayable types
         if not self._force_show_all_types:
             result = result.filter(Content.type.in_(content_type_list.query_allowed_types_slugs()))
 
-        if workspace:
-            result = result.filter(Content.workspace_id == workspace.workspace_id)
+        if workspaces:
+            workspace_ids = [workspace.workspace_id for workspace in workspaces]
+            result = result.filter(Content.workspace_id.in_(workspace_ids))
 
         # Security layer: if user provided, filter
         # with user workspaces privileges
@@ -267,8 +270,8 @@ class ContentApi(object):
 
         return result
 
-    def _base_query(self, workspace: Workspace = None) -> Query:
-        result = self.__real_base_query(workspace)
+    def _base_query(self, workspaces: typing.Optional[typing.List[Workspace]] = None) -> Query:
+        result = self.__real_base_query(workspaces)
 
         if not self._show_active:
             result = result.filter(
@@ -322,60 +325,8 @@ class ContentApi(object):
 
         return result
 
-    def get_base_query(self, workspace: typing.Optional[Workspace]) -> Query:
-        return self._base_query(workspace)
-
-    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-    # def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
-    #     """
-    #     This method returns child items (folders or items) for left bar treeview.
-    #
-    #     :param parent:
-    #     :param workspace:
-    #     :param filter_by_allowed_content_types:
-    #     :param removed_item_ids:
-    #     :param allowed_node_types: This parameter allow to hide folders for which the given type of content is not allowed.
-    #            For example, if you want to move a Page from a folder to another, you should show only folders that accept pages
-    #     :return:
-    #     """
-    #     filter_by_allowed_content_types = filter_by_allowed_content_types or []  # FDV
-    #     removed_item_ids = removed_item_ids or []  # FDV
-    #
-    #     if not allowed_node_types:
-    #         allowed_node_types = [content_type_list.Folder.slug]
-    #     elif allowed_node_types==content_type_list.Any_SLUG:
-    #         allowed_node_types = ContentType.all()
-    #
-    #     parent_id = parent.content_id if parent else None
-    #     folders = self._base_query(workspace).\
-    #         filter(Content.parent_id==parent_id).\
-    #         filter(Content.type.in_(allowed_node_types)).\
-    #         filter(Content.content_id.notin_(removed_item_ids)).\
-    #         all()
-    #
-    #     if not filter_by_allowed_content_types or \
-    #                     len(filter_by_allowed_content_types)<=0:
-    #         # Standard case for the left treeview: we want to show all contents
-    #         # in the left treeview... so we still filter because for example
-    #         # comments must not appear in the treeview
-    #         return [folder for folder in folders \
-    #                 if folder.type in ContentType.allowed_types_for_folding()]
-    #
-    #     # Now this is a case of Folders only (used for moving content)
-    #     # When moving a content, you must get only folders that allow to be filled
-    #     # with the type of content you want to move
-    #     result = []
-    #     for folder in folders:
-    #         for allowed_content_type in filter_by_allowed_content_types:
-    #
-    #             is_folder = folder.type == content_type_list.Folder.slug
-    #             content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
-    #
-    #             if is_folder and content_type__allowed:
-    #                 result.append(folder)
-    #                 break
-    #
-    #     return result
+    def get_base_query(self, workspaces: typing.Optional[typing.List[Workspace]]) -> Query:
+        return self._base_query(workspaces)
 
     def _is_filename_available(
         self,
@@ -400,7 +351,7 @@ class ContentApi(object):
         assert workspace
         assert content_namespace
         label, file_extension = os.path.splitext(filename)
-        query = self.get_base_query(workspace)
+        query = self.get_base_query([workspace] if workspace else None)
         query = query.filter(Content.content_namespace == content_namespace)
 
         if parent:
@@ -419,7 +370,7 @@ class ContentApi(object):
             return False
         else:
             critical_error_text = (
-                "Something is wrong in the database ! "
+                "Something is wrong in the database! "
                 "Content filename should be unique "
                 "in a same folder in database"
                 "but you have {nb} content with "
@@ -634,10 +585,12 @@ class ContentApi(object):
         if not content_id:
             return None
 
+        workspaces = [workspace] if workspace else None
+
         if ignore_content_state_filter:
-            base_request = self.__real_base_query(workspace)
+            base_request = self.__real_base_query(workspaces)
         else:
-            base_request = self._base_query(workspace)
+            base_request = self._base_query(workspaces)
 
         base_request = base_request.filter(Content.content_id == content_id)
 
@@ -700,7 +653,7 @@ class ContentApi(object):
             temporary_prefix="tracim-revision-content",
         )
 
-    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method still needed?
     def get_one_by_label_and_parent(
         self, content_label: str, content_parent: Content = None
     ) -> Content:
@@ -708,11 +661,10 @@ class ContentApi(object):
         This method let us request the database to obtain a Content with its name and parent
         :param content_label: Either the content's label or the content's filename if the label is None
         :param content_parent: The parent's content
-        :param workspace: The workspace's content
         :return The corresponding Content
         """
-        workspace = content_parent.workspace if content_parent else None
-        query = self._base_query(workspace)
+        workspaces = [content_parent.workspace] if content_parent else None
+        query = self._base_query(workspaces)
         parent_id = content_parent.content_id if content_parent else None
         query = query.filter(Content.parent_id == parent_id)
 
@@ -744,7 +696,7 @@ class ContentApi(object):
     def get_one_by_filename(
         self, filename: str, workspace: Workspace, parent: typing.Optional[Content] = None,
     ):
-        query = self._base_query(workspace)
+        query = self._base_query([workspace] if workspace else None)
         query = query.filter((Content.label + Content.file_extension) == filename)
         if parent:
             query = query.filter(Content.parent_id == parent.content_id)
@@ -855,7 +807,7 @@ class ContentApi(object):
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
         content_type_slug: str = content_type_list.Any_SLUG,
-        workspace: typing.Optional[Workspace] = None,
+        workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
@@ -867,7 +819,7 @@ class ContentApi(object):
         Extended filter for better "get all data" query
         :param parent_ids: filter by parent_ids
         :param content_type_slug: filter by content_type slug
-        :param workspace: filter by workspace
+        :param workspaces: filter by workspaces
         :param complete_path_to_id: add all parent(root included) of content_id
         given there to parent_ids filter.
         :param order_by_properties: filter by properties can be both string of
@@ -879,7 +831,7 @@ class ContentApi(object):
         assert not parent_ids or isinstance(parent_ids, list)
         assert content_type_slug is not None
         assert not complete_path_to_id or isinstance(complete_path_to_id, int)
-        query = self._base_query(workspace)
+        query = self._base_query(workspaces)
 
         # INFO - G.M - 2018-11-12 - Get list of all ancestror
         #  of content, workspace root included
@@ -947,7 +899,7 @@ class ContentApi(object):
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
         content_type: str = content_type_list.Any_SLUG,
-        workspace: typing.Optional[Workspace] = None,
+        workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
@@ -955,6 +907,7 @@ class ContentApi(object):
         complete_path_to_id: typing.Optional[int] = None,
         page_token: typing.Optional[str] = None,
         count: typing.Optional[int] = None,
+        acp: typing.Optional[str] = None,
     ) -> Page:
         """
         Return all content using some filters
@@ -962,79 +915,24 @@ class ContentApi(object):
         :param complete_path_to_id: filter by path of content_id
         (add all parent, root included to parent_ids filter)
         :param content_type: filter by content_type slug
-        :param workspace: filter by workspace
+        :param workspaces: filter by workspaces
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
-        :return: List of contents
+        :param page_token: the page token of this paged request
+        :param count: the number of elements per page
+        :return: Paged list of contents
         """
         query = self.get_all_query(
-            parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id
+            parent_ids, content_type, workspaces, label, order_by_properties, complete_path_to_id
         )
         if count:
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
-    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
-    # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
-    #     """
-    #     Return parent_id childs of given content_types
-    #     :param parent_id: parent id
-    #     :param content_types: list of types
-    #     :param workspace: workspace filter
-    #     :return: list of content
-    #     """
-    #     resultset = self._base_query(workspace)
-    #     resultset = resultset.filter(Content.type.in_(content_types))
-    #
-    #     if parent_id:
-    #         resultset = resultset.filter(Content.parent_id==parent_id)
-    #     if parent_id is False:
-    #         resultset = resultset.filter(Content.parent_id == None)
-    #
-    #     return resultset.all()
-
-    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
-    # TODO find an other name to filter on is_deleted / is_archived
-    def get_all_with_filter(
-        self,
-        parent_id: int = None,
-        content_type: str = content_type_list.Any_SLUG,
-        workspace: Workspace = None,
-    ) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
-        assert content_type is not None  # DYN_REMOVE
-        assert isinstance(content_type, str)  # DYN_REMOVE
-
-        resultset = self._base_query(workspace)
-
-        if content_type != content_type_list.Any_SLUG:
-            resultset = resultset.filter(Content.type == content_type)
-
-        resultset = resultset.filter(Content.is_deleted == self._show_deleted)
-        resultset = resultset.filter(Content.is_archived == self._show_archived)
-        resultset = resultset.filter(Content.is_temporary == self._show_temporary)
-
-        resultset = resultset.filter(Content.parent_id == parent_id)
-
-        return resultset.all()
-
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def get_all_without_exception(
-        self, content_type: str, workspace: Workspace = None
-    ) -> typing.List[Content]:
-        assert content_type is not None  # DYN_REMOVE
-
-        resultset = self._base_query(workspace)
-
-        if content_type != content_type_list.Any_SLUG:
-            resultset = resultset.filter(Content.type == content_type)
-
-        return resultset.all()
-
     def get_last_active(
         self,
-        workspace: Workspace = None,
+        workspace: typing.Optional[Workspace] = None,
         limit: typing.Optional[int] = None,
         before_content: typing.Optional[Content] = None,
         content_ids: typing.Optional[typing.List[int]] = None,
@@ -1052,7 +950,7 @@ class ContentApi(object):
         """
 
         resultset = (
-            self.get_all_query(workspace=workspace)
+            self.get_all_query(workspaces=[workspace] if workspace else None)
             .outerjoin(
                 RevisionReadStatus,
                 and_(
@@ -1875,7 +1773,7 @@ class ContentApi(object):
 
         # INFO - G.M - 2020-03-27 - Get all content of workspace
         resultset = (
-            self.get_all_query(workspace=workspace)
+            self.get_all_query(workspaces=[workspace])
             .outerjoin(
                 RevisionReadStatus,
                 and_(
@@ -2044,32 +1942,7 @@ class ContentApi(object):
                 return self.get_archived_parent_id(content.parent)
         return 0
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def find_one_by_unique_property(
-        self, property_name: str, property_value: str, workspace: Workspace = None
-    ) -> Content:
-        """
-        Return Content who contains given property.
-        Raise sqlalchemy.orm.exc.MultipleResultsFound if more than one Content
-        contains this property value.
-        :param property_name: Name of property
-        :param property_value: Value of property
-        :param workspace: Workspace who contains Content
-        :return: Found Content
-        """
-        # TODO - 20160602 - Bastien: Should be JSON type query
-        # see https://www.compose.io/articles/using-json-extensions-in-\
-        # postgresql-from-python-2/
-        query = self._base_query(workspace=workspace).filter(
-            Content._properties.like(
-                '%"{property_name}": "{property_value}"%'.format(
-                    property_name=property_name, property_value=property_value
-                )
-            )
-        )
-        return query.one()
-
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method still needed?
     def generate_folder_label(self, workspace: Workspace, parent: Content = None) -> str:
         """
         Generate a folder label
@@ -2078,7 +1951,7 @@ class ContentApi(object):
         :return: Generated folder name
         """
         _ = self.translator.get_translation
-        query = self._base_query(workspace=workspace).filter(
+        query = self._base_query([workspace] if workspace else None).filter(
             Content.label.ilike("{0}%".format(_("New folder")))
         )
         if parent:
@@ -2149,7 +2022,7 @@ class ContentApi(object):
             self.get_all_query(
                 parent_ids=None,
                 content_type_slug=content_type_list.Any_SLUG,
-                workspace=None,
+                workspaces=None,
                 label=None,
             )
             .join(FavoriteContent, Content.id == FavoriteContent.content_id)

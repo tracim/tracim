@@ -67,13 +67,12 @@ export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToIncl
   return baseFetch('GET', `${apiUrl}/users/me/known_members?acp=${userNameToSearch}${opts}`)
 }
 
-export const getMyselfKnownContent = (apiUrl, contentToSearch, limit = 0) => {
+export const getMyselfKnownContents = (apiUrl, searchString, limit) => {
   const queryParameterList = []
-  if (contentToSearch) queryParameterList.push(`search_string=${encodeURIComponent(contentToSearch)}`)
-  else queryParameterList.push('search_string=*')
-  if (Number.isInteger(limit)) queryParameterList.push(`size=${limit}`)
+  queryParameterList.push(`acp=${encodeURIComponent(searchString)}`)
+  if (Number.isInteger(limit)) queryParameterList.push(`limit=${limit}`)
 
-  return baseFetch('GET', `${apiUrl}/advanced_search/content?${queryParameterList.join('&')}`)
+  return baseFetch('GET', `${apiUrl}/users/me/known_contents?${queryParameterList.join('&')}`)
 }
 
 const getResponse = async (url) => {
