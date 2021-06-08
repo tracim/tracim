@@ -29,5 +29,6 @@
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
   "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
   "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
-  "Validate anyway": "Valider quand même"
+  "Validate anyway": "Valider quand même",
+  "Tags": "Tags"
 }

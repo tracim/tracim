@@ -193,5 +193,11 @@
   "Download {{filename}}": "Herunterladen {{filename}}",
   "Translate to {{language}}": "Übersetzen in {{language}}",
   "1 file selected": "1 Datei ausgewählt",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} ausgewählte Dateien"
+  "{{numberOfFile}} files selected": "{{numberOfFile}} ausgewählte Dateien",
+  "Error while adding a tag to the content": "Fehler beim Hinzufügen eines Tags zum Inhalt",
+  "Add a tag": "Tag hinzufügen",
+  "Create a tag or choose one in the list for this content": "Erstellen Sie ein Tag oder wählen Sie eines aus der Liste für diesen Inhalt",
+  "Create new tag...": "Neues Tag erstellen...",
+  "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Tags",
+  "Tag List": "Tag Liste"
 }

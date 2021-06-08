@@ -61,5 +61,6 @@
   "Note: Your browser might not be able to read this file.": "Hinweis: Ihr Browser ist möglicherweise nicht in der Lage, diese Datei zu lesen.",
   "The file has been updated, it can't be edited anymore": "Die Datei wurde aktualisiert, sie kann nicht mehr bearbeitet werden",
   "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
-  "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration"
+  "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
+  "Tags": "Tags"
 }

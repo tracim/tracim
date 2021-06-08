@@ -193,5 +193,11 @@
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Attach files": "Anexar ficheiros",
   "Download {{filename}}": "Download {{filename}}",
-  "Translate to {{language}}": "Traduzir para {{language}}"
+  "Translate to {{language}}": "Traduzir para {{language}}",
+  "Error while adding a tag to the content": "Erro ao adicionar uma etiqueta ao conteúdo",
+  "Add a tag": "Adicionar uma etiqueta",
+  "Create a tag or choose one in the list for this content": "Criar uma etiqueta ou escolher uma na lista para este conteúdo",
+  "Create new tag...": "Criar nova etiqueta...",
+  "Error while fetching a list of tags": "Erro ao obter uma lista de etiqueta",
+  "Tag List": "Lista de etiquetas"
 }

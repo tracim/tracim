@@ -193,5 +193,11 @@
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Attach files": "Attach files",
   "Download {{filename}}": "Download {{filename}}",
-  "Translate to {{language}}": "Translate to {{language}}"
+  "Translate to {{language}}": "Translate to {{language}}",
+  "Error while adding a tag to the content": "Error while adding a tag to the content",
+  "Add a tag": "Add a tag",
+  "Create a tag or choose one in the list for this content": "Create a tag or choose one in the list for this content",
+  "Create new tag...": "Create new tag...",
+  "Error while fetching a list of tags": "Error while fetching a list of tags",
+  "Tag List": "Tag List"
 }
