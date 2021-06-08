@@ -37,7 +37,8 @@ class TestTagsEndpoint(object):
     """
 
     @pytest.mark.parametrize(
-        "tag_names", [(SAMPLE_TAG_LIST)],
+        "tag_names",
+        [(SAMPLE_TAG_LIST)],
     )
     def test_api__get_contents_tags__ok_200__nominal_case(
         self,
@@ -77,7 +78,8 @@ class TestTagsEndpoint(object):
                 assert tag_res["tag_name"] == tag_name
 
     @pytest.mark.parametrize(
-        "tag_name", SAMPLE_TAG_LIST,
+        "tag_name",
+        SAMPLE_TAG_LIST,
     )
     def test_api__get_one_tag__ok_200__nominal_case(
         self,
@@ -109,7 +111,8 @@ class TestTagsEndpoint(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag.tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag.tag_id,
             ),
             status=200,
         )
@@ -148,7 +151,8 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -158,7 +162,7 @@ class TestTagsEndpoint(object):
         assert tag_res["tag_name"] == tag_name
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
-    def test_api__post_content_tag__err_400__already_exist(
+    def test_api__post_content_tag__err_400__already_exists(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -185,14 +189,16 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
         )
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=400,
             params=params,
@@ -200,7 +206,7 @@ class TestTagsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.TAG_ALREADY_EXISTS
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
-    def test_api__delete_content_tag__ok_200__user_is_author_and_workspace_manager(
+    def test_api__delete_content_tag__ok_200__user_is_contributor(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -212,7 +218,7 @@ class TestTagsEndpoint(object):
         tag_name,
     ) -> None:
         """
-        delete tag (user is workspace_manager and owner)
+        delete tag (user is contributor)
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -229,7 +235,8 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -263,7 +270,7 @@ class TestTagsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.TAG_NOT_FOUND
 
     @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
-    def test_api__delete_content_tag__ok_400__is_not_contributor(
+    def test_api__add_workspace_tag__ok_200__is_contributor(
         self,
         workspace_api_factory,
         content_api_factory,
@@ -276,7 +283,100 @@ class TestTagsEndpoint(object):
         tag_name,
     ) -> None:
         """
-        delete tag (user is workspace_manager and owner)
+        add tag to workspace (user is contributor)
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        test_workspace = workspace_api.create_workspace(label="test", save_now=True)
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"tag_name": tag_name}
+        res = web_testapp.post_json(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=200,
+            params=params,
+        )
+
+        tag_id = res.json_body["tag_id"]
+
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+
+    @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
+    def test_api__add_workspace_tag__ok__403_is_reader(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        role_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+        riyad_user,
+        tag_name,
+    ) -> None:
+        """
+        add tag to workspace (user is reader)
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        test_workspace = workspace_api.create_workspace(label="test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        params = {"tag_name": tag_name}
+        res = web_testapp.post_json(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=403,
+            params=params,
+        )
+
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+
+    @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
+    def test_api__delete_content_tag__ok_400__is_reader(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        role_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+        riyad_user,
+        tag_name,
+    ) -> None:
+        """
+        delete tag (user is reader)
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -296,7 +396,8 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -333,7 +434,8 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag_id,
             ),
             status=403,
         )
@@ -341,7 +443,143 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag_id,
             ),
             status=200,
         )
+
+    @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
+    def test_api__put_content_tag__ok_200__user_is_reader(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+        # event_helper,
+        tag_name,
+    ) -> None:
+        """
+        put tag (user is reader)
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        test_workspace = workspace_api.create_workspace(label="test", save_now=True)
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"tag_name": tag_name}
+        res = web_testapp.post_json(
+            "/api/workspaces/{workspace_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+            ),
+            status=200,
+            params=params,
+        )
+        tag_id = res.json_body["tag_id"]
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+        res = web_testapp.put(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags/{tag_id}".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+
+        assert len([tag for tag in res.json_body if tag["tag_id"] == tag_id]) == 1
+
+    @pytest.mark.parametrize("tag_name", SAMPLE_TAG_LIST)
+    def test_api__put_content_tag__ok_400__is_not_contributor(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        role_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+        riyad_user,
+        tag_name,
+    ) -> None:
+        """
+        put tag (user is reader)
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        test_workspace = workspace_api.create_workspace(label="test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        folder = content_api.create(
+            label="test-folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"tag_name": tag_name}
+        res = web_testapp.post_json(
+            "/api/workspaces/{workspace_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+            ),
+            status=200,
+            params=params,
+        )
+        tag_id = res.json_body["tag_id"]
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+
+        web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
+        res = web_testapp.put(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags/{tag_id}".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=403,
+        )
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+                tag_id=tag_id,
+            ),
+            status=200,
+        )
+
+        assert not [tag for tag in res.json_body if tag["tag_id"] == tag_id]

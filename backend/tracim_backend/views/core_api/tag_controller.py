@@ -127,7 +127,7 @@ class TagController(Controller):
         tag_lib = TagLib(session=request.dbsession)
         return tag_lib.add(
             user=request.current_user,
-            workspace_id=request.current_workspace.workspace_id,
+            workspace=request.current_workspace,
             tag_name=hapic_data.body.tag_name,
             do_save=True,
         )
