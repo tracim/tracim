@@ -917,8 +917,8 @@ export class HtmlDocument extends React.Component {
         />
       ) : null
     }
-    const tags = {
-      id: 'tags',
+    const tag = {
+      id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
@@ -934,7 +934,7 @@ export class HtmlDocument extends React.Component {
         />
       )
     }
-    return [timelineObject, tags]
+    return [timelineObject, tag]
   }
 
   render () {

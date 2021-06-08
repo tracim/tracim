@@ -19,12 +19,13 @@ export class NewTagForm extends React.Component {
     const response = await handleFetchResult(
       await postContentTag(props.apiUrl, props.workspaceId, props.contentId, this.state.tagName)
     )
-
     if (!response.ok) {
       sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
     }
-    this.setState({tagName:''})
 
+    // CR - 08/06/2021 - TODO - autre fenêtre d'ajout si get 200 ok afficher que le tag est bien added
+    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'))
+    this.setState({ tagName: '' })
   }
 
   render () {
@@ -54,38 +55,6 @@ export class NewTagForm extends React.Component {
               autoComplete='off'
               autoFocus
             />
-
-            {props.autoCompleteActive && props.fetchGetContentTagList.length >= 2 && (
-              // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
-              <div className='autocomplete primaryColorBorder'>
-                {props.searchedKnownTagList.length > 0
-                  ? props.searchedKnownTagList.filter((u, i) => i < 5).map(u => // only displays the first 5
-                    <div
-                      className='autocomplete__item'
-                      onClick={() => props.onClickKnownTag(u)}
-                      key={u.tag_id}
-                    >
-                      <div
-                        className='autocomplete__item__name'
-                        data-cy='autocomplete__item__name'
-                        title={u.tagName}
-                      >
-                        {u.tagName}
-                      </div>
-                    </div>
-                  )
-                  : (
-                    <div
-                      className='autocomplete__item'
-                      onClick={props.onClickAutoComplete}
-                    >
-                      <div className='autocomplete__item__icon'>
-                        <i className='fas fa-fw fa-user-secret' />
-                      </div>
-                    </div>
-                  )}
-              </div>
-            )}
           </div>
         </div>
 
