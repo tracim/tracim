@@ -105,7 +105,7 @@ devtools_require = [
 
 # add black for python 3.6+
 if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black")
+    devtools_require.append("black==19.10b0")
 
 mysql_require = ["PyMySQL[rsa]"]
 
