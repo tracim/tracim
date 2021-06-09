@@ -566,10 +566,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.delete(items[0])
         transaction.commit()
@@ -579,7 +579,7 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -588,7 +588,7 @@ class TestContentApi(object):
         user = uapi.get_one(uid)
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
@@ -706,10 +706,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(session=session, current_user=user, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.archive(items[0])
         transaction.commit()
@@ -720,7 +720,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -732,7 +732,7 @@ class TestContentApi(object):
 
         # Test that the item is still available if "show deleted" is activated
         api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
     def test_get_all_with_filter(
@@ -770,14 +770,14 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items2 = api.get_all(None, content_type_list.File.slug, workspace)
+        items2 = api.get_all(None, content_type_list.File.slug, [workspace])
         eq_(1, len(items2))
         eq_("thefile", items2[0].label)
 
-        items3 = api.get_all(None, content_type_list.Folder.slug, workspace)
+        items3 = api.get_all(None, content_type_list.Folder.slug, [workspace])
         eq_(1, len(items3))
         eq_("thefolder", items3[0].label)
 
@@ -806,10 +806,10 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(3, len(items))
 
-        items2 = api.get_all([parent_id], content_type_list.File.slug, workspace)
+        items2 = api.get_all([parent_id], content_type_list.File.slug, [workspace])
         eq_(1, len(items2))
         eq_(child_id, items2[0].content_id)
 
