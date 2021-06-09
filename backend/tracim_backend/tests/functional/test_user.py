@@ -6,6 +6,7 @@ import io
 import typing
 
 from PIL import Image
+from depot.io.utils import FileIntent
 import pytest
 import transaction
 from webtest import TestApp
@@ -4320,6 +4321,95 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["has_avatar"] is False
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestKnownContent(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/users/known_contents
+    """
+
+    def test_api__get_known_contents__ok_200__nominal_case(
+        self,
+        admin_user,
+        session,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+    ):
+        workspace1 = workspace_api_factory.get().create_workspace(label="test1", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace(label="test2", save_now=True)
+
+        content_api = content_api_factory.get()
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace1,
+            label="Test file ananas",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
+
+        session.add(test_file)
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace2,
+            label="Test file banane",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
+
+        session.add(test_file)
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace2,
+            label="Test file pomme",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file pomme", "Test file pomme.txt", "text/plain")
+
+        session.add(test_file)
+
+        transaction.commit()
+
+        user_id = int(admin_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"acp": "anan", "limit": 15}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 2
+
+        params = {"acp": "Pomme"}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 1
+
+        params = {"acp": "kiwi"}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 0
 
 
 @pytest.mark.usefixtures("base_fixture")
