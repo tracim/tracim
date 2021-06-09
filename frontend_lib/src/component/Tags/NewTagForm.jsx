@@ -24,7 +24,7 @@ export class NewTagForm extends React.Component {
     }
 
     // CR - 08/06/2021 - TODO - autre fenêtre d'ajout si get 200 ok afficher que le tag est bien added
-    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'))
+    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
     this.setState({ tagName: '' })
   }
 

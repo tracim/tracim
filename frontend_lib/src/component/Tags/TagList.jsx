@@ -130,8 +130,8 @@ class TagList extends React.Component {
             : (
               <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddTagBtn}>
                 <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                  <div className='taglist__btnadd__button__avatar'>
-                    <div className='taglist__btnadd__button__avatar__icon'>
+                  <div className='taglist__btnadd__button__plus'>
+                    <div className='taglist__btnadd__button__plus__icon'>
                       <i className='fas fa-plus' />
                     </div>
                   </div>
@@ -156,6 +156,7 @@ class TagList extends React.Component {
                   done={tag.done}
                   checked={state.tagIsChecked[tag.tag_id]}
                   name={tag.tag_name}
+                  tagId={tag.tag_id}
                   description={tag.description}
                   onClickCheckbox={() => this.toggleChecked(tag.tag_id)}
                 />

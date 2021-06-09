@@ -8,36 +8,20 @@ require('./TagList.styl')
 export const Tag = props => {
   return (
     <div className='taglist__list__item'>
-      <div className='taglist__list__item__avatar'>
-        <Checkbox
-          onClickCheckbox={props.onClickCheckbox}
-          checked={props.checked}
-          name={'tag-' + props.name}
-          styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
-          styleCheck={{ top: '-5px' }}
-        />
-      </div>
-
-      <div
+      <Checkbox
+        onClickCheckbox={props.onClickCheckbox}
+        checked={props.checked}
+        name={'tag-' + props.tagId}
+        styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+        styleCheck={{ top: '-5px' }}
+      />
+      <label
+        htmlFor={'checkbox-tag-' + props.tagId}
         className='taglist__list__item__info'
-        onClick={props.onClickCheckbox}
+        title={props.name}
       >
-        <div>
-          <label
-            // className='taglist__list__item__info__firstColumn__name'
-            title={props.name}
-          >
-            {props.name}
-          </label>
-
-          <div
-            // className='taglist__list__item__info__firstColumn__username'
-            title={props.description}
-          >
-            {props.description}
-          </div>
-        </div>
-      </div>
+        {props.name}
+      </label>
     </div>
   )
 }
@@ -52,6 +36,7 @@ Tag.defaultProps = {
 Tag.propTypes = {
   checked: PropTypes.bool,
   name: PropTypes.string.isRequired,
+  tagId: PropTypes.number.isRequired,
   description: PropTypes.string,
   onClickCheckbox: PropTypes.func
 }

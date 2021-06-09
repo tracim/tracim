@@ -28,19 +28,19 @@
       padding 10px 15px
       &:hover
         background-color grey-hover
-      // &__avatar
-      //   margin-right 20px
       &__info
-        margin-right auto
-        width calc(100% - 81px) // 81px is the avatar's size
-        display flex
-        flex-direction row
+        flex 1
+        cursor pointer
+        margin-bottom 0
       &__delete
         font-size 20px
         color darkGrey
         cursor pointer
       &__last
         border none
+      .checkboxCustom
+        margin-bottom 0
+        align-self center
   &__btnadd
     border-bottom 2px solid grey
     padding 15px
@@ -49,7 +49,7 @@
       align-items center
       border-color grey
       color grey
-      &__avatar
+      &__plus
         display flex
         justify-content center
         align-items center

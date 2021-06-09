@@ -60,12 +60,13 @@ def upgrade():
     op.create_table(
         "content_tag",
         sa.Column(
-            "tag_id",
+            "id",
             sa.Integer,
-            sa.Sequence("seq__tag__tag_id"),
+            sa.Sequence("seq__content_tag__id"),
             autoincrement=True,
             primary_key=True,
         ),
+        sa.Column("tag_id", sa.Integer, sa.Sequence("seq__tag__tag_id"),),
         sa.Column(
             "content_id",
             sa.Integer,
