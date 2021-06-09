@@ -1416,6 +1416,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",  # noqa: W605
             request_method="GET",
         )
+        configurator.add_view(self.contents_read_status, route_name="contents_read_status")
 
         # set content as read/unread
         configurator.add_route(
