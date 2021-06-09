@@ -40,7 +40,7 @@ def upgrade():
             sa.ForeignKey("workspaces.workspace_id", onupdate="CASCADE", ondelete="CASCADE",),
             nullable=False,
         ),
-        sa.Column("tag_name", sa.Unicode(), nullable=False),
+        sa.Column("tag_name", sa.Unicode(length=255), nullable=False),
         sa.Column("author_id", sa.Integer(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(

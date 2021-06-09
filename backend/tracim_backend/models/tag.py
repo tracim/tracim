@@ -23,7 +23,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
         ForeignKey("workspaces.workspace_id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     )
-    tag_name = Column(Unicode(), nullable=False)
+    tag_name = Column(Unicode(length=255), nullable=False)
 
     workspace = relationship("Workspace", remote_side=[Workspace.workspace_id], lazy="joined")
 
