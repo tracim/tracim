@@ -47,13 +47,6 @@ def upgrade():
             ["author_id"], ["users.user_id"], name=op.f("fk_reaction_author_id_users")
         ),
         sa.PrimaryKeyConstraint("tag_id", name=op.f("pk_tag")),
-        sa.ForeignKeyConstraint(
-            ["workspace_id"],
-            ["workspaces.workspace_id"],
-            name=op.f("fk_tag_workspace_id_workspaces"),
-            onupdate="CASCADE",
-            ondelete="CASCADE",
-        ),
         sa.UniqueConstraint("workspace_id", "tag_name"),
     )
 
