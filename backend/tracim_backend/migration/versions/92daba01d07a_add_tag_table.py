@@ -71,13 +71,6 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["author_id"], ["users.user_id"], name=op.f("fk_content_tag_author_id_users")
         ),
-        sa.ForeignKeyConstraint(
-            ["content_id"],
-            ["content.id"],
-            name=op.f("fk_content_tag_content_id_content"),
-            onupdate="CASCADE",
-            ondelete="CASCADE",
-        ),
         sa.UniqueConstraint("tag_id", "content_id"),
     )
 
