@@ -37,7 +37,7 @@ def upgrade():
         sa.Column(
             "workspace_id",
             sa.Integer,
-            sa.ForeignKey("workspace.id", onupdate="CASCADE", ondelete="CASCADE",),
+            sa.ForeignKey("workspaces.workspace_id", onupdate="CASCADE", ondelete="CASCADE",),
             nullable=False,
         ),
         sa.Column("tag_name", sa.Unicode(), nullable=False),
