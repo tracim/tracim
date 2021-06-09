@@ -36,10 +36,7 @@ class TestTagsEndpoint(object):
     endpoint
     """
 
-    @pytest.mark.parametrize(
-        "tag_names",
-        [(SAMPLE_TAG_LIST)],
-    )
+    @pytest.mark.parametrize("tag_names", [(SAMPLE_TAG_LIST)])
     def test_api__get_contents_tags__ok_200__nominal_case(
         self,
         web_testapp,
