@@ -6,7 +6,6 @@ from hapic.data import HapicFile
 from pyramid.config import Configurator
 from pyramid.response import Response
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
@@ -67,7 +66,6 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutUserSchema
-from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
@@ -586,42 +584,6 @@ class UserController(Controller):
             do_save=True,
         )
         return
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @check_right(has_personal_access)
-    @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.input_query(ActiveContentFilterQuerySchema())
-    @hapic.output_body(ContentDigestSchema(many=True))
-    def last_active_content(self, context, request: TracimRequest, hapic_data=None):
-        """
-        Get last_active_content for user
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        content_filter = hapic_data.query
-        content_api = ContentApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = None
-        if hapic_data.path.workspace_id:
-            workspace = wapi.get_one(hapic_data.path.workspace_id)
-        before_content = None
-        if content_filter.before_content_id:
-            before_content = content_api.get_one(
-                content_id=content_filter.before_content_id,
-                workspace=workspace,
-                content_type=content_type_list.Any_SLUG,
-            )
-        last_actives = content_api.get_last_active(
-            workspace=workspace, limit=content_filter.limit or None, before_content=before_content
-        )
-        return [content_api.get_content_in_context(content) for content in last_actives]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -1454,14 +1416,6 @@ class UserController(Controller):
             "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",  # noqa: W605
             request_method="GET",
         )
-        configurator.add_view(self.contents_read_status, route_name="contents_read_status")
-        # last active content for user
-        configurator.add_route(
-            "last_active_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active",  # noqa: W605
-            request_method="GET",
-        )
-        configurator.add_view(self.last_active_content, route_name="last_active_content")
 
         # set content as read/unread
         configurator.add_route(

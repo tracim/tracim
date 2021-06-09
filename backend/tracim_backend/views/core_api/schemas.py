@@ -40,7 +40,6 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
@@ -1052,26 +1051,6 @@ class FilterContentQuerySchema(marshmallow.Schema):
     @post_load
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentFilter(**data)
-
-
-class ActiveContentFilterQuerySchema(marshmallow.Schema):
-    limit = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description="if 0 or not set, return all elements, else return only "
-        "the first limit elem (according to offset)",
-        validate=strictly_positive_int_validator,
-    )
-    before_content_id = marshmallow.fields.Int(
-        example=41,
-        default=None,
-        allow_none=True,
-        description="return only content updated before this content",
-    )
-
-    @post_load
-    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-        return ActiveContentFilter(**data)
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):

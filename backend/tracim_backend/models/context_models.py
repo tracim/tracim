@@ -580,12 +580,6 @@ class ContentFilter(object):
         self.count = count
 
 
-class ActiveContentFilter(object):
-    def __init__(self, limit: int = None, before_content_id: datetime = None) -> None:
-        self.limit = limit
-        self.before_content_id = before_content_id
-
-
 class ContentIdsQuery(object):
     def __init__(self, content_ids: str = None) -> None:
         self.content_ids = string_to_list(content_ids, ",", int)
