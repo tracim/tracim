@@ -41,10 +41,17 @@ class TagOnContent(CreationDateMixin, DeclarativeBase):
     __tablename__ = "content_tag"
     __table_args__ = (UniqueConstraint("tag_id", "content_id"),)
 
-    id = Column(Integer, Sequence("seq__content_tag__id"), autoincrement=True, primary_key=True,)
-    tag_id = Column(Integer, ForeignKey("tag.tag_id", onupdate="CASCADE", ondelete="CASCADE",),)
+    tag_id = Column(
+        Integer,
+        ForeignKey("tag.tag_id", onupdate="CASCADE", ondelete="CASCADE",),
+        primary_key=True,
+    )
+
     content_id = Column(
-        Integer, ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",), nullable=False,
+        Integer,
+        ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        primary_key=True,
     )
 
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)

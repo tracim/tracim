@@ -52,19 +52,13 @@ def upgrade():
 
     op.create_table(
         "content_tag",
-        sa.Column(
-            "id",
-            sa.Integer,
-            sa.Sequence("seq__content_tag__id"),
-            autoincrement=True,
-            primary_key=True,
-        ),
-        sa.Column("tag_id", sa.Integer, sa.Sequence("seq__tag__tag_id"),),
+        sa.Column("tag_id", sa.Integer, sa.Sequence("seq__tag__tag_id"), primary_key=True),
         sa.Column(
             "content_id",
             sa.Integer,
             sa.ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",),
             nullable=False,
+            primary_key=True,
         ),
         sa.Column("author_id", sa.Integer(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
