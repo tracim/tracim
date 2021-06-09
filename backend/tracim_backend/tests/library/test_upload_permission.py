@@ -69,7 +69,7 @@ class TestUploadPermissionLib(object):
             transaction.commit()
 
         content_api = content_api_factory.get()
-        contents = content_api.get_all(workspace=workspace)
+        contents = content_api.get_all(workspaces=[workspace])
         assert len(contents) == 5
 
         folders = content_api.get_all(
@@ -78,13 +78,15 @@ class TestUploadPermissionLib(object):
         assert len(folders) == 1
         folder_id = folders[0].content_id
 
-        files = content_api.get_all(workspace=workspace, content_type=content_type_list.File.slug)
+        files = content_api.get_all(
+            workspaces=[workspace], content_type=content_type_list.File.slug
+        )
         assert len(files) == 2
         for file_ in files:
             assert file_.parent_id == folder_id
 
         comments = content_api.get_all(
-            workspace=workspace, content_type=content_type_list.Comment.slug
+            workspaces=[workspace], content_type=content_type_list.Comment.slug
         )
         assert len(comments) == 2
 
@@ -146,18 +148,20 @@ class TestUploadPermissionLib(object):
             transaction.commit()
 
         content_api = content_api_factory.get()
-        contents = content_api.get_all(workspace=workspace)
+        contents = content_api.get_all(workspaces=[workspace])
         assert len(contents) == 6
 
         folders = content_api.get_all(
-            workspace=workspace, content_type=content_type_list.Folder.slug
+            workspaces=[workspace], content_type=content_type_list.Folder.slug
         )
         assert len(folders) == 2
 
-        files = content_api.get_all(workspace=workspace, content_type=content_type_list.File.slug)
+        files = content_api.get_all(
+            workspaces=[workspace], content_type=content_type_list.File.slug
+        )
         assert len(files) == 2
 
         comments = content_api.get_all(
-            workspace=workspace, content_type=content_type_list.Comment.slug
+            workspaces=[workspace], content_type=content_type_list.Comment.slug
         )
         assert len(comments) == 2

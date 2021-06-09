@@ -310,14 +310,14 @@ class ContentOnlyContainer(WebdavContainer):
             parent_id = self.content.content_id
             children = self.content_api.get_all(
                 content_type=content_type_list.Any_SLUG,
-                workspace=self.workspace,
+                workspaces=[self.workspace],
                 parent_ids=[parent_id],
                 order_by_properties=["content_id"],
             )
         else:
             children = self.content_api.get_all(
                 content_type=content_type_list.Any_SLUG,
-                workspace=self.workspace,
+                workspaces=[self.workspace],
                 parent_ids=[0],
                 order_by_properties=["content_id"],
             )

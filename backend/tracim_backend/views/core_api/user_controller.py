@@ -1360,7 +1360,7 @@ class UserController(Controller):
         configurator.add_route("users", "/users", request_method="GET")
         configurator.add_view(self.users, route_name="users")
 
-        # known members lists
+        # known members list
         configurator.add_route(
             "known_members",
             "/users/{user_id:\d+}/known_members",
@@ -1368,7 +1368,7 @@ class UserController(Controller):
         )
         configurator.add_view(self.known_members, route_name="known_members")
 
-        # known contents lists
+        # known contents list
         configurator.add_route(
             "known_contents",
             "/users/{user_id:\d+}/known_contents",

@@ -105,6 +105,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
+DEFAULT_KNOWN_CONTENT_NB_LIMIT = 15
 
 
 class StrippedString(String):
@@ -928,7 +929,7 @@ class KnownContentsQuerySchema(marshmallow.Schema):
 
     limit = marshmallow.fields.Int(
         example=15,
-        default=15,
+        default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
         description="limit the number of results to this value, if not 0",
         validate=strictly_positive_int_validator,
     )
