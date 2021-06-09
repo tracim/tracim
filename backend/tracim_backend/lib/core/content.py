@@ -1698,7 +1698,10 @@ class ContentApi(object):
         return self.mark_read__workspace(None, read_datetime, do_flush)
 
     def mark_read__workspace(
-        self, workspace: Workspace, read_datetime: datetime = None, do_flush: bool = True,
+        self,
+        workspace: typing.Optional[Workspace],
+        read_datetime: datetime = None,
+        do_flush: bool = True,
     ) -> None:
         """
         Read content of a workspace visible for the user.
@@ -1710,7 +1713,7 @@ class ContentApi(object):
 
         # INFO - G.M - 2020-03-27 - Get all content of workspace
         resultset = (
-            self.get_all_query(workspaces=[workspace])
+            self.get_all_query(workspaces=[workspace] if workspace else None)
             .outerjoin(
                 RevisionReadStatus,
                 and_(
