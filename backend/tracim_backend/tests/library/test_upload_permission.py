@@ -73,7 +73,7 @@ class TestUploadPermissionLib(object):
         assert len(contents) == 5
 
         folders = content_api.get_all(
-            workspace=workspace, content_type=content_type_list.Folder.slug
+            workspaces=[workspace], content_type=content_type_list.Folder.slug
         )
         assert len(folders) == 1
         folder_id = folders[0].content_id
