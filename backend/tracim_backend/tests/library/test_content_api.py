@@ -11,7 +11,6 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -21,74 +20,6 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import eq_
-
-
-class TestSortContentApi(object):
-    def test_compare_content_for_sorting_by_type(self, content_type_list, app_config):
-        c1 = Content()
-        c1.label = ""
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = ""
-        c2.type = "folder"
-
-        c11 = c1
-
-        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
-        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
-        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
-
-    def test_compare_content_for_sorting_by_label(self):
-        c1 = Content()
-        c1.label = "bbb"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = "aaa"
-        c2.type = "file"
-
-        c11 = c1
-
-        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
-        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
-        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
-
-    def test_sort_by_label_or_filename(self):
-        c1 = Content()
-        c1.label = "ABCD"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = ""
-        c2.type = "file"
-        c2.file_name = "AABC"
-
-        c3 = Content()
-        c3.label = "BCDE"
-        c3.type = "file"
-
-        items = [c1, c2, c3]
-        sorteds = ContentApi.sort_content(items)
-
-        assert sorteds[0] == c2
-        assert sorteds[1] == c1
-        assert sorteds[2] == c3
-
-    def test_sort_by_content_type(self):
-        c1 = Content()
-        c1.label = "AAAA"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = "BBBB"
-        c2.type = "folder"
-
-        items = [c1, c2]
-        sorteds = ContentApi.sort_content(items)
-
-        assert sorteds[0] == c2
-        assert sorteds[1] == c1
 
 
 @pytest.mark.usefixtures("base_fixture")

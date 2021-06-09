@@ -1388,20 +1388,6 @@ class RevisionReadStatus(DeclarativeBase):
 
 
 # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-class NodeTreeItem(object):
-    """
-        This class implements a model that allow to simply represents
-        the left-panel menu items. This model is used by dbapi but
-        is not directly related to sqlalchemy and database
-    """
-
-    def __init__(self, node: Content, children: List["NodeTreeItem"], is_selected: bool = False):
-        self.node = node
-        self.children = children
-        self.is_selected = is_selected
-
-
-# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
 class VirtualEvent(object):
     @classmethod
     def create_from(cls, object):

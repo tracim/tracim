@@ -53,7 +53,6 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import AuthoredContentRevisionsInfos
@@ -66,7 +65,6 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
@@ -75,50 +73,6 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
-
-
-# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content) -> int:
-    """
-    :param content1:
-    :param content2:
-    :return:    1 if content1 > content2
-                -1 if content1 < content2
-                0 if content1 = content2
-    """
-
-    if content1.type == content2.type:
-        if content1.get_label().lower() > content2.get_label().lower():
-            return 1
-        elif content1.get_label().lower() < content2.get_label().lower():
-            return -1
-        return 0
-    else:
-        # TODO - D.A. - 2014-12-02 - Manage Content Types Dynamically
-        content_type_order = [
-            content_type_list.Folder.slug,
-            content_type_list.Page.slug,
-            content_type_list.Thread.slug,
-            content_type_list.File.slug,
-        ]
-
-        content_1_type_index = content_type_order.index(content1.type)
-        content_2_type_index = content_type_order.index(content2.type)
-        result = content_1_type_index - content_2_type_index
-
-        if result < 0:
-            return -1
-        elif result > 0:
-            return 1
-        else:
-            return 0
-
-
-# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-def compare_tree_items_for_sorting_by_type_and_name(
-    item1: NodeTreeItem, item2: NodeTreeItem
-) -> int:
-    return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
 class AddCopyRevisionsResult(object):
@@ -220,23 +174,6 @@ class ContentApi(object):
             .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
             .options(contains_eager(Content.current_revision))
         )
-
-    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-    @classmethod
-    def sort_tree_items(cls, content_list: typing.List[NodeTreeItem]) -> typing.List[NodeTreeItem]:
-        news = []
-        for item in content_list:
-            news.append(item)
-
-        content_list.sort(key=cmp_to_key(compare_tree_items_for_sorting_by_type_and_name))
-
-        return content_list
-
-    # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-    @classmethod
-    def sort_content(cls, content_list: typing.List[Content]) -> typing.List[Content]:
-        content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
-        return content_list
 
     def __real_base_query(
         self, workspaces: typing.Optional[typing.List[Workspace]] = None
