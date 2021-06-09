@@ -199,5 +199,6 @@
   "Create a tag or choose one in the list for this content": "Create a tag or choose one in the list for this content",
   "Create new tag...": "Create new tag...",
   "Error while fetching a list of tags": "Error while fetching a list of tags",
-  "Tag List": "Tag List"
+  "Tag List": "Tag List",
+  "Your tag has been added": "Your tag has been added"
 }

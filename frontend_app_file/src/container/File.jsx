@@ -478,7 +478,6 @@ export class File extends React.Component {
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
-
     if (response.apiResponse.status === 200) {
       if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
     }

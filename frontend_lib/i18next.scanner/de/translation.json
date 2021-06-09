@@ -199,5 +199,6 @@
   "Create a tag or choose one in the list for this content": "Erstellen Sie ein Tag oder wählen Sie eines aus der Liste für diesen Inhalt",
   "Create new tag...": "Neues Tag erstellen...",
   "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Tags",
-  "Tag List": "Tag Liste"
+  "Tag List": "Tag Liste",
+  "Your tag has been added": "Ihr Tag wurde hinzugefügt"
 }

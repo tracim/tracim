@@ -478,7 +478,6 @@ export class HtmlDocument extends React.Component {
 
   handleClickCloseAddTagBtn = () => this.setState({ displayNewTagForm: false })
 
-
   handleCloseNewVersion = () => {
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
@@ -865,7 +864,7 @@ export class HtmlDocument extends React.Component {
     autoCompleteFormNewTagActive: false,
     autoCompleteClicked: true
   })
-  
+
   getMenuItemList = () => {
     const { props, state } = this
     const timelineObject = {
