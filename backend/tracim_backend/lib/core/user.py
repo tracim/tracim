@@ -371,16 +371,16 @@ class UserApi(object):
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         return ALL__GROUP_MENTIONS
 
-    def get_user_workspaces_query(self) -> Query:
+    def get_user_workspaces_query(self, user_id: int) -> Query:
         return self._session.query(UserRoleInWorkspace.workspace_id).filter(
-            UserRoleInWorkspace.user_id == self._user.user_id
+            UserRoleInWorkspace.user_id == user_id
         )
 
     def get_user_workspaces(self) -> typing.List[Workspace]:
-        return self.get_user_workspaces_query().all()
+        return self.get_user_workspaces_query(self._user.user_id).all()
 
     def _get_user_ids_in_same_workspace(self, user_id: int):
-        user_workspaces_id_query = self.get_user_workspaces_query()
+        user_workspaces_id_query = self.get_user_workspaces_query(user_id)
         users_in_workspaces = (
             self._session.query(UserRoleInWorkspace.user_id)
             .distinct(UserRoleInWorkspace.user_id)
