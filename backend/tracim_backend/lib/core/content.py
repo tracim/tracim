@@ -351,7 +351,7 @@ class ContentApi(object):
         assert workspace
         assert content_namespace
         label, file_extension = os.path.splitext(filename)
-        query = self.get_base_query([workspace] if workspace else None)
+        query = self.get_base_query(workspaces=[workspace] if workspace else None)
         query = query.filter(Content.content_namespace == content_namespace)
 
         if parent:
@@ -588,9 +588,9 @@ class ContentApi(object):
         workspaces = [workspace] if workspace else None
 
         if ignore_content_state_filter:
-            base_request = self.__real_base_query(workspaces)
+            base_request = self.__real_base_query(workspaces=workspaces)
         else:
-            base_request = self._base_query(workspaces)
+            base_request = self._base_query(workspaces=workspaces)
 
         base_request = base_request.filter(Content.content_id == content_id)
 
@@ -831,7 +831,7 @@ class ContentApi(object):
         assert not parent_ids or isinstance(parent_ids, list)
         assert content_type_slug is not None
         assert not complete_path_to_id or isinstance(complete_path_to_id, int)
-        query = self._base_query(workspaces)
+        query = self._base_query(workspaces=workspaces)
 
         # INFO - G.M - 2018-11-12 - Get list of all ancestror
         #  of content, workspace root included
@@ -1951,7 +1951,7 @@ class ContentApi(object):
         :return: Generated folder name
         """
         _ = self.translator.get_translation
-        query = self._base_query([workspace] if workspace else None).filter(
+        query = self._base_query(workspaces=[workspace] if workspace else None).filter(
             Content.label.ilike("{0}%".format(_("New folder")))
         )
         if parent:
