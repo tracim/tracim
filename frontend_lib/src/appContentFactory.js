@@ -592,7 +592,7 @@ export function appContentFactory (WrappedComponent) {
 
       if (query.includes('#')) {
 
-        function matchingContentIdsLast(contentA, contentB) {
+        function matchingContentIdsFirst(contentA, contentB) {
           const aContentId = contentA.content_id.toString()
           const bContentId = contentB.content_id.toString()
 
@@ -601,15 +601,15 @@ export function appContentFactory (WrappedComponent) {
             const idOfBStartsWithKeyword = bContentId.startsWith(keyword)
 
             if (idOfAStartsWithKeyword && !idOfBStartsWithKeyword) {
-              return 1
+              return -1
             }
 
             if (idOfBStartsWithKeyword && !idOfAStartsWithKeyword) {
-              return -1
+              return 1
             }
           }
 
-          return bContentId.localeCompare(aContentId, undefined, {numeric: true})
+          return aContentId.localeCompare(bContentId, undefined, {numeric: true})
         }
 
         const fetchUserKnownContents = await handleFetchResult(
@@ -619,7 +619,7 @@ export function appContentFactory (WrappedComponent) {
         switch (fetchUserKnownContents.apiResponse.status) {
           case 200: {
             const matchingList = fetchUserKnownContents.body.map(m => ({ detail: m.label, ...m }))
-            return matchingList.sort(matchingContentIdsLast)
+            return matchingList.sort(matchingContentIdsFirst)
           }
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
         }

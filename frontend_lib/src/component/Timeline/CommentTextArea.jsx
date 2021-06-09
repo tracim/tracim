@@ -62,7 +62,7 @@ export class CommentTextArea extends React.Component {
     this.setState({
       isAutoCompleteActivated: true,
       autoCompleteCursorPosition: autoCompleteItemList.length - 1,
-      autoCompleteItemList: autoCompleteItemList
+      autoCompleteItemList: autoCompleteItemList.reverse() // NOTE - RJ - 2021-06-09 - reverse puts most interesting results closer
     })
   }
 
