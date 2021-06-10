@@ -9,9 +9,7 @@ import {
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
-import {
-  Icon
-} from 'tracim_frontend_lib'
+import { Icon } from '../Icon/Icon.jsx'
 import {
   getWorkspaceTagList,
   getContentTagList,
