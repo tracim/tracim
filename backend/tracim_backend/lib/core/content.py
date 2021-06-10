@@ -590,7 +590,8 @@ class ContentApi(object):
             temporary_prefix="tracim-revision-content",
         )
 
-    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method still needed?
+    # TODO - G.M - 2018-09-04 - & R.J - 2021-06-10 - [Cleanup] this method is only used in a test,
+    # we may want to move it there (tests/library/test_content_api.py)
     def get_one_by_label_and_parent(
         self, content_label: str, content_parent: Content = None
     ) -> Content:
