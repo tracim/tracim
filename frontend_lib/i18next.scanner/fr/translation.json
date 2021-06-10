@@ -195,5 +195,12 @@
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Attach files": "Joindre des fichiers",
   "Download {{filename}}": "Télécharger {{filename}}",
-  "Translate to {{language}}": "Traduire en {{language}}"
+  "Translate to {{language}}": "Traduire en {{language}}",
+  "Error while adding a tag to the content": "Erreur pendant l'ajout d'une étiquette au contenu",
+  "Add a tag": "Ajouter une étiquette",
+  "Create a tag or choose one in the list for this content": "Créez une étiquette ou choisissez-en une dans la liste pour ce contenu",
+  "Create new tag...": "Créer un nouveau tag",
+  "Error while fetching a list of tags": "Erreur pendant la récupération d'une liste d'étiquettes ",
+  "Tag List": "Liste d'étiquettes",
+  "Your tag has been added": "Votre étiquette a été ajoutée"
 }

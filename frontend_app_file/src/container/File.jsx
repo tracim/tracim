@@ -56,7 +56,8 @@ import {
   getDefaultTranslationState,
   FavoriteButton,
   FAVORITE_STATE,
-  ToolBar
+  ToolBar,
+  TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import { debug } from '../debug.js'
@@ -81,6 +82,7 @@ export class File extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       timeline: [],
+      displayNewTagForm: false,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -476,7 +478,6 @@ export class File extends React.Component {
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
-
     if (response.apiResponse.status === 200) {
       if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
     }
@@ -823,6 +824,13 @@ export class File extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewTagActive: false,
+    autoCompleteClicked: true
+  })
+
+  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
+
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -954,6 +962,23 @@ export class File extends React.Component {
         />
       ) : null
     }
+    const tag = {
+      id: 'tag',
+      label: props.t('Tags'),
+      icon: 'fas fa-tag',
+      children: (
+        <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
+          displayNewTagForm={state.displayNewTagForm}
+          onClickAddTagBtn={this.handleToggleAddTagForm}
+          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
+          searchedKnownTagList={props.searchedKnownTagList}
+          onClickAutoComplete={this.handleClickAutoComplete}
+        />
+      )
+    }
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -981,6 +1006,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
+        tag,
         {
           id: 'share',
           label: props.t('Share'),
@@ -1004,9 +1030,10 @@ export class File extends React.Component {
           )
         },
         propertiesObject
+
       ]
     } else {
-      return [timelineObject, propertiesObject]
+      return [timelineObject, tag, propertiesObject]
     }
   }
 

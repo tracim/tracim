@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import sinon from 'sinon'
 import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 require('../../src/component/CardPopup/CardPopup.styl')
@@ -21,7 +21,7 @@ describe('<CardPopup />', () => {
 
   const Children = () => <div><h1>Random title</h1>I am a children of CardPopup</div>
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <CardPopup
       {...props}
     >

@@ -1,0 +1,96 @@
+@import '../../css/Variable.styl'
+
+.tagList
+  flex-direction column
+  width calc(100% - 65px)
+  height 100%
+  min-height 260px
+  overflow auto
+  margin-bottom 10px
+  &__header
+    margin 10px 15px
+    padding 10px
+    font-size fontSizeMedium
+  &__wrapper
+    position relative
+    margin-left 15px
+    width calc(100% - 25px)
+    border 1px solid grey
+    background-color offWhite
+  &__list
+    margin 0
+    padding 0
+    list-style none
+    width 100%
+    &__item
+      border-bottom 1px solid grey
+      display flex
+      padding 10px 15px
+      &:hover
+        background-color grey-hover
+      &__info
+        flex 1
+        cursor pointer
+        margin-bottom 0
+      &__delete
+        font-size fontSizeMedium
+        color darkGrey
+        cursor pointer
+      &__last
+        border none
+      .checkboxCustom
+        margin-bottom 0
+        align-self center
+  &__btnAdd
+    border-bottom 2px solid grey
+    padding 15px
+    &__button
+      display flex
+      align-items center
+      border-color grey
+      color grey
+      &__plus
+        display flex
+        justify-content center
+        align-items center
+        margin-right 20px
+        border-width 2px
+        border-style dashed
+        border-radius 50%
+        width 50px
+        height 50px
+        cursor pointer
+        &__icon
+          font-size fontSizeTitle
+      &__text
+        font-size 18px
+        cursor pointer
+
+
+// MEDIAQUERIES
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .tagList
+    width 100%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .tagList
+    margin 50px 0
+    width 100%
+
+@media (max-width: max-xs)
+  .tagList
+    margin 50px 0
+    width 100%
+    &__title
+      margin-left 10px
+    &__wrapper
+      height auto
+    &__list
+      height auto
+      overflow-Y visible
+      &__item:nth-last-child(1)
+        border-bottom 1px solid grey
+    &__btnAdd
+      border-top 0
