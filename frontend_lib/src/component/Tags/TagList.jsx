@@ -10,6 +10,9 @@ import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
 import {
+  Icon
+} from 'tracim_frontend_lib'
+import {
   getWorkspaceTagList,
   getContentTagList,
   deleteContentTag,
@@ -96,6 +99,7 @@ class TagList extends React.Component {
       return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
     }
 
+    // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
     const sortedTagList = fetchGetWsTagList.body.sort(sortTagList)
 
     const tagIsChecked = {}
@@ -132,7 +136,9 @@ class TagList extends React.Component {
                 <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                   <div className='taglist__btnadd__button__plus'>
                     <div className='taglist__btnadd__button__plus__icon'>
-                      <i className='fas fa-plus' />
+                      <Icon
+                        icon='fas fa-plus'
+                      />
                     </div>
                   </div>
 
