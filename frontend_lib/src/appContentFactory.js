@@ -587,31 +587,30 @@ export function appContentFactory (WrappedComponent) {
     }
 
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
+      function matchingContentIdsFirst (contentA, contentB) {
+        const aContentId = contentA.content_id.toString()
+        const bContentId = contentB.content_id.toString()
+
+        if (keyword) {
+          const idOfAStartsWithKeyword = aContentId.startsWith(keyword)
+          const idOfBStartsWithKeyword = bContentId.startsWith(keyword)
+
+          if (idOfAStartsWithKeyword && !idOfBStartsWithKeyword) {
+            return -1
+          }
+
+          if (idOfBStartsWithKeyword && !idOfAStartsWithKeyword) {
+            return 1
+          }
+        }
+
+        return aContentId.localeCompare(bContentId, undefined, { numeric: true })
+      }
+
       let autoCompleteItemList = []
       const keyword = query.substring(1)
 
       if (query.includes('#')) {
-
-        function matchingContentIdsFirst(contentA, contentB) {
-          const aContentId = contentA.content_id.toString()
-          const bContentId = contentB.content_id.toString()
-
-          if (keyword) {
-            const idOfAStartsWithKeyword = aContentId.startsWith(keyword)
-            const idOfBStartsWithKeyword = bContentId.startsWith(keyword)
-
-            if (idOfAStartsWithKeyword && !idOfBStartsWithKeyword) {
-              return -1
-            }
-
-            if (idOfBStartsWithKeyword && !idOfAStartsWithKeyword) {
-              return 1
-            }
-          }
-
-          return aContentId.localeCompare(bContentId, undefined, {numeric: true})
-        }
-
         const fetchUserKnownContents = await handleFetchResult(
           await getMyselfKnownContents(this.apiUrl, keyword, NUMBER_RESULTS_BY_PAGE)
         )
