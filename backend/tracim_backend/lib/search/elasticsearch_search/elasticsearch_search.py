@@ -366,7 +366,7 @@ class ESSearchApi(SearchApi):
             owner_id=workspace.owner_id,
             member_ids=member_ids,
             member_count=len(member_ids),
-            content_count=capi.get_all_query(workspace=workspace).count(),
+            content_count=capi.get_all_query(workspaces=[workspace]).count(),
         )
         indexed_workspace.meta.id = workspace.workspace_id
         workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
@@ -934,7 +934,7 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            self.index_contents(content_api.get_all_query(workspace=workspace), context)
+            self.index_contents(content_api.get_all_query(workspaces=[workspace]), context)
         except IndexingError:
             logger.exception(
                 self,

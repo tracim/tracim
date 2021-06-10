@@ -1,6 +1,8 @@
 {
   "{{user}}'s profile": "Perfil de {{user}}",
   "all": "todos",
+  "An error has happened while getting the known content list": "Aconteceu um erro ao obter a lista de conteúdos conhecidos",
+  "Error while detecting the links": "Erro ao detectar as ligações",
   "Open as content": "Abrir como conteúdo",
   "Timeline": "Linha cronológica",
   "Restore": "Restaurar",

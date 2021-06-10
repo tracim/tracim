@@ -122,7 +122,7 @@ You can now quit `MariaDB` prompt:
 
 ## SQLAlchemy settings ##
 
-In file `tracim/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
+In file `backend/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
 
 If you are willing to choose `PostgreSQL` or `MariaDB`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
 
@@ -132,7 +132,7 @@ For instance, with `PostgreSQL`, this should give you:
     # sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb
     # sqlalchemy.url = sqlite:///tracimdb.sqlite
 
-Proceed as above for the file `tracim/tests.ini`, except that you need to reproduce these steps three times for each of the following entries:
+Proceed as above for the file `backend/tests_configs.ini`, except that you need to reproduce these steps three times for each of the following entries:
 
 - [app:main]
 - [app:ldap]
@@ -144,4 +144,4 @@ Again with `PostgreSQL`, this should give you:
     # sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb_test
     # sqlalchemy.url = sqlite:///tracimdb_test.sqlite
 
-*Note: Do not copy the lines from the file `tracim/development.ini` to the file `tracim/tests.ini`, the database names are not the same.*
+*Note: Do not copy the lines from the file `backend/development.ini` to the file `backend/tests_configs.ini`, the database names are not the same.*

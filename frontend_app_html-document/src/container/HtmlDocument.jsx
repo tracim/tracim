@@ -295,7 +295,7 @@ export class HtmlDocument extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -303,7 +303,7 @@ export class HtmlDocument extends React.Component {
   handleTinyMceSelectionChange = (e, position) => {
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -315,7 +315,7 @@ export class HtmlDocument extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -328,7 +328,7 @@ export class HtmlDocument extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -605,8 +605,8 @@ export class HtmlDocument extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateAnywayNewComment = () => {
@@ -873,6 +873,8 @@ export class HtmlDocument extends React.Component {
       icon: 'fa-history',
       children: state.config.apiUrl ? (
         <Timeline
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          key='Timeline'
           customClass={`${state.config.slug}__contentpage__timeline`}
           customColor={state.config.hexcolor}
           apiUrl={state.config.apiUrl}
@@ -892,7 +894,6 @@ export class HtmlDocument extends React.Component {
           onClickRevisionBtn={this.handleClickShowRevision}
           shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-          key='Timeline'
           invalidMentionList={state.invalidMentionList}
           onClickCancelSave={this.handleCancelSave}
           onClickSaveAnyway={this.handleClickValidateAnywayNewComment}

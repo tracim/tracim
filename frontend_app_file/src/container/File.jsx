@@ -483,8 +483,8 @@ export class File extends React.Component {
     }
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -946,7 +946,7 @@ export class File extends React.Component {
           onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-          searchForMentionInQuery={this.searchForMentionInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           workspaceId={state.content.workspace_id}
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,

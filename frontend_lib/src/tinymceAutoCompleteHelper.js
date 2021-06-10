@@ -1,6 +1,6 @@
-const MENTION_AUTOCOMPLETE_REGEX = /(?:^|\s)@([a-zA-Z\-_]*)$/
+const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
 
-const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
+const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
 
 let previousSelAndOffset = null
 
@@ -25,7 +25,7 @@ const getSelAndOffset = () => {
   }
 }
 
-export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, isAutoCompleteActivated) => {
+export const tinymceAutoCompleteHandleInput = (e, setState, fetchAutoCompleteItemList, isAutoCompleteActivated) => {
   const selAndOffset = getSelAndOffset()
 
   if (previousSelAndOffset && previousSelAndOffset.text === selAndOffset.text && previousSelAndOffset.offset === selAndOffset.offset) {
@@ -35,17 +35,16 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
   }
 
   previousSelAndOffset = selAndOffset
-
-  if (MENTION_AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
+  if (AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
     if (isAutoCompleteActivated) {
-      tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
+      tinymceAutoCompleteSearchForMentionOrLinkCandidate(fetchAutoCompleteItemList, setState)
       return
     }
 
     if (e && (e.data || e.key === 'Backspace')) {
-      // The user typed something in a mention or in the beginning of a mention
+      // The user typed something in a mention/link or in the beginning of a mention/link
       setState({ isAutoCompleteActivated: true })
-      tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
+      tinymceAutoCompleteSearchForMentionOrLinkCandidate(fetchAutoCompleteItemList, setState)
       return
     }
   }
@@ -53,26 +52,27 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchMentionList, is
   setState({ isAutoCompleteActivated: false })
 }
 
-const tinymceAutoCompleteSearchForMentionCandidate = async (fetchMentionList, setState) => {
-  const mentionCandidate = getTextOnCursor(previousSelAndOffset).match(MENTION_AUTOCOMPLETE_REGEX)
-  if (!mentionCandidate) {
+const tinymceAutoCompleteSearchForMentionOrLinkCandidate = async (fetchAutoCompleteItemList, setState) => {
+  const mentionOrLinkCandidate = getTextOnCursor(previousSelAndOffset).match(AUTOCOMPLETE_REGEX)
+  if (!mentionOrLinkCandidate) {
     previousSelAndOffset = null
     setState({ isAutoCompleteActivated: false })
     return
   }
 
-  const nameCandidate = mentionCandidate[1]
-  const fetchSearchMentionList = await fetchMentionList(nameCandidate)
+  const mentionOrLink = mentionOrLinkCandidate[0].trimStart()
+  const fetchSearchAutoCompleteItemList = await fetchAutoCompleteItemList(mentionOrLink)
+
   setState({
-    autoCompleteItemList: fetchSearchMentionList.filter(item => item.mention),
+    autoCompleteItemList: fetchSearchAutoCompleteItemList.filter(item => item.mention || item.content_id),
     autoCompleteCursorPosition: 0
   })
 }
 
-export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchMentionList) => {
+export const tinymceAutoCompleteHandleKeyUp = (event, setState, isAutoCompleteActivated, fetchAutoCompleteItemList) => {
   if (!isAutoCompleteActivated || event.key !== 'Backspace') return
   previousSelAndOffset = getSelAndOffset()
-  tinymceAutoCompleteSearchForMentionCandidate(fetchMentionList, setState)
+  tinymceAutoCompleteSearchForMentionOrLinkCandidate(fetchAutoCompleteItemList, setState)
 }
 
 export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoCompleteActivated, autoCompleteCursorPosition, autoCompleteItemList) => {
@@ -113,31 +113,35 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
   }
 }
 
-// RJ - 2020-09-25 - FIXME
-// Duplicate code with tinymceAutoCompleteHelper.js
+// FIXME - RJ - 2020-09-25
+// Duplicate code with CommentTextArea.js
 // See https://github.com/tracim/tracim/issues/3639
-
 export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) => {
-  if (!autoCompleteItem.mention) {
-    console.log('Error: this member does not have a username')
-    return
+  let character, keyword
+
+  if (autoCompleteItem.content_id) {
+    character = '#'
+    keyword = autoCompleteItem.content_id
+  } else {
+    character = '@'
+    keyword = autoCompleteItem.mention
   }
 
   const sel = tinymce.activeEditor.selection.getSel()
   const cursorPos = sel.anchorOffset
-  const spaceAfterMention = '\u00A0'
+  const endSpace = '\u00A0'
 
   const charAtCursor = cursorPos - 1
   const text = sel.anchorNode.textContent
-  const posAt = text.lastIndexOf('@', charAtCursor)
+  const posAt = text.lastIndexOf(character, charAtCursor)
   let textBegin, textEnd
 
   if (posAt > -1) {
-    textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+    textBegin = text.substring(0, posAt) + character + keyword + endSpace
     textEnd = text.substring(seekUsernameEnd(text, cursorPos))
   } else {
-    console.log('Error: mention autocomplete: did not find "@"')
-    textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
+    console.log(`Error in autocompletion: did not find ${character}`)
+    textBegin = `${text} ${character}${keyword}${endSpace}`
     textEnd = ''
   }
 
@@ -146,6 +150,6 @@ export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) =
   setState({ isAutoCompleteActivated: false })
 }
 
-export const tinymceAutoCompleteHandleSelectionChange = (setState, fetchMentionList, isAutoCompleteActivated) => {
-  tinymceAutoCompleteHandleInput(null, setState, fetchMentionList, isAutoCompleteActivated)
+export const tinymceAutoCompleteHandleSelectionChange = (setState, fetchAutoCompleteItemList, isAutoCompleteActivated) => {
+  tinymceAutoCompleteHandleInput(null, setState, fetchAutoCompleteItemList, isAutoCompleteActivated)
 }

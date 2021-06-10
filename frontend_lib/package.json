@@ -95,6 +95,7 @@
       "EventSource",
       "CustomEvent",
       "HTMLElement",
+      "HTMLAnchorElement",
       "DOMParser",
       "globalThis",
       "GLOBAL_primaryColor",
