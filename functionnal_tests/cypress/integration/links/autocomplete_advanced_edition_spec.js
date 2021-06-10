@@ -13,7 +13,8 @@ let workspaceId
 
 const linkChar = '#'
 
-describe('A comment in advanced edition', () => {
+describe.skip('A comment in advanced edition', () => {
+  // RJ - FIXME - 2021-06-10 - unstable test disabled, see https://github.com/tracim/tracim/issues/3986
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
