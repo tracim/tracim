@@ -1,4 +1,3 @@
-import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
 let workspaceTest

@@ -478,7 +478,7 @@ class CommentPathFilename(object):
 
 class KnownMembersQuery(object):
     """
-    Autocomplete query model
+    Member autocomplete query model
     """
 
     def __init__(
@@ -493,6 +493,16 @@ class KnownMembersQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
         self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
+
+
+class KnownContentsQuery(object):
+    """
+    Content autocomplete query model
+    """
+
+    def __init__(self, acp: str, limit: int = None,) -> None:
+        self.acp = acp
         self.limit = limit
 
 
@@ -568,12 +578,6 @@ class ContentFilter(object):
         self.sort = sort or ContentSortOrder.LABEL_ASC
         self.page_token = page_token
         self.count = count
-
-
-class ActiveContentFilter(object):
-    def __init__(self, limit: int = None, before_content_id: datetime = None) -> None:
-        self.limit = limit
-        self.before_content_id = before_content_id
 
 
 class ContentIdsQuery(object):

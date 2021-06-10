@@ -37,7 +37,7 @@ describe('TinyMce text editor', function () {
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
       })
 
-      it('the autocompletion popup should open when type "@"', function () {
+      it('the autocompletion popup should open when typing "@"', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@')
           cy.get('.autocomplete').should('be.visible')

@@ -17,6 +17,7 @@ import {
 } from './action.async.js'
 
 export const PAGE = {
+  CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
     ROOT: '/ui/workspaces',

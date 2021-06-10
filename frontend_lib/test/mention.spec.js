@@ -7,11 +7,11 @@ import {
   handleMentionsBeforeSave,
   MENTION_ID_PREFIX,
   MENTION_ME_CLASS
-} from '../src/mention.js'
+} from '../src/mentionOrLink.js'
 
 const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
-describe('mention.js', () => {
+describe('mentions on mentionOrLink.js', () => {
   describe('function wrapMentionsInSpanTags', () => {
     const parser = new global.DOMParser()
 

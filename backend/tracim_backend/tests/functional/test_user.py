@@ -6,6 +6,7 @@ import io
 import typing
 
 from PIL import Image
+from depot.io.utils import FileIntent
 import pytest
 import transaction
 from webtest import TestApp
@@ -28,717 +29,6 @@ from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import create_png_test_image
 from tracim_backend.views.core_api.schemas import UserDigestSchema
-
-
-@pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestUserRecentlyActiveContentEndpoint(object):
-    """
-    Tests for /api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active
-    """
-
-    def test_api__get_recently_active_content__ok__200__admin(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        content_type_list,
-        content_api_factory,
-        web_testapp,
-        session,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=200,
-        )
-        res = res.json_body
-        assert len(res) == 7
-        for elem in res:
-            assert isinstance(elem["content_id"], int)
-            assert isinstance(elem["content_type"], str)
-            assert elem["content_type"] != "comments"
-            assert isinstance(elem["is_archived"], bool)
-            assert isinstance(elem["is_deleted"], bool)
-            assert isinstance(elem["label"], str)
-            assert isinstance(elem["parent_id"], int) or elem["parent_id"] is None
-            assert isinstance(elem["show_in_ui"], bool)
-            assert isinstance(elem["slug"], str)
-            assert isinstance(elem["status"], str)
-            assert isinstance(elem["sub_content_types"], list)
-            for sub_content_type in elem["sub_content_types"]:
-                assert isinstance(sub_content_type, str)
-            assert isinstance(elem["workspace_id"], int)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[2]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[3]["content_id"] == secondly_created_but_not_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[4]["content_id"] == secondly_created.content_id
-        assert res[5]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[6]["content_id"] == main_folder.content_id
-
-    def test_api__get_recently_active_content__err__400__no_access_to_workspace(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        web_testapp,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=400,
-        )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
-
-    def test_api__get_recently_active_content__ok__200__user_itself(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        content_type_list,
-        content_api_factory,
-        web_testapp,
-        session,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=200,
-        )
-        res = res.json_body
-        assert len(res) == 7
-        for elem in res:
-            assert isinstance(elem["content_id"], int)
-            assert isinstance(elem["content_type"], str)
-            assert elem["content_type"] != "comments"
-            assert isinstance(elem["is_archived"], bool)
-            assert isinstance(elem["is_deleted"], bool)
-            assert isinstance(elem["label"], str)
-            assert isinstance(elem["parent_id"], int) or elem["parent_id"] is None
-            assert isinstance(elem["show_in_ui"], bool)
-            assert isinstance(elem["slug"], str)
-            assert isinstance(elem["status"], str)
-            assert isinstance(elem["sub_content_types"], list)
-            for sub_content_type in elem["sub_content_types"]:
-                assert isinstance(sub_content_type, str)
-            assert isinstance(elem["workspace_id"], int)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[2]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[3]["content_id"] == secondly_created_but_not_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[4]["content_id"] == secondly_created.content_id
-        assert res[5]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[6]["content_id"] == main_folder.content_id
-
-    def test_api__get_recently_active_content__err__403__other_user(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        content_type_list,
-        content_api_factory,
-        web_testapp,
-        session,
-        admin_user,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
-                user_id=admin_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=403,
-        )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
-
-    def test_api__get_recently_active_content__ok__200__limit_2_multiple(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        content_type_list,
-        content_api_factory,
-        web_testapp,
-        session,
-    ):
-        # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
-        # anymore to fix datetime lack of precision.
-
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"limit": 2}
-        res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
-            status=200,
-            params=params,
-        )
-        res = res.json_body
-        assert len(res) == 2
-        for elem in res:
-            assert isinstance(elem["content_id"], int)
-            assert isinstance(elem["content_type"], str)
-            assert elem["content_type"] != "comments"
-            assert isinstance(elem["is_archived"], bool)
-            assert isinstance(elem["is_deleted"], bool)
-            assert isinstance(elem["label"], str)
-            assert isinstance(elem["parent_id"], int) or elem["parent_id"] is None
-            assert isinstance(elem["show_in_ui"], bool)
-            assert isinstance(elem["slug"], str)
-            assert isinstance(elem["status"], str)
-            assert isinstance(elem["sub_content_types"], list)
-            for sub_content_type in elem["sub_content_types"]:
-                assert isinstance(sub_content_type, str)
-            assert isinstance(elem["workspace_id"], int)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-
-        params = {"limit": 2, "before_content_id": secondly_created_but_not_commented.content_id}
-        res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
-            status=200,
-            params=params,
-        )
-        res = res.json_body
-        assert len(res) == 2
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[0]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_updated.content_id
-
-    def test_api__get_recently_active_content__err__400__bad_before_content_id(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        content_type_list,
-        content_api_factory,
-        web_testapp,
-        session,
-    ):
-        # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
-        # anymore to fix datetime lack of precision.
-
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-
-        api = content_api_factory.get()
-        main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-        api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
-        )
-        session.flush()
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"before_content_id": 4000}
-        res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/recently_active".format(workspace.workspace_id),
-            status=400,
-            params=params,
-        )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -4320,6 +3610,95 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["has_avatar"] is False
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestKnownContent(object):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/users/known_contents
+    """
+
+    def test_api__get_known_contents__ok_200__nominal_case(
+        self,
+        admin_user,
+        session,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+    ):
+        workspace1 = workspace_api_factory.get().create_workspace(label="test1", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace(label="test2", save_now=True)
+
+        content_api = content_api_factory.get()
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace1,
+            label="Test file ananas",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
+
+        session.add(test_file)
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace2,
+            label="Test file banane",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
+
+        session.add(test_file)
+
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace2,
+            label="Test file pomme",
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = ".txt"
+        test_file.depot_file = FileIntent(b"Test file pomme", "Test file pomme.txt", "text/plain")
+
+        session.add(test_file)
+
+        transaction.commit()
+
+        user_id = int(admin_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"acp": "anan", "limit": 15}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 2
+
+        params = {"acp": "Pomme"}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 1
+
+        params = {"acp": "kiwi"}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 0
 
 
 @pytest.mark.usefixtures("base_fixture")
