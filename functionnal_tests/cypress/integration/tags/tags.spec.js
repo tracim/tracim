@@ -1,46 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 
-// TODO
-// * Check create new tag
-//  ** Create a new tag
-//  ** click on "validate"
-//  ** check if new tag has been created
-
-// * Unchecking a tag
-//  ** click on a checked item on the list
-//  ** check if it is still marked as a content tag
-
-// * Re-checking a tag
-//  ** go back to the unchecked tag
-//  ** check it
-//  **  see if it is marked as a content tag
 
 describe.skip('Create tags', () => {
-  // RJ - FIXME - 2021-06-10 - This test suit is failing in Travis.
-  // See https://github.com/tracim/tracim/issues/4694
-
-  // const onClickCloseAddTagBtnCallBack = sinon.spy()
-  // const onClickBtnValidateCallBack = sinon.spy()
-
-  // const props = {
-  //   onClickCloseAddTagBtn: onClickCloseAddTagBtnCallBack,
-  //   apiUrl: '/',
-  //   searchedKnownTagList: [
-  //     { tagName: 'Tag 1', tag_id: 1 },
-  //     { tagName: 'Tag 2', tag_id: 2 },
-  //     { tagName: 'Tag 6', tag_id: 3 },
-  //     { tagName: 'Tag 89', tag_id: 4 },
-  //     { tagName: 'Tag 11', tag_id: 5 },
-  //     { tagName: 'Tag 98', tag_id: 6 }
-  //   ],
-  //   onClickAutoComplete: onClickAutoCompleteCallBack,
-  //   autoCompleteClicked: true,
-  //   onClickBtnValidate: onClickBtnValidateCallBack,
-  //   autoCompleteActive: false
-  // }
-
-  // const wrapper = mount(<NewTagForm {...props} />)
-
   let htmlContentId
   let workspaceId
 
