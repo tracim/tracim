@@ -5,8 +5,8 @@ import { CUSTOM_EVENT } from '../../customEvent.js'
 
 function onClick (e) {
   const t = e.target
-  if (t instanceof HTMLAnchorElement &&  t.href && t.href.startsWith(location.origin + '/')) {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url:  t.href.substr(location.origin.length) } })
+  if (t instanceof HTMLAnchorElement && t.href && t.href.startsWith(location.origin + '/')) {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: t.href.substr(location.origin.length) } })
     e.preventDefault()
   }
 }
