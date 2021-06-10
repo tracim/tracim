@@ -15,7 +15,7 @@ import { PAGES } from '../../support/urls_commands'
 //  ** check it
 //  **  see if it is marked as a content tag
 
-describe.skip('Create tags', () => {
+describe('Create tags', () => {
   // RJ - FIXME - 2021-06-10 - This test suit is failing in Travis.
   // See https://github.com/tracim/tracim/issues/4694
 
