@@ -11,7 +11,7 @@ import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
 import {
   Icon
-} from 'tracim_frontend_lib'
+} from '../Icon/Icon.jsx'
 import {
   getWorkspaceTagList,
   getContentTagList,
