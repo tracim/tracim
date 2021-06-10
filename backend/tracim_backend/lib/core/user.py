@@ -11,11 +11,13 @@ from hapic.data import HapicFile
 from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
+import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import cast
 import transaction
 
 from tracim_backend.app_models.validator import TracimValidator
@@ -356,7 +358,7 @@ class UserApi(object):
         if acp:
             query = query.filter(
                 or_(
-                    Content.content_id.ilike("%{}%".format(acp)),
+                    cast(Content.content_id, sqlalchemy.String).ilike("%{}%".format(acp)),
                     Content.label.ilike("%{}%".format(acp)),
                 )
             )
