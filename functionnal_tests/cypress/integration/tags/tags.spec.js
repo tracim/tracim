@@ -82,10 +82,8 @@ describe('Create tags', () => {
         it('should create two tags', () => {
           cy.get('[data-cy=popin_right_part_tag]').click()
           cy.get('[data-cy=taglist__btnadd]').click()
-          cy.get('[data-cy=addtag]').type('TagOne')
-          cy.get('[data-cy=ValidateTag]').click()
-          cy.get('[data-cy=addtag]').type('TagTwo')
-          cy.get('[data-cy=ValidateTag]').click()
+          cy.get('[data-cy=addtag]').type('TagOne').then(() => { cy.get('[data-cy=ValidateTag]').click() })
+          cy.get('[data-cy=addtag]').type('TagTwo').then(() => { cy.get('[data-cy=ValidateTag]').click() })
           // switch tab and come back
           cy.get('[data-cy=popin_right_part_timeline]').click()
           cy.get('[data-cy=popin_right_part_tag]').click()
