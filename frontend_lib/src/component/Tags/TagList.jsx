@@ -138,6 +138,7 @@ class TagList extends React.Component {
                     <div className='taglist__btnadd__button__plus__icon'>
                       <Icon
                         icon='fas fa-plus'
+                        title={props.t('Add a tag')}
                       />
                     </div>
                   </div>

@@ -21,6 +21,7 @@ export class NewTagForm extends React.Component {
     )
     if (!response.ok) {
       sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+      return
     }
 
     sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
