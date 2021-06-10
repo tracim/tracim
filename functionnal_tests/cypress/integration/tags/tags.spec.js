@@ -74,6 +74,8 @@ describe('Create tags', () => {
           })
         })
 
+        after(cy.cancelXHR)
+
         it('should create two tags', () => {
           cy.get('[data-cy=popin_right_part_tag]').click()
           cy.get('[data-cy=taglist__btnadd]').click()

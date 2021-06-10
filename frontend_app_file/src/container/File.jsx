@@ -266,7 +266,7 @@ export class File extends React.Component {
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent  (pageToLoad = null) {
+  async updateTimelineAndContent (pageToLoad = null) {
     this.setState({
       newComment: getLocalStorageItem(
         this.state.appName,
@@ -280,7 +280,7 @@ export class File extends React.Component {
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
-  componentDidUpdate  (prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -294,7 +294,7 @@ export class File extends React.Component {
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  componentWillUnmount  () {
+  componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
@@ -1102,7 +1102,7 @@ export class File extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
-  render  () {
+  render () {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
 
