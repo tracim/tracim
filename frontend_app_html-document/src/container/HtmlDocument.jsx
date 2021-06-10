@@ -924,8 +924,8 @@ export class HtmlDocument extends React.Component {
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
           displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleToggleAddTag}
-          onClickCloseAddTagBtn={this.handleToggleAddTag}
+          onClickAddTagBtn={this.handleToggleAddTagForm}
+          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
         />

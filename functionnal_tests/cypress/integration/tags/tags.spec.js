@@ -42,10 +42,10 @@ describe.skip('Create tags', () => {
 
         it('should create two tags', () => {
           cy.get('[data-cy=popin_right_part_tag]').click()
-          cy.get('[data-cy=taglist__btnadd]').click()
-          cy.get('[data-cy=addtag]').type('TagOne')
+          cy.get('[data-cy=tag_list__btn_add]').click()
+          cy.get('[data-cy=add_tag]').type('TagOne')
           cy.get('[data-cy=ValidateTag]').click()
-          cy.get('[data-cy=addtag]').type('TagTwo')
+          cy.get('[data-cy=add_tag]').type('TagTwo')
           cy.get('[data-cy=ValidateTag]').click()
           // switch tab and come back
           cy.get('[data-cy=popin_right_part_timeline]').click()
@@ -53,20 +53,20 @@ describe.skip('Create tags', () => {
         })
 
         it('should list the tags', () => {
-          cy.get('[data-cy=taglist] li').its('length').should('be.equal', 2)
-          cy.get('[data-cy=taglist]').first().should('contain', 'TagTwo')
+          cy.get('[data-cy=tag_list] li').its('length').should('be.equal', 2)
+          cy.get('[data-cy=tag_list]').first().should('contain', 'TagTwo')
         })
 
         it('clicking on a tag should uncheck it', () => {
-          cy.get('[data-cy=taglist] .checkboxCustom__checked').its('length').should('be.equal', 2)
-          cy.get('[data-cy=taglist] li label').first().click()
-          cy.get('[data-cy=taglist] .checkboxCustom__checked').its('length').should('be.equal', 1)
+          cy.get('[data-cy=tag_list] .checkboxCustom__checked').its('length').should('be.equal', 2)
+          cy.get('[data-cy=tag_list] li label').first().click()
+          cy.get('[data-cy=tag_list] .checkboxCustom__checked').its('length').should('be.equal', 1)
         })
 
         it('clicking on an unchecked tag should check it', () => {
-          cy.get('[data-cy=taglist] .checkboxCustom__checked').its('length').should('be.equal', 1)
-          cy.get('[data-cy=taglist] li label').first().click()
-          cy.get('[data-cy=taglist] .checkboxCustom__checked').its('length').should('be.equal', 2)
+          cy.get('[data-cy=tag_list] .checkboxCustom__checked').its('length').should('be.equal', 1)
+          cy.get('[data-cy=tag_list] li label').first().click()
+          cy.get('[data-cy=tag_list] .checkboxCustom__checked').its('length').should('be.equal', 2)
         })
       })
     }

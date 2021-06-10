@@ -3,6 +3,8 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { postContentTag } from '../../action.async.js'
 import { sendGlobalFlashMessage, handleFetchResult } from '../../helper.js'
+import CloseButton from '../Button/CloseButton.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -31,25 +33,26 @@ export class NewTagForm extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className='taglist__form'>
-        <div className='taglist__form__close' onClick={props.onClickCloseAddTagBtn}>
-          <i className='fas fa-times' />
-        </div>
+      <div className='tagList__form'>
+        <CloseButton
+          onClick={props.onClickCloseAddTagBtn}
+          customClass='tagList__form__close'
+        />
 
-        <div className='taglist__form__tag'>
-          <div className='taglist__form__title'>{props.t('Add a tag')}</div>
+        <div className='tagList__form__tag'>
+          <div className='tagList__form__title'>{props.t('Add a tag')}</div>
 
-          <div className='taglist__form__member__tag'>
-            <label className='name__label' htmlFor='addtag'>
+          <div className='tagList__form__member__tag'>
+            <label className='name__label' htmlFor='addTag'>
               {props.t('Create a tag or choose one in the list for this content')}
             </label>
 
             <input
               type='text'
               className='name__input form-control'
-              id='addtag'
+              id='addTag'
               placeholder={props.t('Create new tag...')}
-              data-cy='addtag'
+              data-cy='add_tag'
               value={this.state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}
               autoComplete='off'
@@ -58,16 +61,16 @@ export class NewTagForm extends React.Component {
           </div>
         </div>
 
-        <div className='taglist__form__submitbtn'>
-          <button
-            className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
+        <div className='tagList__form__submitBtn'>
+          <IconButton
+            intent='primary'
+            mode='light'
             disabled={!this.state.tagName}
+            icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             data-cy='ValidateTag'
-          >
-            {props.t('Validate')}&nbsp;
-            <i className='fas fa-fw fa-check' />
-          </button>
+            text={props.t('Validate')}
+          />
         </div>
       </div>
     )

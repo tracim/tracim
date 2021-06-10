@@ -78,6 +78,7 @@ class TagList extends React.Component {
 
     if (!fetchGetContentTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+      return
     }
 
     const isContentTag = (tag) => {
@@ -115,13 +116,13 @@ class TagList extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='taglist' data-cy='taglist'>
+      <div className='tagList' data-cy='tag_list'>
 
-        <div className='taglist__header'>
+        <div className='tagList__header'>
           {props.t('Tag List')}
         </div>
 
-        <div className='taglist__wrapper'>
+        <div className='tagList__wrapper'>
           {props.displayNewTagForm
             ? (
               <NewTagForm
@@ -132,10 +133,10 @@ class TagList extends React.Component {
               />
             )
             : (
-              <div className='taglist__btnadd' data-cy='taglist__btnadd' onClick={props.onClickAddTagBtn}>
-                <div className='taglist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                  <div className='taglist__btnadd__button__plus'>
-                    <div className='taglist__btnadd__button__plus__icon'>
+              <div className='tagList__btnAdd' data-cy='tag_list__btn_add' onClick={props.onClickAddTagBtn}>
+                <div className='tagList__btnAdd__button primaryColorFontHover primaryColorBorderHover'>
+                  <div className='tagList__btnAdd__button__plus'>
+                    <div className='tagList__btnAdd__button__plus__icon'>
                       <Icon
                         icon='fas fa-plus'
                         title={props.t('Add a tag')}
@@ -143,18 +144,18 @@ class TagList extends React.Component {
                     </div>
                   </div>
 
-                  <div className='taglist__btnadd__button__text'>
+                  <div className='tagList__btnAdd__button__text'>
                     {props.t('Add a tag')}
                   </div>
                 </div>
               </div>
             )}
-          <ul className='taglist__list'>
+          <ul className='tagList__list'>
             {state.tagList.map((tag, index) =>
               <li
                 className={classnames(
-                  'taglist__list__item_wrapper',
-                  { taglist__list__item__last: state.tagList.length === index + 1 }
+                  'tagList__list__item_wrapper',
+                  { tagList__list__item__last: state.tagList.length === index + 1 }
                 )}
                 key={tag.tag_id}
               >

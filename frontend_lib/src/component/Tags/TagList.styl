@@ -1,6 +1,6 @@
 @import '../../css/Variable.styl'
 
-.taglist
+.tagList
   flex-direction column
   width calc(100% - 65px)
   height 100%
@@ -41,7 +41,7 @@
       .checkboxCustom
         margin-bottom 0
         align-self center
-  &__btnadd
+  &__btnAdd
     border-bottom 2px solid grey
     padding 15px
     &__button
@@ -71,16 +71,16 @@
 
 @media (min-width: min-md) and (max-width: max-md)
 
-  .taglist
+  .tagList
     width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .taglist
+  .tagList
     margin 50px 0
     width 100%
 
 @media (max-width: max-xs)
-  .taglist
+  .tagList
     margin 50px 0
     width 100%
     &__title
@@ -92,5 +92,5 @@
       overflow-Y visible
       &__item:nth-last-child(1)
         border-bottom 1px solid grey
-    &__btnadd
+    &__btnAdd
       border-top 0

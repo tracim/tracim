@@ -7,7 +7,7 @@ require('./TagList.styl')
 
 export const Tag = props => {
   return (
-    <div className='taglist__list__item'>
+    <div className='tagList__list__item'>
       <Checkbox
         onClickCheckbox={props.onClickCheckbox}
         checked={props.checked}
@@ -17,7 +17,7 @@ export const Tag = props => {
       />
       <label
         htmlFor={'checkbox-tag-' + props.tagId}
-        className='taglist__list__item__info'
+        className='tagList__list__item__info'
         title={props.name}
       >
         {props.name}
@@ -37,6 +37,5 @@ Tag.propTypes = {
   checked: PropTypes.bool,
   name: PropTypes.string.isRequired,
   tagId: PropTypes.number.isRequired,
-  description: PropTypes.string,
   onClickCheckbox: PropTypes.func
 }
