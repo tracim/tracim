@@ -2,6 +2,9 @@ import { PAGES } from '../../support/urls_commands'
 
 
 describe.skip('Create tags', () => {
+  // RJ - FIXME - 2021-06-10 - This test suit is failing in Travis.
+  // See https://github.com/tracim/tracim/issues/4694
+
   let htmlContentId
   let workspaceId
 
