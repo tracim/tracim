@@ -474,9 +474,7 @@ export class HtmlDocument extends React.Component {
     }))
   }
 
-  handleClickAddTagBtn = () => this.setState({ displayNewTagForm: true })
-
-  handleClickCloseAddTagBtn = () => this.setState({ displayNewTagForm: false })
+  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
 
   handleCloseNewVersion = () => {
     globalThis.tinymce.remove('#wysiwygNewVersion')
@@ -926,8 +924,8 @@ export class HtmlDocument extends React.Component {
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
           displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleClickAddTagBtn}
-          onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
+          onClickAddTagBtn={this.handleToggleAddTag}
+          onClickCloseAddTagBtn={this.handleToggleAddTag}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
         />

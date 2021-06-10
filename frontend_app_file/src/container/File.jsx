@@ -829,9 +829,7 @@ export class File extends React.Component {
     autoCompleteClicked: true
   })
 
-  handleClickAddTagBtn = () => this.setState({ displayNewTagForm: true })
-
-  handleClickCloseAddTagBtn = () => this.setState({ displayNewTagForm: false })
+  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
 
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
@@ -974,8 +972,8 @@ export class File extends React.Component {
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
           displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleClickAddTagBtn}
-          onClickCloseAddTagBtn={this.handleClickCloseAddTagBtn}
+          onClickAddTagBtn={this.handleToggleAddTagForm}
+          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
         />
