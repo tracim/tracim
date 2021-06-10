@@ -295,7 +295,7 @@ export class HtmlDocument extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -303,7 +303,7 @@ export class HtmlDocument extends React.Component {
   handleTinyMceSelectionChange = (e, position) => {
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -315,7 +315,7 @@ export class HtmlDocument extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -328,7 +328,7 @@ export class HtmlDocument extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -603,8 +603,8 @@ export class HtmlDocument extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateAnywayNewComment = () => {
@@ -896,7 +896,7 @@ export class HtmlDocument extends React.Component {
           onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
           onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
           showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-          searchForMentionInQuery={this.searchForMentionInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           workspaceId={state.content.workspace_id}
           onClickTranslateComment={comment => props.handleTranslateComment(
             comment,

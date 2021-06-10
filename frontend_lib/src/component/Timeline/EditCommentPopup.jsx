@@ -49,8 +49,8 @@ export class EditCommentPopup extends React.Component {
 
   handleChangeNewComment = e => this.setState({ newComment: e.target.value })
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.props.workspaceId)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
   render () {
@@ -73,7 +73,7 @@ export class EditCommentPopup extends React.Component {
           newComment={state.newComment}
           onChangeNewComment={this.handleChangeNewComment}
           onInitWysiwyg={this.handleInitWysiwyg}
-          searchForMentionInQuery={this.searchForMentionInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           lang={props.loggedUserLanguage}
           wysiwyg
         />

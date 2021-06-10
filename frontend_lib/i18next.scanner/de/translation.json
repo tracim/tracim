@@ -1,6 +1,8 @@
 {
   "{{user}}'s profile": "Das Profil von {{user}}",
   "all": "alle",
+  "An error has happened while getting the known content list": "Beim Abrufen der Liste der bekannten Inhalte ist ein Fehler aufgetreten",
+  "Error while detecting the links": "Fehler bei der Erkennung der Links",
   "Open as content": "Als Inhalt öffnen",
   "Timeline": "Zeitleiste",
   "Restore": "Wiederherstellen",
