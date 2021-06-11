@@ -1,6 +1,6 @@
 """add tag table
 
-Revision ID: 0d0c9758426f
+Revision ID: 92daba01d07a
 Revises: eb9b7e534b54
 Create Date: 2021-06-11 09:48:53.035351
 
@@ -9,7 +9,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "0d0c9758426f"
+revision = "92daba01d07a"
 down_revision = "eb9b7e534b54"
 
 
