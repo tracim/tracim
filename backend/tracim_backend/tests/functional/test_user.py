@@ -3641,7 +3641,6 @@ class TestKnownContent(object):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
 
         session.add(test_file)
@@ -3653,7 +3652,6 @@ class TestKnownContent(object):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
 
         session.add(test_file)
@@ -3662,19 +3660,33 @@ class TestKnownContent(object):
             content_type_slug=content_type_list.File.slug,
             workspace=workspace2,
             label="Test file pomme",
-            do_save=False,
+            do_save=True,
             do_notify=False,
         )
-        test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file pomme", "Test file pomme.txt", "text/plain")
 
         session.add(test_file)
+
+        # NOTE - RJ - 2021-06-11 - no request should return a comment
+        comment = content_api.create_comment(
+            workspace=workspace2, parent=test_file, content="hello", do_save=True, do_notify=False,
+        )
+
+        session.add(comment)
 
         transaction.commit()
 
         user_id = int(admin_user.user_id)
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {"acp": "", "limit": 15}
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_contents?".format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        assert len(res.json_body) == 3
 
         params = {"acp": "anan", "limit": 15}
         res = web_testapp.get(
