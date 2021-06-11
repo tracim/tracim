@@ -45,6 +45,7 @@ import {
   getContentComment,
   getFileChildContent,
   handleMentionsBeforeSave,
+  handleLinksBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
   permissiveNumberEqual,
@@ -529,8 +530,15 @@ export class HtmlDocument extends React.Component {
       return
     }
 
+    let newDocumentForApiWithMentionAndLink
+    try {
+      newDocumentForApiWithMentionAndLink = handleLinksBeforeSave(newDocumentForApiWithMention)
+    } catch (e) {
+      return Promise.reject(e.message || props.t('Error while saving the new version'))
+    }
+
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMentionAndLink)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -548,7 +556,7 @@ export class HtmlDocument extends React.Component {
             mode: APP_FEATURE_MODE.VIEW,
             content: {
               ...previousState.content,
-              raw_content: newDocumentForApiWithMention
+              raw_content: newDocumentForApiWithMentionAndLink
             },
             oldInvalidMentionList: allInvalidMentionList,
             showInvalidMentionPopupInContent: false,

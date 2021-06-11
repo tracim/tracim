@@ -68,6 +68,7 @@ import {
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   handleMentionsBeforeSave
 } from './mentionOrLink.js'
 import { TracimComponent } from './tracimComponent.js'
@@ -273,6 +274,7 @@ export {
   EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   naturalCompareLabels,
   ScrollToBottomWrapper,
   sortWorkspaceList,
