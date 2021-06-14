@@ -67,15 +67,16 @@ class PopinFixedHeader extends React.Component {
           {state.editTitle
             ? (
               <input
-                className='wsContentGeneric__header__title__editiontitle editiontitle'
-                value={state.editTitleValue}
-                onChange={this.handleChangeTitle}
-                onKeyDown={this.handleInputKeyPress}
-                autoFocus
+              className='wsContentGeneric__header__title__editiontitle editiontitle'
+              value={state.editTitleValue}
+              onChange={this.handleChangeTitle}
+              onKeyDown={this.handleInputKeyPress}
+              autoFocus
               />
-            )
-            : componentTitle}
+              )
+              : componentTitle}
         </div>
+        <div>hello</div>
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
           <button
