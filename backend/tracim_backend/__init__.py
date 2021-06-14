@@ -111,7 +111,10 @@ spreadsheet_mimetypes = (
     "application/vnd.lotus-1-2-3",
 )
 for mimetype in spreadsheet_mimetypes:
-    LO_MIMETYPES.pop(mimetype)
+    try:
+        LO_MIMETYPES.pop(mimetype)
+    except KeyError:
+        pass
 
 
 class TracimPyramidContext(PyramidContext):
