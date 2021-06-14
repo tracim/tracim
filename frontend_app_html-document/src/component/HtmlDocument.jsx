@@ -5,10 +5,13 @@ import classnames from 'classnames'
 
 import {
   APP_FEATURE_MODE,
+  Breadcrumbs,
+  BREADCRUMBS_TYPE,
   ConfirmPopup,
   AutoComplete,
   PromptMessage,
   HTMLContent,
+  PAGE,
   TextAreaApp,
   TRANSLATION_STATE,
   TranslateButton
@@ -72,6 +75,29 @@ export const HtmlDocument = props => {
         />
       )}
 
+      <Breadcrumbs
+        root={{
+          link: PAGE.HOME,
+          label: props.t('Home'),
+          icon: 'fas fa-home',
+          type: BREADCRUMBS_TYPE.CORE,
+          isALink: true
+        }}
+        breadcrumbsList={[{
+          link: PAGE.HOME,
+          label: props.t('Home'),
+          icon: 'fas fa-home',
+          type: BREADCRUMBS_TYPE.CORE,
+          isALink: true
+        }, {
+          link: PAGE.HOME,
+          label: props.t('Home'),
+          icon: 'fas fa-home',
+          type: BREADCRUMBS_TYPE.CORE,
+          isALink: true
+        }]}
+      />
+
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <PromptMessage
@@ -97,10 +123,10 @@ export const HtmlDocument = props => {
               <div className='html-document__contentpage__textnote__top__version'>
                 {props.t(
                   'Version #{{versionNumber}}', {
-                    versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                      ? props.lastVersion
-                      : props.version
-                  }
+                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                    ? props.lastVersion
+                    : props.version
+                }
                 )}
                 {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
                   <div className='html-document__contentpage__textnote__top__lastversion'>
