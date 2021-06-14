@@ -12,11 +12,8 @@ attrs==18.2.0             # via cmd2, jsonschema
 babel==2.6.0              # via tracim_backend (setup.py)
 beaker==1.10.0            # via pyramid-beaker, tracim_backend (setup.py)
 beautifulsoup4==4.6.3     # via tracim_backend (setup.py), webpreview
-cairocffi==1.1.0          # via cairosvg
-cairosvg==2.4.2           # via preview-generator
 caldav==0.6.0             # via tracim_backend (setup.py)
 certifi==2018.11.29       # via requests
-cffi==1.13.2              # via cairocffi
 chardet==3.0.4            # via requests
 click==7.0                # via rq
 cliff==2.14.0             # via tracim_backend (setup.py)
@@ -29,10 +26,8 @@ defusedxml==0.5.0         # via cairosvg, wsgidav
 elasticsearch-dsl==7.0.0  # via tracim_backend (setup.py)
 elasticsearch==7.0.1      # via elasticsearch-dsl, tracim_backend (setup.py)
 email-reply-parser==0.5.9  # via tracim_backend (setup.py)
-ffmpeg-python==0.2.0      # via preview-generator
 filedepot==0.8.0          # via tracim_backend (setup.py)
-filelock==3.0.10          # via preview-generator, tracim_backend (setup.py)
-future==0.18.2            # via ffmpeg-python
+filelock==3.0.10          # via tracim_backend (setup.py)
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.2          # via tracim_backend (setup.py)
 gripcontrol==4.0.0        # via tracim_backend (setup.py)
@@ -66,7 +61,6 @@ prettytable==0.7.2        # via cliff
 preview-generator==0.20   # via tracim_backend (setup.py)
 pubcontrol==3.0.0         # via gripcontrol
 pyasn1==0.4.4             # via ldap3
-pycparser==2.19           # via cffi
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.3.0           # via pyramid-debugtoolbar
 pyjwt==1.7.1              # via gripcontrol, pubcontrol
@@ -108,7 +102,6 @@ unidecode==1.0.23         # via python-slugify
 urllib3==1.26.2           # via elasticsearch, requests
 venusian==1.1.0           # via pyramid
 vobject==0.9.6.1          # via caldav, radicale
-vtk==8.1.2                # via preview-generator
 waitress==1.1.0           # via tracim_backend (setup.py)
 wand==0.4.5               # via preview-generator
 wcwidth==0.1.7            # via cmd2
@@ -116,7 +109,6 @@ webencodings==0.5.1       # via tinycss2
 webob==1.8.4              # via pyramid
 webpreview==1.6.0         # via tracim_backend (setup.py)
 wsgidav==2.4.1            # via tracim_backend (setup.py)
-xvfbwrapper==0.2.9        # via preview-generator
 zipp==0.6.0               # via importlib-metadata
 zope.deprecation==4.3.0   # via pyramid
 zope.interface==4.6.0     # via pyramid, pyramid-retry, transaction, zope.sqlalchemy
