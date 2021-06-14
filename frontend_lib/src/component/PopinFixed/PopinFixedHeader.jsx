@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { ROLE } from '../../helper.js'
+// import { DropdownMenu } from '../DropdownMenu/DropdownMenu.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -76,7 +77,15 @@ class PopinFixedHeader extends React.Component {
               )
               : componentTitle}
         </div>
-        <div>hello</div>
+
+        {/* <DropdownMenu
+          buttonCustomClass='timedEvent__top'
+          // buttonClick={props.onEventClicked} // eslint-disable-line
+          buttonOpts={topContents}
+          buttonTooltip=''
+        >
+          {props.eventList.map(createHistoryTimedEvent)}
+        </DropdownMenu> */}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
           <button
