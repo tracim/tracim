@@ -5,6 +5,8 @@ import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
+  Breadcrumbs,
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
   handleFetchResult,
@@ -50,6 +52,7 @@ export class Thread extends React.Component {
 
     this.state = {
       appName: 'thread',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -292,6 +295,13 @@ export class Thread extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app thread, count not build breadcrumbs', e)
     }
@@ -514,6 +524,17 @@ export class Thread extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
+          <>
+            <Breadcrumbs
+              root={{
+                link: PAGE.HOME,
+                label: '',
+                icon: 'fas fa-home',
+                type: BREADCRUMBS_TYPE.CORE,
+                isALink: true
+              }}
+              breadcrumbsList={state.breadcrumbsList}
+            />
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           {state.config.apiUrl ? (
@@ -567,6 +588,7 @@ export class Thread extends React.Component {
               onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             />
           ) : null}
+          </>
         </PopinFixedContent>
       </PopinFixed>
     )
