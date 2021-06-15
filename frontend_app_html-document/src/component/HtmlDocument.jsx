@@ -75,29 +75,6 @@ export const HtmlDocument = props => {
         />
       )}
 
-      <Breadcrumbs
-        root={{
-          link: PAGE.HOME,
-          label: props.t('Home'),
-          icon: 'fas fa-home',
-          type: BREADCRUMBS_TYPE.CORE,
-          isALink: true
-        }}
-        breadcrumbsList={[{
-          link: PAGE.HOME,
-          label: props.t('Home'),
-          icon: 'fas fa-home',
-          type: BREADCRUMBS_TYPE.CORE,
-          isALink: true
-        }, {
-          link: PAGE.HOME,
-          label: props.t('Home'),
-          icon: 'fas fa-home',
-          type: BREADCRUMBS_TYPE.CORE,
-          isALink: true
-        }]}
-      />
-
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === APP_FEATURE_MODE.VIEW && props.isDraftAvailable && (
           <PromptMessage
@@ -111,15 +88,28 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__top'>
-              <TranslateButton
-                translationState={props.translationState}
-                targetLanguageList={props.translationTargetLanguageList}
-                targetLanguageCode={props.translationTargetLanguageCode}
-                onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
-                onClickTranslate={props.onClickTranslateDocument}
-                onClickRestore={props.onClickRestoreDocument}
-                dataCy='htmlDocumentTranslateButton'
-              />
+              <div>
+                <Breadcrumbs
+                  root={{
+                    link: PAGE.HOME,
+                    label: '',
+                    icon: 'fas fa-home',
+                    type: BREADCRUMBS_TYPE.CORE,
+                    isALink: true
+                  }}
+                  breadcrumbsList={props.breadcrumbsList}
+                />
+
+                <TranslateButton
+                  translationState={props.translationState}
+                  targetLanguageList={props.translationTargetLanguageList}
+                  targetLanguageCode={props.translationTargetLanguageCode}
+                  onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                  onClickTranslate={props.onClickTranslateDocument}
+                  onClickRestore={props.onClickRestoreDocument}
+                  dataCy='htmlDocumentTranslateButton'
+                />
+              </div>
               <div className='html-document__contentpage__textnote__top__version'>
                 {props.t(
                   'Version #{{versionNumber}}', {

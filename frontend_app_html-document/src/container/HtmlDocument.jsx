@@ -7,6 +7,7 @@ import {
   addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   CONTENT_TYPE,
@@ -73,6 +74,7 @@ export class HtmlDocument extends React.Component {
     props.setApiUrl(param.config.apiUrl)
     this.state = {
       appName: 'html-document',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -368,6 +370,13 @@ export class HtmlDocument extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app html-document, count not build breadcrumbs', e)
     }
@@ -1038,6 +1047,7 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            breadcrumbsList={state.breadcrumbsList}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             apiUrl={state.config.apiUrl}
