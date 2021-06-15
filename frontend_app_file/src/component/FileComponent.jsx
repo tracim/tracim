@@ -5,8 +5,11 @@ import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
 import {
   APP_FEATURE_MODE,
-  PromptMessage,
+  Breadcrumbs,
+  BREADCRUMBS_TYPE,
   FileDropzone,
+  PromptMessage,
+  PAGE,
   PopupProgressUpload
 } from 'tracim_frontend_lib'
 
@@ -122,20 +125,33 @@ export class FileComponent extends React.Component {
         )}
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
-          <PreviewComponent
-            color={props.customColor}
-            downloadRawUrl={props.downloadRawUrl}
-            isPdfAvailable={props.isPdfAvailable}
-            isJpegAvailable={props.isJpegAvailable}
-            downloadPdfPageUrl={props.downloadPdfPageUrl}
-            downloadPdfFullUrl={props.downloadPdfFullUrl}
-            previewUrl={props.previewUrl}
-            filePageNb={props.filePageNb}
-            fileCurrentPage={props.fileCurrentPage}
-            lightboxUrlList={props.lightboxUrlList}
-            onClickPreviousPage={props.onClickPreviousPage}
-            onClickNextPage={props.onClickNextPage}
-          />
+          <span>
+            <Breadcrumbs
+              root={{
+                link: PAGE.HOME,
+                label: '',
+                icon: 'fas fa-home',
+                type: BREADCRUMBS_TYPE.CORE,
+                isALink: true
+              }}
+              breadcrumbsList={props.breadcrumbsList}
+            />
+
+            <PreviewComponent
+              color={props.customColor}
+              downloadRawUrl={props.downloadRawUrl}
+              isPdfAvailable={props.isPdfAvailable}
+              isJpegAvailable={props.isJpegAvailable}
+              downloadPdfPageUrl={props.downloadPdfPageUrl}
+              downloadPdfFullUrl={props.downloadPdfFullUrl}
+              previewUrl={props.previewUrl}
+              filePageNb={props.filePageNb}
+              fileCurrentPage={props.fileCurrentPage}
+              lightboxUrlList={props.lightboxUrlList}
+              onClickPreviousPage={props.onClickPreviousPage}
+              onClickNextPage={props.onClickNextPage}
+            />
+          </span>
         )}
 
         {props.mode === APP_FEATURE_MODE.EDIT && (

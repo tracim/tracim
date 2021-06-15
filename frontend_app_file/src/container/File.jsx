@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
   TracimComponent,
@@ -77,6 +78,7 @@ export class File extends React.Component {
 
     this.state = {
       appName: 'file',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -413,6 +415,13 @@ export class File extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app file, count not build breadcrumbs', e)
     }
@@ -1218,6 +1227,7 @@ export class File extends React.Component {
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
+            breadcrumbsList={state.breadcrumbsList}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
