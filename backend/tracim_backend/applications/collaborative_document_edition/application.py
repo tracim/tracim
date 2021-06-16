@@ -11,6 +11,7 @@ from tracim_backend.applications.collaborative_document_edition.factory import (
 )
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.app import TracimApplication
+from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.views import BASE_API
 
 
@@ -30,6 +31,12 @@ class CollaborativeDocumentEditionApp(TracimApplication):
         )
         app_config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = app_config.get_raw_config(
             "collaborative_document_edition.file_template_dir", default_file_template_dir
+        )
+        app_config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS = string_to_unique_item_list(
+            app_config.get_raw_config("collaborative_document_edition.enabled_extensions", "",),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
 
     def check_config(self, app_config: CFG) -> None:
