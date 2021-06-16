@@ -120,7 +120,19 @@ class PopinFixedHeader extends React.Component {
             buttonTooltip={t('Actions')}
           >
             {actionList.map((action) =>
-              <IconButton
+              action.downloadLink
+              ? <a
+                href={action.downloadLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                download
+                title={action.label}
+                key={action.label}
+              >
+                <i className={`fa-fw ${action.icon}`} />
+                {action.label}
+              </a>
+              : <IconButton
                 icon={action.icon}
                 text={action.label}
                 label={action.label}

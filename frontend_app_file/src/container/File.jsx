@@ -1140,17 +1140,17 @@ export class File extends React.Component {
             } , {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
-              onClick: '', // () => this.getDownloadPdfPageUrl(state),
+              downloadLink: this.getDownloadPdfPageUrl(state),
               showAction: ''
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              onClick: '', // () => this.getDownloadPdfFullUrl(state),
+              onClick: () => {}, // () => this.getDownloadPdfFullUrl(state),
               showAction: ''
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              onClick: '', // () => this.getDownloadRawUrl(state),
+              onClick: () => {}, // () => this.getDownloadRawUrl(state),
               showAction: ''
             }
           ]}
