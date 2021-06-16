@@ -5,11 +5,8 @@ import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
 import {
   APP_FEATURE_MODE,
-  Breadcrumbs,
-  BREADCRUMBS_TYPE,
   FileDropzone,
   PromptMessage,
-  PAGE,
   PopupProgressUpload
 } from 'tracim_frontend_lib'
 
@@ -125,34 +122,6 @@ export class FileComponent extends React.Component {
         )}
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
-          <span>
-            <div className='file__contentpage__top'>
-              <Breadcrumbs
-                root={{
-                  link: PAGE.HOME,
-                  label: '',
-                  icon: 'fas fa-home',
-                  type: BREADCRUMBS_TYPE.CORE,
-                  isALink: true
-                }}
-                breadcrumbsList={props.breadcrumbsList}
-              />
-
-              <div className='file__contentpage__top__version'>
-                {props.t(
-                  'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW
-                    ? props.lastVersion
-                    : props.version
-                }
-                )}
-                {props.mode === APP_FEATURE_MODE.REVISION && (
-                  <div className='file__contentpage__top__lastversion'>
-                    ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                  </div>
-                )}
-              </div>
-            </div>
             <PreviewComponent
               color={props.customColor}
               downloadRawUrl={props.downloadRawUrl}
@@ -167,7 +136,6 @@ export class FileComponent extends React.Component {
               onClickPreviousPage={props.onClickPreviousPage}
               onClickNextPage={props.onClickNextPage}
             />
-          </span>
         )}
 
         {props.mode === APP_FEATURE_MODE.EDIT && (

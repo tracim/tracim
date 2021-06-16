@@ -5,13 +5,10 @@ import classnames from 'classnames'
 
 import {
   APP_FEATURE_MODE,
-  Breadcrumbs,
-  BREADCRUMBS_TYPE,
   ConfirmPopup,
   AutoComplete,
   PromptMessage,
   HTMLContent,
-  PAGE,
   TextAreaApp,
   TRANSLATION_STATE,
   TranslateButton
@@ -88,42 +85,15 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className='html-document__contentpage__textnote__top'>
-              <div>
-                <Breadcrumbs
-                  root={{
-                    link: PAGE.HOME,
-                    label: '',
-                    icon: 'fas fa-home',
-                    type: BREADCRUMBS_TYPE.CORE,
-                    isALink: true
-                  }}
-                  breadcrumbsList={props.breadcrumbsList}
-                />
-
-                <TranslateButton
-                  translationState={props.translationState}
-                  targetLanguageList={props.translationTargetLanguageList}
-                  targetLanguageCode={props.translationTargetLanguageCode}
-                  onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
-                  onClickTranslate={props.onClickTranslateDocument}
-                  onClickRestore={props.onClickRestoreDocument}
-                  dataCy='htmlDocumentTranslateButton'
-                />
-              </div>
-              <div className='html-document__contentpage__textnote__top__version'>
-                {props.t(
-                  'Version #{{versionNumber}}', {
-                  versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                    ? props.lastVersion
-                    : props.version
-                }
-                )}
-                {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                  <div className='html-document__contentpage__textnote__top__lastversion'>
-                    ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                  </div>
-                )}
-              </div>
+              <TranslateButton
+                translationState={props.translationState}
+                targetLanguageList={props.translationTargetLanguageList}
+                targetLanguageCode={props.translationTargetLanguageCode}
+                onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                onClickTranslate={props.onClickTranslateDocument}
+                onClickRestore={props.onClickRestoreDocument}
+                dataCy='htmlDocumentTranslateButton'
+              />
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className={noteClassName}>
@@ -193,8 +163,6 @@ HtmlDocument.propTypes = {
   customColor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
-  version: PropTypes.string,
-  lastVersion: PropTypes.number,
   text: PropTypes.string,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,

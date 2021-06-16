@@ -958,7 +958,7 @@ export class HtmlDocument extends React.Component {
 
     const displayTranslatedText = (
       state.mode !== APP_FEATURE_MODE.EDIT &&
-        state.translationState === TRANSLATION_STATE.TRANSLATED
+      state.translationState === TRANSLATION_STATE.TRANSLATED
     )
     return (
       <PopinFixed
@@ -1028,11 +1028,9 @@ export class HtmlDocument extends React.Component {
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               content={state.content}
-              availableStatuses={state.config.availableStatuses}
               appMode={state.mode}
               loggedUser={state.loggedUser}
               hexcolor={state.config.hexcolor}
-              onChangeStatus={this.handleChangeStatus}
               onClickArchive={this.handleClickArchive}
               onClickDelete={this.handleClickDelete}
             />
@@ -1040,14 +1038,21 @@ export class HtmlDocument extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
+          content={state.content}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
+          version={state.content.number}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
-            breadcrumbsList={state.breadcrumbsList}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             apiUrl={state.config.apiUrl}
@@ -1056,8 +1061,6 @@ export class HtmlDocument extends React.Component {
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleClickSaveDocument}
-            version={state.content.number}
-            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}

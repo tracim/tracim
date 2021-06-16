@@ -1,6 +1,15 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
+import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
+import {
+  APP_FEATURE_MODE,
+  BREADCRUMBS_TYPE,
+  PAGE,
+  ROLE
+} from '../../helper.js'
 
 class PopinFixedContent extends React.Component {
   constructor (props) {
@@ -17,33 +26,88 @@ class PopinFixedContent extends React.Component {
   }
 
   render () {
-    return this.props.children.length === 2
+    const { props } = this
+    return props.children.length === 2
       ? (
         <div className={classnames(
           'wsContentGeneric__content',
-          `${this.props.customClass}__content`,
+          `${props.customClass}__content`,
           { rightPartOpen: this.state.rightPartOpen, rightPartClose: !this.state.rightPartOpen }
         )}
         >
-          <div className={classnames('wsContentGeneric__content__left', `${this.props.customClass}__content__left`)}>
+          <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
+            <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
+              {props.breadcrumbsList && (
+                <Breadcrumbs
+                  root={{
+                    link: PAGE.HOME,
+                    label: '',
+                    icon: 'fas fa-home',
+                    type: BREADCRUMBS_TYPE.CORE,
+                    isALink: true
+                  }}
+                  breadcrumbsList={props.breadcrumbsList}
+                />
+              )}
+
+              {!!props.lastVersion &&
+              (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
+              (
+                <div
+                  className={classnames(
+                    'wsContentGeneric__content__left__top__version',
+                    `${props.customClass}__content__left__top__version`
+                  )}
+                >
+                  {props.t(
+                    'Version #{{versionNumber}}', {
+                    versionNumber: props.appMode === APP_FEATURE_MODE.VIEW
+                      ? props.lastVersion
+                      : props.version
+                  }
+                  )}
+                  {props.appMode === APP_FEATURE_MODE.REVISION && (
+                    <div
+                      className={classnames(
+                        'wsContentGeneric__content__left__top__lastversion',
+                        `${props.customClass}__content__left__top__lastversion`
+                      )}
+                    >
+                      ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                    </div>
+                  )}
+                  &nbsp;-&nbsp;
+                </div>
+              )}
+
+              {props.availableStatuses && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+                <SelectStatus
+                  selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
+                  availableStatus={props.availableStatuses}
+                  onChangeStatus={props.onChangeStatus}
+                  disabled={props.appMode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
+                />
+              )}
+            </div>
+
             {this.props.children[0]}
           </div>
 
-          {React.cloneElement(this.props.children[1], {
+          {React.cloneElement(props.children[1], {
             handleToggleRightPart: this.handleToggleRightPart,
             rightPartOpen: this.state.rightPartOpen
           })}
         </div>
       )
       : (
-        <div className={classnames('wsContentGeneric__content', `${this.props.customClass}__content`)}>
-          {this.props.children}
+        <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
+          {props.children}
         </div>
       )
   }
 }
 
-export default PopinFixedContent
+export default translate()(PopinFixedContent)
 
 PopinFixedContent.propTypes = {
   customClass: PropTypes.string,

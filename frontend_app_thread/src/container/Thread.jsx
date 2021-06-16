@@ -35,6 +35,8 @@ import {
   getDefaultTranslationState,
   FavoriteButton,
   FAVORITE_STATE,
+  ROLE,
+  SelectStatus,
   ToolBar
 } from 'tracim_frontend_lib'
 import {
@@ -512,9 +514,7 @@ export class Thread extends React.Component {
             </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
-              onChangeStatus={this.handleChangeStatus}
               content={state.content}
-              availableStatuses={state.config.availableStatuses}
               loggedUser={state.loggedUser}
               hexcolor={state.config.hexcolor}
               onClickArchive={this.handleClickArchive}
@@ -535,59 +535,69 @@ export class Thread extends React.Component {
               }}
               breadcrumbsList={state.breadcrumbsList}
             />
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+
+            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
+              <SelectStatus
+                selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                availableStatus={state.config.availableStatuses}
+                onChangeStatus={this.handleChangeStatus}
+                disabled={state.content.is_archived || state.content.is_deleted}
+              />
+            )}
+
+            {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
-          {state.config.apiUrl ? (
-            <Timeline
-              customClass={`${state.config.slug}__contentpage`}
-              customColor={state.config.hexcolor}
-              loggedUser={state.loggedUser}
-              memberList={state.config.workspace && state.config.workspace.memberList}
-              apiUrl={state.config.apiUrl}
-              timelineData={state.timeline}
-              newComment={state.newComment}
-              newCommentAsFileList={state.newCommentAsFileList}
-              disableComment={!state.content.is_editable}
-              availableStatusList={state.config.availableStatuses}
-              wysiwyg={state.timelineWysiwyg}
-              onChangeNewComment={this.handleChangeNewComment}
-              onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-              onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-              onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
-              allowClickOnRevision={false}
-              onClickRevisionBtn={() => {}}
-              shouldScrollToBottom
-              isArchived={state.content.is_archived}
-              onClickRestoreArchived={this.handleClickRestoreArchive}
-              isDeleted={state.content.is_deleted}
-              onClickRestoreDeleted={this.handleClickRestoreDelete}
-              isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-              deprecatedStatus={state.config.availableStatuses[3]}
-              showTitle={false}
-              invalidMentionList={state.invalidMentionList}
-              isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-              onClickCancelSave={this.handleCancelSave}
-              onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-              onInitWysiwyg={this.handleInitWysiwyg}
-              workspaceId={state.content.workspace_id}
-              showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-              onClickTranslateComment={comment => props.handleTranslateComment(
-                comment,
-                state.content.workspace_id,
-                state.translationTargetLanguageCode,
-                this.setState.bind(this)
-              )}
-              onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-              onClickEditComment={this.handleClickEditComment}
-              onClickDeleteComment={this.handleClickDeleteComment}
-              onClickOpenFileComment={this.handleClickOpenFileComment}
-              translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-              translationTargetLanguageCode={state.translationTargetLanguageCode}
-              onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-            />
-          ) : null}
+            {state.config.apiUrl ? (
+              <Timeline
+                customClass={`${state.config.slug}__contentpage`}
+                customColor={state.config.hexcolor}
+                loggedUser={state.loggedUser}
+                memberList={state.config.workspace && state.config.workspace.memberList}
+                apiUrl={state.config.apiUrl}
+                timelineData={state.timeline}
+                newComment={state.newComment}
+                newCommentAsFileList={state.newCommentAsFileList}
+                disableComment={!state.content.is_editable}
+                availableStatusList={state.config.availableStatuses}
+                wysiwyg={state.timelineWysiwyg}
+                onChangeNewComment={this.handleChangeNewComment}
+                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                onClickWysiwygBtn={this.handleToggleWysiwyg}
+                allowClickOnRevision={false}
+                onClickRevisionBtn={() => { }}
+                shouldScrollToBottom
+                isArchived={state.content.is_archived}
+                onClickRestoreArchived={this.handleClickRestoreArchive}
+                isDeleted={state.content.is_deleted}
+                onClickRestoreDeleted={this.handleClickRestoreDelete}
+                isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+                deprecatedStatus={state.config.availableStatuses[3]}
+                showTitle={false}
+                invalidMentionList={state.invalidMentionList}
+                isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                onClickCancelSave={this.handleCancelSave}
+                onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+                onInitWysiwyg={this.handleInitWysiwyg}
+                workspaceId={state.content.workspace_id}
+                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+                onClickTranslateComment={comment => props.handleTranslateComment(
+                  comment,
+                  state.content.workspace_id,
+                  state.translationTargetLanguageCode,
+                  this.setState.bind(this)
+                )}
+                onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                onClickEditComment={this.handleClickEditComment}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                translationTargetLanguageCode={state.translationTargetLanguageCode}
+                onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+              />
+            ) : null}
           </>
         </PopinFixedContent>
       </PopinFixed>

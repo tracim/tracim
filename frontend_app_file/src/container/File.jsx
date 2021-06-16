@@ -1236,11 +1236,9 @@ export class File extends React.Component {
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               content={state.content}
-              availableStatuses={state.config.availableStatuses}
               appMode={state.mode}
               loggedUser={state.loggedUser}
               hexcolor={state.config.hexcolor}
-              onChangeStatus={this.handleChangeStatus}
               onClickArchive={this.handleClickArchive}
               onClickDelete={this.handleClickDelete}
             />
@@ -1248,12 +1246,19 @@ export class File extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
+          content={state.content}
           customClass={`${state.config.slug}__contentpage`}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
+          version={state.content.number}
         >
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
-            breadcrumbsList={state.breadcrumbsList}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
@@ -1261,9 +1266,7 @@ export class File extends React.Component {
             isJpegAvailable={state.content.has_jpeg_preview}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            version={state.content.number}
             mimeType={state.content.mimetype}
-            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
