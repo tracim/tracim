@@ -52,6 +52,39 @@ class PopinFixedHeader extends React.Component {
     }
   }
 
+  // handleContentDeletedOrRestored = data => {
+  //   const { state } = this
+  //   const isTlmAboutCurrentContent = data.fields.content.content_id === state.content.content_id
+  //   const isTlmAboutCurrentContentChildren = data.fields.content.parent_id === state.content.content_id
+
+  //   if (!isTlmAboutCurrentContent && !isTlmAboutCurrentContentChildren) return
+
+  //   if (isTlmAboutCurrentContent) {
+  //     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+  //     this.setState(prev =>
+  //       ({
+  //         content: clientToken === data.fields.client_token
+  //           ? { ...prev.content, ...data.fields.content }
+  //           : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+  //         newContent: {
+  //           ...prev.content,
+  //           ...data.fields.content
+  //         },
+  //         editionAuthor: data.fields.author.public_name,
+  //         showRefreshWarning: clientToken !== data.fields.client_token,
+  //         mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
+  //         timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
+  //         isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+  //       })
+  //     )
+  //     return
+  //   }
+
+  //   if (isTlmAboutCurrentContentChildren) {
+  //     this.handleContentCommentDeleted(data)
+  //   }
+  // }
+
   render () {
     const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, showChangeTitleButton, t, actionList } = this.props
     const { state } = this
@@ -94,8 +127,30 @@ class PopinFixedHeader extends React.Component {
                 key={action.label}
                 onClick={action.onClick}
                 customClass='transparentButton'
+                showAction={action.showAction}
               />
             )}
+
+            {/* Ici check si il ya les droits */}
+            {/* <IconButton
+              icon={action.icon}
+              text={action.label}
+              label={action.label}
+              key={action.label}
+              onClick={action.onClick}
+              customClass='transparentButton'
+              showAction={action.showAction}
+            /> */}
+            {/* end */}
+            {/* <AppContentRightMenu
+              apiUrl={state.config.apiUrl}
+              content={state.content}
+              appMode={state.mode}
+              loggedUser={state.loggedUser}
+              hexcolor={state.config.hexcolor}
+              onClickArchive={this.handleClickArchive}
+              onClickDelete={this.handleClickDelete}
+            /> */}
           </DropdownMenu>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&

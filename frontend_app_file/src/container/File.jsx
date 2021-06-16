@@ -69,6 +69,8 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
+// import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
+
 export class File extends React.Component {
   constructor (props) {
     super(props)
@@ -1109,31 +1111,6 @@ export class File extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
-  getActionListItems = () => [
-    {
-      icon: 'fa-share-alt',
-      text: 'hey',
-      label: 'hey',
-      key: 'hey',
-      onClick: 'wip',
-      customClass: 'transparentButton'
-    } , {
-      icon: 'fa-share-alt',
-      text: 'heyo',
-      label: 'hey',
-      key: 'hey',
-      onClick: 'wip',
-      customClass: 'transparentButton'
-    } , {
-      icon: 'fa-share-alt',
-      text: 'hoy',
-      label: 'hoy',
-      key: 'hoy',
-      onClick: 'wip',
-      customClass: 'transparentButton'
-    }
-  ]
-
   render () {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
@@ -1155,7 +1132,30 @@ export class File extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
-          actionList={this.getActionListItems()}
+          actionList={[
+            {
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              key: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: '' //state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
+            } , {
+              icon: 'far fa-file',
+              label: props.t('Download current page as PDF'),
+              onClick: '', // () => this.getDownloadPdfPageUrl(state),
+              showAction: ''
+            }, {
+              icon: 'far fa-file-pdf',
+              label: props.t('Download as PDF'),
+              onClick: '', // () => this.getDownloadPdfFullUrl(state),
+              showAction: ''
+            }, {
+              icon: 'fas fa-download',
+              label: props.t('Download file'),
+              onClick: '', // () => this.getDownloadRawUrl(state),
+              showAction: ''
+            }
+          ]}
         />
 
         <PopinFixedOption
