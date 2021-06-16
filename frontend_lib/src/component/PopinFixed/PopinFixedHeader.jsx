@@ -3,7 +3,8 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { ROLE } from '../../helper.js'
-// import { DropdownMenu } from '../DropdownMenu/DropdownMenu.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -52,7 +53,7 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, showChangeTitleButton, t } = this.props
+    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, showChangeTitleButton, t, actionList } = this.props
     const { state } = this
 
     return (
@@ -78,14 +79,24 @@ class PopinFixedHeader extends React.Component {
               : componentTitle}
         </div>
 
-        {/* <DropdownMenu
-          buttonCustomClass='timedEvent__top'
-          // buttonClick={props.onEventClicked} // eslint-disable-line
-          buttonOpts={topContents}
-          buttonTooltip=''
-        >
-          {props.eventList.map(createHistoryTimedEvent)}
-        </DropdownMenu> */}
+        {actionList && actionList.length > 0 &&
+          <DropdownMenu
+            buttonCustomClass='timedEvent__top'
+            // buttonClick={props.onEventClicked} // eslint-disable-line
+            buttonIcon='fa-fw fas fa-ellipsis-v'
+            buttonTooltip={t('Actions')}
+          >
+            {actionList.map((action) =>
+              <IconButton
+                icon={action.icon}
+                text={action.label}
+                label={action.label}
+                key={action.label}
+                onClick={action.onClick}
+                customClass='transparentButton'
+              />
+            )}
+          </DropdownMenu>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
           <button
@@ -134,7 +145,8 @@ PopinFixedHeader.propTypes = {
   userRoleIdInWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func,
   disableChangeTitle: PropTypes.bool,
-  showChangeTitleButton: PropTypes.bool
+  showChangeTitleButton: PropTypes.bool,
+  actionList: PropTypes.array
 }
 
 PopinFixedHeader.defaultProps = {
@@ -145,5 +157,6 @@ PopinFixedHeader.defaultProps = {
   userRoleIdInWorkspace: ROLE.reader.id,
   onChangeTitle: () => {},
   disableChangeTitle: false,
-  showChangeTitleButton: true
+  showChangeTitleButton: true,
+  actionList: []
 }

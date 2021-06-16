@@ -1109,6 +1109,31 @@ export class File extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  getActionListItems = () => [
+    {
+      icon: 'fa-share-alt',
+      text: 'hey',
+      label: 'hey',
+      key: 'hey',
+      onClick: 'wip',
+      customClass: 'transparentButton'
+    } , {
+      icon: 'fa-share-alt',
+      text: 'heyo',
+      label: 'hey',
+      key: 'hey',
+      onClick: 'wip',
+      customClass: 'transparentButton'
+    } , {
+      icon: 'fa-share-alt',
+      text: 'hoy',
+      label: 'hoy',
+      key: 'hoy',
+      onClick: 'wip',
+      customClass: 'transparentButton'
+    }
+  ]
+
   render () {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
@@ -1130,6 +1155,7 @@ export class File extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
+          actionList={this.getActionListItems()}
         />
 
         <PopinFixedOption
