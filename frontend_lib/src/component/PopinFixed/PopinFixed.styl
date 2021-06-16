@@ -4,8 +4,8 @@
   position fixed
   top headerHeight
   right 0
-  width 70%
-  max-width calc(100% - 345px) // 300px sidebar with + 45px btn toggle sidebar
+  width 100%
+  max-width calc(100% - 340px) // 300px sidebar with + 40px btn toggle sidebar
   height 100%
   border 1px solid grey
   background-color lightGrey
@@ -18,37 +18,28 @@
     align-items center
     padding 15px 10px
     height 62px
+    background-color offWhite
+    border-bottom 1px solid mediumGrey
     & > *
       margin-right 5px
     &__icon
       margin-right 10px
-      font-size 22px
-      color white
+      font-size fontSizeTitle
     &__title
       margin-right 10px
       border-radius 5px
       width 100%
-      color white
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
+      font-size fontSizeMedium
       & > input
         padding-left 5px
-    &__edittitle
-      border 1px solid transparent
-      border-radius 5px
-      padding 2px 8px
-      color white
-      font-size 17px
-      .fa-pencil-alt
-        color offWhite
     &__close
-      border 1px solid white
       border-radius 5px
       padding 3px 7px
       & > i
-        color white
-        font-size 20px
+        font-size fontSizeMedium
   &__option
     border-bottom 1px solid grey
     padding 6px 10px
@@ -75,9 +66,9 @@
         & > i
           margin-right 10px
           color darkGrey
-          font-size 22px
+          font-size fontSizeMedium
       &__action
-        font-size 18px
+        font-size fontSizeMedium
         background-color transparent
         border none
         cursor pointer
@@ -106,6 +97,7 @@
         padding 5px 10px
         & .breadcrumbs
           margin-inline-end auto
+          overflow auto
         &__version
           margin-left auto
           display flex
@@ -123,14 +115,13 @@
         &__title
           margin 10px 15px
           padding 10px
-          font-size 20px
+          font-size fontSizeMedium
       &__header
         display flex
         flex-direction column
         width 65px
         background-color mediumGrey
-        font-size 20px
-        color darkGrey
+        font-size fontSizeMedium
         cursor pointer
         &__icon
           cursor pointer
