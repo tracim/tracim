@@ -24,12 +24,10 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedRightPart,
-  RefreshWarningMessage,
   ROLE,
   AppContentRightMenu,
   Timeline,
   TagList,
-  IconButton,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -1004,26 +1002,6 @@ export class HtmlDocument extends React.Component {
                   icon='fas fa-plus-circle'
                 />
               )}
-
-              {state.mode === APP_FEATURE_MODE.REVISION && (
-                <IconButton
-                  customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
-                  color={state.config.hexcolor}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickLastVersion}
-                  icon='fas fa-history'
-                  text={props.t('Last version')}
-                  title={props.t('Last version')}
-                />
-              )}
-
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
-                />
-              )}
             </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
@@ -1043,6 +1021,7 @@ export class HtmlDocument extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          isRefreshNeeded={state.showRefreshWarning}
           lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
@@ -1053,6 +1032,7 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            editionAuthor={state.editionAuthor}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             apiUrl={state.config.apiUrl}
@@ -1090,6 +1070,8 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickRefresh={this.handleClickRefresh}
+            onClickLastVersion={this.handleClickLastVersion}
           />
 
           <PopinFixedRightPart

@@ -27,7 +27,6 @@ import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   FilenameWithExtension,
-  IconButton,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -41,7 +40,6 @@ import {
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
   addRevisionFromTLM,
-  RefreshWarningMessage,
   setupCommonRequestHeaders,
   getOrCreateSessionClientToken,
   getCurrentContentVersionNumber,
@@ -1201,20 +1199,6 @@ export class File extends React.Component {
                 />
               )}
 
-              {state.mode === APP_FEATURE_MODE.REVISION && (
-                <IconButton
-                  customClass='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
-                  color={state.config.hexcolor}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickLastVersion}
-                  icon='fas fa-history'
-                  text={props.t('Last version')}
-                  title={props.t('Last version')}
-                  dataCy='appFileLastVersionBtn'
-                />
-              )}
-
               {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (
                 <GenericButton
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
@@ -1223,13 +1207,6 @@ export class File extends React.Component {
                   onClick={() => this.setState({ previewVideo: true })}
                   faIcon='fas fa-play'
                   style={{ marginLeft: '5px' }}
-                />
-              )}
-
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
                 />
               )}
             </ToolBar>
@@ -1251,6 +1228,7 @@ export class File extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           customClass={`${state.config.slug}__contentpage`}
+          isRefreshNeeded={state.showRefreshWarning}
           lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
@@ -1259,6 +1237,8 @@ export class File extends React.Component {
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
+            editionAuthor={state.editionAuthor}
+            isRefreshNeeded={state.showRefreshWarning}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
@@ -1293,6 +1273,8 @@ export class File extends React.Component {
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
+            onClickRefresh={this.handleClickRefresh}
+            onClickLastVersion={this.handleClickLastVersion}
           />
 
           <PopinFixedRightPart

@@ -23,13 +23,16 @@
   .thread
     &__contentpage
       width 100%
+      &__top
+        display flex
+        justify-content space-between
+        padding 10px
       &__content
         width 100%
-        height calc(100% - 175px)
       &__texteditor
         flex 0 0 auto
 
 @media (min-width: min-sm) and (max-width: max-lg)
   .thread
     .thread__contentpage__content
-      height calc(100% - 110px)
+      height calc(100% - 145px)

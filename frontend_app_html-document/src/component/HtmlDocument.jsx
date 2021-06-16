@@ -7,8 +7,10 @@ import {
   APP_FEATURE_MODE,
   ConfirmPopup,
   AutoComplete,
+  IconButton,
   PromptMessage,
   HTMLContent,
+  RefreshWarningMessage,
   TextAreaApp,
   TRANSLATION_STATE,
   TranslateButton
@@ -26,6 +28,28 @@ export const HtmlDocument = props => {
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
+      <div className='html-document__contentpage__option'>
+        {props.mode === APP_FEATURE_MODE.REVISION && (
+          <IconButton
+            customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+            color={props.customColor}
+            intent='primary'
+            mode='light'
+            onClick={props.onClickLastVersion}
+            icon='fas fa-history'
+            text={props.t('Last version')}
+            title={props.t('Last version')}
+          />
+        )}
+
+        {props.isRefreshNeeded && (
+          <RefreshWarningMessage
+            tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+            onClickRefresh={props.onClickRefresh}
+          />
+        )}
+      </div>
+
       {props.displayNotifyAllMessage && (
         <PromptMessage
           msg={
@@ -177,7 +201,6 @@ HtmlDocument.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  isRefreshNeeded: PropTypes.bool,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),

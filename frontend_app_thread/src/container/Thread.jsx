@@ -524,27 +524,30 @@ export class Thread extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-          <>
-            <Breadcrumbs
-              root={{
-                link: PAGE.HOME,
-                label: '',
-                icon: 'fas fa-home',
-                type: BREADCRUMBS_TYPE.CORE,
-                isALink: true
-              }}
-              breadcrumbsList={state.breadcrumbsList}
-            />
-
-            {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
-              <SelectStatus
-                selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                availableStatus={state.config.availableStatuses}
-                onChangeStatus={this.handleChangeStatus}
-                disabled={state.content.is_archived || state.content.is_deleted}
+          <div className='thread__contentpage'>
+            {/* INFO - G.B. - 20210616 - Since the thread component behaves a bit differently than the others it was preferable to put
+            Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
+            <div className='thread__contentpage__top'>
+              <Breadcrumbs
+                root={{
+                  link: PAGE.HOME,
+                  label: '',
+                  icon: 'fas fa-home',
+                  type: BREADCRUMBS_TYPE.CORE,
+                  isALink: true
+                }}
+                breadcrumbsList={state.breadcrumbsList}
               />
-            )}
 
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
+                <SelectStatus
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
+                  onChangeStatus={this.handleChangeStatus}
+                  disabled={state.content.is_archived || state.content.is_deleted}
+                />
+              )}
+            </div>
             {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
@@ -598,7 +601,7 @@ export class Thread extends React.Component {
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
               />
             ) : null}
-          </>
+          </div>
         </PopinFixedContent>
       </PopinFixed>
     )

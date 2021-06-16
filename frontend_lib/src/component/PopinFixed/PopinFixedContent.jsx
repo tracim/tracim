@@ -51,34 +51,34 @@ class PopinFixedContent extends React.Component {
               )}
 
               {!!props.lastVersion &&
-              (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
-              (
-                <div
-                  className={classnames(
-                    'wsContentGeneric__content__left__top__version',
-                    `${props.customClass}__content__left__top__version`
-                  )}
-                >
-                  {props.t(
-                    'Version #{{versionNumber}}', {
-                    versionNumber: props.appMode === APP_FEATURE_MODE.VIEW
-                      ? props.lastVersion
-                      : props.version
-                  }
-                  )}
-                  {props.appMode === APP_FEATURE_MODE.REVISION && (
-                    <div
-                      className={classnames(
-                        'wsContentGeneric__content__left__top__lastversion',
-                        `${props.customClass}__content__left__top__lastversion`
-                      )}
-                    >
-                      ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                    </div>
-                  )}
-                  &nbsp;-&nbsp;
-                </div>
-              )}
+                (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
+                (
+                  <div
+                    className={classnames(
+                      'wsContentGeneric__content__left__top__version',
+                      `${props.customClass}__content__left__top__version`
+                    )}
+                  >
+                    {props.t(
+                      'Version #{{versionNumber}}', {
+                        versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                          ? props.lastVersion
+                          : props.version
+                      }
+                    )}
+                    {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                      <div
+                        className={classnames(
+                          'wsContentGeneric__content__left__top__lastversion',
+                          `${props.customClass}__content__left__top__lastversion`
+                        )}
+                      >
+                        ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                      </div>
+                    )}
+                    &nbsp;-&nbsp;
+                  </div>
+                )}
 
               {props.availableStatuses && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
