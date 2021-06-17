@@ -142,18 +142,6 @@ class PopinFixedHeader extends React.Component {
                 showAction={action.showAction}
               />
             )}
-
-            {/* Ici check si il ya les droits */}
-            <IconButton
-              icon='far fa-fw fa-trash-alt'
-              text={t('Delete')}
-              label={t('Delete')}
-              key={t('Delete')}
-              onClick='' // {state.content.is_deleted}
-              customClass='transparentButton'
-              showAction=''
-            />
-            {/* end */}
           </DropdownMenu>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&

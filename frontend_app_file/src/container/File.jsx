@@ -1136,22 +1136,27 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               key: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
-              showAction: '' //state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
             } , {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
               downloadLink: this.getDownloadPdfPageUrl(state),
-              showAction: ''
+              showAction: state.content.has_pdf_preview
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              onClick: () => {}, // () => this.getDownloadPdfFullUrl(state),
-              showAction: ''
+              downloadLink: this.getDownloadPdfFullUrl(state),
+              showAction: state.content.has_pdf_preview
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              onClick: () => {}, // () => this.getDownloadRawUrl(state),
-              showAction: ''
+              downloadLink: this.getDownloadRawUrl(state),
+              showAction: true
+            }, {
+              icon: 'far fa-fw fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser
             }
           ]}
         />
