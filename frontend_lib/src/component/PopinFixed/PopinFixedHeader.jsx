@@ -141,6 +141,7 @@ class PopinFixedHeader extends React.Component {
                 onClick={action.onClick}
                 customClass='transparentButton'
                 showAction={action.showAction}
+                disabled={action.disabled}
               />
             )}
           </DropdownMenu>}

@@ -1136,7 +1136,8 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               key: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
             } , {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
