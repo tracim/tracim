@@ -9,15 +9,14 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
+  EmojiReactions,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   Timeline,
-  AppContentRightMenu,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -36,8 +35,7 @@ import {
   FavoriteButton,
   FAVORITE_STATE,
   ROLE,
-  SelectStatus,
-  ToolBar
+  SelectStatus
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -486,50 +484,37 @@ export class Thread extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
           actionList={[
-           {
+            {
               icon: 'far fa-fw fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted
             }
           ]}
-        />
-
-        <PopinFixedOption
-          customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          i18n={i18n}
         >
           <div>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
-                />
-              )}
-            </ToolBar>
-            <AppContentRightMenu
+            <EmojiReactions
               apiUrl={state.config.apiUrl}
-              content={state.content}
               loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
+              contentId={state.content.content_id}
+              workspaceId={state.content.workspace_id}
             />
           </div>
-        </PopinFixedOption>
+
+          <FavoriteButton
+            favoriteState={props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE}
+            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+          />
+
+        </PopinFixedHeader>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <div className='thread__contentpage'>
@@ -556,6 +541,12 @@ export class Thread extends React.Component {
                 />
               )}
             </div>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
             {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (

@@ -17,13 +17,9 @@ import {
   handleInvalidMentionInComment,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
   Timeline,
-  NewVersionBtn,
-  GenericButton,
-  AppContentRightMenu,
   displayDistanceDate,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -56,7 +52,6 @@ import {
   getDefaultTranslationState,
   FavoriteButton,
   FAVORITE_STATE,
-  ToolBar,
   TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -1137,10 +1132,16 @@ export class File extends React.Component {
               showAction: onlineEditionAction,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
             }, {
+              icon: 'fas fa-play',
+              label: props.t('Play video'),
+              onClick: () => this.setState({ previewVideo: true }),
+              showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
+            }, {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
@@ -1160,16 +1161,19 @@ export class File extends React.Component {
               icon: 'far fa-fw fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted
             }
           ]}
         >
-          <EmojiReactions
-            apiUrl={state.config.apiUrl}
-            loggedUser={state.loggedUser}
-            contentId={state.content.content_id}
-            workspaceId={state.content.workspace_id}
-          />
+          <div>
+            <EmojiReactions
+              apiUrl={state.config.apiUrl}
+              loggedUser={state.loggedUser}
+              contentId={state.content.content_id}
+              workspaceId={state.content.workspace_id}
+            />
+          </div>
 
           <FavoriteButton
             favoriteState={props.isContentInFavoriteList(state.content, state)
@@ -1183,61 +1187,6 @@ export class File extends React.Component {
             )}
           />
         </PopinFixedHeader>
-
-        <PopinFixedOption
-          customColor={state.config.hexcolor}
-          customClass={`${state.config.slug}`}
-          i18n={i18n}
-        >
-          <div>
-            <ToolBar>
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <NewVersionBtn
-                  customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Upload a new version')}
-                  icon='fas fa-upload'
-                />
-              )}
-
-              {/* {onlineEditionAction && (
-                <GenericButton
-                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
-                  dataCy='wsContentGeneric__option__menu__addversion'
-                  customColor={state.config.hexcolor}
-                  onClick={onlineEditionAction.handleClick}
-                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t(onlineEditionAction.label)}
-                  style={{
-                    marginLeft: '5px'
-                  }}
-                  faIcon='fas fa-edit'
-                />
-              )} */}
-
-              {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (
-                <GenericButton
-                  customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
-                  customColor={state.config.hexcolor}
-                  label={props.t('Play video')}
-                  onClick={() => this.setState({ previewVideo: true })}
-                  faIcon='fas fa-play'
-                  style={{ marginLeft: '5px' }}
-                />
-              )}
-            </ToolBar>
-            {/* <AppContentRightMenu
-              apiUrl={state.config.apiUrl}
-              content={state.content}
-              appMode={state.mode}
-              loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
-            /> */}
-          </div>
-        </PopinFixedOption>
 
         <PopinFixedContent
           appMode={state.mode}

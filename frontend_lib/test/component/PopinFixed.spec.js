@@ -4,7 +4,6 @@ import { shallow } from 'enzyme'
 import PopinFixed from '../../src/component/PopinFixed/PopinFixed'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
-import PopinFixedOption from '../../src/component/PopinFixed/PopinFixedOption'
 require('../../src/component/PopinFixed/PopinFixed.styl')
 
 describe('<PopinFixed />', () => {
@@ -21,7 +20,6 @@ describe('<PopinFixed />', () => {
       {...props}
     >
       <PopinFixedHeader />
-      <PopinFixedOption />
       <PopinFixedContent />
     </PopinFixed>
   )

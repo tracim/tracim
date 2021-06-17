@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { APP_FEATURE_MODE, ROLE } from '../../helper.js'
+import { ROLE } from '../../helper.js'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
@@ -49,39 +49,6 @@ class PopinFixedHeader extends React.Component {
     switch (e.key) {
       case 'Enter': this.handleClickChangeTitleBtn(); break
       case 'Escape': this.handleClickUndoChangeTitleBtn(); break
-    }
-  }
-
-  handleContentDeletedOrRestored = data => {
-    const { state } = this
-    const isTlmAboutCurrentContent = data.fields.content.content_id === state.content.content_id
-    const isTlmAboutCurrentContentChildren = data.fields.content.parent_id === state.content.content_id
-
-    if (!isTlmAboutCurrentContent && !isTlmAboutCurrentContentChildren) return
-
-    if (isTlmAboutCurrentContent) {
-      const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-      this.setState(prev =>
-        ({
-          content: clientToken === data.fields.client_token
-            ? { ...prev.content, ...data.fields.content }
-            : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-          newContent: {
-            ...prev.content,
-            ...data.fields.content
-          },
-          editionAuthor: data.fields.author.public_name,
-          showRefreshWarning: clientToken !== data.fields.client_token,
-          mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-          timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-          isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-        })
-      )
-      return
-    }
-
-    if (isTlmAboutCurrentContentChildren) {
-      this.handleContentCommentDeleted(data)
     }
   }
 
@@ -136,14 +103,12 @@ class PopinFixedHeader extends React.Component {
           </button>}
         {actionList && actionList.length > 0 && (
           <DropdownMenu
-            buttonCustomClass='timedEvent__top'
-            // buttonClick={props.onEventClicked} // eslint-disable-line
-            buttonIcon='fa-fw fas fa-ellipsis-v'
+            buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
           >
-            {actionList.filter(action => action.showAction).map((action) =>
-              action.downloadLink
-                ? <a
+            {actionList.filter(action => action.showAction).map((action) => action.downloadLink
+              ? (
+                <a
                   href={action.downloadLink}
                   target='_blank'
                   rel='noopener noreferrer'
@@ -154,7 +119,8 @@ class PopinFixedHeader extends React.Component {
                   <i className={`fa-fw ${action.icon}`} />
                   {action.label}
                 </a>
-                : <IconButton
+              ) : (
+                <IconButton
                   icon={action.icon}
                   text={action.label}
                   label={action.label}
@@ -163,7 +129,7 @@ class PopinFixedHeader extends React.Component {
                   customClass='transparentButton'
                   showAction={action.showAction}
                 />
-            )}
+              ))}
           </DropdownMenu>
         )}
 

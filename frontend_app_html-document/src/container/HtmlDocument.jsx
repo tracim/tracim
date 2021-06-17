@@ -12,20 +12,18 @@ import {
   buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  EmojiReactions,
   getCurrentContentVersionNumber,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
-  NewVersionBtn,
   PAGE,
   PopinFixed,
   PopinFixedContent,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedRightPart,
   ROLE,
-  AppContentRightMenu,
   Timeline,
   TagList,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -52,8 +50,7 @@ import {
   handleTranslateHtmlContent,
   getDefaultTranslationState,
   FavoriteButton,
-  FAVORITE_STATE,
-  ToolBar
+  FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -979,56 +976,37 @@ export class HtmlDocument extends React.Component {
               label: props.t('Edit'),
               key: props.t('Edit'),
               onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id, 
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
-            } , {
-              icon: 'far fa-fw fa-trash-alt',
+            }, {
+              icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted
             }
           ]}
-        />
-
-        <PopinFixedOption
-          customColor={state.config.hexcolor}
-          customClass={`${state.config.slug}`}
-          i18n={i18n}
         >
           <div>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <NewVersionBtn
-                  customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
-                  icon='fas fa-plus-circle'
-                />
-              )}
-            </ToolBar>
-            <AppContentRightMenu
+            <EmojiReactions
               apiUrl={state.config.apiUrl}
-              content={state.content}
-              appMode={state.mode}
               loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
+              contentId={state.content.content_id}
+              workspaceId={state.content.workspace_id}
             />
           </div>
-        </PopinFixedOption>
+          <FavoriteButton
+            favoriteState={props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE}
+            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+          />
+        </PopinFixedHeader>
 
         <PopinFixedContent
           appMode={state.mode}
