@@ -294,7 +294,15 @@ export class FolderAdvanced extends React.Component {
           componentTitle={<div>{state.content.label}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
-          onValidateChangeTitle={this.handleSaveEditLabel}
+          onValidateChangeTitle={this.handleSaveEditLabel} actionList={[
+            {
+              icon: 'far fa-fw fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+            }
+          ]}
+
         />
 
         <PopinFixedOption>
