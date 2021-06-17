@@ -6,6 +6,7 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
+  EmojiReactions,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -70,7 +71,7 @@ import FileProperties from '../component/FileProperties.jsx'
 // import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 export class File extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const param = props.data || debug
@@ -229,22 +230,20 @@ export class File extends React.Component {
 
     if (isTlmAboutCurrentContent) {
       const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-      this.setState(prev =>
-        ({
-          content: clientToken === data.fields.client_token
-            ? { ...prev.content, ...data.fields.content }
-            : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-          newContent: {
-            ...prev.content,
-            ...data.fields.content
-          },
-          editionAuthor: data.fields.author.public_name,
-          showRefreshWarning: clientToken !== data.fields.client_token,
-          mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-          timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-          isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-        })
-      )
+      this.setState(prev => ({
+        content: clientToken === data.fields.client_token
+          ? { ...prev.content, ...data.fields.content }
+          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+        newContent: {
+          ...prev.content,
+          ...data.fields.content
+        },
+        editionAuthor: data.fields.author.public_name,
+        showRefreshWarning: clientToken !== data.fields.client_token,
+        mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
+        timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
+        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      }))
       return
     }
 
@@ -1132,12 +1131,18 @@ export class File extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           actionList={[
             {
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
+            }, {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),
               key: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
-            } , {
+            }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
               downloadLink: this.getDownloadPdfPageUrl(state),
@@ -1159,7 +1164,26 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
             }
           ]}
-        />
+        >
+          <EmojiReactions
+            apiUrl={state.config.apiUrl}
+            loggedUser={state.loggedUser}
+            contentId={state.content.content_id}
+            workspaceId={state.content.workspace_id}
+          />
+
+          <FavoriteButton
+            favoriteState={props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE}
+            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+          />
+        </PopinFixedHeader>
 
         <PopinFixedOption
           customColor={state.config.hexcolor}
@@ -1168,17 +1192,6 @@ export class File extends React.Component {
         >
           <div>
             <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
@@ -1189,7 +1202,7 @@ export class File extends React.Component {
                 />
               )}
 
-              {onlineEditionAction && (
+              {/* {onlineEditionAction && (
                 <GenericButton
                   customClass={`${state.config.slug}__option__menu__editBtn btn outlineTextBtn`}
                   dataCy='wsContentGeneric__option__menu__addversion'
@@ -1202,7 +1215,7 @@ export class File extends React.Component {
                   }}
                   faIcon='fas fa-edit'
                 />
-              )}
+              )} */}
 
               {isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST) && (
                 <GenericButton
@@ -1215,7 +1228,7 @@ export class File extends React.Component {
                 />
               )}
             </ToolBar>
-            <AppContentRightMenu
+            {/* <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               content={state.content}
               appMode={state.mode}
@@ -1223,7 +1236,7 @@ export class File extends React.Component {
               hexcolor={state.config.hexcolor}
               onClickArchive={this.handleClickArchive}
               onClickDelete={this.handleClickDelete}
-            />
+            /> */}
           </div>
         </PopinFixedOption>
 

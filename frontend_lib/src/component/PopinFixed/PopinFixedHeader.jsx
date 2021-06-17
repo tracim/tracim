@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { ROLE } from '../../helper.js'
+import { APP_FEATURE_MODE, ROLE } from '../../helper.js'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
@@ -102,57 +102,27 @@ class PopinFixedHeader extends React.Component {
           {state.editTitle
             ? (
               <input
-              className='wsContentGeneric__header__title__editiontitle editiontitle'
-              value={state.editTitleValue}
-              onChange={this.handleChangeTitle}
-              onKeyDown={this.handleInputKeyPress}
-              autoFocus
+                className='wsContentGeneric__header__title__editiontitle editiontitle'
+                value={state.editTitleValue}
+                onChange={this.handleChangeTitle}
+                onKeyDown={this.handleInputKeyPress}
+                autoFocus
               />
-              )
-              : componentTitle}
+            )
+            : componentTitle}
         </div>
 
-        {actionList && actionList.length > 0 &&
-          <DropdownMenu
-            buttonCustomClass='timedEvent__top'
-            // buttonClick={props.onEventClicked} // eslint-disable-line
-            buttonIcon='fa-fw fas fa-ellipsis-v'
-            buttonTooltip={t('Actions')}
-          >
+        {this.props.children}
 
-            {actionList.filter(action => action.showAction).map((action) =>
-              action.downloadLink
-              ? <a
-                href={action.downloadLink}
-                target='_blank'
-                rel='noopener noreferrer'
-                download
-                title={action.label}
-                key={action.label}
-              >
-                <i className={`fa-fw ${action.icon}`} />
-                {action.label}
-              </a>
-              : <IconButton
-                icon={action.icon}
-                text={action.label}
-                label={action.label}
-                key={action.label}
-                onClick={action.onClick}
-                customClass='transparentButton'
-                showAction={action.showAction}
-              />
-            )}
-          </DropdownMenu>}
-
-        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
+        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickUndoChangeTitleBtn}
             disabled={disableChangeTitle}
           >
             <i className='fas fa-undo' title={t('Undo change in title')} />
-          </button>}
+          </button>
+        )}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton &&
           <button
@@ -164,8 +134,38 @@ class PopinFixedHeader extends React.Component {
               ? <i className='fas fa-check' title={t('Validate the title')} />
               : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
           </button>}
-
-        {this.props.children}
+        {actionList && actionList.length > 0 && (
+          <DropdownMenu
+            buttonCustomClass='timedEvent__top'
+            // buttonClick={props.onEventClicked} // eslint-disable-line
+            buttonIcon='fa-fw fas fa-ellipsis-v'
+            buttonTooltip={t('Actions')}
+          >
+            {actionList.filter(action => action.showAction).map((action) =>
+              action.downloadLink
+                ? <a
+                  href={action.downloadLink}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  download
+                  title={action.label}
+                  key={action.label}
+                >
+                  <i className={`fa-fw ${action.icon}`} />
+                  {action.label}
+                </a>
+                : <IconButton
+                  icon={action.icon}
+                  text={action.label}
+                  label={action.label}
+                  key={action.label}
+                  onClick={action.onClick}
+                  customClass='transparentButton'
+                  showAction={action.showAction}
+                />
+            )}
+          </DropdownMenu>
+        )}
 
         <div
           className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
@@ -202,7 +202,7 @@ PopinFixedHeader.defaultProps = {
   rawTitle: '',
   componentTitle: <div />,
   userRoleIdInWorkspace: ROLE.reader.id,
-  onChangeTitle: () => {},
+  onChangeTitle: () => { },
   disableChangeTitle: false,
   showChangeTitleButton: true,
   actionList: []
