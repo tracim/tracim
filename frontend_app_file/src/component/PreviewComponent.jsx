@@ -87,51 +87,6 @@ export class PreviewComponent extends React.Component {
 
     return (
       <div className='previewcomponent'>
-        <div className='previewcomponent__dloption'>
-          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
-            <a
-              className='previewcomponent__dloption__icon btn iconBtn'
-              href={props.downloadPdfPageUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              download
-              style={{ ':hover': { color: props.color } }}
-              title={props.t('Download current page as PDF')}
-              key='file_btn_dl_pdfall'
-            >
-              <i className='far fa-file' />
-            </a>
-          )}
-
-          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isPdfAvailable && (
-            <a
-              className='previewcomponent__dloption__icon btn iconBtn'
-              href={props.downloadPdfFullUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              download
-              style={{ ':hover': { color: props.color } }}
-              title={props.t('Download as PDF')}
-              key='file_btn_dl_pdfpage'
-            >
-              <i className='far fa-file-pdf' />
-            </a>
-          )}
-
-          <a
-            className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadRawUrl}
-            target='_blank'
-            rel='noopener noreferrer'
-            download
-            style={{ ':hover': { color: props.color } }}
-            title={props.t('Download file')}
-            key='file_btn_dl_raw'
-          >
-            <i className='fas fa-download' />
-          </a>
-        </div>
-
         <div className='previewcomponent__filepreview'>
           {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button

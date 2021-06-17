@@ -63,10 +63,8 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
-// import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
-
 export class File extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     const param = props.data || debug
@@ -1158,7 +1156,7 @@ export class File extends React.Component {
               downloadLink: this.getDownloadRawUrl(state),
               showAction: true
             }, {
-              icon: 'far fa-fw fa-trash-alt',
+              icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,

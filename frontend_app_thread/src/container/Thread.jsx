@@ -485,7 +485,7 @@ export class Thread extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           actionList={[
             {
-              icon: 'far fa-fw fa-trash-alt',
+              icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,

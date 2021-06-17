@@ -103,6 +103,7 @@ class PopinFixedHeader extends React.Component {
           </button>}
         {actionList && actionList.length > 0 && (
           <DropdownMenu
+            buttonCustomClass='wsContentGeneric__header__actions'
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
           >
@@ -121,11 +122,12 @@ class PopinFixedHeader extends React.Component {
                 </a>
               ) : (
                 <IconButton
+                  disabled={action.disabled}
                   icon={action.icon}
                   text={action.label}
                   label={action.label}
                   key={action.label}
-                  onClick={action.onClick}
+                  onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
                   customClass='transparentButton'
                   showAction={action.showAction}
                 />
