@@ -973,6 +973,20 @@ export class HtmlDocument extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
+          actionList={[
+            {
+              icon: 'fas fa-plus-circle',
+              label: props.t('Edit'),
+              key: props.t('Edit'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.mode === APP_FEATURE_MODE.VIEW || state.content.is_editable
+            } , {
+              icon: 'far fa-fw fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+            }
+          ]}
         />
 
         <PopinFixedOption

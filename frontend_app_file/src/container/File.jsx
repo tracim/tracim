@@ -1156,7 +1156,7 @@ export class File extends React.Component {
               icon: 'far fa-fw fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
-              showAction: state.loggedUser
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
             }
           ]}
         />

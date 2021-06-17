@@ -119,7 +119,8 @@ class PopinFixedHeader extends React.Component {
             buttonIcon='fa-fw fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
           >
-            {actionList.map((action) =>
+
+            {actionList.filter(action => action.showAction).map((action) =>
               action.downloadLink
               ? <a
                 href={action.downloadLink}
@@ -142,6 +143,7 @@ class PopinFixedHeader extends React.Component {
                 showAction={action.showAction}
               />
             )}
+
           </DropdownMenu>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&
