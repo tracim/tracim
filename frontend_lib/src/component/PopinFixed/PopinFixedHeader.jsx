@@ -143,7 +143,6 @@ class PopinFixedHeader extends React.Component {
                 showAction={action.showAction}
               />
             )}
-
           </DropdownMenu>}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle &&

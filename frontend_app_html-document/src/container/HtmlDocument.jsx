@@ -979,7 +979,7 @@ export class HtmlDocument extends React.Component {
               label: props.t('Edit'),
               key: props.t('Edit'),
               onClick: this.handleClickNewVersion,
-              showAction: state.mode === APP_FEATURE_MODE.VIEW || state.content.is_editable
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
             } , {
               icon: 'far fa-fw fa-trash-alt',
               label: props.t('Delete'),

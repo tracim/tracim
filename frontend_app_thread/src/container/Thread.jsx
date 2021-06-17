@@ -485,6 +485,14 @@ export class Thread extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
+          actionList={[
+           {
+              icon: 'far fa-fw fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id
+            }
+          ]}
         />
 
         <PopinFixedOption
