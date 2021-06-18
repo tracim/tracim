@@ -49,8 +49,20 @@ class CollaborativeDocumentEditionLib(ABC):
         self._user = current_user
         self._config = config
 
-    @abstractmethod
     def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+        """
+        Get list of supported file type for collaborative editions.
+        The list is obtained by calling _get_supported_file_types() then filtering it with
+        the config setting COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS.
+        """
+        file_types = self._get_supported_file_types()
+        enabled_extensions = self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS
+        if not enabled_extensions:
+            return file_types
+        return [file_type for file_type in file_types if file_type.extension in enabled_extensions]
+
+    @abstractmethod
+    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """
@@ -69,19 +81,27 @@ class CollaborativeDocumentEditionLib(ABC):
         """
         return list of templates names as string like "text.odt"
         """
-        template_list = []
         try:
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
         except (NotADirectoryError) as exc:
             raise FileTemplateNotAvailable from exc
-        for filename in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR):
-            if not isfile(
-                join(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, filename)
-            ):
-                continue
-            template_list.append(filename)
-        return template_list
+
+        template_filenames = [
+            entry
+            for entry in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
+            if isfile(join(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, entry))
+        ]
+
+        if not self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS:
+            return template_filenames
+
+        return [
+            filename
+            for filename in template_filenames
+            if os.path.splitext(filename)[1][1:]
+            in self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS
+        ]
 
     def _get_file_template_path(self, template_filename: str) -> str:
         template_path = os.path.join(
