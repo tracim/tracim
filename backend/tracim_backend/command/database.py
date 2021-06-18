@@ -3,8 +3,11 @@ import argparse
 import re
 import traceback
 
+from alembic import command as alembic_command
+from alembic.config import Config
 from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
+from sqlalchemy import text
 from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
 import transaction
@@ -52,6 +55,11 @@ class InitializeDBCommand(AppContextCommand):
         app_config = CFG(settings)
         self._create_schema(app_config)
         self._populate_database(app_config, add_test_data=parsed_args.test_data)
+        alembic_config = Config(parsed_args.config_file)
+        alembic_command.stamp(config=alembic_config, revision="head")
+        print("-------------------")
+        print("Current database version:")
+        alembic_command.show(config=alembic_config, rev="head")
 
     @classmethod
     def _create_schema(cls, app_config: CFG) -> None:
@@ -117,6 +125,8 @@ class DeleteDBCommand(AppContextCommand):
         if parsed_args.force:
             print("Database deletion begin.")
             DeclarativeBase.metadata.drop_all(engine)
+            sql = text("DROP TABLE IF EXISTS migrate_version;")
+            engine.execute(sql)
             print("Database deletion done.")
             try:
                 print("Cleaning depot begin.")

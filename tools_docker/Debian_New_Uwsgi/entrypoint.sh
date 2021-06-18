@@ -115,7 +115,6 @@ if [ "$INIT_DATABASE" = true ] ; then
     log "Initialise Database"
     cd /tracim/backend/
     tracimcli_as_user "db init"
-    alembic_as_user "stamp head"
     loggood "Database initialisation success"
 else
     log "Update database"
