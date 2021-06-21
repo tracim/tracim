@@ -9,7 +9,6 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
-  EmojiReactions,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
@@ -32,7 +31,6 @@ import {
   getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  FavoriteButton,
   FAVORITE_STATE,
   ROLE,
   SelectStatus
@@ -493,29 +491,20 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__delete'
             }
           ]}
-        >
-          <div>
-            <EmojiReactions
-              apiUrl={state.config.apiUrl}
-              loggedUser={state.loggedUser}
-              contentId={state.content.content_id}
-              workspaceId={state.content.workspace_id}
-            />
-          </div>
-
-          <FavoriteButton
-            favoriteState={props.isContentInFavoriteList(state.content, state)
-              ? FAVORITE_STATE.FAVORITE
-              : FAVORITE_STATE.NOT_FAVORITE}
-            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-          />
-
-        </PopinFixedHeader>
+          showReactions
+          apiUrl={state.config.apiUrl}
+          loggedUser={state.loggedUser}
+          content={state.content}
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+        />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <div className='thread__contentpage'>

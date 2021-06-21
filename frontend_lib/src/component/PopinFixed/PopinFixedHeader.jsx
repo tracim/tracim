@@ -5,6 +5,8 @@ import { translate } from 'react-i18next'
 import { ROLE } from '../../helper.js'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
+import FavoriteButton from '../Button/FavoriteButton.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -53,8 +55,20 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, showChangeTitleButton, t, actionList } = this.props
-    const { state } = this
+    const { state, props } = this
+    const {
+      customClass,
+      customColor,
+      faIcon,
+      rawTitle,
+      componentTitle,
+      userRoleIdInWorkspace,
+      onClickCloseBtn,
+      disableChangeTitle,
+      showChangeTitleButton,
+      t,
+      actionList
+    } = props
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
@@ -79,7 +93,26 @@ class PopinFixedHeader extends React.Component {
             : componentTitle}
         </div>
 
-        {this.props.children}
+        {props.showReactions && (
+          <div>
+            <EmojiReactions
+              apiUrl={props.apiUrl}
+              loggedUser={props.loggedUser}
+              contentId={props.content.content_id}
+              workspaceId={props.content.workspace_id}
+            />
+          </div>
+        )}
+
+        {props.favoriteState && (
+          <FavoriteButton
+            favoriteState={props.favoriteState}
+            onClickAddToFavoriteList={props.onClickAddToFavoriteList}
+            onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+          />
+        )}
+
+        {props.children}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
           <button

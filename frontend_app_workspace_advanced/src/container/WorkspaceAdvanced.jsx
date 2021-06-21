@@ -10,7 +10,6 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
-  PopinFixedHeader,
   PopinFixedContent,
   PopinFixedRightPart,
   CUSTOM_EVENT,
@@ -715,19 +714,15 @@ export class WorkspaceAdvanced extends React.Component {
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
           componentTitle={<div>{state.content.label}</div>}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          config={state.config}
+          content={state.content}
+          customClass={`${state.config.slug}__contentpage`}
+          loggedUser={state.loggedUser}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
-        />
-
-        <PopinFixedContent
-          customClass={`${state.config.slug}__contentpage`}
+          disableChangeTitle={false}
         >
           <WorkspaceAdvancedConfiguration
             customColor={state.config.hexcolor}
