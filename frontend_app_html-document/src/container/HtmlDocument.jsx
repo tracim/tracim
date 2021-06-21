@@ -977,13 +977,15 @@ export class HtmlDocument extends React.Component {
               key: props.t('Edit'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'popinListItem__newVersion'
             }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted
+              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
             }
           ]}
         >

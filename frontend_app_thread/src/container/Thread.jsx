@@ -489,7 +489,8 @@ export class Thread extends React.Component {
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: state.content.is_archived || state.content.is_deleted
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
             }
           ]}
         >
