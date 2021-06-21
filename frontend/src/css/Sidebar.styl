@@ -1,12 +1,11 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
 .sidebar
   position relative
   &__expand
-    left sidebar-width
+    left sidebarWidth
     top 0
     position absolute
     display flex
@@ -25,7 +24,7 @@ sidebar-animate-speed = 0.5s
   &__frame
     position relative
     transition all sidebar-animate-speed
-    width sidebar-width
+    width sidebarWidth
     height "calc(100vh - %s)" % headerHeight
     z-index 10
     box-shadow -1px 2px 2px 1px var(--sidebarColor)
@@ -45,7 +44,7 @@ sidebar-animate-speed = 0.5s
   &__scrollup
     position fixed
     bottom 0
-    left sidebar-width
+    left sidebarWidth
     display flex
     justify-content center
     align-items center

@@ -5,18 +5,17 @@
   top headerHeight
   right 0
   width 100%
-  max-width calc(100% - 340px) // 300px sidebar with + 40px btn toggle sidebar
   height 100%
-  border 1px solid grey
   background-color lightGrey
-  box-shadow shadow-right
-  z-index 20
+  z-index 9
+  &.sidebarVisible
+    max-width "calc(100% - %s)" % sidebarWidth
   &.visible
     visibility visible
   &__header
     display flex
     align-items center
-    margin 5px 10px
+    margin 5px 5px 5px 40px
     height 60px
     border-bottom 1px solid mediumGrey
     & > *
