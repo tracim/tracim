@@ -163,6 +163,7 @@ class PopinFixedHeader extends React.Component {
                   onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
                   customClass='transparentButton'
                   showAction={action.showAction}
+                  data-cy={action.dataCy}
                 />
               ))}
           </DropdownMenu>
