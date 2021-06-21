@@ -10,6 +10,7 @@ import {
   PAGE,
   ROLE
 } from '../../helper.js'
+import PopinFixedHeader from './PopinFixedHeader.jsx'
 
 class PopinFixedContent extends React.Component {
   constructor (props) {
@@ -36,6 +37,25 @@ class PopinFixedContent extends React.Component {
         )}
         >
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
+            <PopinFixedHeader
+              customClass={props.customClass}
+              customColor={props.config.hexcolor}
+              faIcon={props.config.faIcon}
+              rawTitle={props.content.label}
+              componentTitle={props.componentTitle}
+              userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
+              onClickCloseBtn={props.onClickCloseBtn}
+              onValidateChangeTitle={props.onValidateChangeTitle}
+              disableChangeTitle={props.disableChangeTitle}
+              actionList={props.actionList}
+              showReactions={props.showReactions}
+              apiUrl={props.config.apiUrl}
+              loggedUser={props.loggedUser}
+              content={props.content}
+              favoriteState={props.favoriteState}
+              onClickAddToFavoriteList={props.onClickAddToFavoriteList}
+              onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+            />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
               {props.breadcrumbsList && (
                 <Breadcrumbs
@@ -61,10 +81,10 @@ class PopinFixedContent extends React.Component {
                   >
                     {props.t(
                       'Version #{{versionNumber}}', {
-                        versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                          ? props.lastVersion
-                          : props.version
-                      }
+                      versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                        ? props.lastVersion
+                        : props.content.number
+                    }
                     )}
                     {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
                       <div

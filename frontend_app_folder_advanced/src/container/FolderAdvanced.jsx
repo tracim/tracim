@@ -18,7 +18,6 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  FavoriteButton,
   FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -299,21 +298,18 @@ export class FolderAdvanced extends React.Component {
               disabled: state.content.is_archived || state.content.is_deleted
             }
           ]}
-        >
-          <FavoriteButton
-            favoriteState={(
-              props.isContentInFavoriteList(state.content, state)
-                ? FAVORITE_STATE.FAVORITE
-                : FAVORITE_STATE.NOT_FAVORITE
-            )}
-            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-          />
-        </PopinFixedHeader>
+          favoriteState={(
+            props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE
+          )}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+        />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <FolderAdvancedComponent

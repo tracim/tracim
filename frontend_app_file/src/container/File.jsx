@@ -6,7 +6,6 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
-  EmojiReactions,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -16,7 +15,6 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   PopinFixed,
-  PopinFixedHeader,
   PopinFixedContent,
   PopinFixedRightPart,
   Timeline,
@@ -50,7 +48,6 @@ import {
   putUserConfiguration,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  FavoriteButton,
   FAVORITE_STATE,
   TagList
 } from 'tracim_frontend_lib'
@@ -1112,16 +1109,21 @@ export class File extends React.Component {
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
           componentTitle={<FilenameWithExtension file={state.content} />}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          content={state.content}
+          config={state.config}
+          customClass={`${state.config.slug}__contentpage`}
+          disableChangeTitle={!state.content.is_editable}
+          isRefreshNeeded={state.showRefreshWarning}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!state.content.is_editable}
           actionList={[
             {
               icon: 'fas fa-edit',
@@ -1163,40 +1165,16 @@ export class File extends React.Component {
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted
             }
           ]}
-        >
-          <div>
-            <EmojiReactions
-              apiUrl={state.config.apiUrl}
-              loggedUser={state.loggedUser}
-              contentId={state.content.content_id}
-              workspaceId={state.content.workspace_id}
-            />
-          </div>
-
-          <FavoriteButton
-            favoriteState={props.isContentInFavoriteList(state.content, state)
-              ? FAVORITE_STATE.FAVORITE
-              : FAVORITE_STATE.NOT_FAVORITE}
-            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-          />
-        </PopinFixedHeader>
-
-        <PopinFixedContent
-          appMode={state.mode}
-          availableStatuses={state.config.availableStatuses}
-          breadcrumbsList={state.breadcrumbsList}
-          content={state.content}
-          customClass={`${state.config.slug}__contentpage`}
-          isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-          loggedUser={state.loggedUser}
-          onChangeStatus={this.handleChangeStatus}
-          version={state.content.number}
+          showReactions
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
         >
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}

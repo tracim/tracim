@@ -12,7 +12,6 @@ import {
   buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  EmojiReactions,
   getCurrentContentVersionNumber,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
@@ -21,7 +20,6 @@ import {
   PAGE,
   PopinFixed,
   PopinFixedContent,
-  PopinFixedHeader,
   PopinFixedRightPart,
   ROLE,
   Timeline,
@@ -49,7 +47,6 @@ import {
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
-  FavoriteButton,
   FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -960,16 +957,31 @@ export class HtmlDocument extends React.Component {
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
           componentTitle={<div>{state.content.label}</div>}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          content={state.content}
+          config={state.config}
+          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          disableChangeTitle={!state.content.is_editable}
+          isRefreshNeeded={state.showRefreshWarning}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!state.content.is_editable}
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          showReactions
           actionList={[
             {
               icon: 'fas fa-plus-circle',
@@ -986,39 +998,6 @@ export class HtmlDocument extends React.Component {
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted
             }
           ]}
-        >
-          <div>
-            <EmojiReactions
-              apiUrl={state.config.apiUrl}
-              loggedUser={state.loggedUser}
-              contentId={state.content.content_id}
-              workspaceId={state.content.workspace_id}
-            />
-          </div>
-          <FavoriteButton
-            favoriteState={props.isContentInFavoriteList(state.content, state)
-              ? FAVORITE_STATE.FAVORITE
-              : FAVORITE_STATE.NOT_FAVORITE}
-            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-              state.content, state.loggedUser, this.setState.bind(this)
-            )}
-          />
-        </PopinFixedHeader>
-
-        <PopinFixedContent
-          appMode={state.mode}
-          availableStatuses={state.config.availableStatuses}
-          breadcrumbsList={state.breadcrumbsList}
-          content={state.content}
-          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
-          isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-          loggedUser={state.loggedUser}
-          onChangeStatus={this.handleChangeStatus}
-          version={state.content.number}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
