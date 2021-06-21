@@ -6,6 +6,7 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
+  EmojiReactions,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -15,6 +16,7 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   PopinFixed,
+  PopinFixedHeader,
   PopinFixedContent,
   PopinFixedRightPart,
   Timeline,
@@ -48,6 +50,7 @@ import {
   putUserConfiguration,
   permissiveNumberEqual,
   getDefaultTranslationState,
+  FavoriteButton,
   FAVORITE_STATE,
   TagList
 } from 'tracim_frontend_lib'
@@ -1109,54 +1112,55 @@ export class File extends React.Component {
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedContent
-          appMode={state.mode}
-          availableStatuses={state.config.availableStatuses}
-          breadcrumbsList={state.breadcrumbsList}
+        <PopinFixedHeader
+          customClass={`${state.config.slug}`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          rawTitle={state.content.label}
           componentTitle={<FilenameWithExtension file={state.content} />}
-          content={state.content}
-          config={state.config}
-          customClass={`${state.config.slug}__contentpage`}
-          disableChangeTitle={!state.content.is_editable}
-          isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-          loggedUser={state.loggedUser}
-          onChangeStatus={this.handleChangeStatus}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={!state.content.is_editable}
           actionList={[
             {
               icon: 'fas fa-edit',
               label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
               onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
               showAction: onlineEditionAction,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'wsContentGeneric__option__menu__addversion'
             }, {
               icon: 'fas fa-play',
               label: props.t('Play video'),
               onClick: () => this.setState({ previewVideo: true }),
-              showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
+              showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST),
+              dataCy: 'popinListItem__playVideo'
             }, {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'popinListItem__uploadNewVersion'
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
               downloadLink: this.getDownloadPdfPageUrl(state),
-              showAction: state.content.has_pdf_preview
+              showAction: state.content.has_pdf_preview,
+              dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
               downloadLink: this.getDownloadPdfFullUrl(state),
-              showAction: state.content.has_pdf_preview
+              showAction: state.content.has_pdf_preview,
+              dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
               downloadLink: this.getDownloadRawUrl(state),
-              showAction: true
+              showAction: true,
+              dataCy: 'popinListItem__downloadFile'
             }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
@@ -1166,16 +1170,40 @@ export class File extends React.Component {
               dataCy: 'popinListItem__delete'
             }
           ]}
-          showReactions
-          favoriteState={props.isContentInFavoriteList(state.content, state)
-            ? FAVORITE_STATE.FAVORITE
-            : FAVORITE_STATE.NOT_FAVORITE}
-          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-            state.content, state.loggedUser, this.setState.bind(this)
-          )}
-          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-            state.content, state.loggedUser, this.setState.bind(this)
-          )}
+        >
+          <div>
+            <EmojiReactions
+              apiUrl={state.config.apiUrl}
+              loggedUser={state.loggedUser}
+              contentId={state.content.content_id}
+              workspaceId={state.content.workspace_id}
+            />
+          </div>
+
+          <FavoriteButton
+            favoriteState={props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE}
+            onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+            onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+              state.content, state.loggedUser, this.setState.bind(this)
+            )}
+          />
+        </PopinFixedHeader>
+
+        <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
+          content={state.content}
+          customClass={`${state.config.slug}__contentpage`}
+          isRefreshNeeded={state.showRefreshWarning}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
+          version={state.content.number}
         >
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
