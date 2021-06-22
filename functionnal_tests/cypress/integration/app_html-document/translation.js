@@ -4,7 +4,7 @@ describe('App HTML Document', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('users')
+    cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       cy.visitPage({
         pageName: PAGES.CONTENTS,
@@ -19,15 +19,19 @@ describe('App HTML Document', function () {
   })
 
   it('should have translations', () => {
-    cy.get('.wsContentGeneric__option__menu__addversion').contains('Edit')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="popinListItem__newVersion"]').contains('Edit')
 
     cy.changeLanguage('fr')
-    cy.get('.wsContentGeneric__option__menu__addversion').contains('Modifier')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="popinListItem__newVersion"]').contains('Modifier')
 
     cy.changeLanguage('pt')
-    cy.get('.wsContentGeneric__option__menu__addversion').contains('Editar')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="popinListItem__newVersion"]').contains('Editar')
 
     cy.changeLanguage('de')
-    cy.get('.wsContentGeneric__option__menu__addversion').contains('Bearbeiten')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="popinListItem__newVersion"]').contains('Bearbeiten')
   })
 })

@@ -32,7 +32,6 @@ describe('App File', () => {
     cy.get('[data-cy="newVersionBtn"]').contains('Téléverser une nouvelle version')
 
     cy.changeLanguage('pt')
-    // cy.get('
     cy.get('[data-cy="dropdownContentButton"]').click()
     cy.get('[data-cy="newVersionBtn"]').contains('Carregar uma nova versão')
 

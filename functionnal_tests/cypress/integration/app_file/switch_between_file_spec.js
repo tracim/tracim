@@ -50,7 +50,7 @@ describe('App File', () => {
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
 
-        cy.get('.file__contentpage__header__close[data-cy="popinFixed__header__button__close"]')
+        cy.get('.file__contentpage__header__close')
           .click()
 
         cy.get('.breadcrumbs__item')
@@ -73,7 +73,7 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.contains('.breadcrumbs__item', 'Contents')
+        cy.get('.file__contentpage__content__left__top > ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
           .click()
 
         cy.get('[data-cy="popinFixed"]')
