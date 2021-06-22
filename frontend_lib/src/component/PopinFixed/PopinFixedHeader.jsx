@@ -139,6 +139,7 @@ class PopinFixedHeader extends React.Component {
             buttonCustomClass='wsContentGeneric__header__actions'
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
+            buttonDataCy='dropdownContentButton'
           >
             {actionList.filter(action => action.showAction).map((action) => action.downloadLink
               ? (
@@ -163,7 +164,7 @@ class PopinFixedHeader extends React.Component {
                   onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
                   customClass='transparentButton'
                   showAction={action.showAction}
-                  data-cy={action.dataCy}
+                  dataCy={action.dataCy}
                 />
               ))}
           </DropdownMenu>

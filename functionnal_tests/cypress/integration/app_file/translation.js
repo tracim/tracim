@@ -24,15 +24,20 @@ describe('App File', () => {
   })
 
   it('should have translations', () => {
-    cy.get('.file__option__menu').contains('Upload a new version')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="newVersionBtn"]').contains('Upload a new version')
 
     cy.changeLanguage('fr')
-    cy.get('.file__option__menu').contains('Téléverser une nouvelle version')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="newVersionBtn"]').contains('Téléverser une nouvelle version')
 
     cy.changeLanguage('pt')
-    cy.get('.file__option__menu').contains('Carregar uma nova versão')
+    // cy.get('
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="newVersionBtn"]').contains('Carregar uma nova versão')
 
     cy.changeLanguage('de')
-    cy.get('.file__option__menu').contains('Hochladen einer neuen Version')
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="newVersionBtn"]').contains('Hochladen einer neuen Version')
   })
 })
